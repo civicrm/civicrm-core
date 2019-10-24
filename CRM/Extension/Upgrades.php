@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This class stores logic for managing schema upgrades in CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Extension_Upgrades {
 
@@ -59,11 +59,11 @@ class CRM_Extension_Upgrades {
    * @return CRM_Queue_Queue
    */
   public static function createQueue() {
-    $queue = CRM_Queue_Service::singleton()->create(array(
+    $queue = CRM_Queue_Service::singleton()->create([
       'type' => 'Sql',
       'name' => self::QUEUE_NAME,
       'reset' => TRUE,
-    ));
+    ]);
 
     CRM_Utils_Hook::upgrade('enqueue', $queue);
 

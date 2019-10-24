@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -55,8 +55,8 @@ class CRM_Member_Page_AJAX {
 FROM    civicrm_membership_type
 WHERE   id = %1";
 
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($memType, 'Positive')));
-    $properties = array('financial_type_id', 'total_amount', 'name', 'auto_renew');
+    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$memType, 'Positive']]);
+    $properties = ['financial_type_id', 'total_amount', 'name', 'auto_renew'];
     while ($dao->fetch()) {
       foreach ($properties as $property) {
         $details[$property] = $dao->$property;

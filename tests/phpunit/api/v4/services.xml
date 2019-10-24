@@ -1,0 +1,10 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="test.param_provider" class="api\v4\Service\TestCreationParameterProvider">
+            <argument type="service" id="spec_gatherer"/>
+        </service>
+    </services>
+</container>

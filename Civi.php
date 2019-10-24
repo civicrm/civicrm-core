@@ -18,7 +18,7 @@ class Civi {
 
   /**
    * A central location for static variable storage.
-   *
+   * @var array
    * @code
    * `Civi::$statics[__CLASS__]['foo'] = 'bar';
    * @endcode
@@ -26,20 +26,24 @@ class Civi {
   public static $statics = array();
 
   /**
-   * EXPERIMENTAL. Retrieve a named cache instance.
-   *
-   * This interface is flagged as experimental due to political
-   * ambiguity in PHP community -- PHP-FIG has an open but
-   * somewhat controversial draft standard for caching. Based on
-   * the current draft, it's expected that this function could
-   * simultaneously support both CRM_Utils_Cache_Interface and
-   * PSR-6, but that depends on whether PSR-6 changes any more.
+   * Retrieve a named cache instance.
    *
    * @param string $name
    *   The name of the cache. The 'default' cache is biased toward
    *   high-performance caches (eg memcache/redis/apc) when
    *   available and falls back to single-request (static) caching.
+   *   Ex: 'short' or 'default' is useful for high-speed, short-lived cache data.
+   *       This is appropriate if you believe that latency (millisecond-level
+   *       read time) is the main factor. For example: caching data from
+   *       a couple SQL queries.
+   *   Ex: 'long' can be useful for longer-lived cache data. It's appropriate if
+   *       you believe that longevity (e.g. surviving for several hours or a day)
+   *       is more important than  millisecond-level access time. For example:
+   *       caching the result of a simple metadata-query.
+   *
    * @return CRM_Utils_Cache_Interface
+   *   NOTE: Beginning in CiviCRM v5.4, the cache instance complies with
+   *   PSR-16 (\Psr\SimpleCache\CacheInterface).
    */
   public static function cache($name = 'default') {
     return \Civi\Core\Container::singleton()->get('cache.' . $name);
@@ -111,6 +115,22 @@ class Civi {
    */
   public static function resources() {
     return CRM_Core_Resources::singleton();
+  }
+
+  /**
+   * Obtain the contact's personal settings.
+   *
+   * @param NULL|int $contactID
+   *   For the default/active user's contact, leave $domainID as NULL.
+   * @param NULL|int $domainID
+   *   For the default domain, leave $domainID as NULL.
+   * @return \Civi\Core\SettingsBag
+   * @throws CRM_Core_Exception
+   *   If there is no contact, then there's no SettingsBag, and we'll throw
+   *   an exception.
+   */
+  public static function contactSettings($contactID = NULL, $domainID = NULL) {
+    return \Civi\Core\Container::getBootService('settings_manager')->getBagByContact($domainID, $contactID);
   }
 
   /**

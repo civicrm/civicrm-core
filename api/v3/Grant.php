@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,7 +58,7 @@ function _civicrm_api3_grant_create_spec(&$params) {
   $params['grant_type_id']['api.required'] = 1;
   $params['status_id']['api.required'] = 1;
   $params['amount_total']['api.required'] = 1;
-  $params['status_id']['api.aliases'] = array('grant_status');
+  $params['status_id']['api.aliases'] = ['grant_status'];
 }
 
 /**

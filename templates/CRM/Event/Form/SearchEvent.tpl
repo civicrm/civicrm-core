@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,39 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-event-searchevent-form-block">
- <h3>{ts}Find Events{/ts}</h3>
+  <div class="crm-accordion-wrapper crm-block crm-form-block crm-event-searchevent-form-block collapsed">
+    <div class="crm-accordion-header">
+      {ts}Find Events{/ts}
+    </div>
+    <div class="crm-accordion-body">
   <table class="form-layout">
     <tr class="crm-event-searchevent-form-block-title">
-        <td>{$form.title.html|crmAddClass:twenty}
-             <div class="description font-italic">
-                    {ts}Complete OR partial Event name.{/ts}
-             </div>
-             <div style="height: auto; vertical-align: bottom">{$form.eventsByDates.html}</div>
+        <td>
+          <label>{$form.title.label}</label>
+          {$form.title.html|crmAddClass:twenty}
+          <div class="description font-italic">
+                 {ts}Complete OR partial Event name.{/ts}
+          </div>
         </td>
-        <td rowspan="2"><label>{ts}Event Type{/ts}</label>
+        <td><label>{ts}Event Type{/ts}</label>
           {$form.event_type_id.html}
         </td>
-        <td class="right" rowspan="2">&nbsp;{include file="CRM/common/formButtons.tpl"}</td>
     </tr>
-
+    <tr>
+    <td colspan="2"><div style="height: auto; vertical-align: bottom">{$form.eventsByDates.html}</div></td>
+    </tr>
     <tr>
        <td colspan="2">
        <table class="form-layout-compressed" id="id_fromToDates">
-        <tr class="crm-event-searchevent-form-block-start_date">
-            <td class="label">{$form.start_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}</td>
-        </tr>
-        <tr class="crm-event-searchevent-form-block-end_date" >
-            <td class="label">{$form.end_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
+        <tr class="">
+          <td class="crm-event-searchevent-form-block-start_date">
+            <label>{$form.start_date.label}</label>
+            {$form.start_date.html}
+          </td>
+          <td class="crm-event-searchevent-form-block-end_date">
+            <label>{$form.end_date.label}</label>
+            {$form.end_date.html}
+          </td>
         </tr>
       </table>
     </td></tr>
@@ -56,16 +63,17 @@
     {* campaign in event search *}
     {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
     campaignTrClass='crm-event-searchevent-form-block-campaign_id' campaignTdClass=''}
-
+    <td class="right">{include file="CRM/common/formButtons.tpl"}</td>
   </table>
-</div>
+    </div>
+  </div>
 
 {include file="CRM/common/showHide.tpl"}
 
 {literal}
 <script type="text/javascript">
 if ( document.getElementsByName('eventsByDates')[1].checked ) {
-  cj('#id_fromToDates').show();
+  CRM.$('#id_fromToDates').show();
 }
 </script>
 {/literal}

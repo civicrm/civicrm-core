@@ -17,16 +17,20 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
   protected $cache;
 
   /**
+   * Singleton object.
+   *
    * @param bool $fresh
+   *
    * @return CRM_Cxn_CiviCxnHttp
+   * @throws \CRM_Core_Exception
    */
   public static function singleton($fresh = FALSE) {
     if (self::$singleton === NULL || $fresh) {
-      $cache = CRM_Utils_Cache::create(array(
+      $cache = CRM_Utils_Cache::create([
         'name' => 'CiviCxnHttp',
-        'type' => Civi::settings()->get('debug_enabled') ? 'ArrayCache' : array('SqlGroup', 'ArrayCache'),
+        'type' => Civi::settings()->get('debug_enabled') ? 'ArrayCache' : ['SqlGroup', 'ArrayCache'],
         'prefetch' => FALSE,
-      ));
+      ]);
 
       self::$singleton = new CRM_Cxn_CiviCxnHttp($cache);
     }
@@ -34,14 +38,17 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
   }
 
   /**
-   * @param CRM_Utils_Cache_Interface|NULL $cache
-   *   The cache data store.
+   * The cache data store.
+   *
+   * @param CRM_Utils_Cache_Interface|null $cache
    */
   public function __construct($cache) {
     $this->cache = $cache;
   }
 
   /**
+   * Send.
+   *
    * @param string $verb
    * @param string $url
    * @param string $blob
@@ -50,11 +57,11 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
    * @return array
    *   array($headers, $blob, $code)
    */
-  public function send($verb, $url, $blob, $headers = array()) {
+  public function send($verb, $url, $blob, $headers = []) {
     $lowVerb = strtolower($verb);
 
     if ($lowVerb === 'get' && $this->cache) {
-      $cachePath = 'get/' . md5($url);
+      $cachePath = 'get_' . md5($url);
       $cacheLine = $this->cache->get($cachePath);
       if ($cacheLine && $cacheLine['expires'] > CRM_Utils_Time::getTimeRaw()) {
         return $cacheLine['data'];
@@ -66,12 +73,12 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     if ($lowVerb === 'get' && $this->cache) {
       $expires = CRM_Utils_Http::parseExpiration($result[0]);
       if ($expires !== NULL) {
-        $cachePath = 'get/' . md5($url);
-        $cacheLine = array(
+        $cachePath = 'get_' . md5($url);
+        $cacheLine = [
           'url' => $url,
           'expires' => $expires,
           'data' => $result,
-        );
+        ];
         $this->cache->set($cachePath, $cacheLine);
       }
     }
@@ -93,9 +100,9 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
   protected function createStreamOpts($verb, $url, $blob, $headers) {
     $result = parent::createStreamOpts($verb, $url, $blob, $headers);
 
-    $caConfig = CA_Config_Stream::probe(array(
+    $caConfig = CA_Config_Stream::probe([
       'verify_peer' => (bool) Civi::settings()->get('verifySSL'),
-    ));
+    ]);
     if ($caConfig->isEnableSSL()) {
       $result['ssl'] = $caConfig->toStreamOptions();
     }
@@ -104,6 +111,15 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     }
 
     return $result;
+  }
+
+  /**
+   * Get cache.
+   *
+   * @return \CRM_Utils_Cache_Interface|null
+   */
+  public function getCache() {
+    return $this->cache;
   }
 
 }

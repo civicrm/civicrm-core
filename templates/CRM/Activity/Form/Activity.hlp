@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,11 +23,12 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-is_multi_activity-title"}
-  {ts}Create Separate Activity Records?{/ts}
+{htxt id="separation-title"}
+  {ts}Activity Separation{/ts}
 {/htxt}
-{htxt id="id-is_multi_activity"}
-  <p>{ts}By default a single activity record will be created and linked to all the contacts listed above. However, if you think you might be editing the activity later - and entering different information for different contacts - check this box to create separate activity records.{/ts}</p>
+{htxt id="separation"}
+  <p>{ts}With separate activities, you can enter different activity information for different contacts after creating the activities.{/ts}</p>
+  <p>{ts}With a single activity, the activity information cannot be customized for each contact.{/ts}</p>
 {/htxt}
 
 {htxt id="assignee_contact_id"}

@@ -11,8 +11,10 @@ DELETE FROM civicrm_option_value
 --  CRM-19517 Disable all price fields and price field options that use disabled fianancial types
 UPDATE civicrm_price_field_value cpfv
 INNER JOIN civicrm_financial_type cft ON cft.id = cpfv.financial_type_id
+INNER JOIN civicrm_price_field pf ON pf.id = cpfv.price_field_id
+INNER JOIN civicrm_price_set ps ON ps.id = pf.price_set_id
 SET cpfv.is_active = 0
-WHERE cft.is_active = 0;
+WHERE cft.is_active = 0 AND ps.is_quick_config = 0;
 
 UPDATE civicrm_price_field cpf
 LEFT JOIN (SELECT DISTINCT price_field_id AS price_field_id
@@ -38,6 +40,13 @@ INSERT INTO
  `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}description{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
   (@option_group_id_adOpt, {localize}'{ts escape="sql"}Supplemental Address 3{/ts}'{/localize}, (SELECT @max_val := @max_val + 1), 'supplemental_address_3', NULL, 0, NULL, (SELECT @supp2_wt := @supp2_wt + 1), {localize}''{/localize}, 0, 0, 1, NULL, NULL, NULL);
+
+-- Some legacy sites have `0000-00-00 00:00:00` values in
+-- `civicrm_financial_trxn.trxn_date` which correspond to the same value in
+-- `civicrm_contribution.receive_date`
+-- MySQL 5.7 may bork when comparing datetime columns to '0000-00-00 00:00:00' so cast the column to a CHAR(20) when comparing
+UPDATE civicrm_financial_trxn SET trxn_date = NULL WHERE CAST(trxn_date AS CHAR(20)) = '0000-00-00 00:00:00';
+UPDATE civicrm_contribution SET receive_date = NULL WHERE CAST(receive_date AS CHAR(20)) = '0000-00-00 00:00:00';
 
 -- CRM-20439 rename card_type to card_type_id of civicrm_financial_trxn table (IIDA-126)
 ALTER TABLE `civicrm_financial_trxn` CHANGE `card_type` `card_type_id` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';

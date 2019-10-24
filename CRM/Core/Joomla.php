@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -52,7 +52,7 @@ class CRM_Core_Joomla {
       return;
     }
 
-    $blockIds = array(
+    $blockIds = [
       CRM_Core_Block::CREATE_NEW,
       CRM_Core_Block::RECENTLY_VIEWED,
       CRM_Core_Block::DASHBOARD,
@@ -60,9 +60,9 @@ class CRM_Core_Joomla {
       CRM_Core_Block::LANGSWITCH,
       //CRM_Core_Block::EVENT,
       //CRM_Core_Block::FULLTEXT_SEARCH
-    );
+    ];
 
-    $blocks = array();
+    $blocks = [];
     foreach ($blockIds as $id) {
       $blocks[] = CRM_Core_Block::getContent($id);
     }

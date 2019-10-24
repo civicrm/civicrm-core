@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/Mailing</base>
-  <class>Component</class>
+  <class>MailingComponent</class>
   <name>civicrm_mailing_component</name>
   <comment>Stores information about the mailing components (header/footer).</comment>
   <field>

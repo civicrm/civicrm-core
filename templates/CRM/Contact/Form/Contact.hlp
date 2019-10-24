@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -76,6 +76,13 @@
 <p>{ts}You can use an address belonging to an existing contact or create a new contact by selecting the desired contact type from the select field. If you link an individual's address to an organization, an employee-employer relationship will be automatically created. If you link an individual's address to a household, a household member relationship is created.{/ts}</p>
 {/htxt}
 
+{htxt id="id-sharedAddress-updateRelationships-title"}
+  {ts}Update Employer{/ts}
+{/htxt}
+{htxt id="id-sharedAddress-updateRelationships"}
+<p>{ts}Set this organization as the current employer for this individual. Note: will disable any existing employer relationship for this individual.{/ts}</p>
+{/htxt}
+
 {htxt id="id-communication_style-title"}
   {ts}Communication Style{/ts}
 {/htxt}
@@ -128,10 +135,10 @@
 <p>{ts}Upload a photo or icon that you want to be displayed when viewing this contact.{/ts}</p>
 {/htxt}
 
-{htxt id="id-internal-id-title"}
+{htxt id="id-contact-id-title"}
   {ts}Contact ID{/ts}
 {/htxt}
-{htxt id="id-internal-id"}
+{htxt id="id-contact-id"}
 <p>{ts}Every contact in CiviCRM has a unique ID number. This number will never change and is the most accurate way of identifying a contact.{/ts}</p>
 {/htxt}
 
@@ -160,7 +167,7 @@
   {ts}Geocoding{/ts}
 {/htxt}
 {htxt id="id-geo-code"}
-{capture assign=docLink}{docURL page="user/initial-set-up/installation-and-basic-setup" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}{/capture}
+{capture assign=docLink}{docURL page="user/initial-set-up/installation-and-basic-set-up" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}{/capture}
 <p>{ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {$docLink}</p>
 {/htxt}
 

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@ CRM.$(function($) {
         $("#payment-info").html(html).trigger('crmLoad');
       }
     });
-
+    // Fixme: Possible bug - the following line won't be processed by smarty because it's in a literal block
     var taxAmount = "{$totalTaxAmount}";
     if (taxAmount) {
       $('.total_amount-section').show();
@@ -55,16 +55,16 @@ CRM.$(function($) {
     {if $component eq "event"}
       <th>{ts}Total Fee(s){/ts}</th>
     {else}
-      <th>{ts}Contribution Amount(s){/ts}</th>
+      <th>{ts}Contribution Total{/ts}</th>
     {/if}
     <th class="right">{ts}Total Paid{/ts}</th>
     <th class="right">{ts}Balance{/ts}</th>
   </tr>
   <tr>
-    <td>{$paymentInfo.total|crmMoney}</td>
+    <td>{$paymentInfo.total|crmMoney:$paymentInfo.currency}</td>
     <td class='right'>
       {if $paymentInfo.paid > 0}
-        {$paymentInfo.paid|crmMoney}
+        {$paymentInfo.paid|crmMoney:$paymentInfo.currency}
         {if !$hideButtonLinks}
           <br/>
           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
@@ -74,7 +74,7 @@ CRM.$(function($) {
         {/if}
       {/if}
     </td>
-    <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney}</td>
+    <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney:$paymentInfo.currency}</td>
   </tr>
 </table>
 {if $paymentInfo.balance and !$paymentInfo.payLater && !$hideButtonLinks}

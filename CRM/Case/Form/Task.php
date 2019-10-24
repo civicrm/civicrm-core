@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,145 +26,42 @@
  */
 
 /**
- *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
- * This class generates task actions for CiviEvent.
+ * This class generates form task actions for CiviCase.
  */
-class CRM_Case_Form_Task extends CRM_Core_Form {
+class CRM_Case_Form_Task extends CRM_Core_Form_Task {
 
   /**
-   * The task being performed
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The additional clause that we restrict the search with
-   *
+   * Must be set to entity table name (eg. civicrm_participant) by child class
    * @var string
    */
-  protected $_componentClause = NULL;
-
+  public static $tableName = 'civicrm_case';
   /**
-   * The array that holds all the component ids
-   *
-   * @var array
+   * Must be set to entity shortname (eg. event)
+   * @var string
    */
-  protected $_componentIds;
+  public static $entityShortname = 'case';
 
   /**
-   * The array that holds all the case ids
-   *
-   * @var array
-   */
-  public $_caseIds;
-
-  /**
-   * Build all the data structures needed to build the form.
-   */
-  public function preProcess() {
-    self::preProcessCommon($this);
-  }
-
-  /**
-   * @param CRM_Core_Form $form
-   * @param bool $useTable
-   */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
-    $form->_caseIds = array();
-
-    $values = $form->controller->exportValues($form->get('searchFormName'));
-
-    $form->_task = $values['task'];
-    $caseTasks = CRM_Case_Task::tasks();
-    $form->assign('taskName', $caseTasks[$form->_task]);
-
-    $ids = array();
-    if ($values['radio_ts'] == 'ts_sel') {
-      foreach ($values as $name => $value) {
-        if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
-          $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
-        }
-      }
-    }
-    else {
-      $queryParams = $form->get('queryParams');
-      $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
-        CRM_Contact_BAO_Query::MODE_CASE
-      );
-      $query->_distinctComponentClause = " ( civicrm_case.id )";
-      $query->_groupByComponentClause = " GROUP BY civicrm_case.id ";
-      $result = $query->searchQuery(0, 0, NULL);
-      while ($result->fetch()) {
-        $ids[] = $result->case_id;
-      }
-    }
-
-    if (!empty($ids)) {
-      $form->_componentClause = ' civicrm_case.id IN ( ' . implode(',', $ids) . ' ) ';
-      $form->assign('totalSelectedCases', count($ids));
-    }
-
-    $form->_caseIds = $form->_componentIds = $ids;
-
-    //set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($form->get('searchFormName'));
-    if ($searchFormName == 'search') {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/case/search', $urlParams));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-        $urlParams
-      ));
-    }
-  }
-
-  /**
-   * Given the signer id, compute the contact id
-   * since its used for things like send email
+   * @inheritDoc
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_caseIds,
-      'civicrm_case_contact'
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
+      'civicrm_case_contact', 'case_id'
     );
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
+   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
    *
-   * @param string $title
-   *   Title of the main button.
-   * @param string $nextType
-   *   Button type for the form after processing.
-   * @param string $backType
-   * @param bool $submitOnce
+   * @return int
    */
-  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+  public function getQueryMode() {
+    return CRM_Contact_BAO_Query::MODE_CASE;
   }
 
 }

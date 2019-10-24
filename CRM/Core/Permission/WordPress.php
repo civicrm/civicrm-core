@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -37,20 +37,22 @@
  *
  */
 class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
+
   /**
    * Given a permission string, check for access requirements
    *
    * @param string $str
    *   The permission to check.
+   * @param int $userId
    *
    * @return bool
    *   true if yes, else false
    */
-  public function check($str) {
+  public function check($str, $userId = NULL) {
     // Generic cms 'administer users' role tranlates to users with the 'edit_users' capability' in WordPress
-    $str = $this->translatePermission($str, 'WordPress', array(
+    $str = $this->translatePermission($str, 'WordPress', [
       'administer users' => 'edit_users',
-    ));
+    ]);
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
     }
@@ -74,16 +76,18 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
       return TRUE;
     }
 
-    if (current_user_can('super admin') || current_user_can('administrator')) {
+    $user = $userId ? get_userdata($userId) : wp_get_current_user();
+
+    if ($user->has_cap('super admin') || $user->has_cap('administrator')) {
       return TRUE;
     }
 
     // Make string lowercase and convert spaces into underscore
     $str = CRM_Utils_String::munge(strtolower($str));
 
-    if (is_user_logged_in()) {
+    if ($user->exists()) {
       // Check whether the logged in user has the capabilitity
-      if (current_user_can($str)) {
+      if ($user->has_cap($str)) {
         return TRUE;
       }
     }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
 
@@ -48,7 +48,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
-    $this->_pages = array();
+    $this->_pages = [];
     if ($action == CRM_Core_Action::ADVANCED) {
       $this->_pages['CRM_Contact_Form_Search_Advanced'] = NULL;
       list($task, $result) = $this->taskName($controller, 'Advanced');
@@ -92,7 +92,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
    *
    * @param string $formName
    *
-   * @return string
+   * @return array
    *   the name of the form that will handle the task
    */
   public function taskName($controller, $formName = 'Search') {
@@ -103,15 +103,10 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
     }
     $this->_controller->set('task', $value);
 
-    if ($value) {
-      $componentMode = $this->_controller->get('component_mode');
-      $modeValue = CRM_Contact_Form_Search::getModeValue($componentMode);
-      $taskClassName = $modeValue['taskClassName'];
-      return $taskClassName::getTask($value);
-    }
-    else {
-      return CRM_Contact_Task::getTask($value);
-    }
+    $componentMode = $this->_controller->get('component_mode');
+    $modeValue = CRM_Contact_Form_Search::getModeValue($componentMode);
+    $taskClassName = $modeValue['taskClassName'];
+    return $taskClassName::getTask($value);
   }
 
   /**

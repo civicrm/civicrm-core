@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -63,7 +63,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     $this->addRule('name',
       ts('Name already exists in Database.'),
       'objectExists',
-      array('CRM_Core_DAO_OptionGroup', $this->_id)
+      ['CRM_Core_DAO_OptionGroup', $this->_id]
     );
 
     $this->add('text',
@@ -78,15 +78,15 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionGroup', 'description')
     );
 
-    $this->addSelect('data_type', array('options' => CRM_Utils_Type::dataTypes()), TRUE);
+    $this->addSelect('data_type', ['options' => CRM_Utils_Type::dataTypes()], empty($this->_values['is_reserved']));
 
     $element = $this->add('checkbox', 'is_active', ts('Enabled?'));
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      if (in_array($this->_values['name'], array(
+      if (in_array($this->_values['name'], [
         'encounter_medium',
         'case_type',
         'case_status',
-      ))) {
+      ])) {
         static $caseCount = NULL;
         if (!isset($caseCount)) {
           $caseCount = CRM_Case_BAO_Case::caseCount(NULL, FALSE);
@@ -96,8 +96,12 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
           $element->freeze();
         }
       }
+
+      $this->add('checkbox', 'is_reserved', ts('Reserved?'));
+      $this->freeze('is_reserved');
+
       if (!empty($this->_values['is_reserved'])) {
-        $this->freeze(array('name', 'is_active'));
+        $this->freeze(['name', 'is_active', 'data_type']);
       }
     }
 
@@ -110,23 +114,26 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
   public function postProcess() {
     CRM_Utils_System::flushCache();
 
-    $params = $this->exportValues();
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_OptionGroup::del($this->_id);
       CRM_Core_Session::setStatus(ts('Selected option group has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
-
-      $params = $ids = array();
       // store the submitted values in an array
       $params = $this->exportValues();
 
-      if ($this->_action & CRM_Core_Action::UPDATE) {
-        $ids['optionGroup'] = $this->_id;
+      if ($this->_action & CRM_Core_Action::ADD) {
+        // If we are adding option group via UI it should not be marked reserved.
+        if (!isset($params['is_reserved'])) {
+          $params['is_reserved'] = 0;
+        }
+      }
+      elseif ($this->_action & CRM_Core_Action::UPDATE) {
+        $params['id'] = $this->_id;
       }
 
-      $optionGroup = CRM_Core_BAO_OptionGroup::add($params, $ids);
-      CRM_Core_Session::setStatus(ts('The Option Group \'%1\' has been saved.', array(1 => $optionGroup->name)), ts('Saved'), 'success');
+      $optionGroup = CRM_Core_BAO_OptionGroup::add($params);
+      CRM_Core_Session::setStatus(ts('The Option Group \'%1\' has been saved.', [1 => $optionGroup->name]), ts('Saved'), 'success');
     }
   }
 

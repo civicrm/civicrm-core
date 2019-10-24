@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -36,43 +36,67 @@
  */
 class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
-  static $_links = NULL;
+  public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
+  public $_id = NULL;
+  public $_action = NULL;
 
   /**
    * View details of a recurring contribution.
    */
   public function view() {
-    $recur = new CRM_Contribute_DAO_ContributionRecur();
-    $recur->id = $this->_id;
-    if ($recur->find(TRUE)) {
-      $values = array();
-      CRM_Core_DAO::storeValues($recur, $values);
-      // if there is a payment processor ID, get the name of the payment processor
-      if (!empty($values['payment_processor_id'])) {
-        $values['payment_processor'] = CRM_Core_DAO::getFieldValue(
-          'CRM_Financial_DAO_PaymentProcessor',
-          $values['payment_processor_id'],
-          'name'
-        );
-      }
-      $idFields = array('contribution_status_id', 'campaign_id');
-      if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($values['id'])) {
-        $idFields[] = 'financial_type_id';
-      }
-      foreach ($idFields as $idField) {
-        if (!empty($values[$idField])) {
-          $values[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $values[$idField]);
-        }
-      }
-
-      $this->assign('recur', $values);
+    if (empty($this->_id)) {
+      CRM_Core_Error::statusBounce('Recurring contribution not found');
     }
+
+    try {
+      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', [
+        'id' => $this->_id,
+      ]);
+    }
+    catch (Exception $e) {
+      CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->_id);
+    }
+
+    $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
+      CRM_Utils_Array::value('payment_processor_id', $contributionRecur)
+    );
+    $idFields = ['contribution_status_id', 'campaign_id', 'financial_type_id'];
+    foreach ($idFields as $idField) {
+      if (!empty($contributionRecur[$idField])) {
+        $contributionRecur[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $contributionRecur[$idField]);
+      }
+    }
+
+    // Add linked membership
+    $membership = civicrm_api3('Membership', 'get', [
+      'contribution_recur_id' => $contributionRecur['id'],
+    ]);
+    if (!empty($membership['count'])) {
+      $membershipDetails = reset($membership['values']);
+      $contributionRecur['membership_id'] = $membershipDetails['id'];
+      $contributionRecur['membership_name'] = $membershipDetails['membership_name'];
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('ContributionRecur', NULL, $contributionRecur['id']);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contributionRecur['id']);
+
+    $this->assign('recur', $contributionRecur);
+
+    $displayName = CRM_Contact_BAO_Contact::displayName($contributionRecur['contact_id']);
+    $this->assign('displayName', $displayName);
+
+    // Check if this is default domain contact CRM-10482
+    if (CRM_Contact_BAO_Contact::checkDomainContact($contributionRecur['contact_id'])) {
+      $displayName .= ' (' . ts('default organization') . ')';
+    }
+
+    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
+    CRM_Utils_System::setTitle(ts('View Recurring Contribution from') . ' ' . $displayName);
   }
 
   public function preProcess() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);

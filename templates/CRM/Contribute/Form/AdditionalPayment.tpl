@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,35 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $transaction}
-  {if !empty($rows)}
-   <table id='info'>
-     <tr class="columnheader">
-       <th>{ts}Amount{/ts}</th>
-       <th>{ts}Type{/ts}</th>
-       <th>{ts}Payment Method{/ts}</th>
-       <th>{ts}Received{/ts}</th>
-       <th>{ts}Transaction ID{/ts}</th>
-       <th>{ts}Status{/ts}</th>
-     </tr>
-     {foreach from=$rows item=row}
-     <tr>
-       <td>{$row.total_amount|crmMoney:$row.currency}</td>
-       <td>{$row.financial_type}</td>
-       <td>{$row.payment_instrument}{if $row.check_number} (#{$row.check_number}){/if}</td>
-       <td>{$row.receive_date|crmDate}</td>
-       <td>{$row.trxn_id}</td>
-       <td>{$row.status}</td>
-     </tr>
-     {/foreach}
-    <table>
-  {else}
-     {if $component eq 'event'}
-       {assign var='entity' value='participant'}
-     {else}
-       {assign var='entity' value=$component}
-     {/if}
-     {ts 1=$entity}No payments found for this %1 record{/ts}
-  {/if}
+  {include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}
   {if !$suppressPaymentFormButtons}
     <div class="crm-submit-buttons">
        {include file="CRM/common/formButtons.tpl"}
@@ -84,9 +56,6 @@
     <tr>
       <td class="font-size12pt label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
     </tr>
-    {if $contributionMode}
-      <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
-    {/if}
     {if $eventName}
       <tr>
         <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
@@ -108,8 +77,11 @@
         </tr>
         <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
         </tr>
+      {/if}
+      {if $contributionMode}
+        <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
       {/if}
     </tr>
    </table>
@@ -132,12 +104,6 @@
             <td >{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
-          {if $showCheckNumber || !$isOnline}
-            <tr id="checkNumber" class="crm-payment-form-block-check_number">
-              <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html}</td>
-            </tr>
-          {/if}
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
             <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
@@ -155,7 +121,7 @@
     {literal}
     <script type="text/javascript">
 
-    var url = "{/literal}{$dataUrl}{literal}";
+    var url = {/literal}{$dataUrl|@json_encode}{literal};
 
       CRM.$(function($) {
         showHideByValue( 'is_email_receipt', '', 'notice', 'table-row', 'radio', false );
@@ -202,14 +168,4 @@
 
     </script>
     {/literal}
-      {if !$contributionMode}
-        {include file="CRM/common/showHideByFieldValue.tpl"
-        trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
-        target_element_id   ="checkNumber"
-        target_element_type ="table-row"
-        field_type          ="select"
-        invert              = 0
-        }
-    {/if}
 {/if}

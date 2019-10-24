@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -91,18 +91,8 @@ class CRM_Core_BAO_CMSUser {
     $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
     $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
 
-    //if CMS is configured for not to allow creating new CMS user,
-    //don't build the form,Fixed for CRM-4036
-    if ($isJoomla) {
-      $userParams = JComponentHelper::getParams('com_users');
-      if (!$userParams->get('allowUserRegistration')) {
-        return FALSE;
-      }
-    }
-    elseif ($isDrupal && !variable_get('user_register', TRUE)) {
-      return FALSE;
-    }
-    elseif ($isWordPress && !get_option('users_can_register')) {
+    if (!$config->userSystem->isUserRegistrationPermitted()) {
+      // Do not build form if CMS is not configured to allow creating users.
       return FALSE;
     }
 
@@ -111,8 +101,7 @@ class CRM_Core_BAO_CMSUser {
     }
 
     // $cms is true when there is email(primary location) is set in the profile field.
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::singleton()->get('userID');
     $showUserRegistration = FALSE;
     if ($action) {
       $showUserRegistration = TRUE;
@@ -124,9 +113,9 @@ class CRM_Core_BAO_CMSUser {
     if ($isCMSUser && $emailPresent) {
       if ($showUserRegistration) {
         if ($isCMSUser != 2) {
-          $extra = array(
+          $extra = [
             'onclick' => "return showHideByValue('cms_create_account','','details','block','radio',false );",
-          );
+          ];
           $form->addElement('checkbox', 'cms_create_account', ts('Create an account?'), NULL, $extra);
           $required = FALSE;
         }
@@ -138,12 +127,12 @@ class CRM_Core_BAO_CMSUser {
         $form->assign('isCMS', $required);
         if (!$userID || $action & CRM_Core_Action::PREVIEW || $action & CRM_Core_Action::PROFILE) {
           $form->add('text', 'cms_name', ts('Username'), NULL, $required);
-          if (($isDrupal && !variable_get('user_email_verification', TRUE)) OR ($isJoomla) OR ($isWordPress)) {
+          if ($config->userSystem->isPasswordUserGenerated()) {
             $form->add('password', 'cms_pass', ts('Password'));
             $form->add('password', 'cms_confirm_pass', ts('Confirm Password'));
           }
 
-          $form->addFormRule(array('CRM_Core_BAO_CMSUser', 'formRule'), $form);
+          $form->addFormRule(['CRM_Core_BAO_CMSUser', 'formRule'], $form);
         }
         $showCMS = TRUE;
       }
@@ -178,7 +167,7 @@ class CRM_Core_BAO_CMSUser {
     $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
     $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
 
-    $errors = array();
+    $errors = [];
     if ($isDrupal || $isJoomla || $isWordPress) {
       $emailName = NULL;
       if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
@@ -208,7 +197,7 @@ class CRM_Core_BAO_CMSUser {
         $errors[$emailName] = ts('Please specify a valid email address.');
       }
 
-      if (($isDrupal && !variable_get('user_email_verification', TRUE)) OR ($isJoomla) OR ($isWordPress)) {
+      if ($config->userSystem->isPasswordUserGenerated()) {
         if (empty($fields['cms_pass']) ||
           empty($fields['cms_confirm_pass'])
         ) {
@@ -224,11 +213,11 @@ class CRM_Core_BAO_CMSUser {
       }
 
       // now check that the cms db does not have the user name and/or email
-      if ($isDrupal OR $isJoomla OR $isWordPress) {
-        $params = array(
+      if ($isDrupal or $isJoomla or $isWordPress) {
+        $params = [
           'name' => $fields['cms_name'],
           'mail' => $fields[$emailName],
-        );
+        ];
       }
 
       $config->userSystem->checkUserNameEmailExists($params, $errors, $emailName);

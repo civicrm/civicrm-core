@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,11 +30,12 @@
         <p>{ts count=$suppressedEmails plural='Email will NOT be sent to %count contacts - (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).'}Email will NOT be sent to %count contact - (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).{/ts}</p>
     </div>
 {/if}
+{crmSetting var="logged_in_email_setting" name="allow_mail_from_logged_in_contact"}
 <table class="form-layout-compressed">
-    <tr class="crm-contactEmail-form-block-fromEmailAddress">
-       <td class="label">{$form.fromEmailAddress.label}</td>
-       <td>{$form.fromEmailAddress.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
-    </tr>
+  <tr id="selectEmailFrom" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
+    <td class="label">{$form.from_email_address.label}</td>
+    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin logged_in_email_setting=$logged_in_email_setting}</td>
+  </tr>
     <tr class="crm-contactEmail-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>

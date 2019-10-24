@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -72,14 +72,13 @@ function civicrm_api3_activity_type_get($params) {
 function civicrm_api3_activity_type_create($params) {
 
   $action = 1;
-  $groupParams = array('name' => 'activity_type');
 
   if ($optionValueID = CRM_Utils_Array::value('option_value_id', $params)) {
     $action = 2;
   }
 
-  $activityObject = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $action, $optionValueID);
-  $activityType = array();
+  $activityObject = CRM_Core_OptionValue::addOptionValue($params, 'activity_type', $action, $optionValueID);
+  $activityType = [];
   _civicrm_api3_object_to_array($activityObject, $activityType[$activityObject->id]);
   return civicrm_api3_create_success($activityType, $params, 'activity_type', 'create');
 }
@@ -93,16 +92,16 @@ function civicrm_api3_activity_type_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
-  $params['label'] = array(
+  $params['label'] = [
     'api.required' => 1,
     'title' => 'Label',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $params['weight'] = array(
+  ];
+  $params['weight'] = [
     'api.required' => 1,
     'title' => 'Weight',
     'type' => CRM_Utils_Type::T_STRING,
-  );
+  ];
 }
 
 /**

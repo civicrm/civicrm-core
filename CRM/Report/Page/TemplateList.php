@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -83,7 +83,7 @@ LEFT  JOIN civicrm_component comp
     $sql .= " ORDER BY  v.weight ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $rows = array();
+    $rows = [];
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&

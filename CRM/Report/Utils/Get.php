@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -113,6 +113,7 @@ class CRM_Report_Utils_Get {
       case 'ew':
       case 'nhas':
       case 'like':
+      case 'eq':
       case 'neq':
         $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Array::value('type', $field));
         if ($value !== NULL) {
@@ -177,6 +178,11 @@ class CRM_Report_Utils_Get {
         }
         break;
 
+      case 'nll':
+      case 'nnll':
+        $defaults["{$fieldName}_op"] = $fieldOP;
+        break;
+
       case 'in':
       case 'notin':
         // send the type as string so that multiple values can also be retrieved from url.
@@ -199,10 +205,10 @@ class CRM_Report_Utils_Get {
    */
   public static function processChart(&$defaults) {
     $chartType = CRM_Utils_Array::value("charts", $_GET);
-    if (in_array($chartType, array(
+    if (in_array($chartType, [
       'barChart',
       'pieChart',
-    ))) {
+    ])) {
       $defaults["charts"] = $chartType;
     }
   }
@@ -297,7 +303,7 @@ class CRM_Report_Utils_Get {
       }
       if (CRM_Utils_Array::value("ufld", $_GET) == 1) {
         // unset all display columns
-        $defaults['fields'] = array();
+        $defaults['fields'] = [];
       }
       if (!empty($urlFields)) {
         foreach ($reportFields as $tableName => $fields) {

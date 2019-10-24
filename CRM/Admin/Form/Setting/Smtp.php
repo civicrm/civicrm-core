@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -36,41 +36,60 @@
  */
 class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   protected $_testButtonName;
+  protected $_settings = [
+    'allow_mail_from_logged_in_contact' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+  ];
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
 
-    $outBoundOption = array(
+    $outBoundOption = [
       CRM_Mailing_Config::OUTBOUND_OPTION_MAIL => ts('mail()'),
       CRM_Mailing_Config::OUTBOUND_OPTION_SMTP => ts('SMTP'),
       CRM_Mailing_Config::OUTBOUND_OPTION_SENDMAIL => ts('Sendmail'),
       CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED => ts('Disable Outbound Email'),
       CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB => ts('Redirect to Database'),
-    );
+    ];
     $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
+
+    $props = array();
+    $settings = Civi::settings()->getMandatory('mailing_backend') ?? [];
+    //Load input as readonly whose values are overridden in civicrm.settings.php.
+    foreach ($settings as $setting => $value) {
+      if (isset($value)) {
+        $props[$setting]['readonly'] = TRUE;
+        $setStatus = TRUE;
+      }
+    }
 
     CRM_Utils_System::setTitle(ts('Settings - Outbound Mail'));
     $this->add('text', 'sendmail_path', ts('Sendmail Path'));
     $this->add('text', 'sendmail_args', ts('Sendmail Argument'));
-    $this->add('text', 'smtpServer', ts('SMTP Server'));
-    $this->add('text', 'smtpPort', ts('SMTP Port'));
-    $this->addYesNo('smtpAuth', ts('Authentication?'));
-    $this->addElement('text', 'smtpUsername', ts('SMTP Username'));
-    $this->addElement('password', 'smtpPassword', ts('SMTP Password'));
+    $this->add('text', 'smtpServer', ts('SMTP Server'), CRM_Utils_Array::value('smtpServer', $props));
+    $this->add('text', 'smtpPort', ts('SMTP Port'), CRM_Utils_Array::value('smtpPort', $props));
+    $this->addYesNo('smtpAuth', ts('Authentication?'), CRM_Utils_Array::value('smtpAuth', $props));
+    $this->addElement('text', 'smtpUsername', ts('SMTP Username'), CRM_Utils_Array::value('smtpUsername', $props));
+    $this->addElement('password', 'smtpPassword', ts('SMTP Password'), CRM_Utils_Array::value('smtpPassword', $props));
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
-    $this->addFormRule(array('CRM_Admin_Form_Setting_Smtp', 'formRule'));
+    $this->addFormRule(['CRM_Admin_Form_Setting_Smtp', 'formRule']);
     parent::buildQuickForm();
     $buttons = $this->getElement('buttons')->getElements();
-    $buttons[] = $this->createElement('submit', $this->_testButtonName, ts('Save & Send Test Email'), array('crm-icon' => 'fa-envelope-o'));
+    $buttons[] = $this->createElement('submit', $this->_testButtonName, ts('Save & Send Test Email'), ['crm-icon' => 'fa-envelope-o']);
     $this->getElement('buttons')->setElements($buttons);
+
+    if (!empty($setStatus)) {
+      CRM_Core_Session::setStatus("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php.", '', 'info', array('expires' => 0));
+    }
   }
 
   /**
    * Process the form submission.
+   *
+   * @throws \Exception
    */
   public function postProcess() {
     // flush caches so we reload details for future requests
@@ -78,6 +97,9 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     CRM_Utils_System::flushCache();
 
     $formValues = $this->controller->exportValues($this->_name);
+
+    Civi::settings()->set('allow_mail_from_logged_in_contact', (!empty($formValues['allow_mail_from_logged_in_contact'])));
+    unset($formValues['allow_mail_from_logged_in_contact']);
 
     $buttonName = $this->controller->getButtonName();
     // check if test button
@@ -91,16 +113,15 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       else {
         $session = CRM_Core_Session::singleton();
         $userID = $session->get('userID');
-        list($toDisplayName, $toEmail, $toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
+        list($toDisplayName, $toEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
 
         //get the default domain email address.CRM-4250
         list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
         if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-          $fixUrl = CRM_Utils_System::url("civicrm/admin/domain", 'action=update&reset=1');
-          CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', array(1 => $fixUrl)));
+          $fixUrl = CRM_Utils_System::url("civicrm/admin/options/from_email_address", 'action=update&reset=1');
+          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; System Settings &raquo; Option Groups &raquo; From Email Address</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
         }
-
         if (!$toEmail) {
           CRM_Core_Error::statusBounce(ts('Cannot send a test email because your user record does not have a valid email address.'));
         }
@@ -111,12 +132,11 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
         $to = '"' . $toDisplayName . '"' . "<$toEmail>";
         $from = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
-        $testMailStatusMsg = ts('Sending test email. FROM: %1 TO: %2.<br />', array(
-            1 => $domainEmailAddress,
-            2 => $toEmail,
-          ));
+        $testMailStatusMsg = ts('Sending test email') . ':<br />'
+          . ts('From: %1', [1 => $domainEmailAddress]) . '<br />'
+          . ts('To: %1', [1 => $toEmail]) . '<br />';
 
-        $params = array();
+        $params = [];
         if ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
           $subject = "Test for SMTP settings";
           $message = "SMTP settings are correct.";
@@ -155,23 +175,29 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           $mailerName = 'mail';
         }
 
-        $headers = array(
+        $headers = [
           'From' => $from,
           'To' => $to,
           'Subject' => $subject,
-        );
+        ];
 
         $mailer = Mail::factory($mailerName, $params);
 
         $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
         $result = $mailer->send($toEmail, $headers, $message);
         unset($errorScope);
-        if (!is_a($result, 'PEAR_Error')) {
-          CRM_Core_Session::setStatus($testMailStatusMsg . ts('Your %1 settings are correct. A test email has been sent to your email address.', array(1 => strtoupper($mailerName))), ts("Mail Sent"), "success");
+        if (defined('CIVICRM_MAIL_LOG') && defined('CIVICRM_MAIL_LOG_AND_SEND')) {
+          $testMailStatusMsg .= '<br />' . ts('You have defined CIVICRM_MAIL_LOG_AND_SEND - mail will be logged.') . '<br /><br />';
+        }
+        if (defined('CIVICRM_MAIL_LOG') && !defined('CIVICRM_MAIL_LOG_AND_SEND')) {
+          CRM_Core_Session::setStatus($testMailStatusMsg . ts('You have defined CIVICRM_MAIL_LOG - no mail will be sent.  Your %1 settings have not been tested.', [1 => strtoupper($mailerName)]), ts("Mail not sent"), "warning");
+        }
+        elseif (!is_a($result, 'PEAR_Error')) {
+          CRM_Core_Session::setStatus($testMailStatusMsg . ts('Your %1 settings are correct. A test email has been sent to your email address.', [1 => strtoupper($mailerName)]), ts("Mail Sent"), "success");
         }
         else {
           $message = CRM_Utils_Mail::errorMessage($mailer, $result);
-          CRM_Core_Session::setStatus($testMailStatusMsg . ts('Oops. Your %1 settings are incorrect. No test mail has been sent.', array(1 => strtoupper($mailerName))) . $message, ts("Mail Not Sent"), "error");
+          CRM_Core_Session::setStatus($testMailStatusMsg . ts('Oops. Your %1 settings are incorrect. No test mail has been sent.', [1 => strtoupper($mailerName)]) . $message, ts("Mail Not Sent"), "error");
         }
       }
     }
@@ -196,7 +222,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array
+   * @return array|bool
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
@@ -233,7 +259,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    */
   public function setDefaultValues() {
     if (!$this->_defaults) {
-      $this->_defaults = array();
+      $this->_defaults = [];
 
       $mailingBackend = Civi::settings()->get('mailing_backend');
       if (!empty($mailingBackend)) {
@@ -256,6 +282,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         }
       }
     }
+    $this->_defaults['allow_mail_from_logged_in_contact'] = Civi::settings()->get('allow_mail_from_logged_in_contact');
     return $this->_defaults;
   }
 

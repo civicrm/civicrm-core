@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,20 +42,6 @@
       {$form.description.html}
       <br /><span class="description">{ts}Optional description of this domain (useful for sites with multiple domains).{/ts}</span>
         </td>
-    </tr>
-    </table>
-  <h3>{ts}System-generated Mail Settings{/ts}</h3>
-    <table class="form-layout-compressed">
-    <tr>
-      <td>
-        {$form.email_name.label} {help id="from-name"}<br />
-        {$form.email_name.html}
-      </td>
-      <td class="">
-        {$form.email_address.label} {help id="from-email"}<br />
-        {$form.email_address.html}
-           <br /><span class="description">(info@example.org)</span>
-      </td>
     </tr>
     </table>
 

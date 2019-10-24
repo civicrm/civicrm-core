@@ -138,7 +138,7 @@
   <item>
      <path>civicrm/admin/setting/preferences/event</path>
      <title>CiviEvent Component Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Event</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
      <desc>Configure global CiviEvent behaviors.</desc>
      <access_arguments>access CiviEvent,administer CiviCRM</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
@@ -300,11 +300,13 @@
     <path>civicrm/ajax/event/add_participant_to_cart</path>
     <page_callback>CRM_Event_Cart_Page_CheckoutAJAX::add_participant_to_cart</page_callback>
     <access_callback>1</access_callback>
+    <is_public>true</is_public>
   </item>
   <item>
     <path>civicrm/ajax/event/remove_participant_from_cart</path>
     <page_callback>CRM_Event_Cart_Page_CheckoutAJAX::remove_participant_from_cart</page_callback>
     <access_callback>1</access_callback>
+    <is_public>true</is_public>
   </item>
   <item>
     <path>civicrm/event/add_to_cart</path>

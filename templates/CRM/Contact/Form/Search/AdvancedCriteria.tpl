@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -56,14 +56,7 @@ CRM.$(function($) {
     return false;
   });
   // TODO: Why are the modes numeric? If they used the string there would be no need for this map
-  var modes = {
-    '2': 'CiviContribute',
-    '3': 'CiviEvent',
-    '4': 'activity',
-    '5': 'CiviMember',
-    '6': 'CiviCase',
-    '8': 'CiviMail'
-  };
+  var modes = {/literal}{$component_mappings}{literal};
   // Handle change of results mode
   $('#component_mode').change(function() {
     // Reset task dropdown
@@ -73,7 +66,7 @@ CRM.$(function($) {
       $('.crm-' + mode + '-accordion.collapsed').crmAccordionToggle();
       loadPanes(mode);
     }
-    if ($('#component_mode').val() == '7') {
+    if ('related_contact' === modes[$('#component_mode').val()]) {
       $('#crm-display_relationship_type').show();
     }
     else {
@@ -133,9 +126,8 @@ CRM.$(function($) {
       {include file="CRM/Contact/Form/Search/Criteria/Basic.tpl"}
     </div>
   </div>
-
   {foreach from=$allPanes key=paneName item=paneValue}
-    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' and $openedPanes.$paneName} {else}collapsed{/if}">
+    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || $openedPanes.$paneName} {else}collapsed{/if}">
       <div class="crm-accordion-header" id="{$paneValue.id}">
         {$paneName}
       </div>
@@ -146,7 +138,15 @@ CRM.$(function($) {
 
   <table class="form-layout">
     <tr>
-      <td>{include file="CRM/common/formButtons.tpl" location="botton"}</td>
+      <td>
+        {include file="CRM/common/formButtons.tpl" location="bottom"}
+        <div class="crm-submit-buttons reset-advanced-search">
+          <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
+            <i class="crm-i fa-undo"></i>
+            &nbsp;{ts}Reset Form{/ts}
+          </a>
+        </div>
+      </td>
     </tr>
   </table>
 {/strip}

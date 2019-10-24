@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,6 +34,7 @@
 
   <table class="form-layout">
    <tr class="crm-mailing-group-form-block-name"><td class="label">{$form.name.label}</td><td>{$form.name.html} {help id="sms-name"}</td></tr>
+   <tr class="crm-mailing-upload-form-block-sms_provider_id"><td class="label">{$form.sms_provider_id.label}</td><td>{$form.sms_provider_id.html}  {help id ="id-sms_provider" isAdmin=$isAdmin}</td></tr>
   </table>
 
 

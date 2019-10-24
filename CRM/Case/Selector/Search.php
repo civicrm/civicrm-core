@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,20 +41,20 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = array(
+  public static $_properties = [
     'contact_id',
     'contact_type',
     'sort_name',
@@ -67,19 +67,19 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
     'case_type',
     'case_role',
     'phone',
-  );
+  ];
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -180,49 +180,49 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return array
    */
-  static public function &links($isDeleted = FALSE, $key = NULL) {
+  public static function &links($isDeleted = FALSE, $key = NULL) {
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if ($isDeleted) {
-      self::$_links = array(
-        CRM_Core_Action::RENEW => array(
+      self::$_links = [
+        CRM_Core_Action::RENEW => [
           'name' => ts('Restore'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'restore-case',
           'title' => ts('Restore Case'),
-        ),
-      );
+        ],
+      ];
     }
     else {
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('Manage'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=case' . $extraParams,
           'ref' => 'manage-case',
           'class' => 'no-popup',
           'title' => ts('Manage Case'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'delete-case',
           'title' => ts('Delete Case'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Assign to Another Client'),
           'url' => 'civicrm/contact/view/case/editClient',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'reassign',
           'class' => 'medium-popup',
           'title' => ts('Assign to Another Client'),
-        ),
-      );
+        ],
+      ];
     }
 
-    $actionLinks = array();
+    $actionLinks = [];
     foreach (self::$_links as $key => $value) {
       $actionLinks['primaryActions'][$key] = $value;
     }
@@ -292,10 +292,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $this->_additionalClause
     );
     // process the result of the query
-    $rows = array();
+    $rows = [];
 
     //CRM-4418 check for view, edit, delete
-    $permissions = array(CRM_Core_Permission::VIEW);
+    $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('access all cases and activities')
       || CRM_Core_Permission::check('access my cases and activities')
     ) {
@@ -308,10 +308,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
     $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, " AND v.name = 'Urgent' ");
 
-    $scheduledInfo = array();
+    $scheduledInfo = [];
 
     while ($result->fetch()) {
-      $row = array();
+      $row = [];
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (isset($result->$property)) {
@@ -322,7 +322,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $isDeleted = FALSE;
       if ($result->case_deleted) {
         $isDeleted = TRUE;
-        $row['case_status_id'] = empty($row['case_status_id']) ? "" : $row['case_status_id'] . '<br />(deleted)';
+        $row['case_status_id'] = empty($row['case_status_id']) ? "" : $row['case_status_id'] . '<br />' . ts('(deleted)');
       }
 
       $scheduledInfo['case_id'][] = $result->case_id;
@@ -332,11 +332,11 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
       $links = self::links($isDeleted, $this->_key);
       $row['action'] = CRM_Core_Action::formLink($links['primaryActions'],
-        $mask, array(
+        $mask, [
           'id' => $result->case_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        ),
+        ],
         ts('more'),
         FALSE,
         'case.selector.actions',
@@ -349,12 +349,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
       //adding case manager to case selector.CRM-4510.
       $caseType = CRM_Case_BAO_Case::getCaseType($result->case_id, 'name');
-      $caseManagerContact = CRM_Case_BAO_Case::getCaseManagerContact($caseType, $result->case_id);
-
-      if (!empty($caseManagerContact)) {
-        $row['casemanager_id'] = CRM_Utils_Array::value('casemanager_id', $caseManagerContact);
-        $row['casemanager'] = CRM_Utils_Array::value('casemanager', $caseManagerContact);
-      }
+      $row['casemanager'] = CRM_Case_BAO_Case::getCaseManagerContact($caseType, $result->case_id);
 
       if (isset($result->case_status_id) &&
         array_key_exists($result->case_status_id, $caseStatus)
@@ -405,51 +400,51 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(
-        array(
+      self::$_columnHeaders = [
+        [
           'name' => ts('Subject'),
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Status'),
           'sort' => 'case_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Case Type'),
           'sort' => 'case_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('My Role'),
           'sort' => 'case_role',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Case Manager'),
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Most Recent'),
           'sort' => 'case_recent_activity_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Next Sched.'),
           'sort' => 'case_scheduled_activity_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array('name' => ts('Actions')),
-      );
+        ],
+        ['name' => ts('Actions')],
+      ];
 
       if (!$this->_single) {
-        $pre = array(
-          array(
+        $pre = [
+          [
             'name' => ts('Client'),
             'sort' => 'sort_name',
             'direction' => CRM_Utils_Sort::ASCENDING,
-          ),
-        );
+          ],
+        ];
 
         self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
       }
@@ -461,7 +456,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * @return mixed
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**
@@ -482,6 +477,79 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    */
   public function getExportFileName($output = 'csv') {
     return ts('Case Search');
+  }
+
+  /**
+   * Add the set of "actionLinks" to the case activity
+   *
+   * @param int $caseID
+   * @param int $contactID
+   * @param int $userID
+   * @param string $context
+   * @param \CRM_Core_DAO $dao
+   *
+   * @return string
+   *   HTML formatted Link
+   */
+  public static function addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao) {
+    // FIXME: Why are we not using CRM_Core_Action for these links? This is too much manual work and likely to get out-of-sync with core markup.
+    $caseActivityId = $dao->id;
+    $allowView = CRM_Case_BAO_Case::checkPermission($caseActivityId, 'view', $dao->activity_type_id, $userID);
+    $allowEdit = CRM_Case_BAO_Case::checkPermission($caseActivityId, 'edit', $dao->activity_type_id, $userID);
+    $allowDelete = CRM_Case_BAO_Case::checkPermission($caseActivityId, 'delete', $dao->activity_type_id, $userID);
+    $emailActivityTypeIDs = [
+      'Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email'),
+      'Inbound Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email'),
+    ];
+    $url = CRM_Utils_System::url("civicrm/case/activity",
+      "reset=1&cid={$contactID}&caseid={$caseID}", FALSE, NULL, FALSE
+    );
+    $contextUrl = '';
+    if ($context == 'fulltext') {
+      $contextUrl = "&context={$context}";
+    }
+    $editUrl = "{$url}&action=update{$contextUrl}";
+    $deleteUrl = "{$url}&action=delete{$contextUrl}";
+    $restoreUrl = "{$url}&action=renew{$contextUrl}";
+    $viewTitle = ts('View activity');
+    $caseDeleted = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseID, 'is_deleted');
+
+    $url = "";
+    $css = 'class="action-item crm-hover-button"';
+    if ($allowView) {
+      $viewUrl = CRM_Utils_System::url('civicrm/case/activity/view', array('cid' => $contactID, 'aid' => $caseActivityId));
+      $url = '<a ' . str_replace('action-item', 'action-item medium-pop-up', $css) . 'href="' . $viewUrl . '" title="' . $viewTitle . '">' . ts('View') . '</a>';
+    }
+    $additionalUrl = "&id={$caseActivityId}";
+    if (!$dao->deleted) {
+      //hide edit link of activity type email.CRM-4530.
+      if (!in_array($dao->type, $emailActivityTypeIDs)) {
+        //hide Edit link if activity type is NOT editable (special case activities).CRM-5871
+        if ($allowEdit) {
+          $url .= '<a ' . $css . ' href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
+        }
+      }
+      if ($allowDelete) {
+        $url .= ' <a ' . str_replace('action-item', 'action-item small-popup', $css) . ' href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
+      }
+    }
+    elseif (!$caseDeleted) {
+      $url = ' <a ' . $css . ' href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
+    }
+
+    //check for operations.
+    if (CRM_Case_BAO_Case::checkPermission($caseActivityId, 'Move To Case', $dao->activity_type_id)) {
+      $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'move\',' . $caseActivityId . ', ' . $caseID . ', this ); return false;">' . ts('Move To Case') . '</a> ';
+    }
+    if (CRM_Case_BAO_Case::checkPermission($caseActivityId, 'Copy To Case', $dao->activity_type_id)) {
+      $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'copy\',' . $caseActivityId . ',' . $caseID . ', this ); return false;">' . ts('Copy To Case') . '</a> ';
+    }
+    // if there are file attachments we will return how many and, if only one, add a link to it
+    if (!empty($dao->attachment_ids)) {
+      $url .= implode(' ', CRM_Core_BAO_File::paperIconAttachment('civicrm_activity', $caseActivityId));
+    }
+
+    return $url;
   }
 
 }

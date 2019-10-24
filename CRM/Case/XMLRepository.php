@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * The XMLRepository is responsible for loading XML for case-types.
  * It includes any bulk operations that apply across the list of all XML
@@ -40,15 +40,17 @@ class CRM_Case_XMLRepository {
   /**
    * @var array<String,SimpleXMLElement>
    */
-  protected $xml = array();
+  protected $xml = [];
 
   /**
-   * @var array|NULL
+   * @var array|null
    */
   protected $hookCache = NULL;
 
   /**
-   * @var array|NULL symbolic names of case-types
+   * Symbolic names of case-types.
+   *
+   * @var array|null
    */
   protected $allCaseTypes = NULL;
 
@@ -63,13 +65,20 @@ class CRM_Case_XMLRepository {
     return self::$singleton;
   }
 
+  public function flush() {
+    $this->xml = [];
+    $this->hookCache = NULL;
+    $this->allCaseTypes = NULL;
+    CRM_Core_DAO::$_dbColumnValueCache = [];
+  }
+
   /**
    * Class constructor.
    *
    * @param array $allCaseTypes
    * @param array $xml
    */
-  public function __construct($allCaseTypes = NULL, $xml = array()) {
+  public function __construct($allCaseTypes = NULL, $xml = []) {
     $this->allCaseTypes = $allCaseTypes;
     $this->xml = $xml;
   }
@@ -169,14 +178,14 @@ class CRM_Case_XMLRepository {
       if (isset($config->customTemplateDir) && $config->customTemplateDir) {
         // check if the file exists in the custom templates directory
         $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
+          [
             $config->customTemplateDir,
             'CRM',
             'Case',
             'xml',
             'configuration',
             "$caseType.xml",
-          )
+          ]
         );
       }
     }
@@ -185,24 +194,24 @@ class CRM_Case_XMLRepository {
       if (!file_exists($fileName)) {
         // check if file exists locally
         $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
+          [
             dirname(__FILE__),
             'xml',
             'configuration',
             "$caseType.xml",
-          )
+          ]
         );
       }
 
       if (!file_exists($fileName)) {
         // check if file exists locally
         $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
+          [
             dirname(__FILE__),
             'xml',
             'configuration.sample',
             "$caseType.xml",
-          )
+          ]
         );
       }
     }
@@ -215,7 +224,7 @@ class CRM_Case_XMLRepository {
    */
   public function getCaseTypesViaHook() {
     if ($this->hookCache === NULL) {
-      $this->hookCache = array();
+      $this->hookCache = [];
       CRM_Utils_Hook::caseTypes($this->hookCache);
     }
     return $this->hookCache;
@@ -235,7 +244,7 @@ class CRM_Case_XMLRepository {
    * @return array<string> symbolic-names of activity-types
    */
   public function getAllDeclaredActivityTypes() {
-    $result = array();
+    $result = [];
 
     $p = new CRM_Case_XMLProcessor_Process();
     foreach ($this->getAllCaseTypes() as $caseTypeName) {
@@ -249,10 +258,12 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Relationships are straight from XML, described from perspective of non-client
+   *
    * @return array<string> symbolic-names of relationship-types
    */
   public function getAllDeclaredRelationshipTypes() {
-    $result = array();
+    $result = [];
 
     $p = new CRM_Case_XMLProcessor_Process();
     foreach ($this->getAllCaseTypes() as $caseTypeName) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -98,7 +98,7 @@ function civicrm_api3_group_get($params) {
  * @throws API_Exception
  */
 function civicrm_api3_group_delete($params) {
-  $group = civicrm_api3_group_get(array('id' => $params['id']));
+  $group = civicrm_api3_group_get(['id' => $params['id']]);
   if ($group['count'] == 0) {
     throw new API_Exception('Could not delete group ' . $params['id']);
   }

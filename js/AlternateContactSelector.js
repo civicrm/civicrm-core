@@ -9,7 +9,7 @@ CRM.$(function($) {
           $.each(result.values, function (id, value) {
             $.each(value, function (fieldname, fieldvalue) {
               $('#' + fieldname).val(fieldvalue).change();
-              $("[name=" + fieldname + "]").val([fieldvalue]);
+              $('[name="' + fieldname + '"]').val([fieldvalue]);
               if ($.isArray(fieldvalue)) {
                 $.each(fieldvalue, function (index, val) {
                   $("#" + fieldname + "_" + val).prop('checked', true);

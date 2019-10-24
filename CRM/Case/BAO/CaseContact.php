@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -45,9 +45,14 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
    * @return CRM_Case_BAO_CaseContact
    */
   public static function create($params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'CaseContact', CRM_Utils_Array::value('id', $params), $params);
+
     $caseContact = new self();
     $caseContact->copyValues($params);
     $caseContact->save();
+
+    CRM_Utils_Hook::post($hook, 'CaseContact', $caseContact->id, $caseContact);
 
     // add to recently viewed
     $caseType = CRM_Case_BAO_Case::getCaseType($caseContact->case_id);
@@ -57,7 +62,7 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
 
     $title = CRM_Contact_BAO_Contact::displayName($caseContact->contact_id) . ' - ' . $caseType;
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
       $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/case',
         "action=delete&reset=1&id={$caseContact->case_id}&cid={$caseContact->contact_id}&context=home"
@@ -81,12 +86,12 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
    * @inheritDoc
    */
   public function addSelectWhereClause() {
-    return array(
+    return [
       // Reuse case acls
       'case_id' => CRM_Utils_SQL::mergeSubquery('Case'),
       // Case acls already check for contact access so we can just mark contact_id as handled
-      'contact_id' => array(),
-    );
+      'contact_id' => [],
+    ];
     // Don't call hook selectWhereClause, the case query already did
   }
 

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,45 +24,20 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting membership type  *}
+{if $action eq 8}
+  {include file="CRM/Core/Form/EntityForm.tpl"}
+{else}
 <div class="crm-block crm-form-block crm-membership-type-form-block">
 
   <div class="form-item" id="membership_type_form">
-  {if $action eq 8}
-    <div class="messages status no-popup">
-      {ts}WARNING: Deleting this option will result in the loss of all membership records of this type.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
-    </div>
-    <div> {include file="CRM/common/formButtons.tpl"}</div>
-  {else}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
-      <tr class="crm-membership-type-form-block-name">
-        <td class="label">{$form.name.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_type' field='name' id=$membershipTypeId}{/if}
-        </td>
-        <td>{$form.name.html}<br />
-          <span class="description">{ts}e.g. 'Student', 'Senior', 'Honor Society'...{/ts}</span>
-        </td>
-      </tr>
-      <tr class="crm-membership-type-form-block-description">
-        <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_type' field='description' id=$membershipTypeId}{/if}
-        </td>
-        <td>{$form.description.html}<br />
-          <span class="description">{ts}Description of this membership type for internal use. May include eligibility, benefits, terms, etc.{/ts}</span>
-        </td>
-      </tr>
-
-      <tr class="crm-membership-type-form-block-member_org">
-        <td class="label">{$form.member_of_contact_id.label}</td>
-        <td>{$form.member_of_contact_id.html}<br />
-          <span class="description">{ts}Members assigned this membership type belong to which organization (e.g. this is for membership in 'Save the Whales - Northwest Chapter'). NOTE: This organization/group/chapter must exist as a CiviCRM Organization type contact.{/ts}</span>
-        </td>
-      </tr>
-
-      <tr class="crm-membership-type-form-block-minimum_fee">
-        <td class="label">{$form.minimum_fee.label}</td>
-        <td>{$form.minimum_fee.html|crmMoney}<br />
-          <span  class="description">{ts}Minimum fee required for this membership type. For free/complimentary memberships - set minimum fee to zero (0). NOTE: When using CiviCRM to process sales taxes this should be the tax exclusive amount.{/ts}</span>
-        </td>
-      </tr>
+      {foreach from=$tpl_standardised_fields item=fieldName}
+       {assign var=fieldSpec value=$entityFields.$fieldName}
+       <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
+          {include file="CRM/Core/Form/Field.tpl"}
+        </tr>
+      {/foreach}
       <tr class="crm-membership-type-form-block-financial_type_id">
         <td class="label">{$form.financial_type_id.label}</td>
         <td>{$form.financial_type_id.html}<br />
@@ -128,7 +103,7 @@
       <tr class="crm-membership-type-form-block-visibility">
         <td class="label">{$form.visibility.label}</td>
         <td>{$form.visibility.html}<br />
-          <span class="description">{ts}Is this membership type available for self-service signups ('Public') or assigned by CiviCRM 'staff' users only ('Admin'){/ts}</span>
+          <span class="description">{ts}Can this membership type be used for self-service signups ('Public'), or is it only for CiviCRM users with 'Edit Contributions' permission ('Admin').{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-weight">
@@ -149,6 +124,8 @@
         {ts 1=$reminderLink}Configure membership renewal reminders using <a href="%1">Schedule Reminders</a>. If you have previously configured renewal reminder templates, you can re-use them with your new scheduled reminders.{/ts} {docURL page="user/email/scheduled-reminders"}
       </div>
     </fieldset>
+
+    {include file="CRM/common/customDataBlock.tpl"}
 
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {/if}

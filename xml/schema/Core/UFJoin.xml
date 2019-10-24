@@ -101,6 +101,7 @@
     <title>Profile Use Data</title>
     <type>longtext</type>
     <comment>Json serialized array of data used by the ufjoin.module</comment>
+    <serialize>JSON</serialize>
     <add>4.5</add>
   </field>
 </table>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,28 +40,23 @@
  *
  * @return array
  *   API result Array.
+ * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_event_create($params) {
   // Required fields for creating an event
   if (empty($params['id']) && empty($params['is_template'])) {
-    civicrm_api3_verify_mandatory($params, NULL, array(
+    civicrm_api3_verify_mandatory($params, NULL, [
       'start_date',
       'title',
-      array('event_type_id', 'template_id'),
-    ));
+      ['event_type_id', 'template_id'],
+    ]);
   }
   // Required fields for creating an event template
   elseif (empty($params['id']) && !empty($params['is_template'])) {
-    civicrm_api3_verify_mandatory($params, NULL, array(
+    civicrm_api3_verify_mandatory($params, NULL, [
       'template_title',
-    ));
-  }
-
-  // Clone event from template
-  if (!empty($params['template_id']) && empty($params['id'])) {
-    $copy = CRM_Event_BAO_Event::copy($params['template_id']);
-    $params['id'] = $copy->id;
-    unset($params['template_id']);
+    ]);
   }
 
   _civicrm_api3_event_create_legacy_support_42($params);
@@ -78,7 +73,7 @@ function civicrm_api3_event_create($params) {
  */
 function _civicrm_api3_event_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
-  $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
+  $params['financial_type_id']['api.aliases'] = ['contribution_type_id'];
   $params['is_template']['api.default'] = 0;
 }
 
@@ -131,16 +126,16 @@ function civicrm_api3_event_get($params) {
   }
 
   $events = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Event', $sql, TRUE);
-  $options = _civicrm_api3_get_options_from_params($params);
+  $options = _civicrm_api3_get_options_from_params($params, TRUE);
   if ($options['is_count']) {
     return civicrm_api3_create_success($events, $params, 'Event', 'get');
   }
   foreach ($events as $id => $event) {
-    if (!empty($params['return.is_full'])) {
+    if (!empty($options['return']['is_full'])) {
       _civicrm_api3_event_getisfull($events, $id);
     }
     _civicrm_api3_event_get_legacy_support_42($events, $id);
-    if (!empty($options['return'])) {
+    if (!empty($options['return']['price_set_id'])) {
       $events[$id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $id);
     }
   }
@@ -157,7 +152,7 @@ function civicrm_api3_event_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_event_get_spec(&$params) {
-  $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
+  $params['financial_type_id']['api.aliases'] = ['contribution_type_id'];
 }
 
 /**
@@ -208,12 +203,14 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
   if (!empty($eventFullResult) && is_int($eventFullResult)) {
     $event[$event_id]['available_places'] = $eventFullResult;
   }
+  elseif (is_null($eventFullResult)) {
+    return $event[$event_id]['is_full'] = 0;
+  }
   else {
     $event[$event_id]['available_places'] = 0;
   }
   $event[$event_id]['is_full'] = $event[$event_id]['available_places'] == 0 ? 1 : 0;
 }
-
 
 /**
  * Get event list parameters.
@@ -223,14 +220,14 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
  * @param array $request
  */
 function _civicrm_api3_event_getlist_params(&$request) {
-  $fieldsToReturn = array('start_date', 'event_type_id', 'title', 'summary');
+  $fieldsToReturn = ['start_date', 'event_type_id', 'title', 'summary'];
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   $request['params']['options']['sort'] = 'start_date DESC';
   if (empty($request['params']['id'])) {
-    $request['params'] += array(
+    $request['params'] += [
       'is_template' => 0,
       'is_active' => 1,
-    );
+    ];
   }
 }
 
@@ -245,20 +242,16 @@ function _civicrm_api3_event_getlist_params(&$request) {
  * @return array
  */
 function _civicrm_api3_event_getlist_output($result, $request) {
-  $output = array();
+  $output = [];
   if (!empty($result['values'])) {
     foreach ($result['values'] as $row) {
-      $data = array(
+      $data = [
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
-        'description' => array(
-          CRM_Core_Pseudoconstant::getLabel(
-            'CRM_Event_BAO_Event',
-            'event_type_id',
-            $row['event_type_id']
-          ),
-        ),
-      );
+        'description' => [
+          CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $row['event_type_id']),
+        ],
+      ];
       if (!empty($row['start_date'])) {
         $data['description'][0] .= ': ' . CRM_Utils_Date::customFormat($row['start_date']);
       }
@@ -269,7 +262,7 @@ function _civicrm_api3_event_getlist_output($result, $request) {
       $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['id'], 'civicrm_event');
       $data['extra']['is_recur'] = FALSE;
       if ($repeat) {
-        $data['suffix'] = ts('(%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
+        $data['suffix'] = ts('(%1 of %2)', [1 => $repeat[0], 2 => $repeat[1]]);
         $data['extra']['is_recur'] = TRUE;
       }
       $output[] = $data;

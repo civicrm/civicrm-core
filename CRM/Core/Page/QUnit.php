@@ -43,7 +43,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
       CRM_Core_Resources::singleton()->addScriptFile($ext, "tests/qunit/$suite/test.js", 1000, 'html-header');
     }
 
-    CRM_Utils_System::setTitle(ts('QUnit: %2 (%1)', array(1 => $ext, 2 => $suite)));
+    CRM_Utils_System::setTitle(ts('QUnit: %2 (%1)', [1 => $ext, 2 => $suite]));
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'bower_components/qunit/qunit/qunit.js', 1, 'html-header')
       ->addStyleFile('civicrm', 'bower_components/qunit/qunit/qunit.css', 1, 'html-header');
@@ -64,13 +64,13 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
       && isset($arg[3])
       && isset($arg[4])
     ) {
-      return array(
+      return [
         trim(CRM_Utils_Type::escape($arg[3], 'String'), '/'),
         trim(CRM_Utils_Type::escape($arg[4], 'String'), '/'),
-      );
+      ];
     }
     else {
-      return array(NULL, NULL);
+      return [NULL, NULL];
     }
   }
 

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,7 +66,7 @@
             <td>{$row.contact_type}</td>
             <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=`$context`"}">{$row.sort_name}</a></td>
             {foreach from=$row item=value key=key}
-               {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "contact_type_orig") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id")and ($key neq "contact_sub_type")}
+               {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "contact_type_orig") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id")}
               <td>
                 {if $key EQ "household_income_total" }
                     {$value|crmMoney}
@@ -97,7 +97,7 @@
             <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=`$context`"}">{if $row.is_deleted}<del>{/if}{$row.sort_name}{if $row.is_deleted}</del>{/if}</a></td>
             {if $action eq 512 or $action eq 256}
               {if !empty($columnHeaders.street_address)}
-          <td><span title="{$row.street_address}">{$row.street_address|mb_truncate:22:"...":true}{if $row.do_not_mail} <span class="icon privacy-flag do-not-mail"></span>{/if}</span></td>
+          <td><span title="{$row.street_address|escape}">{$row.street_address|mb_truncate:22:"...":true}{if $row.do_not_mail} <span class="icon privacy-flag do-not-mail"></span>{/if}</span></td>
         {/if}
         {if !empty($columnHeaders.city)}
                 <td>{$row.city}</td>
@@ -113,7 +113,7 @@
               {/if}
               <td>
                 {if $row.email}
-                    <span title="{$row.email}">
+                    <span title="{$row.email|escape}">
                         {$row.email|mb_truncate:17:"...":true}
                         {if $row.on_hold}
                           (On Hold)<span class="status-hold" title="{ts}This email is on hold (probably due to bouncing).{/ts}"></span>
@@ -133,7 +133,7 @@
               </td>
            {else}
               {foreach from=$row item=value key=key}
-                {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "contact_sub_type") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id") and ($key neq "contact_type_orig")}
+                {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id") and ($key neq "contact_type_orig")}
                  <td>{$value}&nbsp;</td>
                 {/if}
               {/foreach}

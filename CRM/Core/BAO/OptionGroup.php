@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -69,8 +69,8 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionGroup', $id, 'is_active', $is_active);
@@ -87,23 +87,13 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return object
    */
-  public static function add(&$params, $ids = array()) {
-    if (empty($params['id'])) {
-      $params['id'] = CRM_Utils_Array::value('optionGroup', $ids);
+  public static function add(&$params, $ids = []) {
+    if (empty($params['id']) && !empty($ids['optionGroup'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
+      $params['id'] = $ids['optionGroup'];
     }
-
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-
-    // action is taken depending upon the mode
     $optionGroup = new CRM_Core_DAO_OptionGroup();
     $optionGroup->copyValues($params);;
-
-    if ($params['is_default']) {
-      $query = "UPDATE civicrm_option_group SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query);
-    }
-
     $optionGroup->save();
     return $optionGroup;
   }
@@ -171,10 +161,10 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *   ID of the option group.
    */
   public static function ensureOptionGroupExists($params) {
-    $existingValues = civicrm_api3('OptionGroup', 'get', array(
+    $existingValues = civicrm_api3('OptionGroup', 'get', [
       'name' => $params['name'],
       'return' => 'id',
-    ));
+    ]);
     if (!$existingValues['count']) {
       $result = civicrm_api3('OptionGroup', 'create', $params);
       return $result['id'];
@@ -217,6 +207,38 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
       }
     }
     return \Civi::$statics[__CLASS__]['titles_by_name'];
+  }
+
+  /**
+   * Set the given values to active, and set all other values to inactive.
+   *
+   * @param string $optionGroupName
+   *   e.g "languages"
+   * @param string[] $activeValues
+   *   e.g. array("en_CA","fr_CA")
+   */
+  public static function setActiveValues($optionGroupName, $activeValues) {
+    $params = [
+      1 => [$optionGroupName, 'String'],
+    ];
+
+    // convert activeValues into placeholders / params in the query
+    $placeholders = [];
+    $i = count($params) + 1;
+    foreach ($activeValues as $value) {
+      $placeholders[] = "%{$i}";
+      $params[$i] = [$value, 'String'];
+      $i++;
+    }
+    $placeholders = implode(', ', $placeholders);
+
+    CRM_Core_DAO::executeQuery("
+UPDATE civicrm_option_value cov
+       LEFT JOIN civicrm_option_group cog ON cov.option_group_id = cog.id
+SET cov.is_active = CASE WHEN cov.name IN ({$placeholders}) THEN 1 ELSE 0 END
+WHERE cog.name = %1",
+      $params
+    );
   }
 
 }

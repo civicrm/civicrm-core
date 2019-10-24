@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -96,7 +96,7 @@
                                     {assign var=fieldLink value=$field|cat:"_link"}
                                     {assign var=fieldHover value=$field|cat:"_hover"}
                                     <td  class="report-contents crm-report_{$field}">
-                                        {if $row.$fieldLink}<a title="{$row.$fieldHover}" href="{$row.$fieldLink}">{/if}
+                                        {if $row.$fieldLink}<a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}">{/if}
 
                                         {if $row.$field eq 'Subtotal'}
                                             {$row.$field}
@@ -142,7 +142,7 @@
                                                 {assign var=fieldHover value=$field|cat:"_hover"}
                               <td class="report-contents crm-report_{$field}">
                                   {if $row.$fieldLink}
-                                <a title="{$row.$fieldHover} "href="{$row.$fieldLink}">
+                                <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}">
                                   {/if}
 
                                   {if $row.$field eq 'Sub Total'}
@@ -201,3 +201,10 @@
     {/if}
     {include file="CRM/Report/Form/ErrorMessage.tpl"}
 </div>
+
+
+{if $outputMode == 'print'}
+  <script type="text/javascript">
+    window.print();
+  </script>
+{/if}

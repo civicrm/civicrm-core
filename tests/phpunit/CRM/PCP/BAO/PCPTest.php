@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,6 +33,8 @@
  */
 class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
+  use CRMTraits_PCP_PCPTestTrait;
+
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
@@ -56,7 +58,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertEquals($params['link_text'], $pcpBlock->link_text, 'Check for link text.');
     $this->assertEquals($params['is_active'], $pcpBlock->is_active, 'Check for is_active.');
     // Delete our test object
-    $delParams = array('id' => $pcpBlock->id);
+    $delParams = ['id' => $pcpBlock->id];
     // FIXME: Currently this delete fails with an FK constraint error: DELETE FROM civicrm_contribution_type  WHERE (  civicrm_contribution_type.id = 5 )
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCPBlock', $delParams );
   }
@@ -83,7 +85,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertEquals($params['is_active'], $pcp->is_active, 'Check for is_active.');
 
     // Delete our test object
-    $delParams = array('id' => $pcp->id);
+    $delParams = ['id' => $pcp->id];
     // FIXME: Currently this delete fails with an FK constraint error: DELETE FROM civicrm_contribution_type  WHERE (  civicrm_contribution_type.id = 5 )
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }
@@ -111,7 +113,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertEquals($params['is_active'], $pcp->is_active, 'Check for is_active.');
 
     // Delete our test object
-    $delParams = array('id' => $pcp->id);
+    $delParams = ['id' => $pcp->id];
     // FIXME: Currently this delete fails with an FK constraint error: DELETE FROM civicrm_contribution_type  WHERE (  civicrm_contribution_type.id = 5 )
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }
@@ -124,56 +126,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertDBRowNotExist('CRM_PCP_DAO_PCP', $pcpId,
       'Database check PCP deleted successfully.'
     );
-  }
-
-  /**
-   * Build params.
-   */
-  private function pcpBlockParams() {
-    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
-    $contribPageId = $contribPage->id;
-    $supporterProfile = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
-    $supporterProfileId = $supporterProfile->id;
-
-    $params = array(
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $contribPageId,
-      'supporter_profile_id' => $supporterProfileId,
-      'target_entity_id' => 1,
-      'is_approval_needed' => 1,
-      'is_tellfriend_enabled' => 1,
-      'tellfriend_limit' => 1,
-      'link_text' => 'Create your own PCP',
-      'is_active' => 1,
-    );
-
-    return $params;
-  }
-
-  /**
-   * Build params.
-   */
-  private function pcpParams() {
-    $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
-    $contactId = $contact->id;
-    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
-    $contribPageId = $contribPage->id;
-
-    $params = array(
-      'contact_id' => $contactId,
-      'status_id' => '1',
-      'title' => 'My PCP',
-      'intro_text' => 'Hey you, contribute now!',
-      'page_text' => 'You better give more.',
-      'donate_link_text' => 'Donate Now',
-      'page_id' => $contribPageId,
-      'is_thermometer' => 1,
-      'is_honor_roll' => 1,
-      'goal_amount' => 10000.00,
-      'is_active' => 1,
-    );
-
-    return $params;
   }
 
   /**

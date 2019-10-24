@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,10 +33,6 @@
 {include file="CRM/Mailing/Form/Count.tpl"}
 
 <table class="form-layout-compressed">
-    <tr class="crm-mailing-upload-form-block-sms_provider_id"><td class="label">{$form.sms_provider_id.label}</td>
-        <td>{$form.sms_provider_id.html} {help id ="id-sms_provider" isAdmin=$isAdmin}</td>
-    </tr>
-
     <tr class="crm-mailing-upload-form-block-template">
       <td class="label">{$form.SMStemplate.label}</td>
   <td>{$form.SMStemplate.html}</td>

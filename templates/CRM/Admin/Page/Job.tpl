@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,14 +25,15 @@
 *}
 {capture assign=runAllURL}{crmURL p='civicrm/admin/runjobs' q="reset=1"}{/capture}
 <div class="help">
-    {ts 1=$runAllURL}You can configure scheduled jobs (cron tasks) for your CiviCRM installation. For most sites, your system administrator should set up one or more 'cron' tasks to run the enabled jobs. However, you can also <a href="%1">run all scheduled jobs manually</a>, or run specific jobs from this screen (click 'more' and then 'Execute Now').{/ts} {docURL page="Managing Scheduled Jobs" resource="wiki" text="(Job parameters and command line syntax documentation...)"}
+    {ts 1=$runAllURL}You can configure scheduled jobs (cron tasks) for your CiviCRM installation. For most sites, your system administrator should set up one or more 'cron' tasks to run the enabled jobs. However, you can also <a href="%1">run all scheduled jobs manually</a>, or run specific jobs from this screen (click 'more' and then 'Execute Now').{/ts} {docURL page="sysadmin/setup/jobs" text="(Job parameters and command line syntax documentation...)"}
 </div>
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/Job.tpl"}
 {else}
 
-  {if $rows}
+<div class="crm-content-block crm-block">
+{if $rows}
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
@@ -45,7 +46,7 @@
     {strip}
         {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-        <br/><table class="selector row-highlight">
+        <table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Name (Frequency)/Description{/ts}</th>
             <th >{ts}Command/Parameters{/ts}</th>
@@ -86,4 +87,5 @@
      </div>
 
 {/if}
+</div>
 {/if}

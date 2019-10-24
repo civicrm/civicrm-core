@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -45,9 +45,9 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
-    $params = array('id' => $contactId);
+    $params = ['id' => $contactId];
 
-    $defaults = array();
+    $defaults = [];
     CRM_Contact_BAO_Contact::getValues($params, $defaults);
 
     //get the current employer name

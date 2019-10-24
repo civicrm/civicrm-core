@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,6 +32,8 @@
     {capture assign="premiumLink"}{crmURL p="civicrm/admin/contribute/managePremiums" q="reset=1"}{/capture}
     <p>{ts 1=$typeLink 2=$paymentLink 3=$premiumLink}Financial accounts correspond to those in your accounting system.  <a href="%1">Financial types</a>, <a href="%2">payment methods</a>, and <a href="%3">premiums</a> are associated with financial accounts so that they can result in the proper double-entry transactions to export to your accounting system.{/ts}</p>
   </div>
+
+<div class="crm-content-block crm-block">
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
       <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-top" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Financial Account{/ts}</span></a>
@@ -47,7 +49,7 @@
       {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
       <table id="crm-financial_accounts" class="display">
-         <thead class="sticky">
+        <thead class="sticky">
           <th>{ts}Name{/ts}</th>
           <th>{ts}Description{/ts}</th>
           <th>{ts}Acctg Code{/ts}</th>
@@ -60,15 +62,15 @@
         </thead>
         {foreach from=$rows item=row}
         <tr id="financial_account-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-        <td class="crm-editable" data-field="name">{$row.name}</td>
-        <td class="crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
-        <td class="crm-editable" data-field="accounting_code">{$row.accounting_code}</td>
-        <td>{$row.financial_account_type_id}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
-        <td>{if $row.is_deductible eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-        <td>{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-        <td>{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" /> {/if}</td>
-        <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-        <td>{$row.action|replace:'xx':$row.id}</td>
+          <td class="crm-editable" data-field="name">{$row.name}</td>
+          <td class="crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
+          <td class="crm-editable" data-field="accounting_code">{$row.accounting_code}</td>
+          <td>{$row.financial_account_type_id}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
+          <td>{if $row.is_deductible eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+          <td>{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+          <td>{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" /> {/if}</td>
+          <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+          <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
       </table>
@@ -88,4 +90,6 @@
       {ts 1=$crmURL}There are no Financial Account entered. You can <a href='%1'>add one</a>.{/ts}
     </div>
   {/if}
+</div>
+
 {/if}

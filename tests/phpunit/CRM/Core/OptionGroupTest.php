@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
    * Ensure only one option value exists after calling ensureOptionValueExists.
    */
   public function testWeightOptionGroup() {
-    $values = array();
+    $values = [];
     $options1 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE);
     $options2 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE, FALSE, 'value', 'name');
     // Verify that arrays are equal.
@@ -68,10 +68,10 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
    * @return array
    */
   public function optionGroupTests() {
-    $tests = array();
-    $tests[] = array('event_type', 'Integer');
-    $tests[] = array('addressee', 'null');
-    $tests[] = array('activity_status', 'Integer');
+    $tests = [];
+    $tests[] = ['event_type', 'Integer'];
+    $tests[] = ['addressee', 'null'];
+    $tests[] = ['activity_status', 'Integer'];
     return $tests;
   }
 
@@ -89,6 +89,22 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     else {
       $this->assertEquals($dataType, $expectedDataType);
     }
+  }
+
+  public function emailAddressTests() {
+    $tests[] = ['"Name"<email@example.com>', '"Name" <email@example.com>'];
+    $tests[] = ['"Name" <email@example.com>', '"Name" <email@example.com>'];
+    $tests[] = ['"Name"  <email@example.com>', '"Name" <email@example.com>'];
+    return $tests;
+  }
+
+  /**
+   * @dataProvider emailAddressTests
+   */
+  public function testSanitizeFromEmailAddress($dirty, $clean) {
+    $form = new CRM_Admin_Form_Options();
+    $actual = $form->sanitizeFromEmailAddress($dirty);
+    $this->assertEquals($actual, $clean);
   }
 
 }

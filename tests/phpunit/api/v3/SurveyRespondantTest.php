@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,23 +33,22 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
 
-
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
-    $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', array('label' => 'PhoneBank', 'sequential' => 1));
+    $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', ['label' => 'PhoneBank', 'sequential' => 1]);
     $phoneBankActivityTypeID = $phoneBankActivity['values'][0]['value'];
-    $surveyParams = array(
+    $surveyParams = [
       'title' => "survey respondent",
       'activity_type_id' => $phoneBankActivityTypeID,
       'instructions' => "Call people, ask for money",
-    );
+    ];
     $survey = $this->callAPISuccess('survey', 'create', $surveyParams);
     $surveyID = $survey['id'];
-    $this->params = array(
+    $this->params = [
       'sequential' => '1',
       'survey_id' => $surveyID,
-    );
+    ];
   }
 
   /**

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,6 +34,10 @@
       <td class="label">{$form.url.label} {help id="id-menu_url" file="CRM/Admin/Form/Navigation.hlp"}</td>
       <td>{$form.url.html} </td>
     </tr>
+    <tr class="crm-navigation-form-block-icon">
+      <td class="label">{$form.icon.label} {help id="id-menu_icon" file="CRM/Admin/Form/Navigation.hlp"}</td>
+      <td>{$form.icon.html} </td>
+    </tr>
     {if $form.parent_id.html}
       <tr class="crm-navigation-form-block-parent_id">
         <td class="label">{$form.parent_id.label} {help id="id-parent" file="CRM/Admin/Form/Navigation.hlp"}</td>
@@ -62,12 +66,7 @@
       .on('change', function() {
         $('span.permission_operator_wrapper').toggle(CRM._.includes($(this).val(), ','));
       })
-      .change()
-      .crmSelect2({
-        formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: function(row) {return row.label},
-        multiple: true
-      });
+      .change();
   });
 </script>
 {/literal}

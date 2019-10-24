@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -45,15 +45,12 @@ class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
     }
 
-    $session = &CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-    $summary = CRM_Case_BAO_Case::getCasesSummary(TRUE, $userID);
+    $summary = CRM_Case_BAO_Case::getCasesSummary(TRUE);
 
     if (!empty($summary)) {
       $this->assign('casesSummary', $summary);

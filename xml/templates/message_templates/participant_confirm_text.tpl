@@ -1,4 +1,5 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
 {if !$isAdditional and $participant.id}
 
 ===========================================================

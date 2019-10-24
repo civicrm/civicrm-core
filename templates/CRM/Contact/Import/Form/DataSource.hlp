@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -94,7 +94,7 @@
       <tr><td>{ts}A spreadsheet-like file with the contact data in each row. Data fields are separated by commas. You can export to a "CSV" file from most spreadsheet applications, many database managers, as well as other contact management and address book applications. Consult the documentation for your application if you're not sure how to do this. Save this file to your local hard drive (or an accessible drive on your network) - and then choose that file as your Import Upload File.{/ts}</td></tr>
       <tr><td><strong>{ts}SQL Query{/ts}</strong></td></tr>
       <tr><td>{ts}A direct SQL query in the form of a SELECT query. For example:{/ts}</td></tr>
-      <tr><td><code>SELECT first_name, last_name, email FROM somedatabase.sometable</code><td></tr>
+      <tr><td><code>SELECT first_name, last_name, email FROM somedatabase.sometable</code></td></tr>
       <tr><td>{ts}This query can be against a different database, but that database has to be on the same database server and the CiviCRM database user has to have the SELECT privilege (and any other privileges required to execute the query).{/ts}</td></tr>
     </table>
   </p>

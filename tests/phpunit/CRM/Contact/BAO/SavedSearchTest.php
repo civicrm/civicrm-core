@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -48,12 +48,12 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   protected function tearDown() {
-    $this->quickCleanup(array(
+    $this->quickCleanup([
       'civicrm_mapping_field',
       'civicrm_mapping',
       'civicrm_group',
       'civicrm_saved_search',
-    ));
+    ]);
   }
 
   /**
@@ -62,14 +62,14 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
   public function testDefaultValues() {
     $sg = new CRM_Contact_Form_Search_Advanced();
     $sg->controller = new CRM_Core_Controller();
-    $sg->_formValues = array(
+    $sg->_formValues = [
       'group_search_selected' => 'group',
-      'privacy_options' => array('do_not_email'),
+      'privacy_options' => ['do_not_email'],
       'privacy_operator' => 'OR',
       'privacy_toggle' => 2,
       'operator' => 'AND',
       'component_mode' => 1,
-    );
+    ];
     CRM_Core_DAO::executeQuery(
       "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($sg->_formValues) . "')"
     );
@@ -91,12 +91,191 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($formValues) . "')"
     );
     $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
-    $this->assertEquals(array('membership_type_id', 'membership_status_id'), array_keys($result));
+    $this->assertEquals(['membership_type_id', 'membership_status_id'], array_keys($result));
     foreach ($result as $key => $value) {
       $this->assertEquals($expectedResult, $value, 'failure on set ' . $searchDescription);
     }
   }
 
+  /**
+   * Test if dates ranges are stored correctly
+   * in civicrm_saved_search table and are
+   * extracted properly.
+   */
+  public function testDateRange() {
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = [
+      'hidden_basic' => 1,
+      'group_search_selected' => 'group',
+      'component_mode' => 1,
+      'operator' => 'AND',
+      'privacy_operator' => 'OR',
+      'privacy_toggle' => 1,
+      'participant_register_date_low' => '01/01/2009',
+      'participant_register_date_high' => '01/01/2018',
+      'radio_ts' => 'ts_all',
+      'title' => 'bah bah bah',
+    ];
+
+    $queryParams = [
+      0 => [
+        0 => 'participant_register_date_low',
+        1 => '=',
+        2 => '01/01/2009',
+        3 => 0,
+        4 => 0,
+      ],
+      1 => [
+        0 => 'participant_register_date_high',
+        1 => '=',
+        2 => '01/01/2018',
+        3 => 0,
+        4 => 0,
+      ],
+    ];
+
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $this->assertEquals('01/01/2009', $result['participant_register_date_low']);
+    $this->assertEquals('01/01/2018', $result['participant_register_date_high']);
+  }
+
+  /**
+   * Test if skipped elements are correctly
+   * stored and retrieved as formvalues.
+   */
+  public function testSkippedElements() {
+    $relTypeID = $this->relationshipTypeCreate();
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = [
+      'operator' => 'AND',
+      'title' => 'testsmart',
+      'radio_ts' => 'ts_all',
+      'component_mode' => CRM_Contact_BAO_Query::MODE_CONTACTS,
+      'display_relationship_type' => "{$relTypeID}_a_b",
+      'uf_group_id' => 1,
+    ];
+    $queryParams = [];
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $expectedResult = [
+      'operator' => 'AND',
+      'component_mode' => CRM_Contact_BAO_Query::MODE_CONTACTS,
+      'display_relationship_type' => "{$relTypeID}_a_b",
+      'uf_group_id' => 1,
+    ];
+    $this->checkArrayEquals($result, $expectedResult);
+  }
+
+  /**
+   * Test if relative dates are stored correctly
+   * in civicrm_saved_search table.
+   */
+  public function testRelativeDateValues() {
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = [
+      'operator' => 'AND',
+      'event_relative' => 'this.month',
+      'participant_relative' => 'today',
+      'participant_test' => 0,
+      'title' => 'testsmart',
+      'radio_ts' => 'ts_all',
+    ];
+    $queryParams = [];
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $expectedResult = [
+      'event' => 'this.month',
+      'participant' => 'today',
+    ];
+    $this->checkArrayEquals($result['relative_dates'], $expectedResult);
+  }
+
+  /**
+   * Test if change log relative dates are stored correctly
+   * in civicrm_saved_search table.
+   */
+  public function testRelativeDateChangeLog() {
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = [
+      'operator' => 'AND',
+      'log_date_relative' => 'this.month',
+      'radio_ts' => 'ts_all',
+    ];
+    $queryParams = [];
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $expectedResult = [
+      'log' => 'this.month',
+    ];
+    $this->checkArrayEquals($result['relative_dates'], $expectedResult);
+  }
+
+  /**
+   * Test relative dates
+   *
+   * This is a slightly odd test because it was originally created to test that we DO create a
+   * special 'relative_dates' key but the new favoured format is not to do that and to
+   * save (eg) custom_1_relative = this.day.
+   *
+   * It still presumably provides useful 'this does not fatal or give enotice' coverage.
+   */
+  public function testCustomFieldRelativeDates() {
+    // Create a custom field.
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'relative_date_test_group']);
+    $params = [
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'test_datefield',
+      'label' => 'Date Field for Testing',
+      'html_type' => 'Select Date',
+      'data_type' => 'Date',
+      'default_value' => NULL,
+      'weight' => 4,
+      'is_required' => 1,
+      'is_searchable' => 1,
+      'date_format' => 'mm/dd/yy',
+      'is_active' => 1,
+    ];
+    $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
+    $id = $customField['id'];
+
+    $queryParams = [
+      0 => [
+        0 => "custom_${id}_low",
+        1 => '=',
+        2 => '20170425000000',
+      ],
+      1 => [
+        0 => "custom_${id}_high",
+        1 => '=',
+        2 => '20170501235959',
+      ],
+    ];
+    $formValues = [
+      "custom_${id}_relative" => 'ending.week',
+    ];
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    // Since custom_13 doesn't have the word 'date' in it, the key is
+    // set to 0, rather than the field name.
+    $this->assertArrayNotHasKey('relative_dates', $queryParams, 'Relative date in custom field smart group creation failed.');
+    $dropCustomValueTables = TRUE;
+    $this->quickCleanup(['civicrm_saved_search'], $dropCustomValueTables);
+  }
 
   /**
    * Get variants of the fields we want to test.
@@ -104,10 +283,10 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * @return array
    */
   public function getSavedSearches() {
-    $return = array();
+    $return = [];
     $searches = $this->getSearches();
     foreach ($searches as $key => $search) {
-      $return[] = array($search['form_values'], $search['expected'], $key);
+      $return[] = [$search['form_values'], $search['expected'], $key];
     }
     return $return;
   }
@@ -120,78 +299,78 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * @return array
    */
   public function getSearches() {
-    return array(
-      'checkbox_format_1_first' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(1 => 1, 2 => 1),
-          'member_status_id' => array(1 => 1, 2 => 1),
-        ),
-        'expected' => array(1, 2),
-      ),
-      'checkbox_format_1_later' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(2 => 1, 1 => 1),
-          'member_status_id' => array(2 => 1, 1 => 1),
-        ),
-        'expected' => array(2, 1),
-      ),
-      'checkbox_format_single_use_1' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(1 => 1),
-          'member_status_id' => array(1 => 1),
-        ),
-        'expected' => array(1),
-      ),
-      'checkbox_format_single_not_1' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(2 => 1),
-          'member_status_id' => array(2 => 1),
-        ),
-        'expected' => array(2),
-      ),
-      'array_format' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(1, 2),
-          'member_status_id' => array(1, 2),
-        ),
-        'expected' => array(1, 2),
-      ),
-      'array_format_1_later' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(2, 1),
-          'member_status_id' => array(2, 1),
-        ),
-        'expected' => array(2, 1),
-      ),
-      'array_format_single_use_1' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(1),
-          'member_status_id' => array(1),
-        ),
-        'expected' => array(1),
-      ),
-      'array_format_single_not_1' => array(
-        'form_values' => array(
-          'member_membership_type_id' => array(2),
-          'member_status_id' => array(2),
-        ),
-        'expected' => array(2),
-      ),
-      'IN_format_single_not_1' => array(
-        'form_values' => array(
-          'membership_type_id' => array('IN' => array(2)),
-          'membership_status_id' => array('IN' => array(2)),
-        ),
-        'expected' => array(2),
-      ),
-      'IN_format_1_later' => array(
-        'form_values' => array(
-          'membership_type_id' => array('IN' => array(2, 1)),
-          'membership_status_id' => array('IN' => array(2, 1)),
-        ),
-        'expected' => array(2, 1),
-      ),
-    );
+    return [
+      'checkbox_format_1_first' => [
+        'form_values' => [
+          'member_membership_type_id' => [1 => 1, 2 => 1],
+          'member_status_id' => [1 => 1, 2 => 1],
+        ],
+        'expected' => [1, 2],
+      ],
+      'checkbox_format_1_later' => [
+        'form_values' => [
+          'member_membership_type_id' => [2 => 1, 1 => 1],
+          'member_status_id' => [2 => 1, 1 => 1],
+        ],
+        'expected' => [2, 1],
+      ],
+      'checkbox_format_single_use_1' => [
+        'form_values' => [
+          'member_membership_type_id' => [1 => 1],
+          'member_status_id' => [1 => 1],
+        ],
+        'expected' => [1],
+      ],
+      'checkbox_format_single_not_1' => [
+        'form_values' => [
+          'member_membership_type_id' => [2 => 1],
+          'member_status_id' => [2 => 1],
+        ],
+        'expected' => [2],
+      ],
+      'array_format' => [
+        'form_values' => [
+          'member_membership_type_id' => [1, 2],
+          'member_status_id' => [1, 2],
+        ],
+        'expected' => [1, 2],
+      ],
+      'array_format_1_later' => [
+        'form_values' => [
+          'member_membership_type_id' => [2, 1],
+          'member_status_id' => [2, 1],
+        ],
+        'expected' => [2, 1],
+      ],
+      'array_format_single_use_1' => [
+        'form_values' => [
+          'member_membership_type_id' => [1],
+          'member_status_id' => [1],
+        ],
+        'expected' => [1],
+      ],
+      'array_format_single_not_1' => [
+        'form_values' => [
+          'member_membership_type_id' => [2],
+          'member_status_id' => [2],
+        ],
+        'expected' => [2],
+      ],
+      'IN_format_single_not_1' => [
+        'form_values' => [
+          'membership_type_id' => ['IN' => [2]],
+          'membership_status_id' => ['IN' => [2]],
+        ],
+        'expected' => [2],
+      ],
+      'IN_format_1_later' => [
+        'form_values' => [
+          'membership_type_id' => ['IN' => [2, 1]],
+          'membership_status_id' => ['IN' => [2, 1]],
+        ],
+        'expected' => [2, 1],
+      ],
+    ];
   }
 
 }

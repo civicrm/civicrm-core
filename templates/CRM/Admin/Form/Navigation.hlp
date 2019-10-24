@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,6 +28,13 @@
 {/htxt}
 {htxt id="id-menu_url"}
 {ts}Enter the destination URL. Generally you should use relative URLs for CiviCRM pages (e.g. links to profiles). Use complete URLs for external pages. Leave this field empty if you are creating a menu section that does not have a clickable destination.{/ts}
+{/htxt}
+
+{htxt id="id-menu_icon-title"}
+  {ts}Icon{/ts}
+{/htxt}
+{htxt id="id-menu_icon"}
+{ts}Select an icon to appear to the left side of the navigation menu item.{/ts}
 {/htxt}
 
 {htxt id="id-parent-title"}

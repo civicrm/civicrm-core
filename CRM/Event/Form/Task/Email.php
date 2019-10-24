@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
  */
 
@@ -42,7 +42,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
    * Are we operating in "single mode", i.e. sending email to one
    * specific contact?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 
@@ -50,7 +50,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
    * Are we operating in "single mode", i.e. sending email to one
    * specific contact?
    *
-   * @var boolean
+   * @var bool
    */
   public $_noEmails = FALSE;
 

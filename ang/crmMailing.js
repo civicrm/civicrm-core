@@ -1,8 +1,6 @@
 (function (angular, $, _) {
 
-  angular.module('crmMailing', [
-    'crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'
-  ]);
+  angular.module('crmMailing', CRM.angRequires('crmMailing'));
 
   angular.module('crmMailing').config([
     '$routeProvider',

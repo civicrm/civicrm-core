@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -43,7 +43,7 @@ class CRM_Contact_Form_Edit_Lock {
    *   Form object.
    */
   public static function buildQuickForm(&$form) {
-    $form->addField('modified_date', array('type' => 'hidden', 'id' => 'modified_date', 'label' => ''));
+    $form->addField('modified_date', ['type' => 'hidden', 'id' => 'modified_date', 'label' => '']);
   }
 
   /**
@@ -59,7 +59,7 @@ class CRM_Contact_Form_Edit_Lock {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
+    $errors = [];
 
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
     if ($fields['modified_date'] != $timestamps['modified_date']) {

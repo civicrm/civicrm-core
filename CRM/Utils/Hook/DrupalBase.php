@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
 
@@ -38,40 +38,46 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   private $isBuilt = FALSE;
 
   /**
-   * @var array(string)
+   * All Modules.
+   *
+   * @var string[]
    */
   private $allModules = NULL;
 
   /**
-   * @var array(string)
+   * CiviCRM Modules.
+   *
+   * @var string[]
    */
   private $civiModules = NULL;
 
   /**
-   * @var array(string)
+   * Drupal modules.
+   *
+   * @var string[]
    */
   private $drupalModules = NULL;
 
   /**
-   * @see CRM_Utils_Hook::invoke()
-   *
    * @param int $numParams
    *   Number of parameters to pass to the hook.
-   * @param unknown $arg1
+   * @param mixed $arg1
    *   Parameter to be passed to the hook.
-   * @param unknown $arg2
+   * @param mixed $arg2
    *   Parameter to be passed to the hook.
-   * @param unknown $arg3
+   * @param mixed $arg3
    *   Parameter to be passed to the hook.
-   * @param unknown $arg4
+   * @param mixed $arg4
    *   Parameter to be passed to the hook.
-   * @param unknown $arg5
+   * @param mixed $arg5
    *   Parameter to be passed to the hook.
    * @param mixed $arg6
    * @param string $fnSuffix
    *   Function suffix, this is effectively the hook name.
    *
    * @return array|bool
+   * @throws \Exception
+   * @see CRM_Utils_Hook::invoke()
    */
   public function invokeViaUF(
     $numParams,
@@ -91,14 +97,11 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   public function buildModuleList() {
     if ($this->isBuilt === FALSE) {
       if ($this->drupalModules === NULL) {
-        if (function_exists('module_list')) {
-          // copied from user_module_invoke
-          $this->drupalModules = module_list();
-        }
+        $this->drupalModules = $this->getDrupalModules();
       }
 
       if ($this->civiModules === NULL) {
-        $this->civiModules = array();
+        $this->civiModules = [];
         $this->requireCiviModules($this->civiModules);
       }
 
@@ -125,6 +128,20 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
         // both CRM and CMS have bootstrapped, so this is the final list
         $this->isBuilt = TRUE;
       }
+    }
+  }
+
+  /**
+   * Gets modules installed on the Drupal site.
+   *
+   * @return array|null
+   *   The machine names of the modules installed in Drupal, or NULL if unable
+   *   to determine the modules.
+   */
+  protected function getDrupalModules() {
+    if (function_exists('module_list')) {
+      // copied from user_module_invoke
+      return module_list();
     }
   }
 

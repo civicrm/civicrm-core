@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_SMS_Controller_Send extends CRM_Core_Controller {
 
@@ -62,7 +62,7 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
     $this->addPages($this->_stateMachine, $action);
 
     // add all the actions
-    $uploadNames = array_merge(array('textFile'),
+    $uploadNames = array_merge(['textFile'],
       CRM_Core_BAO_File::uploadNames()
     );
 

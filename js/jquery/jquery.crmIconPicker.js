@@ -38,10 +38,12 @@
         ];
 
       function formatButton() {
-        var split = $input.val().split(' ');
+        var val = $input.val().replace('fa ', '');
+        val = val.replace('crm-i ', '');
+        var split = val.split(' ');
         $button.button('option', {
           label: split[0] || ts('None'),
-          icons: {primary: $input.val()}
+          icons: {primary: val ? val : 'fa-'}
         });
         $style.toggle(!!split[0]).val(split[1] || '');
       }
@@ -78,9 +80,9 @@
 
         function displayDialog() {
           dialog.append('<style type="text/css">' +
-            '#crmIconPicker {font-size: 2em;}' +
+            '#crmIconPicker {font-size: 20px;}' +
             '#crmIconPicker .icon-search input {font-family: FontAwesome; padding-left: .5em; margin-bottom: 1em;}' +
-            '#crmIconPicker a.ui-button {width: 2em; height: 2em; color: #222;}' +
+            '#crmIconPicker a.ui-button {width: 1em; height: 1em; color: #222;}' +
             '#crmIconPicker a.ui-button .ui-icon {margin-top: -0.5em; width: auto; height: auto;}' +
             '</style>' +
             '<div class="icon-search"><input class="crm-form-text" name="search" placeholder="&#xf002"/></div>' +
@@ -115,4 +117,9 @@
 
     });
   };
+
+  $(document)
+    .on('crmLoad', function(e) {
+      $('.crm-icon-picker', e.target).not('.iconpicker-widget').crmIconPicker();
+    });
 }(CRM.$, CRM._));

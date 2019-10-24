@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -50,6 +50,10 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
     self::createMapXML($ids, $lid, $this, TRUE, $type);
     $this->assign('single', FALSE);
     $this->assign('skipLocationType', TRUE);
+    $is_public = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $ids, 'is_public');
+    if ($is_public == 0) {
+      CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    }
   }
 
   /**

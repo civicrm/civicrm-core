@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -215,6 +215,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'title' => ts('Test-drive'),
           'url' => $urlString,
           'qs' => $urlParams . '&action=preview',
+          // Addresses https://lab.civicrm.org/dev/core/issues/658
+          'fe' => TRUE,
           'uniqueName' => 'test_drive',
         ),
       );
@@ -245,21 +247,21 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'name' => ts('Current Month-To-Date'),
           'title' => ts('Current Month-To-Date'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&start={$monthDate}&end={$now}",
+          'qs' => "{$urlParams}&receive_date_low={$monthDate}&receive_date_high={$now}",
           'uniqueName' => 'current_month_to_date',
         ),
         CRM_Core_Action::REVERT => array(
           'name' => ts('Fiscal Year-To-Date'),
           'title' => ts('Fiscal Year-To-Date'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&start={$yearDate}&end={$yearNow}",
+          'qs' => "{$urlParams}&receive_date_low={$yearDate}&receive_date_high={$yearNow}",
           'uniqueName' => 'fiscal_year_to_date',
         ),
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Cumulative'),
           'title' => ts('Cumulative'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&start=&end=$now",
+          'qs' => "{$urlParams}&receive_date_low=&receive_date_high=$now",
           'uniqueName' => 'cumulative',
         ),
       );
@@ -382,9 +384,18 @@ AND         cp.page_type = 'contribute'
       $this, TRUE, 0, 'GET'
     );
 
-    CRM_Contribute_BAO_ContributionPage::copy($gid);
+    $copy = CRM_Contribute_BAO_ContributionPage::copy($gid);
 
-    CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
+    $urlString = CRM_Utils_System::currentPath();
+    $urlParams = 'reset=1';
+
+    // Redirect to copied contribution page
+    if ($copy->id) {
+      $urlString = 'civicrm/admin/contribute/settings';
+      $urlParams .= '&action=update&id=' . $copy->id;
+    }
+
+    CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
   }
 
   /**
@@ -419,8 +430,10 @@ AND         cp.page_type = 'contribute'
     $params = array();
 
     $whereClause = $this->whereClause($params, FALSE);
-    $this->pagerAToZ($whereClause, $params);
-
+    $config = CRM_Core_Config::singleton();
+    if ($config->includeAlphabeticalPager) {
+      $this->pagerAToZ($whereClause, $params);
+    }
     $params = array();
     $whereClause = $this->whereClause($params, TRUE);
     $this->pager($whereClause, $params);

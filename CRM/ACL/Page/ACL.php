@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
 
@@ -39,7 +39,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -59,30 +59,30 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/acl',
           'qs' => 'reset=1&action=update&id=%%id%%',
           'title' => ts('Edit ACL'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable ACL'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/acl',
           'qs' => 'reset=1&action=delete&id=%%id%%',
           'title' => ts('Delete ACL'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -90,51 +90,17 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
   /**
    * Run the page.
    *
-   * This method is called after the page is created. It checks for the
-   * type of action and executes that action.
-   * Finally it calls the parent's run method.
+   * Set the breadcrumb before beginning the standard page run.
    */
   public function run() {
-    // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
-
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
-
     // set breadcrumb to append to admin/access
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Access Control'),
-        'url' => CRM_Utils_System::url('civicrm/admin/access',
-          'reset=1'
-        ),
-      ),
-    );
+        'url' => CRM_Utils_System::url('civicrm/admin/access', 'reset=1'),
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
-    // what action to take ?
-    if ($action & (CRM_Core_Action::ADD | CRM_Core_Action::DELETE)) {
-      $this->edit($action, $id);
-    }
-
-    if ($action & (CRM_Core_Action::UPDATE)) {
-      $this->edit($action, $id);
-
-      if (isset($id)) {
-        $aclName = CRM_Core_DAO::getFieldValue('CRM_ACL_DAO_ACL', $id);
-        CRM_Utils_System::setTitle(ts('Edit ACL -  %1', array(1 => $aclName)));
-      }
-    }
-
-    // finally browse the acl's
-    if ($action & CRM_Core_Action::BROWSE) {
-      $this->browse();
-    }
 
     // parent run
     return parent::run();
@@ -145,7 +111,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    */
   public function browse() {
     // get all acl's sorted by weight
-    $acl = array();
+    $acl = [];
     $query = "
   SELECT *
     FROM civicrm_acl
@@ -156,26 +122,26 @@ ORDER BY entity_id
 
     $roles = CRM_Core_OptionGroup::values('acl_role');
 
-    $group = array(
+    $group = [
       '-1' => ts('- select -'),
       '0' => ts('All Groups'),
-    ) + CRM_Core_PseudoConstant::group();
-    $customGroup = array(
+    ] + CRM_Core_PseudoConstant::group();
+    $customGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Custom Groups'),
-    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
-    $ufGroup = array(
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+    $ufGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Profiles'),
-    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
-    $event = array(
+    $event = [
       '-1' => ts('- select -'),
       '0' => ts('All Events'),
-    ) + CRM_Event_PseudoConstant::event();
+    ] + CRM_Event_PseudoConstant::event();
 
     while ($dao->fetch()) {
-      $acl[$dao->id] = array();
+      $acl[$dao->id] = [];
       $acl[$dao->id]['name'] = $dao->name;
       $acl[$dao->id]['operation'] = $dao->operation;
       $acl[$dao->id]['entity_id'] = $dao->entity_id;
@@ -193,22 +159,22 @@ ORDER BY entity_id
 
       switch ($acl[$dao->id]['object_table']) {
         case 'civicrm_saved_search':
-          $acl[$dao->id]['object'] = $group[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $group);
           $acl[$dao->id]['object_name'] = ts('Group');
           break;
 
         case 'civicrm_uf_group':
-          $acl[$dao->id]['object'] = $ufGroup[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $ufGroup);
           $acl[$dao->id]['object_name'] = ts('Profile');
           break;
 
         case 'civicrm_custom_group':
-          $acl[$dao->id]['object'] = $customGroup[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $customGroup);
           $acl[$dao->id]['object_name'] = ts('Custom Group');
           break;
 
         case 'civicrm_event':
-          $acl[$dao->id]['object'] = $event[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $event);
           $acl[$dao->id]['object_name'] = ts('Event');
           break;
       }
@@ -226,7 +192,7 @@ ORDER BY entity_id
       $acl[$dao->id]['action'] = CRM_Core_Action::formLink(
         self::links(),
         $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'ACL.manage.action',
@@ -267,6 +233,28 @@ ORDER BY entity_id
    */
   public function userContext($mode = NULL) {
     return 'civicrm/acl';
+  }
+
+  /**
+   * Edit an ACL.
+   *
+   * @param int $mode
+   *   What mode for the form ?.
+   * @param int $id
+   *   Id of the entity (for update, view operations).
+   * @param bool $imageUpload
+   *   Not used in this case, but extended from CRM_Core_Page_Basic.
+   * @param bool $pushUserContext
+   *   Not used in this case, but extended from CRM_Core_Page_Basic.
+   */
+  public function edit($mode, $id = NULL, $imageUpload = FALSE, $pushUserContext = TRUE) {
+    if ($mode & (CRM_Core_Action::UPDATE)) {
+      if (isset($id)) {
+        $aclName = CRM_Core_DAO::getFieldValue('CRM_ACL_DAO_ACL', $id);
+        CRM_Utils_System::setTitle(ts('Edit ACL &ndash; %1', [1 => $aclName]));
+      }
+    }
+    parent::edit($mode, $id, $imageUpload, $pushUserContext);
   }
 
 }

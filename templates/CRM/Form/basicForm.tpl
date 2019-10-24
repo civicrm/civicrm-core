@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,84 +25,6 @@
 *}
 <div class="crm-block crm-form-block crm-{$formName}-block">
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    {if $formName == "Contribute_Preferences"}
-      <table class = "form-layout">
-        {foreach from=$htmlFields item=desc key=htmlField}
-          {if $form.$htmlField}
-	    {assign var=n value=$htmlField|cat:'_description'}
-            <tr class="crm-preferences-form-block-{$htmlField}">
-              {if $form.$htmlField.html_type EQ 'checkbox'|| $form.$htmlField.html_type EQ 'checkboxes'}
-                <td class="label"></td>
-                <td>
-                  {$form.$htmlField.html} {$form.$htmlField.label}
-                  {if $desc}
-                    <br /><span class="description">{$desc}</span>
-                  {/if}
-                </td>
-              {else}
-                <td class="label">{$form.$htmlField.label}&nbsp;{if $htmlField eq 'acl_financial_type'}{help id="$htmlField"}{/if}</td>
-                <td>
-                  {$form.$htmlField.html}
-                  {if $desc}
-                    <br /><span class="description">{$desc}</span>
-                  {/if}
-                </td>
-              {/if}
-            </tr>
-          {/if}
-        {/foreach}
-      </table>
-    {/if}
-    <table class="form-layout" id="invoicing_blocks">
-        {foreach from=$fields item=field key=fieldName}
-            {assign var=n value=$fieldName}
-            {if $form.$n}
-              <tr class="crm-preferences-form-block-{$fieldName}">
-                    {if $field.html_type EQ 'checkbox'|| $field.html_type EQ 'checkboxes'}
-                        <td class="label"></td>
-                        <td>
-                            {$form.$n.html} {$form.$n.label}
-                            {if $field.description}
-                                <br /><span class="description">{$field.description}</span>
-                            {/if}
-                        </td>
-                    {else}
-                        <td class="label">{$form.$n.label}</td>
-                        <td>
-                            {$form.$n.html}
-                            {if $field.description}
-                                <br /><span class="description">{$field.description}</span>
-                            {/if}
-                        </td>
-                    {/if}
-              </tr>
-          {/if}
-        {/foreach}
-  </table>
-
+    {include file="CRM/Form/basicFormFields.tpl"}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-{if $formName == "Contribute_Preferences"}
-  {literal}
-    <script type="text/javascript">
-      cj(document).ready(function() {
-        if (document.getElementById("invoicing").checked) {
-          cj("#invoicing_blocks").show();
-        }
-        else {
-          cj("#invoicing_blocks").hide();
-        }
-      });
-      cj(function () {
-        cj("input[type=checkbox]").click(function() {
-          if (cj("#invoicing").is(":checked")) {
-            cj("#invoicing_blocks").show();
-          }
-          else {
-            cj("#invoicing_blocks").hide();
-          }
-        });
-      });
-    </script>
-  {/literal}
-{/if}

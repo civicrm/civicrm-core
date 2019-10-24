@@ -5,8 +5,7 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
-.crm-container input,
-#civicrm-menu input {
+.crm-container input {
   box-sizing: content-box;
 }
 
@@ -17,6 +16,10 @@ div.crm-container label {
 
 div.crm-container fieldset label{
   float: none;
+}
+
+input.crm-form-radio + label, input.crm-form-checkbox + label{
+  margin-left: 7px;
 }
 
 .crm-container .crm-quickSearchField {
@@ -271,7 +274,8 @@ input.crm-form-entityref {
 }
 .crm-container input.crm-form-text,
 .crm-container .crm-icon-picker-button,
-.crm-container input.dateplugin {
+.crm-container input.dateplugin,
+.crm-container input.crm-form-password {
   border: 1px solid #999;
   vertical-align: middle;
   padding: 1px 2px;
@@ -285,7 +289,9 @@ input.crm-form-entityref {
 .crm-container input.crm-form-text[disabled],
 .crm-container input.dateplugin[disabled],
 .crm-container select.crm-form-select[disabled],
-.crm-container input.crm-form-text[readonly] {
+.crm-container input.crm-form-text[readonly],
+.crm-container input.crm-form-password[disabled],
+.crm-container input.crm-form-password[readonly] {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #ddd), color-stop(15%, #f2f2f2));
   background-image: -webkit-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
   background-image: -moz-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
@@ -294,7 +300,8 @@ input.crm-form-entityref {
 
 .crm-container input.crm-form-text[disabled],
 .crm-container input.dateplugin[disabled],
-.crm-container select.crm-form-select[disabled] {
+.crm-container select.crm-form-select[disabled],
+.crm-container input.crm-form-password[disabled] {
   color: #a9a9a9;
 }
 
@@ -327,7 +334,6 @@ input.crm-form-entityref {
 
 .crm-container fieldset legend {
   display: block;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   font-weight: bold;
   padding: 4px;
@@ -378,6 +384,10 @@ input.crm-form-entityref {
   float: left;
   width: 17%;
   text-align: right;
+}
+
+.crm-container .crm-section .label label{
+  white-space: normal;
 }
 
 .crm-container .label-left .label {
@@ -709,7 +719,6 @@ input.crm-form-entityref {
   /* h3 used as table header for civicrm */
   background-color: #CDE8FE;
   font-size: 15px;
-  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   color: #121A2D;
   padding: 4px 6px;
@@ -874,6 +883,12 @@ input.crm-form-entityref {
 #crm-container tr.columnfooter td {
   font-size: 1.1em;
   font-weight: bold;
+}
+
+/* dev/core#1039 Make contact details in popup on merge screen non bold */
+#crm-container tr.columnheader td [class*="crm-summary-col-"] {
+  font-size: 13px;
+  font-weight: normal;
 }
 
 #crm-container tr.columnheader-dark th span.extra {
@@ -1069,6 +1084,7 @@ input.crm-form-entityref {
 #crm-recently-viewed ul {
   list-style-image: none;
   font-size: .9em;
+  padding: 0;
 }
 
 #crm-recently-viewed li.crm-recently-viewed {
@@ -1119,6 +1135,11 @@ input.crm-form-entityref {
 
 #crm-recently-viewed li.crm-recently-viewed:hover .crm-recentview-wrapper {
   display: block;
+}
+
+.crm-recentview-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #crm-recently-viewed .crm-recentview-wrapper a:hover {
@@ -1420,6 +1441,7 @@ input.crm-form-entityref {
   padding: 4px;
   margin: 0;
   line-height: 15px;
+  white-space: initial;
 }
 
 .crm-container .action-item-wrap {
@@ -1624,11 +1646,6 @@ input.crm-form-entityref {
   clear: both;
 }
 
-#crm-container table.caseSelector td.status-urgent {
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
 .crm-container .crm-clearfix:after {
   clear: both;
   content: ".";
@@ -1794,16 +1811,6 @@ input.crm-form-entityref {
 }
 
 /* Set/alter ICONS */
-
-#crm-container div#printer-friendly {
-  float: right;
-  position: relative;
-  margin: -2em 0.5em 0 0;
-}
-/* For Joomla, margin 0 works correctly */
-#crm-container table#crm-content div#printer-friendly {
-  margin: 0;
-}
 
 #crm-container .order-icon {
   height: 15px;
@@ -2113,6 +2120,10 @@ a.crm-i:hover {
   color: #6177D5;
 }
 
+.crm-i.crm-i-green {
+  color: #86c661;
+}
+
 .crm-i-button {
   position: relative;
 }
@@ -2337,7 +2348,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-status-box-outer.status-start {
-  background: #F8FF03 url("../bower_components/jquery-ui/themes/smoothness/images/animated-overlay.gif");
+  background: #F8FF03 url("../i/animated-overlay.gif");
 }
 
 .crm-status-box-outer .crm-status-box-inner {
@@ -2670,10 +2681,14 @@ div.crm-container form {
 /* Date plugin */
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date {
-  background: white url(../i/cal.gif) no-repeat scroll right center;
-  padding-right: 16px;
-  /* so that text doesn't flow on top of icon */
   width: 9em;
+}
+
+.crm-container input.dateplugin::placeholder,
+.crm-container input.crm-form-date::placeholder,
+.crm-container input.crm-form-time::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
 }
 
 .crm-container div.batch-update {
@@ -2750,7 +2765,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container a.sorting_desc,
 .crm-container a.sorting_asc {
   color: #A7A7A7;
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_both.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_both.png") no-repeat left center;
   padding-left: 20px;
 }
 .crm-container a.sorting_desc,
@@ -2765,16 +2780,16 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container table thead a.sorting_asc {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_asc.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_desc {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_desc.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_asc_disabled {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc_disabled.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_asc_disabled.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_desc_disabled {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc_disabled.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_desc_disabled.png") no-repeat left center;
 }
 
 /* Otherwise for some reason we have 2 sort icons */
@@ -2798,7 +2813,9 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container .disabled,
+.crm-container .disabled td,
 .crm-container .cancelled,
+.crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor,
 .crm-container li.crm-count-0 a.ui-tabs-anchor,
 .crm-container li.crm-count-0 a.ui-tabs-anchor em {
@@ -2899,7 +2916,6 @@ tbody.scrollContent tr.alternateRow {
 
 
 .crm-container div.status,
-div.m ul#civicrm-menu,
 .crm-container #help,
 .crm-container .help,
 .crm-container .ui-tabs-panel,
@@ -3117,6 +3133,10 @@ div.m ul#civicrm-menu,
 .crm-container .select2-container[class*=" fa-"]:before {
   display: none;
 }
+.crm-container .select2-results .select2-result.select2-disabled > .select2-result-label {
+  opacity: .6;
+  cursor: default;
+}
 
 /* Restore this property otherwise our css overrides it */
 .select2-search input {
@@ -3202,6 +3222,65 @@ span.crm-select-item-color {
 
 #crm-container .crm-fb-tweet-buttons {
   width: 93%;
+}
+
+/* Checkbox gropus */
+.crm-container ul.crm-checkbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  border: 1px solid #a5a5a5;
+  width: 300px;
+  max-width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.crm-container ul.crm-checkbox-list li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.crm-container ul.crm-checkbox-list li input {
+  position: absolute;
+  left: 5px;
+  top: 4px;
+}
+.crm-container ul.crm-checkbox-list li label {
+  display: block;
+  padding: 2px 0 2px 22px;
+  margin: 0;
+  word-break: break-all;
+}
+.crm-container ul.crm-checkbox-list li:nth-child(even) label {
+  background-color: #FAFAFA;
+}
+.crm-container ul.crm-checkbox-list li input:checked + label {
+  background-color: #FFFFCC;
+}
+.crm-container ul.crm-checkbox-list li:nth-child(even) input:checked + label {
+  background-color: #fffdb2
+}
+
+.crm-container ul.crm-sortable-list li label {
+  padding-left: 40px;
+  cursor: move;
+}
+.crm-container ul.crm-sortable-list li label:after {
+  display: block;
+  font-family: "FontAwesome";
+  content: "\f047";
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  font-size: 10px;
+  color: grey;
+}
+.crm-container ul.crm-sortable-list li:hover label:after {
+  color: inherit;
+}
+.crm-container ul.crm-checkbox-list.crm-sortable-list li input {
+  left: 23px;
 }
 
 /* classes related to batch entry operation */
@@ -3569,6 +3648,9 @@ span.crm-status-icon {
 .crm-container.crm-public .select2-container,
 .crm-container.crm-public .select2-results {
   font-size: 14px;
+}
+.crm-container.crm-public .select2-container * {
+  box-sizing: content-box;
 }
 .crm-container.crm-public .select2-container .select2-choice {
   padding: 5px 5px 5px 8px;

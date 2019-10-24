@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,13 +41,7 @@
             {foreach from=$elements item=element}
                 <tr class="crm-contact-custom-search-eventDetails-form-block-{$element}">
                     <td class="label">{$form.$element.label}</td>
-                    {if $element eq 'start_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}</td>
-                    {elseif $element eq 'end_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
-                    {else}
-                        <td>{$form.$element.html}</td>
-                    {/if}
+                    <td>{$form.$element.html}</td>
                 </tr>
             {/foreach}
             <tr class="crm-contact-custom-search-eventDetails-form-block-event_type">

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -47,11 +47,11 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $addressId = CRM_Utils_Request::retrieve('aid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, $_REQUEST);
 
-    $address = array();
+    $address = [];
     if ($addressId > 0) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']);
 
-      $entityBlock = array('id' => $addressId);
+      $entityBlock = ['id' => $addressId];
       $address = CRM_Core_BAO_Address::getValues($entityBlock, FALSE, 'id');
       if (!empty($address)) {
         foreach ($address as $key => & $value) {
@@ -65,16 +65,16 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
 
     if (!empty($currentAddressBlock['address'][$locBlockNo])) {
       // get contact name of shared contact names
-      $sharedAddresses = array();
+      $sharedAddresses = [];
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($currentAddressBlock['address']);
       foreach ($currentAddressBlock['address'] as $key => $addressValue) {
         if (!empty($addressValue['master_id']) &&
           !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']
         ) {
-          $sharedAddresses[$key]['shared_address_display'] = array(
+          $sharedAddresses[$key]['shared_address_display'] = [
             'address' => $addressValue['display'],
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
-          );
+          ];
         }
       }
       $idValue = $currentAddressBlock['address'][$locBlockNo]['id'];
@@ -83,9 +83,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
       }
 
       // add custom data of type address
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address',
-        $this, $idValue
-      );
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address', NULL, $idValue);
 
       // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
       $currentAddressBlock['address'][$locBlockNo]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
@@ -97,7 +95,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $contactId;
     $contact->find(TRUE);
-    $privacy = array();
+    $privacy = [];
     foreach (CRM_Contact_BAO_Contact::$_commPrefs as $name) {
       if (isset($contact->$name)) {
         $privacy[$name] = $contact->$name;

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,6 +38,7 @@
  *
  */
 class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
+
   /**
    */
   public function __construct() {
@@ -49,7 +50,7 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $this->tMargin = 0;
     $w = $pw - 2 * $this->lMargin;
     $h = $ph - 2 * $this->tMargin;
-    $this->format = array(
+    $this->format = [
       'name' => 'A4 horiz',
       'paper-size' => 'A4',
       'metric' => 'mm',
@@ -62,7 +63,7 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
       'width' => $w,
       'height' => $h,
       'font-size' => 36,
-    );
+    ];
     //      $this->setDebug ();
   }
 

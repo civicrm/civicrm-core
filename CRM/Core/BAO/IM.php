@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -98,20 +98,20 @@ WHERE
   civicrm_contact.id = %1
 ORDER BY
   civicrm_im.is_primary DESC, im_id ASC ";
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
-    $ims = $values = array();
+    $ims = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'id' => $dao->im_id,
         'name' => $dao->im,
         'locationTypeId' => $dao->locationTypeId,
         'providerId' => $dao->providerId,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $ims[$count++] = $values;
@@ -147,18 +147,18 @@ AND   cim.id IN (loc.im_id, loc.im_2_id)
 AND   ltype.id = cim.location_type_id
 ORDER BY cim.is_primary DESC, im_id ASC ";
 
-    $params = array(1 => array($entityId, 'Integer'));
+    $params = [1 => [$entityId, 'Integer']];
 
-    $ims = array();
+    $ims = [];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
-      $ims[$dao->im_id] = array(
+      $ims[$dao->im_id] = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'id' => $dao->im_id,
         'name' => $dao->im,
         'locationTypeId' => $dao->locationTypeId,
-      );
+      ];
     }
     return $ims;
   }

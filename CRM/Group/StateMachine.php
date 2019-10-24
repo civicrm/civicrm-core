@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -43,12 +43,12 @@ class CRM_Group_StateMachine extends CRM_Core_StateMachine {
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
-    $this->_pages = array(
+    $this->_pages = [
       'CRM_Group_Form_Edit' => NULL,
       'CRM_Contact_Form_Search_Basic' => NULL,
       'CRM_Contact_Form_Task_AddToGroup' => NULL,
       'CRM_Contact_Form_Task_Result' => NULL,
-    );
+    ];
 
     $this->addSequentialPages($this->_pages, $action);
   }

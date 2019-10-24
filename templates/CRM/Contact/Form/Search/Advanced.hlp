@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -82,6 +82,14 @@
     <p>{ts}Use this filter to limit search results to relationships where the related contacts are part of a specific group or groups. For example, you might want to find all individuals who are employees ('Employee of' relationship type) of organizations which are in your 'Corporate Sponsors' group.{/ts}</p>
 {/htxt}
 
+{htxt id="id-relationship-active-period-title"}
+{ts}Active Period{/ts}
+{/htxt}
+{htxt id="id-relationship-active-period"}
+    <p>{ts}Use this filter to limit search results to relationships which were active during the specified time period (e.g. this is useful if you need to search all volunteer relationships that were active during 2014).{/ts}</p>
+    <p>{ts}By definition a relationship is active if any of these conditions occurs: (1) Start Date <= Current Date <= End Date (2) Start Date <= Current Date and End Date is not defined (3) Start Date is not defined and Current Date <= End Date{/ts}</p>
+{/htxt}
+
 {htxt id="id-all-tags-title"}
 {ts}Tags{/ts}
 {/htxt}
@@ -102,4 +110,18 @@
 {htxt id="is-test"}
     <p>{ts}In the process of setting up CiviCRM components or configuring pages and profiles, you might have created test contributions, activities, participants, pledges, etc.{/ts}</p>
     <p>{ts}Once you have finished your testing, it is a good idea to clean up by finding your test records and deleting them.{/ts}</p>
+{/htxt}
+
+{htxt id="processor-id-title"}
+{ts}Processor ID{/ts}
+{/htxt}
+{htxt id="processor-id"}
+    <p>{ts}This is the payment processor's own ID for the recurring contribution. Ideally it should be unique, but in practice may not be.{/ts}</p>
+{/htxt}
+
+{htxt id="transaction-id-title"}
+{ts}Transaction ID{/ts}
+{/htxt}
+{htxt id="transaction-id"}
+    <p>{ts}Unique reference for the recurring contribution. May be made up of other fields, e.g. bank ID, account number, etc.{/ts}</p>
 {/htxt}

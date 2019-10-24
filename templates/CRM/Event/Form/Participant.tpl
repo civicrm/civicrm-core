@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -184,6 +184,16 @@
     {assign var=registerMode value="LIVE"}
   {/if}
   <div class="crm-block crm-form-block crm-participant-form-block">
+    {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
+      <div class="action-link css_right crm-link-credit-card-mode">
+        {if $contactId}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+        {else}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
+        {/if}
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card event registration{/ts}</a>
+      </div>
+    {/if}
     <div class="view-content">
       {if $participantMode}
         <div class="help">
@@ -249,12 +259,6 @@
               </tr>
             {/if}
           {/if}
-          {if $participantMode}
-            <tr class="crm-participant-form-block-payment_processor_id">
-              <td class="label nowrap">{$form.payment_processor_id.label}</td>
-              <td>{$form.payment_processor_id.html}</td>
-            </tr>
-          {/if}
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td>
             <td class="view-value">
@@ -274,13 +278,7 @@
           </tr>
           <tr class="crm-participant-form-block-register_date">
             <td class="label">{$form.register_date.label}</td>
-            <td>
-              {if $hideCalendar neq true}
-                    {include file="CRM/common/jcalendar.tpl" elementName=register_date}
-                  {else}
-                    {$form.register_date.value|crmDate}
-                  {/if}
-            </td>
+            <td>{$form.register_date.html}</td>
           </tr>
           <tr class="crm-participant-form-block-status_id">
             <td class="label">{$form.status_id.label}</td>
@@ -292,6 +290,12 @@
             <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}<br />
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
+          {if $participantMode}
+            <tr class="crm-participant-form-block-payment_processor_id">
+              <td class="label nowrap">{$form.payment_processor_id.label}</td>
+              <td>{$form.payment_processor_id.html}</td>
+            </tr>
+          {/if}
         </table>
        {if $participantId and $hasPayment}
         <table class='form-layout'>
@@ -357,8 +361,8 @@
           $('#campaign_id', $form).select2('val', info.campaign_id);
 
           // Event and event-type custom data
-          CRM.buildCustomData('Participant', eventId, {/literal}{$eventNameCustomDataTypeID}{literal});
-          CRM.buildCustomData('Participant', info.event_type_id, {/literal}{$eventTypeCustomDataTypeID}{literal});
+          CRM.buildCustomData('Participant', eventId, {/literal}{$eventNameCustomDataTypeID}{literal}, null, null, null, true);
+          CRM.buildCustomData('Participant', info.event_type_id, {/literal}{$eventTypeCustomDataTypeID}{literal}, null, null, null, true);
 
           buildFeeBlock();
         });
@@ -391,6 +395,9 @@
           {if $urlPathVar}
           dataUrl += '&' + '{$urlPathVar}';
           {/if}
+          {if $isBackOffice}
+            dataUrl += '&' + 'is_backoffice=1';
+          {/if}
 
           {literal}
           var eventId = $('[name=event_id], #event_id', $form).val();
@@ -404,7 +411,7 @@
             return;
           }
 
-          var participantId  = "{/literal}{$participantId}{literal}";
+          var participantId  = {/literal}{$participantId|@json_encode}{literal};
 
           if (participantId) {
             dataUrl += '&participantId=' + participantId;

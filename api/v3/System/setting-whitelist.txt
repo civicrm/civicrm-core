@@ -32,6 +32,7 @@ mailerJobSize
 mailerJobsMax
 maxFileSize
 max_attachments
+max_attachments_backend
 replyTo
 secondDegRelPermissions
 securityAlert

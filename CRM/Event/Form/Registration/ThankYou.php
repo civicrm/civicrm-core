@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -39,6 +39,7 @@
  *
  */
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * Set variables up before form is built.
@@ -96,13 +97,10 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    $getTaxDetails = FALSE;
+    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
     $taxAmount = 0;
 
-    $lineItemForTemplate = array();
+    $lineItemForTemplate = [];
     if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value) && $value != 'skip') {
@@ -111,7 +109,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
             foreach ($value as $v) {
               if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
                 $taxAmount += $v['tax_amount'];
-                $getTaxDetails = TRUE;
               }
             }
           }
@@ -123,13 +120,11 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config') &&
       !empty($lineItemForTemplate)
     ) {
-      $this->assign('lineItem', $lineItemForTemplate);
+      $this->assignLineItemsToTemplate($lineItemForTemplate);
     }
 
     if ($invoicing) {
-      $this->assign('getTaxDetails', $getTaxDetails);
       $this->assign('totalTaxAmount', $taxAmount);
-      $this->assign('taxTerm', $taxTerm);
     }
     $this->assign('totalAmount', $this->_totalAmount);
 
@@ -148,8 +143,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     if (CRM_Utils_Array::value('defaultRole', $this->_params[0]) == 1) {
       $this->assign('defaultRole', TRUE);
     }
-    $defaults = array();
-    $fields = array();
+    $defaults = [];
+    $fields = [];
     if (!empty($this->_fields)) {
       foreach ($this->_fields as $name => $dontCare) {
         $fields[$name] = 1;
@@ -179,7 +174,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     $params['entity_id'] = $this->_eventId;
     $params['entity_table'] = 'civicrm_event';
-    $data = array();
+    $data = [];
     CRM_Friend_BAO_Friend::retrieve($params, $data);
     if (!empty($data['is_active'])) {
       $friendText = $data['title'];

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  */
 function smarty_function_crmSetting($params, &$smarty) {
 
-  $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
+  $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Utils_REST', 'fatal']);
   unset($params['method']);
   unset($params['assign']);
   $params['version'] = 3;
@@ -51,7 +51,8 @@ function smarty_function_crmSetting($params, &$smarty) {
   require_once 'api/api.php';
   $result = civicrm_api('setting', 'getvalue', $params);
   unset($errorScope);
-  if ($result === FALSE) {
+  // Core-688 FALSE is returned by Boolean settings, thus giving false errors.
+  if ($result === NULL) {
     $smarty->trigger_error("Unknown error");
     return NULL;
   }

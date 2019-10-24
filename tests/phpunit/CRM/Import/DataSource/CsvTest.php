@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
+| CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2017                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -28,7 +28,7 @@
 /**
  * Tests for the CRM_Import_Datasource_Csv class.
  */
-class CRM_Import_Datasource_CsvTest extends CiviUnitTestCase {
+class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
 
   /**
    * Test the to csv function.
@@ -39,12 +39,12 @@ class CRM_Import_Datasource_CsvTest extends CiviUnitTestCase {
    */
   public function testToCsv($fileName) {
     $dataSource = new CRM_Import_DataSource_Csv();
-    $params = array(
-      'uploadFile' => array(
+    $params = [
+      'uploadFile' => [
         'name' => __DIR__ . '/' . $fileName,
-      ),
+      ],
       'skipColumnHeader' => TRUE,
-    );
+    ];
 
     // Get the PEAR::DB object
     $dao = new CRM_Core_DAO();
@@ -72,7 +72,7 @@ class CRM_Import_Datasource_CsvTest extends CiviUnitTestCase {
    * @return array
    */
   public function getCsvFiles() {
-    return array(array('import.csv'), array('yogi.csv'));
+    return [['import.csv'], ['yogi.csv']];
   }
 
 }

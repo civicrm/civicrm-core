@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,9 +24,11 @@
  +--------------------------------------------------------------------+
 *}
 {* Confirmation of Grant delete  *}
-<div class="messages status no-popup">
-        <p><div class="icon inform-icon"></div>&nbsp;
-        {ts}Are you sure you want to delete the selected Grants? This delete operation cannot be undone and will delete all transactions associated with these grants.{/ts}</p>
-        <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
+<div class="crm-block crm-form-block crm-grant-task-delete-form-block">
+  <div class="messages status no-popup">
+          <div class="icon inform-icon"></div>&nbsp;
+          {ts}Are you sure you want to delete the selected Grants? This delete operation cannot be undone and will delete all transactions associated with these grants.{/ts}
+          <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
+  </div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>

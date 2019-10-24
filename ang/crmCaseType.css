@@ -2,8 +2,14 @@
     vertical-align: middle;
     cursor: move;
 }
+
+.crmCaseType .fa-pencil {
+    margin: 0.2em 0.2em 0 0;
+    cursor: pointer;
+}
+
 .crmCaseType .fa-trash {
-    margin: 0.4em 0.2em 0 0;
+    margin: 0.56em 0.2em 0 0;
     cursor: pointer;
 }
 

@@ -1,0 +1,33 @@
+From 226061647fc7e30f99855c8b481a88f5d78f455b Mon Sep 17 00:00:00 2001
+From: Ed Preston <epreston@prestonsoft.com>
+Date: Mon, 9 Oct 2017 20:29:46 +1100
+Subject: [PATCH] Fix: Uncaught Dompdf\Exception: No block-level parent found.
+ Not good
+
+Fatal error: Uncaught Dompdf\Exception: No block-level parent found.
+Not good
+---
+ src/Dompdf.php | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/Dompdf.php b/src/Dompdf.php
+index 40329063..bfb1c2b1 100644
+--- a/src/Dompdf.php
++++ b/src/Dompdf.php
+@@ -490,6 +490,16 @@ public function loadHtml($str, $encoding = 'UTF-8')
+             $doc->loadHTML($str);
+             $doc->encoding = $encoding;
+ 
++            // Remove #text children nodes in nodes that shouldn't have #CRM-21395
++            $tag_names = array("html", "table", "tbody", "thead", "tfoot", "tr");
++            foreach ($tag_names as $tag_name) {
++                $nodes = $doc->getElementsByTagName($tag_name);
++
++                foreach ($nodes as $node) {
++                    self::removeTextNodes($node);
++                }
++            }
++
+             // If some text is before the doctype, we are in quirksmode
+             if (preg_match("/^(.+)<!doctype/i", ltrim($str), $matches)) {
+                 $quirksmode = true;

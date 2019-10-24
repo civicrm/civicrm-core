@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,8 +27,8 @@
   {ts}Override Status{/ts}
 {/htxt}
 {htxt id="id-status-override"}
-  <p>{ts}Membership status is normally assigned and updated automatically based on your configured membership status rules. However, if you want to assign a status manually and bypass automated status setting, check this box. Then you can select from the available status options.{/ts}</p>
-  <p>{ts}The status you assign will remain in force, unless it is again modified on this screen. As long as the Status Override flag is checked, the automated membership status update script will NOT update this membership record.{/ts}</p>
+  <p>{ts}Membership status is normally assigned and updated automatically based on your configured membership status rules. However, if you want to assign a status manually and bypass automated status setting, choose either "Override Permanently" or "Override Until Selected Date", Then you can select from the available status options.{/ts}</p>
+  <p>{ts}If you select "Override Permanently", The status you assign will remain in force, unless it is again modified on this screen. If you select "Override Until Selected Date", it will behave same as "Override Permanently" but will revert to "No" once the selected date is reached. As long as the Membership Override is active, the automated membership status update script will NOT update this membership record.{/ts}</p>
 {/htxt}
 
 {htxt id="id-contribution_contact-title"}

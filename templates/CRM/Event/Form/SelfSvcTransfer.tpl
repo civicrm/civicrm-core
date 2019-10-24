@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,22 +44,32 @@
       <td class="crm-participant-participant_role">{$details.role}</td>
     </tr>
   </table>
-  <div class="crm-public-form-item crm-section selfsvctransfer-section">
-    <div class="crm-public-form-item crm-section selfsvctransfer-firstname-section">
-      <div class="label">{$form.first_name.label}</div>
-      <div class="content">{$form.first_name.html}</div>
-      <div class="clear"></div>
+  {if $form.contact_id}
+    <div class="crm-public-form-item crm-section selfsvctransfer-section">
+      <div class="crm-public-form-item crm-section selfsvctransfer-contact_id-section">
+        <div class="label">{$form.contact_id.label}</div>
+        <div class="content">{$form.contact_id.html}</div>
+        <div class="clear"></div>
+      </div>
     </div>
-    <div class="crm-public-form-item crm-section selfsvctransfer-lastname-section">
-      <div class="label">{$form.last_name.label}</div>
-      <div class="content">{$form.last_name.html}</div>
-      <div class="clear"></div>
-   </div>
-   <div class="crm-public-form-item crm-section selfsvctransfer-email-section">
-     <div class="label">{$form.email.label}</div>
-     <div class="content">{$form.email.html}</div>
-     <div class="clear"></div>
-   </div>
-  </div>
+  {else}
+    <div class="crm-public-form-item crm-section selfsvctransfer-section">
+      <div class="crm-public-form-item crm-section selfsvctransfer-firstname-section">
+        <div class="label">{$form.first_name.label}</div>
+        <div class="content">{$form.first_name.html}</div>
+        <div class="clear"></div>
+      </div>
+      <div class="crm-public-form-item crm-section selfsvctransfer-lastname-section">
+        <div class="label">{$form.last_name.label}</div>
+        <div class="content">{$form.last_name.html}</div>
+        <div class="clear"></div>
+      </div>
+      <div class="crm-public-form-item crm-section selfsvctransfer-email-section">
+        <div class="label">{$form.email.label}</div>
+        <div class="content">{$form.email.html}</div>
+        <div class="clear"></div>
+      </div>
+    </div>
+  {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

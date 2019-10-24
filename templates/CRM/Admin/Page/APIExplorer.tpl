@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,10 +25,6 @@
 *}
 <style>
   {literal}
-  #mainTabContainer {
-    background: transparent;
-    border: 0 none;
-  }
   #mainTabContainer pre {
     line-height: 14px;
     font-size: 11px;
@@ -226,6 +222,7 @@
   {/literal}
 </style>
 
+<div class="crm-block crm-content-block">
 <div id="mainTabContainer">
   <ul>
     <li class="ui-corner-all" title="GUI to build and execute API calls">
@@ -240,7 +237,7 @@
   </ul>
 
   <div id="explorer-tab">
-
+    <div class="crm-block crm-form-block">
     <form id="api-explorer">
       <label for="api-entity">{ts}Entity{/ts}:</label>
       <select class="crm-form-select big required" id="api-entity" name="entity">
@@ -308,13 +305,16 @@
           <i class="crm-i fa-bolt"></i><input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}"/>
         </span>
       </div>
+
 <pre id="api-result" class="linenums">
 {ts}Results are displayed here.{/ts}
 </pre>
     </form>
   </div>
+  </div>
 
   <div id="examples-tab">
+    <div class="crm-block crm-form-block">
     <form id="api-examples">
       <label for="example-entity">{ts}Entity{/ts}:</label>
       <select class="crm-form-select big required" id="example-entity" name="entity">
@@ -335,8 +335,10 @@
 </pre>
     </form>
   </div>
+  </div>
 
   <div id="docs-tab">
+    <div class="crm-block crm-form-block">
     <form id="api-docs">
       <label for="doc-entity">{ts}Entity{/ts}:</label>
       <select class="crm-form-select big required" id="doc-entity" name="entity">
@@ -356,9 +358,10 @@
         {ts}Results are displayed here.{/ts}
       </div>
     </form>
+    </div>
   </div>
 </div>
-
+</div>
 {strip}
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -121,10 +121,10 @@
                       {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
                       {* Schedule Reminders requires a different query string. *}
                       {if $v.url EQ 'civicrm/event/manage/reminder'}
-                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                        <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"
                             href="{crmURL p="`$v.url`" q="reset=1&action=browse&setTab=1&id=`$id`"}">{$v.title}</a></li>
                       {else}
-                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                        <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"
                             href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
                       {/if}
                     {/foreach}

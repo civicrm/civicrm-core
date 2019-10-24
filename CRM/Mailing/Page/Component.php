@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -42,7 +42,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -51,7 +51,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_Mailing_BAO_Component';
+    return 'CRM_Mailing_BAO_MailingComponent';
   }
 
   /**
@@ -62,24 +62,24 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => CRM_Utils_System::currentPath(),
           'qs' => 'action=update&id=%%id%%',
           'title' => ts('Edit Mailing Component'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Mailing Component'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Mailing Component'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }

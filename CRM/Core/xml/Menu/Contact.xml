@@ -401,6 +401,7 @@
   <path_arguments>action=add</path_arguments>
   <title>Activities</title>
   <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
+  <access_arguments>send SMS</access_arguments>
 </item>
   <item>
     <path>civicrm/ajax/contactrelationships</path>

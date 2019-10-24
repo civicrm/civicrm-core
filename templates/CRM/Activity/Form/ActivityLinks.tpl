@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -68,10 +68,10 @@
 {if $hookLinks}
    {foreach from=$hookLinks item=link}
     <li>
-        <a href="{$link.url}" data-tab="activity"{if !empty($link.title)} title="{$link.title}"{/if}
+        <a href="{$link.url}" data-tab="activity"{if !empty($link.title)} title="{$link.title|escape}"{/if}
         {if !empty($link.class)} class="{$link.class}"{/if}>
           {if $link.img}
-                <img src="{$link.img}" alt="{$link.title}" />&nbsp;
+                <img src="{$link.img}" alt="{$link.title|escape}" />&nbsp;
           {/if}
           {$link.name}
         </a>

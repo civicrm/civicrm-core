@@ -1,9 +1,9 @@
 <?php
 /**
  * +--------------------------------------------------------------------+
- * | CiviCRM version 4.7                                                |
+ * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2017                                |
+ * | Copyright CiviCRM LLC (c) 2004-2019                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -37,48 +37,72 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
 
   /**
    * Test get function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
-    $this->callAPISuccess($this->_entity, 'getsingle', array('label' => 'Manage Groups', 'domain_id' => 1));
+  public function testGet($version) {
+    $this->_apiversion = $version;
+    $this->callAPISuccess($this->_entity, 'getsingle', ['label' => 'Manage Groups', 'domain_id' => 1]);
   }
 
   /**
    * Test get specifying parent
+   * FIXME: Api4
    */
   public function testGetByParent() {
     // get by name
-    $this->callAPISuccess($this->_entity, 'get', array('parentID' => 'Administer', 'domain_id' => 1));
+    $this->callAPISuccess($this->_entity, 'get', ['parentID' => 'Administer', 'domain_id' => 1]);
 
-    $params = array(
+    $params = [
       'name' => 'Administer',
       'domain_id' => 1,
       'return' => 'id',
-    );
+    ];
     $adminId = $this->callAPISuccess($this->_entity, 'getvalue', $params);
 
-    $this->callAPISuccess($this->_entity, 'get', array('parentID' => $adminId, 'domain_id' => 1));
+    $this->callAPISuccess($this->_entity, 'get', ['parentID' => $adminId, 'domain_id' => 1]);
   }
 
   /**
    * Test create function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreate() {
-    $params = array('label' => 'Feed the Goats', 'domain_id' => 1);
+  public function testCreate($version) {
+    $this->_apiversion = $version;
+    $params = ['label' => 'Feed the Goats', 'domain_id' => 1];
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->getAndCheck($params, $result['id'], $this->_entity, TRUE);
   }
 
   /**
-   * Test delete function.
+   * Test create function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDelete() {
-    $getParams = array(
+  public function testDefaultDomain($version) {
+    $this->_apiversion = $version;
+    $params = ['label' => 'Herd the Cats'];
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    // Check domain_id has been set per default
+    $params['domain_id'] = CRM_Core_Config::domainID();
+    $this->getAndCheck($params, $result['id'], $this->_entity, TRUE);
+  }
+
+  /**
+   * Test delete function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDelete($version) {
+    $this->_apiversion = $version;
+    $getParams = [
       'return' => 'id',
-      'options' => array('limit' => 1),
-    );
+      'options' => ['limit' => 1],
+    ];
     $result = $this->callAPISuccess('Navigation', 'getvalue', $getParams);
-    $this->callAPISuccess('Navigation', 'delete', array('id' => $result));
-    $this->callAPIFailure('Navigation', 'getvalue', array('id' => $result));
+    $this->callAPISuccess('Navigation', 'delete', ['id' => $result]);
+    $this->callAPIFailure('Navigation', 'getvalue', ['id' => $result]);
   }
 
 }

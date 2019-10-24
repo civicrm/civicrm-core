@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,30 +30,30 @@
  */
 class CRM_Core_Payment_BaseIPN {
 
-  static $_now = NULL;
+  public static $_now = NULL;
 
   /**
    * Input parameters from payment processor. Store these so that
    * the code does not need to keep retrieving from the http request
    * @var array
    */
-  protected $_inputParameters = array();
+  protected $_inputParameters = [];
 
   /**
    * Only used by AuthorizeNetIPN.
+   * @var bool
    *
    * @deprecated
    *
-   * @var bool
    */
   protected $_isRecurring = FALSE;
 
   /**
    * Only used by AuthorizeNetIPN.
+   * @var bool
    *
    * @deprecated
    *
-   * @var bool
    */
   protected $_isFirstOrLastRecurringPayment = FALSE;
 
@@ -125,6 +125,14 @@ class CRM_Core_Payment_BaseIPN {
 
     $objects['contact'] = &$contact;
     $objects['contribution'] = &$contribution;
+
+    // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
+    if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
+      // We don't need to worry if about removing contribution page id as it will be set later in
+      //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
+      unset($ids['contributionPage']);
+    }
+
     if (!$this->loadObjects($input, $ids, $objects, $required, $paymentProcessorID)) {
       return FALSE;
     }
@@ -156,10 +164,10 @@ class CRM_Core_Payment_BaseIPN {
       // default options are that we log an error & echo it out
       // note that we should refactor this error handling into error code @ some point
       // but for now setting up enough separation so we can do unit tests
-      $error_handling = array(
+      $error_handling = [
         'log_error' => 1,
         'echo_error' => 1,
-      );
+      ];
     }
     $ids['paymentProcessor'] = $paymentProcessorID;
     if (is_a($objects['contribution'], 'CRM_Contribute_BAO_Contribution')) {
@@ -187,10 +195,10 @@ class CRM_Core_Payment_BaseIPN {
         echo $e->getMessage();
       }
       if (!empty($error_handling['return_error'])) {
-        return array(
+        return [
           'is_error' => 1,
           'error_message' => ($e->getMessage()),
-        );
+        ];
       }
     }
     $objects = array_merge($objects, $contribution->_relatedObjects);
@@ -205,14 +213,15 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $input
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
-  public function failed(&$objects, &$transaction, $input = array()) {
+  public function failed(&$objects, &$transaction, $input = []) {
     $contribution = &$objects['contribution'];
-    $memberships = array();
+    $memberships = [];
     if (!empty($objects['membership'])) {
       $memberships = &$objects['membership'];
       if (is_numeric($memberships)) {
-        $memberships = array($objects['membership']);
+        $memberships = [$objects['membership']];
       }
     }
 
@@ -223,14 +232,14 @@ class CRM_Core_Payment_BaseIPN {
     $participant = &$objects['participant'];
 
     // CRM-15546
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ));
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ]);
+    $contribution->contribution_status_id = $contributionStatuses['Failed'];
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
-    $contribution->contribution_status_id = $contributionStatuses['Failed'];
     $contribution->save();
 
     // Add line items for recurring payments.
@@ -247,36 +256,19 @@ class CRM_Core_Payment_BaseIPN {
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
-        // if transaction is failed then set "Cancelled" as membership status
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ));
         foreach ($memberships as $membership) {
-          if ($membership) {
-            $membership->status_id = $membershipStatuses['Cancelled'];
-            $membership->save();
-
-            //update related Memberships.
-            $params = array('status_id' => $membershipStatuses['Cancelled']);
-            CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
-          }
+          // @fixme Should we cancel only Pending memberships? per cancelled()
+          $this->cancelMembership($membership, $membership->status_id, FALSE);
         }
       }
 
       if ($participant) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ));
-        $participant->status_id = $participantStatuses['Cancelled'];
-        $participant->save();
+        $this->cancelParticipant($participant->id);
       }
     }
 
     $transaction->commit();
-    CRM_Core_Error::debug_log_message("Setting contribution status to failed");
-    //echo "Success: Setting contribution status to failed<p>";
+    Civi::log()->debug("Setting contribution status to Failed");
     return TRUE;
   }
 
@@ -290,7 +282,7 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function pending(&$objects, &$transaction) {
     $transaction->commit();
-    CRM_Core_Error::debug_log_message("returning since contribution status is pending");
+    Civi::log()->debug("Returning since contribution status is Pending");
     echo "Success: Returning since contribution status is pending<p>";
     return TRUE;
   }
@@ -303,32 +295,38 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $input
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
-  public function cancelled(&$objects, &$transaction, $input = array()) {
+  public function cancelled(&$objects, &$transaction, $input = []) {
     $contribution = &$objects['contribution'];
-    $memberships = &$objects['membership'];
-    if (is_numeric($memberships)) {
-      $memberships = array($objects['membership']);
+    $memberships = [];
+    if (!empty($objects['membership'])) {
+      $memberships = &$objects['membership'];
+      if (is_numeric($memberships)) {
+        $memberships = [$objects['membership']];
+      }
     }
 
-    $participant = &$objects['participant'];
     $addLineItems = FALSE;
     if (empty($contribution->id)) {
       $addLineItems = TRUE;
     }
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ));
+    $participant = &$objects['participant'];
+
+    // CRM-15546
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ]);
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
-    $contribution->cancel_date = self::$_now;
-    $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
+    $contribution->cancel_date = self::$_now;
+    $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
     $contribution->save();
 
-    //add lineitems for recurring payments
+    // Add line items for recurring payments.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
       CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
@@ -342,37 +340,19 @@ class CRM_Core_Payment_BaseIPN {
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ));
-        // Cancel only Pending memberships
-        // CRM-18688
-        $pendingStatusId = $membershipStatuses['Pending'];
         foreach ($memberships as $membership) {
-          if ($membership && ($membership->status_id == $pendingStatusId)) {
-            $membership->status_id = $membershipStatuses['Cancelled'];
-            $membership->save();
-
-            //update related Memberships.
-            $params = array('status_id' => $membershipStatuses['Cancelled']);
-            CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
+          if ($membership) {
+            $this->cancelMembership($membership, $membership->status_id);
           }
         }
       }
 
       if ($participant) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ));
-        $participant->status_id = $participantStatuses['Cancelled'];
-        $participant->save();
+        $this->cancelParticipant($participant->id);
       }
     }
     $transaction->commit();
-    CRM_Core_Error::debug_log_message("Setting contribution status to cancelled");
-    //echo "Success: Setting contribution status to cancelled<p>";
+    Civi::log()->debug("Setting contribution status to Cancelled");
     return TRUE;
   }
 
@@ -386,9 +366,58 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function unhandled(&$objects, &$transaction) {
     $transaction->rollback();
-    CRM_Core_Error::debug_log_message("returning since contribution status: is not handled");
+    Civi::log()->debug("Returning since contribution status is not handled");
     echo "Failure: contribution status is not handled<p>";
     return FALSE;
+  }
+
+  /**
+   * Logic to cancel a participant record when the related contribution changes to failed/cancelled.
+   * @todo This is part of a bigger refactor for dev/core/issues/927 - "duplicate" functionality exists in CRM_Contribute_BAO_Contribution::cancel()
+   *
+   * @param $participantID
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function cancelParticipant($participantID) {
+    // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
+    $participantParams['id'] = $participantID;
+    $participantParams['status_id'] = 'Cancelled';
+    civicrm_api3('Participant', 'create', $participantParams);
+  }
+
+  /**
+   * Logic to cancel a membership record when the related contribution changes to failed/cancelled.
+   * @todo This is part of a bigger refactor for dev/core/issues/927 - "duplicate" functionality exists in CRM_Contribute_BAO_Contribution::cancel()
+   * @param \CRM_Member_BAO_Membership $membership
+   * @param int $membershipStatusID
+   * @param boolean $onlyCancelPendingMembership
+   *   Do we only cancel pending memberships? OR memberships in any status? (see CRM-18688)
+   * @fixme Historically failed() cancelled membership in any status, cancelled() cancelled only pending memberships so we retain that behaviour for now.
+   *
+   */
+  private function cancelMembership($membership, $membershipStatusID, $onlyCancelPendingMembership = TRUE) {
+    // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
+    // Cancel only Pending memberships
+    $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+    if (($membershipStatusID == $pendingMembershipStatusId) || ($onlyCancelPendingMembership == FALSE)) {
+      $cancelledMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled');
+
+      $membership->status_id = $cancelledMembershipStatusId;
+      $membership->save();
+
+      $params = ['status_id' => $cancelledMembershipStatusId];
+      CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
+
+      // @todo Convert the above to API
+      // $membershipParams = [
+      //   'id' => $membership->id,
+      //   'status_id' => $cancelledMembershipStatusId,
+      // ];
+      // civicrm_api3('Membership', 'create', $membershipParams);
+      // CRM_Member_BAO_Membership::updateRelatedMemberships($membershipParams['id'], ['status_id' => $cancelledMembershipStatusId]);
+    }
+
   }
 
   /**
@@ -413,7 +442,7 @@ class CRM_Core_Payment_BaseIPN {
    * This function has been problematic for some time but there are now several tests via the api_v3_Contribution test
    * and the Paypal & Authorize.net IPN tests so any refactoring should be done in conjunction with those.
    *
-   * This function needs to have the 'body' moved to the CRM_Contribution_BAO_Contribute class and to undergo
+   * This function needs to have the 'body' moved to the CRM_Contribute_BAO_Contribute class and to undergo
    * refactoring to separate the complete transaction and repeat transaction functionality into separate functions with
    * a shared function that updates related components.
    *
@@ -445,6 +474,9 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    * @param CRM_Core_Transaction $transaction
    * @param bool $recur
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
     $contribution = &$objects['contribution'];
@@ -462,7 +494,7 @@ class CRM_Core_Payment_BaseIPN {
   public function getBillingID(&$ids) {
     $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
     if (!$ids['billing']) {
-      CRM_Core_Error::debug_log_message(ts('Please set a location type of %1', array(1 => 'Billing')));
+      CRM_Core_Error::debug_log_message(ts('Please set a location type of %1', [1 => 'Billing']));
       echo "Failure: Could not find billing location type<p>";
       return FALSE;
     }
@@ -491,6 +523,8 @@ class CRM_Core_Payment_BaseIPN {
    *   is because the function is also used to generate pdfs
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values,

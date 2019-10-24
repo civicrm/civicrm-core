@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,12 +58,11 @@
   </tr>
   <tr class="crm-campaign-form-block-start_date">
       <td class="label">{$form.start_date.label}</td>
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=start_date}
-      </td>
+      <td class="view-value">{$form.start_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-end_date">
       <td class="label">{$form.end_date.label}</td>
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
+      <td class="view-value">{$form.end_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-status_id">
       <td class="label">{$form.status_id.label}</td>
@@ -95,26 +94,10 @@
   </tr>
   </table>
 
-  <div id="customData"></div>
+  {include file="CRM/common/customDataBlock.tpl"}
 
 {/if}
 <div class="crm-submit-buttons">
      {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>
-
-{* include custom data js *}
-{include file="CRM/common/customData.tpl"}
-
-{literal}
-<script type="text/javascript">
-  CRM.$(function($) {
-    {/literal}{if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-    {else}
-      CRM.buildCustomData( '{$customDataType}' );
-    {/if}
-    {literal}
-  });
-</script>
-{/literal}

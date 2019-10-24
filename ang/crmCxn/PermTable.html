@@ -21,7 +21,7 @@
             <em ng-show="api.actions == '*'">{{ts('Any')}}</em>
             <code ng-hide="api.actions == '*'">{{api.actions}}</code>
           </span>
-          <span ng-switch-default>
+          <span ng-switch-default="">
             <span ng-repeat="action in api.actions"><code>{{action}}</code><span ng-show="!$last">, </span></span>
           </span>
       </div>

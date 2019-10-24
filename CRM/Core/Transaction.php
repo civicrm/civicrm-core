@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
  * $Id$
  *
@@ -95,6 +95,7 @@ class CRM_Core_Transaction {
   /**
    * Whether commit() has been called on this instance
    * of CRM_Core_Transaction
+   * @var bool
    */
   private $_pseudoCommitted = FALSE;
 
@@ -147,7 +148,7 @@ class CRM_Core_Transaction {
   /**
    * @param $flag
    */
-  static public function rollbackIfFalse($flag) {
+  public static function rollbackIfFalse($flag) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
     if ($flag === FALSE && $frame !== NULL) {
       $frame->setRollbackOnly();
@@ -203,7 +204,7 @@ class CRM_Core_Transaction {
    * callstack will not wind-down normally -- e.g. before
    * a call to exit().
    */
-  static public function forceRollbackIfEnabled() {
+  public static function forceRollbackIfEnabled() {
     if (\Civi\Core\Transaction\Manager::singleton()->getFrame() !== NULL) {
       \Civi\Core\Transaction\Manager::singleton()->forceRollback();
     }
@@ -212,7 +213,7 @@ class CRM_Core_Transaction {
   /**
    * @return bool
    */
-  static public function willCommit() {
+  public static function willCommit() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
     return ($frame === NULL) ? TRUE : !$frame->isRollbackOnly();
   }
@@ -220,7 +221,7 @@ class CRM_Core_Transaction {
   /**
    * Determine whether there is a pending transaction.
    */
-  static public function isActive() {
+  public static function isActive() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
     return ($frame !== NULL);
   }
@@ -246,7 +247,7 @@ class CRM_Core_Transaction {
    *          See php manual call_user_func_array for details.
    * @param int $id
    */
-  static public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
+  public static function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
     $frame->addCallback($phase, $callback, $params, $id);
   }

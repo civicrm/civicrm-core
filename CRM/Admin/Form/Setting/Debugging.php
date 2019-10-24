@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -36,11 +36,13 @@
  */
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
     'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-  );
+    'assetCache' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'environment' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+  ];
 
   /**
    * Build the form object.
@@ -52,6 +54,11 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
     }
 
     parent::buildQuickForm();
+    if (Civi::settings()->getMandatory('environment') !== NULL) {
+      $element = $this->getElement('environment');
+      $element->freeze();
+      CRM_Core_Session::setStatus(ts('The environment settings have been disabled because it has been overridden in the settings file.'), ts('Environment settings'), 'info');
+    }
   }
 
 }

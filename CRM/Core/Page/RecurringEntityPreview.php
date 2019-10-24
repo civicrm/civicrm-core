@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
 
@@ -36,8 +36,8 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
    * Run the basic page (run essentially starts execution for that page).
    */
   public function run() {
-    $parentEventId = $startDate = $endDate = NULL;
-    $dates = $original = array();
+    $parentEntityId = $startDate = $endDate = NULL;
+    $dates = $original = [];
     $formValues = $_REQUEST;
     if (!empty($formValues['entity_table'])) {
       $startDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'][0];
@@ -56,26 +56,26 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
       }
 
       if (!empty($formValues['entity_id'])) {
-        $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['entity_id'], $formValues['entity_table']);
+        $parentEntityId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['entity_id'], $formValues['entity_table']);
       }
 
       // Get original entity
       $original[$startDateColumnName] = CRM_Utils_Date::processDate($formValues['repetition_start_date']);
       $daoName = CRM_Core_BAO_RecurringEntity::$_tableDAOMapper[$formValues['entity_table']];
-      if ($parentEventId) {
-        $startDate = $original[$startDateColumnName] = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $startDateColumnName);
-        $endDate = $original[$startDateColumnName] = $endDateColumnName ? CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $endDateColumnName) : NULL;
+      if ($parentEntityId) {
+        $startDate = $original[$startDateColumnName] = CRM_Core_DAO::getFieldValue($daoName, $parentEntityId, $startDateColumnName);
+        $endDate = $original[$startDateColumnName] = $endDateColumnName ? CRM_Core_DAO::getFieldValue($daoName, $parentEntityId, $endDateColumnName) : NULL;
       }
 
       //Check if there is any enddate column defined to find out the interval between the two range
       if (CRM_Utils_Array::value('intervalDateColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
         if ($endDate) {
           $interval = $recursion->getInterval($startDate, $endDate);
-          $recursion->intervalDateColumns = array($endDateColumnName => $interval);
+          $recursion->intervalDateColumns = [$endDateColumnName => $interval];
         }
       }
 
-      $dates = array_merge(array($original), $recursion->generateRecursiveDates());
+      $dates = array_merge([$original], $recursion->generateRecursiveDates());
 
       foreach ($dates as $key => &$value) {
         if ($startDateColumnName) {
@@ -88,8 +88,8 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
       }
 
       //Show the list of participants registered for the events if any
-      if ($formValues['entity_table'] == "civicrm_event" && !empty($parentEventId)) {
-        $getConnectedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($parentEventId, 'civicrm_event', TRUE);
+      if ($formValues['entity_table'] == "civicrm_event" && !empty($parentEntityId)) {
+        $getConnectedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($parentEntityId, 'civicrm_event', TRUE);
         if ($getConnectedEntities) {
           $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getConnectedEntities);
           if (!empty($participantDetails['countByName'])) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,8 +28,46 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
+
+  /**
+   * Create entity batch entry.
+   *
+   * @param array $params
+   * @return array
+   */
+  public static function create(&$params) {
+    $op = 'edit';
+    $entityId = CRM_Utils_Array::value('id', $params);
+    if (!$entityId) {
+      $op = 'create';
+    }
+    CRM_Utils_Hook::pre($op, 'EntityBatch', $entityId, $params);
+    $entityBatch = new CRM_Batch_DAO_EntityBatch();
+    $entityBatch->copyValues($params);
+    $entityBatch->save();
+    CRM_Utils_Hook::post($op, 'EntityBatch', $entityBatch->id, $entityBatch);
+    return $entityBatch;
+  }
+
+  /**
+   * Remove entries from entity batch.
+   * @param array|int $params
+   * @return CRM_Batch_DAO_EntityBatch
+   */
+  public static function del($params) {
+    if (!is_array($params)) {
+      $params = ['id' => $params];
+    }
+    $entityBatch = new CRM_Batch_DAO_EntityBatch();
+    $entityId = CRM_Utils_Array::value('id', $params);
+    CRM_Utils_Hook::pre('delete', 'EntityBatch', $entityId, $params);
+    $entityBatch->copyValues($params);
+    $entityBatch->delete();
+    CRM_Utils_Hook::post('delete', 'EntityBatch', $entityBatch->id, $entityBatch);
+    return $entityBatch;
+  }
 
 }

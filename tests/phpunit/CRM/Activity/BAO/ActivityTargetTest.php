@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,9 +52,8 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
   public function testRetrieveTargetIdsByActivityIdZeroID() {
     $this->activityCreate();
     $target = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId(0);
-    $this->assertSame($target, array(), 'No targets returned');
+    $this->assertSame($target, [], 'No targets returned');
   }
-
 
   public function testRetrieveTargetIdsByActivityIdOneID() {
     $activity = $this->activityCreate();

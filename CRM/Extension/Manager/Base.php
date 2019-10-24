@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,12 +30,14 @@
  * uninstalling extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
 
   /**
-   * @var bool hether to automatically uninstall and install during 'replace'
+   * Whether to automatically uninstall and install during 'replace'.
+   *
+   * @var bool
    */
   public $autoReplace;
 

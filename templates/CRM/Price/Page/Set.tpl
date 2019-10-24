@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,8 +49,7 @@
     {/if}
 
     {if $rows}
-    <div id="price_set">
-    <p></p>
+    <div id="price_set" class="crm-content-block crm-block">
         {strip}
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}

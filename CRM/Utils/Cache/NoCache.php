@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
+
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -54,20 +59,22 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
     return FALSE;
   }
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return null
    */
-  public function get($key) {
-    return NULL;
+  public function get($key, $default = NULL) {
+    return $default;
   }
 
   /**
@@ -84,6 +91,10 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    */
   public function flush() {
     return FALSE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
 }

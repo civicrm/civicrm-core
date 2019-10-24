@@ -22,7 +22,7 @@ Required vars: caseType
       {{ activityType.name }}
     </td>
     <td>
-      <input class="crm-form-text number" type="text" ng-pattern="/^[1-9][0-9]*$/" ng-model="activityType.max_instances" />
+      <input class="crm-form-text number" type="text" ng-pattern="/^[1-9][0-9]*$/" ng-model="activityType.max_instances">
     </td>
     <td>
       <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)" title="{{ts('Remove')}}"></a>
@@ -39,7 +39,7 @@ Required vars: caseType
            crm-var="newActivity"
            crm-on-add="addActivityType(newActivity)"
            placeholder="{{ts('Add activity type')}}"
-              />
+      ></span>
     </td>
   </tr>
   </tfoot>

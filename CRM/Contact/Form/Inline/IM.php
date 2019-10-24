@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -38,11 +38,13 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
 
   /**
    * Ims of the contact that is been viewed.
+   * @var array
    */
-  private $_ims = array();
+  private $_ims = [];
 
   /**
    * No of im blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 
@@ -88,7 +90,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_IM::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_IM', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Inline_IM', 'formRule']);
   }
 
   /**
@@ -102,7 +104,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = array();
+    $hasData = $hasPrimary = $errors = [];
     if (!empty($fields['im']) && is_array($fields['im'])) {
       foreach ($fields['im'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
@@ -135,7 +137,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_ims)) {
       foreach ($this->_ims as $id => $value) {
         $defaults['im'][$id] = $value;

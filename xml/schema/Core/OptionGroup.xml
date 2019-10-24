@@ -61,6 +61,7 @@
     <title>Option Group Is Reserved?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this a predefined system option group (i.e. it can not be deleted)?</comment>
     <add>1.5</add>
   </field>
@@ -68,12 +69,16 @@
     <name>is_active</name>
     <title>Option Group Is Active?</title>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
     <comment>Is this option group active?</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>is_locked</name>
     <title>Option Group Is Locked</title>
+    <default>0</default>
+    <required>true</required>
     <type>boolean</type>
     <comment>A lock to remove the ability to add new options via the UI.</comment>
     <add>4.5</add>

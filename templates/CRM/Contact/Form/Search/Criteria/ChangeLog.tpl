@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,24 +26,24 @@
 <div id="changelog" class="form-item">
   <table class="form-layout">
     <tr>
-      <td>
-        <span class="modifiedBy"><label>{ts}Modified By{/ts}</label></span>
-        <span class="hiddenElement addedBy"><label>{ts}Added By{/ts}</label></span>
-        <br/>
-        {$form.changed_by.html}
-      </td>
-      <td width="100%">
+      <td colspan="2">
         {$form.log_date.html}
-        <br/>
       </td>
     </tr>
     <tr>
+      <td width="30%">
+        <span class="modifiedBy"><label>{ts}Modified By{/ts}</label></span>
+        <span class="hiddenElement addedBy"><label>{ts}Added By{/ts}</label></span>
+      </td>
       <td>
         <span class="modifiedBy"><label>{ts}Modified Between{/ts}</label></span>
         <span class="hiddenElement addedBy"><label>{ts}Added Between{/ts}</label></span>
       </td>
     </tr>
     <tr>
+      <td>
+        {$form.changed_by.html}
+      </td>
       {include file="CRM/Core/DateRange.tpl" fieldName="log_date" from='_low' to='_high'}
     </tr>
   </table>

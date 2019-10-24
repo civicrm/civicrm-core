@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -51,38 +51,25 @@ class CRM_Dedupe_Finder {
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
    *
-   * @param int $limit
-   *   Optional limit. This limits the number of contacts for which the code will
-   *   attempt to find matches.
-   *
    * @return array
    *   Array of (cid1, cid2, weight) dupe triples
    *
-   * @throws CiviCRM_API3_Exception
    * @throws Exception
    */
-  public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE, $limit = NULL) {
+  public static function dupes($rgid, $cids = [], $checkPermissions = TRUE) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
-      CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
-    }
-    if (empty($rgBao->contactIds) && !empty($limit)) {
-      $limitedContacts = civicrm_api3('Contact', 'get', array(
-        'return' => 'id',
-        'contact_type' => $rgBao->contact_type,
-        'options' => array('limit' => $limit),
-      ));
-      $rgBao->contactIds = array_keys($limitedContacts['values']);
+      throw new CRM_Core_Exception('Dedupe rule not found for selected contacts');
     }
 
     $rgBao->fillTable();
     $dao = new CRM_Core_DAO();
     $dao->query($rgBao->thresholdQuery($checkPermissions));
-    $dupes = array();
+    $dupes = [];
     while ($dao->fetch()) {
-      $dupes[] = array($dao->id1, $dao->id2, $dao->weight);
+      $dupes[] = [$dao->id1, $dao->id2, $dao->weight];
     }
     $dao->query($rgBao->tableDropQuery());
 
@@ -96,7 +83,7 @@ class CRM_Dedupe_Finder {
    *
    * check_permission is a boolean flag to indicate if permission should be considered.
    * default is to always check permissioning but public pages for example might not want
-   * permission to be checked for anonymous users. Refer CRM-6211. We might be beaking
+   * permission to be checked for anonymous users. Refer CRM-6211. We might be breaking
    * Multi-Site dedupe for public pages.
    *
    * @param array $params
@@ -112,18 +99,22 @@ class CRM_Dedupe_Finder {
    *
    * @return array
    *   matching contact ids
+   * @throws \CRM_Core_Exception
    */
   public static function dupesByParams(
     $params,
     $ctype,
     $used = 'Unsupervised',
-    $except = array(),
+    $except = [],
     $ruleGroupID = NULL
   ) {
     // If $params is empty there is zero reason to proceed.
     if (!$params) {
-      return array();
+      return [];
     }
+    $checkPermission = CRM_Utils_Array::value('check_permission', $params, TRUE);
+    // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
+    $params = array_filter($params);
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
@@ -140,16 +131,19 @@ class CRM_Dedupe_Finder {
       $rgBao->contact_type = $ctype;
       $rgBao->used = $used;
       if (!$rgBao->find(TRUE)) {
-        CRM_Core_Error::fatal("$used rule for $ctype does not exist");
+        throw new CRM_Core_Exception("$used rule for $ctype does not exist");
       }
     }
-    $params['check_permission'] = CRM_Utils_Array::value('check_permission', $params, TRUE);
 
+    if (isset($params['civicrm_phone']['phone_numeric'])) {
+      $orig = $params['civicrm_phone']['phone_numeric'];
+      $params['civicrm_phone']['phone_numeric'] = preg_replace('/[^\d]/', '', $orig);
+    }
     $rgBao->params = $params;
     $rgBao->fillTable();
     $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery($params['check_permission']));
-    $dupes = array();
+    $dao->query($rgBao->thresholdQuery($checkPermission));
+    $dupes = [];
     while ($dao->fetch()) {
       if (isset($dao->id) && $dao->id) {
         $dupes[] = $dao->id;
@@ -165,18 +159,23 @@ class CRM_Dedupe_Finder {
    * @param int $rgid
    *   Rule group id.
    * @param int $gid
-   *   Contact group id (currently, works only with non-smart groups).
+   *   Contact group id.
    *
-   * @param int $limit
+   * @param int $searchLimit
+   *  Limit for the number of contacts to be used for comparison.
+   *  The search methodology finds all matches for the searchedContacts so this limits
+   *  the number of searched contacts, not the matches found.
+   *
    * @return array
    *   array of (cid1, cid2, weight) dupe triples
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function dupesInGroup($rgid, $gid, $limit = NULL) {
-    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, $limit));
+  public static function dupesInGroup($rgid, $gid, $searchLimit = 0) {
+    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, TRUE, $searchLimit));
     if (!empty($cids)) {
       return self::dupes($rgid, $cids);
     }
-    return array();
+    return [];
   }
 
   /**
@@ -190,18 +189,19 @@ class CRM_Dedupe_Finder {
    *
    * @return array
    *   valid $params array for dedupe
+   * @throws \CRM_Core_Exception
    */
   public static function formatParams($fields, $ctype) {
-    $flat = array();
+    $flat = [];
     CRM_Utils_Array::flatten($fields, $flat);
 
     // FIXME: This may no longer be necessary - check inputs
-    $replace_these = array(
+    $replace_these = [
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
       'gender' => 'gender_id',
-    );
-    foreach (array('individual_suffix', 'individual_prefix', 'gender') as $name) {
+    ];
+    foreach (['individual_suffix', 'individual_prefix', 'gender'] as $name) {
       if (!empty($fields[$name])) {
         $flat[$replace_these[$name]] = $flat[$name];
         unset($flat[$name]);
@@ -209,10 +209,10 @@ class CRM_Dedupe_Finder {
     }
 
     // handle {birth,deceased}_date
-    foreach (array(
+    foreach ([
       'birth_date',
       'deceased_date',
-    ) as $date) {
+    ] as $date) {
       if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
@@ -229,7 +229,7 @@ class CRM_Dedupe_Finder {
 
     // handle preferred_communication_method
     if (!empty($fields['preferred_communication_method'])) {
-      $methods = array_intersect($fields['preferred_communication_method'], array('1'));
+      $methods = array_intersect($fields['preferred_communication_method'], ['1']);
       $methods = array_keys($methods);
       sort($methods);
       if ($methods) {
@@ -238,7 +238,7 @@ class CRM_Dedupe_Finder {
     }
 
     // handle custom data
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, CRM_Core_DAO::$_nullObject, NULL, -1);
+    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1);
     CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
     foreach ($tree as $key => $cg) {
       if (!is_int($key)) {
@@ -266,15 +266,16 @@ class CRM_Dedupe_Finder {
     // FIXME: CRM-5026 should be fixed here; the below clobbers all address info; we should split off address fields and match
     // the -digit to civicrm_address.location_type_id and -Primary to civicrm_address.is_primary
     foreach ($flat as $key => $value) {
-      $matches = array();
+      $matches = [];
       if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+|Primary)$/', $key, $matches)) {
         $return = array_values(array_filter($matches));
-        $flat[$return[1]] = $value;
+        // make sure the first occurrence is kept, not the last
+        $flat[$return[1]] = empty($flat[$return[1]]) ? $value : $flat[$return[1]];
         unset($flat[$key]);
       }
     }
 
-    $params = array();
+    $params = [];
     $supportedFields = CRM_Dedupe_BAO_RuleGroup::supportedFields($ctype);
     if (is_array($supportedFields)) {
       foreach ($supportedFields as $table => $fields) {
@@ -282,12 +283,22 @@ class CRM_Dedupe_Finder {
           // for matching on civicrm_address fields, we also need the location_type_id
           $fields['location_type_id'] = '';
           // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
-          $fixes = array(
+          $fixes = [
             'address_name' => 'name',
             'country' => 'country_id',
             'state_province' => 'state_province_id',
             'county' => 'county_id',
-          );
+          ];
+          foreach ($fixes as $orig => $target) {
+            if (!empty($flat[$orig])) {
+              $params[$table][$target] = $flat[$orig];
+            }
+          }
+        }
+        if ($table === 'civicrm_phone') {
+          $fixes = [
+            'phone' => 'phone_numeric',
+          ];
           foreach ($fixes as $orig => $target) {
             if (!empty($flat[$orig])) {
               $params[$table][$target] = $flat[$orig];
@@ -310,7 +321,7 @@ class CRM_Dedupe_Finder {
    * @param array $foundDupes
    * @param string $cacheKeyString
    *
-   * @return array Dupe pairs with the keys
+   * @return array
    *   Dupe pairs with the keys
    *   -srcID
    *   -srcName
@@ -318,11 +329,9 @@ class CRM_Dedupe_Finder {
    *   -dstName
    *   -weight
    *   -canMerge
-   *
-   * @throws CRM_Core_Exception
    */
   public static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
-    $cids = array();
+    $cids = [];
     foreach ($foundDupes as $dupe) {
       $cids[$dupe[0]] = 1;
       $cids[$dupe[1]] = 1;
@@ -330,7 +339,7 @@ class CRM_Dedupe_Finder {
     $cidString = implode(', ', array_keys($cids));
 
     $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
-    $displayNames = array();
+    $displayNames = [];
     while ($dao->fetch()) {
       $displayNames[$dao->id] = $dao->display_name;
     }
@@ -345,19 +354,18 @@ class CRM_Dedupe_Finder {
         $dstID = $userId;
       }
 
-      $mainContacts[] = $row = array(
+      $mainContacts[] = $row = [
         'dstID' => $dstID,
         'dstName' => $displayNames[$dstID],
         'srcID' => $srcID,
         'srcName' => $displayNames[$srcID],
         'weight' => $dupes[2],
         'canMerge' => TRUE,
-      );
+      ];
 
       $data = CRM_Core_DAO::escapeString(serialize($row));
-      $values[] = " ( 'civicrm_contact', $dstID, $srcID, '$cacheKeyString', '$data' ) ";
+      CRM_Core_BAO_PrevNextCache::setItem('civicrm_contact', $dstID, $srcID, $cacheKeyString, $data);
     }
-    CRM_Core_BAO_PrevNextCache::setItem($values);
     return $mainContacts;
   }
 

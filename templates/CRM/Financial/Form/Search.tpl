@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 
 {* Financial search component. *}
 <div id="enableDisableStatusMsg" class="crm-container" style="display:none"></div>
-<div class="crm-submit-buttons">
+<div class="action-link">
   <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}New Accounting Batch{/ts}</span></a>
 </div>
 <div class="crm-form-block crm-search-form-block">
@@ -99,8 +99,8 @@ CRM.$(function($) {
         {sClass:'crm-batch-checkbox', bSortable:false},
         {sClass:'crm-batch-name'},
         {sClass:'crm-batch-payment_instrument'},
-        {sClass:'crm-batch-item_count right'},
-        {sClass:'crm-batch-total right'},
+        {sClass:'crm-batch-item_count right', bSortable:false},
+        {sClass:'crm-batch-total right', bSortable:false},
         {sClass:'crm-batch-status'},
         {sClass:'crm-batch-created_by'},
         {sClass:'crm-batch-links', bSortable:false},

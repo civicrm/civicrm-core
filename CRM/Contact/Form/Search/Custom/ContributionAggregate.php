@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -46,12 +46,12 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     $this->_formValues = $formValues;
 
     // Define the columns for search result rows
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
       ts('Contribution Count') => 'donation_count',
       ts('Contribution Amount') => 'donation_amount',
-    );
+    ];
 
     // define component access permission needed
     $this->_permissionedComponent = 'CiviContribute';
@@ -63,6 +63,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
+    $form->addSearchFieldMetadata(['Contribution' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
 
     /**
      * You can define a custom title for the search form
@@ -83,17 +85,16 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
       ts('...and $')
     );
     $form->addRule('max_amount', ts('Please enter a valid amount (numbers and decimal point only).'), 'money');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     $form->addSelect('financial_type_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search')
+      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search']
     );
 
     /**
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array('min_amount', 'max_amount'));
+    $form->assign('elements', ['min_amount', 'max_amount']);
   }
 
   /**
@@ -188,6 +189,20 @@ civicrm_contact AS contact_a {$this->_aclFrom}
   }
 
   /**
+   * Get the metadata for fields to be included on the contact search form.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'receive_date' => ['title' => ''],
+    ];
+    $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
+    foreach ($fields as $fieldName => $field) {
+      $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
+    }
+    return $fields;
+  }
+
+  /**
    * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values.
    *
    * @param bool $includeContactIDs
@@ -195,28 +210,40 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array(
+    $clauses = [
       "contrib.contact_id = contact_a.id",
       "contrib.is_test = 0",
-    );
+    ];
 
-    $dateParams = array(
-      'contribution_date_relative' => $this->_formValues['contribution_date_relative'],
-      'contribution_date_low' => $this->_formValues['contribution_date_low'],
-      'contribution_date_high' => $this->_formValues['contribution_date_high'],
-    );
+    foreach ([
+      'receive_date_relative',
+      'receive_date_low',
+      'receive_date_high',
+    ] as $dateFieldName) {
+      $dateParams[$dateFieldName] = CRM_Utils_Array::value(
+        $dateFieldName,
+        $this->_formValues
+      );
+    }
+
     foreach (CRM_Contact_BAO_Query::convertFormValues($dateParams) as $values) {
       list($name, $op, $value) = $values;
       if (strstr($name, '_low')) {
-        $clauses[] = "contrib.receive_date >= " . CRM_Utils_Date::processDate($value);
+        if (strlen($value) == 10) {
+          $value .= ' 00:00:00';
+        }
+        $clauses[] = "contrib.receive_date >= '{$value}'";
       }
       else {
-        $clauses[] = "contrib.receive_date <= " . CRM_Utils_Date::processDate($value);
+        if (strlen($value) == 10) {
+          $value .= ' 23:59:59';
+        }
+        $clauses[] = "contrib.receive_date <= '{$value}'";
       }
     }
 
     if ($includeContactIDs) {
-      $contactIDs = array();
+      $contactIDs = [];
       foreach ($this->_formValues as $id => $value) {
         if ($value &&
           substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -248,7 +275,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function having($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [];
     $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
     if ($min) {
       $min = CRM_Utils_Rule::cleanMoney($min);
@@ -274,9 +301,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
   public function count() {
     $sql = $this->all();
 
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 

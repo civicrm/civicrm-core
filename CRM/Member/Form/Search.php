@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -61,6 +61,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "member_";
 
@@ -69,7 +70,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  protected $entityReferenceFields = array('membership_type_id');
+  protected $entityReferenceFields = ['membership_type_id'];
 
   /**
    * Processing needed for buildForm and later.
@@ -82,19 +83,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->defaults = array();
-
-    /*
-     * we allow the controller to set force/reset externally, useful when we are being
-     * driven by the wizard framework
-     */
-
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-
-    $this->assign("context", $this->_context);
+    $this->loadStandardSearchOptionsFromUrl();
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
@@ -106,6 +95,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     }
 
     if ($this->_force) {
+      $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);
+      $this->addFormFieldsFromMetadata();
       $this->postProcess();
       $this->set('force', 0);
     }
@@ -153,7 +144,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addSortNameField();
+    $this->addContactSearchFields();
 
     CRM_Member_BAO_Query::buildSearchForm($this);
 
@@ -163,9 +154,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
         $this->addRowSelectors($rows);
       }
 
-      $permission = CRM_Core_Permission::getPermission();
-
-      $this->addTaskMenu(CRM_Member_Task::permissionedTaskTitles($permission));
+      $this->addTaskMenu(CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()));
     }
 
   }
@@ -193,6 +182,36 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Get the label for the tag field.
+   *
+   * We do this in a function so the 'ts' wraps the whole string to allow
+   * better translation.
+   *
+   * @return string
+   */
+  protected function getTagLabel() {
+    return ts('Member Tag(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getGroupLabel() {
+    return ts('Member Group(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getContactTypeLabel() {
+    return ts('Member Contact Type');
+  }
+
+  /**
    * The post processing of the form gets done here.
    *
    * Key things done during post processing are
@@ -210,8 +229,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
 
     $this->fixFormValues();
 
@@ -276,17 +294,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Set default values.
-   *
-   * @todo - can this function override be removed?
-   *
-   * @return array
-   */
-  public function setDefaultValues() {
-    return $this->_defaults;
-  }
-
-  /**
    * If this search has been forced then see if there are any get values, and if so over-ride the post values.
    *
    * Note that this means that GET over-rides POST :) & that force with no parameters can be very destructive.
@@ -305,8 +312,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     $membershipType = CRM_Utils_Request::retrieve('type', 'String');
 
     if ($membershipType) {
-      $this->_formValues['membership_type_id'] = array($membershipType);
-      $this->_defaults['membership_type_id'] = array($membershipType);
+      $this->_formValues['membership_type_id'] = [$membershipType];
+      $this->_defaults['membership_type_id'] = [$membershipType];
     }
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
@@ -353,8 +360,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     //LCD also allow restrictions to membership owner via GET
     $owner = CRM_Utils_Request::retrieve('owner', 'String');
-    if ($owner) {
-      $this->_formValues['member_is_primary'] = $this->_defaults['member_is_primary'] = 2;
+    if (in_array($owner, ['0', '1'])) {
+      $this->_formValues['member_is_primary'] = $this->_defaults['member_is_primary'] = $owner;
     }
   }
 

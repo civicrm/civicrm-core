@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentProcessorType {
 
   /**
    * Static holder for the default payment processor.
+   * @var object
    */
-  static $_defaultPaymentProcessorType = NULL;
+  public static $_defaultPaymentProcessorType = NULL;
 
   /**
    * Class constructor.
@@ -73,9 +74,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
-   *
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_PaymentProcessorType', $id, 'is_active', $is_active);
@@ -90,8 +90,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    */
   public static function &getDefault() {
     if (self::$_defaultPaymentProcessorType == NULL) {
-      $params = array('is_default' => 1);
-      $defaults = array();
+      $params = ['is_default' => 1];
+      $defaults = [];
       self::$_defaultPaymentProcessorType = self::retrieve($params, $defaults);
     }
     return self::$_defaultPaymentProcessorType;
@@ -179,7 +179,7 @@ SELECT pp.id processor_id
 FROM civicrm_payment_processor pp, civicrm_payment_processor_type ppt
 WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
 
-    $params = array(1 => array($paymentProcessorTypeId, 'Integer'));
+    $params = [1 => [$paymentProcessorTypeId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     if ($dao->fetch()) {
@@ -200,8 +200,8 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
    *
    * @return array
    */
-  static private function getAllPaymentProcessorTypes($attr) {
-    $ppt = array();
+  private static function getAllPaymentProcessorTypes($attr) {
+    $ppt = [];
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
     $dao->find();
     while ($dao->fetch()) {

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
     {ts}Personalize the contents and appearance of your personal campaign page here. You will be able to return to this page and make changes at any time.{/ts}
 </div>
 <fieldset class="crm-pcp-campaign-group">
-<div class="crm-block crm-contribution-campaign-form-block">
+<div class="crm-block crm-form-block crm-contribution-campaign-form-block">
 {crmRegion name="pcp-form-campaign"}
   <div class="crm-section crm-pcp-title-section crm-contribution-form-block-title">
     <div class="label">{$form.pcp_title.label}</div>
@@ -81,7 +81,7 @@
     <div class="label">{$form.is_honor_roll.label}</div>
     <div class="content">
       {$form.is_honor_roll.html}
-      <div class="description">{ts}If this option is checked, an "honor roll" will be displayed with the names (or nicknames) of the people who supported you. (Donors will have the option to remain anonymous. Their names will NOT be listed.){/ts}</div>{* [ML] string changed #9704 *}
+      <div class="description">{ts}If this option is checked, an "honor roll" will be displayed with the names (or nicknames) of the people who supported you. (Donors will have the option to remain anonymous. Their names will NOT be listed.){/ts}</div>
     </div>
     <div class="clear"></div>
   </div>
@@ -104,8 +104,8 @@
     <div class="clear"></div>
   </div>
 {/crmRegion}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>  
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </fieldset>
 <script type="text/javascript">
     // Always open attachment div by default for this form

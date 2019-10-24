@@ -61,6 +61,16 @@
     <add>3.0</add>
   </field>
   <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>CSS class name for an icon</comment>
+    <default>NULL</default>
+    <required>false</required>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>permission</name>
     <title>Required Permission</title>
     <type>varchar</type>

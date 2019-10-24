@@ -25,7 +25,7 @@
 
   <tr>
    <td>
-  <p>{contact.email_greeting},</p>
+     {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
@@ -33,7 +33,7 @@
     {else}
      <p>{ts}Thank you for your participation.{/ts}
      {if $participant_status}{ts 1=$participant_status}This letter is a confirmation that your registration has been received and your status has been updated to <strong> %1</strong>.{/ts}
-     {else}{if $isOnWaitlist}{ts}This letter is a confirmation that your registration has been received and your status has been updated to <strong>waitlisted</strong>.{/ts}{else}{ts}This letter is a confirmation that your registration has been received and your status has been updated to <strong>registered<strong>.{/ts}{/if}{/if}.</p>
+     {else}{if $isOnWaitlist}{ts}This letter is a confirmation that your registration has been received and your status has been updated to <strong>waitlisted</strong>.{/ts}{else}{ts}This letter is a confirmation that your registration has been received and your status has been updated to <strong>registered<strong>.{/ts}{/if}{/if}</p>
 
     {/if}
 
@@ -50,8 +50,6 @@
      {/if}
     {elseif $is_pay_later && !$isAmountzero && !$isAdditionalParticipant}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
-    {else}
-     <p>{ts}Please print this confirmation for your records.{/ts}</p>
     {/if}
 
    </td>
@@ -177,7 +175,7 @@
        </td>
      </tr>
     {/if}
-    {if $event.is_monetary}
+    {if $event.is_monetary and not $isRequireApproval}
 
       <tr>
        <th {$headerStyle}>
@@ -412,7 +410,7 @@
         </tr>
        {/if}
 
-       {if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+       {if $credit_card_type}
         <tr>
          <th {$headerStyle}>
           {ts}Credit Card Information{/ts}

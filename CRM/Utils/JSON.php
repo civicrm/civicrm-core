@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,6 +44,16 @@ class CRM_Utils_JSON {
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo json_encode($input);
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Test whether the input string is valid JSON.
+   * @param string $str
+   * @return boolean
+   */
+  public static function isValidJSON($str) {
+    json_decode($str);
+    return json_last_error() == JSON_ERROR_NONE;
   }
 
   /**
@@ -78,7 +88,7 @@ class CRM_Utils_JSON {
         // CRM-7130 --lets addslashes to only double quotes,
         // since we are using it to quote the field value.
         // str_replace helps to provide a break for new-line
-        $sOutput .= '"' . addcslashes(str_replace(array("\r\n", "\n", "\r"), '<br />', $value[$element]), '"\\') . '"';
+        $sOutput .= '"' . addcslashes(str_replace(["\r\n", "\n", "\r"], '<br />', $value[$element]), '"\\') . '"';
 
         // remove extra spaces and tab character that breaks dataTable CRM-12551
         $sOutput = preg_replace("/\s+/", " ", $sOutput);

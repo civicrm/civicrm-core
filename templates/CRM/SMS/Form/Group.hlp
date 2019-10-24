@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,4 +61,17 @@
 {/htxt}
 {htxt id="exclude-mailings"}
 <p>{ts}If you have sent other Mass SMS - you can additionally Include (or Exclude) contacts who received those Mass SMS. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this SMS.{/ts}</p>
+{/htxt}
+
+{htxt id ="id-sms_provider-title"}
+  {ts}SMS Provider{/ts}
+{/htxt}
+{htxt id ="id-sms_provider"}
+<p>{ts}Select the SMS provider for this mass message from the dropdown list.{/ts}</p>
+{if $params.isAdmin}
+    {capture assign="fromConfig"}{crmURL p="civicrm/admin/sms/provider" q="reset=1"}{/capture}
+    <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; System Settings &raquo; SMS Providers</a> to add or edit SMS Provider.{/ts}</p>
+{else}
+    {ts}Contact your site administrator if you need to use a SMS Provider which is not in the dropdown list.{/ts}
+{/if}
 {/htxt}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,16 +31,7 @@
             {$cd_edit.title}
         </div>
         <div>
-            {if $cd_edit.help_pre}
-                <div class="messages help">{$cd_edit.help_pre}</div>
-            {/if}
-            <table class="form-layout-compressed">
-                {foreach from=$cd_edit.fields item=element key=field_id}
-                    {include file="CRM/Contact/Form/Edit/Address/CustomField.tpl"}
-                {/foreach}
-            </table>
-            <div class="spacer"></div>
-            {if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post}</div>{/if}
+        {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity='address'}
         </div>
     </div>
 

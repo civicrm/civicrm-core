@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,6 +42,7 @@
           <tr class="columnheader">
             <th class='crm-custom_option-label'>{ts}Label{/ts}</th>
             <th class='crm-custom_option-value'>{ts}Value{/ts}</th>
+	          <th class='crm-custom_option-description'>{ts}Description{/ts}</th>
             <th class='crm-custom_option-default_value'>{ts}Default{/ts}</th>
             <th class='crm-custom_option-is_active'>{ts}Enabled?{/ts}</th>
             <th class='crm-custom_option-links'>&nbsp;</th>
@@ -70,6 +71,7 @@
                               {sClass:'crm-custom_option-label'},
                               {sClass:'crm-custom_option-value'},
                               {sClass:'crm-custom_option-default_value'},
+                              {sClass:'crm-custom_option-default_description'},
                               {sClass:'crm-custom_option-is_active'},
                               {sClass:'crm-custom_option-links'},
                               {sClass:'hiddenElement'}
@@ -157,7 +159,10 @@
       {/literal}
 
       <div class="action-link">
-          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {crmButton q="reset=1&action=map&fid=$fid&gid=$gid" class="action-item open-inline-noreturn" icon="sort-alpha-asc"}{ts}Alphabetize Options{/ts}{/crmButton}
+          {if !$isOptionGroupLocked}
+            {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {/if}
           {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="times"}{ts}Done{/ts}{/crmButton}
       </div>
     </div>

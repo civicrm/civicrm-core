@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,7 @@
   </tr>
 {/if}
 <tr id="Phone_Block_{$blockId}">
-  <td>{$form.phone.$blockId.phone.html}&nbsp;&nbsp;{ts}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
+  <td>{$form.phone.$blockId.phone.html} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
   {if $className eq 'CRM_Contact_Form_Contact'}
   <td>{$form.phone.$blockId.location_type_id.html}</td>
   {/if}
@@ -56,8 +56,7 @@
 {if !$addBlock}
 <tr>
   <td colspan="4">
-  &nbsp;&nbsp;<a id='addPhone' href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'Phone', '{$className}');return false;">{ts}Add another Phone number{/ts}</a>
+  &nbsp;&nbsp;<a id='addPhone' href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'Phone', '{$className}');return false;">{ts}Add another phone number{/ts}</a>
   </td>
 </tr>
 {/if}
-

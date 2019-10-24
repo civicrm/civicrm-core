@@ -1,3 +1,4 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 {if $receipt_text}
 {$receipt_text}
 {/if}
@@ -6,9 +7,6 @@
 ===========================================================
 {$pay_later_receipt}
 ===========================================================
-{else}
-
-{ts}Please print this receipt for your records.{/ts}
 {/if}
 
 {if $membership_assign && !$useForMember}
@@ -112,12 +110,16 @@
 
 {/if}
 {if $is_recur}
-{if $contributeMode eq 'notify' or $contributeMode eq 'directIPN'}
-{ts 1=$cancelSubscriptionUrl}This membership will be renewed automatically. You can cancel the auto-renewal option by visiting this web page: %1.{/ts}
+{ts}This membership will be renewed automatically.{/ts}
+{if $cancelSubscriptionUrl}
+
+{ts 1=$cancelSubscriptionUrl}You can cancel the auto-renewal option by visiting this web page: %1.{/ts}
+
+{/if}
+
 {if $updateSubscriptionBillingUrl}
 
 {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
-{/if}
 {/if}
 {/if}
 

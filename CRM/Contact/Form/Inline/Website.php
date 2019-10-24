@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -38,11 +38,13 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
 
   /**
    * Websitess of the contact that is been viewed.
+   * @var array
    */
-  private $_websites = array();
+  private $_websites = [];
 
   /**
    * No of website blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 
@@ -53,8 +55,8 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
     parent::preProcess();
 
     //get all the existing websites
-    $params = array('contact_id' => $this->_contactId);
-    $values = array();
+    $params = ['contact_id' => $this->_contactId];
+    $values = [];
     $this->_websites = CRM_Core_BAO_Website::getValues($params, $values);
   }
 
@@ -87,6 +89,8 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Website::buildQuickForm($this, $blockId, TRUE);
     }
 
+    $this->addFormRule(['CRM_Contact_Form_Inline_Website', 'formRule'], $this);
+
   }
 
   /**
@@ -95,7 +99,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_websites)) {
       foreach ($this->_websites as $id => $value) {
         $defaults['website'][$id] = $value;
@@ -122,10 +126,44 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
       }
     }
     // Process / save websites
-    CRM_Core_BAO_Website::create($params['website'], $this->_contactId, TRUE);
+    CRM_Core_BAO_Website::process($params['website'], $this->_contactId, TRUE);
 
     $this->log();
     $this->response();
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
+   * @param CRM_Contact_Form_Inline_Website $form
+   *
+   * @return array
+   */
+  public static function formRule($fields, $errors, $form) {
+    $hasData = $errors = [];
+    if (!empty($fields['website']) && is_array($fields['website'])) {
+      $types = [];
+      foreach ($fields['website'] as $instance => $blockValues) {
+        $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
+
+        if ($dataExists) {
+          $hasData[] = $instance;
+          if (!empty($blockValues['website_type_id'])) {
+            if (empty($types[$blockValues['website_type_id']])) {
+              $types[$blockValues['website_type_id']] = $blockValues['website_type_id'];
+            }
+            else {
+              $errors["website[" . $instance . "][website_type_id]"] = ts('Contacts may only have one website of each type at most.');
+            }
+          }
+        }
+      }
+    }
+    return $errors;
   }
 
 }

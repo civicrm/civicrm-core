@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,62 +28,80 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
- * CRM_Utils_Cache_Interface
+ * CRM_Utils_Cache_Interface is a long-standing interface used within CiviCRM
+ * for interacting with a cache service. In style and substance, it is extremely
+ * similar to PHP-FIG's SimpleCache interface (PSR-16). Consequently, beginning
+ * with CiviCRM v5.4, this extends \Psr\SimpleCache\CacheInterface.
  *
- * PHP-FIG has been developing a draft standard for caching,
- * PSR-6. The standard has not been ratified yet. When
- * making changes to this interface, please take care to
- * avoid *conflicst* with PSR-6's CacheItemPoolInterface. At
- * time of writing, they do not conflict. Avoiding conflicts
- * will enable more transition paths where Civi
- * simultaneously supports both interfaces in the same
- * implementation.
- *
- * For example, the current interface defines:
- *
- *   function get($key) => mixed $value
- *
- * and PSR-6 defines:
- *
- *   function getItem($key) => ItemInterface $item
- *
- * These are different styles (e.g. "weak item" vs "strong item"),
- * but the two methods do not *conflict*. They can coexist,
- * and you can trivially write adapters between the two.
- *
- * @see https://github.com/php-fig/fig-standards/blob/master/proposed/cache.md
+ * @see https://www.php-fig.org/psr/psr-16/
  */
-interface CRM_Utils_Cache_Interface {
+interface CRM_Utils_Cache_Interface extends \Psr\SimpleCache\CacheInterface {
 
   /**
    * Set the value in the cache.
    *
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
    */
-  public function set($key, &$value);
+  public function set($key, $value, $ttl = NULL);
 
   /**
    * Get a value from the cache.
    *
    * @param string $key
+   * @param mixed $default
    * @return mixed
-   *   NULL if $key has not been previously set
+   *   The previously set value value, or $default (NULL).
    */
-  public function get($key);
+  public function get($key, $default = NULL);
 
   /**
    * Delete a value from the cache.
    *
    * @param string $key
+   * @return bool
    */
   public function delete($key);
 
   /**
    * Delete all values from the cache.
+   *
+   * NOTE: flush() and clear() should be aliases. flush() is specified by
+   * Civi's traditional interface, and clear() is specified by PSR-16.
+   *
+   * @return bool
+   * @see clear
+   * @deprecated
    */
   public function flush();
+
+  /**
+   * Delete all values from the cache.
+   *
+   * NOTE: flush() and clear() should be aliases. flush() is specified by
+   * Civi's traditional interface, and clear() is specified by PSR-16.
+   *
+   * @return bool
+   * @see flush
+   */
+  public function clear();
+
+  /**
+   * Determines whether an item is present in the cache.
+   *
+   * NOTE: It is recommended that has() is only to be used for cache warming type purposes
+   * and not to be used within your live applications operations for get/set, as this method
+   * is subject to a race condition where your has() will return true and immediately after,
+   * another script can remove it making the state of your app out of date.
+   *
+   * @param string $key The cache item key.
+   *
+   * @return bool
+   */
+  public function has($key);
 
 }

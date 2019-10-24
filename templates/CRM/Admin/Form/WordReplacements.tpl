@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,10 +36,10 @@
 
 {else}
   {* this template is used for adding/editing string overrides  *}
+  <div class="help">
+    {ts}Use <strong>Word Replacements</strong> to change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurrences of 'Contribution' with 'Donation').{/ts} {help id="id-word_replace"}
+  </div>
   <div class="crm-form crm-form-block crm-string_override-form-block">
-    <div class="help">
-      {ts}Use <strong>Word Replacements</strong> to change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurrences of 'Contribution' with 'Donation').{/ts} {help id="id-word_replace"}
-    </div>
     <div class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location='top'}
     </div>

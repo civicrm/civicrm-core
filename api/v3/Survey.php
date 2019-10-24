@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,6 @@
  *
  * @package CiviCRM_APIv3
  */
-
 
 /**
  * Create or update a survey.
@@ -99,12 +98,12 @@ function civicrm_api3_survey_delete($params) {
  * @return array
  */
 function _civicrm_api3_survey_getlist_defaults(&$request) {
-  return array(
-    'description_field' => array(
+  return [
+    'description_field' => [
       'campaign_id',
-    ),
-    'params' => array(
+    ],
+    'params' => [
       'is_active' => 1,
-    ),
-  );
+    ],
+  ];
 }

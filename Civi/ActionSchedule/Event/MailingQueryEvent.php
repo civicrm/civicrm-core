@@ -1,7 +1,6 @@
 <?php
 namespace Civi\ActionSchedule\Event;
 
-use Civi\ActionSchedule\MappingInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -51,7 +50,7 @@ class MailingQueryEvent extends Event {
   /**
    * The mapping record which produced this mailing.
    *
-   * @var MappingInterface
+   * @var \Civi\ActionSchedule\MappingInterface
    */
   public $mapping;
 
@@ -64,7 +63,7 @@ class MailingQueryEvent extends Event {
 
   /**
    * @param \CRM_Core_DAO_ActionSchedule $actionSchedule
-   * @param MappingInterface $mapping
+   * @param \Civi\ActionSchedule\MappingInterface $mapping
    * @param \CRM_Utils_SQL_Select $query
    */
   public function __construct($actionSchedule, $mapping, $query) {

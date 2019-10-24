@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -52,7 +52,7 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
 
     $config = CRM_Core_Config::singleton();
 
-    $this->_pages = array(
+    $this->_pages = [
       'CRM_Contribute_Form_ContributionPage_Settings' => NULL,
       'CRM_Contribute_Form_ContributionPage_Amount' => NULL,
       'CRM_Member_Form_MembershipBlock' => NULL,
@@ -62,7 +62,7 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
       'CRM_Contribute_Form_ContributionPage_Custom' => NULL,
       'CRM_Contribute_Form_ContributionPage_Premium' => NULL,
       'CRM_Contribute_Form_ContributionPage_Widget' => NULL,
-    );
+    ];
 
     if (!in_array("CiviMember", $config->enableComponents)) {
       unset($this->_pages['CRM_Member_Form_MembershipBlock']);

@@ -50,7 +50,7 @@ class CRM_Core_CodeGen_Util_Smarty {
     require_once 'Smarty/Smarty.class.php';
     $smarty = new Smarty();
     $smarty->template_dir = "$base/xml/templates";
-    $smarty->plugins_dir = array("$base/packages/Smarty/plugins", "$base/CRM/Core/Smarty/plugins");
+    $smarty->plugins_dir = ["$base/packages/Smarty/plugins", "$base/CRM/Core/Smarty/plugins"];
     $smarty->compile_dir = $this->getCompileDir();
     $smarty->clear_all_cache();
 

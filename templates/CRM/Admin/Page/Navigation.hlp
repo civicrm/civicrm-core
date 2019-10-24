@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,5 +40,5 @@
   <li>{ts}Change the permissions for a menu item. Right-click and select 'Edit'.{/ts}</li>
   <li>{ts}Re-order menu items (including moving them from one branch of the menu 'tree' to another. Simply use your mouse to 'drag and drop' the menu item to the new location.{/ts}</li>
 </ul>
-<p><em>{ts}Changes you make to the menu are saved immediately. However, you will need reload this page to see your changes in the menu bar above.{/ts}</em></p>
+<p><em>{ts}Changes you make to the menu are saved immediately.{/ts}</em></p>
 {/htxt}

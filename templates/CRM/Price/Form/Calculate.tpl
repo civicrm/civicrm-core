@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,17 +25,16 @@
 *}
 
 {assign var='hideTotal' value=$quickConfig+$noCalcValueDisplay}
+
 <div id="pricesetTotal" class="crm-section section-pricesetTotal">
-  <div class="label
-  {if $hideTotal},  hiddenElement{/if}" id="pricelabel">
-    <label>
-      {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
-      <span id='amount_sum_label'>{ts}Total Amount{/ts}{else}{ts}Total Fee(s){/ts}</span>
-       {if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}
-      {/if}
-    </label>
+  <div id="pricelabel" class="label {if $hideTotal}hiddenElement{/if}">
+    {if ($extends eq 'Contribution') || ($extends eq 'Membership')}
+      <span id='amount_sum_label'>{ts}Total Amount{/ts}</span>
+    {else}
+      <span id='amount_sum_label'>{ts}Total Fee(s){/ts}{if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}</span>
+    {/if}
   </div>
-  <div class="content calc-value" {if $hideTotal}style="display:none;"{/if} id="pricevalue" ></div>
+  <div class="content calc-value" {if $hideTotal}style="display:none;"{/if} id="pricevalue"></div>
 </div>
 
 <script type="text/javascript">
@@ -46,25 +45,23 @@ var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
 var symbol         = '{/literal}{$currencySymbol}{literal}';
 var optionSep      = '|';
 
+// Recalculate the total fees based on user selection
 cj("#priceset [price]").each(function () {
+  var elementType = cj(this).attr('type');
+  if (this.tagName == 'SELECT') {
+    elementType = 'select-one';
+  }
 
-    var elementType =  cj(this).attr('type');
-    if ( this.tagName == 'SELECT' ) {
-      elementType = 'select-one';
-    }
-
-    switch(elementType) {
-      case 'checkbox':
-        //event driven calculation of element.
-        cj(this).click(function(){
-          calculateCheckboxLineItemValue(this);
-          display(calculateTotalFee());
-        });
+  switch(elementType) {
+    case 'checkbox':
+      cj(this).click(function(){
         calculateCheckboxLineItemValue(this);
+        display(calculateTotalFee());
+      });
+      calculateCheckboxLineItemValue(this);
       break;
 
     case 'radio':
-      //event driven calculation of element.
       cj(this).click( function(){
         calculateRadioLineItemValue(this);
         display(calculateTotalFee());
@@ -72,32 +69,26 @@ cj("#priceset [price]").each(function () {
       calculateRadioLineItemValue(this);
       break;
 
-  case 'text':
-
-    //event driven calculation of element.
-    cj(this).bind( 'keyup', function() {
+    case 'text':
+      cj(this).bind( 'keyup', function() {
+        calculateText(this);
+      }).bind( 'blur' , function() {
+        calculateText(this);
+      });
+      //default calculation of element.
       calculateText(this);
-    }).bind( 'blur' , function() {
-      calculateText(this);
-    });
-    //default calculation of element.
-    calculateText(this);
+      break;
 
-    break;
-
-  case 'select-one':
-    calculateSelectLineItemValue(this);
-
-    //event driven calculation of element.
-    cj(this).change( function() {
+    case 'select-one':
       calculateSelectLineItemValue(this);
-      display(calculateTotalFee());
-    });
 
-
-    break;
-
+      cj(this).change(function() {
+        calculateSelectLineItemValue(this);
+        display(calculateTotalFee());
+      });
+      break;
   }
+
   display(calculateTotalFee());
 });
 

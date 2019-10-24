@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_I18n_Schema {
 
@@ -73,7 +73,7 @@ class CRM_Core_I18n_Schema {
     // build the column-adding SQL queries
     $columns = CRM_Core_I18n_SchemaStructure::columns();
     $indices = CRM_Core_I18n_SchemaStructure::indices();
-    $queries = array();
+    $queries = [];
     foreach ($columns as $table => $hash) {
       // drop old indices
       if (isset($indices[$table])) {
@@ -107,6 +107,9 @@ class CRM_Core_I18n_Schema {
     // update civicrm_domain.locales
     $domain->locales = $locale;
     $domain->save();
+
+    // CRM-21627 Updates the $dbLocale
+    CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
   }
 
   /**
@@ -164,7 +167,7 @@ class CRM_Core_I18n_Schema {
     $retain,
     $table,
     $class = 'CRM_Core_I18n_SchemaStructure',
-    $triggers = array()
+    $triggers = []
   ) {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -177,8 +180,8 @@ class CRM_Core_I18n_Schema {
 
     $columns =& $class::columns();
     $indices =& $class::indices();
-    $queries = array();
-    $dropQueries = array();
+    $queries = [];
+    $dropQueries = [];
     // drop indices
     if (isset($indices[$table])) {
       foreach ($indices[$table] as $index) {
@@ -188,18 +191,20 @@ class CRM_Core_I18n_Schema {
       }
     }
 
+    $dao = new CRM_Core_DAO();
     // deal with columns
     foreach ($columns[$table] as $column => $type) {
-      $queries[] = "ALTER TABLE {$table} ADD {$column} {$type}";
-      $queries[] = "UPDATE {$table} SET {$column} = {$column}_{$retain}";
+      $queries[] = "ALTER TABLE {$table} CHANGE `{$column}_{$retain}` `{$column}` {$type}";
       foreach ($locales as $loc) {
-        $dropQueries[] = "ALTER TABLE {$table} DROP {$column}_{$loc}";
+        if (strcmp($loc, $retain) !== 0) {
+          $dropQueries[] = "ALTER TABLE {$table} DROP {$column}_{$loc}";
+        }
       }
     }
 
     // drop views
     foreach ($locales as $loc) {
-      $queries[] = "DROP VIEW {$table}_{$loc}";
+      $queries[] = "DROP VIEW IF EXISTS {$table}_{$loc}";
     }
 
     // add original indices
@@ -255,12 +260,12 @@ class CRM_Core_I18n_Schema {
     // build the required SQL queries
     $columns = CRM_Core_I18n_SchemaStructure::columns();
     $indices = CRM_Core_I18n_SchemaStructure::indices();
-    $queries = array();
+    $queries = [];
     foreach ($columns as $table => $hash) {
       // add new columns
       foreach ($hash as $column => $type) {
         // CRM-7854: skip existing columns
-        if (CRM_Core_DAO::checkFieldExists($table, "{$column}_{$locale}", FALSE)) {
+        if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}", FALSE)) {
           continue;
         }
         $queries[] = "ALTER TABLE {$table} ADD {$column}_{$locale} {$type}";
@@ -295,8 +300,10 @@ class CRM_Core_I18n_Schema {
    *   locales to be rebuilt.
    * @param string $version
    *   version of schema structure to use.
+   * @param bool $isUpgradeMode
+   *   Are we upgrading our database
    */
-  public static function rebuildMultilingualSchema($locales, $version = NULL) {
+  public static function rebuildMultilingualSchema($locales, $version = NULL, $isUpgradeMode = FALSE) {
     if ($version) {
       $latest = self::getLatestSchema($version);
       require_once "CRM/Core/I18n/SchemaStructure_{$latest}.php";
@@ -307,13 +314,13 @@ class CRM_Core_I18n_Schema {
     }
     $indices =& $class::indices();
     $tables =& $class::tables();
-    $queries = array();
+    $queries = [];
     $dao = new CRM_Core_DAO();
 
     // get all of the already existing indices
-    $existing = array();
+    $existing = [];
     foreach (array_keys($indices) as $table) {
-      $existing[$table] = array();
+      $existing[$table] = [];
       $dao->query("SHOW INDEX FROM $table", FALSE);
       while ($dao->fetch()) {
         if (preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $dao->Key_name)) {
@@ -337,7 +344,7 @@ class CRM_Core_I18n_Schema {
     // rebuild views
     foreach ($locales as $locale) {
       foreach ($tables as $table) {
-        $queries[] = self::createViewQuery($locale, $table, $dao, $class);
+        $queries[] = self::createViewQuery($locale, $table, $dao, $class, $isUpgradeMode);
       }
     }
 
@@ -410,9 +417,9 @@ class CRM_Core_I18n_Schema {
     $version = str_ireplace(".upgrade", "", $version);
 
     // fetch all the SchemaStructure versions we ship and sort by version
-    $schemas = array();
+    $schemas = [];
     foreach (scandir(dirname(__FILE__)) as $file) {
-      $matches = array();
+      $matches = [];
       if (preg_match('/^SchemaStructure_([0-9a-z_]+)\.php$/', $file, $matches)) {
         $schemas[] = str_replace('_', '.', $matches[1]);
       }
@@ -444,10 +451,10 @@ class CRM_Core_I18n_Schema {
     $indices =& $class::indices();
     $columns =& $class::columns();
     if (!isset($indices[$table])) {
-      return array();
+      return [];
     }
 
-    $queries = array();
+    $queries = [];
     foreach ($indices[$table] as $index) {
       $unique = isset($index['unique']) && $index['unique'] ? 'UNIQUE' : '';
       foreach ($index['field'] as $i => $col) {
@@ -481,13 +488,15 @@ class CRM_Core_I18n_Schema {
    *   A DAO object to run DESCRIBE queries.
    * @param string $class
    *   schema structure class to use.
-   *
+   * @param bool $isUpgradeMode
+   *   Are we in upgrade mode therefore only build based off table not class
    * @return array
    *   array of CREATE INDEX queries
    */
-  private static function createViewQuery($locale, $table, &$dao, $class = 'CRM_Core_I18n_SchemaStructure') {
+  private static function createViewQuery($locale, $table, &$dao, $class = 'CRM_Core_I18n_SchemaStructure', $isUpgradeMode = FALSE) {
     $columns =& $class::columns();
-    $cols = array();
+    $cols = [];
+    $tableCols = [];
     $dao->query("DESCRIBE {$table}", FALSE);
     while ($dao->fetch()) {
       // view non-internationalized columns directly
@@ -496,10 +505,16 @@ class CRM_Core_I18n_Schema {
       ) {
         $cols[] = $dao->Field;
       }
+      $tableCols[] = $dao->Field;
     }
     // view intrernationalized columns through an alias
     foreach ($columns[$table] as $column => $_) {
-      $cols[] = "{$column}_{$locale} {$column}";
+      if (!$isUpgradeMode) {
+        $cols[] = "{$column}_{$locale} {$column}";
+      }
+      elseif (in_array("{$column}_{$locale}", $tableCols)) {
+        $cols[] = "{$column}_{$locale} {$column}";
+      }
     }
     return "CREATE OR REPLACE VIEW {$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM {$table}";
   }
@@ -545,7 +560,7 @@ class CRM_Core_I18n_Schema {
         continue;
       }
 
-      $trigger = array();
+      $trigger = [];
 
       foreach ($hash as $column => $_) {
         $trigger[] = "IF NEW.{$column}_{$locale} IS NOT NULL THEN";
@@ -554,9 +569,9 @@ class CRM_Core_I18n_Schema {
         }
         foreach ($locales as $old) {
           $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
-          foreach (array_merge($locales, array(
+          foreach (array_merge($locales, [
             $locale,
-          )) as $loc) {
+          ]) as $loc) {
             if ($loc == $old) {
               continue;
             }
@@ -567,17 +582,17 @@ class CRM_Core_I18n_Schema {
       }
 
       $sql = implode(' ', $trigger);
-      $info[] = array(
-        'table' => array($table),
+      $info[] = [
+        'table' => [$table],
         'when' => 'BEFORE',
-        'event' => array('UPDATE'),
+        'event' => ['UPDATE'],
         'sql' => $sql,
-      );
+      ];
     }
 
     // take care of the ON INSERT triggers
     foreach ($columns as $table => $hash) {
-      $trigger = array();
+      $trigger = [];
       foreach ($hash as $column => $_) {
         $trigger[] = "IF NEW.{$column}_{$locale} IS NOT NULL THEN";
         foreach ($locales as $old) {
@@ -585,9 +600,9 @@ class CRM_Core_I18n_Schema {
         }
         foreach ($locales as $old) {
           $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
-          foreach (array_merge($locales, array(
+          foreach (array_merge($locales, [
             $locale,
-          )) as $loc) {
+          ]) as $loc) {
             if ($loc == $old) {
               continue;
             }
@@ -598,12 +613,12 @@ class CRM_Core_I18n_Schema {
       }
 
       $sql = implode(' ', $trigger);
-      $info[] = array(
-        'table' => array($table),
+      $info[] = [
+        'table' => [$table],
         'when' => 'BEFORE',
-        'event' => array('INSERT'),
+        'event' => ['INSERT'],
         'sql' => $sql,
-      );
+      ];
     }
   }
 

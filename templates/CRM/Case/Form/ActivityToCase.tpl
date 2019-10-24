@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,7 +60,7 @@
     }
 
     var dataUrl = {/literal}"{crmURL p='civicrm/case/addToCase' q='reset=1' h=0}"{literal};
-    dataUrl += '&activityId=' + activityID + '&caseId=' + currentCaseId + '&cid=' + {/literal}"{$contactID}"{literal};
+    dataUrl += '&activityId=' + activityID + '&caseId=' + currentCaseId + '&cid=' + {/literal}"{$contactID}"{literal} + '&fileOnCaseAction=' + action;
 
     function save() {
       if (!$("#file_on_case_unclosed_case_id").val()) {

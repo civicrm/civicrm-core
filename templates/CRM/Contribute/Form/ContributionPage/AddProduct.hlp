@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,4 +25,5 @@
 *}
 {htxt id="id-financial_type-product"}
 {ts}Select a Financial Type that has both a 'Cost of Sales Premiums Account' and a 'Premiums Inventory Account' if you want to generate accounting transactions to track the cost of premiums used.{/ts}
+<br />{ts}The default Financial Type is configured when creating the "Premium" but it can be changed for each contribution page if required.{/ts}
 {/htxt}

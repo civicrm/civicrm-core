@@ -33,6 +33,10 @@ class SequenceListener implements CaseChangeListener {
   }
 
   /**
+   * Triggers next case activity in sequence if current activity status is updated
+   * to type=COMPLETED(See CRM-21598). The adjoining activity is created according
+   * to the sequence configured in case type.
+   *
    * @param \Civi\CCase\Event\CaseChangeEvent $event
    *
    * @throws \CiviCRM_API3_Exception
@@ -47,10 +51,10 @@ class SequenceListener implements CaseChangeListener {
       return;
     }
 
-    $actTypes = array_flip(\CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'));
-    $actStatuses = array_flip(\CRM_Core_PseudoConstant::activityStatus('name'));
+    $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
+    $actStatuses = array_flip(\CRM_Activity_BAO_Activity::getStatusesByType(\CRM_Activity_BAO_Activity::COMPLETED));
 
-    $actIndex = $analyzer->getActivityIndex(array('activity_type_id', 'status_id'));
+    $actIndex = $analyzer->getActivityIndex(['activity_type_id', 'status_id']);
 
     foreach ($activitySetXML->ActivityTypes->ActivityType as $actTypeXML) {
       $actTypeId = $actTypes[(string) $actTypeXML->name];
@@ -59,7 +63,7 @@ class SequenceListener implements CaseChangeListener {
         $this->createActivity($analyzer, $actTypeXML);
         return;
       }
-      elseif (empty($actIndex[$actTypeId][$actStatuses['Completed']])) {
+      elseif (!in_array(key($actIndex[$actTypeId]), $actStatuses)) {
         // Haven't gotten past this step yet!
         return;
       }
@@ -68,16 +72,16 @@ class SequenceListener implements CaseChangeListener {
     //CRM-17452 - Close the case only if all the activities are complete
     $activities = $analyzer->getActivities();
     foreach ($activities as $activity) {
-      if ($activity['status_id'] != $actStatuses['Completed']) {
+      if (!in_array($activity['status_id'], $actStatuses)) {
         return;
       }
     }
 
     // OK, the all activities have completed
-    civicrm_api3('Case', 'create', array(
+    civicrm_api3('Case', 'create', [
       'id' => $analyzer->getCaseId(),
       'status_id' => 'Closed',
-    ));
+    ]);
     $analyzer->flush();
   }
 
@@ -110,13 +114,18 @@ class SequenceListener implements CaseChangeListener {
    * @param \SimpleXMLElement $actXML the <ActivityType> tag which describes the new activity
    */
   public function createActivity(Analyzer $analyzer, \SimpleXMLElement $actXML) {
-    $params = array(
+    $params = [
       'activity_type_id' => (string) $actXML->name,
       'status_id' => 'Scheduled',
       'activity_date_time' => \CRM_Utils_Time::getTime('YmdHis'),
       'case_id' => $analyzer->getCaseId(),
-    );
-    $r = civicrm_api3('Activity', 'create', $params);
+    ];
+    $case = $analyzer->getCase();
+    if (!empty($case['contact_id'])) {
+      $params['target_id'] = \CRM_Utils_Array::first($case['contact_id']);
+    }
+
+    civicrm_api3('Activity', 'create', $params);
     $analyzer->flush();
   }
 

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -74,25 +74,20 @@
       </td></tr>
     </table>
   </td>
-  {if $form.activity_tags}
-    <td><label>{ts}Activity Tag(s){/ts}</label>
-      <div id="Tags" class="listing-box">
-        {foreach from=$form.activity_tags item="tag_val"}
-          <div class="{cycle values='odd-row,even-row'}">
-            {$tag_val.html}
-          </div>
-        {/foreach}
-    </td>
-  {else}
-    <td>&nbsp;</td>
-  {/if}
 </tr>
 
+{if $form.activity_tags}
+  <tr>
+    <td><label>{$form.activity_tags.label}</label>
+      <br/>
+      {$form.activity_tags.html}
+    </td>
+  </tr>
+{/if}
+
 <tr>
-  <td><label>{ts}Activity Dates{/ts}</label></td>
-</tr>
-<tr>
-  {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high'}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" colspan="2"}
+  <td>&nbsp;</td>
 </tr>
 <tr>
   <td>
@@ -115,6 +110,11 @@
     &nbsp; {$form.activity_test.html}
   </td>
 </tr>
+<tr>
+<td>{$form.activity_location.label}<br />
+  {$form.activity_location.html}</td>
+<td></td>
+</tr>
 {if $buildSurveyResult }
   <tr>
     <td id="activityResult">
@@ -135,7 +135,7 @@ campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
 {if $activityGroupTree}
   <tr id="activityCustom">
-    <td id="activityCustomData" colspan="2">
+    <td id="activityCustomData" colspan="4">
       {include file="CRM/Custom/Form/Search.tpl" groupTree=$activityGroupTree showHideLinks=false}
     </td>
   </tr>

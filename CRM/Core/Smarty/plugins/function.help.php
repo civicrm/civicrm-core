@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -56,7 +56,7 @@ function smarty_function_help($params, &$smarty) {
     return NULL;
   }
 
-  $params['file'] = str_replace(array('.tpl', '.hlp'), '', $params['file']);
+  $params['file'] = str_replace(['.tpl', '.hlp'], '', $params['file']);
 
   if (empty($params['title'])) {
     $vars = $smarty->get_template_vars();
@@ -83,7 +83,7 @@ function smarty_function_help($params, &$smarty) {
   }
 
   // Escape for html
-  $title = htmlspecialchars(ts('%1 Help', array(1 => $name)));
+  $title = htmlspecialchars(ts('%1 Help', [1 => $name]));
   // Escape for html and js
   $name = htmlspecialchars(json_encode($name), ENT_QUOTES);
 
@@ -92,5 +92,5 @@ function smarty_function_help($params, &$smarty) {
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
-  return '<a class="' . $class . '" title="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
+  return '<a class="' . $class . '" title="' . $title . '" aria-label="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
 }

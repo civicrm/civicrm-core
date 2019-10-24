@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,11 +39,15 @@
                 </tr>
             {/foreach}
             <tr class="crm-contact-custom-search-contributionDetails-form-block-receive_date">
-              <td class="label">{ts}Contribution Dates{/ts}</td>
-              {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
+              <td class="label" for="receive_date_relative">
+                <label>{ts}Contribution Dates{/ts}</label>
+              </td>
+              {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" colspan="2"}
             </tr>
             <tr class="crm-contact-custom-search-contributionDetails-form-block-financial_type">
-                <td class="label">{ts}Financial Type{/ts}</td>
+                <td class="label" for="financial_type_id">
+                  <label>{ts}Financial Type{/ts}</label>
+                </td>
                 <td>{$form.financial_type_id.html|crmAddClass:twenty}</td>
             </tr>
         </table>

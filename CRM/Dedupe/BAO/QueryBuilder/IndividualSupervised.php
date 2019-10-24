@@ -15,25 +15,25 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
    */
   public static function record($rg) {
 
-    $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params, array());
-    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, array());
+    $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params, []);
+    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, []);
 
-    $params = array(
-      1 => array(
+    $params = [
+      1 => [
         CRM_Utils_Array::value('first_name', $civicrm_contact, ''),
         'String',
-      ),
-      2 => array(
+      ],
+      2 => [
         CRM_Utils_Array::value('last_name', $civicrm_contact, ''),
         'String',
-      ),
-      3 => array(
+      ],
+      3 => [
         CRM_Utils_Array::value('email', $civicrm_email, ''),
         'String',
-      ),
-    );
+      ],
+    ];
 
-    return array(
+    return [
       "civicrm_contact.{$rg->name}.{$rg->threshold}" => CRM_Core_DAO::composeQuery("
                 SELECT contact.id as id1, {$rg->threshold} as weight
                 FROM civicrm_contact as contact
@@ -42,7 +42,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
                   AND first_name = %1
                   AND last_name = %2
                   AND email = %3", $params, TRUE),
-    );
+    ];
   }
 
   /**
@@ -65,9 +65,9 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
                 email1.email=email2.email
             WHERE contact1.contact_type = 'Individual'");
 
-    return array(
+    return [
       "civicrm_contact.{$rg->name}.{$rg->threshold}" => $query,
-    );
+    ];
   }
 
 }

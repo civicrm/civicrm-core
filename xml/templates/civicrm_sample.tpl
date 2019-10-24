@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.7                                                |
+-- | CiviCRM version 5                                                  |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2019                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -251,4 +251,3 @@ VALUES
     (@priceFieldID,'bass','Bass','25',1,1,1,2),
     (@priceFieldID,'tenor','Tenor','40',2,1,0,2),
     (@priceFieldID,'soprano','Soprano','50',3,1,0,2);
-

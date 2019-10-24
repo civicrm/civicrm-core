@@ -64,6 +64,7 @@
       <type>Select</type>
       <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.5</add>
   </field>
   <index>
@@ -151,8 +152,7 @@
     <import>true</import>
     <headerPattern>/legal\s?id/i</headerPattern>
     <dataPattern>/\w+?\d{5,}/</dataPattern>
-    <comment>May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.
-    </comment>
+    <comment>May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.</comment>
     <add>1.1</add>
     <html>
       <type>Text</type>
@@ -288,7 +288,9 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
   </field>
   <index>
     <name>index_preferred_communication_method</name>
@@ -349,6 +351,9 @@
     <length>32</length>
     <comment>API Key for validating requests related to this contact.</comment>
     <add>2.2</add>
+    <permission>
+      <or>administer CiviCRM, edit api keys</or>
+    </permission>
   </field>
   <index>
     <name>index_api_key</name>
@@ -491,6 +496,8 @@
       <optionGroupName>communication_style</optionGroupName>
     </pseudoconstant>
     <export>true</export>
+    <import>true</import>
+    <headerPattern>/style/i</headerPattern>
     <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.</comment>
     <add>4.4</add>
     <html>
@@ -532,8 +539,12 @@
     <name>email_greeting_id</name>
     <type>int unsigned</type>
     <title>Email Greeting ID</title>
+    <export>true</export>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Email Greeting.</comment>
     <add>3.0</add>
+    <pseudoconstant>
+      <optionGroupName>email_greeting</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>email_greeting_custom</name>
@@ -562,11 +573,15 @@
     <name>postal_greeting_id</name>
     <type>int unsigned</type>
     <title>Postal Greeting ID</title>
+    <export>true</export>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Postal Greeting.</comment>
     <add>3.0</add>
     <html>
       <type>Text</type>
     </html>
+    <pseudoconstant>
+      <optionGroupName>postal_greeting</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>postal_greeting_custom</name>
@@ -597,6 +612,10 @@
     <title>Addressee ID</title>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Addressee.</comment>
     <add>3.0</add>
+    <export>true</export>
+    <pseudoconstant>
+      <optionGroupName>addressee</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>addressee_custom</name>
@@ -684,6 +703,11 @@
       <type>CheckBox</type>
     </html>
   </field>
+  <index>
+    <name>index_is_deceased</name>
+    <fieldName>is_deceased</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>deceased_date</name>
     <type>date</type>
@@ -852,6 +876,11 @@
     <default>NULL</default>
     <add>4.3</add>
   </field>
+  <index>
+    <name>index_created_date</name>
+    <fieldName>created_date</fieldName>
+    <add>5.18</add>
+  </index>
   <field>
     <name>modified_date</name>
     <type>timestamp</type>
@@ -861,4 +890,9 @@
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <add>4.3</add>
   </field>
+  <index>
+    <name>index_modified_date</name>
+    <fieldName>modified_date</fieldName>
+    <add>5.18</add>
+  </index>
 </table>

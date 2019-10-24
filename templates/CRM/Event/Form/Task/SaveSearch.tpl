@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,8 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-event-savesearch-form-block">
-<fieldset>
-    <legend>{ts}Smart Group{/ts}</legend>
+
+  <h3>{ts}Smart Group{/ts}</h3>
 
   <div class="help">
     <p>{ts}This smart group will stay up-to-date with all contacts who meet the search criteria.{/ts}</p>
@@ -56,11 +56,9 @@
    <tr>
       <td colspan="2" class="label">{include file="CRM/Event/Form/Task.tpl"}</td>
    </tr>
-   <tr>
-      <td colspan="2">{include file="CRM/common/formButtons.tpl" location="bottom"}</td>
-   </tr>
 </table>
-
-</fieldset>
+<div class="crm-submit-buttons">
+{include file="CRM/common/formButtons.tpl" location="bottom"}
+</div>
 </div>
 

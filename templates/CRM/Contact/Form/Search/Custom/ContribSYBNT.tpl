@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,8 +42,8 @@
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-inclusion_date_one">
                <td><label>Inclusion Date One: Start/End</label></td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date_1}</td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date_1}</td>
+               <td>{$form.start_date_1.html}</td>
+               <td>{$form.end_date_1.html}</td>
                <td>{$form.is_first_amount.html}&nbsp;{ts}First time donor only?{/ts}</td>
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-min_amount_2">
@@ -54,8 +54,8 @@
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-inclusion_date_two">
                <td><label>Inclusion Date Two: Start/End</label></td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date_2}</td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date_2}</td>
+               <td>{$form.start_date_2.html}</td>
+               <td>{$form.end_date_2.html}</td>
                <td>&nbsp;</td>
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-exclude_min_amount">
@@ -66,8 +66,8 @@
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-exclusion_date">
                <td><label>Exclusion Date: Start/End</label></td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=exclude_start_date}</td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=exclude_end_date}</td>
+               <td>{$form.exclude_start_date.html}</td>
+               <td>{$form.exclude_end_date.html}</td>
                <td>&nbsp;</td>
            </tr>
         </table>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_Form_Date {
 
@@ -45,7 +45,7 @@ class CRM_Core_Form_Date {
    */
   public static function buildAllowedDateFormats(&$form) {
 
-    $dateOptions = array();
+    $dateOptions = [];
 
     if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Import_Form_DataSource') {
       $dateText = ts('yyyy-mm-dd OR yyyy-mm-dd HH:mm OR yyyymmdd OR yyyymmdd HH:mm (1998-12-25 OR 1998-12-25 15:33 OR 19981225 OR 19981225 10:30 OR ( 2008-9-1 OR 2008-9-1 15:33 OR 20080901 15:33)');
@@ -62,9 +62,8 @@ class CRM_Core_Form_Date {
     $dateOptions[] = $form->createElement('radio', NULL, NULL, ts('dd-mon-yy OR dd/mm/yy (25-Dec-98 OR 25/12/98)'), self::DATE_dd_mon_yy);
     $dateOptions[] = $form->createElement('radio', NULL, NULL, ts('dd/mm/yyyy (25/12/1998) OR (1/9/2008)'), self::DATE_dd_mm_yyyy);
     $form->addGroup($dateOptions, 'dateFormats', ts('Date Format'), '<br/>');
-    $form->setDefaults(array('dateFormats' => self::DATE_yyyy_mm_dd));
+    $form->setDefaults(['dateFormats' => self::DATE_yyyy_mm_dd]);
   }
-
 
   /**
    * Retrieve the date range - relative or absolute and assign it to the form.
@@ -81,12 +80,14 @@ class CRM_Core_Form_Date {
    *   Additional value pairs to add.
    * @param string $dateFormat
    * @param bool|string $displayTime
+   * @param array $attributes
    */
   public static function buildDateRange(
     &$form, $fieldName, $count = 1,
     $from = '_from', $to = '_to', $fromLabel = 'From:',
-    $required = FALSE, $operators = array(),
-    $dateFormat = 'searchDate', $displayTime = FALSE
+    $required = FALSE, $operators = [],
+    $dateFormat = 'searchDate', $displayTime = FALSE,
+    $attributes = ['class' => 'crm-select2']
   ) {
     $selector
       = CRM_Core_Form_Date::returnDateRangeSelector(
@@ -98,7 +99,8 @@ class CRM_Core_Form_Date {
     CRM_Core_Form_Date::addDateRangeToForm(
       $form, $fieldName, $selector,
       $from, $to, $fromLabel,
-      $required, $dateFormat, $displayTime
+      $required, $dateFormat, $displayTime,
+      $attributes
     );
   }
 
@@ -126,13 +128,13 @@ class CRM_Core_Form_Date {
   public static function returnDateRangeSelector(
     &$form, $fieldName, $count = 1,
     $from = '_from', $to = '_to', $fromLabel = 'From:',
-    $required = FALSE, $operators = array(),
+    $required = FALSE, $operators = [],
     $dateFormat = 'searchDate', $displayTime = FALSE
   ) {
-    $selector = array(
+    $selector = [
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
-    );
+    ];
     // CRM-16195 Pull relative date filters from an option group
     $selector = $selector + CRM_Core_OptionGroup::values('relative_date_filters');
 
@@ -165,14 +167,26 @@ class CRM_Core_Form_Date {
    * @param bool $required
    * @param string $dateFormat
    * @param bool $displayTime
+   * @param array $attributes
    */
-  public static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
+  public static function addDateRangeToForm(
+    &$form,
+    $fieldName,
+    $selector,
+    $from = '_from',
+    $to = '_to',
+    $fromLabel = 'From:',
+    $required = FALSE,
+    $dateFormat = 'searchDate',
+    $displayTime = FALSE,
+    $attributes
+  ) {
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),
       $selector,
       $required,
-      array('class' => 'crm-select2')
+      $attributes
     );
 
     $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);

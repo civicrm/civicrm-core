@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -77,7 +77,7 @@
 <p>{if $params.waitlist}
   {ts}You may allow users to join a waitlist when the event is full (by checking the box below).{/ts}
 {else}
-  {ts}You may allow users to join a waitlist when the event is full. To enable this feature you must first enable the Participant Statuses used by the waitlist work-flow (click the pencil icon, or navigate to Administer » CiviEvent » Participant Statuses). Then reload this form and check 'Offer a Waitlist?'.{/ts}
+  {ts}You may allow users to join a waitlist when the event is full. To enable this feature you must first enable the Participant Statuses used by the waitlist work-flow (click the wrench icon, or navigate to Administer » CiviEvent » Participant Statuses). Then reload this form and check 'Offer a Waitlist?'.{/ts}
 {/if}</p>
 <p>{ts}Otherwise, the registration link is hidden and the &quot;Event Full Message&quot' is displayed when the maximum number of registrations is reached. Only participants with status types marked as 'counted' are included when checking if the event is full.{/ts}</p>
 {/htxt}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,13 +31,14 @@
     {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
   </div>
 
+<div class="crm-content-block crm-block">
   {if $rows}
 
   <div id="ltype">
     {strip}
         {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-        <br/><table class="selector row-highlight">
+        <table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Provider Details{/ts}</th>
             <th >{ts}Username{/ts}</th>
@@ -70,4 +71,5 @@
   <div class="action-link">
     {crmButton p='civicrm/admin/sms/provider' q="action=add&reset=1" icon="plus-circle"}{ts}Add SMS Provider{/ts}{/crmButton}
   </div>
+</div>
 {/if}

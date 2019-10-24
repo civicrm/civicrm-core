@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
 {else}
 
   {if $rows}
-    <div id="badge-layout">
+    <div id="badge-layout" class="crm-content-block crm-block">
       {strip}
       {* handle enable/disable actions*}
         {include file="CRM/common/enableDisableApi.tpl"}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -54,7 +54,7 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    */
   public static function create(&$params) {
     $assignment = new CRM_Activity_BAO_ActivityContact();
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $assignment->copyValues($params);
@@ -71,12 +71,12 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    * @return array
    */
   public static function retrieveAssigneeIdsByActivityId($activity_id) {
-    $assigneeArray = array();
+    $assigneeArray = [];
     if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
       return $assigneeArray;
     }
 
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $sql = "
@@ -87,7 +87,12 @@ WHERE      activity_id = %1
 AND        record_type_id = $assigneeID
 AND        civicrm_contact.is_deleted = 0
 ";
-    $assignment = CRM_Core_DAO::executeQuery($sql, array(1 => array($activity_id, 'Integer')));
+    $assignment = CRM_Core_DAO::executeQuery($sql, [
+      1 => [
+        $activity_id,
+        'Integer',
+      ],
+    ]);
     while ($assignment->fetch()) {
       $assigneeArray[] = $assignment->contact_id;
     }
@@ -108,11 +113,11 @@ AND        civicrm_contact.is_deleted = 0
    * @return array
    */
   public static function getAssigneeNames($activityIDs, $isDisplayName = FALSE, $skipDetails = TRUE) {
-    $assigneeNames = array();
+    $assigneeNames = [];
     if (empty($activityIDs)) {
       return $assigneeNames;
     }
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $whereClause = "";

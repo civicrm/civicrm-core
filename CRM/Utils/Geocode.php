@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -37,20 +37,22 @@
 class CRM_Utils_Geocode {
 
   /**
+   * @deprecated
+   *
+   * @todo Remove this method. In case people are calling this downstream (which
+   *   is unsupported usage), we'll deprecate it for a few releases before
+   *   removing it altogether.
+   *
    * @return string|''
    *   Class name, or empty.
    */
   public static function getProviderClass() {
-    $settings = Civi::settings();
-    if ($settings->get('geoProvider')) {
-      return 'CRM_Utils_Geocode_' . $settings->get('geoProvider');
-    }
-    elseif ($settings->get('mapProvider')) {
-      return 'CRM_Utils_Geocode_' . $settings->get('mapProvider');
-    }
-    else {
-      return '';
-    }
+    Civi::log()->warning(
+      'CRM_Utils_Geocode is deprecated and will be removed from core soon, use CRM_Utils_GeocodeProvider::getUsableClassName()',
+      ['civi.tag' => 'deprecated']
+    );
+
+    return (string) CRM_Utils_GeocodeProvider::getUsableClassName();
   }
 
 }

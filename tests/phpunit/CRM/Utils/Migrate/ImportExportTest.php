@@ -13,10 +13,10 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
   }
 
   public function tearDown() {
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_custom_group',
       'civicrm_custom_field',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
@@ -29,8 +29,8 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    */
   public function basicXmlTestCases() {
     // a small library which we use to describe test cases
-    $fixtures = array();
-    $fixtures['textField'] = array(
+    $fixtures = [];
+    $fixtures['textField'] = [
       'name' => 'test_textfield',
       'label' => 'Name1',
       'html_type' => 'Text',
@@ -40,8 +40,8 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       'is_required' => 1,
       'is_searchable' => 0,
       'is_active' => 1,
-    );
-    $fixtures['selectField'] = array(
+    ];
+    $fixtures['selectField'] = [
       // custom_group_id
       'label' => 'Our select field',
       'html_type' => 'Select',
@@ -51,36 +51,36 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       'is_searchable' => 0,
       'is_active' => 1,
       // 'option_group_name' => 'our_select_field_20130818044104',
-      'option_values' => array(
-        array(
+      'option_values' => [
+        [
           'weight' => 1,
           'label' => 'Label1',
           'value' => 1,
           'is_active' => 1,
-        ),
-        array(
+        ],
+        [
           'weight' => 2,
           'label' => 'Label2',
           'value' => 2,
           'is_active' => 1,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     // the actual test cases
-    $cases = array();
+    $cases = [];
 
-    $cases[] = array(
+    $cases[] = [
       // CustomGroup params
-      array(
+      [
         'extends' => 'Contact',
         'title' => 'example',
-      ),
+      ],
       // CustomField params
       $fixtures['textField'],
       // expectedXmlFilePath
       __DIR__ . '/fixtures/Contact-text.xml',
-    );
+    ];
 
     /* @codingStandardsIgnoreStart
     $cases[] = array(
@@ -96,55 +96,55 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
     );
     @codingStandardsIgnoreEnd */
 
-    $cases[] = array(
+    $cases[] = [
       // CustomGroup params
-      array(
+      [
         'extends' => 'Individual',
         'title' => 'example',
-      ),
+      ],
       // CustomField params
       $fixtures['textField'],
       // expectedXmlFilePath
       __DIR__ . '/fixtures/Individual-text.xml',
-    );
+    ];
 
-    $cases[] = array(
+    $cases[] = [
       // CustomGroup params
-      array(
+      [
         'extends' => 'Individual',
-        'extends_entity_column_value' => array('Student'),
+        'extends_entity_column_value' => ['Student'],
         'title' => 'example',
-      ),
+      ],
       // CustomField params
       $fixtures['textField'],
       // expectedXmlFilePath
       __DIR__ . '/fixtures/IndividualStudent-text.xml',
-    );
+    ];
 
-    $cases[] = array(
+    $cases[] = [
       // CustomGroup params
-      array(
+      [
         'extends' => 'Activity',
         'title' => 'example',
-      ),
+      ],
       // CustomField params
       $fixtures['textField'],
       // expectedXmlFilePath
       __DIR__ . '/fixtures/Activity-text.xml',
-    );
+    ];
 
-    $cases[] = array(
+    $cases[] = [
       // CustomGroup params
-      array(
+      [
         'extends' => 'Activity',
-        'extends_entity_column_value' => array(array_search('Meeting', CRM_Core_PseudoConstant::activityType())),
+        'extends_entity_column_value' => [1],
         'title' => 'example',
-      ),
+      ],
       // CustomField params
       $fixtures['textField'],
       // expectedXmlFilePath
       __DIR__ . '/fixtures/ActivityMeeting-text.xml',
-    );
+    ];
 
     return $cases;
   }
@@ -159,20 +159,20 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * @dataProvider basicXmlTestCases
    */
   public function testBasicXMLExports($customGroupParams, $fieldParams, $expectedXmlFilePath) {
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', array(
-      1 => array($customGroupParams['title'], 'String'),
-    ));
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', [
+      1 => [$customGroupParams['title'], 'String'],
+    ]);
     $customGroup = $this->customGroupCreate($customGroupParams);
     $fieldParams['custom_group_id'] = $customGroup['id'];
     $customField = $this->callAPISuccess('custom_field', 'create', $fieldParams);
 
     $exporter = new CRM_Utils_Migrate_Export();
-    $exporter->buildCustomGroups(array($customGroup['id']));
+    $exporter->buildCustomGroups([$customGroup['id']]);
     // print $exporter->toXML();
     $this->assertEquals(file_get_contents($expectedXmlFilePath), $exporter->toXML());
 
-    $this->callAPISuccess('custom_field', 'delete', array('id' => $customField['id']));
-    $this->callAPISuccess('custom_group', 'delete', array('id' => $customGroup['id']));
+    $this->callAPISuccess('custom_field', 'delete', ['id' => $customField['id']]);
+    $this->callAPISuccess('custom_group', 'delete', ['id' => $customGroup['id']]);
   }
 
   /**
@@ -184,21 +184,21 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * @dataProvider basicXmlTestCases
    */
   public function testBasicXMLImports($expectCustomGroup, $expectCustomField, $inputXmlFilePath) {
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', array(
-      1 => array($expectCustomGroup['title'], 'String'),
-    ));
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', [
+      1 => [$expectCustomGroup['title'], 'String'],
+    ]);
 
     $importer = new CRM_Utils_Migrate_Import();
     $importer->run($inputXmlFilePath);
 
-    $customGroups = $this->callAPISuccess('custom_group', 'get', array('title' => $expectCustomGroup['title']));
+    $customGroups = $this->callAPISuccess('custom_group', 'get', ['title' => $expectCustomGroup['title']]);
     $this->assertEquals(1, $customGroups['count']);
     $customGroup = array_shift($customGroups['values']);
     foreach ($expectCustomGroup as $expectKey => $expectValue) {
       $this->assertEquals($expectValue, $customGroup[$expectKey]);
     }
 
-    $customFields = $this->callAPISuccess('custom_field', 'get', array('label' => $expectCustomField['label']));
+    $customFields = $this->callAPISuccess('custom_field', 'get', ['label' => $expectCustomField['label']]);
     $this->assertEquals(1, $customFields['count']);
     $customField = array_shift($customFields['values']);
     foreach ($expectCustomField as $expectKey => $expectValue) {

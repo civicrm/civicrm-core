@@ -22,8 +22,8 @@ class CRM_Case_Audit_AuditConfig {
     // set some defaults
     $this->completionLabel = "Status";
     $this->completionValue = "Completed";
-    $this->sortByLabels = array("Actual Date", "Due Date");
-    $this->ifBlanks = array();
+    $this->sortByLabels = ["Actual Date", "Due Date"];
+    $this->ifBlanks = [];
 
     $this->loadConfig();
   }
@@ -57,8 +57,8 @@ class CRM_Case_Audit_AuditConfig {
   }
 
   public function loadConfig() {
-    $this->regionFieldList = array();
-    $this->includeRules = array();
+    $this->regionFieldList = [];
+    $this->includeRules = [];
 
     $doc = new DOMDocument();
     $xmlString = file_get_contents(dirname(__FILE__) . '/' . $this->filename);
@@ -67,14 +67,14 @@ class CRM_Case_Audit_AuditConfig {
       $regions = $doc->getElementsByTagName("region");
       foreach ($regions as $region) {
         $regionName = $region->getAttribute("name");
-        $this->regionFieldList[$regionName] = array();
+        $this->regionFieldList[$regionName] = [];
 
         // Inclusion/exclusion settings
         $includeRule = $region->getAttribute("includeRule");
         if (empty($includeRule)) {
           $includeRule = 'include';
         }
-        $this->includeRules[$regionName] = array('rule' => $includeRule);
+        $this->includeRules[$regionName] = ['rule' => $includeRule];
         if ($includeRule == 'exclude') {
           $altRegion = $region->getAttribute("exclusionCorrespondingRegion");
           $this->includeRules[$regionName]['altRegion'] = $altRegion;
@@ -124,7 +124,7 @@ class CRM_Case_Audit_AuditConfig {
 
       $sortElement = $doc->getElementsByTagName("sortByLabels");
       if (!empty($sortElement)) {
-        $this->sortByLabels = array();
+        $this->sortByLabels = [];
         $label_elements = $sortElement->item(0)->getElementsByTagName("label");
         foreach ($label_elements as $ele) {
           $this->sortByLabels[] = $ele->nodeValue;

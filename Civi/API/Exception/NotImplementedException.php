@@ -8,6 +8,7 @@ require_once 'api/Exception.php';
  * @package Civi\API\Exception
  */
 class NotImplementedException extends \API_Exception {
+
   /**
    * @param string $message
    *   The human friendly error message.
@@ -18,7 +19,7 @@ class NotImplementedException extends \API_Exception {
    * @param \Exception|NULL $previous
    *   A previous exception which caused this new exception.
    */
-  public function __construct($message, $extraParams = array(), \Exception $previous = NULL) {
+  public function __construct($message, $extraParams = [], \Exception $previous = NULL) {
     parent::__construct($message, \API_Exception::NOT_IMPLEMENTED, $extraParams, $previous);
   }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,12 +26,14 @@
  */
 
 namespace Civi\API\Event;
+use Civi\API\Provider\WrappingProvider;
 
 /**
  * Class PrepareEvent
  * @package Civi\API\Event
  */
 class PrepareEvent extends Event {
+
   /**
    * @param array $apiRequest
    *   The full description of the API request.
@@ -39,6 +41,30 @@ class PrepareEvent extends Event {
    */
   public function setApiRequest($apiRequest) {
     $this->apiRequest = $apiRequest;
+    return $this;
+  }
+
+  /**
+   * Replace the normal implementation of an API call with some wrapper.
+   *
+   * The wrapper has discretion to call -- or not call -- or iterate with --
+   * the original API implementation, with original or substituted arguments.
+   *
+   * Ex:
+   *
+   * $event->wrapApi(function($apiRequest, $continue){
+   *   echo "Hello\n";
+   *   $continue($apiRequest);
+   *   echo "Goodbye\n";
+   * });
+   *
+   * @param callable $callback
+   *   The custom API implementation.
+   *   Function(array $apiRequest, callable $continue).
+   * @return PrepareEvent
+   */
+  public function wrapApi($callback) {
+    $this->apiProvider = new WrappingProvider($callback, $this->apiProvider);
     return $this;
   }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,7 +54,7 @@ function civicrm_api3_entity_tag_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_entity_tag_get_spec(&$params) {
-  $params['entity_id']['api.aliases'] = array('contact_id');
+  $params['entity_id']['api.aliases'] = ['contact_id'];
   $params['entity_table']['api.default'] = 'civicrm_contact';
 }
 
@@ -101,7 +101,7 @@ function _civicrm_api3_entity_tag_delete_spec(&$params) {
  */
 function _civicrm_api3_entity_tag_common($params, $op = 'add') {
 
-  $entityIDs   = array();
+  $entityIDs = $tagIDs = [];
   $entityTable = 'civicrm_contact';
   if (is_array($params)) {
     foreach ($params as $n => $v) {
@@ -109,7 +109,12 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
         $entityIDs[] = $v;
       }
       elseif (substr($n, 0, 6) == 'tag_id') {
-        $tagIDs[] = $v;
+        if (is_array($v)) {
+          $tagIDs = array_merge($tagIDs, $v);
+        }
+        else {
+          $tagIDs[] = $v;
+        }
       }
       elseif (substr($n, 0, 12) == 'entity_table') {
         $entityTable = $v;
@@ -130,7 +135,7 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
     }
   }
 
-  $values = array('is_error' => 0);
+  $values = ['is_error' => 0];
   if ($op == 'add') {
     $values['total_count'] = $values['added'] = $values['not_added'] = 0;
     foreach ($tagIDs as $tagID) {
@@ -155,4 +160,38 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
     $values['error_message'] = "Unable to $op tags";
   }
   return $values;
+}
+
+/**
+ * Replace tags for an entity
+ */
+function civicrm_api3_entity_tag_replace($params) {
+  $transaction = new CRM_Core_Transaction();
+  try {
+
+    $baseParams = _civicrm_api3_generic_replace_base_params($params);
+    unset($baseParams['tag_id']);
+
+    // Lookup pre-existing records
+    $preexisting = civicrm_api3('entity_tag', 'get', $baseParams);
+    $preexisting = array_column($preexisting['values'], 'tag_id');
+    $toAdd = isset($params['tag_id']) ? $params['tag_id'] : array_column($params['values'], 'tag_id');
+    $toRemove = array_diff($preexisting, $toAdd);
+
+    $result = [];
+    if ($toAdd) {
+      $result = _civicrm_api3_entity_tag_common(array_merge($baseParams, ['tag_id' => $toAdd]), 'add');
+    }
+    if ($toRemove) {
+      $result += _civicrm_api3_entity_tag_common(array_merge($baseParams, ['tag_id' => $toRemove]), 'remove');
+    }
+    // Not really errors
+    unset($result['is_error'], $result['error_message']);
+
+    return civicrm_api3_create_success($result, $params, 'EntityTag', 'replace');
+  }
+  catch (Exception $e) {
+    $transaction->rollback();
+    return civicrm_api3_create_error($e->getMessage());
+  }
 }

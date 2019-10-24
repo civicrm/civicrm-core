@@ -14,6 +14,8 @@
  * $Id: Dummy.php 45429 2013-02-06 22:11:18Z lobo $
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * Dummy payment processor
  */
@@ -22,8 +24,8 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
 
   protected $_mode = NULL;
 
-  protected $_params = array();
-  protected $_doDirectPaymentResult = array();
+  protected $_params = [];
+  protected $_doDirectPaymentResult = [];
 
   /**
    * Set result from do Direct Payment for test purposes.
@@ -34,7 +36,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   public function setDoDirectPaymentResult($doDirectPaymentResult) {
     $this->_doDirectPaymentResult = $doDirectPaymentResult;
     if (empty($this->_doDirectPaymentResult['trxn_id'])) {
-      $this->_doDirectPaymentResult['trxn_id'] = array();
+      $this->_doDirectPaymentResult['trxn_id'] = [];
     }
     else {
       $this->_doDirectPaymentResult['trxn_id'] = (array) $doDirectPaymentResult['trxn_id'];
@@ -73,6 +75,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @return array
    *   the result in a nice formatted array (or an error object)
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doDirectPayment(&$params) {
     // Invoke hook_civicrm_paymentProcessor
@@ -99,21 +102,24 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {
       $result = $this->_doDirectPaymentResult;
+      if (CRM_Utils_Array::value('payment_status_id', $result) === 'failed') {
+        throw new PaymentProcessorException($result['message'] ?? 'failed');
+      }
       $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
       return $result;
     }
     if ($this->_mode == 'test') {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
-      $p = array();
-      $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+      $p = [];
+      $trxn_id = strval(CRM_Core_DAO::singleValueQuery($query, $p));
       $trxn_id = str_replace('test_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
       $params['trxn_id'] = 'test_' . $trxn_id . '_' . uniqid();
     }
     else {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'live_%'";
-      $p = array();
-      $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+      $p = [];
+      $trxn_id = strval(CRM_Core_DAO::singleValueQuery($query, $p));
       $trxn_id = str_replace('live_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
       $params['trxn_id'] = 'live_' . $trxn_id . '_' . uniqid();
@@ -136,6 +142,33 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   protected function supportsLiveMode() {
     return TRUE;
   }
+
+  /**
+   * Does this payment processor support refund?
+   *
+   * @return bool
+   */
+  public function supportsRefund() {
+    return TRUE;
+  }
+
+  /**
+   * Supports altering future start dates
+   * @return bool
+   */
+  public function supportsFutureRecurStartDate() {
+    return TRUE;
+  }
+
+  /**
+   * Submit a refund payment
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   */
+  public function doRefund(&$params) {}
 
   /**
    * Generate error object.
@@ -195,7 +228,17 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * @return array
    */
   public function getEditableRecurringScheduleFields() {
-    return array('amount', 'next_sched_contribution_date');
+    return ['amount', 'next_sched_contribution_date'];
+  }
+
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return bool|object
+   */
+  public function cancelSubscription(&$message = '', $params = []) {
+    return TRUE;
   }
 
 }

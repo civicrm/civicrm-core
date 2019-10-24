@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * allows us to use these paths during upgrades.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -56,31 +56,31 @@ class CRM_Queue_Menu {
         $menuPath['title'] = 'Queue Runner';
         $menuPath['page_callback'] = 'CRM_Queue_Page_Runner';
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       case 'civicrm/queue/ajax/runNext':
       case 'civicrm/upgrade/queue/ajax/runNext':
         $menuPath['path'] = $path;
-        $menuPath['page_callback'] = array('CRM_Queue_Page_AJAX', 'runNext');
+        $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'runNext'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       case 'civicrm/queue/ajax/skipNext':
       case 'civicrm/upgrade/queue/ajax/skipNext':
         $menuPath['path'] = $path;
-        $menuPath['page_callback'] = array('CRM_Queue_Page_AJAX', 'skipNext');
+        $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'skipNext'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       case 'civicrm/queue/ajax/onEnd':
       case 'civicrm/upgrade/queue/ajax/onEnd':
         $menuPath['path'] = $path;
-        $menuPath['page_callback'] = array('CRM_Queue_Page_AJAX', 'onEnd');
+        $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'onEnd'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       default:

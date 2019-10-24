@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -152,8 +152,12 @@
 
         <div id="map-field" >
         <fieldset id="map-field"><legend>{ts}Regular Fees{/ts}</legend>
-        {ts}Use the table below to enter descriptive labels and amounts for up to ten event fee levels. These will be presented as a list of radio button options. Both the label and dollar amount will be displayed. You can also configure one or more sets of discounted fees by checking "Discounts by Signup Date" below.{/ts}<br />
-  {if $isQuick}{ts}Click <a id='quickconfig' href='#'>here</a> if you want to configure the Regular Fees below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}{/if}
+        <span class="description">{ts}Use the table below to enter descriptive labels and amounts for up to ten event fee levels. These will be presented as a list of radio button options. Both the label and dollar amount will be displayed. You can also configure one or more sets of discounted fees by checking "Discounts by Signup Date" below.{/ts}
+        <br />
+        {if $isQuick}
+          {ts}Click <a id='quickconfig' href='#'>here</a> if you want to configure the Regular Fees below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}
+        {/if}
+        </span>
         <table id="map-field-table">
         <tr class="columnheader"><td scope="column">{ts}Fee Label{/ts}</td><td scope="column">{ts}Amount{/ts}</td><td scope="column">{ts}Default?{/ts}<br />{$form.default.0.html}</td></tr>
         {section name=loop start=1 loop=11}
@@ -189,8 +193,8 @@
            <td>{if $index GT 1} <a onclick="showHideDiscountRow('discount_{$index}', false, {$index}); return false;" name="discount_{$index}" href="#" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>{/if}
            </td>
            <td class="crm-event-manage-fee-form-block-discount_name"> {$form.discount_name.$index.html}</td>
-           <td class="crm-event-manage-fee-form-block-discount_start_date"> {include file="CRM/common/jcalendar.tpl" elementName='discount_start_date' elementIndex=$index} </td>
-           <td class="crm-event-manage-fee-form-block-discount_end_date"> {include file="CRM/common/jcalendar.tpl" elementName='discount_end_date' elementIndex=$index} </td>
+           <td class="crm-event-manage-fee-form-block-discount_start_date"> {$form.discount_start_date.$index.html} </td>
+           <td class="crm-event-manage-fee-form-block-discount_end_date"> {$form.discount_end_date.$index.html} </td>
      </tr>
     {/section}
     </table>
@@ -201,7 +205,7 @@
 
         {if $discountSection}
             <fieldset id="map-field"><legend>{ts}Discounted Fees{/ts}</legend>
-            <p>{ts}Use the table below to enter descriptive labels and amounts for up to ten discounted event fees for each discount set. <strong>Don't forget to click 'Save' when you are finished.</strong>{/ts}</p>
+            <span class="description">{ts}Use the table below to enter descriptive labels and amounts for up to ten discounted event fees for each discount set. <strong>Don't forget to click 'Save' when you are finished.</strong>{/ts}</span>
       <table id="map-field-table">
             <tr class="columnheader">
          <td scope="column">{ts}Fee Label{/ts}</td>

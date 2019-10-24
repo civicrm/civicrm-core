@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,9 +34,7 @@
         {if ! $single and $context eq 'Search' }
             <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
         {/if}
-        {if $single}
             <th></th>
-        {/if}
         {foreach from=$columnHeaders item=header}
             <th scope="col">
                 {if $header.sort}
@@ -60,8 +58,8 @@
                 <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
             </td>
             {if ! $single }
+                <td>{$row.contact_type}</td>
                 <td>
-                    {$row.contact_type} &nbsp;
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a>
                 </td>
             {/if}

@@ -49,6 +49,9 @@
     <length>64</length>
     <required>true</required>
     <comment>Name for CiviCRM field which is being exposed for sharing.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_UFField::getAvailableFieldTitles</callback>
+    </pseudoconstant>
     <add>1.1</add>
   </field>
   <field>
@@ -183,6 +186,9 @@
     <type>int unsigned</type>
     <comment>Phone Type Id, if required</comment>
     <add>2.2</add>
+    <pseudoconstant>
+      <optionGroupName>phone_type</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>website_type_id</name>
@@ -190,6 +196,9 @@
     <type>int unsigned</type>
     <comment>Website Type Id, if required</comment>
     <add>4.5</add>
+    <pseudoconstant>
+      <optionGroupName>website_type</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>label</name>

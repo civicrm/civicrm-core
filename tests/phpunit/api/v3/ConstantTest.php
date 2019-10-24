@@ -37,7 +37,6 @@
  * @group headless
  */
 class api_v3_ConstantTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
 
   /**
    * Test setup for every test.
@@ -48,16 +47,15 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   public function setUp() {
     //  Connect to the database
     parent::setUp();
-    $this->_apiversion = 3;
   }
 
   /**
    * Test civicrm_constant_get( ) for unknown constant
    */
   public function testUnknownConstant() {
-    $result = $this->callAPIFailure('constant', 'get', array(
+    $result = $this->callAPIFailure('constant', 'get', [
       'name' => 'thisTypeDoesNotExist',
-    ));
+    ]);
   }
 
   /**
@@ -65,9 +63,9 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    */
   public function testActivityStatus() {
 
-    $result = $this->callAPISuccess('constant', 'get', array(
+    $result = $this->callAPISuccess('constant', 'get', [
       'name' => 'activityStatus',
-    ));
+    ]);
 
     $this->assertTrue($result['count'] > 5, "In line " . __LINE__);
     $this->assertContains('Scheduled', $result['values'], "In line " . __LINE__);
@@ -80,23 +78,26 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    * Test civicrm_constant_get( 'activityType' )
    */
   public function testActivityType() {
-    $result = $this->callAPIAndDocument('constant', 'get', array(
+    $result = $this->callAPIAndDocument('constant', 'get', [
       'name' => 'activityType',
-    ), __FUNCTION__, __FILE__, NULL, NULL, 'get');
+    ], __FUNCTION__, __FILE__, NULL, NULL, 'get');
     $this->assertTrue($result['count'] > 2, "In line " . __LINE__);
     $this->assertContains('Meeting', $result['values'], "In line " . __LINE__);
   }
 
   /**
    * Test civicrm_address_getoptions( 'location_type_id' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testLocationTypeGet() {
+  public function testLocationTypeGet($version) {
+    $this->_apiversion = $version;
     // needed to get rid of cached values from previous tests
     CRM_Core_PseudoConstant::flush();
 
-    $params = array(
+    $params = [
       'field' => 'location_type_id',
-    );
+    ];
     $result = $this->callAPIAndDocument('address', 'getoptions', $params, __FUNCTION__, __FILE__);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
     $this->assertContains('Home', $result['values'], "In line " . __LINE__);
@@ -107,11 +108,14 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_phone_getoptions( 'phone_type_id' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testPhoneType() {
-    $params = array(
+  public function testPhoneType($version) {
+    $this->_apiversion = $version;
+    $params = [
       'field' => 'phone_type_id',
-    );
+    ];
     $result = $this->callAPIAndDocument('phone', 'getoptions', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(5, $result['count'], "In line " . __LINE__);
@@ -124,11 +128,14 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_constant_get( 'mailProtocol' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testmailProtocol() {
-    $params = array(
+  public function testmailProtocol($version) {
+    $this->_apiversion = $version;
+    $params = [
       'field' => 'protocol',
-    );
+    ];
     $result = $this->callAPIAndDocument('mail_settings', 'getoptions', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(4, $result['count'], "In line " . __LINE__);

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
     </tr>
     <tr>
       <td class="label">{$form.scheduled_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=scheduled_date}</td>
+      <td>{$form.scheduled_date.html}</td>
     </tr>
     <tr>
       <td class="label">{$form.scheduled_amount.label}</td>

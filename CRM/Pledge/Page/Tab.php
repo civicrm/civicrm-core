@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   public $_permission = NULL;
@@ -52,10 +52,10 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('pledge', $this->_contactId);
       // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = array(
+      $this->ajaxResponse['updateTabs'] = [
         '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
         '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-      );
+      ];
     }
   }
 
@@ -94,7 +94,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
@@ -156,7 +156,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * @param $form
    */
   public static function setContext(&$form) {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form, FALSE, 'search');
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
     // validate the qfKey

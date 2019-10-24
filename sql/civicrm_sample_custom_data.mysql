@@ -1,5 +1,5 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.7                                                |
+-- | CiviCRM version 5                                                  |
 -- +--------------------------------------------------------------------+
 -- | Copyright CiviCRM LLC (c) 2004-2017                                |
 -- +--------------------------------------------------------------------+
@@ -43,7 +43,7 @@ INSERT INTO `civicrm_custom_group` (`name`, `title`, `extends`, `style`, `collap
 -- * create option group for storing custom options for custom fields
 -- *
 -- *******************************************************/
-INSERT INTO  `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`) VALUES ('custom_most_important_issue', 'Most Important Issue', 1, 1), ( 'custom_marital_status', 'Marital Status', 1, 1);
+INSERT INTO  `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`) VALUES ('custom_most_important_issue', 'Most Important Issue', 0, 1), ( 'custom_marital_status', 'Marital Status', 1, 1);
 
 SELECT @option_most_id    := max(id) from civicrm_option_group where name = 'custom_most_important_issue';
 SELECT @option_marital_id := max(id) from civicrm_option_group where name = 'custom_marital_status';
@@ -78,7 +78,7 @@ CREATE TABLE `civicrm_value_constituent_information_1` (`id` int(10) unsigned NO
 
 -- Fall Fundraiser Dinner participants’ custom data
 
-INSERT INTO civicrm_option_group  ( name, title, is_active, is_reserved ) VALUES  ('soup_selection', 'Soup Selection', 1, 1);
+INSERT INTO  `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`) VALUES  ('soup_selection', 'Soup Selection', 0, 1);
 SELECT @ogid := MAX(id) FROM civicrm_option_group;
 
 INSERT INTO civicrm_custom_group ( name, title,  extends, extends_entity_column_id, extends_entity_column_value, style, is_active, table_name) VALUES ('Food_Preference', 'Food Preference', 'Participant', 2, '1', 'Inline', 1, 'civicrm_value_food_preference_2');
@@ -97,7 +97,7 @@ INSERT INTO `civicrm_custom_group` (`name`, `title`, `extends`, `extends_entity_
 
 SELECT @cgid_contribution := MAX(id) FROM civicrm_custom_group;
 
-INSERT INTO civicrm_option_group  ( name, title, is_active ) VALUES ('how_long_have_you_been_a_donor', 'How long have you been a donor?', 1);
+INSERT INTO  `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`) VALUES ('how_long_have_you_been_a_donor', 'How long have you been a donor?', 0, 1);
 
 SELECT @ogid_contribution := MAX(id) FROM civicrm_option_group;
 

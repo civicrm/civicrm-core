@@ -52,7 +52,7 @@
     <name>report_id</name>
     <title>Report template ID</title>
     <type>varchar</type>
-    <length>64</length>
+    <length>512</length>
     <required>true</required>
     <comment>FK to civicrm_option_value for the report template</comment>
     <html>
@@ -121,6 +121,7 @@
     <type>text</type>
     <import>true</import>
     <comment>Submitted form values for this report</comment>
+    <serialize>PHP</serialize>
     <add>2.2</add>
   </field>
   <field>

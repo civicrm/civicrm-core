@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
 
@@ -50,7 +50,7 @@ SELECT count(*) as count
 FROM   civicrm_mailing_recipients
 WHERE  mailing_id = %1
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
@@ -73,13 +73,29 @@ WHERE  mailing_id = %1
       $limitString = "LIMIT $offset, $limit";
     }
 
+    $isSMSmode = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $mailingID, 'sms_provider_id', 'id');
+    $additionalJoin = '';
+    if (!$isSMSmode) {
+      // mailing_recipients added when mailing is submitted in UI by user.
+      // if any email is marked on_hold =1 or contact is deceased after mailing is submitted
+      // then it should be get skipped while preparing event_queue
+      // event_queue list is prepared when mailing job gets started.
+      $additionalJoin = " INNER JOIN civicrm_email e ON (r.email_id = e.id AND e.on_hold = 0 AND e.is_primary = 1)
+                          INNER JOIN civicrm_contact c on (c.id = r.contact_id AND c.is_deceased <> 1 AND c.do_not_email = 0 AND c.is_opt_out = 0)
+";
+    }
+    else {
+      $additionalJoin = "INNER JOIN civicrm_contact c on (c.id = r.contact_id AND c.is_deceased <> 1 AND c.do_not_sms = 0 AND c.is_opt_out = 0)";
+    }
+
     $sql = "
-SELECT contact_id, email_id, phone_id
-FROM   civicrm_mailing_recipients
-WHERE  mailing_id = %1
+SELECT r.contact_id, r.email_id, r.phone_id
+FROM   civicrm_mailing_recipients r
+{$additionalJoin}
+WHERE  r.mailing_id = %1
        $limitString
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
 
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
@@ -102,7 +118,7 @@ WHERE  mailing_id = %1
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS  srcMailing_$sourceMailingId");
     $sql = "
 CREATE TEMPORARY TABLE srcMailing_$sourceMailingId
-            (mailing_recipient_id int, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
+            (mailing_recipient_id int unsigned, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
             ENGINE=HEAP";
     CRM_Core_DAO::executeQuery($sql);
     $sql = "

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,13 +33,13 @@
       {foreach from=$statistics.groups item=row}
         <tr>
           <th class="statistics" scope="row">{$row.title}</th>
-          <td>{$row.value}</td>
+          <td>{$row.value|escape}</td>
         </tr>
       {/foreach}
       {foreach from=$statistics.filters item=row}
         <tr>
           <th class="statistics" scope="row">{$row.title}</th>
-          <td>{$row.value}</td>
+          <td>{$row.value|escape}</td>
         </tr>
       {/foreach}
     </table>
@@ -53,11 +53,11 @@
         <th class="statistics" scope="row">{$row.title}</th>
         <td>
           {if $row.type eq 1024}
-            {$row.value|crmMoney}
+            {$row.value|crmMoney|escape}
           {elseif $row.type eq 2}
-            {$row.value}
+            {$row.value|escape}
           {else}
-            {$row.value|crmNumberFormat}
+            {$row.value|crmNumberFormat|escape}
           {/if}
 
         </td>

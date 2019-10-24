@@ -5,7 +5,7 @@
     <path>civicrm/mailing</path>
     <title>CiviMail</title>
     <page_callback>CRM_Mailing_Page_Browse</page_callback>
-    <access_arguments>access CiviMail;create mailings</access_arguments>
+    <access_arguments>access CiviMail;create mailings;send SMS</access_arguments>
     <page_type>1</page_type>
     <weight>600</weight>
     <component>CiviMail</component>
@@ -71,7 +71,7 @@
     <title>Find Mailings</title>
     <path_arguments>scheduled=true</path_arguments>
     <page_callback>CRM_Mailing_Page_Browse</page_callback>
-    <access_arguments>access CiviMail;approve mailings;create mailings;schedule mailings</access_arguments>
+    <access_arguments>access CiviMail;approve mailings;create mailings;schedule mailings;send SMS</access_arguments>
     <page_type>1</page_type>
     <weight>620</weight>
   </item>

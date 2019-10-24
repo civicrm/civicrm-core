@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,14 +42,14 @@
     {* Show link to Tell a Friend (CRM-2153) *}
     {if $friendText}
         <div id="tell-a-friend" class="crm-section tell_friend_link-section">
-            <a href="{$friendURL}" title="{$friendText}" class="button"><span>&raquo; {$friendText}</span></a>
+            <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span>&raquo; {$friendText}</span></a>
        </div><br /><br />
     {/if}
 
     {* Add button for donor to create their own Personal Campaign page *}
     {if $pcpLink}
       <div class="crm-section create_pcp_link-section">
-            <a href="{$pcpLink}" title="{$pcpLinkText}" class="button"><span>&raquo; {$pcpLinkText}</span></a>
+            <a href="{$pcpLink}" title="{$pcpLinkText|escape:'html'}" class="button"><span>&raquo; {$pcpLinkText}</span></a>
         </div><br /><br />
     {/if}
 
@@ -71,12 +71,12 @@
             {/if}
         {* PayPal_Standard sets contribution_mode to 'notify'. We don't know if transaction is successful until we receive the IPN (payment notification) *}
         {elseif $contributeMode EQ 'notify' and $paidEvent}
-            <p>{ts 1=$paymentProcessor.name}Your registration payment has been submitted to %1 for processing. Please print this page for your records.{/ts}</p>
+            <p>{ts 1=$paymentProcessor.name}Your registration payment has been submitted to %1 for processing.{/ts}</p>
             {if $is_email_confirm}
                 <p>{ts 1=$email}A registration confirmation email will be sent to %1 once the transaction is processed successfully.{/ts}</p>
             {/if}
         {else}
-            <p>{ts}Your registration has been processed successfully. Please print this page for your records.{/ts}</p>
+            <p>{ts}Your registration has been processed successfully.{/ts}</p>
             {if $is_email_confirm}
                 <p>{ts 1=$email}A registration confirmation email has also been sent to %1{/ts}</p>
             {/if}
@@ -188,18 +188,20 @@
         </div>
     {/if}
 
-    {if $contributeMode eq 'direct' and $paidEvent and ! $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $credit_card_type}
+      {crmRegion name="event-thankyou-billing-block"}
         <div class="crm-group credit_card-group">
-            <div class="header-dark">
-                {ts}Credit Card Information{/ts}
-            </div>
-            <div class="crm-section no-label credit_card_details-section">
-                <div class="content">{$credit_card_type}</div>
+          <div class="header-dark">
+            {ts}Credit Card Information{/ts}
+          </div>
+          <div class="crm-section no-label credit_card_details-section">
+            <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
-            <div class="content">{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}</div>
+            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         </div>
+      {/crmRegion}
     {/if}
 
     {if $event.thankyou_footer_text}

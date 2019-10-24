@@ -21,7 +21,7 @@
     {foreach from=$line_items item=line_item}
       <tr class="event-line-item {$line_item.class}">
   <td class="event-title">
-    {$line_item.event->title} ({$line_item.event->start_date})
+    {$line_item.event->title} ({$line_item.event->start_date|crmDate})
   </td>
   <td class="participants-column">
     {$line_item.num_participants}<br/>
@@ -155,20 +155,28 @@
 {/if}
 
 <script type="text/javascript">
+{if $form.is_pay_later.name}
 var pay_later_sel = "input#{$form.is_pay_later.name}";
+{/if}
 {literal}
 CRM.$(function($) {
+
   function refresh() {
+    {/literal}{if $form.is_pay_later.name}{literal}
     var is_pay_later = $(pay_later_sel).prop("checked");
+    {/literal}{else}
+    var is_pay_later = false;
+    {/if}{literal}
     $(".credit_card_info-group").toggle(!is_pay_later);
     $(".pay-later-instructions").toggle(is_pay_later);
     $("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");
   }
-  $("input#source").prop('disabled', true);
-
+  {/literal}{if $form.is_pay_later.name}{literal}
   $(pay_later_sel).change(function() {
     refresh();
   });
+  {/literal}{/if}{literal}
+  $("input#source").prop('disabled', true);
   $(".payment_type-section :radio").change(function() {
     var sel = $(this).attr("id");
     $(".check_number-section").toggle(

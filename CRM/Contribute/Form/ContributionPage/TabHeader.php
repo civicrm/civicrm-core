@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * Helper class to build navigation links.
  */
 class CRM_Contribute_Form_ContributionPage_TabHeader {
+
   /**
    * @param CRM_Core_Form $form
    *
@@ -49,11 +50,11 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array(
-        'tabSettings' => array(
+      ->addSetting([
+        'tabSettings' => [
           'active' => self::getCurrentTab($tabs),
-        ),
-      ));
+        ],
+      ]);
     return $tabs;
   }
 
@@ -67,74 +68,46 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       return NULL;
     }
 
-    $tabs = array(
-      'settings' => array(
+    $default = [
+      'link' => NULL,
+      'valid' => FALSE,
+      'active' => FALSE,
+      'current' => FALSE,
+    ];
+
+    $tabs = [
+      'settings' => [
         'title' => ts('Title'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'amount' => array(
+      ] + $default,
+      'amount' => [
         'title' => ts('Amounts'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'membership' => array(
+      ] + $default,
+      'membership' => [
         'title' => ts('Memberships'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'thankyou' => array(
+      ] + $default,
+      'thankyou' => [
         'title' => ts('Receipt'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'friend' => array(
+      ] + $default,
+      'friend' => [
         'title' => ts('Tell a Friend'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'custom' => array(
+      ] + $default,
+      'custom' => [
         'title' => ts('Profiles'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'premium' => array(
+      ] + $default,
+      'premium' => [
         'title' => ts('Premiums'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'widget' => array(
+      ] + $default,
+      'widget' => [
         'title' => ts('Widgets'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-      'pcp' => array(
+      ] + $default,
+      'pcp' => [
         'title' => ts('Personal Campaigns'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ),
-    );
+      ] + $default,
+    ];
 
     $contribPageId = $form->getVar('_id');
-    CRM_Utils_Hook::tabset('civicrm/admin/contribute', $tabs, array('contribution_page_id' => $contribPageId));
+    // Call tabset hook to add/remove custom tabs
+    CRM_Utils_Hook::tabset('civicrm/admin/contribute', $tabs, ['contribution_page_id' => $contribPageId]);
     $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
 
@@ -142,7 +115,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     switch ($className) {
       case 'Contribute':
         $attributes = $form->getVar('_attributes');
-        $class = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+        $class = CRM_Utils_Request::retrieveComponent($attributes);
         break;
 
       case 'MembershipBlock':
@@ -177,7 +150,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
         $tabs[$key]['active'] = $tabs[$key]['valid'] = TRUE;
       }
       //get all section info.
-      $contriPageInfo = CRM_Contribute_BAO_ContributionPage::getSectionInfo(array($contribPageId));
+      $contriPageInfo = CRM_Contribute_BAO_ContributionPage::getSectionInfo([$contribPageId]);
 
       foreach ($contriPageInfo[$contribPageId] as $section => $info) {
         if (!$info) {

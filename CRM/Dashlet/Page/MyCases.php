@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -45,7 +45,7 @@ class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'dashlet');
     $this->assign('context', $context);
 
     //check for civicase access.
@@ -53,12 +53,17 @@ class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
     }
 
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-    $upcoming = CRM_Case_BAO_Case::getCases(FALSE, $userID, 'upcoming', $context);
+    $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search',
+      ts('Case'), CRM_Core_Action::BROWSE,
+      NULL,
+      FALSE, FALSE, TRUE
+    );
+    $controller->setEmbedded(TRUE);
+    $controller->process();
+    $controller->run();
 
-    if (!empty($upcoming)) {
-      $this->assign('upcomingCases', $upcoming);
+    if (CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any'], $context, TRUE)) {
+      $this->assign('casePresent', TRUE);
     }
     return parent::run();
   }

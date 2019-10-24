@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
 
@@ -64,7 +64,7 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
       CRM_Utils_System::redirect($redirect);
     }
     if ($mid && !$continue) {
-      $clone = civicrm_api3('Mailing', 'clone', array('id' => $mid));
+      $clone = civicrm_api3('Mailing', 'clone', ['id' => $mid]);
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $clone['id']));
     }
   }

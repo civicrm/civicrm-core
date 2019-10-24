@@ -1,0 +1,36 @@
+/* Styles specific to Backdrop CMS */
+
+/* Make status messages work with Backdrop styles */
+.crm-container :not(.crm-footer) .messages.status {
+  background-color: #E9EEBC;
+  padding: 0.9em 0.625em 1em 3.438em;
+  border: none;
+}
+
+.crm-container :not(.crm-footer) .messages.status .crm-i {
+  font-size: 1.5rem;
+  color: #fff;
+  background-color: #CFDE56;
+  position: absolute;
+  padding: .4rem;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+}
+
+@media only screen and (min-width:34em) {
+  .crm-container :not(.crm-footer) .messages.status {
+    padding-left: 4.375em;
+  }
+  
+  .crm-container :not(.crm-footer) .messages.status .crm-i {
+    font-size: 1.75rem;
+    padding: .5rem;
+  }
+}
+
+/* Backdrop main navigation icon */
+#admin-bar #admin-bar-menu > li > .dropdown > li > a.civicrm {
+  background: transparent url(../i/logo_sm.png) 5% center no-repeat;
+  background-size: 16px;
+}

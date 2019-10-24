@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -63,7 +63,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    */
   public function edit() {
     // used for ajax tabs
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this);
@@ -73,25 +73,25 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     $activityTypeId = CRM_Utils_Request::retrieve('atype', 'Positive', $this);
 
     // Email and Create Letter activities use a different form class
-    $emailTypeValue = CRM_Core_OptionGroup::getValue('activity_type',
-      'Email',
-      'name'
+    $emailTypeValue = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+      'activity_type_id',
+      'Email'
     );
 
-    $letterTypeValue = CRM_Core_OptionGroup::getValue('activity_type',
-      'Print PDF Letter',
-      'name'
+    $letterTypeValue = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+      'activity_type_id',
+      'Print PDF Letter'
     );
 
     switch ($activityTypeId) {
       case $emailTypeValue:
         $wrapper = new CRM_Utils_Wrapper();
-        $arguments = array('attachUpload' => 1);
+        $arguments = ['attachUpload' => 1];
         return $wrapper->run('CRM_Contact_Form_Task_Email', ts('Email a Contact'), $arguments);
 
       case $letterTypeValue:
         $wrapper = new CRM_Utils_Wrapper();
-        $arguments = array('attachUpload' => 1);
+        $arguments = ['attachUpload' => 1];
         return $wrapper->run('CRM_Contact_Form_Task_PDF', ts('Create PDF Letter'), $arguments);
 
       default:
@@ -131,6 +131,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);
+    $this->assign('allow_edit_inbound_emails', CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions());
 
     // also create the form element for the activity links box
     $controller = new CRM_Core_Controller_Simple(
@@ -159,14 +160,14 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    * Perform actions and display for activities.
    */
   public function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     // Do check for view/edit operation.
     if ($this->_id &&
-      in_array($action, array(CRM_Core_Action::UPDATE, CRM_Core_Action::VIEW))
+      in_array($action, [CRM_Core_Action::UPDATE, CRM_Core_Action::VIEW])
     ) {
       if (!CRM_Activity_BAO_Activity::checkPermission($this->_id, $action)) {
         CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
@@ -189,20 +190,20 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
       $activityTypeId = CRM_Utils_Request::retrieve('atype', 'Positive', $this);
 
       // Email and Create Letter activities use a different form class
-      $emailTypeValue = CRM_Core_OptionGroup::getValue('activity_type',
-        'Email',
-        'name'
+      $emailTypeValue = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+        'activity_type_id',
+        'Email'
       );
 
-      $letterTypeValue = CRM_Core_OptionGroup::getValue('activity_type',
-        'Print PDF Letter',
-        'name'
+      $letterTypeValue = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+        'activity_type_id',
+        'Print PDF Letter'
       );
 
-      if (in_array($activityTypeId, array(
+      if (in_array($activityTypeId, [
         $emailTypeValue,
         $letterTypeValue,
-      ))) {
+      ])) {
         return;
       }
     }

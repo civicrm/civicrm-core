@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,10 +33,9 @@
            <td>&nbsp;</td>
            <td>{include file="CRM/Event/Form/Task.tpl"}</td>
         </tr>
-        <tr>
-           <td>&nbsp;</td>
-           <td>{include file="CRM/common/formButtons.tpl" location="bottom"}</td>
-        </tr>
     </table>
+    <div class="crm-submit-buttons">
+      {include file="CRM/common/formButtons.tpl" location="bottom"}
+    </div>
 </div>
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -139,7 +139,7 @@ class CRM_Utils_File {
    * @throws Exception
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
-    static $exceptions = array('.', '..');
+    static $exceptions = ['.', '..'];
     if ($target == '' || $target == '/' || !$target) {
       throw new Exception("Overly broad deletion");
     }
@@ -154,7 +154,7 @@ class CRM_Utils_File {
           }
           elseif (is_file($object)) {
             if (!unlink($object)) {
-              CRM_Core_Session::setStatus(ts('Unable to remove file %1', array(1 => $object)), ts('Warning'), 'error');
+              CRM_Core_Session::setStatus(ts('Unable to remove file %1', [1 => $object]), ts('Warning'), 'error');
             }
           }
         }
@@ -164,12 +164,12 @@ class CRM_Utils_File {
       if ($rmdir) {
         if (rmdir($target)) {
           if ($verbose) {
-            CRM_Core_Session::setStatus(ts('Removed directory %1', array(1 => $target)), '', 'success');
+            CRM_Core_Session::setStatus(ts('Removed directory %1', [1 => $target]), '', 'success');
           }
           return TRUE;
         }
         else {
-          CRM_Core_Session::setStatus(ts('Unable to remove directory %1', array(1 => $target)), ts('Warning'), 'error');
+          CRM_Core_Session::setStatus(ts('Unable to remove directory %1', [1 => $target]), ts('Warning'), 'error');
         }
       }
     }
@@ -280,7 +280,7 @@ class CRM_Utils_File {
       // I think this fn should default to forward-slash instead.
       $slash = DIRECTORY_SEPARATOR;
     }
-    if (!in_array(substr($path, -1, 1), array('/', '\\'))) {
+    if (!in_array(substr($path, -1, 1), ['/', '\\'])) {
       $path .= $slash;
     }
     return $path;
@@ -303,7 +303,7 @@ class CRM_Utils_File {
     if (!$fileName) {
       $fileName = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
     }
-    $success = file_put_contents($dir . $fileName, $contents);
+    $success = @file_put_contents($dir . $fileName, $contents);
 
     return ($success === FALSE) ? FALSE : $fileName;
   }
@@ -500,7 +500,7 @@ class CRM_Utils_File {
    */
   public static function getFilesByExtension($path, $ext) {
     $path = self::addTrailingSlash($path);
-    $files = array();
+    $files = [];
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {
         if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
@@ -526,8 +526,16 @@ class CRM_Utils_File {
     if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
-  Order allow,deny
-  Deny from all
+# Apache 2.2
+  <IfModule !authz_core_module>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+
+# Apache 2.4+
+  <IfModule authz_core_module>
+    Require all denied
+  </IfModule>
 </Files>
 
 HTACCESS;
@@ -569,8 +577,19 @@ HTACCESS;
   }
 
   /**
-   * Create the base file path from which all our internal directories are
-   * offset. This is derived from the template compile directory set
+   * (Deprecated) Create the file-path from which all other internal paths are
+   * computed. This implementation determines it as `dirname(CIVICRM_TEMPLATE_COMPILEDIR)`.
+   *
+   * This approach is problematic - e.g. it prevents one from authentically
+   * splitting the CIVICRM_TEMPLATE_COMPILEDIR away from other dirs. The implementation
+   * is preserved for backwards compatibility (and should only be called by
+   * CMS-adapters and by Civi\Core\Paths).
+   *
+   * Do not use it for new path construction logic. Instead, use Civi::paths().
+   *
+   * @deprecated
+   * @see \Civi::paths()
+   * @see \Civi\Core\Paths
    */
   public static function baseFilePath() {
     static $_path = NULL;
@@ -621,6 +640,10 @@ HTACCESS;
    * @param $directory
    *
    * @return string
+   * @deprecated
+   *   Computation of a relative path requires some base.
+   *   This implementation is problematic because it relies on an
+   *   implicit base which was constructed problematically.
    */
   public static function relativeDirectory($directory) {
     // Do nothing on windows
@@ -647,12 +670,12 @@ HTACCESS;
 
   /**
    * @param $directory
-   * @param string|NULL $basePath
+   * @param string $basePath
    *   The base path when evaluating relative paths. Should include trailing slash.
    *
    * @return string
    */
-  public static function absoluteDirectory($directory, $basePath = NULL) {
+  public static function absoluteDirectory($directory, $basePath) {
     // check if directory is already absolute, if so return immediately
     // Note: Windows PHP accepts any mix of "/" or "\", so "C:\htdocs" or "C:/htdocs" would be a valid absolute path
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && preg_match(';^[a-zA-Z]:[/\\\\];', $directory)) {
@@ -664,8 +687,12 @@ HTACCESS;
       return $directory;
     }
 
-    // make everything absolute from the baseFilePath
-    $basePath = ($basePath === NULL) ? self::baseFilePath() : $basePath;
+    if ($basePath === NULL) {
+      // Previous versions interpreted `NULL` to mean "default to `self::baseFilePath()`".
+      // However, no code in the known `universe` relies on this interpretation, and
+      // the `baseFilePath()` function is problematic/deprecated.
+      throw new \RuntimeException("absoluteDirectory() requires specifying a basePath");
+    }
 
     // ensure that $basePath has a trailing slash
     $basePath = self::addTrailingSlash($basePath);
@@ -743,11 +770,11 @@ HTACCESS;
    */
   public static function findFiles($dir, $pattern, $relative = FALSE) {
     if (!is_dir($dir)) {
-      return array();
+      return [];
     }
     $dir = rtrim($dir, '/');
-    $todos = array($dir);
-    $result = array();
+    $todos = [$dir];
+    $result = [];
     while (!empty($todos)) {
       $subdir = array_shift($todos);
       $matches = glob("$subdir/$pattern");
@@ -797,7 +824,8 @@ HTACCESS;
       }
     }
     if (empty($childParts)) {
-      return FALSE; // same directory
+      // same directory
+      return FALSE;
     }
     else {
       return TRUE;
@@ -828,7 +856,7 @@ HTACCESS;
 
     CRM_Utils_File::copyDir($fromDir, $toDir);
     if (!CRM_Utils_File::cleanDir($fromDir, TRUE, FALSE)) {
-      CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', array(1 => $fromDir)), '', 'alert');
+      CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', [1 => $fromDir]), '', 'alert');
       return FALSE;
     }
     return TRUE;
@@ -841,17 +869,17 @@ HTACCESS;
    * @param string $fileName
    * @param array $extraParams
    */
-  public static function formatFile(&$param, $fileName, $extraParams = array()) {
+  public static function formatFile(&$param, $fileName, $extraParams = []) {
     if (empty($param[$fileName])) {
       return;
     }
 
-    $fileParams = array(
+    $fileParams = [
       'uri' => $param[$fileName]['name'],
       'type' => $param[$fileName]['type'],
       'location' => $param[$fileName]['name'],
       'upload_date' => date('YmdHis'),
-    ) + $extraParams;
+    ] + $extraParams;
 
     $param[$fileName] = $fileParams;
   }
@@ -890,7 +918,7 @@ HTACCESS;
         break;
 
       default:
-        $url = sprintf('<a href="%s">%s</a>', $url, basename($path));
+        $url = sprintf('<a href="%s">%s</a>', $url, self::cleanFileName(basename($path)));
         break;
     }
 
@@ -910,12 +938,122 @@ HTACCESS;
     $imageURL = CRM_Utils_String::unstupifyUrl($imageURL);
     parse_str(parse_url($imageURL, PHP_URL_QUERY), $query);
 
-    $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
-    $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $url = NULL;
+    if (!empty($query['photo'])) {
+      $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
+    }
+    else {
+      $path = $url = $imageURL;
+    }
+    $fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    //According to (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types),
+    // there are some extensions that would need translating.:
+    $translateMimeTypes = [
+      'tif' => 'tiff',
+      'jpg' => 'jpeg',
+      'svg' => 'svg+xml',
+    ];
+    $mimeType = 'image/' . CRM_Utils_Array::value(
+      $fileExtension,
+      $translateMimeTypes,
+      $fileExtension
+    );
 
-    return self::getFileURL($path, $mimeType);
+    return self::getFileURL($path, $mimeType, $url);
   }
 
+  /**
+   * Resize an image.
+   *
+   * @param string $sourceFile
+   *   Filesystem path to existing image on server
+   * @param int $targetWidth
+   *   New width desired, in pixels
+   * @param int $targetHeight
+   *   New height desired, in pixels
+   * @param string $suffix = ""
+   *   If supplied, the image will be renamed to include this suffix. For
+   *   example if the original file name is "foo.png" and $suffix = "_bar",
+   *   then the final file name will be "foo_bar.png".
+   * @param bool $preserveAspect = TRUE
+   *   When TRUE $width and $height will be used as a bounding box, outside of
+   *   which the resized image will not extend.
+   *   When FALSE, the image will be resized exactly to $width and $height, even
+   *   if it means stretching it.
+   *
+   * @return string
+   *   Path to image
+   * @throws \CRM_Core_Exception
+   *   Under the following conditions
+   *   - When GD is not available.
+   *   - When the source file is not an image.
+   */
+  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "", $preserveAspect = TRUE) {
+
+    // Check if GD is installed
+    $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
+    if (!$gdSupport) {
+      throw new CRM_Core_Exception(ts('Unable to resize image because the GD image library is not currently compiled in your PHP installation.'));
+    }
+
+    $sourceMime = mime_content_type($sourceFile);
+    if ($sourceMime == 'image/gif') {
+      $sourceData = imagecreatefromgif($sourceFile);
+    }
+    elseif ($sourceMime == 'image/png') {
+      $sourceData = imagecreatefrompng($sourceFile);
+    }
+    elseif ($sourceMime == 'image/jpeg') {
+      $sourceData = imagecreatefromjpeg($sourceFile);
+    }
+    else {
+      throw new CRM_Core_Exception(ts('Unable to resize image because the file supplied was not an image.'));
+    }
+
+    // get image about original image
+    $sourceInfo = getimagesize($sourceFile);
+    $sourceWidth = $sourceInfo[0];
+    $sourceHeight = $sourceInfo[1];
+
+    // Adjust target width/height if preserving aspect ratio
+    if ($preserveAspect) {
+      $sourceAspect = $sourceWidth / $sourceHeight;
+      $targetAspect = $targetWidth / $targetHeight;
+      if ($sourceAspect > $targetAspect) {
+        $targetHeight = $targetWidth / $sourceAspect;
+      }
+      if ($sourceAspect < $targetAspect) {
+        $targetWidth = $targetHeight * $sourceAspect;
+      }
+    }
+
+    // figure out the new filename
+    $pathParts = pathinfo($sourceFile);
+    $targetFile = $pathParts['dirname'] . DIRECTORY_SEPARATOR
+      . $pathParts['filename'] . $suffix . "." . $pathParts['extension'];
+
+    $targetData = imagecreatetruecolor($targetWidth, $targetHeight);
+
+    // resize
+    imagecopyresized($targetData, $sourceData,
+      0, 0, 0, 0,
+      $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+
+    // save the resized image
+    $fp = fopen($targetFile, 'w+');
+    ob_start();
+    imagejpeg($targetData);
+    $image_buffer = ob_get_contents();
+    ob_end_clean();
+    imagedestroy($targetData);
+    fwrite($fp, $image_buffer);
+    rewind($fp);
+    fclose($fp);
+
+    // return the URL to link to
+    $config = CRM_Core_Config::singleton();
+    return $config->imageUploadURL . basename($targetFile);
+  }
 
   /**
    * Get file icon class for specific MIME Type
@@ -934,6 +1072,50 @@ HTACCESS;
       }
     }
     return $iconClasses['*'];
+  }
+
+  /**
+   * Is the filename a safe and valid filename passed in from URL
+   *
+   * @param string $fileName
+   * @return bool
+   */
+  public static function isValidFileName($fileName = NULL) {
+    if ($fileName) {
+      $check = $fileName !== basename($fileName) ? FALSE : TRUE;
+      if ($check) {
+        if (substr($fileName, 0, 1) == '/' || substr($fileName, 0, 1) == '.' || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
+          $check = FALSE;
+        }
+      }
+      return $check;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get the extensions that this MimeTpe is for
+   * @param string $mimeType the mime-type we want extensions for
+   * @return array
+   */
+  public static function getAcceptableExtensionsForMimeType($mimeType = NULL) {
+    $mapping = \MimeType\Mapping::$types;
+    $extensions = [];
+    foreach ($mapping as $extension => $type) {
+      if ($mimeType == $type) {
+        $extensions[] = $extension;
+      }
+    }
+    return $extensions;
+  }
+
+  /**
+   * Get the extension of a file based on its path
+   * @param string $path path of the file to query
+   * @return string
+   */
+  public static function getExtensionFromPath($path) {
+    return pathinfo($path, PATHINFO_EXTENSION);
   }
 
 }

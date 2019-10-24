@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -98,7 +98,7 @@
 
 {/if}
 
-{if $permission EQ 'edit' AND ($action eq 16)}
+{if ($permission EQ 'edit' OR $canAddNotes) AND ($action eq 16)}
    <div class="action-link">
    <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><i class="crm-i fa-comment"></i> {ts}Add Note{/ts}</span></a>
    </div>
@@ -116,13 +116,13 @@
 
     function showHideComments( noteId ) {
 
-        elRow = cj('tr#cnote_'+ noteId)
+        elRow = cj('tr#Note-'+ noteId)
 
         if (elRow.hasClass('view-comments')) {
             cj('tr.note-comment_'+ noteId).remove()
-            commentRows['cnote_'+ noteId] = {};
-            cj('tr#cnote_'+ noteId +' span.icon_comments_show').show();
-            cj('tr#cnote_'+ noteId +' span.icon_comments_hide').hide();
+            commentRows['Note-'+ noteId] = {};
+            cj('tr#Note-'+ noteId +' span.icon_comments_show').show();
+            cj('tr#Note-'+ noteId +' span.icon_comments_hide').hide();
             elRow.removeClass('view-comments');
         } else {
             var getUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0}"{literal};
@@ -135,7 +135,7 @@
         var urlTemplate = '{/literal}{crmURL p='civicrm/contact/view' q="reset=1&cid=" h=0 }{literal}'
         if (response['values'][0] && response['values'][0].entity_id) {
             var noteId = response['values'][0].entity_id
-            var row = cj('tr#cnote_'+ noteId);
+            var row = cj('tr#Note-'+ noteId);
 
             row.addClass('view-comments');
 
@@ -145,20 +145,20 @@
                 var rowClassOddEven = 'even'
             }
 
-            if ( commentRows['cnote_'+ noteId] ) {
-                for ( var i in commentRows['cnote_'+ noteId] ) {
+            if ( commentRows['Note-'+ noteId] ) {
+                for ( var i in commentRows['Note-'+ noteId] ) {
                     return false;
                 }
             } else {
-                commentRows['cnote_'+ noteId] = {};
+                commentRows['Note-'+ noteId] = {};
             }
             for (i in response['values']) {
                 if ( response['values'][i].id ) {
-                    if ( commentRows['cnote_'+ noteId] &&
-                        commentRows['cnote_'+ noteId][response['values'][i].id] ) {
+                    if ( commentRows['Note-'+ noteId] &&
+                        commentRows['Note-'+ noteId][response['values'][i].id] ) {
                         continue;
                     }
-                    str = '<tr id="cnote_'+ response['values'][i].id +'" class="'+ rowClassOddEven +' note-comment_'+ noteId +'">'
+                    str = '<tr id="Note-'+ response['values'][i].id +'" class="'+ rowClassOddEven +' note-comment_'+ noteId +'">'
                         + '<td></td>'
                         + '<td style="padding-left: 2em">'
                         + response['values'][i].note
@@ -172,13 +172,13 @@
                         + response['values'][i].attachment
                         + '</td><td>'+ commentAction.replace(/{cid}/g, response['values'][i].createdById).replace(/{id}/g, response['values'][i].id) +'</td></tr>'
 
-                    commentRows['cnote_'+ noteId][response['values'][i].id] = str;
+                    commentRows['Note-'+ noteId][response['values'][i].id] = str;
                 }
             }
-            drawCommentRows('cnote_'+ noteId);
+            drawCommentRows('Note-'+ noteId);
 
-            cj('tr#cnote_'+ noteId +' span.icon_comments_show').hide();
-            cj('tr#cnote_'+ noteId +' span.icon_comments_hide').show();
+            cj('tr#Note-'+ noteId +' span.icon_comments_show').hide();
+            cj('tr#Note-'+ noteId +' span.icon_comments_hide').show();
         } else {
             CRM.alert('{/literal}{ts escape="js"}There are no comments for this note{/ts}{literal}', '{/literal}{ts escape="js"}None Found{/ts}{literal}', 'alert');
         }
@@ -190,7 +190,7 @@
         row = cj('tr#'+ rowId)
         for (i in commentRows[rowId]) {
             row.after(commentRows[rowId][i]);
-            row = cj('tr#cnote_'+ i);
+            row = cj('tr#Note-'+ i);
         }
       }
     }
@@ -216,7 +216,7 @@
         </thead>
 
         {foreach from=$notes item=note}
-        <tr id="cnote_{$note.id}" class="{cycle values="odd-row,even-row"} crm-note">
+        <tr id="Note-{$note.id}" data-action="setvalue" class="{cycle values="odd-row,even-row"} crm-note crm-entity">
             <td class="crm-note-comment">
                 {if $note.comment_count}
                     <span id="{$note.id}_show" style="display:block" class="icon_comments_show">
@@ -237,7 +237,7 @@
                   <a class="crm-popup" href="{crmURL p='civicrm/contact/view/note' q="action=view&selectedChild=note&reset=1&cid=`$contactId`&id=`$note.id`"}">{ts}(more){/ts}</a>
                 {/if}
             </td>
-            <td class="crm-note-subject">{$note.subject}</td>
+            <td class="crm-note-subject crmf-subject crm-editable">{$note.subject}</td>
             <td class="crm-note-modified_date" data-order="{$note.modified_date}">{$note.modified_date|crmDate}</td>
             <td class="crm-note-createdBy">
                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$note.contact_id`"}">{$note.createdBy}</a>

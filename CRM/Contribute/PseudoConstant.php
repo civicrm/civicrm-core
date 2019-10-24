@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -95,19 +95,24 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $batch;
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
+   *
    *
    * Get all the financial types
    *
    *
    * @param int $id
+   * @param bool $includeDisabled
    *
    * @return array
    *   array reference of all financial types if any
    */
-  public static function &financialType($id = NULL) {
+  public static function &financialType($id = NULL, $includeDisabled = FALSE) {
     if (!self::$financialType) {
-      $condition = " is_active = 1 ";
+      $condition = "";
+      if (!$includeDisabled) {
+        $condition = " is_active = 1 ";
+      }
       CRM_Core_PseudoConstant::populate(
         self::$financialType,
         'CRM_Financial_DAO_FinancialType',
@@ -126,13 +131,14 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
+   * TODO: buildOptions() doesn't replace this as it doesn't support filtering, which is used with this function.
    *
-   * Get all the financial Accounts
+   * Get all/filtered array of the financial Accounts
    *
    *
    * @param int $id
-   * @param int $financialAccountTypeId
+   * @param int $financialAccountTypeId Optional filer to return only financial accounts of type
    * @param string $retrieveColumn
    * @param string $key
    *
@@ -179,7 +185,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all the contribution pages
    *
@@ -214,7 +220,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all the payment instruments
    *
@@ -254,7 +260,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array of all Premiums if any
    */
   public static function products($pageID = NULL) {
-    $products = array();
+    $products = [];
     $dao = new CRM_Contribute_DAO_Product();
     $dao->is_active = 1;
     $dao->orderBy('id');
@@ -270,7 +276,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       $dao->find(TRUE);
       $premiumID = $dao->id;
 
-      $productID = array();
+      $productID = [];
 
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->premiums_id = $premiumID;
@@ -279,7 +285,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
         $productID[$dao->product_id] = $dao->product_id;
       }
 
-      $tempProduct = array();
+      $tempProduct = [];
       foreach ($products as $key => $value) {
         if (!array_key_exists($key, $productID)) {
           $tempProduct[$key] = $value;
@@ -359,10 +365,10 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &pcpStatus($column = 'label') {
     if (NULL === self::$pcpStatus) {
-      self::$pcpStatus = array();
+      self::$pcpStatus = [];
     }
     if (!array_key_exists($column, self::$pcpStatus)) {
-      self::$pcpStatus[$column] = array();
+      self::$pcpStatus[$column] = [];
 
       self::$pcpStatus[$column] = CRM_Core_OptionGroup::values('pcp_status', FALSE,
         FALSE, FALSE, NULL, $column
@@ -374,6 +380,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get financial account for a Financial type.
    *
+   * @deprecated use the alternative with caching
+   * CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship
    *
    * @param int $entityId
    * @param string $accountRelationType
@@ -382,11 +390,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return int
    */
   public static function getRelationalFinancialAccount($entityId, $accountRelationType, $entityTable = 'civicrm_financial_type', $returnField = 'financial_account_id') {
-    $params = array(
-      'return' => array($returnField),
+    $params = [
+      'return' => [$returnField],
       'entity_table' => $entityTable,
       'entity_id' => $entityId,
-    );
+    ];
     if ($accountRelationType) {
       $params['account_relationship.name'] = $accountRelationType;
     }

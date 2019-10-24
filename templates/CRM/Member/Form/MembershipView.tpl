@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,8 +45,14 @@
         {/if}
         {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
+
+    {if $is_test}
+    <div class="help">
+      <strong>{ts}This is a TEST transaction{/ts}</strong>
+    </div>
+    {/if}
     <table class="crm-info-panel">
-        <tr><td class="label">{ts}Member{/ts}</td><td class="bold"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id&context=$context"}" title="{ts}View contact summary{/ts}">{$displayName}</td></tr>
+      <tr><td class="label">{ts}Member{/ts}</td><td class="bold"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id&context=$context"}" title="{ts}View contact summary{/ts}">{$displayName}</td></tr>
         {if $owner_display_name}
             <tr><td class="label">{ts}By Relationship{/ts}</td><td>{$relationship}&nbsp;&nbsp;<a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$owner_contact_id&context=$context"}" title="{ts}View primary member contact summary{/ts}">{$owner_display_name}</a>&nbsp;</td></tr>
         {/if}
@@ -61,15 +67,53 @@
         <tr><td class="label">{ts}Start date{/ts}</td><td>{$start_date|crmDate}</td></tr>
         <tr><td class="label">{ts}End date{/ts}</td><td>{$end_date|crmDate}</td></tr>
         <tr><td class="label">{ts}Auto-renew{/ts}</td><td>{$auto_renew}</td></tr>
+     {if $contribution_recur_id}
+          <tr>
+            <td class="label">{ts}Recurring Contribution{/ts}</td>
+            <td>
+              <a class="crm-hover-button action-item" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contactId`&context=contribution"}'>View Recurring Contribution</a>
+            </td>
+          </tr>
+     {/if}
     </table>
 
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
-    {if $accessContribution and $rows.0.contribution_id}
-        <div class="crm-accordion-wrapper">
-              <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
-              <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+    {if $accessContribution}
+      <div class="crm-accordion-wrapper">
+        <div class="crm-accordion-header">
+          {ts}Related Contributions and Recurring Contributions{/ts}
         </div>
+        <div class="crm-accordion-body">
+          {if $rows.0.contribution_id}
+            {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+          {/if}
+          <script type="text/javascript">
+            var membershipID = {$id};
+            var contactID = {$contactId};
+            {literal}
+            CRM.$(function($) {
+              CRM.loadPage(
+                CRM.url(
+                  'civicrm/membership/recurring-contributions',
+                  {
+                    reset: 1,
+                    membershipID: membershipID,
+                    cid: contactID
+                  },
+                  'back'
+                ),
+                {
+                  target : '#membership-recurring-contributions',
+                  dialog : false
+                }
+              );
+            });
+            {/literal}
+          </script>
+          <div id="membership-recurring-contributions"></div>
+        </div>
+      </div>
     {/if}
 
     {if $softCredit}

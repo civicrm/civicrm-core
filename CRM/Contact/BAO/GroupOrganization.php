@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganization {
 
@@ -48,41 +48,22 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @return CRM_Contact_DAO_GroupOrganization
    */
   public static function add(&$params) {
-    $formattedValues = array();
-    self::formatValues($params, $formattedValues);
-    $dataExists = self::dataExists($formattedValues);
-    if (!$dataExists) {
+    if (!empty($params['group_organization'])) {
+      $params['id'] = $params['group_organization'];
+    }
+    $dataExists = self::dataExists($params);
+    if (!$dataExists && empty($params['id'])) {
       return NULL;
     }
     $groupOrganization = new CRM_Contact_DAO_GroupOrganization();
-    $groupOrganization->copyValues($formattedValues);
-    // we have ensured we have group_id & organization_id so we can do a find knowing that
-    // this can only find a matching record
-    $groupOrganization->find(TRUE);
+    $groupOrganization->copyValues($params);
+    if (!isset($params['id'])) {
+      // we have ensured we have group_id & organization_id so we can do a find knowing that
+      // this can only find a matching record
+      $groupOrganization->find(TRUE);
+    }
     $groupOrganization->save();
     return $groupOrganization;
-  }
-
-  /**
-   * Format the params.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $formatedValues
-   *   (reference ) an assoc array of name/value pairs.
-   */
-  public static function formatValues(&$params, &$formatedValues) {
-    if (!empty($params['group_organization'])) {
-      $formatedValues['id'] = $params['group_organization'];
-    }
-
-    if (!empty($params['group_id'])) {
-      $formatedValues['group_id'] = $params['group_id'];
-    }
-
-    if (!empty($params['organization_id'])) {
-      $formatedValues['organization_id'] = $params['organization_id'];
-    }
   }
 
   /**

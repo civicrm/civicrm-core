@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,6 +54,12 @@
       </td>
     </tr>
     <tr>
+      <td colspan="2">
+        {$form.relation_description.label}<br />
+        {$form.relation_description.html}
+      </td>
+    </tr>
+    <tr>
       <td colspan="2"><label>{ts}Start Date{/ts}</label></td>
     </tr>
     <tr>
@@ -64,6 +70,12 @@
     </tr>
     <tr>
       {include file="CRM/Core/DateRange.tpl" fieldName="relation_end_date" from='_low' to='_high'}
+    </tr>
+    <tr>
+      <td colspan="2"><label>{ts}Active Period{/ts}</label> {help id="id-relationship-active-period" file="CRM/Contact/Form/Search/Advanced.hlp"}<br /></td>
+    </tr>
+    <tr>
+      {include file="CRM/Core/DateRange.tpl" fieldName="relation_active_period_date" from='_low' to='_high'}
     </tr>
     {if $relationshipGroupTree}
       <tr>

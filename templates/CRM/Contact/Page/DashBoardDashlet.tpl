@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/common/dashboard.tpl"}
-{include file="CRM/common/openFlashChart.tpl"}
+{include file="CRM/common/chart.tpl"}
 {* Alerts for critical configuration settings. *}
 {$communityMessages}
 <div class="crm-submit-buttons crm-dashboard-controls">

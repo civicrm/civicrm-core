@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -187,7 +187,7 @@
             <div class="content">{$form.address.$index.geo_code_1.html}, {$form.address.$index.geo_code_2.html}
                 <br class="spacer"/>
                 <span class="description">
-                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-setup" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
+                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-set-up" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
             </div>
             <div class="clear"></div>
         </div>

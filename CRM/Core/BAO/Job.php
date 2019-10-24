@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id: $
  *
  */
@@ -90,9 +90,8 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
-   *
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Job', $id, 'is_active', $is_active);
@@ -144,6 +143,27 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
 
     $query = "DELETE FROM civicrm_job_log WHERE run_time < SUBDATE(NOW(), $minDaysToKeep) LIMIT $count";
     CRM_Core_DAO::executeQuery($query);
+  }
+
+  /**
+   * Make a copy of a Job.
+   *
+   * @param int $id The job id to copy.
+   * @param array $params
+   * @return CRM_Core_DAO
+   */
+  public static function copy($id, $params = []) {
+    $fieldsFix = [
+      'suffix' => [
+        'name' => ' - ' . ts('Copy'),
+      ],
+      'replace' => $params,
+    ];
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Job', ['id' => $id], NULL, $fieldsFix);
+    $copy->save();
+    CRM_Utils_Hook::copy('Job', $copy);
+
+    return $copy;
   }
 
 }

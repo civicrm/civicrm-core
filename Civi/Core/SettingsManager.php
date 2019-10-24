@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,13 +67,20 @@ class SettingsManager {
   protected $cache;
 
   /**
-   * @var
+   * @var array
    *   Array (int $id => SettingsBag $bag).
    */
-  protected $bagsByDomain = array(), $bagsByContact = array();
+  protected $bagsByDomain = [];
+
 
   /**
-   * @var array|NULL
+   * @var array
+   *   Array (int $id => SettingsBag $bag).
+   */
+  protected $bagsByContact = [];
+
+  /**
+   * @var array|null
    *   Array(string $entity => array(string $settingName => mixed $value)).
    *   Ex: $mandatory['domain']['uploadDir'].
    *   NULL means "autoload from $civicrm_setting".
@@ -149,7 +156,10 @@ class SettingsManager {
   }
 
   /**
-   * @param int|NULL $domainId
+   * Get Settings by domain.
+   *
+   * @param int|null $domainId
+   *
    * @return SettingsBag
    */
   public function getBagByDomain($domainId) {
@@ -170,13 +180,27 @@ class SettingsManager {
   }
 
   /**
-   * @param int|NULL $domainId
-   * @param int|NULL $contactId
+   * Get Settings by contact.
+   *
+   * @param int|null $domainId
+   *   For the default domain, leave $domainID as NULL.
+   * @param int|null $contactId
+   *   For the default/active user's contact, leave $domainID as NULL.
+   *
    * @return SettingsBag
+   * @throws \CRM_Core_Exception
+   *   If there is no contact, then there's no SettingsBag, and we'll throw
+   *   an exception.
    */
   public function getBagByContact($domainId, $contactId) {
     if ($domainId === NULL) {
       $domainId = \CRM_Core_Config::domainID();
+    }
+    if ($contactId === NULL) {
+      $contactId = \CRM_Core_Session::getLoggedInContactID();
+      if (!$contactId) {
+        throw new \CRM_Core_Exception("Cannot access settings subsystem - user or domain is unavailable");
+      }
     }
 
     $key = "$domainId:$contactId";
@@ -205,13 +229,13 @@ class SettingsManager {
       return self::getSystemDefaults($entity);
     }
 
-    $cacheKey = 'defaults:' . $entity;
+    $cacheKey = 'defaults_' . $entity;
     $defaults = $this->cache->get($cacheKey);
     if (!is_array($defaults)) {
-      $specs = SettingsMetadata::getMetadata(array(
+      $specs = SettingsMetadata::getMetadata([
         'is_contact' => ($entity === 'contact' ? 1 : 0),
-      ));
-      $defaults = array();
+      ]);
+      $defaults = [];
       foreach ($specs as $key => $spec) {
         $defaults[$key] = \CRM_Utils_Array::value('default', $spec);
       }
@@ -255,12 +279,12 @@ class SettingsManager {
    * @return array
    */
   public static function parseMandatorySettings($civicrm_setting) {
-    $result = array(
-      'domain' => array(),
-      'contact' => array(),
-    );
+    $result = [
+      'domain' => [],
+      'contact' => [],
+    ];
 
-    $rewriteGroups = array(
+    $rewriteGroups = [
       //\CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => 'domain',
       //\CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => 'domain',
       //\CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME => 'domain',
@@ -279,7 +303,7 @@ class SettingsManager {
       //\CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => 'domain',
       'domain' => 'domain',
       'contact' => 'contact',
-    );
+    ];
 
     if (is_array($civicrm_setting)) {
       foreach ($civicrm_setting as $oldGroup => $values) {
@@ -299,7 +323,8 @@ class SettingsManager {
     $this->mandatory = NULL;
 
     $this->cache->flush();
-    \Civi::cache('settings')->flush(); // SettingsMetadata; not guaranteed to use same cache.
+    // SettingsMetadata; not guaranteed to use same cache.
+    \Civi::cache('settings')->flush();
 
     foreach ($this->bagsByDomain as $bag) {
       /** @var SettingsBag $bag */
@@ -330,12 +355,12 @@ class SettingsManager {
    * @return array
    */
   private static function getSystemDefaults($entity) {
-    $defaults = array();
+    $defaults = [];
     switch ($entity) {
       case 'domain':
-        $defaults = array(
+        $defaults = [
           'installed' => FALSE,
-          'enable_components' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'),
+          'enable_components' => ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'],
           'customFileUploadDir' => '[civicrm.files]/custom/',
           'imageUploadDir' => '[civicrm.files]/persist/contribute/',
           'uploadDir' => '[civicrm.files]/upload/',
@@ -344,7 +369,7 @@ class SettingsManager {
           'extensionsURL' => '[civicrm.files]/ext/',
           'resourceBase' => '[civicrm.root]/',
           'userFrameworkResourceURL' => '[civicrm.root]/',
-        );
+        ];
         break;
 
     }

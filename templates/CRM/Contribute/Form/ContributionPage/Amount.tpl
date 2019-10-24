@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -121,7 +121,7 @@
         </table>
     </div>
 {if $futurePaymentProcessor}
-    <span id="pledge_calendar_date_field">&nbsp;&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=pledge_calendar_date}</span>
+    <span id="pledge_calendar_date_field">&nbsp;&nbsp;{$form.pledge_calendar_date.html}</span>
     <span id="pledge_calendar_month_field">&nbsp;&nbsp;{$form.pledge_calendar_month.html}<br/><span class="description">{ts}Recurring payment will be processed this day of the month following submission of this contribution page.{/ts}</span></span>
 {/if}
 
@@ -160,7 +160,7 @@
                 {if $futurePaymentProcessor}
                     <tr id="adjustRecurringFields" class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
                         <td>{$form.adjust_recur_start_date.html}<br/>
-			  <div id="recurDefaults">
+                          <div id="recurDefaults">
                             <span class="description">{$form.pledge_default_toggle.label}</span>
                             <table class="form-layout-compressed">
                               <tr class="crm-contribution-form-block-date_of_recurring_contribution">
@@ -202,7 +202,10 @@
 
             <tr><td colspan="2">
                 <fieldset><legend>{ts}Fixed Contribution Options{/ts}</legend>
-                    {ts}Use the table below to enter up to ten fixed contribution amounts. These will be presented as a list of radio button options. Both the label and dollar amount will be displayed.{/ts}{if $isQuick}{ts} Click <a id='quickconfig' href='#'>here</a> if you want to configure the Fixed Contribution Options below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}{/if}<br />
+                  <div class="description">
+                    {ts}Use the table below to enter up to ten fixed contribution amounts. These will be presented as a list of radio button options. Both the label and dollar amount will be displayed.{/ts}{if $isQuick}{ts} Click <a id='quickconfig' href='#'>here</a> if you want to configure the Fixed Contribution Options below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}{/if}
+                  </div>
+                    <br />
                     <table id="map-field-table">
                         <tr class="columnheader" ><th scope="column">{ts}Contribution Label{/ts}</th><th scope="column">{ts}Amount{/ts}</th><th scope="column">{ts}Default?{/ts}<br />{$form.default.0.html}</th></tr>
                         {section name=loop start=1 loop=11}
@@ -338,48 +341,47 @@
     }
   }
 
-  function showHideAmountBlock( element, elementName )
-        {
-     // show / hide when amount section is active check/uncheck.
-
-     var priceSetID = {/literal}'{$priceSetID}'{literal};
-
-     switch ( elementName ) {
+  function showHideAmountBlock(element, elementName) {
+    // show / hide when amount section is active check/uncheck.
+    var priceSetID = {/literal}'{$priceSetID}'{literal};
+    switch (elementName) {
       case 'price_set_id':
-           if ( element ) {
-               cj('#amountFields').hide();
-           } else {
-               cj('#amountFields').show();
-           }
-           cj("#amount_block_is_active").prop('checked', true );
-      break;
-
-      case 'is_pledge_active' :
-      case 'is_allow_other_amount' :
-           if ( element.checked ) {
-               if ( priceSetID ) cj( "#price_set_id" ).val( '' );
-             cj('#amountFields').show();
-                 }
-           cj("#amount_block_is_active").prop('checked', true );
-      break;
-
-         case 'amount_block_is_active' :
-           if ( element.checked ) {
-               if ( priceSetID ) {
-           cj('#amountFields').hide();
-           cj( "#price_set_id" ).val( priceSetID );
-        } else {
-           cj('#amountFields').show();
-           cj( "#price_set_id" ).val( '' );
+        if (element) {
+          cj('#amountFields').hide();
         }
-        cj('#priceSet, #recurringFields').show();
-           } else {
-            cj( "#price_set_id" ).val( '' );
-            cj('#amountFields, #priceSet, #recurringFields').hide();
-           }
-      break;
-     }
-   }
+        else {
+          cj('#amountFields').show();
+        }
+        break;
+
+      case 'is_pledge_active':
+      case 'is_allow_other_amount':
+        if (element.checked) {
+          if (priceSetID) cj( "#price_set_id" ).val('');
+          cj('#amountFields').show();
+        }
+        cj("#amount_block_is_active").prop('checked', true );
+        break;
+
+      case 'amount_block_is_active':
+        if (element.checked) {
+          if (priceSetID) {
+            cj('#amountFields').hide();
+            cj( "#price_set_id" ).val(priceSetID);
+          }
+          else {
+            cj('#amountFields').show();
+            cj( "#price_set_id" ).val('');
+          }
+          cj('#priceSet, #recurringFields').show();
+        }
+        else {
+          cj( "#price_set_id" ).val('');
+          cj('#amountFields, #priceSet, #recurringFields').hide();
+        }
+        break;
+      }
+    }
 
     function showRecurring( paymentProcessorIds ) {
         var display = true;

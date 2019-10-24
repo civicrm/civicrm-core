@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Type {
   const
@@ -66,6 +66,16 @@ class CRM_Utils_Type {
     BIG = 30,
     FORTYFIVE = 45,
     HUGE = 45;
+
+  /**
+   * Maximum size of a MySQL BLOB or TEXT column in bytes.
+   */
+  const BLOB_SIZE = 65535;
+
+  /**
+   * Maximum value of a MySQL signed INT column.
+   */
+  const INT_MAX = 2147483647;
 
   /**
    * Gets the string representation for a data type.
@@ -144,6 +154,28 @@ class CRM_Utils_Type {
   }
 
   /**
+   * @return array
+   *   An array of type in the form 'type name' => 'int representing type'
+   */
+  public static function getValidTypes() {
+    return [
+      'Int' => self::T_INT,
+      'String' => self::T_STRING,
+      'Enum' => self::T_ENUM,
+      'Date' => self::T_DATE,
+      'Time' => self::T_TIME,
+      'Boolean' => self::T_BOOLEAN,
+      'Text' => self::T_TEXT,
+      'Blob' => self::T_BLOB,
+      'Timestamp' => self::T_TIMESTAMP,
+      'Float' => self::T_FLOAT,
+      'Money' => self::T_MONEY,
+      'Email' => self::T_EMAIL,
+      'Mediumblob' => self::T_MEDIUMBLOB,
+    ];
+  }
+
+  /**
    * Get the data_type for the field.
    *
    * @param array $fieldMetadata
@@ -201,19 +233,22 @@ class CRM_Utils_Type {
    *
    * @return mixed
    *   The data, escaped if necessary.
+   * @throws \Exception
    */
   public static function escape($data, $type, $abort = TRUE) {
     switch ($type) {
       case 'Integer':
       case 'Int':
-        if (CRM_Utils_Rule::integer($data)) {
-          return (int) $data;
-        }
-        break;
-
       case 'Positive':
-        if (CRM_Utils_Rule::positiveInteger($data)) {
-          return (int) $data;
+      case 'Float':
+      case 'Money':
+      case 'Date':
+      case 'Timestamp':
+      case 'ContactReference':
+      case 'MysqlOrderByDirection':
+        $validatedData = self::validate($data, $type, $abort);
+        if (isset($validatedData)) {
+          return $validatedData;
         }
         break;
 
@@ -255,43 +290,10 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'Float':
-      case 'Money':
-        if (CRM_Utils_Rule::numeric($data)) {
-          return $data;
-        }
-        break;
-
       case 'String':
       case 'Memo':
       case 'Text':
-        return CRM_Core_DAO::escapeString($data);
-
-      case 'Date':
-      case 'Timestamp':
-        // a null date or timestamp is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if ((preg_match('/^\d{8}$/', $data) ||
-            preg_match('/^\d{14}$/', $data)
-          ) &&
-          CRM_Utils_Rule::mysqlDate($data)
-        ) {
-          return $data;
-        }
-        break;
-
-      case 'ContactReference':
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if (CRM_Utils_Rule::validContact($data)) {
-          return (int) $data;
-        }
-        break;
+        return CRM_Core_DAO::escapeString(self::validate($data, $type, $abort));
 
       case 'MysqlColumnNameOrAlias':
         if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
@@ -300,12 +302,6 @@ class CRM_Utils_Type {
           $data = '`' . implode('`.`', $parts) . '`';
 
           return $data;
-        }
-        break;
-
-      case 'MysqlOrderByDirection':
-        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
-          return strtolower($data);
         }
         break;
 
@@ -339,7 +335,7 @@ class CRM_Utils_Type {
 
             }
             // Normal clause.
-            $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
+            $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', ['CRM_Utils_Type', 'mysqlOrderByCallback'], trim($part));
           }
           return implode(', ', $parts);
         }
@@ -355,6 +351,7 @@ class CRM_Utils_Type {
     // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
+
       CRM_Core_Error::fatal("$data is not of the type $type");
     }
     return NULL;
@@ -369,13 +366,47 @@ class CRM_Utils_Type {
    *   The type to validate against.
    * @param bool $abort
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
-   * @name string $name
+   * @param string $name
    *   The name of the attribute
+   * @param bool $isThrowException
+   *   Should an exception be thrown rather than a using a deprecated fatal error.
    *
    * @return mixed
    *   The data, escaped if necessary
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
+  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ', $isThrowException = FALSE) {
+
+    $possibleTypes = [
+      'Integer',
+      'Int',
+      'Positive',
+      'CommaSeparatedIntegers',
+      'Boolean',
+      'Float',
+      'Money',
+      'Text',
+      'String',
+      'Link',
+      'Memo',
+      'Date',
+      'Timestamp',
+      'ContactReference',
+      'MysqlColumnNameOrAlias',
+      'MysqlOrderByDirection',
+      'MysqlOrderBy',
+      'ExtensionKey',
+      'Json',
+      'Alphanumeric',
+      'Color',
+    ];
+    if (!in_array($type, $possibleTypes)) {
+      if ($isThrowException) {
+        throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+      }
+      CRM_Core_Error::fatal(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+    }
     switch ($type) {
       case 'Integer':
       case 'Int':
@@ -387,12 +418,6 @@ class CRM_Utils_Type {
       case 'Positive':
         if (CRM_Utils_Rule::positiveInteger($data)) {
           return (int) $data;
-        }
-        break;
-
-      case 'Boolean':
-        if (CRM_Utils_Rule::boolean($data)) {
-          return $data;
         }
         break;
 
@@ -410,18 +435,6 @@ class CRM_Utils_Type {
         return $data;
 
       case 'Date':
-        // a null date is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if (preg_match('/^\d{8}$/', $data) &&
-          CRM_Utils_Rule::mysqlDate($data)
-        ) {
-          return $data;
-        }
-        break;
-
       case 'Timestamp':
         // a null timestamp is valid
         if (strlen(trim($data)) == 0) {
@@ -444,13 +457,7 @@ class CRM_Utils_Type {
         }
 
         if (CRM_Utils_Rule::validContact($data)) {
-          return $data;
-        }
-        break;
-
-      case 'MysqlColumnNameOrAlias':
-        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
@@ -460,19 +467,24 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlOrderBy':
-        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
+      case 'ExtensionKey':
+        if (CRM_Utils_Rule::checkExtensionKeyIsValid($data)) {
           return $data;
         }
         break;
 
       default:
-        CRM_Core_Error::fatal("Cannot recognize $type for $data");
-        break;
+        $check = lcfirst($type);
+        if (CRM_Utils_Rule::$check($data)) {
+          return $data;
+        }
     }
 
     if ($abort) {
       $data = htmlentities($data);
+      if ($isThrowException) {
+        throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
+      }
       CRM_Core_Error::fatal("$name (value: $data) is not of the type $type");
     }
 
@@ -518,12 +530,12 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Get list of avaliable Data Tupes for Option Groups
+   * Get list of avaliable Data Types for Option Groups
    *
    * @return array
    */
   public static function dataTypes() {
-    $types = array(
+    $types = [
       'Integer',
       'String',
       'Date',
@@ -531,7 +543,7 @@ class CRM_Utils_Type {
       'Timestamp',
       'Money',
       'Email',
-    );
+    ];
     return array_combine($types, $types);
   }
 

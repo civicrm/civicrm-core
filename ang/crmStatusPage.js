@@ -1,8 +1,5 @@
 (function(angular, $, _) {
-  // Declare a list of dependencies.
-  angular.module('statuspage', [
-    'crmUi', 'crmUtil', 'ngRoute'
-  ]);
+  angular.module('statuspage', CRM.angRequires('statuspage'));
 
   // router
   angular.module('statuspage').config( function($routeProvider) {

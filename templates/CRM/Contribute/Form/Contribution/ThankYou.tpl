@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,13 +39,13 @@
   {* Show link to Tell a Friend (CRM-2153) *}
   {if $friendText}
     <div id="tell-a-friend" class="crm-section friend_link-section">
-      <a href="{$friendURL}" title="{$friendText}" class="button"><span>&raquo; {$friendText}</span></a>
+      <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span>&raquo; {$friendText}</span></a>
     </div>{if !$linkText}<br /><br />{/if}
   {/if}
   {* Add button for donor to create their own Personal Campaign page *}
   {if $linkText}
     <div class="crm-section create_pcp_link-section">
-      <a href="{$linkTextUrl}" title="{$linkText}" class="button"><span>&raquo; {$linkText}</span></a>
+      <a href="{$linkTextUrl}" title="{$linkText|escape:'html'}" class="button"><span>&raquo; {$linkText}</span></a>
     </div><br /><br />
   {/if}
 
@@ -63,7 +63,7 @@
         </div>
       {/if}
     {elseif $isPendingOutcome}
-      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing. Please print this page for your records.{/ts}</div>
+      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing.{/ts}</div>
         {if $is_email_receipt}
       <div>
         {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -74,7 +74,7 @@
       </div>
     {/if}
   {else}
-    <div>{ts}Your transaction has been processed successfully. Please print this page for your records.{/ts}</div>
+    <div>{ts}Your transaction has been processed successfully.{/ts}</div>
       {if $is_email_receipt}
         <div>
           {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -188,13 +188,13 @@
     </div>
   {/if}
 
-  {if $onbehalfProfile|@count}
+  {if $onbehalfProfile && $onbehalfProfile|@count}
     <div class="crm-group onBehalf_display-group label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
      </div>
   {/if}
 
-  {if $honoreeProfileFields|@count}
+  {if $honoreeProfileFields && $honoreeProfileFields|@count}
     <div class="crm-group honor_block-group">
       <div class="header-dark">
         {$soft_credit_type}
@@ -274,14 +274,12 @@
   {if $contributeMode eq 'direct' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 )}
     {crmRegion name="contribution-thankyou-billing-block"}
       <div class="crm-group credit_card-group">
-        <div class="header-dark">
-          {if $paymentProcessor.payment_type & 2}
-            {ts}Direct Debit Information{/ts}
-          {else}
-            {ts}Credit Card Information{/ts}
-          {/if}
-        </div>
-        {if $paymentProcessor.payment_type & 2}
+        {if $paymentFieldsetLabel}
+          <div class="header-dark">
+            {$paymentFieldsetLabel}
+          </div>
+        {/if}
+        {if $paymentProcessor.payment_type == 2}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br />
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br />
@@ -292,7 +290,7 @@
           <div class="crm-section no-label credit_card_details-section">
             <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
-            <div class="content">{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}</div>
+            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         {/if}

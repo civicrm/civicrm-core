@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="batch-update crm-block crm-form-block crm-event-batch-form-block">
-<fieldset>
   <div class="help">
     {if $context EQ 'statusChange'} {* Update Participant Status task *}
       {ts}Update the status for each participant individually below, or change all statuses to:{/ts}
@@ -108,15 +107,10 @@
              </tr>
             {/foreach}
            </tr>
-           <tr>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td> {if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl"}
-              </td>
-           </tr>
          </table>
-
-</fieldset>
+<div class="crm-submit-buttons">
+{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl"}
+</div>
 </div>
 
 {if $context EQ 'statusChange'} {* Update Participant Status task *}

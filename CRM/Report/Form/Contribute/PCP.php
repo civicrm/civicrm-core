@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -38,155 +38,181 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Supporter'),
             'required' => TRUE,
             'default' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'contact_type' => array(
+          ],
+          'contact_type' => [
             'title' => ts('Supporter Contact Type'),
-          ),
-          'contact_sub_type' => array(
+          ],
+          'contact_sub_type' => [
             'title' => ts('Supporter Contact Subtype'),
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => ts('Supporter Name'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'title' => ts('Contact ID'),
             'no_display' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'pcp-fields',
-      ),
-      'civicrm_contribution_page' => array(
+      ],
+      'civicrm_contribution_page' => [
         'dao' => 'CRM_Contribute_DAO_ContributionPage',
-        'fields' => array(
-          'page_title' => array(
-            'title' => ts('Contribution Page Title'),
+        'alias' => 'cp',
+        'fields' => [
+          'page_title' => [
+            'title' => ts('Page Title'),
             'name' => 'title',
+            'dbAlias' => 'coalesce(cp_civireport.title, e_civireport.title)',
             'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'page_title' => array(
+          ],
+        ],
+        'filters' => [
+          'page_title' => [
             'title' => ts('Contribution Page Title'),
             'name' => 'title',
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'pcp-fields',
-      ),
-      'civicrm_pcp' => array(
+      ],
+      'civicrm_event' => [
+        'alias' => 'e',
+        'filters' => [
+          'event_title' => [
+            'title' => ts('Event Title'),
+            'name' => 'title',
+            'type' => CRM_Utils_Type::T_STRING,
+          ],
+        ],
+        'grouping' => 'pcp-fields',
+      ],
+      'civicrm_pcp' => [
         'dao' => 'CRM_PCP_DAO_PCP',
-        'fields' => array(
-          'title' => array(
+        'fields' => [
+          'title' => [
             'title' => ts('Personal Campaign Title'),
             'default' => TRUE,
-          ),
-          'goal_amount' => array(
+          ],
+          'page_type' => [
+            'title' => ts('Page Type'),
+            'default' => FALSE,
+          ],
+          'goal_amount' => [
             'title' => ts('Goal Amount'),
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'title' => array(
+          ],
+        ],
+        'filters' => [
+          'title' => [
             'title' => ts('Personal Campaign Title'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
+          ],
+        ],
+        'group_bys' => [
+          'pcp_id' => [
+            'name' => 'id',
+            'required' => TRUE,
+            'default' => TRUE,
+            'title' => ts('Personal Campaign Page'),
+          ],
+        ],
         'grouping' => 'pcp-fields',
-      ),
-      'civicrm_contribution_soft' => array(
+      ],
+      'civicrm_contribution_soft' => [
         'dao' => 'CRM_Contribute_DAO_ContributionSoft',
-        'fields' => array(
-          'amount_1' => array(
+        'fields' => [
+          'amount_1' => [
             'title' => ts('Committed Amount'),
             'name' => 'amount',
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
-            'statistics' => array(
+            'statistics' => [
               'sum' => ts('Committed Amount'),
-            ),
-          ),
-          'amount_2' => array(
+            ],
+          ],
+          'amount_2' => [
             'title' => ts('Amount Received'),
             'name' => 'amount',
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
             // nice trick with dbAlias
             'dbAlias' => 'SUM(IF( contribution_civireport.contribution_status_id > 1, 0, contribution_soft_civireport.amount))',
-          ),
-          'soft_id' => array(
+          ],
+          'soft_id' => [
             'title' => ts('Number of Donors'),
             'name' => 'id',
             'default' => TRUE,
-            'statistics' => array(
+            'statistics' => [
               'count' => ts('Number of Donors'),
-            ),
-          ),
-        ),
-        'filters' => array(
-          'amount_2' => array(
+            ],
+          ],
+        ],
+        'filters' => [
+          'amount_2' => [
             'title' => ts('Amount Received'),
             'type' => CRM_Utils_Type::T_MONEY,
             'dbAlias' => 'SUM(IF( contribution_civireport.contribution_status_id > 1, 0, contribution_soft_civireport.amount))',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'pcp-fields',
-      ),
-      'civicrm_contribution' => array(
+      ],
+      'civicrm_contribution' => [
         'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' => array(
-          'contribution_id' => array(
+        'fields' => [
+          'contribution_id' => [
             'name' => 'id',
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'receive_date' => array(
+          ],
+          'receive_date' => [
             'title' => ts('Most Recent Contribution'),
             'default' => TRUE,
-            'statistics' => array(
+            'statistics' => [
               'max' => ts('Most Recent Contribution'),
-            ),
-          ),
-        ),
+            ],
+          ],
+        ],
         'grouping' => 'pcp-fields',
-      ),
-      'civicrm_financial_trxn' => array(
+      ],
+      'civicrm_financial_trxn' => [
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
-        'fields' => array(
-          'card_type_id' => array(
+        'fields' => [
+          'card_type_id' => [
             'title' => ts('Credit Card Type'),
             'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type_id SEPARATOR ",")',
-          ),
-        ),
-        'filters' => array(
-          'card_type_id' => array(
+          ],
+        ],
+        'filters' => [
+          'card_type_id' => [
             'title' => ts('Credit Card Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
 
     parent::__construct();
+    $this->optimisedForOnlyFullGroupBy = FALSE;
   }
 
   public function from() {
@@ -207,14 +233,16 @@ LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
 
 LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page']}
           ON {$this->_aliases['civicrm_pcp']}.page_id =
-             {$this->_aliases['civicrm_contribution_page']}.id";
+             {$this->_aliases['civicrm_contribution_page']}.id
+               AND {$this->_aliases['civicrm_pcp']}.page_type = 'contribute'
+
+LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
+          ON {$this->_aliases['civicrm_pcp']}.page_id =
+             {$this->_aliases['civicrm_event']}.id
+               AND {$this->_aliases['civicrm_pcp']}.page_type = 'event'";
 
     // for credit card type
     $this->addFinancialTrxnFromClause();
-  }
-
-  public function groupBy() {
-    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_pcp']}.id");
   }
 
   public function orderBy() {
@@ -222,7 +250,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
   }
 
   public function where() {
-    $whereClauses = $havingClauses = array();
+    $whereClauses = $havingClauses = [];
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -308,26 +336,26 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     $dao->fetch();
     $goal_total = $dao->goal_total;
 
-    $statistics['counts']['goal_total'] = array(
+    $statistics['counts']['goal_total'] = [
       'title' => ts('Goal Total'),
       'value' => $goal_total,
       'type' => CRM_Utils_Type::T_MONEY,
-    );
-    $statistics['counts']['committed_total'] = array(
+    ];
+    $statistics['counts']['committed_total'] = [
       'title' => ts('Total Committed'),
       'value' => $committed_total,
       'type' => CRM_Utils_Type::T_MONEY,
-    );
-    $statistics['counts']['received_total'] = array(
+    ];
+    $statistics['counts']['received_total'] = [
       'title' => ts('Total Received'),
       'value' => $received_total,
       'type' => CRM_Utils_Type::T_MONEY,
-    );
-    $statistics['counts']['donors_total'] = array(
+    ];
+    $statistics['counts']['donors_total'] = [
       'title' => ts('Total Donors'),
       'value' => $donors_total,
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
     return $statistics;
   }
 
@@ -342,7 +370,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-    $checkList = array();
+    $checkList = [];
     foreach ($rows as $rowNum => $row) {
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         // not repeat contact sort names if it matches with the one
@@ -378,6 +406,11 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
 
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
+        $entryFound = TRUE;
+      }
+
+      if (!empty($row['civicrm_pcp_page_type'])) {
+        $rows[$rowNum]['civicrm_pcp_page_type'] = ucfirst($rows[$rowNum]['civicrm_pcp_page_type']);
         $entryFound = TRUE;
       }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
  /**
   * @package CRM
-  * @copyright CiviCRM LLC (c) 2004-2017
+  * @copyright CiviCRM LLC (c) 2004-2019
   */
 
 /**
@@ -88,6 +88,11 @@ class CRM_Utils_QueryFormatter {
    */
   const MODE_WILDWORDS_SUFFIX = 'wildwords-suffix';
 
+  /**
+   * Singleton object.
+   *
+   * @var \CRM_Utils_QueryFormatter|null
+   */
   static protected $singleton;
 
   /**
@@ -192,16 +197,16 @@ class CRM_Utils_QueryFormatter {
       list ($tableName, $tableAlias) = explode(' ', $table);
     }
     if (is_scalar($columns)) {
-      $columns = array($columns);
+      $columns = [$columns];
     }
 
-    $clauses = array();
+    $clauses = [];
     if (CRM_Core_InnoDBIndexer::singleton()
       ->hasDeclaredIndex($tableName, $columns)
     ) {
       $formattedQuery = $this->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL);
 
-      $prefixedFieldNames = array();
+      $prefixedFieldNames = [];
       foreach ($columns as $fieldName) {
         $prefixedFieldNames[] = "$tableAlias.$fieldName";
       }
@@ -287,8 +292,8 @@ class CRM_Utils_QueryFormatter {
    */
   protected function _formatFtsBool($text, $mode) {
     $result = NULL;
-    $operators = array('+', '-', '~', '(', ')');
-    $wildCards = array('@', '%', '*');
+    $operators = ['+', '-', '~', '(', ')'];
+    $wildCards = ['@', '%', '*'];
     $expression = preg_quote(implode('', array_merge($operators, $wildCards)), '/');
 
     //Return if searched string ends with an unsupported operator.
@@ -399,7 +404,7 @@ class CRM_Utils_QueryFormatter {
    * @return string
    */
   protected function mapWords($text, $template, $quotes = FALSE) {
-    $result = array();
+    $result = [];
     foreach ($this->parseWords($text, $quotes) as $word) {
       $result[] = str_replace('word', $word, $template);
     }
@@ -407,8 +412,8 @@ class CRM_Utils_QueryFormatter {
   }
 
   /**
-   * @param $text
-   * @bool $quotes
+   * @param string $text
+   * @param bool $quotes
    * @return array
    */
   protected function parseWords($text, $quotes) {
@@ -458,13 +463,13 @@ class CRM_Utils_QueryFormatter {
    * @return array
    */
   public static function getModes() {
-    return array(
+    return [
       self::MODE_NONE,
       self::MODE_PHRASE,
       self::MODE_WILDPHRASE,
       self::MODE_WILDWORDS,
       self::MODE_WILDWORDS_SUFFIX,
-    );
+    ];
   }
 
   /**
@@ -473,12 +478,12 @@ class CRM_Utils_QueryFormatter {
    * @return array
    */
   public static function getLanguages() {
-    return array(
+    return [
       self::LANG_SOLR,
       self::LANG_SQL_FTS,
       self::LANG_SQL_FTSBOOL,
       self::LANG_SQL_LIKE,
-    );
+    ];
   }
 
   /**

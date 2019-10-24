@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
     <tr class="columnheader-dark">
       <th scope="col" rowspan="2">{ts}Members by Type{/ts}</th>
         {if $preMonth}
-      <th scope="col" colspan="3">{$premonth} &ndash; {ts}(Last Month){/ts}</th>
+      <th scope="col" colspan="3">{$premonth} {ts}(Last Month){/ts}</th>
         {/if}
         <th scope="col" colspan="3">{$month}{if $isCurrent}{ts} (MTD){/ts}{/if}</th>
         <th scope="col" colspan="3">
@@ -61,15 +61,15 @@
         <tr>
             <td><strong>{$row.month.total.name}</strong></td>
           {if $preMonth}
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.premonth.new.url}<a href="{$row.premonth.new.url}" title="view details">{$row.premonth.new.count}</a>
               {else}{$row.premonth.new.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.premonth.renew.url}<a href="{$row.premonth.renew.url}" title="view details">{$row.premonth.renew.count}</a>
               {else}{$row.premonth.renew.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.premonth.total.url}
                 <a href="{$row.premonth.total.url}" title="view details">{$row.premonth.total.count}</a>
               {else}
@@ -83,15 +83,15 @@
             </td>
           {/if}
 
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.month.new.url}<a href="{$row.month.new.url}" title="view details">{$row.month.new.count}</a>
               {else}{$row.month.new.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.month.renew.url}<a href="{$row.month.renew.url}" title="view details">{$row.month.renew.count}</a>
               {else}{$row.month.renew.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.month.total.url}
                 <a href="{$row.month.total.url}" title="view details">{$row.month.total.count}</a>
               {else}
@@ -104,15 +104,15 @@
               {/if}]
             </td>
 
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.year.new.url}<a href="{$row.year.new.url}" title="view details">{$row.year.new.count}</a>
               {else}{$row.year.new.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.year.renew.url}<a href="{$row.year.renew.url}" title="view details">{$row.year.renew.count}</a>
               {else}{$row.year.renew.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $row.year.total.url}
                 <a href="{$row.year.total.url}" title="view details">{$row.year.total.count}</a>
               {else}
@@ -125,7 +125,7 @@
               {/if}]
             </td>
 
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $isCurrent}
                 {if $row.current.total.url}
                   <a href="{$row.current.total.url}" title="view details">{$row.current.total.count}</a>
@@ -156,15 +156,15 @@
     <tr class="columnfooter">
         <td><strong>{ts}Totals (all types){/ts}</strong></td>
         {if $preMonth}
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.premonth.new.url}<a href="{$totalCount.premonth.new.url}" title="view details">{$totalCount.premonth.new.count}</a>
               {else}{$totalCount.premonth.new.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.premonth.renew.url}<a href="{$totalCount.premonth.renew.url}" title="view details">{$totalCount.premonth.renew.count}</a>
               {else}{$totalCount.premonth.renew.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.premonth.total.url}
                 <a href="{$totalCount.premonth.total.url}" title="view details">{$totalCount.premonth.total.count}</a>
               {else}
@@ -178,15 +178,15 @@
             </td>
         {/if}
 
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.month.new.url}<a href="{$totalCount.month.new.url}" title="view details">{$totalCount.month.new.count}</a>
               {else}{$totalCount.month.new.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.month.renew.url}<a href="{$totalCount.month.renew.url}" title="view details">{$totalCount.month.renew.count}</a>
               {else}{$totalCount.month.renew.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.month.total.url}
                 <a href="{$totalCount.month.total.url}" title="view details">{$totalCount.month.total.count}</a>
               {else}
@@ -199,15 +199,15 @@
               {/if}]
             </td>
 
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.year.new.url}<a href="{$totalCount.year.new.url}" title="view details">{$totalCount.year.new.count}</a>
               {else}{$totalCount.year.new.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.year.renew.url}<a href="{$totalCount.year.renew.url}" title="view details">{$totalCount.year.renew.count}</a>
               {else}{$totalCount.year.renew.count}{/if}
             </td>
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $totalCount.year.total.url}
                 <a href="{$totalCount.year.total.url}" title="view details">{$totalCount.year.total.count}</a>
               {else}
@@ -220,7 +220,7 @@
               {/if}]
             </td>
 
-            <td class="label">
+            <td class="label crm-grid-cell">
               {if $isCurrent}
                 {if $row.total.total.url}
                   <a href="{$row.total.total.url}" title="view details">{$totalCount.current.total.count}</a>

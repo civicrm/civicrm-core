@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -58,10 +58,14 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
 
     // store case id if present
-    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'Positive', $this, FALSE);
+    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this, FALSE);
+    if (!empty($this->_caseId) && strpos($this->_caseId, ',')) {
+      $this->_caseIds = explode(',', $this->_caseId);
+      unset($this->_caseId);
+    }
 
     // retrieve contact ID if this is 'single' mode
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
+    $cid = CRM_Utils_Request::retrieve('cid', 'CommaSeparatedIntegers', $this, FALSE);
 
     if ($cid) {
       // this is true in non-search context / single mode
@@ -73,7 +77,6 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     if ($cid) {
       CRM_Contact_Form_Task_PDFLetterCommon::preProcessSingle($this, $cid);
       $this->_single = TRUE;
-      $this->_cid = $cid;
     }
     else {
       parent::preProcess();
@@ -85,9 +88,9 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (isset($this->_activityId)) {
-      $params = array('id' => $this->_activityId);
+      $params = ['id' => $this->_activityId];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
       $defaults['html_message'] = CRM_Utils_Array::value('details', $defaults);
     }
@@ -118,8 +121,9 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    */
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
-    if (isset($this->_caseId)) {
-      $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $this->_caseId, 'case_type_id');
+    if (isset($this->_caseId) || isset($this->_caseIds)) {
+      // For a single case, list tokens relevant for only that case type
+      $caseTypeId = isset($this->_caseId) ? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $this->_caseId, 'case_type_id') : NULL;
       $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
     }
     return $tokens;

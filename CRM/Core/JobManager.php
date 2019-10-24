@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,24 +30,27 @@
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_JobManager {
 
   /**
-   * @var array ($id => CRM_Core_ScheduledJob)
+   * Jobs.
+   *
+   * Format is ($id => CRM_Core_ScheduledJob).
+   *
+   * @var array
    */
-  var $jobs = NULL;
+  public $jobs = NULL;
 
   /**
    * @var CRM_Core_ScheduledJob
    */
-  var $currentJob = NULL;
+  public $currentJob = NULL;
 
-  var $singleRunParams = array();
+  public $singleRunParams = [];
 
-  var $_source = NULL;
-
+  public $_source = NULL;
 
   /**
    * Class constructor.
@@ -83,10 +86,10 @@ class CRM_Core_JobManager {
     $this->logEntry('Finishing scheduled jobs execution.');
 
     // Set last cron date for the status check
-    $statusPref = array(
+    $statusPref = [
       'name' => 'checkLastCron',
       'check_info' => gmdate('U'),
-    );
+    ];
     CRM_Core_BAO_StatusPreference::create($statusPref);
   }
 
@@ -118,6 +121,17 @@ class CRM_Core_JobManager {
    */
   public function executeJob($job) {
     $this->currentJob = $job;
+
+    // CRM-18231 check if non-production environment.
+    try {
+      CRM_Core_BAO_Setting::isAPIJobAllowedToRun($job->apiParams);
+    }
+    catch (Exception $e) {
+      $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
+      $this->currentJob = FALSE;
+      return FALSE;
+    }
+
     $this->logEntry('Starting execution of ' . $job->name);
     $job->saveLastRun();
 
@@ -130,14 +144,23 @@ class CRM_Core_JobManager {
       $params = $job->apiParams;
     }
 
+    CRM_Utils_Hook::preJob($job, $params);
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
     catch (Exception$e) {
       $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
+      $result = $e;
     }
+    CRM_Utils_Hook::postJob($job, $params, $result);
     $this->logEntry('Finished execution of ' . $job->name . ' with result: ' . $this->_apiResultToMessage($result));
     $this->currentJob = FALSE;
+
+    //Disable outBound option after executing the job.
+    $environment = CRM_Core_Config::environment(NULL, TRUE);
+    if ($environment != 'Production' && !empty($job->apiParams['runInNonProductionEnvironment'])) {
+      Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);
+    }
   }
 
   /**
@@ -148,13 +171,13 @@ class CRM_Core_JobManager {
    *   ($id => CRM_Core_ScheduledJob)
    */
   private function _getJobs() {
-    $jobs = array();
+    $jobs = [];
     $dao = new CRM_Core_DAO_Job();
     $dao->orderBy('name');
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
     while ($dao->fetch()) {
-      $temp = array();
+      $temp = [];
       CRM_Core_DAO::storeValues($dao, $temp);
       $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
     }
@@ -209,10 +232,21 @@ class CRM_Core_JobManager {
     $dao = new CRM_Core_DAO_JobLog();
 
     $dao->domain_id = $domainID;
-    $dao->description = substr($message, 0, 235);
-    if (strlen($message) > 235) {
-      $dao->description .= " (...)";
+
+    /*
+     * The description is a summary of the message.
+     * HTML tags are stripped from the message.
+     * The description is limited to 240 characters
+     * and has an ellipsis added if it is truncated.
+     */
+    $maxDescription = 240;
+    $ellipsis = " (...)";
+    $description = strip_tags($message);
+    if (strlen($description) > $maxDescription) {
+      $description = substr($description, 0, $maxDescription - strlen($ellipsis)) . $ellipsis;
     }
+    $dao->description = $description;
+
     if ($this->currentJob) {
       $dao->job_id = $this->currentJob->id;
       $dao->name = $this->currentJob->name;

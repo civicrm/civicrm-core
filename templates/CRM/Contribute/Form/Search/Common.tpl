@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,9 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 
-<tr><td><label>{ts}Date Received{/ts}</label></td></tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" colspan="2"}
 </tr>
 <tr>
   <td><label>{ts}Contribution Amounts{/ts}</label> <br />
@@ -39,9 +38,21 @@
 </tr>
 <tr>
   <td>
+    <label>{ts}Currency{/ts}</label> <br />
+    {$form.contribution_currency_type.html|crmAddClass:twenty}
+  </td>
+  {if $form.contribution_batch_id.html }
+    <td>
+      {$form.contribution_batch_id.label}<br />
+      {$form.contribution_batch_id.html}
+    </td>
+  {/if}
+</tr>
+<tr>
+  <td>
     <div class="float-left">
-      <label>{$form.payment_instrument_id.label}</label> <br />
-      {$form.payment_instrument_id.html|crmAddClass:twenty}
+      <label>{$form.contribution_payment_instrument_id.label}</label> <br />
+      {$form.contribution_payment_instrument_id.html|crmAddClass:twenty}
     </div>
     <div class="float-left" id="contribution_check_number_wrapper">
       {$form.contribution_check_number.label} <br />
@@ -71,8 +82,8 @@
     </div>
   </td>
   <td>
-    {$form.invoice_id.label} <br />
-    {$form.invoice_id.html}
+    {$form.invoice_number.label} <br />
+    {$form.invoice_number.html}
   </td>
 </tr>
 <tr>
@@ -145,23 +156,22 @@
     {$form.contribution_pcp_made_through_id.html}
     {include file="CRM/Contribute/Form/PCP.js.tpl"}
   </td>
+  <td>&nbsp;</td>
+</tr>
+<tr>
   <td>
     {$form.contribution_pcp_display_in_roll.label}
     {$form.contribution_pcp_display_in_roll.html}
   </td>
 </tr>
-
+<tr>
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_cancel_date" colspan="2"}
+</tr>
 <tr>
   <td>
-    <label>{ts}Currency{/ts}</label> <br />
-    {$form.contribution_currency_type.html|crmAddClass:twenty}
+    {$form.cancel_reason.label}<br />
+    {$form.cancel_reason.html}
   </td>
-  {if $form.contribution_batch_id.html }
-    <td>
-      {$form.contribution_batch_id.label}<br />
-      {$form.contribution_batch_id.html}
-    </td>
-  {/if}
 </tr>
 
 {* campaign in contribution search *}

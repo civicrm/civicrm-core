@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,16 +42,16 @@ function civicrm_api3_dashboard_contact_create($params) {
   if (empty($params['id'])) {
     civicrm_api3_verify_one_mandatory($params,
       NULL,
-      array(
+      [
         'dashboard_id',
-      )
+      ]
     );
   }
   $errors = _civicrm_api3_dashboard_contact_check_params($params);
   if ($errors !== NULL) {
     return $errors;
   }
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'DashboardContact');
 }
 
 /**

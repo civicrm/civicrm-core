@@ -21,7 +21,7 @@
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts 1=$event.event_title}Your pending event registration for %1 has expired
 because you did not confirm your registration.{/ts}</p>
     <p>{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions

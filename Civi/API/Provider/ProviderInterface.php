@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,13 +27,11 @@
 
 namespace Civi\API\Provider;
 
-use Civi\API\Events;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 /**
  * An API "provider" provides a means to execute API requests.
  */
 interface ProviderInterface {
+
   /**
    * @param array $apiRequest
    *   The full description of the API request.

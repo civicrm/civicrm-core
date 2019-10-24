@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,11 +23,11 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-date-form-block">
 <div class="help">
   {capture assign=crmURL}{crmURL p='civicrm/admin/setting/preferences/date' q='action=reset=1'}{/capture}
     {ts 1=$crmURL}Use this screen to configure default formats for date display and date input fields throughout your site. Settings use standard POSIX specifiers. New installations are preconfigured with standard United States formats. You can override this default setting and define the range of allowed dates for specific field types at <a href="%1">Administer > Customize Data and Screens > Date Preferences</a>{/ts} {help id='date-format'}
 </div>
+<div class="crm-block crm-form-block crm-date-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <fieldset><legend>{ts}Date Display{/ts}</legend>
    <table class="form-layout-compressed">
