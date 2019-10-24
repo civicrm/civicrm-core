@@ -274,6 +274,22 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test / demonstrate behaviour when attempting to filter by group_type.
+   *
+   * Per https://lab.civicrm.org/dev/core/issues/1321 the group_type filter is deceptive
+   * - it only filters on exact match not 'is one of'.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGroupWithGroupTypeFilter() {
+    $this->groupCreate(['group_type' => ['Access Control'], 'name' => 'access_list', 'title' => 'access list']);
+    $this->groupCreate(['group_type' => ['Mailing List'], 'name' => 'mailing_list', 'title' => 'mailing list']);
+    $this->groupCreate(['group_type' => ['Access Control', 'Mailing List'], 'name' => 'group', 'title' => 'group']);
+    $group = $this->callAPISuccessGetSingle('Group', ['return' => 'id,title,group_type', 'group_type' => 'Mailing List']);
+    $this->assertEquals('mailing list', $group['title']);
+  }
+
+  /**
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
