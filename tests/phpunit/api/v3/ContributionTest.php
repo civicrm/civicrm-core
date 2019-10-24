@@ -1294,6 +1294,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Function tests that financial records are added when Contribution is Refunded.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionRefund() {
     $contributionParams = [
@@ -1357,6 +1359,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-17951 the contra account is a financial account with a relationship to a
    * financial type. It is not always configured but should be reflected
    * in the financial_trxn & financial_item table if it is.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateChargebackContributionCustomAccount() {
     $financialAccount = $this->callAPISuccess('FinancialAccount', 'create', [

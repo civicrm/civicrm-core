@@ -1098,14 +1098,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @param array $params
    *
-   * @return bool[]
-   *   Return indicates whether the updateFinancialAccounts function should continue & whether this is a refund.
+   * @return bool
+   *   Return indicates whether the updateFinancialAccounts function should continue.
    */
   private static function updateFinancialAccountsOnContributionStatusChange(&$params) {
     $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
     $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
 
-    $isARefund = FALSE;
     if ((($previousContributionStatus == 'Partially paid' && $currentContributionStatus == 'Completed')
         || ($previousContributionStatus == 'Pending refund' && $currentContributionStatus == 'Completed')
         // This concept of pay_later as different to any other sort of pending is deprecated & it's unclear
@@ -1113,13 +1112,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         || ($previousContributionStatus == 'Pending' && $params['prevContribution']->is_pay_later == TRUE
           && $currentContributionStatus == 'Partially paid'))
     ) {
-      return [FALSE, $isARefund];
+      return FALSE;
     }
 
-    if ($previousContributionStatus == 'Completed'
-      && (self::isContributionStatusNegative($params['contribution']->contribution_status_id))
-    ) {
-      $isARefund = TRUE;
+    if (self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id)) {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
       if (empty($params['contribution']->creditnote_id)) {
@@ -1161,7 +1157,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
         // when creating recurring membership payment - there are 2 lines to comment out in contributonPageTest if fixed
         // & this can be removed
-        return [FALSE, $isARefund];
+        return FALSE;
       }
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       // This is an update so original currency if none passed in.
@@ -1194,9 +1190,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           }
         }
       }
-      return [FALSE, $isARefund];
+      return FALSE;
     }
-    return [TRUE, $isARefund];
+    return TRUE;
   }
 
   /**
@@ -1301,6 +1297,21 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
     return $params;
+  }
+
+  /**
+   * Does this contributtion status update represent a refund.
+   *
+   * @param int $previousContributionStatusID
+   * @param int $currentContributionStatusID
+   *
+   * @return bool
+   */
+  private static function isContributionUpdateARefund($previousContributionStatusID, $currentContributionStatusID): bool {
+    if ('Completed' !== CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $previousContributionStatusID)) {
+      return FALSE;
+    }
+    return self::isContributionStatusNegative($currentContributionStatusID);
   }
 
   /**
@@ -3795,10 +3806,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   public static function updateFinancialAccounts(&$params, $context = NULL) {
     $trxnID = NULL;
     $inputParams = $params;
-    $isARefund = FALSE;
+    $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
 
     if ($context == 'changedStatus') {
-      list($continue, $isARefund) = self::updateFinancialAccountsOnContributionStatusChange($params);
+      $continue = self::updateFinancialAccountsOnContributionStatusChange($params);
       // @todo - it may be that this is always false & the parent function is just a confusing wrapper for the child fn.
       if (!$continue) {
         return;
@@ -3845,7 +3856,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public static function isContributionStatusNegative($status_id) {
     $reversalStatuses = ['Cancelled', 'Chargeback', 'Refunded'];
-    return in_array(CRM_Contribute_PseudoConstant::contributionStatus($status_id, 'name'), $reversalStatuses);
+    return in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $status_id), $reversalStatuses, TRUE);
   }
 
   /**
