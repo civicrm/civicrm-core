@@ -225,13 +225,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
           // @todo consider enabling if it is an add & defaulting to true.
           $element[4] = array_merge((array) CRM_Utils_Array::value(4, $element, []), ['disabled' => TRUE]);
         }
-        $this->addElement($element[0],
+        $newCheckBox = $this->addElement($element[0],
           $element[1],
           array_key_exists('2', $element) ? $element[2] : NULL,
           array_key_exists('3', $element) ? $element[3] : NULL,
           array_key_exists('4', $element) ? $element[4] : NULL,
           array_key_exists('5', $element) ? $element[5] : NULL
         );
+        if (!empty($element['is_checked'])) {
+          $newCheckBox->setChecked(TRUE);
+        }
       }
 
       // add related table elements
