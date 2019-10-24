@@ -1,0 +1,11 @@
+#afGuiEditor-main {
+  display: flex;
+}
+
+#afGuiEditor-palette {
+  flex: 1;
+}
+
+#afGuiEditor-canvas {
+  flex: 1;
+}

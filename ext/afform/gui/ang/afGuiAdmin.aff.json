@@ -1,0 +1,7 @@
+{
+  "title": "Afform Administration",
+  "server_route": "civicrm/admin/afform",
+  "requires": [
+    "afGuiEditor"
+  ]
+}

@@ -1,0 +1,16 @@
+<ul id="afGuiEditor-tabs" class="nav nav-pills nav-stacked">
+  <li role="presentation" ng-class="{active: selectedEntity === null}">
+    <a href ng-click="selectEntity(null)">{{ ts('Form Settings') }}</a>
+  </li>
+  <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntity === entity.name}">
+    <a href ng-click="selectEntity(entity.name)">{{ entity.label }}</a>
+  </li>
+  <li role="presentation" class="dropdown text-right">
+    <a href class="dropdown-toggle" data-toggle="dropdown">
+      <i class="crm-i fa-plus"></i>
+    </a>
+    <ul class="dropdown-menu">
+      <li></li>
+    </ul>
+  </li>
+</ul>
