@@ -17,13 +17,7 @@ class Get extends BasicGetAction {
     /** @var \CRM_Afform_AfformScanner $scanner */
     $scanner = \Civi::service('afform_scanner');
 
-    $where = $this->getWhere();
-    if (count($where) === 1 && $where[0][0] === 'name' && $where[0][1] == '=') {
-      $names = [$where[0][2]];
-    }
-    else {
-      $names = array_keys($scanner->findFilePaths());
-    }
+    $names = $this->_itemsToGet('name') ?? array_keys($scanner->findFilePaths());
 
     $values = [];
     foreach ($names as $name) {
