@@ -1,5 +1,7 @@
 {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
+{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}
+
 {if !$isAdditional and $participant.id}
 
 ===========================================================

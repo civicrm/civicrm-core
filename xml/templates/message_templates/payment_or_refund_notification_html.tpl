@@ -94,7 +94,7 @@
       {if $paymentsComplete}
       <tr>
       <td colspan='2' {$valueStyle}>
-        {ts}Thank you for completing payment.{/ts}
+        {ts}Thank you for completing this payment.{/ts}
       </td>
      </tr>
       {/if}

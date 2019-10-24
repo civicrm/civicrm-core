@@ -94,7 +94,7 @@
       <tr>
        <td>
         <p>{ts}Your recurring contribution term has ended.{/ts}</p>
-        <p>{ts 1=$recur_installments}You have successfully completed %1 recurring contributions. Thank you for your support.{/ts}</p>
+        <p>{ts 1=$recur_installments}You have successfully completed %1 recurring contributions. Thank you.{/ts}</p>
        </td>
       </tr>
       <tr>

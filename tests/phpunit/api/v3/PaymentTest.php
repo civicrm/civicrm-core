@@ -225,7 +225,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Total Fees: $ 300.00',
       'This Payment Amount: $ 150.00',
       'Balance Owed: $ 0.00',
-      'Thank you for completing payment.',
+      'Thank you for completing this payment.',
     ]);
     $mut->stop();
     $mut->clearMessages();
