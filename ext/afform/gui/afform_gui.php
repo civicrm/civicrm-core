@@ -134,6 +134,13 @@ function afform_gui_civicrm_entityTypes(&$entityTypes) {
   _afform_gui_civix_civicrm_entityTypes($entityTypes);
 }
 
+/**
+ * Implements hook_civicrm_themes().
+ */
+function afform_gui_civicrm_themes(&$themes) {
+  _afform_gui_civix_civicrm_themes($themes);
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
