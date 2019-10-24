@@ -1091,10 +1091,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // CRM-15681 don't display sub-types in UI
         continue;
       }
-      foreach (['main' => $main, 'other' => $other] as $moniker => $contact) {
-        list($label, $value) = self::getFieldValueAndLabel($field, $contact);
-        $rows["move_$field"][$moniker] = $label;
+      $rows["move_$field"]['main'] = self::getFieldValueAndLabel($field, $main)['label'];
+      $rows["move_$field"]['other'] = self::getFieldValueAndLabel($field, $other)['label'];
+
+      foreach (['other' => $other] as $moniker => $contact) {
         if ($moniker == 'other') {
+          $value = self::getFieldValueAndLabel($field, $other)['value'];
           //CRM-14334
           if ($value === NULL || $value == '') {
             $value = 'null';
@@ -2524,7 +2526,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     elseif ($field == 'current_employer_id' && !empty($value)) {
       $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
     }
-    return [$label, $value];
+    return ['label' => $label, 'value' => $value];
   }
 
   /**
