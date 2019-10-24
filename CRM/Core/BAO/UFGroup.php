@@ -2359,45 +2359,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$fldName] = $details['worldregion_id'];
           }
           elseif ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($name)) {
-            // @todo retrieving the custom fields here seems obsolete - $field holds more data for the fields.
-            $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $details));
-
-            // hack to add custom data for components
-            $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
-            foreach ($components as $value) {
-              $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-                CRM_Core_BAO_CustomField::getFieldsForImport($value)
-              );
-            }
-
-            switch ($customFields[$customFieldId]['html_type']) {
-              case 'Multi-Select State/Province':
-              case 'Multi-Select Country':
-              case 'Multi-Select':
-                $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
-                foreach ($v as $item) {
-                  if ($item) {
-                    $defaults[$fldName][$item] = $item;
-                  }
-                }
-                break;
-
-              case 'CheckBox':
-                $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
-                foreach ($v as $item) {
-                  if ($item) {
-                    $defaults[$fldName][$item] = 1;
-                    // seems like we need this for QF style checkboxes in profile where its multiindexed
-                    // CRM-2969
-                    $defaults["{$fldName}[{$item}]"] = 1;
-                  }
-                }
-                break;
-
-              default:
-                $defaults[$fldName] = $details[$name];
-                break;
-            }
+            $defaults[$fldName] = self::reformatProfileDefaults($field, $details[$name]);
           }
           else {
             $defaults[$fldName] = $details[$name];
@@ -2479,39 +2441,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     elseif (substr($fieldName, 0, 14) === 'address_custom' &&
                       CRM_Utils_Array::value(substr($fieldName, 8), $value)
                     ) {
-                      if (isset($fields[$name]['html_type'])) {
-                        switch ($fields[$name]['html_type']) {
-                          case 'Multi-Select State/Province':
-                          case 'Multi-Select Country':
-                          case 'Multi-Select':
-                            $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value[substr($fieldName, 8)]);
-                            foreach ($v as $item) {
-                              if ($item) {
-                                $defaults[$fldName][$item] = $item;
-                              }
-                            }
-                            break;
-
-                          case 'CheckBox':
-                            $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value[substr($fieldName, 8)]);
-                            foreach ($v as $item) {
-                              if ($item) {
-                                $defaults[$fldName][$item] = 1;
-                                // seems like we need this for QF style checkboxes in profile where its multiindexed
-                                // CRM-2969
-                                $defaults["{$fldName}[{$item}]"] = 1;
-                              }
-                            }
-                            break;
-
-                          default:
-                            $defaults[$fldName] = $value[substr($fieldName, 8)];
-                            break;
-                        }
-                      }
-                      else {
-                        $defaults[$fldName] = $value[substr($fieldName, 8)];
-                      }
+                      $defaults[$fldName] = self::reformatProfileDefaults($field, $value[substr($fieldName, 8)]);
                     }
                   }
                 }
@@ -3671,6 +3601,51 @@ SELECT  group_id
   public static function getFrontEndTitle(int $profileID) {
     $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $profileID, 'return' => ['title', 'frontend_title']]);
     return $profile['frontend_title'] ?? $profile['title'];
+  }
+
+  /**
+   * This function is used to format the profile default values.
+   *
+   * @param array $field
+   *   Associated array of profile fields to render.
+   * @param string $value
+   *   Value to render
+   *
+   * @return $defaults
+   *   String or array, depending on the html type
+   */
+  public static function reformatProfileDefaults($field, $value) {
+    $defaults = [];
+
+    switch ($field['html_type']) {
+      case 'Multi-Select State/Province':
+      case 'Multi-Select Country':
+      case 'Multi-Select':
+        $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($value));
+        foreach ($v as $item) {
+          if ($item) {
+            $defaults[$item] = $item;
+          }
+        }
+        break;
+
+      case 'CheckBox':
+        $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+        foreach ($v as $item) {
+          if ($item) {
+            $defaults[$item] = 1;
+            // seems like we need this for QF style checkboxes in profile where its multiindexed
+            // CRM-2969
+            $defaults["[{$item}]"] = 1;
+          }
+        }
+        break;
+
+      default:
+        $defaults = $value;
+        break;
+    }
+    return $defaults;
   }
 
 }
