@@ -126,9 +126,11 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
+   * This is public so we can retrieve the filter name via hooks etc. and apply conditional logic (eg. loading javascript conditionals).
+   *
    * @return string
    */
-  protected function getSettingPageFilter() {
+  public function getSettingPageFilter() {
     if (!isset($this->_filter)) {
       // Get the last URL component without modifying the urlPath property.
       $urlPath = array_values($this->urlPath);
