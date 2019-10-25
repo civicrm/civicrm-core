@@ -1091,36 +1091,34 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // CRM-15681 don't display sub-types in UI
         continue;
       }
-      foreach (['main' => $main, 'other' => $other] as $moniker => $contact) {
-        list($label, $value) = self::getFieldValueAndLabel($field, $contact);
-        $rows["move_$field"][$moniker] = $label;
-        if ($moniker == 'other') {
-          //CRM-14334
-          if ($value === NULL || $value == '') {
-            $value = 'null';
-          }
-          if ($value === 0 or $value === '0') {
-            $value = $qfZeroBug;
-          }
-          if (is_array($value) && empty($value[1])) {
-            $value[1] = NULL;
-          }
+      $rows["move_$field"]['main'] = self::getFieldValueAndLabel($field, $main)['label'];
+      $rows["move_$field"]['other'] = self::getFieldValueAndLabel($field, $other)['label'];
 
-          // Display a checkbox to migrate, only if the values are different
-          if ($value != $main[$field]) {
-            $elements[] = [
-              'advcheckbox',
-              "move_$field",
-              NULL,
-              NULL,
-              NULL,
-              $value,
-            ];
-          }
-
-          $migrationInfo["move_$field"] = $value;
-        }
+      $value = self::getFieldValueAndLabel($field, $other)['value'];
+      //CRM-14334
+      if ($value === NULL || $value == '') {
+        $value = 'null';
       }
+      if ($value === 0 or $value === '0') {
+        $value = $qfZeroBug;
+      }
+      if (is_array($value) && empty($value[1])) {
+        $value[1] = NULL;
+      }
+
+      // Display a checkbox to migrate, only if the values are different
+      if ($value != $main[$field]) {
+        $elements[] = [
+          'advcheckbox',
+          "move_$field",
+          NULL,
+          NULL,
+          NULL,
+          $value,
+        ];
+      }
+
+      $migrationInfo["move_$field"] = $value;
       $rows["move_$field"]['title'] = $fields[$field]['title'];
     }
 
@@ -2524,7 +2522,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     elseif ($field == 'current_employer_id' && !empty($value)) {
       $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
     }
-    return [$label, $value];
+    return ['label' => $label, 'value' => $value];
   }
 
   /**
