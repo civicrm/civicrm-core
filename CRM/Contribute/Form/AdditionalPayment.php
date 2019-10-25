@@ -399,8 +399,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->assign('displayName', $this->userDisplayName);
     }
 
-    $this->formatParamsForPaymentProcessor($this->_params);
-
     $this->_params['amount'] = $this->_params['total_amount'];
     // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
     // function to get correct amount level consistently. Remove setting of the amount level in
