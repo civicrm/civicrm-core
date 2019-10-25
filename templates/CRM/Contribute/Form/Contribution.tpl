@@ -238,6 +238,10 @@
       <td class="label">{$form.from_email_address.label}</td>
       <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
     </tr>
+    <tr id="receiptText" class="crm-contribution-form-block-receipt_text"  style="display:none;">
+      <td class="label">{$form.receipt_text.label}</td>
+      <td>{$form.receipt_text.html}</td>
+    </tr>
     <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
       <td class="label">{$form.receipt_date.label}</td>
       <td>{$form.receipt_date.html}<br />
@@ -462,10 +466,12 @@
         function checkEmailDependancies( ) {
           if ($('#is_email_receipt', $form).prop('checked')) {
             $('#fromEmail', $form).show();
+            $('#receiptText', $form).show();
             $('#receiptDate', $form).hide();
           }
           else {
             $('#fromEmail', $form).hide();
+            $('#receiptText', $form).hide();
             $('#receiptDate', $form).show();
           }
         }

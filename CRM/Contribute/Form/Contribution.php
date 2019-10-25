@@ -660,6 +660,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+    $this->add('textarea', 'receipt_text', ts('Receipt Text'), ['rows' => 4, 'cols' => 50]);
 
     $component = 'contribution';
     $componentDetails = [];
