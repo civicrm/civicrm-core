@@ -1720,42 +1720,6 @@ FROM   civicrm_domain
   }
 
   /**
-   * Given the component id, compute the contact id
-   * since its used for things like send email
-   *
-   * @param $componentIDs
-   * @param string $tableName
-   * @param string $idField
-   *
-   * @return array
-   */
-  public static function getContactIDsFromComponent($componentIDs, $tableName, $idField = 'id') {
-    $contactIDs = array();
-
-    if (empty($componentIDs)) {
-      return $contactIDs;
-    }
-
-    $IDs = implode(',', $componentIDs);
-    $order_array = 'ORDER BY ';
-    foreach ($componentIDs as $item) {
-      $order_array .= $idField . ' = ' . $item . ' DESC,';
-    }
-    $order_array = trim($order_array, ',');
-    $query = "
-SELECT contact_id
-  FROM $tableName
- WHERE $idField IN ( $IDs ) $order_array
-";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $contactIDs[] = $dao->contact_id;
-    }
-    return $contactIDs;
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param string $daoName
