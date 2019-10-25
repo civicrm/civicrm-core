@@ -40,34 +40,6 @@ require_once 'CRM/Core/Exception.php';
 require_once 'Log.php';
 
 /**
- * Class CRM_Exception
- */
-class CRM_Exception extends PEAR_Exception {
-
-  /**
-   * Redefine the exception so message isn't optional.
-   *
-   * Supported signatures:
-   *  - PEAR_Exception(string $message);
-   *  - PEAR_Exception(string $message, int $code);
-   *  - PEAR_Exception(string $message, Exception $cause);
-   *  - PEAR_Exception(string $message, Exception $cause, int $code);
-   *  - PEAR_Exception(string $message, PEAR_Error $cause);
-   *  - PEAR_Exception(string $message, PEAR_Error $cause, int $code);
-   *  - PEAR_Exception(string $message, array $causes);
-   *  - PEAR_Exception(string $message, array $causes, int $code);
-   *
-   * @param string $message exception message
-   * @param int $code
-   * @param Exception $previous
-   */
-  public function __construct($message = NULL, $code = 0, Exception $previous = NULL) {
-    parent::__construct($message, $code, $previous);
-  }
-
-}
-
-/**
  * Class CRM_Core_Error
  */
 class CRM_Core_Error extends PEAR_ErrorStack {
