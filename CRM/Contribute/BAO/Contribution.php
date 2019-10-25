@@ -1171,7 +1171,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['entity_id'] = self::$_trxnIDs[] = $trxn->id;
-      $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
+
       $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
 
       $entityParams = [
@@ -1179,14 +1179,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       ];
       foreach ($params['line_item'] as $fieldId => $fields) {
         foreach ($fields as $fieldValueId => $lineItemDetails) {
-          $fparams = [
-            1 => [
-              CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
-              'Integer',
-            ],
-            2 => [$lineItemDetails['id'], 'Integer'],
-          ];
-          CRM_Core_DAO::executeQuery($query, $fparams);
+          self::updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
           $fparams = [
             1 => [$lineItemDetails['id'], 'Integer'],
           ];
@@ -1225,6 +1218,23 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       Civi::log()->debug('The related membership id has been overridden - this may impact data - see  https://github.com/civicrm/civicrm-core/pull/15053');
       civicrm_api3('MembershipPayment', 'create', ['contribution_id' => $contributionID, 'membership_id' => $input['membership_id']]);
     }
+  }
+
+  /**
+   * Update all financial items related to the line item tto have a status of paid.
+   *
+   * @param int $lineItemID
+   */
+  private static function updateFinancialItemForLineItemToPaid($lineItemID) {
+    $fparams = [
+      1 => [
+        CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
+        'Integer',
+      ],
+      2 => [$lineItemID, 'Integer'],
+    ];
+    $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
+    CRM_Core_DAO::executeQuery($query, $fparams);
   }
 
   /**
