@@ -181,4 +181,13 @@ WHERE  modified_date IS NULL
     }
   }
 
+  /**
+   * Remove Entries from `civicrm_acl_contact_cache` for a specific ACLed user
+   * @param int $userID - contact_id of the ACLed user
+   *
+   */
+  public static function deleteContactCacheEntry($userID) {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_acl_contact_cache WHERE user_id = %1", [1 => [$userID, 'Positive']]);
+  }
+
 }
