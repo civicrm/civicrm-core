@@ -87,7 +87,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if ($this->_sms) {
       // if this is an SMS page, check that the user has permission to browse SMS
       if (!CRM_Core_Permission::check('send SMS')) {
-        CRM_Core_Error::fatal(ts('You do not have permission to send SMS'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to send SMS'));
       }
     }
     else {
@@ -95,7 +95,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       // permission (specific permissions have been copied from
       // CRM/Mailing/xml/Menu/Mailing.xml)
       if (!CRM_Core_Permission::check([['access CiviMail', 'approve mailings', 'create mailings', 'schedule mailings']])) {
-        CRM_Core_Error::fatal(ts('You do not have permission to view this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to view this page.'));
       }
     }
 
@@ -195,7 +195,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
     elseif ($this->_action & CRM_Core_Action::CLOSE) {
       if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
       CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
       CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
@@ -203,7 +203,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
     elseif ($this->_action & CRM_Core_Action::REOPEN) {
       if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
       CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
       CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
@@ -214,7 +214,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
         // check for action permissions.
         if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-          CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+          CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
         }
 
         CRM_Mailing_BAO_Mailing::del($this->_mailingId);

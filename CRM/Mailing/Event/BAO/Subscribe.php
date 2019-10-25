@@ -137,7 +137,7 @@ SELECT     civicrm_email.id as email_id
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     if (!$dao->fetch()) {
-      CRM_Core_Error::fatal('Please file an issue with the backtrace');
+      throw new CRM_Core_Exception('Please file an issue with the backtrace');
       return $success;
     }
 

@@ -46,7 +46,7 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $mailing = new CRM_Mailing_BAO_Mailing();

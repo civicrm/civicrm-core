@@ -117,7 +117,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    */
   public static function del($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to MailingAB del function'));
     }
     CRM_Core_Transaction::create()->run(function () use ($id) {
       CRM_Utils_Hook::pre('delete', 'MailingAB', $id, CRM_Core_DAO::$_nullArray);

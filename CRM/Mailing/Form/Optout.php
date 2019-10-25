@@ -44,13 +44,13 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
       !$queue_id ||
       !$hash
     ) {
-      CRM_Core_Error::fatal(ts("Missing input parameters"));
+      throw new CRM_Core_Exception(ts("Missing input parameters"));
     }
 
     // verify that the three numbers above match
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
     if (!$q) {
-      CRM_Core_Error::fatal(ts("There was an error in your request"));
+      throw new CRM_Core_Exception(ts("There was an error in your request"));
     }
 
     list($displayName, $email) = CRM_Mailing_Event_BAO_Queue::getContactInfo($queue_id);

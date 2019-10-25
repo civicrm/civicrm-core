@@ -78,7 +78,7 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
     elseif ($context == 'angPage') {
       $angPage = CRM_Utils_Request::retrieve('angPage', 'String', $this);
       if (!preg_match(':^[a-zA-Z0-9\-_/]+$:', $angPage)) {
-        CRM_Core_Error::fatal('Malformed return URL');
+        throw new CRM_Core_Exception('Malformed return URL');
       }
       $backUrl = CRM_Utils_System::url('civicrm/a/#/' . $angPage);
       $backUrlTitle = ts('Back to Report');

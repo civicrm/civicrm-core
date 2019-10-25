@@ -585,7 +585,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     static $smtpConnectionErrors = 0;
 
     if (!is_object($mailer) || empty($fields)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Either mailer is not an object or we don\'t have recipients to send to in this group');
     }
 
     // get the return properties
@@ -989,7 +989,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
           $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
         }
         if (!$activityTypeID) {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Execption(ts('No relevant activity type found when recording Mailing Event delivered Activity'));
         }
       }
 
