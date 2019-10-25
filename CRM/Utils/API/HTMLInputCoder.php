@@ -146,7 +146,39 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(['<', '>'], ['&lt;', '&gt;'], $values);
+      $values = $this->encodeValue($values);
+    }
+  }
+
+  public function encodeValue($value) {
+    return str_replace(['<', '>'], ['&lt;', '&gt;'], $value);
+  }
+
+  /**
+   * Perform in-place decode on strings (in a list of records).
+   *
+   * @param array $rows
+   *   Ex in: $rows[0] = ['first_name' => 'A&W'].
+   *   Ex out: $rows[0] = ['first_name' => 'A&amp;W'].
+   */
+  public function encodeRows(&$rows) {
+    foreach ($rows as $rid => $row) {
+      $this->encodeRow($rows[$rid]);
+    }
+  }
+
+  /**
+   * Perform in-place encode on strings (in a single record).
+   *
+   * @param array $row
+   *   Ex in: ['first_name' => 'A&W'].
+   *   Ex out: ['first_name' => 'A&amp;W'].
+   */
+  public function encodeRow(&$row) {
+    foreach ($row as $k => $v) {
+      if (is_string($v) && !$this->isSkippedField($k)) {
+        $row[$k] = $this->encodeValue($v);
+      }
     }
   }
 
@@ -161,7 +193,39 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(['&lt;', '&gt;'], ['<', '>'], $values);
+      $values = $this->decodeValue($values);
+    }
+  }
+
+  public function decodeValue($value) {
+    return str_replace(['&lt;', '&gt;'], ['<', '>'], $value);
+  }
+
+  /**
+   * Perform in-place decode on strings (in a list of records).
+   *
+   * @param array $rows
+   *   Ex in: $rows[0] = ['first_name' => 'A&amp;W'].
+   *   Ex out: $rows[0] = ['first_name' => 'A&W'].
+   */
+  public function decodeRows(&$rows) {
+    foreach ($rows as $rid => $row) {
+      $this->decodeRow($rows[$rid]);
+    }
+  }
+
+  /**
+   * Perform in-place decode on strings (in a single record).
+   *
+   * @param array $row
+   *   Ex in: ['first_name' => 'A&amp;W'].
+   *   Ex out: ['first_name' => 'A&W'].
+   */
+  public function decodeRow(&$row) {
+    foreach ($row as $k => $v) {
+      if (is_string($v) && !$this->isSkippedField($k)) {
+        $row[$k] = $this->decodeValue($v);
+      }
     }
   }
 
