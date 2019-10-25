@@ -2445,6 +2445,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     }
                   }
                 }
+                else {
+                  if (substr($fieldName, 0, 14) === 'address_custom' &&
+                    CRM_Utils_Array::value(substr($fieldName, 8), $value)
+                  ) {
+                    $defaults[$fldName] = self::reformatProfileDefaults($field, $value[substr($fieldName, 8)]);
+                  }
+                }
               }
             }
           }
