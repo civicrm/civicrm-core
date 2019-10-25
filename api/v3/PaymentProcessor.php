@@ -167,16 +167,20 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
  *
  * @return array
  *   API result array.
- * @throws CiviCRM_API3_Exception
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Civi\Payment\Exception\PaymentProcessorException
  */
 function civicrm_api3_payment_processor_refund($params) {
+  /** @var \CRM_Core_Payment $processor */
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
-  $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $params['payment_processor_id'])));
+  $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   if (!$processor->supportsRefund()) {
-    throw API_Exception('Payment Processor does not support refund');
+    throw new API_Exception('Payment Processor does not support refund');
   }
   $result = $processor->doRefund($params);
-  return civicrm_api3_create_success(array($result), $params);
+  return civicrm_api3_create_success([$result], $params);
 }
 
 /**
@@ -187,7 +191,7 @@ function civicrm_api3_payment_processor_refund($params) {
  */
 function _civicrm_api3_payment_processor_refund_spec(&$params) {
   $params['payment_processor_id'] = [
-    'api.required' => 1,
+    'api.required' => TRUE,
     'title' => ts('Payment processor'),
     'type' => CRM_Utils_Type::T_INT,
   ];
