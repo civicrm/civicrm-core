@@ -60,6 +60,9 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @return CRM_Price_DAO_PriceSet
    */
   public static function create(&$params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'PriceSet', CRM_Utils_Array::value('id', $params), $params);
+
     if (empty($params['id']) && empty($params['name'])) {
       $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
     }
@@ -81,7 +84,10 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     if (self::eventPriceSetDomainID()) {
       $priceSetBAO->domain_id = CRM_Core_Config::domainID();
     }
-    return $priceSetBAO->save();
+    $priceSetBAO->save();
+
+    CRM_Utils_Hook::post($hook, 'PriceSet', $priceSetBAO->id, $priceSetBAO);
+    return $priceSetBAO;
   }
 
   /**
@@ -727,7 +733,7 @@ WHERE  id = %1";
               $field['options'][$optionValueId]['tax_amount'] = round($taxAmount['tax_amount'], 2);
             }
           }
-          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+          if (!empty($field['options'][$optionValueId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$firstOption['id']]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[key($field['options'])]);
@@ -742,7 +748,7 @@ WHERE  id = %1";
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
-          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+          if (!empty($field['options'][$optionValueId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
             if ($amount_override) {
               $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['unit_price'] = CRM_Utils_Rule::cleanMoney($lineItem[$optionValueId]['line_total'] - $lineItem[$optionValueId]['tax_amount']);
@@ -765,7 +771,7 @@ WHERE  id = %1";
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
-          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+          if (!empty($field['options'][$optionValueId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
@@ -782,7 +788,7 @@ WHERE  id = %1";
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
           foreach ($params["price_{$id}"] as $optionId => $option) {
-            if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
+            if (!empty($field['options'][$optionId]['tax_rate'])) {
               $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);
             }
             $totalPrice += $lineItem[$optionId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionId]);
@@ -1008,19 +1014,9 @@ WHERE  id = %1";
     else {
       $feeBlock = &$form->_priceSet['fields'];
     }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      foreach ($feeBlock as $key => $value) {
-        foreach ($value['options'] as $k => $options) {
-          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-            unset($feeBlock[$key]['options'][$k]);
-          }
-        }
-        if (empty($feeBlock[$key]['options'])) {
-          unset($feeBlock[$key]);
-        }
-      }
-    }
-    // call the hook.
+
+    self::applyACLFinancialTypeStatusToFeeBlock($feeBlock);
+    // Call the buildAmount hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
@@ -1069,6 +1065,29 @@ WHERE  id = %1";
             NULL,
             $options
           );
+        }
+      }
+    }
+  }
+
+  /**
+   * Apply ACLs on Financial Type to the price options in a fee block.
+   *
+   * @param array $feeBlock
+   *   Fee block: array of price fields.
+   *
+   * @return void
+   */
+  public static function applyACLFinancialTypeStatusToFeeBlock(&$feeBlock) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($feeBlock as $key => $value) {
+        foreach ($value['options'] as $k => $options) {
+          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+            unset($feeBlock[$key]['options'][$k]);
+          }
+        }
+        if (empty($feeBlock[$key]['options'])) {
+          unset($feeBlock[$key]);
         }
       }
     }

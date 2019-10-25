@@ -184,6 +184,21 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
 }
 
 /**
+ * SMARTY Compile Check:
+ *
+ * This tells Smarty whether to check for recompiling or not. Recompiling
+ * does not need to happen unless a template or config file is changed.
+ * Typically you enable this during development, and disable for production.
+ *
+ * Related issue:
+ * https://lab.civicrm.org/dev/core/issues/1073
+ *
+ */
+//if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK')) {
+//  define( 'CIVICRM_TEMPLATE_COMPILE_CHECK', FALSE);
+//}
+
+/**
  * Site URLs:
  *
  * This section defines absolute and relative URLs to access the host CMS (Backdrop, Drupal, or Joomla) resources.

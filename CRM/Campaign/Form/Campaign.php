@@ -81,7 +81,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->assign('context', $this->_context);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
-    $this->_campaignId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_campaignId = CRM_Utils_Request::retrieve('id', 'Positive');
 
     $title = NULL;
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -165,6 +165,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
+    $this->add('hidden', 'id', $this->_campaignId);
     if ($this->_action & CRM_Core_Action::DELETE) {
 
       $this->addButtons([
@@ -288,18 +289,21 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    */
   public function postProcess() {
     // store the submitted values in an array
-    $params = $this->controller->exportValues($this->_name);
-    $session = CRM_Core_Session::singleton();
 
-    $groups = [];
-    if (isset($this->_campaignId)) {
+    $session = CRM_Core_Session::singleton();
+    $params = $this->controller->exportValues($this->_name);
+    // To properly save the DAO we need to ensure we don't have a blank id key passed through.
+    if (empty($params['id'])) {
+      unset($params['id']);
+    }
+    if (!empty($params['id'])) {
       if ($this->_action & CRM_Core_Action::DELETE) {
-        CRM_Campaign_BAO_Campaign::del($this->_campaignId);
+        CRM_Campaign_BAO_Campaign::del($params['id']);
         CRM_Core_Session::setStatus(ts('Campaign has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
         return;
       }
-      $params['id'] = $this->_campaignId;
+      $this->_campaignId = $params['id'];
     }
     else {
       $params['created_id'] = $session->get('userID');
@@ -309,8 +313,26 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['last_modified_id'] = $session->get('userID');
     $params['last_modified_date'] = date('YmdHis');
+    $result = self::submit($params, $this);
+    if (!$result['is_error']) {
+      CRM_Core_Session::setStatus(ts('Campaign %1 has been saved.', [1 => $result['values'][$result['id']]['title']]), ts('Saved'), 'success');
+      $session->pushUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
+      $this->ajaxResponse['id'] = $result['id'];
+      $this->ajaxResponse['label'] = $result['values'][$result['id']]['title'];
+    }
+    $buttonName = $this->controller->getButtonName();
+    if ($buttonName == $this->getButtonName('upload', 'new')) {
+      CRM_Core_Session::setStatus(ts(' You can add another Campaign.'), '', 'info');
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign/add', 'reset=1&action=add'));
+    }
+    else {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
+    }
+  }
 
-    if (is_array($params['includeGroups'])) {
+  public static function submit($params = [], $form) {
+    $groups = [];
+    if (!empty($params['includeGroups']) && is_array($params['includeGroups'])) {
       foreach ($params['includeGroups'] as $key => $id) {
         if ($id) {
           $groups['include'][] = $id;
@@ -322,7 +344,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     // delete previous includes/excludes, if campaign already existed
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
     $dao = new CRM_Campaign_DAO_CampaignGroup();
-    $dao->campaign_id = $this->_campaignId;
+    $dao->campaign_id = $form->_campaignId;
     $dao->entity_table = $groupTableName;
     $dao->find();
     while ($dao->fetch()) {
@@ -334,27 +356,14 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       CRM_Utils_Array::value('campaign_type_id', $params)
     );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $this->_campaignId,
+      $form->_campaignId,
       'Campaign'
     );
 
-    $result = CRM_Campaign_BAO_Campaign::create($params);
-
-    if ($result) {
-      CRM_Core_Session::setStatus(ts('Campaign %1 has been saved.', [1 => $result->title]), ts('Saved'), 'success');
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
-      $this->ajaxResponse['id'] = $result->id;
-      $this->ajaxResponse['label'] = $result->title;
-    }
-
-    $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->getButtonName('upload', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another Campaign.'), '', 'info');
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign/add', 'reset=1&action=add'));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
-    }
+    // dev/core#1067 Clean Money before passing onto BAO to do the create.
+    $params['goal_revenue'] = CRM_Utils_Rule::cleanMoney($params['goal_revenue']);
+    $result = civicrm_api3('Campaign', 'create', $params);
+    return $result;
   }
 
 }

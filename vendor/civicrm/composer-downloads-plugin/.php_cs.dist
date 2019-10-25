@@ -1,0 +1,22 @@
+<?php
+
+$header = <<<'EOF'
+This file is part of Composer Extra Files Plugin.
+
+(c) 2017 Last Call Media, Rob Bayliss <rob@lastcallmedia.com>
+
+This source file is subject to the MIT license that is bundled
+with this source code in the file LICENSE.
+EOF;
+
+return PhpCsFixer\Config::create()
+  ->setRiskyAllowed(true)
+  ->setRules([
+    '@Symfony' => true,
+    '@Symfony:risky' => true,
+    'header_comment' => ['header' => $header],
+  ])
+  ->setFinder(
+    PhpCsFixer\Finder::create()
+      ->in([__DIR__.'/src', __DIR__.'/tests'])
+  );

@@ -1434,6 +1434,12 @@ class CRM_Utils_Token {
    * @param array $greetingTokens
    */
   private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
+
+    // Only applies to contact tokens
+    if (!array_key_exists('contact', $greetingTokens)) {
+      return;
+    }
+
     $greetingTokensOriginal = $greetingTokens;
     $contactFieldList = CRM_Contact_DAO_Contact::fields();
     // Sometimes contactDetails are in a multidemensional array, sometimes a

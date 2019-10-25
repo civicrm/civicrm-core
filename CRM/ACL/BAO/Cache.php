@@ -34,7 +34,7 @@
 /**
  *  Access Control Cache.
  */
-class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
+class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
 
   public static $_cache = NULL;
 
@@ -96,7 +96,7 @@ SELECT acl_id
    */
   public static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
-      $dao = new CRM_ACL_DAO_Cache();
+      $dao = new CRM_ACL_BAO_Cache();
       if ($id) {
         $dao->contact_id = $id;
       }

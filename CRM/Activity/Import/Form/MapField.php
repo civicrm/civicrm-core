@@ -77,6 +77,8 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Build the form object.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     // To save the current mappings.
@@ -90,14 +92,8 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $savedMapping = $this->get('savedMapping');
       // Mapping is to be loaded from database.
 
-      list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingRelation) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
-
-      // Get loaded Mapping Fields.
-      $mappingName = CRM_Utils_Array::value('1', $mappingName);
-      $mappingContactType = CRM_Utils_Array::value('1', $mappingContactType);
-      $mappingLocation = CRM_Utils_Array::value('1', $mappingLocation);
-      $mappingPhoneType = CRM_Utils_Array::value('1', $mappingPhoneType);
-      $mappingRelation = CRM_Utils_Array::value('1', $mappingRelation);
+      // Get an array of the name values for mapping fields associated with this mapping_id.
+      $mappingName = CRM_Core_BAO_Mapping::getMappingFieldValues($savedMapping, 'name');
 
       $this->assign('loadedMapping', $savedMapping);
       $this->set('loadedMapping', $savedMapping);

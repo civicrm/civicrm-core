@@ -301,6 +301,12 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           $custom_fields = array_merge($participant->get_form()->get_participant_custom_data_fields());
 
           CRM_Contact_BAO_Contact::createProfileContact($this->_submitValues['field'][$participant_id], $custom_fields, $contact_id);
+
+          CRM_Core_BAO_CustomValueTable::postProcess($this->_submitValues['field'][$participant_id],
+            'civicrm_participant',
+            $participant_id,
+           'Participant'
+          );
         }
       }
     }

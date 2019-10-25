@@ -236,7 +236,6 @@ SELECT *
       }
       $this->appendValue($dao->id, $tableName, $value);
     }
-    $dao->free();
   }
 
   /**
@@ -440,7 +439,6 @@ AND    entity_table = 'civicrm_contact'
         $additionalContacts
       );
     }
-    $dao->free();
   }
 
   /**
@@ -499,7 +497,6 @@ WHERE ac.contact_id IN ( $ids )
       // append activity value
       $this->appendValue($dao->id, 'civicrm_activity', $activity);
     }
-    $dao->free();
   }
 
   /**

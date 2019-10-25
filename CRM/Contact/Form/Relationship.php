@@ -416,8 +416,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $note = !empty($params['note']) ? $params['note'] : '';
     $this->saveRelationshipNotes($relationshipIds, $note);
 
-    $this->setEmploymentRelationship($params, $relationshipIds);
-
     // Refresh contact tabs which might have been affected
     $this->ajaxResponse = [
       'reloadBlocks' => ['#crm-contactinfo-content'],
@@ -635,29 +633,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       if (!empty($action)) {
         civicrm_api3('note', $action, $noteParams);
       }
-    }
-  }
-
-  /**
-   * Sets current employee/employer relationship
-   *
-   * @param $params
-   * @param array $relationshipIds
-   */
-  private function setEmploymentRelationship($params, $relationshipIds) {
-    $employerParams = [];
-    foreach ($relationshipIds as $id) {
-      if (!CRM_Contact_BAO_Relationship::isCurrentEmployerNeedingToBeCleared($params, $id)
-        //don't think this is required to check again.
-        && $this->_allRelationshipNames[$params['relationship_type_id']]["name_a_b"] == 'Employee of') {
-        // Fixme this is dumb why do we have to look this up again?
-        $rel = CRM_Contact_BAO_Relationship::getRelationshipByID($id);
-        $employerParams[$rel->contact_id_a] = $rel->contact_id_b;
-      }
-    }
-    if (!empty($employerParams)) {
-      // @todo this belongs in the BAO.
-      CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($employerParams);
     }
   }
 

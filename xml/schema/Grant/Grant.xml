@@ -167,15 +167,16 @@
     <required>true</required>
     <comment>3 character string, value from config setting or input via user.</comment>
     <add>3.2</add>
-      <pseudoconstant>
-        <table>civicrm_currency</table>
-        <keyColumn>name</keyColumn>
-        <labelColumn>full_name</labelColumn>
-        <nameColumn>name</nameColumn>
-      </pseudoconstant>
-      <html>
-        <type>Select</type>
-      </html>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>currency</name>

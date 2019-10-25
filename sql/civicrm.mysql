@@ -764,6 +764,12 @@ CREATE TABLE `civicrm_contact` (
       , sort_name
       , id
   )
+  ,     INDEX `index_created_date`(
+        created_date
+  )
+  ,     INDEX `index_modified_date`(
+        modified_date
+  )
   
 ,          CONSTRAINT FK_civicrm_contact_primary_contact_id FOREIGN KEY (`primary_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_contact_employer_id FOREIGN KEY (`employer_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
@@ -1732,7 +1738,7 @@ CREATE TABLE `civicrm_cxn` (
 CREATE TABLE `civicrm_cache` (
 
 
-     `id` int unsigned NOT NULL AUTO_INCREMENT  ,
+     `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique table ID',
      `group_name` varchar(32) NOT NULL   COMMENT 'group name for cache element, useful in cleaning cache elements',
      `path` varchar(255)    COMMENT 'Unique path name for cache element',
      `data` longtext    COMMENT 'data associated with this path',
@@ -1860,8 +1866,8 @@ CREATE TABLE `civicrm_custom_field` (
      `end_date_years` int    COMMENT 'Date may be up to end_date_years years after the current date.',
      `date_format` varchar(64)    COMMENT 'date format for custom date',
      `time_format` int unsigned    COMMENT 'time format for custom date',
-     `note_columns` int unsigned    COMMENT ' Number of columns in Note Field ',
-     `note_rows` int unsigned    COMMENT ' Number of rows in Note Field ',
+     `note_columns` int unsigned    COMMENT 'Number of columns in Note Field',
+     `note_rows` int unsigned    COMMENT 'Number of rows in Note Field',
      `column_name` varchar(255)    COMMENT 'Name of the column that holds the values for this field.',
      `option_group_id` int unsigned    COMMENT 'For elements with options, the option group id that is used',
      `filter` varchar(255)    COMMENT 'Stores Contact Get API params contact reference custom fields. May be used for other filters in the future.',
@@ -2602,7 +2608,8 @@ CREATE TABLE `civicrm_status_pref` (
      `hush_until` date   DEFAULT NULL COMMENT 'expires ignore_severity.  NULL never hushes.',
      `ignore_severity` int unsigned   DEFAULT 1 COMMENT 'Hush messages up to and including this severity.',
      `prefs` varchar(255)    COMMENT 'These settings are per-check, and can\'t be compared across checks.',
-     `check_info` varchar(255)    COMMENT 'These values are per-check, and can\'t be compared across checks.' 
+     `check_info` varchar(255)    COMMENT 'These values are per-check, and can\'t be compared across checks.',
+     `is_active` tinyint   DEFAULT 1 COMMENT 'Is this status check active?' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3381,7 +3388,7 @@ CREATE TABLE `civicrm_dashboard` (
         PRIMARY KEY (`id`)
  
  
-,          CONSTRAINT FK_civicrm_dashboard_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)   
+,          CONSTRAINT FK_civicrm_dashboard_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`) ON DELETE CASCADE  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -3661,7 +3668,7 @@ CREATE TABLE `civicrm_action_log` (
      `is_error` tinyint   DEFAULT 0 COMMENT 'Was there any error sending the reminder?',
      `message` text    COMMENT 'Description / text in case there was an error encountered.',
      `repetition_number` int unsigned    COMMENT 'Keeps track of the sequence number of this repetition.',
-     `reference_date` date   DEFAULT NULL COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)' 
+     `reference_date` datetime   DEFAULT NULL COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4508,6 +4515,10 @@ CREATE TABLE `civicrm_address` (
   )
   ,     INDEX `index_city`(
         city
+  )
+  ,     INDEX `index_geo_code_1_geo_code_2`(
+        geo_code_1
+      , geo_code_2
   )
   
 ,          CONSTRAINT FK_civicrm_address_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_address_county_id FOREIGN KEY (`county_id`) REFERENCES `civicrm_county`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_address_state_province_id FOREIGN KEY (`state_province_id`) REFERENCES `civicrm_state_province`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_address_country_id FOREIGN KEY (`country_id`) REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_address_master_id FOREIGN KEY (`master_id`) REFERENCES `civicrm_address`(`id`) ON DELETE SET NULL  

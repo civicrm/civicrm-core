@@ -39,8 +39,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
   protected $_subscriptionDetails = NULL;
 
-  protected $_selfService = FALSE;
-
   public $_bltID = NULL;
 
   /**
@@ -74,12 +72,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
     if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->_subscriptionDetails)) {
       CRM_Core_Error::fatal('Required information missing.');
-    }
-    if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel subscription.'));
-      }
-      $this->_selfService = TRUE;
     }
 
     if (!$this->_paymentProcessor['object']->supports('updateSubscriptionBillingInfo')) {
@@ -160,7 +152,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    */
   public function buildQuickForm() {
     $type = 'next';
-    if ($this->_selfService) {
+    if ($this->isSelfService()) {
       $type = 'submit';
     }
 

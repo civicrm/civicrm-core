@@ -97,9 +97,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       $this->assign('contactId', $this->_subscriptionDetails->contact_id);
     }
 
-    $this->isSelfService();
-
-    $this->assign('self_service', $this->selfService);
+    $this->assign('self_service', $this->isSelfService());
 
     $this->editableScheduleFields = $this->_paymentProcessorObj->getEditableRecurringScheduleFields();
 
@@ -119,7 +117,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     // when custom data is included in this page
-    if (!empty($_POST['hidden_custom']) && !$this->selfService) {
+    if (!empty($_POST['hidden_custom']) && !$this->isSelfService()) {
       CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'ContributionRecur', $this->contributionRecurID);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
@@ -181,7 +179,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->contributionRecurID)) {
-      $this->addEntityRef('financial_type_id', ts('Financial Type'), ['entity' => 'FinancialType'], !$this->selfService);
+      $this->addEntityRef('financial_type_id', ts('Financial Type'), ['entity' => 'FinancialType'], !$this->isSelfService());
     }
 
     // Add custom data
@@ -189,7 +187,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->assign('entityID', $this->contributionRecurID);
 
     $type = 'next';
-    if ($this->selfService) {
+    if ($this->isSelfService()) {
       $type = 'submit';
     }
 
@@ -214,7 +212,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     // store the submitted values in an array
     $params = $this->exportValues();
 
-    if ($this->selfService && $this->_donorEmail) {
+    if ($this->isSelfService() && $this->_donorEmail) {
       // for self service force notify
       $params['is_notify'] = 1;
     }

@@ -56,9 +56,7 @@ AND    g.name = 'custom_search'
 AND    v.is_active = 1
 ORDER By  v.weight
 ";
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
 
     $rows = [];
     while ($dao->fetch()) {

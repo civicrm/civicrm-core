@@ -1,0 +1,27 @@
+{
+	"name": "togos/gitignore",
+	"description": "Parser for .gitignore (and sparse-checkout, and anything else using the same format) files",
+	"license": "MIT",
+
+	"require": {
+		"php": ">=5.2"
+	},
+	"autoload": {
+		"psr-0": {
+			"TOGoS_GitIgnore_": "src/main/php/"
+		}
+	},
+
+
+	"require-dev": {
+		"togos/simpler-test": "1.1.1"
+	},
+	"autoload-dev": {
+		"psr-0": {
+			"TOGoS_GitIgnore_": "src/test/php/"
+		}
+	},
+	"scripts": {
+		"test": "vendor/bin/phpsimplertest --colorful-output --bootstrap vendor/autoload.php src/test/"
+	}
+}

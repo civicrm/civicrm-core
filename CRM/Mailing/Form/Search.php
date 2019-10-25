@@ -44,7 +44,8 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Mailing', 'title')
     );
 
-    CRM_Core_Form_Date::buildDateRange($this, 'mailing', 1, '_from', '_to', ts('From'), FALSE);
+    $dateFieldLabel = ($parent->_sms) ? ts('SMS Date') : ts('Mailing Date');
+    $this->addDatePickerRange('mailing', $dateFieldLabel);
 
     $this->add('text', 'sort_name', ts('Created or Sent by'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
@@ -111,14 +112,20 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
-    CRM_Contact_BAO_Query::fixDateValues($params["mailing_relative"], $params['mailing_from'], $params['mailing_to']);
+    if (!empty($params['mailing_relative'])) {
+      list($params['mailing_low'], $params['mailing_high']) = CRM_Utils_Date::getFromTo($params['mailing_relative'], $params['mailing_low'], $params['mailing_high']);
+      unset($params['mailing_relative']);
+    }
+    elseif (!empty($params['mailing_high'])) {
+      $params['mailing_high'] .= ' ' . '23:59:59';
+    }
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
       $fields = [
         'mailing_name',
-        'mailing_from',
-        'mailing_to',
+        'mailing_low',
+        'mailing_high',
         'sort_name',
         'campaign_id',
         'mailing_status',
@@ -132,16 +139,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])
         ) {
-          if (in_array($field, [
-            'mailing_from',
-            'mailing_to',
-          ]) && !$params["mailing_relative"]) {
-            $time = ($field == 'mailing_to') ? '235959' : NULL;
-            $parent->set($field, CRM_Utils_Date::processDate($params[$field], $time));
-          }
-          else {
-            $parent->set($field, $params[$field]);
-          }
+          $parent->set($field, $params[$field]);
         }
         else {
           $parent->set($field, NULL);

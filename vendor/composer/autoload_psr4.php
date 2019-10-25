@@ -27,6 +27,8 @@ return array(
     'MimeType\\' => array($vendorDir . '/katzien/php-mime-type/src'),
     'MJS\\TopSort\\Tests\\' => array($vendorDir . '/marcj/topsort/tests/Tests'),
     'MJS\\TopSort\\' => array($vendorDir . '/marcj/topsort/src'),
+    'League\\Csv\\' => array($vendorDir . '/league/csv/src'),
+    'LastCall\\DownloadsPlugin\\' => array($vendorDir . '/civicrm/composer-downloads-plugin/src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
     'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),

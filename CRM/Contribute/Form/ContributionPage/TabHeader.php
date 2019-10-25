@@ -68,73 +68,45 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       return NULL;
     }
 
+    $default = [
+      'link' => NULL,
+      'valid' => FALSE,
+      'active' => FALSE,
+      'current' => FALSE,
+    ];
+
     $tabs = [
       'settings' => [
         'title' => ts('Title'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'amount' => [
         'title' => ts('Amounts'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'membership' => [
         'title' => ts('Memberships'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'thankyou' => [
         'title' => ts('Receipt'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'friend' => [
         'title' => ts('Tell a Friend'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'custom' => [
         'title' => ts('Profiles'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'premium' => [
         'title' => ts('Premiums'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'widget' => [
         'title' => ts('Widgets'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
       'pcp' => [
         'title' => ts('Personal Campaigns'),
-        'link' => NULL,
-        'valid' => FALSE,
-        'active' => FALSE,
-        'current' => FALSE,
-      ],
+      ] + $default,
     ];
 
     $contribPageId = $form->getVar('_id');
+    // Call tabset hook to add/remove custom tabs
     CRM_Utils_Hook::tabset('civicrm/admin/contribute', $tabs, ['contribution_page_id' => $contribPageId]);
     $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);

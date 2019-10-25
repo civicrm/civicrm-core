@@ -110,6 +110,11 @@
     &nbsp; {$form.activity_test.html}
   </td>
 </tr>
+<tr>
+<td>{$form.activity_location.label}<br />
+  {$form.activity_location.html}</td>
+<td></td>
+</tr>
 {if $buildSurveyResult }
   <tr>
     <td id="activityResult">

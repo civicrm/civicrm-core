@@ -397,9 +397,9 @@ return [
     'class' => 'CRM_Core_DAO_StatusPreference',
     'table' => 'civicrm_status_pref',
   ],
-  'CRM_ACL_DAO_Cache' => [
-    'name' => 'Cache',
-    'class' => 'CRM_ACL_DAO_Cache',
+  'CRM_ACL_DAO_ACLCache' => [
+    'name' => 'ACLCache',
+    'class' => 'CRM_ACL_DAO_ACLCache',
     'table' => 'civicrm_acl_cache',
   ],
   'CRM_Contact_DAO_Group' => [

@@ -153,16 +153,20 @@
         <td>&nbsp;</td>
         <td>{$form.is_share.html} {$form.is_share.label} {help id="id-is_share"}</td>
       </tr>
-    <tr class="crm-contribution-contributionpage-settings-form-block-is_active"><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}<br />
+        <tr class="crm-contribution-contributionpage-settings-form-block-is_active">
+        <td>&nbsp;</td>  
+        <td>{$form.is_active.html} {$form.is_active.label}</td>
+      </tr>
   {if $contributionPageID}
-        <span class="description">
+        <tr class="crm-contribution-contributionpage-settings-form-block-info_link">
+        <td>&nbsp;</td>  
+        <td class="description">
           {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
               {ts}When your page is active, you can link people to the page by copying and pasting the following URL:{/ts}<br />
               <strong>{crmURL a=1 fe=1 p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}</strong>
           {elseif $config->userFramework EQ 'Joomla'}
               {ts 1=$title}When your page is active, create front-end links to the contribution page using the Menu Manager. Select <strong>Administer CiviCRM &raquo; CiviContribute &raquo; Manage Contribution Pages</strong> and select <strong>%1</strong> for the contribution page.{/ts}
           {/if}
-    </span>
       {/if}
   </td>
   </tr>

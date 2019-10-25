@@ -275,7 +275,7 @@
   </item>
   <item>
      <path>civicrm/admin/scheduleReminders</path>
-     <title>Schedule Reminders</title>[A
+     <title>Schedule Reminders</title>
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_callback>1</access_callback>
@@ -550,7 +550,7 @@
   <item>
      <path>civicrm/admin/setting/preferences/multisite</path>
      <title>Multi Site Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Multisite</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/36.png</icon>
      <weight>130</weight>
@@ -558,7 +558,7 @@
   <item>
      <path>civicrm/admin/setting/preferences/campaign</path>
      <title>CiviCampaign Component Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Campaign</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
   </item>
   <item>
      <path>civicrm/admin/setting/preferences/event</path>
@@ -719,6 +719,7 @@
      <path>civicrm/sms/callback</path>
      <page_callback>CRM_SMS_Page_Callback</page_callback>
      <access_callback>1</access_callback>
+     <is_public>true</is_public>
   </item>
   <item>
     <path>civicrm/admin/badgelayout</path>

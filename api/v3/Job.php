@@ -258,9 +258,8 @@ function _civicrm_api3_job_send_reminder(&$params) {
  * @return array
  */
 function civicrm_api3_job_mail_report($params) {
-  ob_start();
   $result = CRM_Report_Utils_Report::processReport($params);
-  $output = ob_get_clean();
+
   if ($result['is_error'] == 0) {
     // this should be handling by throwing exceptions but can't remove until we can test that.
     return civicrm_api3_create_success();
@@ -542,7 +541,7 @@ function civicrm_api3_job_process_batch_merge($params) {
   $gid = CRM_Utils_Array::value('gid', $params);
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
 
-  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, []), CRM_Utils_Array::value('check_permissions', $params));
+  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, []), CRM_Utils_Array::value('check_permissions', $params), NULL, $params['search_limit']);
 
   return civicrm_api3_create_success($result, $params);
 }
@@ -572,6 +571,12 @@ function _civicrm_api3_job_process_batch_merge_spec(&$params) {
     'description' => 'let the api decide which contact to retain and which to delete?',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
+  $params['search_limit'] = [
+    'title' => ts('Number of contacts to look for matches for.'),
+    'type' => CRM_Utils_Type::T_INT,
+    'api.default' => (int) Civi::settings()->get('dedupe_default_limit'),
+  ];
+
 }
 
 /**

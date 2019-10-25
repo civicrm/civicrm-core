@@ -306,9 +306,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         WHERE   $where
         ";
 
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     $totals = [];
     while ($dao->fetch()) {
       $totals['payment_amount'] = $dao->payment_amount;
@@ -329,9 +327,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   public function count() {
     $sql = $this->all();
 
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 

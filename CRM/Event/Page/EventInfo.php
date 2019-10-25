@@ -96,12 +96,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     // show event fees.
     if ($this->_id && !empty($values['event']['is_monetary'])) {
-      //CRM-6907
-      $config = CRM_Core_Config::singleton();
-      $config->defaultCurrency = CRM_Utils_Array::value('currency',
-        $values['event'],
-        $config->defaultCurrency
-      );
+      CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($values['event']);
 
       //CRM-10434
       $discountId = CRM_Core_BAO_Discount::findSet($this->_id, 'civicrm_event');

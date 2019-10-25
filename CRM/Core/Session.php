@@ -70,9 +70,6 @@ class CRM_Core_Session {
    *
    * The CMS takes care of initiating the php session handler session_start().
    *
-   * When using CiviCRM standalone (w/o a CMS), we start the session
-   * in index.php and then pass it off to here.
-   *
    * All crm code should always use the session using
    * CRM_Core_Session. we prefix stuff to avoid collisions with the CMS and also
    * collisions with other crm modules!

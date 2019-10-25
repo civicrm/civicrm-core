@@ -144,6 +144,8 @@ class CRM_Core_Smarty extends Smarty {
       $this->plugins_dir = [$smartyDir . 'plugins', $pluginsDir];
     }
 
+    $this->compile_check = $this->isCheckSmartyIsCompiled();
+
     // add the session and the config here
     $session = CRM_Core_Session::singleton();
 
@@ -338,6 +340,16 @@ class CRM_Core_Smarty extends Smarty {
     }
 
     return 'en_US';
+  }
+
+  /**
+   * Get the compile_check value.
+   *
+   * @return bool
+   */
+  private function isCheckSmartyIsCompiled() {
+    // check for define in civicrm.settings.php as FALSE, otherwise returns TRUE
+    return CRM_Utils_Constant::value('CIVICRM_TEMPLATE_COMPILE_CHECK', TRUE);
   }
 
 }

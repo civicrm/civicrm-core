@@ -193,7 +193,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $id
    * @param null $cond
    *
-   * @return array
+   * @return array|string
    *   array reference of all participant roles if any
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
@@ -224,7 +224,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    *
-   * @return array
+   * @return array|string
    *   array reference of all participant listings if any
    */
   public static function &participantListing($id = NULL) {
@@ -245,7 +245,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
-   * @return array
+   * @return array|string
    *   array reference of all event types.
    */
   public static function &eventType($id = NULL) {

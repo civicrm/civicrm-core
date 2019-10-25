@@ -54,7 +54,7 @@ function _civicrm_api3_survey_respondant_deprecation() {
  *
  * @return array
  */
-function civicrm_api3_survey_respondant_get(&$params) {
+function civicrm_api3_survey_respondant_get($params) {
 
   civicrm_api3_verify_one_mandatory($params, NULL, ['survey_id', 'id']);
 

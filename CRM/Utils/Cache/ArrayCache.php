@@ -32,9 +32,9 @@
  */
 
 /**
- * Class CRM_Utils_Cache_Arraycache
+ * Class CRM_Utils_Cache_ArrayCache
  */
-class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
+class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait;
   // TODO Native implementation
@@ -56,7 +56,7 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
    * @param array $config
    *   An array of configuration params.
    *
-   * @return \CRM_Utils_Cache_Arraycache
+   * @return \CRM_Utils_Cache_ArrayCache
    */
   public function __construct($config) {
     $this->_cache = [];

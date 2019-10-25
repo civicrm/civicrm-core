@@ -162,7 +162,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(['CRM_Contact_Form_task_AddToGroup', 'formRule']);
+    $this->addFormRule(['CRM_Contact_Form_Task_AddToGroup', 'formRule']);
   }
 
   /**

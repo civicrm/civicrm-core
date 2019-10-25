@@ -13,5 +13,6 @@ return array(
     'c964ee0ededf28c96ebd9db5099ef910' => $vendorDir . '/guzzlehttp/promises/src/functions_include.php',
     '5636a0a89fc28f9cfa8624493b142015' => $vendorDir . '/civicrm/civicrm-setup/civicrm-setup-autoload.php',
     '37a3dc5111fe8f707ab4c132ef1dbc62' => $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
+    '9e4824c5afbdc1482b6025ce3d4dfde8' => $vendorDir . '/league/csv/src/functions_include.php',
     'def43f6c87e4f8dfd0c9e1b1bab14fe8' => $vendorDir . '/symfony/polyfill-iconv/bootstrap.php',
 );

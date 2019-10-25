@@ -230,11 +230,11 @@ class CRM_Core_I18n {
     }
 
     if ($enabled === NULL) {
-      $config = CRM_Core_Config::singleton();
+      $languageLimit = Civi::settings()->get('languageLimit');
       $enabled = [];
-      if (isset($config->languageLimit) and $config->languageLimit) {
+      if ($languageLimit) {
         foreach ($all as $code => $name) {
-          if (in_array($code, array_keys($config->languageLimit))) {
+          if (array_key_exists($code, $languageLimit)) {
             $enabled[$code] = $name;
           }
         }

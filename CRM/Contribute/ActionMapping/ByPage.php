@@ -220,4 +220,16 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
     return $query;
   }
 
+  /**
+   * Determine whether a schedule based on this mapping should
+   * reset the reminder state if the trigger date changes.
+   *
+   * @return bool
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   */
+  public function resetOnTriggerDateChange($schedule) {
+    return FALSE;
+  }
+
 }

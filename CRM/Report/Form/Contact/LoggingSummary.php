@@ -271,7 +271,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
 
       $date = CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
 
-      if ('Update' == CRM_Utils_Array::value('log_civicrm_entity_log_action', $row)) {
+      if (in_array(CRM_Utils_Array::value('log_civicrm_entity_log_action', $row), ['Update', 'Delete'])) {
         $row = $this->addDetailReportLinksToRow($baseQueryCriteria, $row);
       }
 

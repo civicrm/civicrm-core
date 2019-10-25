@@ -129,7 +129,7 @@
     </tr>
 
     {if $eventID}
-      <tr>
+      <tr class="crm-event-manage-eventinfo-form-block-info_link">
         <td>&nbsp;</td>
         <td class="description">
           {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}

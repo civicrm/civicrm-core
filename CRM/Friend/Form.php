@@ -129,7 +129,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
       while ($pcp->fetch()) {
         $this->_title = $pcp->title;
         $this->_campaignId = $pcp->campaign_id;
-        $pcp->free();
       }
 
       $this->assign('pcpTitle', $this->_title);

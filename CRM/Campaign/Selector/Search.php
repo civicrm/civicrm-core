@@ -296,7 +296,8 @@ FROM {$sql['from']}
 
       if (Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
         // SQL-backed prevnext cache uses an extra record for pruning the cache.
-        CRM_Core_BAO_Cache::setItem($cacheKey, 'CiviCRM Search PrevNextCache', $cacheKey);
+        // Also ensure that caches stay alive for 2 days a per previous code.
+        Civi::cache('prevNextCache')->set($cacheKey, $cacheKey, 60 * 60 * 24 * CRM_Core_PrevNextCache_Sql::cacheDays);
       }
     }
   }

@@ -291,7 +291,7 @@ FROM   {$this->_componentTable}
       $this->_greetingOptions = self::getGreetingOptions();
 
       foreach ($this->_greetingOptions as $key => $value) {
-        $fieldLabel = ts('%1 (merging > 2 contacts)', [1 => ucwords(str_replace('_', ' ', $key))]);
+        $fieldLabel = ts('%1 (when merging contacts)', [1 => ucwords(str_replace('_', ' ', $key))]);
         $this->addElement('select', $key, $fieldLabel,
           $value, ['onchange' => "showOther(this);"]
         );
@@ -361,7 +361,7 @@ FROM   {$this->_componentTable}
         if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
 
           $label = ucwords(str_replace('_', ' ', $key));
-          $errors[$value] = ts('Please enter a value for %1 (merging > 2 contacts), or select a pre-configured option from the list.', [1 => $label]);
+          $errors[$value] = ts('Please enter a value for %1 (when merging contacts), or select a pre-configured option from the list.', [1 => $label]);
         }
       }
     }
@@ -387,22 +387,6 @@ FROM   {$this->_componentTable}
     // will send $exportParams as another argument, which is an array and suppose to contain
     // all submitted options or any other argument
     $exportParams = $params;
-
-    if (!empty($this->_greetingOptions)) {
-      foreach ($this->_greetingOptions as $key => $value) {
-        if ($option = CRM_Utils_Array::value($key, $exportParams)) {
-          if ($this->_greetingOptions[$key][$option] == ts('Other')) {
-            $exportParams[$key] = $exportParams["{$key}_other"];
-          }
-          elseif ($this->_greetingOptions[$key][$option] == ts('List of names')) {
-            $exportParams[$key] = '';
-          }
-          else {
-            $exportParams[$key] = $this->_greetingOptions[$key][$option];
-          }
-        }
-      }
-    }
 
     $mappingId = CRM_Utils_Array::value('mapping', $params);
     if ($mappingId) {
@@ -482,9 +466,9 @@ FROM   {$this->_componentTable}
 
     $this->set('mappingTypeId', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', $exportType));
 
-    $mappings = CRM_Core_BAO_Mapping::getMappings($exportType);
+    $mappings = CRM_Core_BAO_Mapping::getMappings($exportType, TRUE);
     if (!empty($mappings)) {
-      $this->add('select', 'mapping', ts('Use Saved Field Mapping'), ['' => '-select-'] + $mappings);
+      $this->add('select2', 'mapping', ts('Use Saved Field Mapping'), $mappings, FALSE, ['placeholder' => ts('- select -')]);
     }
   }
 

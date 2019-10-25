@@ -638,6 +638,7 @@ LIMIT {$offset}, {$rowCount}
 
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive');
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
+    $limit = CRM_Utils_Request::retrieveValue('limit', 'Positive', 0);
     $null = NULL;
     $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
     $selected = CRM_Utils_Request::retrieveValue('selected', 'Boolean');
@@ -646,7 +647,7 @@ LIMIT {$offset}, {$rowCount}
     }
 
     $whereClause = $orderByClause = '';
-    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
+    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE), TRUE, $limit);
 
     $searchRows = [];
 

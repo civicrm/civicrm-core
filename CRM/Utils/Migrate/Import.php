@@ -363,36 +363,7 @@ AND        v.name = %1
       }
     }
     foreach ($fields_indexed_by_group_id as $group_id => $fields) {
-      $total = count($fields);
-      $count = 0;
-      foreach ($fields as $customFieldXML) {
-        $count++;
-        $customField = new CRM_Core_DAO_CustomField();
-        $customField->custom_group_id = $group_id;
-        $skipStore = FALSE;
-        if (!$this->copyData($customField, $customFieldXML, FALSE, 'label')) {
-          $skipStore = TRUE;
-        }
-
-        if (empty($customField->option_group_id) &&
-          isset($customFieldXML->option_group_name)
-        ) {
-          $customField->option_group_id = $idMap['option_group'][(string ) $customFieldXML->option_group_name];
-        }
-        if ($skipStore) {
-          continue;
-        }
-        $customField->save();
-
-        // Only rebuild the table's trigger on the last field added to avoid un-necessary
-        // and slow rebuilds when adding many fields at the same time.
-        $triggerRebuild = FALSE;
-        if ($count == $total) {
-          $triggerRebuild = TRUE;
-        }
-        $indexExist = FALSE;
-        CRM_Core_BAO_CustomField::createField($customField, 'add', $indexExist, $triggerRebuild);
-      }
+      CRM_Core_BAO_CustomField::bulkSave(json_decode(json_encode($fields), TRUE), ['custom_group_id' => $group_id]);
     }
   }
 

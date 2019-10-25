@@ -196,13 +196,13 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add(
             $props['html_type'],
             $setting,
-            ts($props['title']),
+            $props['title'],
             ($options !== NULL) ? $options : CRM_Utils_Array::value('html_attributes', $props, []),
             ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
           );
         }
         elseif ($add == 'addSelect') {
-          $this->addElement('select', $setting, ts($props['title']), $options, CRM_Utils_Array::value('html_attributes', $props));
+          $this->addElement('select', $setting, $props['title'], $options, CRM_Utils_Array::value('html_attributes', $props));
         }
         elseif ($add == 'addCheckBox') {
           $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
@@ -224,23 +224,23 @@ trait CRM_Admin_Form_SettingTrait {
         }
         elseif ($add == 'addChainSelect') {
           $this->addChainSelect($setting, [
-            'label' => ts($props['title']),
+            'label' => $props['title'],
           ]);
         }
         elseif ($add == 'addMonthDay') {
-          $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
+          $this->add('date', $setting, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         elseif ($add === 'addEntityRef') {
-          $this->$add($setting, ts($props['title']), $props['entity_reference_options']);
+          $this->$add($setting, $props['title'], $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, ts($props['title']), [1 => 'Yes', 0 => 'No'], NULL, '&nbsp;&nbsp;');
+          $this->addRadio($setting, $props['title'], [1 => 'Yes', 0 => 'No'], NULL, '&nbsp;&nbsp;');
         }
         elseif ($add === 'add') {
-          $this->add($props['html_type'], $setting, ts($props['title']), $options);
+          $this->add($props['html_type'], $setting, $props['title'], $options);
         }
         else {
-          $this->$add($setting, ts($props['title']), $options);
+          $this->$add($setting, $props['title'], $options);
         }
         // Migrate to using an array as easier in smart...
         $description = CRM_Utils_Array::value('description', $props);
@@ -281,7 +281,8 @@ trait CRM_Admin_Form_SettingTrait {
     // not made this change.
     $htmlType = $spec['html_type'];
     if ($htmlType !== strtolower($htmlType)) {
-      CRM_Core_Error::deprecatedFunctionWarning(ts('Settings fields html_type should be lower case - see https://docs.civicrm.org/dev/en/latest/framework/setting/ - this needs to be fixed for ' . $spec['name']));
+      // Avoiding 'ts' for obscure strings.
+      CRM_Core_Error::deprecatedFunctionWarning('Settings fields html_type should be lower case - see https://docs.civicrm.org/dev/en/latest/framework/setting/ - this needs to be fixed for ' . $spec['name']);
       $htmlType = strtolower($spec['html_type']);
     }
     $mapping = [

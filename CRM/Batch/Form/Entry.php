@@ -122,6 +122,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       ->addSetting(['setting' => ['monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator]])
       ->addSetting(['setting' => ['monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint]]);
 
+    $this->assign('defaultCurrencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
   }
 
   /**
@@ -263,7 +264,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // set an offset to account for other vars we are not counting
     $offset = 50;
     if ((count($this->_elementIndex) + $offset) > ini_get("max_input_vars")) {
-      CRM_Core_Error::fatal(ts('Batch size is too large. Increase value of php.ini setting "max_input_vars" (current val = ' . ini_get("max_input_vars") . ')'));
+      // Avoiding 'ts' for obscure messages.
+      CRM_Core_Error::fatal('Batch size is too large. Increase value of php.ini setting "max_input_vars" (current val = ' . ini_get("max_input_vars") . ')');
     }
 
     $this->assign('fields', $this->_fields);
@@ -393,7 +395,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
       $completeStatus = CRM_Contribute_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $specialFields = [
-        'join_date' => date('Y-m-d'),
+        'membership_join_date' => date('Y-m-d'),
         'receive_date' => $currentDate,
         'contribution_status_id' => $completeStatus,
       ];
@@ -523,7 +525,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           'payment_instrument' => 'payment_instrument_id',
           'contribution_source' => 'source',
           'contribution_note' => 'note',
-
+          'contribution_check_number' => 'check_number',
         ];
         foreach ($fieldTranslations as $formField => $baoField) {
           if (isset($value[$formField])) {
@@ -823,7 +825,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         else {
           $dateTypes = [
-            'join_date' => 'joinDate',
+            'membership_join_date' => 'joinDate',
             'membership_start_date' => 'startDate',
             'membership_end_date' => 'endDate',
           ];
@@ -859,6 +861,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           unset($value['membership_start_date']);
           unset($value['membership_end_date']);
           $ids = [];
+          // @todo stop passing empty $ids
           $membership = CRM_Member_BAO_Membership::create($value, $ids);
         }
 

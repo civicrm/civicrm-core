@@ -323,7 +323,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // set page title
     $title = "{$contactImage} {$displayName}";
     if ($contactDetails[$contactId]['isDeceased']) {
-      $title .= '  <span class="crm-contact-deceased">(deceased)</span>';
+      $title .= '  <span class="crm-contact-deceased">(' . ts('deceased') . ')</span>';
     }
     if ($isDeleted) {
       $title = "<del>{$title}</del>";

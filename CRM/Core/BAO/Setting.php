@@ -496,7 +496,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   public static function isAPIJobAllowedToRun($params) {
     $environment = CRM_Core_Config::environment(NULL, TRUE);
     if ($environment != 'Production') {
-      if (CRM_Utils_Array::value('runInNonProductionEnvironment', $params)) {
+      if (!empty($params['runInNonProductionEnvironment'])) {
         $mailing = Civi::settings()->get('mailing_backend_store');
         if ($mailing) {
           Civi::settings()->set('mailing_backend', $mailing);

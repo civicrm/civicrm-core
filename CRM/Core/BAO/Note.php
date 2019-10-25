@@ -135,7 +135,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *   (deprecated) associated array with note id - preferably set $params['id'].
    * @return null|object
    *   $note CRM_Core_BAO_Note object
-   * @throws \CRM_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
@@ -145,7 +145,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
     if (!empty($params['entity_table']) && $params['entity_table'] == 'civicrm_contact' && !empty($params['check_permissions'])) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($params['entity_id'], CRM_Core_Permission::EDIT)) {
-        throw new CRM_Exception('Permission denied to modify contact record');
+        throw new CRM_Core_Exception('Permission denied to modify contact record');
       }
     }
 

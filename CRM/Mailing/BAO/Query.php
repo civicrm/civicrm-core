@@ -137,7 +137,7 @@ class CRM_Mailing_BAO_Query {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 8) == 'mailing_') {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $grouping = $query->_params[$id][3];

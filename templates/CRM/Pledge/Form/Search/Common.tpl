@@ -25,7 +25,7 @@
 *}
 
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_payment_date" from='_low' to='_high' label="<label>Payment Scheduled</label>"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_payment_scheduled_date" colspan="2"}
 </tr>
 <tr>
   <td colspan="2">
@@ -45,13 +45,13 @@
   </td>
 </tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_create_date" from='_low' to='_high' label="<label>Pledge Made</label>"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_create_date" colspan="2"}
 </tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_start_date" from='_low' to='_high' label="<label>Payments Start Date</label>"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_start_date" colspan="2"}
 </tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_end_date" from='_low' to='_high' label="<label>Payments Ended Date</label>"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_end_date" colspan="2"}
 </tr>
 <tr>
   <td>

@@ -79,7 +79,7 @@
     </td>
   </tr>
 
-  {if $form.separation }
+  {if $form.separation}
     <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
       <td class="label">{$form.separation.label}</td>
       <td>{$form.separation.html} {help id="separation"}</td>
@@ -150,10 +150,12 @@
   </tr>
   <tr class="crm-activity-form-block-details">
     <td class="label">{$form.details.label}</td>
+    {* activityTypeName means label here not name, but it should be name (dev/core#1116-fixme) *}
     {if $activityTypeName eq "Print PDF Letter"}
       <td class="view-value">
       {$form.details.html}
       </td>
+    {* activityTypeName means label here not name, but it should be name (dev/core#1116-fixme) *}
     {elseif $activityTypeName eq "Inbound Email"}
       <td class="view-value">
        {$form.details.html|crmStripAlternatives|nl2br}
@@ -250,7 +252,7 @@
   {/if} {* End Delete vs. Add / Edit action *}
   </table>
   <div class="crm-submit-buttons">
-  {if $action eq 4 && ($activityTName neq 'Inbound Email' || $allow_edit_inbound_emails == 1)}
+  {if $action eq 4 && ($activityTypeNameAndLabel.machineName neq 'Inbound Email' || $allow_edit_inbound_emails == 1)}
     {if !$context }
       {assign var="context" value='activity'}
     {/if}

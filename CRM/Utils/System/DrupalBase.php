@@ -663,4 +663,24 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return (!empty($language->language)) ? $language->language : $language;
   }
 
+  /**
+   * Is a front end page being accessed.
+   *
+   * Generally this would be a contribution form or other public page as opposed to a backoffice page (like contact edit).
+   *
+   * See https://github.com/civicrm/civicrm-drupal/pull/546/files
+   *
+   * @return bool
+   */
+  public function isFrontEndPage() {
+    $path = CRM_Utils_System::getUrlPath();
+
+    // Get the menu for above URL.
+    $item = CRM_Core_Menu::get($path);
+    if (!empty(CRM_Utils_Array::value('is_public', $item))) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }

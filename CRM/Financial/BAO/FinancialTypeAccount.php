@@ -51,7 +51,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *
    * @return CRM_Contribute_BAO_ContributionType
    */
-  public static function retrieve(&$params, &$defaults, &$allValues = []) {
+  public static function retrieve(&$params, &$defaults = [], &$allValues = []) {
     $financialTypeAccount = new CRM_Financial_DAO_EntityFinancialAccount();
     $financialTypeAccount->copyValues($params);
     $financialTypeAccount->find();

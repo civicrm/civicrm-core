@@ -72,6 +72,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -83,14 +86,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $this->loadStandardSearchOptionsFromUrl();
 
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
+    $this->_formValues = $this->getFormValues();
 
     //membership ID
     $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
@@ -103,6 +99,10 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     if ($this->_force) {
+      // Search field metadata is normally added in buildForm but we are bypassing that in this flow
+      // (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
+      $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
       $this->postProcess();
       $this->set('force', 0);
     }
@@ -149,10 +149,30 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Set defaults.
    *
    * @return array
+   * @throws \Exception
    */
   public function setDefaultValues() {
-    if (empty($this->_defaults['contribution_status'])) {
-      $this->_defaults['contribution_status'][1] = 1;
+    $lowReceiveDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
+    if (!empty($lowReceiveDate)) {
+      $this->_formValues['receive_date_low'] = date('Y-m-d H:i:s', strtotime($lowReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_low not start');
+    }
+    $highReceiveDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
+    if (!empty($highReceiveDate)) {
+      $this->_formValues['receive_date_high'] = date('Y-m-d H:i:s', strtotime($highReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
+    }
+    $this->_defaults = parent::setDefaultValues();
+
+    $this->_defaults = array_merge($this->getEntityDefaults('ContributionRecur'), $this->_defaults);
+
+    if (empty($this->_defaults['contribution_status_id']) && !$this->_force) {
+      // In force mode only parameters from the url will be used. When visible/ explicit this is a useful default.
+      $this->_defaults['contribution_status_id'][1] = CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'Completed'
+      );
     }
     return $this->_defaults;
   }
@@ -261,10 +281,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = TRUE;
 
-    if (!empty($_POST) && !$this->_force) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    $this->convertTextStringsToUseLikeOperator();
+    $this->setFormValues();
     $this->fixFormValues();
 
     // We don't show test records in summaries or dashboards
@@ -421,25 +438,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         // also assign individual mode to the template
         $this->_single = TRUE;
       }
-    }
-
-    $lowDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
-    if ($lowDate) {
-      $lowDate = CRM_Utils_Type::escape($lowDate, 'Timestamp');
-      $date = CRM_Utils_Date::setDateDefaults($lowDate);
-      $this->_formValues['contribution_date_low'] = $this->_defaults['contribution_date_low'] = $date[0];
-    }
-
-    $highDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
-    if ($highDate) {
-      $highDate = CRM_Utils_Type::escape($highDate, 'Timestamp');
-      $date = CRM_Utils_Date::setDateDefaults($highDate);
-      $this->_formValues['contribution_date_high'] = $this->_defaults['contribution_date_high'] = $date[0];
-    }
-
-    if ($highDate || $lowDate) {
-      //set the Choose Date Range value
-      $this->_formValues['contribution_date_relative'] = 0;
     }
 
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive',

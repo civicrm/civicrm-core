@@ -37,6 +37,13 @@
 class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
 
   /**
+   * Contact ID associated with the Custom Data
+   *
+   * @var int
+   */
+  public $_contactID = NULL;
+
+  /**
    * Preprocess function.
    */
   public function preProcess() {
@@ -46,6 +53,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     $this->_subName = CRM_Utils_Request::retrieve('subName', 'String');
     $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive');
     $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive');
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive');
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive');
     $this->_onlySubtype = CRM_Utils_Request::retrieve('onlySubtype', 'Boolean');
     $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric');

@@ -189,7 +189,13 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     else {
       $this->assign('price', TRUE);
     }
-    $this->add('select', 'member_price_set_id', ts('Membership Price Set'), (['' => ts('- none -')] + $price));
+    //$this->add('select', 'member_price_set_id', ts('Membership Price Set'), (['' => ts('- none -')] + $price));
+
+    $this->addField('member_price_set_id', [
+      'entity' => 'PriceSet',
+      'name' => 'price_set_id',
+      'options' => $price,
+    ]);
 
     $session = CRM_Core_Session::singleton();
     $single = $session->get('singleForm');

@@ -343,7 +343,7 @@ class CRM_Utils_Address {
         $alternateName = $alternate2;
       }
       //Include values which prepend 'billing_' to country and state_province.
-      if (CRM_Utils_Array::value($alternateName, $params)) {
+      if (!empty($params[$alternateName])) {
         if (empty($value) || !is_numeric($value)) {
           $value = $params[$alternateName];
         }

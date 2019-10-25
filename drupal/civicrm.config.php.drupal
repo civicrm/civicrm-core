@@ -58,6 +58,7 @@ function civicrm_conf_init() {
     // to the script that invokes it
     $moduleDir  = 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules';
     $contribDir = $moduleDir . DIRECTORY_SEPARATOR . 'contrib';
+    $profileDir = DIRECTORY_SEPARATOR . 'profiles' . DIRECTORY_SEPARATOR;
     // check to see if this is under sites/all/modules/contrib or subdir civicrm-core
     if (strpos($currentDir, $contribDir) !== FALSE || strpos($currentDir, 'civicrm-core') !== FALSE) {
       $confdir = $currentDir . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
@@ -65,6 +66,17 @@ function civicrm_conf_init() {
     // check to see if this is under sites/all/modules
     elseif (strpos($currentDir, $moduleDir) !== FALSE) {
       $confdir = $currentDir . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
+    }
+    // check to see if this is under profiles/[PROFILE]/modules
+    elseif (strpos($currentDir, $profileDir) !== FALSE) {
+      // check to see if this is under profiles/[PROFILE]/modules/contrib
+      if (strpos($currentDir, "contrib") !== FALSE) {
+        $sublevels = 5;
+      }
+      else {
+        $sublevels = 4;
+      }
+      $confdir = $currentDir . str_repeat('..' . DIRECTORY_SEPARATOR, $sublevels) . 'sites';
     }
     else {
       $confdir = $currentDir . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
