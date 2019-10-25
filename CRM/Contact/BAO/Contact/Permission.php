@@ -187,12 +187,12 @@ WHERE contact_a.id = %1 AND $permission
   }
 
   /**
-   * Fill the acl contact cache for this contact id if empty.
+   * Fill the acl contact cache for this ACLed contact id if empty.
    *
-   * @param int $userID
+   * @param int $userID - contact_id of the ACLed user
    * @param int|string $type the type of operation (view|edit)
-   * @param bool $force
-   *   Should we force a recompute.
+   * @param bool $force - Should we force a recompute.
+   *
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     // FIXME: maybe find a better way of keeping track of this. @eileen pointed out

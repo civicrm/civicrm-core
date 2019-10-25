@@ -39,7 +39,8 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
   public static $_cache = NULL;
 
   /**
-   * @param int $id
+   * Build an array of ACLs for a specific ACLed user
+   * @param int $id - contact_id of the ACLed user
    *
    * @return mixed
    */
@@ -91,8 +92,10 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
-   * @param array $cache
+   * Store ACLs for a specific user in the `civicrm_acl_cache` table
+   * @param int $id - contact_id of the ACLed user
+   * @param array $cache - key civicrm_acl.id - values is the details of the ACL.
+   *
    */
   public static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
@@ -109,7 +112,9 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
+   * Remove entries from civicrm_acl_cache for a specified ACLed user
+   * @param int $id - contact_id of the ACLed user
+   *
    */
   public static function deleteEntry($id) {
     if (self::$_cache &&
@@ -127,7 +132,9 @@ WHERE contact_id = %1
   }
 
   /**
-   * @param int $id
+   * Update ACL caches `civicrm_acl_cache` and `civicrm_acl_contact_cache for the specified ACLed user
+   * @param int $id - contact_id of ACLed user to update caches for.
+   *
    */
   public static function updateEntry($id) {
     // rebuilds civicrm_acl_cache
