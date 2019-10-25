@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
@@ -37,7 +37,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Class constructor.
@@ -798,10 +798,10 @@ GROUP BY  currency
 
     // get pending and in progress status
     foreach (array(
-               'Pending',
-               'In Progress',
-               'Overdue',
-             ) as $name) {
+      'Pending',
+      'In Progress',
+      'Overdue',
+    ) as $name) {
       if ($statusId = array_search($name, $pledgeStatuses)) {
         $status[] = $statusId;
       }
@@ -1106,7 +1106,7 @@ SELECT  pledge.contact_id              as contact_id,
    *   Array of int (civicrm_pledge_payment.id)
    */
   public static function findCancelablePayments($pledgeID) {
-    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());
+    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'));
 
     $paymentDAO = new CRM_Pledge_DAO_PledgePayment();
     $paymentDAO->pledge_id = $pledgeID;
@@ -1145,7 +1145,7 @@ SELECT  pledge.contact_id              as contact_id,
 
     return civicrm_api3('pledge_payment', 'getcount', array(
       'pledge_id' => $pledgeID,
-      'contribution_id' => array('NOT NULL' => TRUE),
+      'contribution_id' => array('IS NOT NULL' => TRUE),
     ));
   }
 
@@ -1174,7 +1174,6 @@ SELECT  pledge.contact_id              as contact_id,
     return array_flip(array_intersect($paymentStatus, array('Overdue', 'Pending')));
   }
 
-
   /**
    * Create array for recur record for pledge.
    * @return array
@@ -1201,7 +1200,7 @@ SELECT  pledge.contact_id              as contact_id,
   public static function getPledgeStartDate($date, $pledgeBlock) {
     $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
     foreach ($startDate as $field => $value) {
-      if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+      if (!empty($date) && empty($pledgeBlock['is_pledge_start_date_editable'])) {
         return $date;
       }
       if (empty($date)) {

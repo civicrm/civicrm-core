@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
   <table class="form-layout">
     <tr class="crm-preferences-display-form-block-contact_view_options">
       <td class="label">{$form.contact_view_options.label}</td>
-      <td>{$form.contact_view_options.html}</td>
+      <td><ul class="crm-checkbox-list"><li>{$form.contact_view_options.html}</li></ul></td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -60,35 +60,30 @@
           <tr>
             <td style="width:30%">
               <span class="label"><strong>{ts}Individual Name Fields{/ts}</strong></span>
-              <ul id="contactEditNameFields">
+              <ul id="contactEditNameFields" class="crm-checkbox-list">
                 {foreach from=$nameFields item="title" key="opId"}
-                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
-                      style="padding-left:1px;">
-                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  <li id="preference-{$opId}-contactedit">
+                    {$form.contact_edit_options.$opId.html}
                   </li>
                 {/foreach}
               </ul>
             </td>
             <td style="width:30%">
               <span class="label"><strong>{ts}Contact Details{/ts}</strong></span>
-              <ul id="contactEditBlocks">
+              <ul id="contactEditBlocks" class="crm-checkbox-list crm-sortable-list">
                 {foreach from=$contactBlocks item="title" key="opId"}
-                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
-                      style="padding-left:1px;">
-                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
-                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  <li id="preference-{$opId}-contactedit">
+                    {$form.contact_edit_options.$opId.html}
                   </li>
                 {/foreach}
               </ul>
             </td>
-            <td>
+            <td style="width:30%">
               <span class="label"><strong>{ts}Other Panes{/ts}</strong></span>
-              <ul id="contactEditOptions">
+              <ul id="contactEditOptions"  class="crm-checkbox-list crm-sortable-list">
                 {foreach from=$editOptions item="title" key="opId"}
-                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
-                      style="padding-left:1px;">
-                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
-                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  <li id="preference-{$opId}-contactedit">
+                    {$form.contact_edit_options.$opId.html}
                   </li>
                 {/foreach}
               </ul>
@@ -105,7 +100,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-advanced_search_options">
       <td class="label">{$form.advanced_search_options.label}</td>
-      <td>{$form.advanced_search_options.html}</td>
+      <td><ul class="crm-checkbox-list"><li>{$form.advanced_search_options.html}</li></ul></td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -125,7 +120,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification">
       <td class="label"></td>
-      <td>{$form.activity_assignee_notification.html} {$form.activity_assignee_notification.label}</td>
+      <td>{$form.activity_assignee_notification.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -145,7 +140,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification_ics">
       <td class="label"></td>
-      <td>{$form.activity_assignee_notification_ics.html} {$form.activity_assignee_notification_ics.label}</td>
+      <td>{$form.activity_assignee_notification_ics.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -164,12 +159,17 @@
 
     <tr class="crm-preferences-display-form-block-user_dashboard_options">
       <td class="label">{$form.user_dashboard_options.label}</td>
-      <td>{$form.user_dashboard_options.html}<span id="invoice_help">  {help id="id-invoices_id"}</span></td>
+      <td>
+        <ul class="crm-checkbox-list"><li>
+          {$form.user_dashboard_options.html}
+          <span style="position: absolute; right: 5px; bottom: 3px;"> {help id="id-invoices_id"}</span>
+        </li></ul>
+      </td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want constituents to view their own contribution history, un-check that option.{/ts}
+        {$settings_fields.user_dashboard_options.description}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-editor_id">
@@ -199,7 +199,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}Display name format for individual contact display names.{/ts}</td>
+      <td class="description">{$settings_fields.display_name_format.description}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-sort_name_format">
       <td class="label">{$form.sort_name_format.label}</td>
@@ -207,8 +207,37 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}Sort name format for individual contact display names.{/ts}</td>
+      <td class="description">{$settings_fields.sort_name_format.description}</td>
     </tr>
+    <tr class="crm-preferences-display-form-block_menubar_position">
+      <td class="label">{$form.menubar_position.label}</td>
+      <td>
+        {$form.menubar_position.html}
+        <div class="description">{ts}Default position for the CiviCRM menubar.{/ts}</div>
+      </td>
+    </tr>
+    <tr class="crm-preferences-display-form-block_menubar_color">
+      <td class="label">{$form.menubar_color.label}</td>
+      <td>
+        {$form.menubar_color.html}
+      </td>
+    </tr>
+
+    {if $config->userSystem->is_drupal EQ '1'}
+      <tr class="crm-preferences-display-form-block-theme">
+        <td class="label">{ts}Theme{/ts} {help id="theme"}</td>
+        <td>{$form.theme_backend.html}</td>
+      </tr>
+    {else}
+      <tr class="crm-preferences-display-form-block-theme_backend">
+        <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
+        <td>{$form.theme_backend.html}</td>
+      </tr>
+      <tr class="crm-preferences-display-form-block-theme_frontend">
+        <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
+        <td>{$form.theme_frontend.html}</td>
+      </tr>
+      {/if}
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
@@ -238,8 +267,8 @@
         }
 
         // show/hide activity types based on checkbox value
-        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification').is(":checked"));
-        $('#activity_assignee_notification').click(function() {
+        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification_activity_assignee_notification').is(":checked"));
+        $('#activity_assignee_notification_activity_assignee_notification').click(function() {
           $('.crm-preferences-display-form-activity_types').toggle($(this).is(":checked"));
         });
 
@@ -248,12 +277,8 @@
         if (!invoicing) {
           $('#user_dashboard_options_' + invoicesKey).attr("disabled", true);
         }
-        $("#invoice_help").insertAfter("label[for='user_dashboard_options_" + invoicesKey + "']");
 
-        $("#contactEditBlocks, #contactEditOptions").sortable({
-          placeholder: 'ui-state-highlight',
-          update: getSorting
-        });
+        $("#contactEditBlocks, #contactEditOptions").on('sortupdate', getSorting);
 
         function showCKEditorConfig() {
           $('.crm-preferences-display-form-block-editor_id .crm-button').toggle($(this).val() == 'CKEditor');

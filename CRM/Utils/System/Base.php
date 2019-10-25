@@ -11,50 +11,52 @@ abstract class CRM_Utils_System_Base {
    * The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    *
-   * @deprecated
    * @var bool
+   * @deprecated
    *   TRUE, if the CMS is Drupal.
    */
-  var $is_drupal = FALSE;
+  public $is_drupal = FALSE;
 
   /**
    * Deprecated property to check if this is a joomla install. The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    *
-   * @deprecated
    * @var bool
+   * @deprecated
    *   TRUE, if the CMS is Joomla!.
    */
-  var $is_joomla = FALSE;
+  public $is_joomla = FALSE;
 
   /**
    * deprecated property to check if this is a wordpress install. The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    *
-   * @deprecated
    * @var bool
+   * @deprecated
    *   TRUE, if the CMS is WordPress.
    */
-  var $is_wordpress = FALSE;
+  public $is_wordpress = FALSE;
 
   /**
    * Does this CMS / UF support a CMS specific logging mechanism?
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    * @var bool
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    */
-  var $supports_UF_Logging = FALSE;
+  public $supports_UF_Logging = FALSE;
 
   /**
    * @var bool
    *   TRUE, if the CMS allows CMS forms to be extended by hooks.
    */
-  var $supports_form_extensions = FALSE;
+  public $supports_form_extensions = FALSE;
 
   public function initialize() {
     if (\CRM_Utils_System::isSSL()) {
       $this->mapConfigToSSL();
     }
   }
+
+  abstract public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL);
 
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb.
@@ -244,7 +246,7 @@ abstract class CRM_Utils_System_Base {
         if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
           CRM_Utils_System::addHTMLHead($region->render(''));
         }
-        print theme('maintenance_page', array('content' => $content));
+        print theme('maintenance_page', ['content' => $content]);
         exit();
       }
       // TODO: Figure out why D7 returns but everyone else prints
@@ -252,10 +254,9 @@ abstract class CRM_Utils_System_Base {
     }
     $out = $content;
 
-    $config = &CRM_Core_Config::singleton();
     if (
       !$print &&
-      $config->userFramework == 'WordPress'
+      CRM_Core_Config::singleton()->userFramework == 'WordPress'
     ) {
       if (!function_exists('is_admin')) {
         throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
@@ -414,6 +415,19 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Is a front end page being accessed.
+   *
+   * Generally this would be a contribution form or other public page as opposed to a backoffice page (like contact edit).
+   *
+   * @todo Drupal uses the is_public setting - clarify & rationalise. See https://github.com/civicrm/civicrm-drupal/pull/546/files
+   *
+   * @return bool
+   */
+  public function isFrontEndPage() {
+    return CRM_Core_Config::singleton()->userFrameworkFrontend;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
@@ -422,7 +436,7 @@ abstract class CRM_Utils_System_Base {
    * @return string
    *   loginURL for the current CMS
    */
-  public abstract function getLoginURL($destination = '');
+  abstract public function getLoginURL($destination = '');
 
   /**
    * Get the login destination string.
@@ -581,7 +595,7 @@ abstract class CRM_Utils_System_Base {
   public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $url = $config->userFrameworkBaseURL;
-    return array($url, NULL, NULL);
+    return [$url, NULL, NULL];
   }
 
   /**
@@ -618,10 +632,10 @@ abstract class CRM_Utils_System_Base {
       throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
     }
 
-    return array(
+    return [
       'url' => $filesURL,
       'path' => CRM_Utils_File::baseFilePath(),
-    );
+    ];
   }
 
   /**
@@ -678,10 +692,10 @@ abstract class CRM_Utils_System_Base {
       $userFrameworkResourceURL = NULL;
     }
 
-    return array(
-      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL),
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
       'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
-    );
+    ];
   }
 
   /**
@@ -694,7 +708,7 @@ abstract class CRM_Utils_System_Base {
    *
    * FIXME: Document values accepted/required by $params
    */
-  public function userLoginFinalize($params = array()) {
+  public function userLoginFinalize($params = []) {
   }
 
   /**
@@ -707,7 +721,6 @@ abstract class CRM_Utils_System_Base {
       CRM_Core_DAO::executequery($sql);
     }
   }
-
 
   /**
    * Get timezone from CMS.
@@ -789,14 +802,14 @@ abstract class CRM_Utils_System_Base {
    *   - name (ie the system user name.
    */
   public function getUser($contactID) {
-    $ufMatch = civicrm_api3('UFMatch', 'getsingle', array(
+    $ufMatch = civicrm_api3('UFMatch', 'getsingle', [
       'contact_id' => $contactID,
       'domain_id' => CRM_Core_Config::domainID(),
-    ));
-    return array(
+    ]);
+    return [
       'id' => $ufMatch['uf_id'],
       'name' => $ufMatch['uf_name'],
-    );
+    ];
   }
 
   /**
@@ -869,7 +882,7 @@ abstract class CRM_Utils_System_Base {
    *   [CRM_Core_Module]
    */
   public function getModules() {
-    return array();
+    return [];
   }
 
   /**
@@ -913,9 +926,17 @@ abstract class CRM_Utils_System_Base {
   /**
    * Append to coreResourcesList.
    *
-   * @param array $list
+   * @param \Civi\Core\Event\GenericHookEvent $e
    */
-  public function appendCoreResources(&$list) {
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
+  }
+
+  /**
+   * Modify dynamic assets.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
   }
 
   /**
@@ -934,7 +955,21 @@ abstract class CRM_Utils_System_Base {
    */
   public function synchronizeUsers() {
     throw new Exception('CMS user creation not supported for this framework');
-    return array();
+    return [];
+  }
+
+  /**
+   * Send an HTTP Response base on PSR HTTP RespnseInterface response.
+   *
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
+    http_response_code($response->getStatusCode());
+    foreach ($response->getHeaders() as $name => $values) {
+      CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
+    }
+    echo $response->getBody();
+    CRM_Utils_System::civiExit();
   }
 
 }

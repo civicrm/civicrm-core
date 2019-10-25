@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,11 +41,12 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * referenced in the journal entries that isn't defined anywhere.
    *
    * Possibly in the future this could be selected by the user.
+   * @var array
    */
-  public static $complementaryTables = array(
+  public static $complementaryTables = [
     'ACCNT',
     'CUST',
-  );
+  ];
 
   /**
    * Class constructor.
@@ -123,7 +124,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
 
     CRM_Utils_Hook::batchQuery($sql);
 
-    $params = array(1 => array($batchId, 'String'));
+    $params = [1 => [$batchId, 'String']];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
     return $dao;
@@ -160,7 +161,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    */
   public function formatHeaders($values) {
     $arrayKeys = array_keys($values);
-    $headers = array();
+    $headers = [];
     if (!empty($arrayKeys)) {
       foreach ($values[$arrayKeys[0]] as $title => $value) {
         $headers[] = $title;
@@ -179,10 +180,10 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
     foreach ($export as $batchId => $dao) {
-      $financialItems = array();
+      $financialItems = [];
       $this->_batchIds = $batchId;
 
-      $queryResults = array();
+      $queryResults = [];
 
       while ($dao->fetch()) {
         $creditAccountName = $creditAccountType = $creditAccount = NULL;
@@ -199,7 +200,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
 
         $invoiceNo = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $dao->contribution_id;
 
-        $financialItems[] = array(
+        $financialItems[] = [
           'Batch ID' => $dao->batch_id,
           'Invoice No' => $invoiceNo,
           'Contact ID' => $dao->contact_id,
@@ -221,7 +222,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
           'Credit Account Name' => $creditAccountName,
           'Credit Account Type' => $creditAccountType,
           'Item Description' => $dao->item_description,
-        );
+        ];
 
         end($financialItems);
         $queryResults[] = get_object_vars($dao);

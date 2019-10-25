@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,15 +60,12 @@
             <td>{$form.cancel_URL.html} {help id='id-cancel_URL' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
-        <tr class="cancel_button_section crm-uf-advancesetting-form-block-cancel_button_text">
-            <td class="label">{$form.cancel_button_text.label}</td>
-            <td>{$form.cancel_button_text.html} {help id='id-cancel_button_text' file="CRM/UF/Form/Group.hlp"}</td>
-        </tr>
-
-        <tr class="crm-uf-advancesetting-form-block-submit_button_text">
-            <td class="label">{$form.submit_button_text.label}</td>
-            <td>{$form.submit_button_text.html} {help id='id-submit_button_text' file="CRM/UF/Form/Group.hlp"}</td>
-        </tr>
+        {foreach from=$advancedFieldsConverted item=fieldName}
+          {assign var=fieldSpec value=$entityFields.$fieldName}
+          <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName} {$fieldSpec.class}">
+            {include file="CRM/Core/Form/Field.tpl"}
+          </tr>
+        {/foreach}
 
         <tr class="crm-uf-advancesetting-form-block-add_captcha">
             <td class="label"></td>

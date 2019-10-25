@@ -14,15 +14,24 @@ class CRM_Utils_SQL_DeleteTest extends CiviUnitTestCase {
   public function testWherePlain() {
     $del = CRM_Utils_SQL_Delete::from('foo')
       ->where('foo = bar')
-      ->where(array('whiz = bang', 'frob > nicate'));
+      ->where(['whiz = bang', 'frob > nicate']);
     $this->assertLike('DELETE FROM foo WHERE (foo = bar) AND (whiz = bang) AND (frob > nicate)', $del->toSQL());
   }
 
   public function testWhereArg() {
     $del = CRM_Utils_SQL_Delete::from('foo')
-      ->where('foo = @value', array('@value' => 'not"valid'))
-      ->where(array('whiz > @base', 'frob != @base'), array('@base' => 'in"valid'));
+      ->where('foo = @value', ['@value' => 'not"valid'])
+      ->where(['whiz > @base', 'frob != @base'], ['@base' => 'in"valid']);
     $this->assertLike('DELETE FROM foo WHERE (foo = "not\\"valid") AND (whiz > "in\\"valid") AND (frob != "in\\"valid")', $del->toSQL());
+  }
+
+  public function testWhereNullArg() {
+    $del = CRM_Utils_SQL_Delete::from('foo')
+      ->where('foo IS @value', ['@value' => NULL])
+      ->where('nonexistent IS @nonexistent', [])
+      ->where('morenonexistent IS @nonexistent', NULL)
+      ->where('bar IS @value', ['@value' => 'null']);
+    $this->assertLike('DELETE FROM foo WHERE (foo IS NULL) AND (nonexistent IS @nonexistent) AND (morenonexistent IS @nonexistent) AND (bar IS "null")', $del->toSQL());
   }
 
   /**

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,6 +58,11 @@ function _civicrm_api3_relationship_create_spec(&$params) {
   $params['contact_id_b']['api.required'] = 1;
   $params['relationship_type_id']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
+  $params['is_current_employer'] = [
+    'title' => 'Is Current Employer?',
+    'description' => 'This is a optional parameter used to add employer contact when \'Employee Of\' relationship is created',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
 }
 
 /**
@@ -121,7 +126,7 @@ function civicrm_api3_relationship_get($params) {
   }
   //perhaps we should add a 'getcount' but at this stage lets just handle getcount output
   if ($options['is_count']) {
-    return array('count' => $relationships);
+    return ['count' => $relationships];
   }
   foreach ($relationships as $relationshipId => $values) {
     _civicrm_api3_custom_data_get($relationships[$relationshipId], CRM_Utils_Array::value('check_permissions', $params), 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id', $values));
@@ -158,7 +163,7 @@ function _civicrm_api3_handle_relationship_type(&$params) {
  */
 function civicrm_api3_relationship_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
-  $result = civicrm_api3_generic_setValue(array("entity" => 'Relationship', 'params' => $params));
+  $result = civicrm_api3_generic_setValue(["entity" => 'Relationship', 'params' => $params]);
 
   if (empty($result['is_error']) && CRM_Utils_String::munge($params['field']) == 'is_active') {
     $action = CRM_Core_Action::DISABLE;
@@ -216,6 +221,6 @@ function _civicrm_api3_relationship_getoptions_spec(&$params) {
     'title' => ts('Is Form?'),
     'description' => $relationshipTypePrefix . ts('Formats the options for use'
       . ' in a form if true. The format is &lt;id&gt;_a_b => &lt;label&gt;'),
-    'type' => CRM_Utils_Type::T_BOOLEAN
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
 }

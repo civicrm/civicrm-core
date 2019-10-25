@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -31,7 +31,7 @@
  * in the `CRM.visual` namespace.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -54,13 +54,13 @@ class CRM_Utils_VisualBundle {
       return;
     }
 
-    $files = array(
+    $files = [
       'crossfilter' => '[civicrm.bower]/crossfilter-1.3.x/crossfilter.min.js',
       'd3' => '[civicrm.bower]/d3-3.5.x/d3.min.js',
       'dc' => '[civicrm.bower]/dc-2.1.x/dc.min.js',
-    );
+    ];
 
-    $content = array();
+    $content = [];
     $content[] = "(function(){";
     $content[] = "var backups = {d3: window.d3, crossfilter: window.crossfilter, dc: window.dc}";
     $content[] = 'window.CRM = window.CRM || {};';
@@ -93,11 +93,11 @@ class CRM_Utils_VisualBundle {
       return;
     }
 
-    $files = array(
+    $files = [
       '[civicrm.bower]/dc-2.1.x/dc.min.css',
-    );
+    ];
 
-    $content = array();
+    $content = [];
     foreach ($files as $file) {
       $content[] = "// File: $file";
       $content[] = file_get_contents(Civi::paths()->getPath($file));

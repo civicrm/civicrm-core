@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 abstract class CRM_Import_Parser {
   /**
@@ -59,16 +59,19 @@ abstract class CRM_Import_Parser {
 
   /**
    * Total number of non empty lines
+   * @var int
    */
   protected $_totalCount;
 
   /**
    * Running total number of valid lines
+   * @var int
    */
   protected $_validCount;
 
   /**
    * Running total number of invalid rows
+   * @var int
    */
   protected $_invalidRowCount;
 
@@ -81,41 +84,49 @@ abstract class CRM_Import_Parser {
 
   /**
    * Array of error lines, bounded by MAX_ERROR
+   * @var array
    */
   protected $_errors;
 
   /**
    * Total number of conflict lines
+   * @var int
    */
   protected $_conflictCount;
 
   /**
    * Array of conflict lines
+   * @var array
    */
   protected $_conflicts;
 
   /**
    * Total number of duplicate (from database) lines
+   * @var int
    */
   protected $_duplicateCount;
 
   /**
    * Array of duplicate lines
+   * @var array
    */
   protected $_duplicates;
 
   /**
    * Running total number of warnings
+   * @var int
    */
   protected $_warningCount;
 
   /**
    * Maximum number of warnings to store
+   * @var int
    */
   protected $_maxWarningCount = self::MAX_WARNINGS;
 
   /**
    * Array of warning lines, bounded by MAX_WARNING
+   * @var array
    */
   protected $_warnings;
 
@@ -125,6 +136,33 @@ abstract class CRM_Import_Parser {
    * @var array
    */
   protected $_fields;
+
+  /**
+   * Metadata for all available fields, keyed by unique name.
+   *
+   * This is intended to supercede $_fields which uses a special sauce format which
+   * importableFieldsMetadata uses the standard getfields type format.
+   *
+   * @var array
+   */
+  protected $importableFieldsMetadata = [];
+
+  /**
+   * Get metadata for all importable fields in std getfields style format.
+   *
+   * @return array
+   */
+  public function getImportableFieldsMetadata(): array {
+    return $this->importableFieldsMetadata;
+  }
+
+  /**
+   * Set metadata for all importable fields in std getfields style format.
+   * @param array $importableFieldsMetadata
+   */
+  public function setImportableFieldsMetadata(array $importableFieldsMetadata) {
+    $this->importableFieldsMetadata = $importableFieldsMetadata;
+  }
 
   /**
    * Array of the fields that are actually part of the import process
@@ -273,7 +311,7 @@ abstract class CRM_Import_Parser {
    *   (reference) associative array of name/value pairs
    */
   public function &getActiveFieldParams() {
-    $params = array();
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -309,7 +347,7 @@ abstract class CRM_Import_Parser {
     if ($startImport) {
       $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
       //do not force the browser to display the save dialog, CRM-7640
-      $contents = json_encode(array(0, $status));
+      $contents = json_encode([0, $status]);
       file_put_contents($statusFile, $contents);
     }
     else {
@@ -331,10 +369,10 @@ abstract class CRM_Import_Parser {
       $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
       $processedPercent = (int ) (($rowCount * 100) / $totalRowCount);
       $statusMsg = ts('%1 of %2 records - %3 remaining',
-        array(1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted)
+        [1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted]
       );
       $status = "<div class=\"description\">&nbsp; <strong>{$statusMsg}</strong></div>";
-      $contents = json_encode(array($processedPercent, $status));
+      $contents = json_encode([$processedPercent, $status]);
 
       file_put_contents($statusFile, $contents);
       return $currTimestamp;
@@ -345,7 +383,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getSelectValues() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
     }
@@ -356,7 +394,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getSelectTypes() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
         $values[$name] = $field->_hasLocationType;
@@ -369,7 +407,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getHeaderPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
         $values[$name] = $field->_headerPattern;
@@ -382,7 +420,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getDataPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
     }
@@ -507,6 +545,42 @@ abstract class CRM_Import_Parser {
     require_once 'CRM/Utils/DeprecatedUtils.php';
     $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
     return $error;
+  }
+
+  /**
+   * Parse a field which could be represented by a label or name value rather than the DB value.
+   *
+   * We will try to match name first or (per https://lab.civicrm.org/dev/core/issues/1285 if we have an id.
+   *
+   * but if not available then see if we have a label that can be converted to a name.
+   *
+   * @param string|int|null $submittedValue
+   * @param array $fieldSpec
+   *   Metadata for the field
+   *
+   * @return mixed
+   */
+  protected function parsePseudoConstantField($submittedValue, $fieldSpec) {
+    // dev/core#1289 Somehow we have wound up here but the BAO has not been specified in the fieldspec so we need to check this but future us problem, for now lets just return the submittedValue
+    if (!isset($fieldSpec['bao'])) {
+      return $submittedValue;
+    }
+    /* @var \CRM_Core_DAO $bao */
+    $bao = $fieldSpec['bao'];
+    // For historical reasons use validate as context - ie disabled name matches ARE permitted.
+    $nameOptions = $bao::buildOptions($fieldSpec['name'], 'validate');
+    if (isset($nameOptions[$submittedValue])) {
+      return $submittedValue;
+    }
+    if (in_array($submittedValue, $nameOptions)) {
+      return array_search($submittedValue, $nameOptions, TRUE);
+    }
+
+    $labelOptions = array_flip($bao::buildOptions($fieldSpec['name'], 'match'));
+    if (isset($labelOptions[$submittedValue])) {
+      return array_search($labelOptions[$submittedValue], $nameOptions, TRUE);
+    }
+    return '';
   }
 
 }

@@ -184,6 +184,21 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
 }
 
 /**
+ * SMARTY Compile Check:
+ *
+ * This tells Smarty whether to check for recompiling or not. Recompiling
+ * does not need to happen unless a template or config file is changed.
+ * Typically you enable this during development, and disable for production.
+ *
+ * Related issue:
+ * https://lab.civicrm.org/dev/core/issues/1073
+ *
+ */
+//if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK')) {
+//  define( 'CIVICRM_TEMPLATE_COMPILE_CHECK', FALSE);
+//}
+
+/**
  * Site URLs:
  *
  * This section defines absolute and relative URLs to access the host CMS (Backdrop, Drupal, or Joomla) resources.
@@ -456,6 +471,12 @@ define('CIVICRM_DEADLOCK_RETRIES', 3);
 // if (!defined('CIVICRM_MYSQL_STRICT')) {
 // define('CIVICRM_MYSQL_STRICT', TRUE );
 // }
+
+/**
+ * Specify whether the CRM_Core_BAO_Cache should use the legacy
+ * direct-to-SQL-mode or the interim PSR-16 adapter.
+ */
+// define('CIVICRM_BAO_CACHE_ADAPTER', 'CRM_Core_BAO_Cache_Psr16');
 
 if (CIVICRM_UF === 'UnitTests') {
   if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');

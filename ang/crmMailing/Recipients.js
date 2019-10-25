@@ -136,7 +136,7 @@
             var gids = [];
             var mids = [];
 
-            for (var i in values) {
+            for (var i = 0; i < values.length; i++) {
               var dv = convertValueToObj(values[i]);
               if (dv.entity_type == 'civicrm_group') {
                 gids.push(dv.entity_id);

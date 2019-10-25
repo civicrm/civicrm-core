@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
+
   /**
    * @param array $params
    *
@@ -123,7 +124,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
    */
   public static function process($params) {
 
-    $returnMessages = array();
+    $returnMessages = [];
 
     $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
     $expiredStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
@@ -132,7 +133,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     //build the required status ids.
     $statusIds = '(' . implode(',', array_merge(array_keys($pendingStatuses), array_keys($waitingStatuses))) . ')';
 
-    $participantDetails = $fullEvents = array();
+    $participantDetails = $fullEvents = [];
     $expiredParticipantCount = $waitingConfirmCount = $waitingApprovalCount = 0;
 
     //get all participant who's status in class pending and waiting
@@ -158,7 +159,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $participantDetails[$dao->id] = array(
+      $participantDetails[$dao->id] = [
         'id' => $dao->id,
         'event_id' => $dao->event_id,
         'status_id' => $dao->status_id,
@@ -171,7 +172,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
         'end_date' => $dao->end_date,
         'expiration_time' => $dao->expiration_time,
         'requires_approval' => $dao->requires_approval,
-      );
+      ];
     }
 
     if (!empty($participantDetails)) {
@@ -196,7 +197,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
             //lets get the transaction mechanism.
             $transaction = new CRM_Core_Transaction();
 
-            $ids = array($participantId);
+            $ids = [$participantId];
             $expiredId = array_search('Expired', $expiredStatuses);
             $results = CRM_Event_BAO_Participant::transitionParticipants($ids, $expiredId, $values['status_id'], TRUE, TRUE);
             $transaction->commit();
@@ -246,7 +247,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
               //get the additional participant if any.
               $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($participantId);
 
-              $allIds = array($participantId);
+              $allIds = [$participantId];
               if (!empty($additionalIds)) {
                 $allIds = array_merge($allIds, $additionalIds);
               }
@@ -257,7 +258,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
               if (($requiredSpaces <= $eventOpenSpaces) || ($eventOpenSpaces === NULL)) {
                 $transaction = new CRM_Core_Transaction();
 
-                $ids = array($participantId);
+                $ids = [$participantId];
                 $updateStatusId = array_search('Pending from waitlist', $pendingStatuses);
 
                 //lets take a call to make pending or need approval
@@ -318,7 +319,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       }
     }
 
-    return array('is_error' => 0, 'messages' => $returnMessages);
+    return ['is_error' => 0, 'messages' => $returnMessages];
   }
 
 }

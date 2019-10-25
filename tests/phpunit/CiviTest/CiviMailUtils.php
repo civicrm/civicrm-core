@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
 /**
  * Class CiviMailUtils
  */
-class CiviMailUtils extends PHPUnit_Framework_TestCase {
+class CiviMailUtils extends PHPUnit\Framework\TestCase {
 
   /**
    * @var mixed current outbound email option
@@ -165,7 +165,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       if ($dao->fetch()) {
         $msg = $dao->headers . "\n\n" . $dao->body;
       }
-      $dao->free();
     }
 
     switch ($type) {
@@ -198,7 +197,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       while ($dao->fetch()) {
         $msgs[] = $dao->headers . "\n\n" . $dao->body;
       }
-      $dao->free();
     }
 
     switch ($type) {
@@ -333,11 +331,11 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * @param int $limit
    *  How many recent messages to remove, defaults to 0 (all).
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function clearMessages($limit = 0) {
     if ($this->_webtest) {
-      throw new Exception("Not implemented: clearMessages for WebTest");
+      throw new \CRM_Core_Exception("Not implemented: clearMessages for WebTest");
     }
     else {
       $sql = 'DELETE FROM civicrm_mailing_spool ORDER BY id DESC';

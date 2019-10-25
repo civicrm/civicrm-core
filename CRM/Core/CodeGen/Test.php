@@ -4,6 +4,7 @@
  * Generate files used during testing.
  */
 class CRM_Core_CodeGen_Test extends CRM_Core_CodeGen_BaseTask {
+
   public function run() {
     $this->generateCiviTestTruncate();
   }

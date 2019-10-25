@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,24 +30,16 @@
 </div>
 {include file="CRM/Mailing/Form/Count.tpl"}
 
-<table class="form-layout">
-  <tbody>
-    <tr class="crm-sms-schedule-form-block-now">
-        <td class="label">{$form.now.label}</td>
-        <td>{$form.now.html}</td>
-    </tr>
-    <tr>
-        <td class="label">{ts}OR{/ts}</td>
-        <td>&nbsp;</td>
-    </tr>
-    <tr class="crm-sms-schedule-form-block-start_date">
-        <td class="label">{$form.start_date.label}</td>
-        <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}
-            <div class="description">{ts}Set a date and time when you want CiviSMS to start sending this Mass SMS.{/ts}</div>
-        </td>
-    </tr>
-  </tbody>
-</table>
+<div>
+  <div>
+    <div>
+      {$form.send_option.html}
+      <span class="start_date_elements">{$form.start_date.html}</span>
+    </div>
+
+  </div>
+  <div class="description">{ts}Set a date and time when you want CiviSMS to start sending this Mass SMS.{/ts}</div>
+</div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 
 {if $preview}
@@ -71,16 +63,21 @@
 <script type="text/javascript">
 {literal}
   CRM.$(function($) {
-    $('#start_date_display').change(function() {
-      $('#now').prop('checked', !$(this).val());
+
+    // If someone changes the schedule date, auto-select the 'send at' option
+    $(".start_date_elements input").change(function() {
+      $('#send_immediate').prop('checked', false);
+      $('#send_later').prop('checked', true);
     });
-    $('#now').change(function() {
+
+    // Clear scheduled date/time when send immediately is selected
+    $("#send_immediate").change(function() {
       if ($(this).prop('checked')) {
-        $('#start_date_display, #start_date, #start_date_time').val('');
-      } else {
-        $('#start_date_display').focus();
+        $(".start_date_elements input").val('');
+        $(".start_date_elements input").siblings("a.crm-clear-link").css('visibility', 'hidden');
       }
     });
+
   });
 {/literal}
 </script>

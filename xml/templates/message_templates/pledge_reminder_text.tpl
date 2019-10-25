@@ -1,4 +1,4 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
 {ts 1=$next_payment|truncate:10:''|crmDate}This is a reminder that the next payment on your pledge is due on %1.{/ts}
 

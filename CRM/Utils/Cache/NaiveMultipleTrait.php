@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * The traditional CRM_Utils_Cache_Interface did not support multiple-key
  * operations. To get drop-in compliance with PSR-16, we use a naive adapter.
@@ -109,6 +109,7 @@ trait CRM_Utils_Cache_NaiveMultipleTrait {
   }
 
   /**
+   * @param $func
    * @param $keys
    * @throws \CRM_Utils_Cache_InvalidArgumentException
    */

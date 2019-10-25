@@ -36,7 +36,7 @@
         CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled']);
         $timeField
           .addClass('crm-form-text crm-form-time')
-          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
+          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? '\uf017' : $dataField.attr('time-placeholder'))
           .attr('aria-label', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
           .change(updateDataField)
           .timeEntry({
@@ -49,6 +49,12 @@
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
         CRM.utils.copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled', 'aria-label']);
         $dateField.addClass('crm-form-' + type);
+        if (!settings.minDate && !_.isUndefined(settings.start_date_years)) {
+          settings.minDate = '' + (new Date().getFullYear() - settings.start_date_years) + '-01-01';
+        }
+        if (!settings.maxDate && !_.isUndefined(settings.end_date_years)) {
+          settings.maxDate = '' + (new Date().getFullYear() + settings.end_date_years) + '-12-31';
+        }
         if (hasDatepicker) {
           settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
           settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
@@ -58,7 +64,9 @@
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
-          $dateField.addClass('crm-form-date').datepicker(settings);
+          // Set placeholder as calendar icon (`fa-calendar` is Unicode f073)
+          // and add datepicker
+          $dateField.addClass('crm-form-date').attr({placeholder: '\uF073'}).datepicker(settings);
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
           $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');

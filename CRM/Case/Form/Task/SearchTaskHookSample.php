@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -42,7 +42,7 @@ class CRM_Case_Form_Task_SearchTaskHookSample extends CRM_Case_Form_Task {
    */
   public function preProcess() {
     parent::preProcess();
-    $rows = array();
+    $rows = [];
     // display name and email of all contact ids
     $caseIDs = implode(',', $this->_entityIds);
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'case_status', 'id', 'name');
@@ -59,11 +59,11 @@ WHERE cs.id IN ( {$caseIDs} )";
 
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $rows[] = array(
+      $rows[] = [
         'display_name' => $dao->display_name,
         'start_date' => CRM_Utils_Date::customFormat($dao->start_date),
         'status' => $dao->status,
-      );
+      ];
     }
     $this->assign('rows', $rows);
   }
@@ -72,14 +72,13 @@ WHERE cs.id IN ( {$caseIDs} )";
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
-          'type' => 'done',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'done',
+        'name' => ts('Done'),
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
 }

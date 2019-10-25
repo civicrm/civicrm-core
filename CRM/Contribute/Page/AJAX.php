@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  */
 
@@ -36,18 +36,19 @@
  * This class contains all the function that are called using AJAX (jQuery)
  */
 class CRM_Contribute_Page_AJAX {
+
   /**
    * Get Soft credit to list in DT
    */
   public static function getSoftContributionRows() {
-    $requiredParameters = array(
+    $requiredParameters = [
       'cid' => 'Integer',
       'context' => 'String',
-    );
-    $optionalParameters = array(
+    ];
+    $optionalParameters = [
       'entityID' => 'Integer',
       'isTest' => 'Integer',
-    );
+    ];
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);

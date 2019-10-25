@@ -14,7 +14,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->domainDefaults = array(
+    $this->domainDefaults = [
       'd1' => 'alpha',
       'd2' => 'beta',
       'd3' => 'gamma',
@@ -22,20 +22,20 @@ class SettingsManagerTest extends \CiviUnitTestCase {
       'myabspath' => '/tmp/bar',
       'myrelurl' => 'sites/foo',
       'myabsurl' => 'http://example.com/bar',
-    );
-    $this->contactDefaults = array(
+    ];
+    $this->contactDefaults = [
       'c1' => 'alpha',
       'c2' => 'beta',
       'c3' => 'gamma',
-    );
-    $this->mandates = array(
-      'Mailing Preferences' => array(
+    ];
+    $this->mandates = [
+      'Mailing Preferences' => [
         'd3' => 'GAMMA!',
-      ),
-      'contact' => array(
+      ],
+      'contact' => [
         'c3' => 'GAMMA MAN!',
-      ),
-    );
+      ],
+    ];
   }
 
   public function tearDown() {
@@ -131,7 +131,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
    * @return SettingsManager
    */
   protected function createManager() {
-    $cache = new \CRM_Utils_Cache_Arraycache(array());
+    $cache = new \CRM_Utils_Cache_Arraycache([]);
     $cache->set('defaults_domain', $this->domainDefaults);
     $cache->set('defaults_contact', $this->contactDefaults);
     foreach ($this->mandates as $entity => $keyValues) {

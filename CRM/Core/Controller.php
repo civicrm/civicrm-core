@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@
  * for other useful tips and suggestions
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'HTML/QuickForm/Controller.php';
@@ -82,7 +82,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * so the display routine needs to not do any work. (The
    * parent object takes care of the display)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_embedded = FALSE;
 
@@ -94,7 +94,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Useful when we run form in non civicrm context
    * and we need to transfer control back.(eg. drupal)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_skipRedirection = FALSE;
 
@@ -102,14 +102,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var boolean
+   * @var bool
    */
   public $_print = 0;
 
   /**
    * Should we generate a qfKey, true by default
    *
-   * @var boolean
+   * @var bool
    */
   public $_generateQFKey = TRUE;
 
@@ -144,7 +144,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * The destination if set will override the destination the code wants to send it to.
    *
-   * @var string;
+   * @var string
    */
   public $_destination = NULL;
 
@@ -170,6 +170,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *   Should we add a unique sequence number to the end of the key.
    * @param bool $ignoreKey
    *   Should we not set a qfKey for this controller (for standalone forms).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct(
     $title = NULL,
@@ -214,10 +216,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // only use the civicrm cache if we have a valid key
     // else we clash with other users CRM-7059
     if (!empty($this->_key)) {
-      CRM_Core_Session::registerAndRetrieveSessionObjects(array(
+      CRM_Core_Session::registerAndRetrieveSessionObjects([
         "_{$name}_container",
-        array('CiviCRM', $this->_scope),
-      ));
+        ['CiviCRM', $this->_scope],
+      ]);
     }
 
     parent::__construct($name, $modal);
@@ -239,7 +241,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
-      elseif (in_array($snippet, array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+      elseif (in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
@@ -275,12 +277,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   public function fini() {
-    CRM_Core_BAO_Cache::storeSessionToCache(array(
-        "_{$this->_name}_container",
-        array('CiviCRM', $this->_scope),
-      ),
-      TRUE
-    );
+    CRM_Core_BAO_Cache::storeSessionToCache([
+      "_{$this->_name}_container",
+      ['CiviCRM', $this->_scope],
+    ], TRUE);
   }
 
   /**
@@ -382,7 +382,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param array $uploadNames for the various upload buttons (note u can have more than 1 upload)
    */
   public function addActions($uploadDirectory = NULL, $uploadNames = NULL) {
-    $names = array(
+    $names = [
       'display' => 'CRM_Core_QuickForm_Action_Display',
       'next' => 'CRM_Core_QuickForm_Action_Next',
       'back' => 'CRM_Core_QuickForm_Action_Back',
@@ -393,7 +393,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       'done' => 'CRM_Core_QuickForm_Action_Done',
       'jump' => 'CRM_Core_QuickForm_Action_Jump',
       'submit' => 'CRM_Core_QuickForm_Action_Submit',
-    );
+    ];
 
     foreach ($names as $name => $classPath) {
       $action = new $classPath($this->_stateMachine);
@@ -535,12 +535,12 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return array
    */
   public function wizardHeader($currentPageName) {
-    $wizard = array();
-    $wizard['steps'] = array();
+    $wizard = [];
+    $wizard['steps'] = [];
     $count = 0;
     foreach ($this->_pages as $name => $page) {
       $count++;
-      $wizard['steps'][] = array(
+      $wizard['steps'][] = [
         'name' => $name,
         'title' => $page->getTitle(),
         //'link'      => $page->getLink ( ),
@@ -549,7 +549,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         'valid' => TRUE,
         'stepNumber' => $count,
         'collapsed' => FALSE,
-      );
+      ];
 
       if ($name == $currentPageName) {
         $wizard['currentStepNumber'] = $count;
@@ -570,7 +570,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param array $wizard
    */
   public function addWizardStyle(&$wizard) {
-    $wizard['style'] = array(
+    $wizard['style'] = [
       'barClass' => '',
       'stepPrefixCurrent' => '&raquo;',
       'stepPrefixPast' => '&#x2714;',
@@ -579,7 +579,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       'subStepPrefixPast' => '&nbsp;&nbsp;',
       'subStepPrefixFuture' => '&nbsp;&nbsp;',
       'showTitle' => 1,
-    );
+    ];
   }
 
   /**

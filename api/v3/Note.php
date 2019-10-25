@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -113,7 +113,7 @@ function _civicrm_api3_note_get_spec(&$params) {
  *   Nested associative array beginning with direct children of given note.
  */
 function civicrm_api3_note_tree_get($params) {
-  civicrm_api3_verify_mandatory($params, NULL, array('id'));
+  civicrm_api3_verify_mandatory($params, NULL, ['id']);
 
   if (!is_numeric($params['id'])) {
     return civicrm_api3_create_error(ts("Invalid note ID"));

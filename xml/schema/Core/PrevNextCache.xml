@@ -42,7 +42,7 @@
     <add>3.4</add>
   </field>
   <field>
-    <name>cacheKey</name>
+    <name>cachekey</name>
     <title>Cache Key</title>
     <type>varchar</type>
     <length>255</length>
@@ -66,7 +66,7 @@
   </field>
   <index>
     <name>index_all</name>
-    <fieldName>cacheKey</fieldName>
+    <fieldName>cachekey</fieldName>
     <fieldName>entity_id1</fieldName>
     <fieldName>entity_id2</fieldName>
     <fieldName>entity_table</fieldName>

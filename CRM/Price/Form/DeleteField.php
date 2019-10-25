@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -77,17 +77,17 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'next',
         'name' => ts('Delete Price Field'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
   }
 
   /**
@@ -97,7 +97,7 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
    */
   public function postProcess() {
     if (CRM_Price_BAO_PriceField::deleteField($this->_fid)) {
-      CRM_Core_Session::setStatus(ts('The Price Field \'%1\' has been deleted.', array(1 => $this->_title)), '', 'success');
+      CRM_Core_Session::setStatus(ts('The Price Field \'%1\' has been deleted.', [1 => $this->_title]), '', 'success');
     }
   }
 

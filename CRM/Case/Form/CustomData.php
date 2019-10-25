@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -76,10 +76,10 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     // Array contains only one item
     foreach ($groupTree as $groupValues) {
       $this->_customTitle = $groupValues['title'];
-      CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $groupValues['title'])));
+      CRM_Utils_System::setTitle(ts('Edit %1', [1 => $groupValues['title']]));
     }
 
-    $this->_defaults = array();
+    $this->_defaults = [];
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $this->_defaults);
     $this->setDefaults($this->_defaults);
 
@@ -98,18 +98,17 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   public function buildQuickForm() {
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc
-    $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -129,27 +128,69 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
 
-    $session = CRM_Core_Session::singleton();
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Custom Data');
-    $activityParams = array(
+    $activityParams = [
       'activity_type_id' => $activityTypeID,
       'source_contact_id' => $session->get('userID'),
       'is_auto' => TRUE,
       'subject' => $this->_customTitle . " : change data",
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'target_contact_id' => $this->_contactID,
-      'details' => json_encode($this->_defaults),
+      'details' => $this->formatCustomDataChangesForDetail($params),
       'activity_date_time' => date('YmdHis'),
-    );
+    ];
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
-    $caseParams = array(
+    $caseParams = [
       'activity_id' => $activity->id,
       'case_id' => $this->_entityID,
-    );
+    ];
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
     $transaction->commit();
+  }
+
+  /**
+   * Format the custom data changes as [label]: [old value] => [new value]
+   *
+   * @param array $params New custom field values from form
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function formatCustomDataChangesForDetail($params) {
+    $formattedDetails = [];
+    foreach ($params as $customField => $newCustomValue) {
+      if (substr($customField, 0, 7) == 'custom_') {
+        if ($this->_defaults[$customField] == $newCustomValue) {
+          // Don't show values that did not change
+          continue;
+        }
+        // We need custom field ID from custom_XX_1
+        list($_, $customFieldId, $_) = explode('_', $customField);
+
+        if (!empty($customFieldId) && is_numeric($customFieldId)) {
+          // Got a custom field ID
+          $label = civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'label']);
+          $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
+            'custom_field_id' => $customFieldId,
+            'entity_id' => $this->_entityID,
+            'custom_field_value' => $this->_defaults[$customField],
+          ]);
+          $oldValue = $oldValue['values'][$customFieldId]['display'];
+          $newValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
+            'custom_field_id' => $customFieldId,
+            'entity_id' => $this->_entityID,
+            'custom_field_value' => $newCustomValue,
+          ]);
+          $newValue = $newValue['values'][$customFieldId]['display'];
+          $formattedDetails[] = $label . ': ' . $oldValue . ' => ' . $newValue;
+        }
+
+      }
+    }
+
+    return implode('<br/>', $formattedDetails);
   }
 
 }

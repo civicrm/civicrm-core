@@ -4,7 +4,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id: PDF.php 45499 2013-02-08 12:31:05Z kurund $
  */
 
@@ -43,7 +43,7 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * Are we operating in "single mode", i.e. printing letter to one
    * specific participant?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 

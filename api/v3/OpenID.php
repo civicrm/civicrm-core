@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -53,6 +53,10 @@ function civicrm_api3_open_i_d_create($params) {
  */
 function _civicrm_api3_open_i_d_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
+  $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+  if ($defaultLocation) {
+    $params['location_type_id']['api.default'] = $defaultLocation->id;
+  }
 }
 
 /**

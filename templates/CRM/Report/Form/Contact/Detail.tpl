@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -201,3 +201,10 @@
     {/if}
     {include file="CRM/Report/Form/ErrorMessage.tpl"}
 </div>
+
+
+{if $outputMode == 'print'}
+  <script type="text/javascript">
+    window.print();
+  </script>
+{/if}

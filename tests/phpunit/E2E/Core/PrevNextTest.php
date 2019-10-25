@@ -15,7 +15,12 @@ class PrevNextTest extends \CiviEndToEndTestCase {
   /**
    * @var string
    */
-  protected $cacheKey, $cacheKeyB;
+  protected $cacheKey;
+
+  /**
+   * @var string
+   */
+  protected $cacheKeyB;
 
   /**
    * @var \CRM_Core_PrevNextCache_Interface
@@ -26,7 +31,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     parent::setUp();
     $this->prevNext = \Civi::service('prevnext');
     $this->cacheKey = 'PrevNextTest_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
-    $this->cacheKeyB = 'PrevNextTest_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
+    $this->cacheKeyB = 'PrevNextTestb_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $this->assertTrue(
       \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact') > 25,
       'The contact table must have at least 25 records.'
@@ -35,6 +40,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
 
   protected function tearDown() {
     \Civi::service('prevnext')->deleteItem(NULL, $this->cacheKey);
+    \Civi::service('prevnext')->deleteItem(NULL, $this->cacheKeyB);
   }
 
   public function testFillSql() {
@@ -45,11 +51,11 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $query = new \CRM_Contact_BAO_Query(array(), NULL, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, NULL, 'AND');
     $sql = $query->searchQuery($start, $prefillLimit, $sort, FALSE, $query->_includeContactIds,
       FALSE, TRUE, TRUE);
-    $selectSQL = "SELECT DISTINCT '$this->cacheKey', contact_a.id, contact_a.sort_name";
+    $selectSQL = "SELECT DISTINCT %1, contact_a.id, contact_a.sort_name";
     $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $selectSQL, $sql);
 
     $this->assertTrue(
-      $this->prevNext->fillWithSql($this->cacheKey, $sql),
+      $this->prevNext->fillWithSql($this->cacheKey, $sql, [1 => [$this->cacheKey, 'String']]),
       "fillWithSql should return TRUE on success"
     );
 
@@ -91,6 +97,19 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertEquals([1], array_unique(array_values($all)));
 
     $this->assertSelections([]);
+  }
+
+  public function testFetch() {
+    $this->testFillArray();
+
+    $cids = $this->prevNext->fetch($this->cacheKey, 0, 2);
+    $this->assertEquals([100, 400], $cids);
+
+    $cids = $this->prevNext->fetch($this->cacheKey, 0, 4);
+    $this->assertEquals([100, 400, 200, 300], $cids);
+
+    $cids = $this->prevNext->fetch($this->cacheKey, 2, 2);
+    $this->assertEquals([200, 300], $cids);
   }
 
   public function getFillFunctions() {
@@ -300,19 +319,20 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertSelections([], 'getall', $this->cacheKeyB);
   }
 
-
   /**
    * Assert that the current cacheKey has a list of selected contact IDs.
    *
    * @param array $ids
    *   Contact IDs that should be selected.
+   * @param string $action
+   * @param string|NULL $cacheKey
    */
   protected function assertSelections($ids, $action = 'get', $cacheKey = NULL) {
     if ($cacheKey === NULL) {
       $cacheKey = $this->cacheKey;
     }
     $selected = $this->prevNext->getSelection($cacheKey, $action)[$cacheKey];
-    $this->assertEquals($ids, array_keys($selected));
+    $this->assertEquals($ids, array_keys($selected), 'selected cache not correct for ' . $cacheKey . 'defined keys are ' . $this->cacheKey . 'and ' . $this->cacheKeyB);
     $this->assertCount(count($ids), $selected);
   }
 

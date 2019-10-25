@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -46,7 +46,7 @@ class CRM_UF_Page_AJAX {
     $customId = $_GET['customId'];
 
     $isMultiple = CRM_Core_BAO_CustomField::isMultiRecordField($customId);
-    $isMultiple = array('is_multi' => $isMultiple);
+    $isMultiple = ['is_multi' => $isMultiple];
     CRM_Utils_JSON::output($isMultiple);
   }
 

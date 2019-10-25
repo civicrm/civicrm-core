@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_I18n {
 
@@ -40,7 +40,7 @@ class CRM_Core_I18n {
   const NONE = 'none', AUTO = 'auto';
 
   /**
-   * @var callable|NULL
+   * @var callable|null
    *   A callback function which handles SQL string encoding.
    *   Set NULL to use the default, CRM_Core_DAO::escapeString().
    *   This is used by `ts(..., [escape=>sql])`.
@@ -71,11 +71,13 @@ class CRM_Core_I18n {
   /**
    * A PHP-gettext instance for string translation;
    * should stay null if the strings are not to be translated (en_US).
+   * @var object
    */
   private $_phpgettext = NULL;
 
   /**
    * Whether we are using native gettext or not.
+   * @var bool
    */
   private $_nativegettext = FALSE;
 
@@ -83,8 +85,9 @@ class CRM_Core_I18n {
    * Gettext cache for extension domains/streamers, depending on if native or phpgettext.
    * - native gettext: we cache the value for textdomain()
    * - phpgettext: we cache the file streamer.
+   * @var array
    */
-  private $_extensioncache = array();
+  private $_extensioncache = [];
 
   /**
    * @var string
@@ -192,15 +195,15 @@ class CRM_Core_I18n {
       $all = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
 
       // get labels
-      $rows = array();
-      $labels = array();
-      CRM_Core_OptionValue::getValues(array('name' => 'languages'), $rows);
+      $rows = [];
+      $labels = [];
+      CRM_Core_OptionValue::getValues(['name' => 'languages'], $rows);
       foreach ($rows as $id => $row) {
         $labels[$row['name']] = $row['label'];
       }
 
       // check which ones are available; add them to $all if not there already
-      $codes = array();
+      $codes = [];
       if (is_dir(CRM_Core_I18n::getResourceDir()) && $dir = opendir(CRM_Core_I18n::getResourceDir())) {
         while ($filename = readdir($dir)) {
           if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
@@ -223,15 +226,15 @@ class CRM_Core_I18n {
         }
       }
 
-      ksort($all);
+      asort($all);
     }
 
     if ($enabled === NULL) {
-      $config = CRM_Core_Config::singleton();
-      $enabled = array();
-      if (isset($config->languageLimit) and $config->languageLimit) {
+      $languageLimit = Civi::settings()->get('languageLimit');
+      $enabled = [];
+      if ($languageLimit) {
         foreach ($all as $code => $name) {
-          if (in_array($code, array_keys($config->languageLimit))) {
+          if (array_key_exists($code, $languageLimit)) {
             $enabled[$code] = $name;
           }
         }
@@ -239,6 +242,28 @@ class CRM_Core_I18n {
     }
 
     return $justEnabled ? $enabled : $all;
+  }
+
+  /**
+   * Return the available UI languages
+   * @return array|string
+   *   array(string languageCode => string languageName) if !$justCodes
+   */
+  public static function uiLanguages($justCodes = FALSE) {
+    // In multilang we only allow the languages that are configured in db
+    // Otherwise, the languages configured in uiLanguages
+    $settings = Civi::settings();
+    if (CRM_Core_I18n::isMultiLingual()) {
+      $codes = array_keys((array) $settings->get('languageLimit'));
+    }
+    else {
+      $codes = $settings->get('uiLanguages');
+      if (!$codes) {
+        $codes = [$settings->get('lcMessages')];
+      }
+    }
+    return $justCodes ? $codes
+        : CRM_Utils_Array::subset(CRM_Core_I18n::languages(), $codes);
   }
 
   /**
@@ -251,7 +276,7 @@ class CRM_Core_I18n {
    *   modified string
    */
   public function strarg($str) {
-    $tr = array();
+    $tr = [];
     $p = 0;
     for ($i = 1; $i < func_num_args(); $i++) {
       $arg = func_get_arg($i);
@@ -301,11 +326,12 @@ class CRM_Core_I18n {
    *   The params of the translation (if any).
    *   - domain: string|array a list of translation domains to search (in order)
    *   - context: string
+   *   - skip_translation: flag (do only escape/replacement, skip the actual translation)
    *
    * @return string
    *   the translated string
    */
-  public function crm_translate($text, $params = array()) {
+  public function crm_translate($text, $params = []) {
     if (isset($params['escape'])) {
       $escape = $params['escape'];
       unset($params['escape']);
@@ -353,23 +379,25 @@ class CRM_Core_I18n {
     $raw = !empty($params['raw']);
     unset($params['raw']);
 
-    if (!empty($domain)) {
-      // It might be prettier to cast to an array, but this is high-traffic stuff.
-      if (is_array($domain)) {
-        foreach ($domain as $d) {
-          $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
-          if ($candidate != $text) {
-            $text = $candidate;
-            break;
+    if (!isset($params['skip_translation'])) {
+      if (!empty($domain)) {
+        // It might be prettier to cast to an array, but this is high-traffic stuff.
+        if (is_array($domain)) {
+          foreach ($domain as $d) {
+            $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
+            if ($candidate != $text) {
+              $text = $candidate;
+              break;
+            }
           }
+        }
+        else {
+          $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
         }
       }
       else {
-        $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
+        $text = $this->crm_translate_raw($text, NULL, $count, $plural, $context);
       }
-    }
-    else {
-      $text = $this->crm_translate_raw($text, NULL, $count, $plural, $context);
     }
 
     // replace the numbered %1, %2, etc. params if present
@@ -394,8 +422,8 @@ class CRM_Core_I18n {
    * Lookup the raw translation of a string (without any extra escaping or interpolation).
    *
    * @param string $text
-   * @param string|NULL $domain
-   * @param int|NULL $count
+   * @param string|null $domain
+   * @param int|null $count
    * @param string $plural
    * @param string $context
    *
@@ -419,7 +447,7 @@ class CRM_Core_I18n {
         Civi::$statics[__CLASS__][$replacementsLocale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($replacementsLocale);
       }
       else {
-        Civi::$statics[__CLASS__][$replacementsLocale] = array();
+        Civi::$statics[__CLASS__][$replacementsLocale] = [];
       }
     }
     $stringTable = Civi::$statics[__CLASS__][$replacementsLocale];
@@ -461,7 +489,7 @@ class CRM_Core_I18n {
         }
 
         // expand %count in translated string to $count
-        $text = strtr($text, array('%count' => $count));
+        $text = strtr($text, ['%count' => $count]);
 
         // if not plural, but the locale's set, translate
       }
@@ -505,7 +533,7 @@ class CRM_Core_I18n {
    */
   public function localizeArray(
     &$array,
-    $params = array()
+    $params = []
   ) {
     $tsLocale = CRM_Core_I18n::getLocale();
 
@@ -533,7 +561,7 @@ class CRM_Core_I18n {
         $array[$key] = $value;
       }
       elseif ((string ) $key == 'title') {
-        $array[$key] = ts($value, array('context' => 'menu'));
+        $array[$key] = ts($value, ['context' => 'menu']);
       }
     }
   }
@@ -595,7 +623,6 @@ class CRM_Core_I18n {
     return FALSE;
   }
 
-
   /**
    * Is the CiviCRM in multilingual mode.
    *
@@ -645,10 +672,16 @@ class CRM_Core_I18n {
       $this->setPhpGettextLocale($locale);
     }
 
-    // for sql queries
+    // For sql queries, if running in DB multi-lingual mode.
     global $dbLocale;
-    $dbLocale = "_{$locale}";
 
+    if ($dbLocale) {
+      $dbLocale = "_{$locale}";
+    }
+
+    // For self::getLocale()
+    global $tsLocale;
+    $tsLocale = $locale;
   }
 
   /**
@@ -657,14 +690,15 @@ class CRM_Core_I18n {
    * @return CRM_Core_I18n
    */
   public static function &singleton() {
-    static $singleton = array();
-
+    if (!isset(Civi::$statics[__CLASS__]['singleton'])) {
+      Civi::$statics[__CLASS__]['singleton'] = [];
+    }
     $tsLocale = CRM_Core_I18n::getLocale();
-    if (!isset($singleton[$tsLocale])) {
-      $singleton[$tsLocale] = new CRM_Core_I18n($tsLocale);
+    if (!isset(Civi::$statics[__CLASS__]['singleton'][$tsLocale])) {
+      Civi::$statics[__CLASS__]['singleton'][$tsLocale] = new CRM_Core_I18n($tsLocale);
     }
 
-    return $singleton[$tsLocale];
+    return Civi::$statics[__CLASS__]['singleton'][$tsLocale];
   }
 
   /**
@@ -674,7 +708,7 @@ class CRM_Core_I18n {
    *   the final LC_TIME that got set
    */
   public static function setLcTime() {
-    static $locales = array();
+    static $locales = [];
 
     $tsLocale = CRM_Core_I18n::getLocale();
     if (!isset($locales[$tsLocale])) {
@@ -701,10 +735,10 @@ class CRM_Core_I18n {
       return NULL;
     }
     if (empty($language) || $language === '*default*') {
-      $language = civicrm_api3('setting', 'getvalue', array(
+      $language = civicrm_api3('setting', 'getvalue', [
         'name' => 'lcMessages',
         'group' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-      ));
+      ]);
     }
     elseif ($language == 'current_site_language') {
       return CRM_Core_I18n::getLocale();
@@ -736,8 +770,8 @@ class CRM_Core_I18n {
  * @return string
  *   the translated string
  */
-function ts($text, $params = array()) {
-  static $areSettingsAvailable = FALSE;
+function ts($text, $params = []) {
+  static $bootstrapReady = FALSE;
   static $lastLocale = NULL;
   static $i18n = NULL;
   static $function = NULL;
@@ -747,13 +781,18 @@ function ts($text, $params = array()) {
   }
 
   // When the settings become available, lookup customTranslateFunction.
-  if (!$areSettingsAvailable) {
-    $areSettingsAvailable = (bool) \Civi\Core\Container::getBootService('settings_manager');
-    if ($areSettingsAvailable) {
+  if (!$bootstrapReady) {
+    $bootstrapReady = (bool) \Civi\Core\Container::isContainerBooted();
+    if ($bootstrapReady) {
+      // just got ready: determine whether there is a working custom translation function
       $config = CRM_Core_Config::singleton();
       if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
         $function = $config->customTranslateFunction;
       }
+    }
+    else {
+      // don't _translate_ anything until bootstrap has progressed enough
+      $params['skip_translation'] = 1;
     }
   }
 

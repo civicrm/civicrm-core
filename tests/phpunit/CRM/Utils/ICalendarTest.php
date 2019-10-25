@@ -3,7 +3,7 @@
 +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -35,12 +35,14 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
    * @return array
    */
   public function escapeExamples() {
-    $cases = array();
-    $cases[] = array("Hello
-    this is, a test!");
-    $cases[] = array("Hello!!
+    $cases = [];
+    $cases[] = ["Hello
+    this is, a test!",
+    ];
+    $cases[] = ["Hello!!
 
-    this is, a \"test\"!");
+    this is, a \"test\"!",
+    ];
     return $cases;
   }
 

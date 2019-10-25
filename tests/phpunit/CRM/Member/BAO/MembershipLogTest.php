@@ -35,17 +35,17 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $params = array(
+    $params = [
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',
       'name_a_b' => 'Test Employee of',
       'name_b_a' => 'Test Employer of',
-    );
+    ];
     $this->_relationshipTypeId = $this->relationshipTypeCreate($params);
     $this->_orgContactID = $this->organizationCreate();
     $this->_financialTypeId = 1;
 
-    $params = array(
+    $params = [
       'name' => 'test type',
       'description' => NULL,
       'minimum_fee' => 10,
@@ -57,8 +57,8 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
     $this->_membershipTypeID = $membershipType->id;
     $this->_mebershipStatusID = $this->membershipStatusCreate('test status');
@@ -70,7 +70,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->relationshipTypeDelete($this->_relationshipTypeId);
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
+    $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     $this->membershipStatusDelete($this->_mebershipStatusID);
     $this->contactDelete($this->_orgContactID);
   }
@@ -81,7 +81,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   public function testadd() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -90,9 +90,9 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_mebershipStatusID,
-    );
+    ];
 
-    $ids = array();
+    $ids = [];
     $membership = CRM_Member_BAO_Membership::create($params, $ids);
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog', $membership->id,
       'membership_id', 'id',
@@ -109,7 +109,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   public function testdel() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -118,10 +118,10 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_mebershipStatusID,
-    );
-    $ids = array(
+    ];
+    $ids = [
       'userId' => $contactId,
-    );
+    ];
     $membership = CRM_Member_BAO_Membership::create($params, $ids);
     $membershipDelete = CRM_Member_BAO_MembershipLog::del($membership->id);
     $this->assertDBNull('CRM_Member_BAO_MembershipLog', $membership->id, 'membership_id',
@@ -138,7 +138,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   public function testresetmodifiedId() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -147,10 +147,10 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_mebershipStatusID,
-    );
-    $ids = array(
+    ];
+    $ids = [
       'userId' => $contactId,
-    );
+    ];
     $membership = CRM_Member_BAO_Membership::create($params, $ids);
     $resetModifiedId = CRM_Member_BAO_MembershipLog::resetModifiedID($contactId);
     $this->assertDBNull('CRM_Member_BAO_MembershipLog', $contactId, 'modified_id',

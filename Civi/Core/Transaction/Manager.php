@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@ namespace Civi\Core\Transaction;
 /**
  *
  * @package Civi
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class Manager {
 
@@ -44,7 +44,7 @@ class Manager {
   /**
    * @var array<Frame> stack of SQL transactions/savepoints
    */
-  private $frames = array();
+  private $frames = [];
 
   /**
    * @var int
@@ -131,7 +131,7 @@ class Manager {
     // internal state of each frame is consistent with its outcome
 
     $oldFrames = $this->frames;
-    $this->frames = array();
+    $this->frames = [];
     foreach ($oldFrames as $oldFrame) {
       $oldFrame->forceRollback();
     }

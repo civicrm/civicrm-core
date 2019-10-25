@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -48,11 +48,11 @@
  * @throws Exception
  */
 function smarty_function_crmScript($params, &$smarty) {
-  $params += array(
+  $params += [
     'weight' => CRM_Core_Resources::DEFAULT_WEIGHT,
     'region' => CRM_Core_Resources::DEFAULT_REGION,
     'ext' => 'civicrm',
-  );
+  ];
 
   if (array_key_exists('file', $params)) {
     Civi::resources()->addScriptFile($params['ext'], $params['file'], $params['weight'], $params['region']);

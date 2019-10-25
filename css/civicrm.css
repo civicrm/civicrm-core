@@ -5,8 +5,7 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
-.crm-container input,
-#civicrm-menu input {
+.crm-container input {
   box-sizing: content-box;
 }
 
@@ -17,6 +16,10 @@ div.crm-container label {
 
 div.crm-container fieldset label{
   float: none;
+}
+
+input.crm-form-radio + label, input.crm-form-checkbox + label{
+  margin-left: 7px;
 }
 
 .crm-container .crm-quickSearchField {
@@ -331,7 +334,6 @@ input.crm-form-entityref {
 
 .crm-container fieldset legend {
   display: block;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   font-weight: bold;
   padding: 4px;
@@ -717,7 +719,6 @@ input.crm-form-entityref {
   /* h3 used as table header for civicrm */
   background-color: #CDE8FE;
   font-size: 15px;
-  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   color: #121A2D;
   padding: 4px 6px;
@@ -882,6 +883,12 @@ input.crm-form-entityref {
 #crm-container tr.columnfooter td {
   font-size: 1.1em;
   font-weight: bold;
+}
+
+/* dev/core#1039 Make contact details in popup on merge screen non bold */
+#crm-container tr.columnheader td [class*="crm-summary-col-"] {
+  font-size: 13px;
+  font-weight: normal;
 }
 
 #crm-container tr.columnheader-dark th span.extra {
@@ -1434,6 +1441,7 @@ input.crm-form-entityref {
   padding: 4px;
   margin: 0;
   line-height: 15px;
+  white-space: initial;
 }
 
 .crm-container .action-item-wrap {
@@ -1803,16 +1811,6 @@ input.crm-form-entityref {
 }
 
 /* Set/alter ICONS */
-
-#crm-container div#printer-friendly {
-  float: right;
-  position: relative;
-  margin: -2em 0.5em 0 0;
-}
-/* For Joomla, margin 0 works correctly */
-#crm-container table#crm-content div#printer-friendly {
-  margin: 0;
-}
 
 #crm-container .order-icon {
   height: 15px;
@@ -2683,10 +2681,14 @@ div.crm-container form {
 /* Date plugin */
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date {
-  background: white url(../i/cal.gif) no-repeat scroll right center;
-  padding-right: 16px;
-  /* so that text doesn't flow on top of icon */
   width: 9em;
+}
+
+.crm-container input.dateplugin::placeholder,
+.crm-container input.crm-form-date::placeholder,
+.crm-container input.crm-form-time::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
 }
 
 .crm-container div.batch-update {
@@ -2914,7 +2916,6 @@ tbody.scrollContent tr.alternateRow {
 
 
 .crm-container div.status,
-div.m ul#civicrm-menu,
 .crm-container #help,
 .crm-container .help,
 .crm-container .ui-tabs-panel,
@@ -3221,6 +3222,65 @@ span.crm-select-item-color {
 
 #crm-container .crm-fb-tweet-buttons {
   width: 93%;
+}
+
+/* Checkbox gropus */
+.crm-container ul.crm-checkbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  border: 1px solid #a5a5a5;
+  width: 300px;
+  max-width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.crm-container ul.crm-checkbox-list li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.crm-container ul.crm-checkbox-list li input {
+  position: absolute;
+  left: 5px;
+  top: 4px;
+}
+.crm-container ul.crm-checkbox-list li label {
+  display: block;
+  padding: 2px 0 2px 22px;
+  margin: 0;
+  word-break: break-all;
+}
+.crm-container ul.crm-checkbox-list li:nth-child(even) label {
+  background-color: #FAFAFA;
+}
+.crm-container ul.crm-checkbox-list li input:checked + label {
+  background-color: #FFFFCC;
+}
+.crm-container ul.crm-checkbox-list li:nth-child(even) input:checked + label {
+  background-color: #fffdb2
+}
+
+.crm-container ul.crm-sortable-list li label {
+  padding-left: 40px;
+  cursor: move;
+}
+.crm-container ul.crm-sortable-list li label:after {
+  display: block;
+  font-family: "FontAwesome";
+  content: "\f047";
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  font-size: 10px;
+  color: grey;
+}
+.crm-container ul.crm-sortable-list li:hover label:after {
+  color: inherit;
+}
+.crm-container ul.crm-checkbox-list.crm-sortable-list li input {
+  left: 23px;
 }
 
 /* classes related to batch entry operation */
@@ -3588,6 +3648,9 @@ span.crm-status-icon {
 .crm-container.crm-public .select2-container,
 .crm-container.crm-public .select2-results {
   font-size: 14px;
+}
+.crm-container.crm-public .select2-container * {
+  box-sizing: content-box;
 }
 .crm-container.crm-public .select2-container .select2-choice {
   padding: 5px 5px 5px 8px;

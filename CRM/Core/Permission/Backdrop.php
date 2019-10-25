@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -41,14 +41,15 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
   /**
    * Is this user someone with access for the entire system.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_viewAdminUser = FALSE;
   protected $_editAdminUser = FALSE;
 
   /**
    * Am in in view permission or edit permission?
-   * @var boolean
+   *
+   * @var bool
    */
   protected $_viewPermission = FALSE;
   protected $_editPermission = FALSE;
@@ -60,7 +61,6 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
    */
   protected $_viewPermissionedGroups;
   protected $_editPermissionedGroups;
-
 
   /**
    * Given a permission string, check for access requirements
@@ -74,10 +74,10 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
    *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
-    $str = $this->translatePermission($str, 'Drupal', array(
+    $str = $this->translatePermission($str, 'Drupal', [
       'view user account' => 'access user profiles',
       'administer users' => 'administer users',
-    ));
+    ]);
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
     }
@@ -149,7 +149,7 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
    *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
-    static $_cache = array();
+    static $_cache = [];
 
     if (isset($_cache[$permissionName])) {
       return $_cache[$permissionName];
@@ -157,27 +157,27 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
 
     // FIXME!!!!
     /**
-    $uids = array();
-    $sql = "
-      SELECT {users}.uid, {role_permission}.permission
-      FROM {users}
-      JOIN {users_roles}
-        ON {users}.uid = {users_roles}.uid
-      JOIN {role_permission}
-        ON {role_permission}.rid = {users_roles}.rid
-      WHERE {role_permission}.permission = '{$permissionName}'
-        AND {users}.status = 1
-    ";
-
-    $result = db_query($sql);
-    foreach ($result as $record) {
-      $uids[] = $record->uid;
-    }
-
-    $_cache[$permissionName] = self::getContactEmails($uids);
-    return $_cache[$permissionName];
+     * $uids = array();
+     * $sql = "
+     * SELECT {users}.uid, {role_permission}.permission
+     * FROM {users}
+     * JOIN {users_roles}
+     * ON {users}.uid = {users_roles}.uid
+     * JOIN {role_permission}
+     * ON {role_permission}.rid = {users_roles}.rid
+     * WHERE {role_permission}.permission = '{$permissionName}'
+     * AND {users}.status = 1
+     * ";
+     *
+     * $result = db_query($sql);
+     * foreach ($result as $record) {
+     * $uids[] = $record->uid;
+     * }
+     *
+     * $_cache[$permissionName] = self::getContactEmails($uids);
+     * return $_cache[$permissionName];
     */
-    return array();
+    return [];
   }
 
 }

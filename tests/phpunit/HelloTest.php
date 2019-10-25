@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,9 +42,12 @@
 /**
  * Class HelloTest
  */
-class HelloTest extends PHPUnit_Framework_TestCase {
-  // contains the object handle of the string class
-  var $abc;
+class HelloTest extends PHPUnit\Framework\TestCase {
+  /**
+   * contains the object handle of the string class
+   * @var string
+   */
+  public $abc;
 
   /**
    * @param string|null $name

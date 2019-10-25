@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -37,6 +37,7 @@
  *
  */
 class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
+
   /**
    * Given a permission string, check for access requirements
    *
@@ -49,9 +50,9 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    */
   public function check($str, $userId = NULL) {
     // Generic cms 'administer users' role tranlates to users with the 'edit_users' capability' in WordPress
-    $str = $this->translatePermission($str, 'WordPress', array(
+    $str = $this->translatePermission($str, 'WordPress', [
       'administer users' => 'edit_users',
-    ));
+    ]);
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
     }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -37,7 +37,9 @@
 class CRM_Contact_BAO_Query_Hook {
 
   /**
-   * @var array of CRM_Contact_BAO_Query_Interface objects
+   * Query objects.
+   *
+   * @var CRM_Contact_BAO_Query_Interface[]
    */
   protected $_queryObjects = NULL;
 
@@ -62,7 +64,7 @@ class CRM_Contact_BAO_Query_Hook {
    */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
-      $this->_queryObjects = array();
+      $this->_queryObjects = [];
       CRM_Utils_Hook::queryObjects($this->_queryObjects, 'Contact');
     }
     return $this->_queryObjects;
@@ -72,7 +74,7 @@ class CRM_Contact_BAO_Query_Hook {
    * @return array
    */
   public function &getFields() {
-    $extFields = array();
+    $extFields = [];
     foreach (self::getSearchQueryObjects() as $obj) {
       $flds = $obj->getFields();
       $extFields = array_merge($extFields, $flds);

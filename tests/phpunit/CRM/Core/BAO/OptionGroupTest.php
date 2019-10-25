@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -46,20 +46,20 @@ class CRM_Core_BAO_OptionGroupTest extends CiviUnitTestCase {
    * Ensure only one option value exists after calling ensureOptionValueExists.
    */
   public function testEnsureOptionGroupExistsExistingValue() {
-    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array('name' => 'contribution_status'));
-    $this->callAPISuccessGetSingle('OptionGroup', array('name' => 'contribution_status'));
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'contribution_status']);
+    $this->callAPISuccessGetSingle('OptionGroup', ['name' => 'contribution_status']);
   }
 
   /**
    * Ensure only one option value exists adds a new value.
    */
   public function testEnsureOptionGroupExistsNewValue() {
-    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array('name' => 'Bombed'));
-    $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', array('field' => 'option_group_id'))['values'];
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'Bombed']);
+    $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', ['field' => 'option_group_id'])['values'];
     $this->assertTrue(in_array('Bombed', $optionGroups));
 
-    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array('name' => 'Bombed Again'));
-    $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', array('field' => 'option_group_id'))['values'];
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'Bombed Again']);
+    $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', ['field' => 'option_group_id'])['values'];
     $this->assertTrue(in_array('Bombed Again', $optionGroups));
   }
 

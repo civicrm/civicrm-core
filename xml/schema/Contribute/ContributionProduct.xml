@@ -73,6 +73,10 @@
     <export>true</export>
     <comment>Optional. Can be used to record the date this product was fulfilled or shipped.</comment>
     <add>1.4</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
   </field>
   <field>
     <name>start_date</name>

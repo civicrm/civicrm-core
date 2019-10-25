@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -53,13 +53,13 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
       //using _contactIds field for creating params for query so that multiple selections on multiple pages
       //can be printed.
       foreach ($this->_contactIds as $contactId) {
-        $params[] = array(
+        $params[] = [
           CRM_Core_Form::CB_PREFIX . $contactId,
           '=',
           1,
           0,
           0,
-        );
+        ];
       }
     }
 
@@ -112,19 +112,18 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     //
     // just need to add a javacript to popup the window for printing
     //
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Print Contact List'),
-          'js' => array('onclick' => 'window.print()'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'back',
-          'name' => ts('Done'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Print Contact List'),
+        'js' => ['onclick' => 'window.print()'],
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Done'),
+      ],
+    ]);
   }
 
   /**

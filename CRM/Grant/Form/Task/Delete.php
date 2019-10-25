@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -44,7 +44,7 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
    * Are we operating in "single mode", i.e. deleting one
    * specific participation?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
@@ -90,12 +90,12 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
     }
 
     if ($deleted) {
-      $msg = ts('%count grant deleted.', array('plural' => '%count grants deleted.', 'count' => $deleted));
+      $msg = ts('%count grant deleted.', ['plural' => '%count grants deleted.', 'count' => $deleted]);
       CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
     }
 
     if ($failed) {
-      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', ['plural' => '%count could not be deleted.', 'count' => $failed]), ts('Error'), 'error');
     }
   }
 

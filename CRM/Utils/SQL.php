@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Just another collection of static utils functions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_SQL {
 
@@ -44,7 +44,7 @@ class CRM_Utils_SQL {
     require_once 'api/v3/utils.php';
     $baoName = _civicrm_api3_get_BAO($entity);
     $bao = new $baoName();
-    $clauses = $subclauses = array();
+    $clauses = $subclauses = [];
     foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       if ($vals && $field == $joinColumn) {
         $clauses = array_merge($clauses, (array) $vals);
@@ -78,7 +78,7 @@ class CRM_Utils_SQL {
    */
   public static function supportsFullGroupBy() {
     // CRM-21455 MariaDB 10.2 does not support ANY_VALUE
-    $version = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $version = self::getDatabaseVersion();
 
     if (stripos($version, 'mariadb') !== FALSE) {
       return FALSE;
@@ -120,18 +120,36 @@ class CRM_Utils_SQL {
   }
 
   /**
-   * Is the Database set up to handle acceents.
-   * @warning This function was introduced in attempt to determine the reason why the test getInternationalStrings was failing on ubu1604 but passing on ubu1204-5
-   * This function should not be used as the basis of further work as the reasoning is not perfact and is giving false failures.
-   * @return bool
+   * Does the DB version support mutliple locks per
+   *
+   * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
+   *
+   * This is a conservative measure to introduce the change which we expect to deprecate later.
+   *
+   * @todo we only check mariadb & mysql right now but maybe can add percona.
    */
-  public static function supportStorageOfAccents() {
-    $charSetDB = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE 'character_set_database'")->fetchAll();
-    $charSet = $charSetDB[0]['Value'];
-    if ($charSet == 'utf8') {
-      return TRUE;
+  public static function supportsMultipleLocks() {
+    static $isSupportLocks = NULL;
+    if (!isset($isSupportLocks)) {
+      $version = self::getDatabaseVersion();
+      if (stripos($version, 'mariadb') !== FALSE) {
+        $isSupportLocks = version_compare($version, '10.0.2', '>=');
+      }
+      else {
+        $isSupportLocks = version_compare($version, '5.7.5', '>=');
+      }
     }
-    return FALSE;
+
+    return $isSupportLocks;
+  }
+
+  /**
+   * Get the version string for the database.
+   *
+   * @return string
+   */
+  public static function getDatabaseVersion() {
+    return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
   }
 
 }

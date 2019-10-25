@@ -46,7 +46,7 @@ class ExternalBatch {
    * @param array $defaultParams
    *   Default values to merge into any API calls.
    */
-  public function __construct($defaultParams = array()) {
+  public function __construct($defaultParams = []) {
     global $civicrm_root;
     $this->root = $civicrm_root;
     $this->settingsPath = defined('CIVICRM_SETTINGS_PATH') ? CIVICRM_SETTINGS_PATH : NULL;
@@ -65,14 +65,14 @@ class ExternalBatch {
    * @param array $params
    * @return ExternalBatch
    */
-  public function addCall($entity, $action, $params = array()) {
+  public function addCall($entity, $action, $params = []) {
     $params = array_merge($this->defaultParams, $params);
 
-    $this->apiCalls[] = array(
+    $this->apiCalls[] = [
       'entity' => $entity,
       'action' => $action,
       'params' => $params,
-    );
+    ];
     return $this;
   }
 
@@ -119,20 +119,20 @@ class ExternalBatch {
     while (!empty($this->processes)) {
       usleep(self::POLL_INTERVAL);
       foreach (array_keys($this->processes) as $idx) {
-        /** @var Process $process */
+        /** @var \Symfony\Component\Process\Process $process */
         $process = $this->processes[$idx];
         if (!$process->isRunning()) {
           $parsed = json_decode($process->getOutput(), TRUE);
           if ($process->getExitCode() || $parsed === NULL) {
-            $this->apiResults[] = array(
+            $this->apiResults[] = [
               'is_error' => 1,
               'error_message' => 'External API returned malformed response.',
-              'trace' => array(
+              'trace' => [
                 'code' => $process->getExitCode(),
                 'stdout' => $process->getOutput(),
                 'stderr' => $process->getErrorOutput(),
-              ),
-            );
+              ],
+            ];
           }
           else {
             $this->apiResults[] = $parsed;
@@ -179,11 +179,11 @@ class ExternalBatch {
   /**
    * @param array $apiCall
    *   Array with keys: entity, action, params.
-   * @return Process
+   * @return \Symfony\Component\Process\Process
    * @throws \CRM_Core_Exception
    */
   public function createProcess($apiCall) {
-    $parts = array();
+    $parts = [];
 
     if (defined('CIVICRM_TEST') && CIVICRM_TEST) {
       // When testing, civicrm.settings.php may rely on $_CV, which is only
@@ -214,9 +214,9 @@ class ExternalBatch {
     }
 
     $command = implode(" ", $parts);
-    $env = array_merge($this->env, array(
+    $env = array_merge($this->env, [
       'CIVICRM_SETTINGS' => $this->settingsPath,
-    ));
+    ]);
     return new Process($command, $this->root, $env);
   }
 

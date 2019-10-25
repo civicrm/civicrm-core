@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Upgrade_Incremental_MessageTemplates {
 
@@ -80,7 +80,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'text'],
           ['name' => 'event_online_receipt', 'type' => 'html'],
           ['name' => 'event_online_receipt', 'type' => 'subject'],
-        ]
+        ],
       ],
       [
         'version' => '5.7.alpha1',
@@ -88,8 +88,118 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         'label' => ts('Contributions - Invoice'),
         'templates' => [
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
-        ]
-      ]
+        ],
+      ],
+      [
+        'version' => '5.10.alpha1',
+        'upgrade_descriptor' => ts('Show recurring cancel/update URLs in receipt based on payment processor capabilities'),
+        'label' => ts('Receipts - cancel/update subscription URLs'),
+        'templates' => [
+          ['name' => 'contribution_online_receipt', 'type' => 'text'],
+          ['name' => 'contribution_online_receipt', 'type' => 'html'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'text'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'html'],
+          ['name' => 'membership_online_receipt', 'type' => 'text'],
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
+        ],
+      ],
+      [
+        'version' => '5.12.alpha1',
+        'upgrade_descriptor' => ts('Update payment notification to remove print text, use email greeting'),
+        'label' => ts('Payment notification'),
+        'templates' => [
+          ['name' => 'payment_or_refund_notification', 'type' => 'text'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'html'],
+        ],
+      ],
+      [
+        'version' => '5.15.alpha1',
+        'upgrade_descriptor' => ts('Use email greeting and fix capitalization'),
+        'label' => ts('Pledge acknowledgement'),
+        'templates' => [
+          ['name' => 'pledge_acknowledge', 'type' => 'text'],
+          ['name' => 'pledge_acknowledge', 'type' => 'html'],
+        ],
+      ],
+      [
+        'version' => '5.20.alpha1',
+        'upgrade_descriptor' => ts('Fix missing Email greetings'),
+        'templates' => [
+          ['name' => 'contribution_dupalert', 'type' => 'subject'],
+          ['name' => 'contribution_invoice_receipt', 'type' => 'subject'],
+          ['name' => 'contribution_offline_receipt', 'type' => 'html'],
+          ['name' => 'contribution_offline_receipt', 'type' => 'subject'],
+          ['name' => 'contribution_offline_receipt', 'type' => 'text'],
+          ['name' => 'contribution_online_receipt', 'type' => 'subject'],
+          ['name' => 'contribution_recurring_billing', 'type' => 'html'],
+          ['name' => 'contribution_recurring_billing', 'type' => 'subject'],
+          ['name' => 'contribution_recurring_billing', 'type' => 'text'],
+          ['name' => 'contribution_recurring_cancelled', 'type' => 'html'],
+          ['name' => 'contribution_recurring_cancelled', 'type' => 'subject'],
+          ['name' => 'contribution_recurring_cancelled', 'type' => 'text'],
+          ['name' => 'contribution_recurring_edit', 'type' => 'html'],
+          ['name' => 'contribution_recurring_edit', 'type' => 'subject'],
+          ['name' => 'contribution_recurring_edit', 'type' => 'text'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'html'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'subject'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'text'],
+          ['name' => 'event_offline_receipt', 'type' => 'html'],
+          ['name' => 'event_offline_receipt', 'type' => 'subject'],
+          ['name' => 'event_offline_receipt', 'type' => 'text'],
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+          ['name' => 'event_online_receipt', 'type' => 'subject'],
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+          ['name' => 'event_registration_receipt', 'type' => 'html'],
+          ['name' => 'event_registration_receipt', 'type' => 'subject'],
+          ['name' => 'event_registration_receipt', 'type' => 'text'],
+          ['name' => 'membership_autorenew_billing', 'type' => 'html'],
+          ['name' => 'membership_autorenew_billing', 'type' => 'subject'],
+          ['name' => 'membership_autorenew_billing', 'type' => 'text'],
+          ['name' => 'membership_autorenew_cancelled', 'type' => 'html'],
+          ['name' => 'membership_autorenew_cancelled', 'type' => 'subject'],
+          ['name' => 'membership_autorenew_cancelled', 'type' => 'text'],
+          ['name' => 'membership_offline_receipt', 'type' => 'html'],
+          ['name' => 'membership_offline_receipt', 'type' => 'subject'],
+          ['name' => 'membership_offline_receipt', 'type' => 'text'],
+          ['name' => 'membership_online_receipt', 'type' => 'subject'],
+          ['name' => 'participant_cancelled', 'type' => 'html'],
+          ['name' => 'participant_cancelled', 'type' => 'subject'],
+          ['name' => 'participant_cancelled', 'type' => 'text'],
+          ['name' => 'participant_confirm', 'type' => 'html'],
+          ['name' => 'participant_confirm', 'type' => 'subject'],
+          ['name' => 'participant_confirm', 'type' => 'text'],
+          ['name' => 'participant_expired', 'type' => 'html'],
+          ['name' => 'participant_expired', 'type' => 'subject'],
+          ['name' => 'participant_expired', 'type' => 'text'],
+          ['name' => 'participant_transferred', 'type' => 'html'],
+          ['name' => 'participant_transferred', 'type' => 'subject'],
+          ['name' => 'participant_transferred', 'type' => 'text'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'html'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'subject'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'text'],
+          ['name' => 'pcp_notify', 'type' => 'subject'],
+          ['name' => 'pcp_owner_notify', 'type' => 'html'],
+          ['name' => 'pcp_owner_notify', 'type' => 'subject'],
+          ['name' => 'pcp_owner_notify', 'type' => 'text'],
+          ['name' => 'pcp_status_change', 'type' => 'subject'],
+          ['name' => 'pcp_supporter_notify', 'type' => 'html'],
+          ['name' => 'pcp_supporter_notify', 'type' => 'subject'],
+          ['name' => 'pcp_supporter_notify', 'type' => 'text'],
+          ['name' => 'petition_confirmation_needed', 'type' => 'html'],
+          ['name' => 'petition_confirmation_needed', 'type' => 'subject'],
+          ['name' => 'petition_confirmation_needed', 'type' => 'text'],
+          ['name' => 'petition_sign', 'type' => 'html'],
+          ['name' => 'petition_sign', 'type' => 'subject'],
+          ['name' => 'petition_sign', 'type' => 'text'],
+          ['name' => 'pledge_acknowledge', 'type' => 'subject'],
+          ['name' => 'pledge_acknowledge', 'type' => 'subject'],
+          ['name' => 'pledge_reminder', 'type' => 'html'],
+          ['name' => 'pledge_reminder', 'type' => 'subject'],
+          ['name' => 'pledge_reminder', 'type' => 'text'],
+          ['name' => 'uf_notify', 'type' => 'subject'],
+        ],
+      ],
+
     ];
   }
 
@@ -163,8 +273,8 @@ class CRM_Upgrade_Incremental_MessageTemplates {
 
         CRM_Core_DAO::executeQuery("
           UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
-            1 => [$content, 'String']
-            ]
+            1 => [$content, 'String'],
+          ]
         );
       }
     }

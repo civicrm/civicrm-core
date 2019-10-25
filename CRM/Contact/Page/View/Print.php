@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -55,9 +55,9 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
    * View summary details of a contact.
    */
   public function view() {
-    $params = array();
-    $defaults = array();
-    $ids = array();
+    $params = [];
+    $defaults = [];
+    $ids = [];
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
@@ -108,7 +108,7 @@ class CRM_Utils_Rule {
     //   * Composed of alphanumeric chars, underscore and hyphens.
     //   * Maximum length of 64 chars.
     //   * Optionally surrounded by backticks, in which case spaces also OK.
-    if (!preg_match('/^((`[\w- ]{1,64}`|[\w-]{1,64})\.)?(`[\w- ]{1,64}`|[\w-]{1,64})$/i', $str)) {
+    if (!preg_match('/^((`[-\w ]{1,64}`|[-\w]{1,64})\.)?(`[-\w ]{1,64}`|[-\w]{1,64})$/i', $str)) {
       return FALSE;
     }
 
@@ -138,7 +138,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlOrderBy($str) {
-    $matches = array();
+    $matches = [];
     // Using the field function in order by is valid.
     // Look for a string like field(contribution_status_id,3,4,6).
     // or field(civicrm_contribution.contribution_status_id,3,4,6)
@@ -229,6 +229,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function url($url) {
+    if (!$url) {
+      // If this is required then that should be checked elsewhere - here we are not assuming it is required.
+      return TRUE;
+    }
     if (preg_match('/^\//', $url)) {
       // allow relative URL's (CRM-15598)
       $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;
@@ -484,6 +488,8 @@ class CRM_Utils_Rule {
    */
   public static function commaSeparatedIntegers($value) {
     foreach (explode(',', $value) as $val) {
+      // Remove any Whitespace around the key.
+      $val = trim($val);
       if (!self::positiveInteger($val)) {
         return FALSE;
       }
@@ -537,6 +543,16 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Strict validation of 6-digit hex color notation per html5 <input type="color">
+   *
+   * @param $value
+   * @return bool
+   */
+  public static function color($value) {
+    return (bool) preg_match('/^#([\da-fA-F]{6})$/', $value);
+  }
+
+  /**
    * Strip thousand separator from a money string.
    *
    * Note that this should be done at the form layer. Once we are processing
@@ -549,17 +565,17 @@ class CRM_Utils_Rule {
    */
   public static function cleanMoney($value) {
     // first remove all white space
-    $value = str_replace(array(' ', "\t", "\n"), '', $value);
+    $value = str_replace([' ', "\t", "\n"], '', $value);
 
     $config = CRM_Core_Config::singleton();
 
     //CRM-14868
     $currencySymbols = CRM_Core_PseudoConstant::get(
       'CRM_Contribute_DAO_Contribution',
-      'currency', array(
+      'currency', [
         'keyColumn' => 'name',
         'labelColumn' => 'symbol',
-      )
+      ]
     );
     $value = str_replace($currencySymbols, '', $value);
 
@@ -967,7 +983,7 @@ class CRM_Utils_Rule {
     $highDate = strtotime($fields[$fieldName . '_high']);
 
     if ($lowDate > $highDate) {
-      $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', array(1 => $title));
+      $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', [1 => $title]);
     }
   }
 

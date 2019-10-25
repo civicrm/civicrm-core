@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -46,7 +46,6 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
     $membershipLog = new CRM_Member_DAO_MembershipLog();
     $membershipLog->copyValues($params);
     $membershipLog->save();
-    $membershipLog->free();
 
     return $membershipLog;
   }
@@ -75,7 +74,7 @@ UPDATE civicrm_membership_log
    SET modified_id = null
  WHERE modified_id = %1";
 
-    $params = array(1 => array($contactID, 'Integer'));
+    $params = [1 => [$contactID, 'Integer']];
     CRM_Core_DAO::executeQuery($query, $params);
   }
 

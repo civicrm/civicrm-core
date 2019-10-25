@@ -21,14 +21,22 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
   private $raw;
 
   /**
+   * @var string
+   * translate function name
+   */
+  private $tsFunctionName;
+
+  /**
    * CRM_Core_CodeGen_DAO constructor.
    *
    * @param \CRM_Core_CodeGen_Main $config
    * @param string $name
+   * @param string $tsFunctionName
    */
-  public function __construct($config, $name) {
+  public function __construct($config, $name, $tsFunctionName = 'ts') {
     parent::__construct($config);
     $this->name = $name;
+    $this->tsFunctionName = $tsFunctionName;
   }
 
   /**
@@ -63,12 +71,13 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     $template = new CRM_Core_CodeGen_Util_Template('php');
     $template->assign('table', $this->tables[$this->name]);
     if (empty($this->tables[$this->name]['index'])) {
-      $template->assign('indicesPhp', var_export(array(), 1));
+      $template->assign('indicesPhp', var_export([], 1));
     }
     else {
       $template->assign('indicesPhp', var_export($this->tables[$this->name]['index'], 1));
     }
     $template->assign('genCodeChecksum', $this->getTableChecksum());
+    $template->assign('tsFunctionName', $this->tsFunctionName);
     $template->run('dao.tpl', $this->getAbsFileName());
   }
 
@@ -82,12 +91,13 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
       $template = new CRM_Core_CodeGen_Util_Template('php');
       $template->assign('table', $this->tables[$this->name]);
       if (empty($this->tables[$this->name]['index'])) {
-        $template->assign('indicesPhp', var_export(array(), 1));
+        $template->assign('indicesPhp', var_export([], 1));
       }
       else {
         $template->assign('indicesPhp', var_export($this->tables[$this->name]['index'], 1));
       }
       $template->assign('genCodeChecksum', 'NEW');
+      $template->assign('tsFunctionName', $this->tsFunctionName);
       $this->raw = $template->fetch('dao.tpl');
     }
     return $this->raw;
@@ -121,7 +131,7 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
    */
   protected function getTableChecksum() {
     if (!$this->tableChecksum) {
-      $flat = array();
+      $flat = [];
       CRM_Utils_Array::flatten($this->tables[$this->name], $flat);
       ksort($flat);
       $this->tableChecksum = md5(json_encode($flat));

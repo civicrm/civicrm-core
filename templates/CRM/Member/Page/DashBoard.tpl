@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
     <tr class="columnheader-dark">
       <th scope="col" rowspan="2">{ts}Members by Type{/ts}</th>
         {if $preMonth}
-      <th scope="col" colspan="3">{$premonth} &ndash; {ts}(Last Month){/ts}</th>
+      <th scope="col" colspan="3">{$premonth} {ts}(Last Month){/ts}</th>
         {/if}
         <th scope="col" colspan="3">{$month}{if $isCurrent}{ts} (MTD){/ts}{/if}</th>
         <th scope="col" colspan="3">

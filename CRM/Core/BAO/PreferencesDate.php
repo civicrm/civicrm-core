@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
    * Static holder for the default LT.
+   * @var string
    */
-  static $_defaultPreferencesDate = NULL;
+  public static $_defaultPreferencesDate = NULL;
 
   /**
    * Class constructor.
@@ -108,7 +109,7 @@ SET    time_format = %1
 WHERE  time_format IS NOT NULL
 AND    time_format <> ''
 ";
-    $sqlParams = array(1 => array($newValue, 'String'));
+    $sqlParams = [1 => [$newValue, 'String']];
     CRM_Core_DAO::executeQuery($query, $sqlParams);
   }
 

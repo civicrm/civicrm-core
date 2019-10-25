@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -68,7 +68,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    *   array of default values
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
     $defaults['label_name'] = CRM_Utils_Array::value('name', $format);
     $defaults['merge_same_address'] = 0;
@@ -115,7 +115,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
         $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
         $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-        $temp = array();
+        $temp = [];
         foreach ($val as $vals) {
           $temp[] = $comm[$vals];
         }
@@ -123,14 +123,14 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       }
       $row['id'] = $id;
       $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $tokenFields);
-      $rows[$id] = array($formatted);
+      $rows[$id] = [$formatted];
     }
     if ($isPerMembership) {
-      $labelRows = array();
-      $memberships = civicrm_api3('membership', 'get', array(
-        'id' => array('IN' => $this->_memberIds),
+      $labelRows = [];
+      $memberships = civicrm_api3('membership', 'get', [
+        'id' => ['IN' => $this->_memberIds],
         'return' => 'contact_id',
-      ));
+      ]);
       foreach ($memberships['values'] as $id => $membership) {
         if (isset($rows[$membership['contact_id']])) {
           $labelRows[$id] = $rows[$membership['contact_id']];

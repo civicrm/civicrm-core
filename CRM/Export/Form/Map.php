@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -93,23 +93,22 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       $this->get('exportMode')
     );
 
-    $this->addButtons(array(
-        array(
-          'type' => 'back',
-          'name' => ts('Previous'),
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Export'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        ),
-        array(
-          'type' => 'done',
-          'icon' => 'fa-times',
-          'name' => ts('Done'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'back',
+        'name' => ts('Previous'),
+      ],
+      [
+        'type' => 'next',
+        'name' => ts('Export'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+      ],
+      [
+        'type' => 'done',
+        'icon' => 'fa-times',
+        'name' => ts('Done'),
+      ],
+    ]);
   }
 
   /**
@@ -125,7 +124,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $values, $mappingTypeId) {
-    $errors = array();
+    $errors = [];
 
     if (!empty($fields['saveMapping']) && !empty($fields['_qf_Map_next'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
@@ -160,24 +159,6 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
     $exportParams = $this->controller->exportValues('Select');
 
-    $greetingOptions = CRM_Export_Form_Select::getGreetingOptions();
-
-    if (!empty($greetingOptions)) {
-      foreach ($greetingOptions as $key => $value) {
-        if ($option = CRM_Utils_Array::value($key, $exportParams)) {
-          if ($greetingOptions[$key][$option] == ts('Other')) {
-            $exportParams[$key] = $exportParams["{$key}_other"];
-          }
-          elseif ($greetingOptions[$key][$option] == ts('List of names')) {
-            $exportParams[$key] = '';
-          }
-          else {
-            $exportParams[$key] = $greetingOptions[$key][$option];
-          }
-        }
-      }
-    }
-
     $currentPath = CRM_Utils_System::currentPath();
 
     $urlParams = NULL;
@@ -202,14 +183,14 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
 
     $mapperKeys = $params['mapper'][1];
 
-    $checkEmpty = 0;
-    foreach ($mapperKeys as $value) {
-      if ($value[0]) {
-        $checkEmpty++;
+    $mappedFields = [];
+    foreach ((array) $mapperKeys as $field) {
+      if (!empty($field[1])) {
+        $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
       }
     }
 
-    if (!$checkEmpty) {
+    if (!$mappedFields) {
       $this->set('mappingId', NULL);
       CRM_Utils_System::redirect(CRM_Utils_System::url($currentPath, '_qf_Map_display=true' . $urlParams));
     }
@@ -221,11 +202,11 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       }
 
       if (!empty($params['saveMapping'])) {
-        $mappingParams = array(
+        $mappingParams = [
           'name' => $params['saveMappingName'],
           'description' => $params['saveMappingDesc'],
           'mapping_type_id' => $this->get('mappingTypeId'),
-        );
+        ];
 
         $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 
@@ -239,7 +220,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       $this->get('componentIds'),
       (array) $this->get('queryParams'),
       $this->get(CRM_Utils_Sort::SORT_ORDER),
-      $mapperKeys,
+      $mappedFields,
       $this->get('returnProperties'),
       $this->get('exportMode'),
       $this->get('componentClause'),

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,7 +41,7 @@ class CRM_Pledge_Page_AJAX {
    * for batch entry pledges
    */
   public function getPledgeDefaults() {
-    $details = array();
+    $details = [];
     if (!empty($_POST['pid'])) {
       $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
       $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);

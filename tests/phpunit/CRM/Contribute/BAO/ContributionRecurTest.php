@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,12 +30,12 @@
  * @group headless
  */
 class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
-  protected $_params = array();
+  protected $_params = [];
 
   public function setUp() {
     parent::setUp();
     $this->_ids['payment_processor'] = $this->paymentProcessorCreate();
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->individualCreate(),
       'amount' => 3.00,
       'frequency_unit' => 'week',
@@ -62,11 +62,11 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'campaign_id' => NULL,
-    );
+    ];
   }
 
   public function teardown() {
-    $this->quickCleanup(array('civicrm_contribution_recur', 'civicrm_payment_processor'));
+    $this->quickCleanup(['civicrm_contribution_recur', 'civicrm_payment_processor']);
   }
 
   /**
@@ -90,16 +90,16 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testCancelRecur() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($contributionRecur['id']);
+    CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(['id' => $contributionRecur['id']]);
   }
 
   /**
-   * Test checking if contribution recurr object can allow for changes to financial types.
+   * Test checking if contribution recur object can allow for changes to financial types.
    *
    */
   public function testSupportFinancialTypeChange() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
@@ -108,7 +108,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'contribution_status_id' => 1,
       'receive_date' => 'yesterday',
-    ));
+    ]);
     $this->assertTrue(CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($contributionRecur['id']));
   }
 
@@ -119,15 +119,119 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $createParams = $this->_params;
     $createParams['currency'] = 'XAU';
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $createParams);
-    $editParams = array(
+    $editParams = [
       'id' => $contributionRecur['id'],
       'end_date' => '+ 4 weeks',
-    );
+    ];
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $editParams);
     $dao = new CRM_Contribute_BAO_ContributionRecur();
     $dao->id = $contributionRecur['id'];
     $dao->find(TRUE);
     $this->assertEquals('XAU', $dao->currency, 'Edit clobbered recur currency');
+  }
+
+  /**
+   * Check test contributions aren't picked up as template for non-test recurs
+   *
+   */
+  public function testGetTemplateContributionMatchTest1() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
+    // Create a first contrib
+    $firstContrib = $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+    ]);
+    // Create a test contrib - should not be picked up as template for non-test recur
+    $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+      'is_test' => 1,
+    ]);
+    $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
+    $this->assertEquals($firstContrib['id'], $fetchedTemplate['id']);
+  }
+
+  /**
+   * Check non-test contributions aren't picked up as template for test recurs
+   *
+   */
+  public function testGetTemplateContributionMatchTest() {
+    $params = $this->_params;
+    $params['is_test'] = 1;
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $params);
+    // Create a first test contrib
+    $firstContrib = $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+      'is_test' => 1,
+    ]);
+    // Create a non-test contrib - should not be picked up as template for non-test recur
+    // This shouldn't occur - a live contrib against a test recur, but that's not the point...
+    $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+      'is_test' => 0,
+    ]);
+    $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
+    $this->assertEquals($firstContrib['id'], $fetchedTemplate['id']);
+  }
+
+  /**
+   * Test that is_template contribution is used where available
+   *
+   */
+  public function testGetTemplateContributionNewTemplate() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
+    // Create the template
+    $templateContrib = $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+      'is_template' => 1,
+    ]);
+    // Create another normal contrib
+    $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+    ]);
+    $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
+    // Fetched template should be the is_template, not the latest contrib
+    $this->assertEquals($fetchedTemplate['id'], $templateContrib['id']);
   }
 
 }

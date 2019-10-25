@@ -4,7 +4,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,15 +28,13 @@
 
 namespace Civi\Core\SqlTrigger;
 
-use Civi\Core\Event\GenericHookEvent;
-
 /**
  * Build a set of SQL triggers for tracking timestamps on an entity.
  *
  * This class is a generalization of CRM-10554 with the aim of enabling CRM-20958.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class TimestampTriggers {
 
@@ -110,7 +108,7 @@ class TimestampTriggers {
     $customDataEntity,
     $createdDate = 'created_date',
     $modifiedDate = 'modified_date',
-    $relations = array()
+    $relations = []
   ) {
     $this->tableName = $tableName;
     $this->customDataEntity = $customDataEntity;
@@ -153,17 +151,17 @@ class TimestampTriggers {
     }
 
     if ($tableFilter == NULL || $tableFilter == $this->getTableName()) {
-      $info[] = array(
-        'table' => array($this->getTableName()),
+      $info[] = [
+        'table' => [$this->getTableName()],
         'when' => 'BEFORE',
-        'event' => array('INSERT'),
+        'event' => ['INSERT'],
         'sql' => "\nSET NEW.{$this->getCreatedDate()} = CURRENT_TIMESTAMP;\n",
-      );
+      ];
     }
 
     // Update timestamp when modifying closely related tables
     $relIdx = \CRM_Utils_Array::index(
-      array('column', 'table'),
+      ['column', 'table'],
       $this->getAllRelations()
     );
     foreach ($relIdx as $column => $someRelations) {
@@ -203,24 +201,24 @@ class TimestampTriggers {
     // If specific related table requested, just process that one.
     // (Reply: This feels fishy.)
     if (in_array($tableFilter, $relatedTableNames)) {
-      $relatedTableNames = array($tableFilter);
+      $relatedTableNames = [$tableFilter];
     }
 
     // If no specific table requested (include all related tables),
     // or a specific related table requested (as matched above)
     if (empty($tableFilter) || isset($relatedTableNames[$tableFilter])) {
-      $info[] = array(
+      $info[] = [
         'table' => $relatedTableNames,
         'when' => 'AFTER',
-        'event' => array('INSERT', 'UPDATE'),
+        'event' => ['INSERT', 'UPDATE'],
         'sql' => "\nUPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = NEW.$contactRefColumn;\n",
-      );
-      $info[] = array(
+      ];
+      $info[] = [
         'table' => $relatedTableNames,
         'when' => 'AFTER',
-        'event' => array('DELETE'),
+        'event' => ['DELETE'],
         'sql' => "\nUPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = OLD.$contactRefColumn;\n",
-      );
+      ];
     }
   }
 
@@ -321,10 +319,10 @@ class TimestampTriggers {
       $customGroupDAO->is_multiple = 0;
       $customGroupDAO->find();
       while ($customGroupDAO->fetch()) {
-        $relations[] = array(
+        $relations[] = [
           'table' => $customGroupDAO->table_name,
           'column' => 'entity_id',
-        );
+        ];
       }
     }
 

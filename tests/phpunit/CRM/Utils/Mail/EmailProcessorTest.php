@@ -1,18 +1,17 @@
 <?php
 
 /**
- * Class CRM_Utils_EmailProcessorTest
+ * Class CRM_Utils_Mail_EmailProcessorTest
  * @group headless
  */
-
-class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
+class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
 
   /**
    * Event queue record.
    *
    * @var array
    */
-  protected $eventQueue = array();
+  protected $eventQueue = [];
 
   /**
    * ID of our sample contact.
@@ -25,20 +24,20 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
     parent::setUp();
     CRM_Utils_File::cleanDir(__DIR__ . '/data/mail');
     mkdir(__DIR__ . '/data/mail');
-    $this->callAPISuccess('MailSettings', 'get', array(
-      'api.MailSettings.create' => array(
+    $this->callAPISuccess('MailSettings', 'get', [
+      'api.MailSettings.create' => [
         'name' => 'local',
         'protocol' => 'Localdir',
         'source' => __DIR__ . '/data/mail',
         'domain' => 'example.com',
-      ),
-    ));
+      ],
+    ]);
   }
 
   public function tearDown() {
     CRM_Utils_File::cleanDir(__DIR__ . '/data/mail');
     parent::tearDown();
-    $this->quickCleanup(array('civicrm_group', 'civicrm_group_contact', 'civicrm_mailing', 'civicrm_mailing_job', 'civicrm_mailing_event_bounce', 'civicrm_mailing_event_queue', 'civicrm_mailing_group', 'civicrm_mailing_recipients', 'civicrm_contact', 'civicrm_email'));
+    $this->quickCleanup(['civicrm_group', 'civicrm_group_contact', 'civicrm_mailing', 'civicrm_mailing_job', 'civicrm_mailing_event_bounce', 'civicrm_mailing_event_queue', 'civicrm_mailing_group', 'civicrm_mailing_recipients', 'civicrm_contact', 'civicrm_email']);
   }
 
   /**
@@ -49,8 +48,34 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
 
     copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->assertTrue(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
-    $this->callAPISuccess('job', 'fetch_bounces', array());
+    $this->callAPISuccess('job', 'fetch_bounces', []);
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
+    $this->checkMailingBounces(1);
+  }
+
+  /**
+   * Test the job processing function can handle invalid characters.
+   */
+  public function testBounceProcessingInvalidCharacter() {
+    $this->setUpMailing();
+    $mail = 'test_invalid_character.eml';
+
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
+    $this->checkMailingBounces(1);
+  }
+
+  /**
+   * Test that the job processing function can handle incoming utf8mb4 characters.
+   */
+  public function testBounceProcessingUTF8mb4() {
+    $this->setUpMailing();
+    $mail = 'test_utf8mb4_character.txt';
+
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);
   }
 
@@ -63,8 +88,8 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_sample_message.eml';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' .   $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', array());
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_bounces', []);
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);
   }
@@ -79,7 +104,7 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_nested_message.eml';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', array());
+    $this->callAPISuccess('job', 'fetch_bounces', []);
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);
   }
@@ -101,14 +126,14 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
    */
   public function testBounceProcessingDeletedEmail() {
     $this->setUpMailing();
-    $this->callAPISuccess('Email', 'get', array(
+    $this->callAPISuccess('Email', 'get', [
       'contact_id' => $this->contactID,
       'api.email.delete' => 1,
-    ));
+    ]);
 
     copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->assertTrue(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
-    $this->callAPISuccess('job', 'fetch_bounces', array());
+    $this->callAPISuccess('job', 'fetch_bounces', []);
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
     $this->checkMailingBounces(1);
   }
@@ -132,16 +157,16 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
    * Set up a mailing.
    */
   public function setUpMailing() {
-    $this->contactID = $this->individualCreate(array('email' => 'undeliverable@example.com'));
-    $groupID = $this->callAPISuccess('Group', 'create', array(
+    $this->contactID = $this->individualCreate(['email' => 'undeliverable@example.com']);
+    $groupID = $this->callAPISuccess('Group', 'create', [
       'title' => 'Mailing group',
-      'api.GroupContact.create' => array(
+      'api.GroupContact.create' => [
         'contact_id' => $this->contactID,
-      ),
-    ));
-    $this->createMailing(array('scheduled_date' => 'now', 'groups' => array('include' => array($groupID))));
-    $this->callAPISuccess('job', 'process_mailing', array());
-    $this->eventQueue = $this->callAPISuccess('MailingEventQueue', 'get', array('api.MailingEventQueue.create' => array('hash' => 'aaaaaaaaaaaaaaaa')));
+      ],
+    ]);
+    $this->createMailing(['scheduled_date' => 'now', 'groups' => ['include' => [$groupID]]]);
+    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->eventQueue = $this->callAPISuccess('MailingEventQueue', 'get', ['api.MailingEventQueue.create' => ['hash' => 'aaaaaaaaaaaaaaaa']]);
   }
 
 }

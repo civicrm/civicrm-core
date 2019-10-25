@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,6 @@ function civicrm_api3_action_schedule_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');
 }
 
-
 /**
  * Create a new ActionSchedule.
  *
@@ -52,7 +51,7 @@ function civicrm_api3_action_schedule_get($params) {
  * @return array
  */
 function civicrm_api3_action_schedule_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('start_action_date', 'absolute_date'));
+  civicrm_api3_verify_one_mandatory($params, NULL, ['start_action_date', 'absolute_date']);
   if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
     $params['name'] = CRM_Utils_String::munge($params['title']);
   }

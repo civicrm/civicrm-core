@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
 
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
@@ -163,7 +164,6 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
     return ($result !== FALSE);
   }
 
-
   /**
    * @param $key
    *
@@ -194,7 +194,8 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
       $value = $this->_cache->get($key);
       if ($value === FALSE) {
         $value = uniqid();
-        $this->_cache->set($key, $value, FALSE, 0); // Indefinite.
+        // Indefinite.
+        $this->_cache->set($key, $value, FALSE, 0);
       }
       $this->_truePrefix = [
         'value' => $value,

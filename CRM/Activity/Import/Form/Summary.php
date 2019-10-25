@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -89,7 +89,7 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
     }
     $this->assign('dupeActionString', $dupeActionString);
 
-    $properties = array(
+    $properties = [
       'totalRowCount',
       'validRowCount',
       'invalidRowCount',
@@ -101,7 +101,7 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
       'downloadMismatchRecordsUrl',
       'groupAdditions',
       'unMatchCount',
-    );
+    ];
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }

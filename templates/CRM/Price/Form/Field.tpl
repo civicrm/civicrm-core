@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -205,7 +205,7 @@
 
     <tr class="crm-price-field-form-block-active_on">
       <td class="label">{$form.active_on.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=active_on}
+      <td>{$form.active_on.html}
       {if $action neq 4}
         <br /><span class="description">{ts}Date this field becomes effective (optional).  Used for price set fields that are made available starting on a specific date.{/ts}</span>
       {/if}
@@ -214,7 +214,7 @@
 
     <tr class="crm-price-field-form-block-expire_on">
       <td class="label">{$form.expire_on.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=expire_on}
+      <td>{$form.expire_on.html}
       {if $action neq 4}
         <br /><span class="description">{ts}Date this field expires (optional).  Used for price set fields that are no longer available after a specific date (e.g. early-bird pricing).{/ts}</span>
       {/if}

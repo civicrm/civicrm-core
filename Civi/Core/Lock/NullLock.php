@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@ namespace Civi\Core\Lock;
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class NullLock implements LockInterface {
 
@@ -49,7 +49,7 @@ class NullLock implements LockInterface {
   /**
    * Acquire lock.
    *
-   * @param int|NULL $timeout
+   * @param int|null $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.
    *

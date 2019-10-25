@@ -12,5 +12,5 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern) VALUES (@bo
 
 -- CRM-21532 Add French state/departments
 SELECT @country_id := id from civicrm_country where name = 'France' AND iso_code = 'FR';
-INSERT INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`) VALUES
+INSERT IGNORE INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`) VALUES
 (NULL, @country_id, "52", "Haute-Marne");

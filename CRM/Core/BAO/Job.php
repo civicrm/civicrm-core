@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id: $
  *
  */
@@ -149,17 +149,17 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * Make a copy of a Job.
    *
    * @param int $id The job id to copy.
-   *
+   * @param array $params
    * @return CRM_Core_DAO
    */
-  public static function copy($id, $params = array()) {
-    $fieldsFix = array(
-      'suffix' => array(
+  public static function copy($id, $params = []) {
+    $fieldsFix = [
+      'suffix' => [
         'name' => ' - ' . ts('Copy'),
-      ),
+      ],
       'replace' => $params,
-    );
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Job', array('id' => $id), NULL, $fieldsFix);
+    ];
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Job', ['id' => $id], NULL, $fieldsFix);
     $copy->save();
     CRM_Utils_Hook::copy('Job', $copy);
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -40,19 +40,19 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
   }
 
   public function testGetKeysEmpty() {
-    $c = new CRM_Extension_Container_Collection(array());
-    $this->assertEquals($c->getKeys(), array());
+    $c = new CRM_Extension_Container_Collection([]);
+    $this->assertEquals($c->getKeys(), []);
   }
 
   public function testGetKeys() {
     $c = $this->_createContainer();
-    $this->assertEquals(array(
-        'test.conflict',
-        'test.whiz',
-        'test.whizbang',
-        'test.foo',
-        'test.foo.bar',
-      ), $c->getKeys());
+    $this->assertEquals([
+      'test.conflict',
+      'test.whiz',
+      'test.whizbang',
+      'test.foo',
+      'test.foo.bar',
+    ], $c->getKeys());
   }
 
   public function testGetPath() {
@@ -90,15 +90,17 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
   }
 
   public function testCaching() {
-    $cache = new CRM_Utils_Cache_Arraycache(array());
+    $cache = new CRM_Utils_Cache_Arraycache([]);
     $this->assertTrue(!is_array($cache->get('ext-collection')));
     $c = $this->_createContainer($cache, 'ext-collection');
     $this->assertEquals('http://foo', $c->getResUrl('test.foo'));
     $this->assertTrue(is_array($cache->get('ext-collection')));
 
     $cacheData = $cache->get('ext-collection');
-    $this->assertEquals('a', $cacheData['test.foo']); // 'test.foo' was defined in the 'a' container
-    $this->assertEquals('b', $cacheData['test.whiz']); // 'test.whiz' was defined in the 'b' container
+    // 'test.foo' was defined in the 'a' container
+    $this->assertEquals('a', $cacheData['test.foo']);
+    // 'test.whiz' was defined in the 'b' container
+    $this->assertEquals('b', $cacheData['test.whiz']);
   }
 
   /**
@@ -108,37 +110,37 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
    * @return CRM_Extension_Container_Collection
    */
   public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
-    $containers = array();
-    $containers['a'] = new CRM_Extension_Container_Static(array(
-      'test.foo' => array(
+    $containers = [];
+    $containers['a'] = new CRM_Extension_Container_Static([
+      'test.foo' => [
         'path' => '/path/to/foo',
         'resUrl' => 'http://foo',
-      ),
-      'test.foo.bar' => array(
+      ],
+      'test.foo.bar' => [
         'path' => '/path/to/bar',
         'resUrl' => 'http://foobar',
-      ),
-    ));
-    $containers['b'] = new CRM_Extension_Container_Static(array(
-      'test.whiz' => array(
+      ],
+    ]);
+    $containers['b'] = new CRM_Extension_Container_Static([
+      'test.whiz' => [
         'path' => '/path/to/whiz',
         'resUrl' => 'http://whiz',
-      ),
-      'test.whizbang' => array(
+      ],
+      'test.whizbang' => [
         'path' => '/path/to/whizbang',
         'resUrl' => 'http://whizbang',
-      ),
-      'test.conflict' => array(
+      ],
+      'test.conflict' => [
         'path' => '/path/to/conflict-b',
         'resUrl' => 'http://conflict-b',
-      ),
-    ));
-    $containers['c'] = new CRM_Extension_Container_Static(array(
-      'test.conflict' => array(
+      ],
+    ]);
+    $containers['c'] = new CRM_Extension_Container_Static([
+      'test.conflict' => [
         'path' => '/path/to/conflict-c',
         'resUrl' => 'http://conflict-c',
-      ),
-    ));
+      ],
+    ]);
     $c = new CRM_Extension_Container_Collection($containers, $cache, $cacheKey);
     return $c;
   }

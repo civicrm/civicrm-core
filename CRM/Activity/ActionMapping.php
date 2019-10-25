@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,10 +27,9 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Activity_ActionMapping
@@ -56,7 +55,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
    */
   public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Activity_ActionMapping::create(array(
+    $registrations->register(CRM_Activity_ActionMapping::create([
       'id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
       'entity' => 'civicrm_activity',
       'entity_label' => ts('Activity'),
@@ -65,7 +64,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_status' => 'activity_status',
       'entity_status_label' => ts('Activity Status'),
       'entity_date_start' => 'activity_date_time',
-    )));
+    ]));
   }
 
   /**

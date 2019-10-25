@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -144,5 +144,15 @@ interface MappingInterface {
    * @see RecipientBuilder
    */
   public function createQuery($schedule, $phase, $defaultParams);
+
+  /**
+   * Determine whether a schedule based on this mapping should
+   * reset the reminder state if the trigger date changes.
+   *
+   * @return bool
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   */
+  public function resetOnTriggerDateChange($schedule);
 
 }

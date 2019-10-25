@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -88,7 +88,7 @@
 {/if}
 {if $form.subject}
         <tr class="crm-paymentProcessor-form-block-subject">
-            <td class="label">{$form.subject.label}</td><td>{$form.subject.html}</td>
+            <td class="label">{$form.subject.label}</td><td>{$form.subject.html} {help id=$ppTypeName|cat:'-live-subject' title=$form.subject.label}</td>
         </tr>
 {/if}
         <tr class="crm-paymentProcessor-form-block-url_site">
@@ -129,7 +129,7 @@
 {/if}
 {if $form.test_subject}
         <tr class="crm-paymentProcessor-form-block-test_subject">
-            <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html}</td>
+            <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html} {help id=$ppTypeName|cat:'-test-subject' title=$form.test_subject.label}</td>
         </tr>
 {/if}
         <tr class="crm-paymentProcessor-form-block-test_url_site">

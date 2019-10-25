@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,6 +51,12 @@
       <td>
         {$form.relation_target_group.label} {help id="id-relationship-target-group" file="CRM/Contact/Form/Search/Advanced.hlp"}<br />
         {$form.relation_target_group.html|crmAddClass:huge}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        {$form.relation_description.label}<br />
+        {$form.relation_description.html}
       </td>
     </tr>
     <tr>

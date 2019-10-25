@@ -3,7 +3,7 @@
 
 // FIXME: Make this a proper app with unit-tests
 
-$civi_pkgs_dir = dirname( dirname( dirname( __FILE__ ) ) ) .   DIRECTORY_SEPARATOR . 'packages';
+$civi_pkgs_dir = dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'packages';
 require_once $civi_pkgs_dir . DIRECTORY_SEPARATOR . 'simple_html_dom.php';
 exit(main($argv));
 
@@ -19,7 +19,7 @@ function main($argv) {
   $files = $argv;
   array_shift($files); // skip program name
   foreach ($files as $file) {
-    check_tpl($file, function($code, $message) use ($file) {
+    check_tpl($file, function ($code, $message) use ($file) {
       printf("[%s] %s\n", $file, $message);
     });
   }

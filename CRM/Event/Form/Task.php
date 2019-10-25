@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -61,7 +61,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function preProcessCommon(&$form) {
-    $form->_participantIds = array();
+    $form->_participantIds = [];
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
@@ -72,7 +72,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
     }
     $form->assign('taskName', $tasks[$form->_task]);
 
-    $ids = array();
+    $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -130,7 +130,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_participantIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_participantIds,
       'civicrm_participant'
     );
   }
@@ -148,18 +148,17 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
    * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
 }

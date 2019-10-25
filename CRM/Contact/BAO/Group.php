@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
@@ -89,7 +89,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $groupContact->delete();
 
     // make all the 'add_to_group_id' field of 'civicrm_uf_group table', pointing to this group, as null
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
     $query = "UPDATE civicrm_uf_group SET `add_to_group_id`= NULL WHERE `add_to_group_id` = %1";
     CRM_Core_DAO::executeQuery($query, $params);
 
@@ -117,10 +117,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     CRM_Utils_Hook::post('delete', 'Group', $id, $group);
 
     // delete the recently created Group
-    $groupRecent = array(
+    $groupRecent = [
       'id' => $id,
       'type' => 'Group',
-    );
+    ];
     CRM_Utils_Recent::del($groupRecent);
   }
 
@@ -130,8 +130,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id
    */
   public static function getGroupContacts($id) {
-    $params = array(array('group', 'IN', array(1 => $id), 0, 0));
-    list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, array('contact_id'));
+    $params = [['group', 'IN', [1 => $id], 0, 0]];
+    list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
     return $contacts;
   }
 
@@ -149,7 +149,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    */
   public static function memberCount($id, $status = 'Added', $countChildGroups = FALSE) {
     $groupContact = new CRM_Contact_DAO_GroupContact();
-    $groupIds = array($id);
+    $groupIds = [$id];
     if ($countChildGroups) {
       $groupIds = CRM_Contact_BAO_GroupNesting::getDescendentGroupIds($groupIds);
     }
@@ -195,11 +195,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   this array contains the list of members for this group id
    */
   public static function getMember($groupID, $useCache = TRUE, $limit = 0) {
-    $params = array(array('group', '=', $groupID, 0, 0));
-    $returnProperties = array('contact_id');
+    $params = [['group', '=', $groupID, 0, 0]];
+    $returnProperties = ['contact_id'];
     list($contacts) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $limit, $useCache);
 
-    $aMembers = array();
+    $aMembers = [];
     foreach ($contacts as $contact) {
       $aMembers[$contact['contact_id']] = 1;
     }
@@ -278,7 +278,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     $flag = $returnProperties && in_array('member_count', $returnProperties) ? 1 : 0;
 
-    $groups = array();
+    $groups = [];
     while ($dao->fetch()) {
       $group = new CRM_Contact_DAO_Group();
       if ($flag) {
@@ -350,6 +350,20 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Utils_Hook::pre('create', 'Group', NULL, $params);
     }
 
+    // dev/core#287 Disable child groups if all parents are disabled.
+    if (!empty($params['id'])) {
+      $allChildGroupIds = self::getChildGroupIds($params['id']);
+      foreach ($allChildGroupIds as $childKey => $childValue) {
+        $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($childValue);
+        $activeParentsCount = civicrm_api3('Group', 'getcount', [
+          'id' => ['IN' => $parentIds],
+          'is_active' => 1,
+        ]);
+        if (count($parentIds) >= 1 && $activeParentsCount <= 1) {
+          $setDisable = self::setIsActive($childValue, CRM_Utils_Array::value('is_active', $params, 1));
+        }
+      }
+    }
     // form the name only if missing: CRM-627
     $nameParam = CRM_Utils_Array::value('name', $params, NULL);
     if (!$nameParam && empty($params['id'])) {
@@ -407,7 +421,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $group->name = substr($group->name, 0, -4) . "_{$group->id}";
     }
 
-    $group->buildClause();
     $group->save();
 
     // add custom field values
@@ -425,7 +438,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       ) {
         // if no parent present and the group doesn't already have any parents,
         // make sure site group goes as parent
-        $params['parents'] = array($domainGroupID);
+        $params['parents'] = [$domainGroupID];
       }
 
       if (!empty($params['parents'])) {
@@ -466,7 +479,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Utils_Hook::post('create', 'Group', $group->id, $group);
     }
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::check('edit groups')) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/group', 'reset=1&action=update&id=' . $group->id);
       // currently same permission we are using for delete a group
@@ -485,25 +498,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       );
     }
     return $group;
-  }
-
-  /**
-   * Given a saved search compute the clause and the tables
-   * and store it for future use
-   */
-  public function buildClause() {
-    $params = array(array('group', 'IN', array($this->id), 0, 0));
-
-    if (!empty($params)) {
-      $tables = $whereTables = array();
-      $this->where_clause = CRM_Contact_BAO_Query::getWhereClause($params, NULL, $tables, $whereTables);
-      if (!empty($tables)) {
-        $this->select_tables = serialize($tables);
-      }
-      if (!empty($whereTables)) {
-        $this->where_tables = serialize($whereTables);
-      }
-    }
   }
 
   /**
@@ -621,12 +615,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    */
   protected static function flushCaches() {
     CRM_Utils_System::flushCache();
-    $staticCaches = array(
+    $staticCaches = [
       'CRM_Core_PseudoConstant' => 'groups',
       'CRM_ACL_API' => 'group_permission',
       'CRM_ACL_BAO_ACL' => 'permissioned_groups',
       'CRM_Contact_BAO_Group' => 'permission_clause',
-    );
+    ];
     foreach ($staticCaches as $class => $key) {
       if (isset(Civi::$statics[$class][$key])) {
         unset(Civi::$statics[$class][$key]);
@@ -660,9 +654,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       //save the mapping for search builder
       if (!$ssId) {
         //save record in mapping table
-        $mappingParams = array(
+        $mappingParams = [
           'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
-        );
+        ];
         $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
         $mappingId = $mapping->id;
       }
@@ -681,7 +675,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     //create/update saved search record.
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $ssId;
-    $savedSearch->form_values = serialize(CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
+    $formValues = $params['search_context'] === 'builder' ? $params['form_values'] : CRM_Contact_BAO_Query::convertFormValues($params['form_values']);
+    $savedSearch->form_values = serialize($formValues);
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = CRM_Utils_Array::value('search_custom_id', $params);
     $savedSearch->save();
@@ -697,14 +692,14 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
     else {
       //create group only when new saved search.
-      $groupParams = array(
+      $groupParams = [
         'title' => "Hidden Smart Group {$ssId}",
         'is_active' => CRM_Utils_Array::value('is_active', $params, 1),
         'is_hidden' => CRM_Utils_Array::value('is_hidden', $params, 1),
         'group_type' => CRM_Utils_Array::value('group_type', $params),
         'visibility' => CRM_Utils_Array::value('visibility', $params),
         'saved_search_id' => $ssId,
-      );
+      ];
 
       $smartGroup = self::create($groupParams);
       $smartGroupId = $smartGroup->id;
@@ -712,16 +707,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // Update mapping with the name and description of the hidden smart group.
     if ($mappingId) {
-      $mappingParams = array(
+      $mappingParams = [
         'id' => $mappingId,
         'name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $smartGroupId, 'name', 'id'),
         'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $smartGroupId, 'description', 'id'),
         'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
-      );
+      ];
       CRM_Core_BAO_Mapping::add($mappingParams);
     }
 
-    return array($smartGroupId, $ssId);
+    return [$smartGroupId, $ssId];
   }
 
   /**
@@ -737,7 +732,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @todo there seems little reason for the small number of functions that call this to pass in
    * params that then need to be translated in this function since they are coding them when calling
    */
-  static public function getGroupListSelector(&$params) {
+  public static function getGroupListSelector(&$params) {
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
@@ -756,9 +751,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     // format params and add links
-    $groupList = array();
+    $groupList = [];
     foreach ($groups as $id => $value) {
-      $group = array();
+      $group = [];
       $group['group_id'] = $value['id'];
       $group['count'] = $value['count'];
       $group['title'] = $value['title'];
@@ -767,12 +762,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       if (empty($params['parent_id']) && !empty($value['parents'])) {
         $group['parent_id'] = $value['parents'];
         $groupIds = explode(',', $value['parents']);
-        $title = array();
+        $title = [];
         foreach ($groupIds as $gId) {
           $title[] = $allGroups[$gId];
         }
         $group['title'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . implode(', ', $title) . '</div>';
-        $value['class'] = array_diff($value['class'], array('crm-row-parent'));
+        $value['class'] = array_diff($value['class'], ['crm-row-parent']);
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
       if (empty($params['parentsOnly'])) {
@@ -783,7 +778,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         }
       }
       $group['DT_RowClass'] = 'crm-entity ' . implode(' ', $value['class']);
-      $group['DT_RowAttr'] = array();
+      $group['DT_RowAttr'] = [];
       $group['DT_RowAttr']['data-id'] = $value['id'];
       $group['DT_RowAttr']['data-entity'] = 'group';
 
@@ -806,7 +801,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       array_push($groupList, $group);
     }
 
-    $groupsDT = array();
+    $groupsDT = [];
     $groupsDT['data'] = $groupList;
     $groupsDT['recordsTotal'] = !empty($params['total']) ? $params['total'] : NULL;
     $groupsDT['recordsFiltered'] = !empty($params['total']) ? $params['total'] : NULL;
@@ -876,7 +871,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     //FIXME CRM-4418, now we are handling delete separately
     //if we introduce 'delete for group' make sure to handle here.
-    $groupPermissions = array(CRM_Core_Permission::VIEW);
+    $groupPermissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('edit groups')) {
       $groupPermissions[] = CRM_Core_Permission::EDIT;
       $groupPermissions[] = CRM_Core_Permission::DELETE;
@@ -888,16 +883,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $links = self::actionLinks($params);
 
     $allTypes = CRM_Core_OptionGroup::values('group_type');
-    $values = array();
+    $values = [];
 
     $visibility = CRM_Core_SelectValues::ufVisibility();
 
     while ($object->fetch()) {
       $newLinks = $links;
-      $values[$object->id] = array(
-        'class' => array(),
+      $values[$object->id] = [
+        'class' => [],
         'count' => '0',
-      );
+      ];
       CRM_Core_DAO::storeValues($object, $values[$object->id]);
 
       if ($object->saved_search_id) {
@@ -946,24 +941,26 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $groupTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           substr($values[$object->id]['group_type'], 1, -1)
         );
-        $types = array();
+        $types = [];
         foreach ($groupTypes as $type) {
           $types[] = CRM_Utils_Array::value($type, $allTypes);
         }
         $values[$object->id]['group_type'] = implode(', ', $types);
       }
-      $values[$object->id]['action'] = CRM_Core_Action::formLink($newLinks,
-        $action,
-        array(
-          'id' => $object->id,
-          'ssid' => $object->saved_search_id,
-        ),
-        ts('more'),
-        FALSE,
-        'group.selector.row',
-        'Group',
-        $object->id
-      );
+      if ($action) {
+        $values[$object->id]['action'] = CRM_Core_Action::formLink($newLinks,
+          $action,
+          [
+            'id' => $object->id,
+            'ssid' => $object->saved_search_id,
+          ],
+          ts('more'),
+          FALSE,
+          'group.selector.row',
+          'Group',
+          $object->id
+        );
+      }
 
       // If group has children, add class for link to view children
       $values[$object->id]['is_parent'] = FALSE;
@@ -983,11 +980,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $values[$object->id]['org_info'] = "<a href='{$contactUrl}'>{$object->org_name}</a>";
         }
         else {
-          $values[$object->id]['org_info'] = ''; // Empty cell
+          // Empty cell
+          $values[$object->id]['org_info'] = '';
         }
       }
       else {
-        $values[$object->id]['org_info'] = NULL; // Collapsed column if all cells are NULL
+        // Collapsed column if all cells are NULL
+        $values[$object->id]['org_info'] = NULL;
       }
       if ($object->created_id) {
         $contactUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->created_id}");
@@ -1002,7 +1001,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $values[$object->id]['count'] = ts('unknown');
       }
       else {
-        $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
+        $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', ['group' => $object->id]);
       }
     }
 
@@ -1026,7 +1025,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $groupIDs
    *   Array of group ids.
    *
-   * @param NULL $parents
+   * @param string $parents
    * @param string $spacer
    * @param bool $titleOnly
    *
@@ -1039,7 +1038,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $titleOnly = FALSE
   ) {
     if (empty($groupIDs)) {
-      return array();
+      return [];
     }
 
     $groupIdString = '(' . implode(',', array_keys($groupIDs)) . ')';
@@ -1051,8 +1050,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // separators in front of the name to give it a visual offset.
     // Instead of recursively making mysql queries, we'll make one big
     // query and build the hierarchy with the algorithm below.
-    $groups = array();
-    $args = array(1 => array($groupIdString, 'String'));
+    $groups = [];
+    $args = [1 => [$groupIdString, 'String']];
     $query = "
 SELECT id, title, description, visibility, parents
 FROM   civicrm_group
@@ -1062,7 +1061,7 @@ WHERE  id IN $groupIdString
       // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5').
       $parentArray = explode(',', $parents);
       $parent = self::filterActiveGroups($parentArray);
-      $args[2] = array($parent, 'Integer');
+      $args[2] = [$parent, 'Integer'];
       $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
     }
     $query .= " ORDER BY title";
@@ -1072,31 +1071,30 @@ WHERE  id IN $groupIdString
     // $roots represent the current leaf nodes that need to be checked for
     // children. $rows represent the unplaced nodes
     // $tree contains the child nodes based on their parent_id.
-    $roots = array();
-    $tree = array();
+    $roots = [];
+    $tree = [];
     while ($dao->fetch()) {
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);
         $parent = self::filterActiveGroups($parentArray);
-        $tree[$parent][] = array(
+        $tree[$parent][] = [
           'id' => $dao->id,
           'title' => $dao->title,
           'visibility' => $dao->visibility,
           'description' => $dao->description,
-        );
+        ];
       }
       else {
-        $roots[] = array(
+        $roots[] = [
           'id' => $dao->id,
           'title' => $dao->title,
           'visibility' => $dao->visibility,
           'description' => $dao->description,
-        );
+        ];
       }
     }
-    $dao->free();
 
-    $hierarchy = array();
+    $hierarchy = [];
     for ($i = 0; $i < count($roots); $i++) {
       self::buildGroupHierarchy($hierarchy, $roots[$i], $tree, $titleOnly, $spacer, 0);
     }
@@ -1122,11 +1120,11 @@ WHERE  id IN $groupIdString
       $hierarchy[$group['id']] = $spaces . $group['title'];
     }
     else {
-      $hierarchy[$group['id']] = array(
+      $hierarchy[$group['id']] = [
         'title' => $spaces . $group['title'],
         'description' => $group['description'],
         'visibility' => $group['visibility'],
-      );
+      ];
     }
 
     // For performance reasons we use a for loop rather than a foreach.
@@ -1169,15 +1167,15 @@ WHERE {$whereClause}";
    * @return string
    */
   public static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
-    $values = array();
+    $values = [];
     $title = CRM_Utils_Array::value('title', $params);
     if ($title) {
       $clauses[] = "groups.title LIKE %1";
       if (strpos($title, '%') !== FALSE) {
-        $params[1] = array($title, 'String', FALSE);
+        $params[1] = [$title, 'String', FALSE];
       }
       else {
-        $params[1] = array($title, 'String', TRUE);
+        $params[1] = [$title, 'String', TRUE];
       }
     }
 
@@ -1187,14 +1185,14 @@ WHERE {$whereClause}";
       if (!empty($types)) {
         $clauses[] = 'groups.group_type LIKE %2';
         $typeString = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $types) . CRM_Core_DAO::VALUE_SEPARATOR;
-        $params[2] = array($typeString, 'String', TRUE);
+        $params[2] = [$typeString, 'String', TRUE];
       }
     }
 
     $visibility = CRM_Utils_Array::value('visibility', $params);
     if ($visibility) {
       $clauses[] = 'groups.visibility = %3';
-      $params[3] = array($visibility, 'String');
+      $params[3] = [$visibility, 'String'];
     }
 
     $groupStatus = CRM_Utils_Array::value('status', $params);
@@ -1202,12 +1200,12 @@ WHERE {$whereClause}";
       switch ($groupStatus) {
         case 1:
           $clauses[] = 'groups.is_active = 1';
-          $params[4] = array($groupStatus, 'Integer');
+          $params[4] = [$groupStatus, 'Integer'];
           break;
 
         case 2:
           $clauses[] = 'groups.is_active = 0';
-          $params[4] = array($groupStatus, 'Integer');
+          $params[4] = [$groupStatus, 'Integer'];
           break;
 
         case 3:
@@ -1225,16 +1223,16 @@ WHERE {$whereClause}";
     $parent_id = CRM_Utils_Array::value('parent_id', $params);
     if ($parent_id) {
       $clauses[] = 'groups.id IN (SELECT child_group_id FROM civicrm_group_nesting WHERE parent_group_id = %5)';
-      $params[5] = array($parent_id, 'Integer');
+      $params[5] = [$parent_id, 'Integer'];
     }
 
     if ($createdBy = CRM_Utils_Array::value('created_by', $params)) {
       $clauses[] = "createdBy.sort_name LIKE %6";
       if (strpos($createdBy, '%') !== FALSE) {
-        $params[6] = array($createdBy, 'String', FALSE);
+        $params[6] = [$createdBy, 'String', FALSE];
       }
       else {
-        $params[6] = array($createdBy, 'String', TRUE);
+        $params[6] = [$createdBy, 'String', TRUE];
       }
     }
 
@@ -1263,36 +1261,36 @@ WHERE {$whereClause}";
       $params['component_mode'] = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
     $modeValue = CRM_Contact_Form_Search::getModeValue($params['component_mode']);
-    $links = array(
-      CRM_Core_Action::VIEW => array(
+    $links = [
+      CRM_Core_Action::VIEW => [
         'name' => $modeValue['selectorLabel'],
         'url' => 'civicrm/group/search',
         'qs' => 'reset=1&force=1&context=smog&gid=%%id%%&component_mode=' . $params['component_mode'],
         'title' => ts('Group Contacts'),
-      ),
-      CRM_Core_Action::UPDATE => array(
+      ],
+      CRM_Core_Action::UPDATE => [
         'name' => ts('Settings'),
         'url' => 'civicrm/group',
         'qs' => 'reset=1&action=update&id=%%id%%',
         'title' => ts('Edit Group'),
-      ),
-      CRM_Core_Action::DISABLE => array(
+      ],
+      CRM_Core_Action::DISABLE => [
         'name' => ts('Disable'),
         'ref' => 'crm-enable-disable',
         'title' => ts('Disable Group'),
-      ),
-      CRM_Core_Action::ENABLE => array(
+      ],
+      CRM_Core_Action::ENABLE => [
         'name' => ts('Enable'),
         'ref' => 'crm-enable-disable',
         'title' => ts('Enable Group'),
-      ),
-      CRM_Core_Action::DELETE => array(
+      ],
+      CRM_Core_Action::DELETE => [
         'name' => ts('Delete'),
         'url' => 'civicrm/group',
         'qs' => 'reset=1&action=delete&id=%%id%%',
         'title' => ts('Delete Group'),
-      ),
-    );
+      ],
+    ];
 
     return $links;
   }
@@ -1340,12 +1338,12 @@ WHERE {$whereClause}";
    * @return array
    */
   public static function getChildGroupIds($regularGroupIDs) {
-    $childGroupIDs = array();
+    $childGroupIDs = [];
 
     foreach ((array) $regularGroupIDs as $regularGroupID) {
       // temporary store the child group ID(s) of regular group identified by $id,
       //   later merge with main child group array
-      $tempChildGroupIDs = array();
+      $tempChildGroupIDs = [];
       // check that the regular group has any child group, if not then continue
       if ($childrenFound = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $regularGroupID, 'children')) {
         $tempChildGroupIDs[] = $childrenFound;
@@ -1379,11 +1377,11 @@ WHERE {$whereClause}";
    */
   public static function filterActiveGroups($parentArray) {
     if (count($parentArray) > 1) {
-      $result = civicrm_api3('Group', 'get', array(
-        'id' => array('IN' => $parentArray),
+      $result = civicrm_api3('Group', 'get', [
+        'id' => ['IN' => $parentArray],
         'is_active' => TRUE,
         'return' => 'id',
-      ));
+      ]);
       $activeParentGroupIDs = CRM_Utils_Array::collect('id', $result['values']);
       foreach ($parentArray as $key => $groupID) {
         if (!array_key_exists($groupID, $activeParentGroupIDs)) {

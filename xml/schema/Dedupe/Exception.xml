@@ -23,6 +23,7 @@
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <add>3.3</add>
+    <required>TRUE</required>
   </field>
   <foreignKey>
     <name>contact_id1</name>
@@ -37,6 +38,7 @@
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <add>3.3</add>
+    <required>TRUE</required>
   </field>
   <foreignKey>
     <name>contact_id2</name>

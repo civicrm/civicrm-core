@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -36,117 +36,121 @@ class CRM_Utils_SignerTest extends CiviUnitTestCase {
   }
 
   public function testSignValidate() {
-    $cases = array();
-    $cases[] = array(
-      'signParams' => array(
+    $cases = [];
+    $cases[] = [
+      'signParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
-      'validateParams' => array(
+      ],
+      'validateParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
+      ],
       'isValid' => TRUE,
-    );
-    $cases[] = array(
-      'signParams' => array(
+    ];
+    $cases[] = [
+      'signParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
-      'validateParams' => array(
+      ],
+      'validateParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
         'irrelevant' => 'totally-irrelevant',
-      ),
+      ],
       'isValid' => TRUE,
-    );
-    $cases[] = array(
-      'signParams' => array(
+    ];
+    $cases[] = [
+      'signParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
-      'validateParams' => array(
+      ],
+      'validateParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => '',
-      ),
+      ],
       'isValid' => TRUE,
-    );
-    $cases[] = array(
-      'signParams' => array(
+    ];
+    $cases[] = [
+      'signParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
-      'validateParams' => array(
+      ],
+      'validateParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => 0,
-      ),
+      ],
       'isValid' => FALSE,
-    );
-    $cases[] = array(
-      'signParams' => array(
+    ];
+    $cases[] = [
+      'signParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => 0,
-      ),
-      'validateParams' => array(
+      ],
+      'validateParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
+      ],
       'isValid' => FALSE,
-    );
-    $cases[] = array(
-      'signParams' => array(
+    ];
+    $cases[] = [
+      'signParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
-      'validateParams' => array(
+      ],
+      'validateParams' => [
         'a' => 'eh',
         'b' => 'bay',
         'c' => NULL,
-      ),
+      ],
       'isValid' => FALSE,
-    );
-    $cases[] = array(
-      'signParams' => array(
+    ];
+    $cases[] = [
+      'signParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => NULL,
-      ),
-      'validateParams' => array(
+      ],
+      'validateParams' => [
         'a' => 'eh',
         'b' => 'bee',
         'c' => FALSE,
-      ),
+      ],
       'isValid' => FALSE,
-    );
-    $cases[] = array(
-      'signParams' => array(
-        'a' => 1, // int
+    ];
+    $cases[] = [
+      'signParams' => [
+        // int
+        'a' => 1,
         'b' => 'bee',
-      ),
-      'validateParams' => array(
-        'a' => '1', // string
+      ],
+      'validateParams' => [
+        // string
+        'a' => '1',
         'b' => 'bee',
-      ),
+      ],
       'isValid' => TRUE,
-    );
+    ];
 
     foreach ($cases as $caseId => $case) {
-      $signer = new CRM_Utils_Signer('secret', array('a', 'b', 'c'));
+      $signer = new CRM_Utils_Signer('secret', ['a', 'b', 'c']);
       $signature = $signer->sign($case['signParams']);
-      $this->assertTrue(!empty($signature) && is_string($signature)); // arbitrary
+      // arbitrary
+      $this->assertTrue(!empty($signature) && is_string($signature));
 
-      $validator = new CRM_Utils_Signer('secret', array('a', 'b', 'c')); // same as $signer but physically separate
+      // same as $signer but physically separate
+      $validator = new CRM_Utils_Signer('secret', ['a', 'b', 'c']);
       $isValid = $validator->validate($signature, $case['validateParams']);
 
       if ($isValid !== $case['isValid']) {

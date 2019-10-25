@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -52,7 +52,7 @@ class CRM_Utils_ICalendar {
     $text = str_replace("\\", "\\\\", $text);
     $text = str_replace(',', '\,', $text);
     $text = str_replace(';', '\;', $text);
-    $text = str_replace(array("\r\n", "\n", "\r"), "\\n ", $text);
+    $text = str_replace(["\r\n", "\n", "\r"], "\\n ", $text);
     $text = implode("\n ", str_split($text, 50));
     return $text;
   }

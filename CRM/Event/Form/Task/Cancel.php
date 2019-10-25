@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -40,6 +40,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
@@ -76,7 +77,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
    */
   public function postProcess() {
     $params = $this->exportValues();
-    $value = array();
+    $value = [];
 
     foreach ($this->_participantIds as $participantId) {
       $value['id'] = $participantId;

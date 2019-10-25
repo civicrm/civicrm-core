@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@
  */
 function civicrm_api3_membership_type_create($params) {
   // Workaround for fields using nonstandard serialization
-  foreach (array('relationship_type_id', 'relationship_direction') as $field) {
+  foreach (['relationship_type_id', 'relationship_direction'] as $field) {
     if (isset($params[$field]) && is_array($params[$field])) {
       $params[$field] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params[$field]);
     }
@@ -85,14 +85,27 @@ function civicrm_api3_membership_type_get($params) {
   if (!empty($results['values']) && is_array($results['values'])) {
     foreach ($results['values'] as &$item) {
       // Workaround for fields using nonstandard serialization
-      foreach (array('relationship_type_id', 'relationship_direction') as $field) {
+      foreach (['relationship_type_id', 'relationship_direction'] as $field) {
         if (isset($item[$field]) && !is_array($item[$field])) {
+          // @todo - this should be handled by the serialization now...
           $item[$field] = (array) $item[$field];
         }
       }
     }
   }
   return $results;
+}
+
+/**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_membership_type_get_spec(&$params) {
+  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
 }
 
 /**

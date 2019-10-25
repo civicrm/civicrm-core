@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -49,17 +49,17 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
       CRM_Core_Error::fatal(ts('Preview only supports HTTP POST'));
     }
     // Inline forms don't get menu-level permission checks
-    $checkPermission = array(
-      array(
+    $checkPermission = [
+      [
         'administer CiviCRM',
         'manage event profiles',
-      ),
-    );
+      ],
+    ];
     if (!CRM_Core_Permission::check($checkPermission)) {
       CRM_Core_Error::fatal(ts('Permission Denied'));
     }
     $content = json_decode($_REQUEST['ufData'], TRUE);
-    foreach (array('ufGroup', 'ufFieldCollection') as $key) {
+    foreach (['ufGroup', 'ufFieldCollection'] as $key) {
       if (!is_array($content[$key])) {
         CRM_Core_Error::fatal("Missing JSON parameter, $key");
       }

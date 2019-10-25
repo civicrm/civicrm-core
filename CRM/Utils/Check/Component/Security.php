@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
@@ -68,7 +68,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @see CRM-14091
    */
   public function checkLogFileIsNotAccessible() {
-    $messages = array();
+    $messages = [];
 
     $config = CRM_Core_Config::singleton();
 
@@ -86,15 +86,14 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         if (count($log_path) > 1) {
           $url[] = $log_path[1];
           $log_url = implode($filePathMarker, $url);
-          $headers = @get_headers($log_url);
-          if (stripos($headers[0], '200')) {
+          if ($this->fileExists($log_url)) {
             $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
             $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
               . '<br />' .
               '<a href="%2">Read more about this warning</a>';
             $messages[] = new CRM_Utils_Check_Message(
               __FUNCTION__,
-              ts($msg, array(1 => $log_url, 2 => $docs_url)),
+              ts($msg, [1 => $log_url, 2 => $docs_url]),
               ts('Security Warning'),
               \Psr\Log\LogLevel::WARNING,
               'fa-lock'
@@ -124,13 +123,13 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @todo Test with WordPress, Joomla.
    */
   public function checkUploadsAreNotAccessible() {
-    $messages = array();
+    $messages = [];
 
     $config = CRM_Core_Config::singleton();
-    $privateDirs = array(
+    $privateDirs = [
       $config->uploadDir,
       $config->customFileUploadDir,
-    );
+    ];
 
     foreach ($privateDirs as $privateDir) {
       $heuristicUrl = $this->guessUrl($privateDir);
@@ -140,14 +139,14 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           ts('Files in the data directory (<a href="%3">%2</a>) should not be downloadable.'
             . '<br />'
             . '<a href="%1">Read more about this warning</a>',
-            array(
+            [
               1 => $this->createDocUrl('checkUploadsAreNotAccessible'),
               2 => $privateDir,
               3 => $heuristicUrl,
-            )),
-          ts('Private Files Readable'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-lock'
+            ]),
+            ts('Private Files Readable'),
+            \Psr\Log\LogLevel::WARNING,
+            'fa-lock'
         );
       }
     }
@@ -172,11 +171,11 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @todo Test with WordPress, Joomla.
    */
   public function checkDirectoriesAreNotBrowseable() {
-    $messages = array();
+    $messages = [];
     $config = CRM_Core_Config::singleton();
-    $publicDirs = array(
+    $publicDirs = [
       $config->imageUploadDir => $config->imageUploadURL,
-    );
+    ];
 
     // Setup index.html files to prevent browsing
     foreach ($publicDirs as $publicDir => $publicUrl) {
@@ -192,7 +191,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url)),
+          ts($msg, [1 => $publicDir, 2 => $publicDir, 3 => $docs_url]),
           ts('Browseable Directories'),
           \Psr\Log\LogLevel::ERROR,
           'fa-lock'
@@ -202,7 +201,6 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
     return $messages;
   }
-
 
   /**
    * Check that some files are not present.
@@ -215,38 +213,38 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   public function checkFilesAreNotPresent() {
     global $civicrm_root;
 
-    $messages = array();
-    $files = array(
-      array(
+    $messages = [];
+    $files = [
+      [
         // CRM-16005, upgraded from Civi <= 4.5.6
         "{$civicrm_root}/packages/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
-      ),
-      array(
+      ],
+      [
         // CRM-16005, Civi >= 4.5.7
         "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
-      ),
-      array(
+      ],
+      [
         // CRM-16005, Civi >= 4.6.0
         "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
-      ),
-      array(
+      ],
+      [
         // CIVI-SA-2013-001
         "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
         \Psr\Log\LogLevel::CRITICAL,
-      ),
-      array(
+      ],
+      [
         "{$civicrm_root}/packages/html2text/class.html2text.inc",
         \Psr\Log\LogLevel::CRITICAL,
-      ),
-    );
+      ],
+    ];
     foreach ($files as $file) {
       if (file_exists($file[0])) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('File \'%1\' presents a security risk and should be deleted.', array(1 => $file[0])),
+          ts('File \'%1\' presents a security risk and should be deleted.', [1 => $file[0]]),
           ts('Unsafe Files'),
           $file[1],
           'fa-lock'
@@ -260,13 +258,13 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * Discourage use of remote profile forms.
    */
   public function checkRemoteProfile() {
-    $messages = array();
+    $messages = [];
 
     if (Civi::settings()->get('remote_profile_submissions')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('Warning: External profile support (aka "HTML Snippet" support) is enabled in <a href="%1">system settings</a>. This setting may be prone to abuse. If you must retain it, consider HTTP throttling or other protections.',
-          array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))
+          [1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1')]
         ),
         ts('Remote Profiles Enabled'),
         \Psr\Log\LogLevel::WARNING,
@@ -277,13 +275,12 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-
   /**
    * Check that the sysadmin has not modified the Cxn
    * security setup.
    */
   public function checkCxnOverrides() {
-    $list = array();
+    $list = [];
     if (defined('CIVICRM_CXN_CA') && CIVICRM_CXN_CA !== 'CiviRootCA') {
       $list[] = 'CIVICRM_CXN_CA';
     }
@@ -291,14 +288,14 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       $list[] = 'CIVICRM_CXN_APPS_URL';
     }
 
-    $messages = array();
+    $messages = [];
 
     if (!empty($list)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('The system administrator has disabled security settings (%1). Connections to remote applications are insecure.', array(
+        ts('The system administrator has disabled security settings (%1). Connections to remote applications are insecure.', [
           1 => implode(', ', $list),
-        )),
+        ]),
         ts('Security Warning'),
         \Psr\Log\LogLevel::WARNING,
         'fa-lock'
@@ -365,8 +362,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
-    $headers = @get_headers("$url/$file");
-    if (stripos($headers[0], '200')) {
+    if ($this->fileExists("$url/$file")) {
       $content = @file_get_contents("$url/$file");
       if (preg_match('/delete me/', $content)) {
         $result = TRUE;

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,7 +39,7 @@
 {if $action eq 8}
    <div class="messages status no-popup">
        <div class="icon inform-icon"></div>
-       {ts}Do you want to delete this message template?{/ts}
+       {ts 1=$msg_title|escape}Do you want to delete the message template '%1'?{/ts}
    </div>
 {else}
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -61,8 +61,8 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
   public function preProcess() {
     $this->_id = $this->get('id');
 
-    $defaults = array();
-    $params = array('id' => $this->_id);
+    $defaults = [];
+    $params = ['id' => $this->_id];
     CRM_Core_BAO_CustomGroup::retrieve($params, $defaults);
     $this->_title = $defaults['title'];
 
@@ -71,7 +71,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
     $customField->custom_group_id = $this->_id;
 
     if ($customField->find(TRUE)) {
-      CRM_Core_Session::setStatus(ts("The Group '%1' cannot be deleted! You must Delete all custom fields in this group prior to deleting the group.", array(1 => $this->_title)), ts('Deletion Error'), 'error');
+      CRM_Core_Session::setStatus(ts("The Group '%1' cannot be deleted! You must Delete all custom fields in this group prior to deleting the group.", [1 => $this->_title]), ts('Deletion Error'), 'error');
       $url = CRM_Utils_System::url('civicrm/admin/custom/group', "reset=1");
       CRM_Utils_System::redirect($url);
       return TRUE;
@@ -88,18 +88,17 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    */
   public function buildQuickForm() {
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Delete Custom Group'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Delete Custom Group'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -114,7 +113,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
 
     $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_CustomGroup', $this->_id);
     CRM_Core_BAO_CustomGroup::deleteGroup($group);
-    CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", array(1 => $group->title)), '', 'success');
+    CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $group->title]), '', 'success');
   }
 
 }

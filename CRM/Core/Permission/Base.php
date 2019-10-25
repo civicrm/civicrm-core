@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -38,7 +38,10 @@
  */
 class CRM_Core_Permission_Base {
 
-  // permission mapping to stub check() calls
+  /**
+   * permission mapping to stub check() calls
+   * @var array
+   */
   public $permissions = NULL;
 
   /**
@@ -240,10 +243,10 @@ class CRM_Core_Permission_Base {
    * @see CRM_Core_Permission::getCorePermissions
    */
   public static function getModulePermissions($module) {
-    $return_permissions = array();
+    $return_permissions = [];
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {
-      $module_permissions = array();
+      $module_permissions = [];
       $fn_name($module_permissions);
       $return_permissions = $module_permissions;
     }
@@ -260,12 +263,12 @@ class CRM_Core_Permission_Base {
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   public function getAllModulePermissions($descriptions = FALSE) {
-    $permissions = array();
+    $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
     if ($descriptions) {
       foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? $label : array($label);
+        $permissions[$permission] = (is_array($label)) ? $label : [$label];
       }
     }
     else {

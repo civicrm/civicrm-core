@@ -21,7 +21,7 @@
     {foreach from=$line_items item=line_item}
       <tr class="event-line-item {$line_item.class}">
   <td class="event-title">
-    {$line_item.event->title} ({$line_item.event->start_date})
+    {$line_item.event->title} ({$line_item.event->start_date|crmDate})
   </td>
   <td class="participants-column">
     {$line_item.num_participants}<br/>

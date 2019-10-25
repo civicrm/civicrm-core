@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -168,6 +168,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *
    * @return string
    */
+
   /**
    * @return string
    */
@@ -189,26 +190,26 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   /**
    * Set the default form values.
    *
-   *
    * @return array
    *   the default array reference
+   * @throws \Exception
    */
   public function setDefaultValues() {
+    $defaults = parent::setDefaultValues();
     // Set ssID for unit tests.
     if (empty($this->_ssID)) {
       $this->_ssID = $this->get('ssID');
     }
 
-    $defaults = array_merge($this->_formValues, array(
+    $defaults = array_merge($this->_formValues, [
       'privacy_toggle' => 1,
       'operator' => 'AND',
-    ));
+    ], $defaults);
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_ADD;
     }
-
     return $defaults;
   }
 
@@ -227,18 +228,18 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   public function postProcess() {
     $this->set('isAdvanced', '1');
 
+    $this->setFormValues();
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
     if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
       $this->normalizeFormValues();
       // FIXME: couldn't figure out a good place to do this,
       // FIXME: so leaving this as a dependency for now
       if (array_key_exists('contribution_amount_low', $this->_formValues)) {
         foreach (array(
-                   'contribution_amount_low',
-                   'contribution_amount_high',
-                 ) as $f) {
+          'contribution_amount_low',
+          'contribution_amount_high',
+        ) as $f) {
           $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
         }
       }
@@ -269,11 +270,11 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         !$this->_force
       ) {
         foreach (array(
-                   'case_type_id',
-                   'case_status_id',
-                   'case_deleted',
-                   'case_tags',
-                 ) as $caseCriteria) {
+          'case_type_id',
+          'case_status_id',
+          'case_deleted',
+          'case_tags',
+        ) as $caseCriteria) {
           if (!empty($this->_formValues[$caseCriteria])) {
             $allCases = TRUE;
             $this->_formValues['case_owner'] = 1;
@@ -348,8 +349,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'activity_type_id',
       'status_id',
       'priority_id',
-      'activity_subject',
-      'activity_details',
       'contribution_page_id',
       'contribution_product_id',
       'payment_instrument_id',
@@ -387,10 +386,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *
    * @return array
    */
-  public function normalizeDefaultValues(&$defaults) {
-    if (!is_array($defaults)) {
-      $defaults = array();
-    }
+  public function normalizeDefaultValues($defaults) {
     $this->loadDefaultCountryBasedOnState($defaults);
     if ($this->_ssID && empty($_POST)) {
       $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
@@ -403,7 +399,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
      * id of the tagset.
      */
     if (isset($defaults['contact_tags'])) {
-      foreach ($defaults['contact_tags'] as $key => $tagId) {
+      foreach ((array) $defaults['contact_tags'] as $key => $tagId) {
         if (!is_array($tagId)) {
           $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $tagId, 'parent_id');
           $element = "contact_taglist[$parentId]";

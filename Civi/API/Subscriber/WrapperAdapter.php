@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,10 +41,10 @@ class WrapperAdapter implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::PREPARE => array('onApiPrepare', Events::W_MIDDLE),
-      Events::RESPOND => array('onApiRespond', Events::W_EARLY * 2),
-    );
+    return [
+      Events::PREPARE => ['onApiPrepare', Events::W_MIDDLE],
+      Events::RESPOND => ['onApiRespond', Events::W_EARLY * 2],
+    ];
   }
 
   /**
@@ -56,7 +56,7 @@ class WrapperAdapter implements EventSubscriberInterface {
    * @param array $defaults
    *   array(\API_Wrapper).
    */
-  public function __construct($defaults = array()) {
+  public function __construct($defaults = []) {
     $this->defaults = $defaults;
   }
 
@@ -97,8 +97,8 @@ class WrapperAdapter implements EventSubscriberInterface {
    * @return array<\API_Wrapper>
    */
   public function getWrappers($apiRequest) {
-    if (!isset($apiRequest['wrappers'])) {
-      $apiRequest['wrappers'] = $this->defaults;
+    if (!isset($apiRequest['wrappers']) || is_null($apiRequest['wrappers'])) {
+      $apiRequest['wrappers'] = $apiRequest['version'] < 4 ? $this->defaults : [];
       \CRM_Utils_Hook::apiWrappers($apiRequest['wrappers'], $apiRequest);
     }
     return $apiRequest['wrappers'];

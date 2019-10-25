@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -66,7 +66,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
     }
 
     // Check if this StatusPreference already exists.
-    if (empty($params['id']) && CRM_Utils_Array::value('name', $params)) {
+    if (empty($params['id']) && !empty($params['name'])) {
       $statusPreference->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
       $statusPreference->name = $params['name'];
 

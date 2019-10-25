@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,19 +61,12 @@
           <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
         {/if}
         <td class="crm-contribution-amount">
-          {if !$row.contribution_soft_credit_amount}
              <a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}">
                &nbsp; {$row.total_amount|crmMoney:$row.currency}
             </a>
-          {/if}
           {if $row.amount_level }<br/>({$row.amount_level}){/if}
           {if $row.contribution_recur_id}<br/>{ts}(Recurring){/ts}{/if}
         </td>
-        {if $softCreditColumns}
-          <td class="right bold crm-contribution-soft_credit_amount">
-            <span class="nowrap">{$row.contribution_soft_credit_amount|crmMoney:$row.currency}</span>
-          </td>
-        {/if}
       {foreach from=$columnHeaders item=column}
         {assign var='columnName' value=$column.field_name}
         {if !$columnName}{* if field_name has not been set skip, this helps with not changing anything not specifically edited *}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,20 +49,19 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $entity = 'survey';
   public $DBResetRequired = FALSE;
 
-
   public function setUp() {
-    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array(
-        'label' => 'PhoneBank',
-        'return' => 'value',
-      ), 'integer');
+    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', [
+      'label' => 'PhoneBank',
+      'return' => 'value',
+    ], 'integer');
     $this->useTransaction();
     $this->enableCiviCampaign();
-    $this->params = array(
+    $this->params = [
       'title' => "survey title",
       'activity_type_id' => $phoneBankActivityTypeID,
       'max_number_of_contacts' => 12,
       'instructions' => "Call people, ask for money",
-    );
+    ];
     parent::setUp();
   }
 
@@ -93,8 +92,8 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
    */
   public function testDeleteSurvey() {
     $entity = $this->createTestEntity();
-    $result = $this->callAPIAndDocument('survey', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->entity, 'get', array());
+    $result = $this->callAPIAndDocument('survey', 'delete', ['id' => $entity['id']], __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
@@ -108,13 +107,13 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   public function testGetSurveyChainDelete() {
     $description = "Demonstrates get + delete in the same call.";
     $subfile = 'ChainedGetDelete';
-    $params = array(
+    $params = [
       'title' => "survey title",
       'api.survey.delete' => 1,
-    );
+    ];
     $result = $this->callAPISuccess('survey', 'create', $this->params);
     $result = $this->callAPIAndDocument('survey', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', array()));
+    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', []));
   }
 
 }

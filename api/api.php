@@ -24,6 +24,48 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 }
 
 /**
+ * Procedural wrapper for the OO api version 4.
+ *
+ * @param string $entity
+ * @param string $action
+ * @param array $params
+ * @param string|int $index
+ *   If $index is a string, the results array will be indexed by that key.
+ *   If $index is an integer, only the result at that index will be returned.
+ *
+ * @return \Civi\Api4\Generic\Result
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\NotImplementedException
+ */
+function civicrm_api4($entity, $action, $params = [], $index = NULL) {
+  $apiCall = \Civi\Api4\Utils\ActionUtil::getAction($entity, $action);
+  foreach ($params as $name => $param) {
+    $setter = 'set' . ucfirst($name);
+    $apiCall->$setter($param);
+  }
+  $result = $apiCall->execute();
+
+  // Index results by key
+  if ($index && is_string($index) && !CRM_Utils_Rule::integer($index)) {
+    $result->indexBy($index);
+  }
+  // Return result at index
+  if (CRM_Utils_Rule::integer($index)) {
+    $item = $result->itemAt($index);
+    if (is_null($item)) {
+      throw new \API_Exception("Index $index not found in api results");
+    }
+    // Attempt to return a Result object if item is array, otherwise just return the item
+    if (!is_array($item)) {
+      return $item;
+    }
+    $result->exchangeArray($item);
+
+  }
+  return $result;
+}
+
+/**
  * Version 3 wrapper for civicrm_api.
  *
  * Throws exception.
@@ -36,9 +78,10 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
  *   Array to be passed to function.
  *
  * @throws CiviCRM_API3_Exception
+ *
  * @return array
  */
-function civicrm_api3($entity, $action, $params = array()) {
+function civicrm_api3($entity, $action, $params = []) {
   $params['version'] = 3;
   $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
@@ -73,9 +116,9 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
       //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
       // unset($apiRequest['params']['api_action']);
     }
-    return array('action' => array('api.aliases' => array('api_action')));
+    return ['action' => ['api.aliases' => ['api_action']]];
   }
-  $getFieldsParams = array('action' => $apiRequest['action']);
+  $getFieldsParams = ['action' => $apiRequest['action']];
   $entity = $apiRequest['entity'];
   if ($entity == 'Profile' && array_key_exists('profile_id', $apiRequest['params'])) {
     $getFieldsParams['profile_id'] = $apiRequest['params']['profile_id'];

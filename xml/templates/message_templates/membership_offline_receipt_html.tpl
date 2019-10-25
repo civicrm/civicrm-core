@@ -21,15 +21,13 @@
 
   <tr>
    <td>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $formValues.receipt_text_signup}
      <p>{$formValues.receipt_text_signup|htmlize}</p>
     {elseif $formValues.receipt_text_renewal}
      <p>{$formValues.receipt_text_renewal|htmlize}</p>
     {else}
-     <p>{ts}Thank you for your support.{/ts}</p>
-    {/if}
-    {if ! $cancelled}
-     <p>{ts}Please print this receipt for your records.{/ts}</p>
+     <p>{ts}Thank you for this contribution.{/ts}</p>
     {/if}
    </td>
   </tr>

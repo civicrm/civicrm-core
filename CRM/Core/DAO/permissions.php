@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   CRM_Utils_Hook::alterAPIPermissions($entity, $action, $params, $permissions);
 
   // Merge permissions for this entity with the defaults
-  $perm = CRM_Utils_Array::value($entity, $permissions, array()) + $permissions['default'];
+  $perm = CRM_Utils_Array::value($entity, $permissions, []) + $permissions['default'];
 
   // Return exact match if permission for this action has been declared
   if (isset($perm[$action])) {
@@ -62,21 +62,3 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
 
   return isset($perm[$action]) ? $perm[$action] : $perm['default'];
 }
-
-# FIXME: not sure how to permission the following API 3 calls:
-# contribution_transact (make online contributions)
-# entity_tag_display
-# group_contact_pending
-# group_contact_update_status
-# mailing_event_bounce
-# mailing_event_click
-# mailing_event_confirm
-# mailing_event_forward
-# mailing_event_open
-# mailing_event_reply
-# mailing_group_event_domain_unsubscribe
-# mailing_group_event_resubscribe
-# mailing_group_event_subscribe
-# mailing_group_event_unsubscribe
-# membership_status_calc
-# survey_respondant_count

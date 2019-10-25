@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -56,11 +56,11 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   public function setUp() {
     parent::setUp();
-    Civi::settings()->add(array('experimentalFlexMailerEngine' => FALSE));
+    Civi::settings()->add(['experimentalFlexMailerEngine' => FALSE]);
 
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
+      [$this, 'hook_alterMailParams']);
   }
 
   /**
@@ -109,6 +109,25 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   public function testHtmlWithOpenAndUrlTracking() {
     parent::testHtmlWithOpenAndUrlTracking();
+  }
+
+  /**
+   * Test to check Activity being created on mailing Job.
+   *
+   */
+  public function testMailingActivityCreate() {
+    $subject = uniqid('testMailingActivityCreate');
+    $this->runMailingSuccess([
+      'subject' => $subject,
+      'body_html' => 'Test Mailing Activity Create',
+      'scheduled_id' => $this->individualCreate(),
+    ]);
+
+    $this->callAPISuccessGetCount('activity', [
+      'activity_type_id' => 'Bulk Email',
+      'status_id' => 'Completed',
+      'subject' => $subject,
+    ], 1);
   }
 
 }

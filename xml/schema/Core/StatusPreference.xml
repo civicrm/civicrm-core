@@ -89,4 +89,12 @@
     <comment>These values are per-check, and can't be compared across checks.</comment>
     <add>4.7</add>
   </field>
+  <field>
+    <name>is_active</name>
+    <title>Check Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this status check active?</comment>
+    <add>5.19</add>
+  </field>
 </table>

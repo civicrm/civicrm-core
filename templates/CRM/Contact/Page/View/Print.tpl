@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,6 @@
 {literal}
 <script type="text/javascript">
 cj('#mainTabContainer').children(':first').remove();
-cj('#contact-summary' ).children(':first').remove();
 
 </script>
 {/literal}

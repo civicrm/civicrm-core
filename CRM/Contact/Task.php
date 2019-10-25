@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -36,8 +36,10 @@
  */
 class CRM_Contact_Task extends CRM_Core_Task {
 
+  /**
+   * Contact tasks
+   */
   const
-    // Contact tasks
     HOUSEHOLD_CONTACTS = 101,
     ORGANIZATION_CONTACTS = 102,
     RECORD_CONTACTS = 103,
@@ -50,7 +52,10 @@ class CRM_Contact_Task extends CRM_Core_Task {
     INDIVIDUAL_CONTACTS = 110,
     ADD_TO_CASE = 111;
 
-  static $objectType = 'contact';
+  /**
+   * @var string
+   */
+  public static $objectType = 'contact';
 
   public static function tasks() {
     if (!self::$_tasks) {
@@ -300,7 +305,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
       foreach ([
         self::MAP_CONTACTS,
         self::CREATE_MAILING,
-        self::TASK_SMS
+        self::TASK_SMS,
       ] as $task) {
         if (isset(self::$_tasks[$task]) &&
           !empty(self::$_tasks[$task]['title'])

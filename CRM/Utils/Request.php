@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -116,9 +116,9 @@ class CRM_Utils_Request {
 
     if (!isset($value) && $abort) {
       if ($isThrowException) {
-        throw new CRM_Core_Exception(ts("Could not find valid value for %1", array(1 => $name)));
+        throw new CRM_Core_Exception(ts("Could not find valid value for %1", [1 => $name]));
       }
-      CRM_Core_Error::fatal(ts("Could not find valid value for %1", array(1 => $name)));
+      CRM_Core_Error::fatal(ts("Could not find valid value for %1", [1 => $name]));
     }
 
     if (!isset($value) && $default) {
@@ -146,7 +146,7 @@ class CRM_Utils_Request {
    * @param array $method - '$_GET', '$_POST' or '$_REQUEST'.
    *
    * @return mixed
-   *    The value of the variable
+   *   The value of the variable
    */
   protected static function getValue($name, $method) {
     if (isset($method[$name])) {
@@ -183,7 +183,7 @@ class CRM_Utils_Request {
     // http://www.php.net/manual/en/ini.core.php#ini.request-order
     // http://www.php.net/manual/en/ini.core.php#ini.variables-order
 
-    $result = array();
+    $result = [];
     if ($_GET) {
       $result = array_merge($result, $_GET);
     }
@@ -215,10 +215,42 @@ class CRM_Utils_Request {
    *   Where to look for the value - GET|POST|REQUEST
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public static function retrieveValue($name, $type, $defaultValue = NULL, $isRequired = FALSE, $method = 'REQUEST') {
     $null = NULL;
     return CRM_Utils_Request::retrieve((string) $name, (string) $type, $null, (bool) $isRequired, $defaultValue, $method, TRUE);
+  }
+
+  /**
+   * Retrieve the component from the action attribute of a form.
+   *
+   * Contribution Page forms and Event Management forms detect the value of a
+   * component (and therefore the desired tab key) by reaching into the "action"
+   * attribute of a form and reading the final item of the path. In WordPress,
+   * however, the URL may be urlencoded, and so the URL may need to be decoded
+   * before parsing it.
+   *
+   * @see https://lab.civicrm.org/dev/wordpress/issues/12#note_10699
+   *
+   * @param array $attributes
+   *   The form attributes array.
+   *
+   * @return string
+   *   The desired value.
+   */
+  public static function retrieveComponent($attributes) {
+    $url = CRM_Utils_Array::value('action', $attributes);
+    // Whilst the following is a fallible universal test for urlencoded URLs,
+    // thankfully the "action" URL has a limited and predictable form and
+    // therefore this comparison is sufficient for our purposes.
+    if (rawurlencode(rawurldecode($url)) !== $url) {
+      $value = strtolower(basename(rawurldecode($url)));
+    }
+    else {
+      $value = strtolower(basename($url));
+    }
+    return $value;
   }
 
 }

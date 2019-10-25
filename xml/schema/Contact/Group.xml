@@ -35,6 +35,9 @@
     <localizable>true</localizable>
     <comment>Name of Group.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>description</name>

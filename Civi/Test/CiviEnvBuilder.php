@@ -19,10 +19,10 @@ use RuntimeException;
 class CiviEnvBuilder {
   protected $name;
 
-  private $steps = array();
+  private $steps = [];
 
   /**
-   * @var string|NULL
+   * @var string|null
    *   A digest of the values in $steps.
    */
   private $targetSignature = NULL;

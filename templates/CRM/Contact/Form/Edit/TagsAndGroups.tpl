@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
         {if !$type || $type eq 'tag'}
           <td>
             <div class="crm-section tag-section">
-              {if $title}{$form.tag.label}{/if}
+              {if $title}{$form.tag.label}<br>{/if}
               {$form.tag.html}
             </div>
             {if $context NEQ 'profile'}

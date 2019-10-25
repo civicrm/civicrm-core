@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -57,7 +57,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function preProcessCommon(&$form) {
-    $form->_pledgeIds = array();
+    $form->_pledgeIds = [];
 
     $values = $form->controller->exportValues('Search');
 
@@ -65,7 +65,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
     $pledgeTasks = CRM_Pledge_Task::tasks();
     $form->assign('taskName', $pledgeTasks[$form->_task]);
 
-    $ids = array();
+    $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -114,7 +114,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_pledgeIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_pledgeIds,
       'civicrm_pledge'
     );
   }
@@ -130,18 +130,17 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
    * @param bool $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => $nextType,
           'name' => $title,
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => $backType,
           'name' => ts('Cancel'),
-        ),
-      )
-    );
+        ],
+    ]);
   }
 
 }

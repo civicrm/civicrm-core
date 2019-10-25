@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -56,11 +56,7 @@
     {/if}
   </td>
   <td align="center">{$form.email.$blockId.on_hold.html}</td>
-  {if $multipleBulk}
-    <td align="center" id="Email-Bulkmail-html">{$form.email.$blockId.is_bulkmail.html}</td>
-  {else}
-    <td align="center" id="Email-Bulkmail-html">{$form.email.$blockId.is_bulkmail.1.html}</td>
-  {/if}
+  <td align="center" id="Email-Bulkmail-html">{$form.email.$blockId.is_bulkmail.html}</td>
   <td align="center" id="Email-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>
     {$form.email.$blockId.is_primary.1.html}
   </td>

@@ -1,0 +1,45 @@
+{
+  "Contact": [
+    {
+      "first_name": "Phoney",
+      "last_name": "Contact",
+      "contact_type": "Individual",
+      "@ref": "test_contact_1"
+    },
+    {
+      "first_name": "Second",
+      "last_name": "Test",
+      "contact_type": "Individual",
+      "@ref": "test_contact_2"
+    }
+  ],
+  "Activity": [
+    {
+      "subject": "Test Phone Activity",
+      "activity_type": "Phone Call",
+      "source_contact_id": "@ref test_contact_1.id"
+    },
+    {
+      "subject": "Another Activity",
+      "activity_type": "Meeting",
+      "source_contact_id": "@ref test_contact_1.id",
+      "assignee_contact_id": [
+        "@ref test_contact_1.id",
+        "@ref test_contact_2.id"
+      ]
+    }
+  ],
+  "Phone": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "phone": "+35355439483",
+      "location_type_id": "1",
+      "@ref": "test_phone_1"
+    },
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "phone": "+3538733439483",
+      "location_type_id": "2"
+    }
+  ]
+}

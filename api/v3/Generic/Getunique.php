@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@
  */
 function civicrm_api3_generic_getunique($apiRequest) {
   $entity = _civicrm_api_get_entity_name_from_camel($apiRequest['entity']);
-  $uniqueFields = array();
+  $uniqueFields = [];
 
   $dao = _civicrm_api3_get_DAO($entity);
   $uFields = $dao::indices();

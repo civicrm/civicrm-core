@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -40,13 +40,13 @@ class CRM_Case_Form_Task_PickProfile extends CRM_Core_Form_Task_PickProfile {
    *
    * @var string
    */
-  static $tableName = 'civicrm_case';
+  public static $tableName = 'civicrm_case';
 
   /**
    * Must be set to entity shortname (eg. event)
    *
    * @var string
    */
-  static $entityShortname = 'case';
+  public static $entityShortname = 'case';
 
 }

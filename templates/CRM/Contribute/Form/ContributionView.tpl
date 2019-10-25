@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -175,7 +175,7 @@
     <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
 
-  {if $payment_instrument eq 'Check'|ts}
+  {if $check_number}
     <tr>
       <td class="label">{ts}Check Number{/ts}</td>
       <td>{$check_number}</td>
@@ -253,7 +253,7 @@
   {/if}
 </table>
 
-{if count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
+{if $softContributions && count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
   <div class="crm-accordion-wrapper crm-soft-credit-pane">
     <div class="crm-accordion-header">
       {ts}Soft Credit{/ts}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -80,14 +80,14 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    *
    * @var string
    */
-  static $tableName = NULL;
+  public static $tableName = NULL;
 
   /**
    * Must be set to entity shortname (eg. event)
    *
    * @var string
    */
-  static $entityShortname = NULL;
+  public static $entityShortname = NULL;
 
   /**
    * Build all the data structures needed to build the form.
@@ -106,7 +106,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
-    $form->_entityIds = array();
+    $form->_entityIds = [];
 
     $searchFormValues = $form->controller->exportValues($form->get('searchFormName'));
 
@@ -115,7 +115,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     $entityTasks = $className::tasks();
     $form->assign('taskName', $entityTasks[$form->_task]);
 
-    $entityIds = array();
+    $entityIds = [];
     if ($searchFormValues['radio_ts'] == 'ts_sel') {
       foreach ($searchFormValues as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -177,7 +177,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    * For example, for cases we need to override this function as the table name is civicrm_case_contact
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
       $this::$tableName
     );
   }
@@ -194,18 +194,17 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    * @param bool $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

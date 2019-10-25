@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -42,7 +42,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    * Are we operating in "single mode", i.e. deleting one
    * specific contribution?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
@@ -82,17 +82,16 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
       }
     }
     if ($count && empty($this->_contributionIds)) {
-      CRM_Core_Session::setStatus(ts('1 contribution could not be deleted.', array('plural' => '%count contributions could not be deleted.', 'count' => $count)), ts('Error'), 'error');
-      $this->addButtons(array(
-        array(
+      CRM_Core_Session::setStatus(ts('1 contribution could not be deleted.', ['plural' => '%count contributions could not be deleted.', 'count' => $count]), ts('Error'), 'error');
+      $this->addButtons([
+        [
           'type' => 'back',
           'name' => ts('Cancel'),
-        ),
-       )
-      );
+        ],
+      ]);
     }
     elseif ($count && !empty($this->_contributionIds)) {
-      CRM_Core_Session::setStatus(ts('1 contribution will not be deleted.', array('plural' => '%count contributions will not be deleted.', 'count' => $count)), ts('Warning'), 'warning');
+      CRM_Core_Session::setStatus(ts('1 contribution will not be deleted.', ['plural' => '%count contributions will not be deleted.', 'count' => $count]), ts('Warning'), 'warning');
       $this->addDefaultButtons(ts('Delete Contributions'), 'done');
     }
     else {
@@ -115,12 +114,12 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
     }
 
     if ($deleted) {
-      $msg = ts('%count contribution deleted.', array('plural' => '%count contributions deleted.', 'count' => $deleted));
+      $msg = ts('%count contribution deleted.', ['plural' => '%count contributions deleted.', 'count' => $deleted]);
       CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
     }
 
     if ($failed) {
-      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', ['plural' => '%count could not be deleted.', 'count' => $failed]), ts('Error'), 'error');
     }
   }
 

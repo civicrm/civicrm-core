@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Contribute_ActionMapping_ByType
@@ -102,7 +101,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    * @throws CRM_Core_Exception
    */
   public function getValueLabels() {
-    return CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'get', array());
+    return CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'get', []);
   }
 
   /**
@@ -117,7 +116,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    * @throws CRM_Core_Exception
    */
   public function getStatusLabels($value) {
-    return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', array());
+    return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', []);
   }
 
   /**
@@ -127,12 +126,12 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   Array(string $fieldName => string $fieldLabel).
    */
   public function getDateFields() {
-    return array(
+    return [
       'receive_date' => ts('Receive Date'),
       'cancel_date' => ts('Cancel Date'),
       'receipt_date' => ts('Receipt Date'),
       'thankyou_date' => ts('Thank You Date'),
-    );
+    ];
   }
 
   /**
@@ -146,9 +145,9 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   Ex: array('assignee' => 'Activity Assignee').
    */
   public function getRecipientTypes() {
-    return array(
+    return [
       'soft_credit_type' => ts('Soft Credit Role'),
-    );
+    ];
   }
 
   /**
@@ -170,7 +169,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
         return \CRM_Core_OptionGroup::values('soft_credit_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
 
       default:
-        return array();
+        return [];
     }
   }
 
@@ -184,7 +183,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   List of error messages.
    */
   public function validateSchedule($schedule) {
-    return array();
+    return [];
   }
 
   /**
@@ -238,6 +237,18 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
     }
 
     return $query;
+  }
+
+  /**
+   * Determine whether a schedule based on this mapping should
+   * reset the reminder state if the trigger date changes.
+   *
+   * @return bool
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   */
+  public function resetOnTriggerDateChange($schedule) {
+    return FALSE;
   }
 
 }

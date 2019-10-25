@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -35,10 +35,16 @@
  */
 class CRM_Case_Form_Task extends CRM_Core_Form_Task {
 
-  // Must be set to entity table name (eg. civicrm_participant) by child class
-  static $tableName = 'civicrm_case';
-  // Must be set to entity shortname (eg. event)
-  static $entityShortname = 'case';
+  /**
+   * Must be set to entity table name (eg. civicrm_participant) by child class
+   * @var string
+   */
+  public static $tableName = 'civicrm_case';
+  /**
+   * Must be set to entity shortname (eg. event)
+   * @var string
+   */
+  public static $entityShortname = 'case';
 
   /**
    * @inheritDoc

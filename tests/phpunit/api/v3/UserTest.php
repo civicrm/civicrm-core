@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,13 +26,13 @@
  */
 
 /**
- *  Test APIv3 civicrm_website_* functions
+ *  Test APIv3 civicrm_user_* functions
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  * @group headless
  */
-class api_v3_UserWebsiteTest extends CiviUnitTestCase {
+class api_v3_UserTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
   protected $_entity = 'User';
@@ -43,10 +43,10 @@ class api_v3_UserWebsiteTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->contactID = $this->createLoggedInUser();
-    $this->params = array(
+    $this->params = [
       'contact_id' => $this->contactID,
       'sequential' => 1,
-    );
+    ];
   }
 
   public function testUserGet() {
@@ -61,7 +61,7 @@ class api_v3_UserWebsiteTest extends CiviUnitTestCase {
    * Test retrieval of label metadata.
    */
   public function testGetFields() {
-    $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'getfields', ['action' => 'get'], __FUNCTION__, __FILE__);
     $this->assertArrayKeyExists('name', $result['values']);
   }
 

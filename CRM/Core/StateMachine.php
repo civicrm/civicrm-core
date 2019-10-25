@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -94,7 +94,7 @@ class CRM_Core_StateMachine {
     $this->_controller = &$controller;
     $this->_action = $action;
 
-    $this->_states = array();
+    $this->_states = [];
   }
 
   /**
@@ -262,7 +262,7 @@ class CRM_Core_StateMachine {
     $this->_pages = &$pages;
     $numPages = count($pages);
 
-    $this->_pageNames = array();
+    $this->_pageNames = [];
     foreach ($pages as $tempName => $value) {
       if (!empty($value['className'])) {
         $this->_pageNames[] = $tempName;

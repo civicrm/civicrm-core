@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -55,10 +55,10 @@ class CRM_Contact_Form_Edit_Website {
     $form->applyFilter('__ALL__', 'trim');
 
     //Website type select
-    $form->addField("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
+    $form->addField("website[$blockId][website_type_id]", ['entity' => 'website', 'class' => 'eight', 'placeholder' => NULL]);
 
     //Website box
-    $form->addField("website[$blockId][url]", array('entity' => 'website', 'aria-label' => ts('Website URL %1', [1 => $blockId])));
+    $form->addField("website[$blockId][url]", ['entity' => 'website', 'aria-label' => ts('Website URL %1', [1 => $blockId])]);
     $form->addRule("website[$blockId][url]", ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
 
   }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,7 +41,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    *
    * Single mode means sending email to one specific contact.
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 
@@ -49,7 +49,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * Are we operating in "single mode", i.e. sending email to one
    * specific contact?
    *
-   * @var boolean
+   * @var bool
    */
   public $_noEmails = FALSE;
 
@@ -64,31 +64,31 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * Store "to" contact details.
    * @var array
    */
-  public $_toContactDetails = array();
+  public $_toContactDetails = [];
 
   /**
    * Store all selected contact id's, that includes to, cc and bcc contacts
    * @var array
    */
-  public $_allContactIds = array();
+  public $_allContactIds = [];
 
   /**
    * Store only "to" contact ids.
    * @var array
    */
-  public $_toContactIds = array();
+  public $_toContactIds = [];
 
   /**
    * Store only "cc" contact ids.
    * @var array
    */
-  public $_ccContactIds = array();
+  public $_ccContactIds = [];
 
   /**
    * Store only "bcc" contact ids.
    * @var array
    */
-  public $_bccContactIds = array();
+  public $_bccContactIds = [];
 
   /**
    * Build all the data structures needed to build the form.
@@ -103,7 +103,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     // Allow request to specify email id rather than contact id
     $toEmailId = CRM_Utils_Request::retrieve('email_id', 'String', $this);
     if ($toEmailId) {
-      $toEmail = civicrm_api('email', 'getsingle', array('version' => 3, 'id' => $toEmailId));
+      $toEmail = civicrm_api('email', 'getsingle', ['version' => 3, 'id' => $toEmailId]);
       if (!empty($toEmail['email']) && !empty($toEmail['contact_id'])) {
         $this->_toEmail = $toEmail;
       }
@@ -115,7 +115,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
 
     if ($cid) {
       $cid = explode(',', $cid);
-      $displayName = array();
+      $displayName = [];
 
       foreach ($cid as $val) {
         $displayName[] = CRM_Contact_BAO_Contact::displayName($val);
@@ -131,7 +131,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     if (!$cid && $this->_context != 'standalone') {
       parent::preProcess();
     }
-    CRM_Contact_Form_Task_EmailCommon::bounceIfSimpleMailLimitExceeded(count($this->_contactIds));
 
     $this->assign('single', $this->_single);
     if (CRM_Core_Permission::check('administer CiviCRM')) {
@@ -164,6 +163,13 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    */
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
+
+    if (isset($this->_caseId) || isset($this->_caseIds)) {
+      // For a single case, list tokens relevant for only that case type
+      $caseTypeId = isset($this->_caseId) ? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $this->_caseId, 'case_type_id') : NULL;
+      $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
+    }
+
     return $tokens;
   }
 

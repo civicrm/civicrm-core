@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@
         </dl>
       </div>
     {/if}
-    <p>{ts 1=$whom_url 2=$whom_name 3=$who_url 4=$who_name 5=$log_date}Change to <a href='%1'>%2</a> made by <a href='%3'>%4</a> on %5:{/ts}</p>
+    <p>{ts 1=$whom_url 2=$whom_name|escape 3=$who_url 4=$who_name|escape 5=$log_date}Change to <a href='%1'>%2</a> made by <a href='%3'>%4</a> on %5:{/ts}</p>
     {if $layout eq 'overlay'}
       {include file="CRM/Report/Form/Layout/Overlay.tpl"}
     {else}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@ class CRM_Utils_Url {
    *
    * @param string $url
    *
-   * @return UriInterface
+   * @return \GuzzleHttp\Psr7\UriInterface
    */
   public static function parseUrl($url) {
     return new Uri($url);
@@ -44,7 +44,7 @@ class CRM_Utils_Url {
   /**
    * Unparse url back to a string.
    *
-   * @param UriInterface $parsed
+   * @param \GuzzleHttp\Psr7\UriInterface $parsed
    *
    * @return string
    */

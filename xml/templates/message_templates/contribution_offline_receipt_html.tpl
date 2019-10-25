@@ -21,15 +21,12 @@
 
   <tr>
    <td>
-
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $formValues.receipt_text}
      <p>{$formValues.receipt_text|htmlize}</p>
     {else}
-     <p>{ts}Thank you for your support.{/ts}</p>
+     <p>{ts}Below you will find a receipt for this contribution.{/ts}</p>
     {/if}
-
-    <p>{ts}Please print this receipt for your records.{/ts}</p>
-
    </td>
   </tr>
   <tr>

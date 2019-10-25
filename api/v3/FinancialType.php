@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,8 +44,6 @@ function civicrm_api3_financial_type_create($params) {
 
 function _civicrm_api3_financial_type_create_spec(&$params) {
   $params['name']['api.required'] = 1;
-  $params['name']['type'] = CRM_Utils_Type::T_STRING;
-  unset($params['name']['pseudoconstant']);
 }
 
 /**

@@ -90,6 +90,7 @@
     <pseudoconstant>
       <optionGroupName>tag_used_for</optionGroupName>
     </pseudoconstant>
+    <serialize>COMMA</serialize>
     <add>3.2</add>
   </field>
   <field>

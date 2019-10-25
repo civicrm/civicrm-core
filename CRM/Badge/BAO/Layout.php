@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
@@ -141,7 +141,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
     $printLabel = new CRM_Core_DAO_PrintLabel();
     $printLabel->find();
 
-    $labels = array();
+    $labels = [];
     while ($printLabel->fetch()) {
       $labels[$printLabel->id] = $printLabel->title;
     }
@@ -158,7 +158,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *   array formatted array
    */
   public static function buildLayout(&$params) {
-    $layoutParams = array('id' => $params['badge_id']);
+    $layoutParams = ['id' => $params['badge_id']];
     CRM_Badge_BAO_Layout::retrieve($layoutParams, $layoutInfo);
 
     $formatProperties = CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_PrintLabel', 'label_format_name', $layoutInfo['label_format_name']);
@@ -177,7 +177,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @return array
    *   associated array of decoded elements
    */
-  static public function getDecodedData($jsonData) {
+  public static function getDecodedData($jsonData) {
     return json_decode($jsonData, TRUE);
   }
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -47,11 +47,11 @@ class CRM_SMS_StateMachine_Send extends CRM_Core_StateMachine {
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
-    $this->_pages = array(
+    $this->_pages = [
       'CRM_SMS_Form_Group' => NULL,
       'CRM_SMS_Form_Upload' => NULL,
       'CRM_SMS_Form_Schedule' => NULL,
-    );
+    ];
 
     $this->addSequentialPages($this->_pages, $action);
   }

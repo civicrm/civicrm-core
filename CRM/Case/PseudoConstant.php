@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,19 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * This class holds all the Pseudo constants that are specific for CiviCase.
  */
 class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
-
-  /**
-   * Activity type
-   * @var array
-   */
-  static $activityTypeList = array();
 
   /**
    * Get all the case statues.
@@ -155,8 +149,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function &caseActivityType($indexName = TRUE, $all = FALSE) {
     $cache = (int) $indexName . '_' . (int) $all;
 
-    if (!array_key_exists($cache, self::$activityTypeList)) {
-      self::$activityTypeList[$cache] = array();
+    if (!isset(Civi::$statics[__CLASS__]['activityTypeList'][$cache])) {
+      Civi::$statics[__CLASS__]['activityTypeList'][$cache] = [];
 
       $query = "
               SELECT  v.label as label ,v.value as value, v.name as name, v.description as description, v.icon
@@ -179,7 +173,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
 
       $dao = CRM_Core_DAO::executeQuery($query);
 
-      $activityTypes = array();
+      $activityTypes = [];
       while ($dao->fetch()) {
         if ($indexName) {
           $index = $dao->name;
@@ -187,16 +181,16 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
         else {
           $index = $dao->value;
         }
-        $activityTypes[$index] = array();
+        $activityTypes[$index] = [];
         $activityTypes[$index]['id'] = $dao->value;
         $activityTypes[$index]['label'] = $dao->label;
         $activityTypes[$index]['name'] = $dao->name;
         $activityTypes[$index]['icon'] = $dao->icon;
         $activityTypes[$index]['description'] = $dao->description;
       }
-      self::$activityTypeList[$cache] = $activityTypes;
+      Civi::$statics[__CLASS__]['activityTypeList'][$cache] = $activityTypes;
     }
-    return self::$activityTypeList[$cache];
+    return Civi::$statics[__CLASS__]['activityTypeList'][$cache];
   }
 
   /**
