@@ -100,6 +100,11 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
     if (in_array('CiviCase', $config->enableComponents)) {
       $this->addTask('Change direction of autoassignees in case type xml', 'changeCaseTypeAutoassignee');
     }
+
+    $this->addTask('Add weight column to relationship type table', 'addColumn', 'civicrm_relationship_type',
+      'weight', "INT NOT NULL COMMENT 'Relationship type weight'", TRUE, '5.20.alpha1');
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_relationship_type SET weight = id");
+
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add "Template" contribution status', 'templateStatus');
     $this->addTask('Update smart groups to rename filters on case_from and case_to to case_start_date and case_end_date', 'updateSmartGroups', [
