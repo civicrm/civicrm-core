@@ -97,7 +97,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * If modeException == true, errors are raised as exception instead of returning civicrm_errors
    * @var bool
    */
-  public static $modeException = TRUE;
+  public static $modeException = NULL;
 
   /**
    * Singleton function used to manage this object.
@@ -125,6 +125,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     $log = CRM_Core_Config::getLog();
     $this->setLogger($log);
+
+    // Throw Exceptions in non production environments
+    if (CRM_Core_Config::environment() !== 'production') {
+      self::$modeException = TRUE;
+    }
 
     // PEAR<=1.9.0 does not declare "static" properly.
     if (!is_callable(['PEAR', '__callStatic'])) {
