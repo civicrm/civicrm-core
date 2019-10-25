@@ -177,11 +177,46 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    * For example, for cases we need to override this function as the table name is civicrm_case_contact
    */
   public function setContactIDs() {
-    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
+    $this->_contactIds = &getContactIDsFromComponent($this->_entityIds,
       $this::$tableName
     );
   }
+  public function orderBy() {
+    return NULL;
+  }
+  
+  /**
+   * Given the component id, compute the contact id
+   * since its used for things like send email
+   *
+   * @param $componentIDs
+   * @param string $tableName
+   * @param string $idField
+   *
+   * @return array
+   */
+  public function getContactIDsFromComponent($componentIDs, $tableName, $idField = 'id') {
+    $contactIDs = array();
 
+    if (empty($componentIDs)) {
+      return $contactIDs;
+    }
+
+    $IDs = implode(',', $componentIDs);
+    $order_array = $this->orderBy();
+    $query = "
+  SELECT contact_id
+  FROM $tableName
+  WHERE $idField IN ( $IDs ) $order_array
+  ";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $contactIDs[] = $dao->contact_id;
+    }
+    return $contactIDs;
+  }
+  
   /**
    * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
