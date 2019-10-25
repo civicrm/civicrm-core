@@ -92,7 +92,11 @@ trait DAOActionTrait {
     $query->orderBy = $this->getOrderBy();
     $query->limit = $this->getLimit();
     $query->offset = $this->getOffset();
-    return $query->run();
+    $result = $query->run();
+    if (is_array($result)) {
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
+    }
+    return $result;
   }
 
   /**
