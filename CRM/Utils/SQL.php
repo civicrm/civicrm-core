@@ -124,16 +124,11 @@ class CRM_Utils_SQL {
    *
    * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
    *
-   * As an interim measure we ALSO require CIVICRM_SUPPORT_MULTIPLE_LOCKS to be defined.
-   *
    * This is a conservative measure to introduce the change which we expect to deprecate later.
    *
    * @todo we only check mariadb & mysql right now but maybe can add percona.
    */
   public static function supportsMultipleLocks() {
-    if (!defined('CIVICRM_SUPPORT_MULTIPLE_LOCKS')) {
-      return FALSE;
-    }
     static $isSupportLocks = NULL;
     if (!isset($isSupportLocks)) {
       $version = self::getDatabaseVersion();
