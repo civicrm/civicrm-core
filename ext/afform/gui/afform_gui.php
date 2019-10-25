@@ -141,30 +141,57 @@ function afform_gui_civicrm_themes(&$themes) {
   _afform_gui_civix_civicrm_themes($themes);
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
+/**
+ * Implements hook_civicrm_pageRun().
+ */
+function afform_gui_civicrm_pageRun(&$page) {
+  if (get_class($page) == 'CRM_Afform_Page_AfformBase' && $page->get('afModule') == 'afGuiAdmin') {
+    Civi::resources()->addScriptUrl(Civi::service('asset_builder')->getUrl('af-gui-vars.js'));
+  }
+}
 
 /**
- * Implements hook_civicrm_preProcess().
+ * Implements hook_civicrm_buildAsset().
  *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function afform_gui_civicrm_preProcess($formName, &$form) {
+ * Loads metadata to send to the gui editor.
+ */
+function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
+  if ($asset !== 'af-gui-vars.js') {
+    return;
+  }
 
-} // */
+  // Things that can't be handled by afform. TODO: Need a better way to do this. Maybe add core metadata about what each entity is for, and filter on that.
+  $entityBlacklist = [
+    'ACL',
+    'ActionSchedule',
+    'ActivityContact',
+    'Afform%',
+    'CaseContact',
+    'EntityTag',
+    'GroupContact',
+    'GroupNesting',
+    'GroupOrganization',
+    'Setting',
+    'System',
+    'UF%',
+  ];
+  $entityApi = Civi\Api4\Entity::get()
+    ->setCheckPermissions(FALSE)
+    ->setSelect(['name', 'description']);
+  foreach ($entityBlacklist as $nono) {
+    $entityApi->addWhere('name', 'NOT LIKE', $nono);
+  }
 
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
-function afform_gui_civicrm_navigationMenu(&$menu) {
-  _afform_gui_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _afform_gui_civix_navigationMenu($menu);
-} // */
+  $contacts = Civi\Api4\Contact::getFields()
+    ->setCheckPermissions(FALSE)
+    ->setIncludeCustom(TRUE)
+    ->setLoadOptions(TRUE)
+    ->setAction('Create')
+    ->execute();
+
+  $mimeType = 'text/javascript';
+  $content = "CRM.afformAdminData={";
+  $content .= 'entities:' . json_encode((array) $entityApi->execute(), JSON_UNESCAPED_SLASHES) . ',';
+  $content .= 'fields:' . json_encode(['Contact' => (array) $contacts], JSON_UNESCAPED_SLASHES);
+  $content .= '}';
+}

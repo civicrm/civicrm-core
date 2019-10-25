@@ -13,6 +13,7 @@
         $scope.ts = CRM.ts();
         $scope.afform = null;
         $scope.selectedEntity = null;
+        $scope.meta = CRM.afformAdminData;
         var newForm = {
           title: ts('Untitled Form'),
           layout: {
@@ -61,11 +62,13 @@
             label: entityType + ' ' + num
           };
           $scope.afform.layout['#children'].push($scope.entities[entityType + num]);
+          $scope.selectEntity(entityType + num);
         };
 
         $scope.removeEntity = function(entityName) {
           delete $scope.entities[entityName];
           $scope.afform.layout['#children'].splice(_.findIndex($scope.afform.layout['#children'], {'#tag': 'af-entity', name: entityName}), 1);
+          $scope.selectEntity(null);
         };
 
         $scope.selectEntity = function(entityName) {
