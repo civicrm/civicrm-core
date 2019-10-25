@@ -54,12 +54,12 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
       'civicrm_case_contact', 'case_id'
     );
   }
-  // order by case id return to getContactIDsFromComponent
+  //order by case id return to getContactIDsFromComponent
   public function orderBy() {
     $order_array = 'ORDER BY ';
     foreach ($this->_entityIds as $item) {
-       $order_array .= case_id . ' = ' . $item . ' DESC,';
-     }
+      $order_array .= case_id . ' = ' . $item . ' DESC,';
+    }
     return $order_array = trim($order_array, ',');
   }
   /**
