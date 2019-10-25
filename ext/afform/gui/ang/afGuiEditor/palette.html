@@ -1,29 +1,24 @@
-<ul id="afGuiEditor-palette-tabs" class="nav nav-pills nav-stacked">
-  <li role="presentation" ng-class="{active: selectedEntity === null}">
-    <a href ng-click="selectEntity(null)">{{ ts('Form Settings') }}</a>
-  </li>
-  <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntity === entity.name}">
-    <a href ng-click="selectEntity(entity.name)">{{ entity.label }}</a>
-  </li>
-  <li role="presentation" class="dropdown">
-    <a href class="dropdown-toggle" data-toggle="dropdown">
-      <i class="crm-i fa-plus"></i>
-    </a>
-    <ul class="dropdown-menu">
-      <li ng-repeat="entity in meta.entities">
-        <a href ng-click="addEntity(entity.name)">{{ entity.name }}</a>
+<div id="afGuiEditor-palette-config" class="panel panel-default">
+    <ul id="afGuiEditor-palette-tabs" class="panel-heading nav nav-tabs">
+      <li role="presentation" ng-class="{active: selectedEntity === null}">
+        <a href ng-click="selectEntity(null)">{{ ts('Form Settings') }}</a>
+      </li>
+      <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntity === entity.name}">
+        <a href ng-click="selectEntity(entity.name)">
+          <span af-gui-editable ng-model="entity.label">{{ entity.label }}</span>
+        </a>
+      </li>
+      <li role="presentation" class="dropdown">
+        <a href class="dropdown-toggle" data-toggle="dropdown">
+          <i class="crm-i fa-plus"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li ng-repeat="entity in meta.entities">
+            <a href ng-click="addEntity(entity.name)">{{ entity.name }}</a>
+          </li>
+        </ul>
       </li>
     </ul>
-  </li>
-</ul>
-<div id="afGuiEditor-palette-config" class="panel panel-default">
-  <div class="panel-heading">
-    <span ng-if="selectedEntity === null">{{ ts('Form Settings') }}</span>
-    <span ng-if="selectedEntity !== null">{{ entities[selectedEntity].label }}</span>
-    <a href ng-if="selectedEntity !== null" ng-click="removeEntity(selectedEntity)" class="pull-right">
-      <i class="crm-i fa-trash"></i>
-    </a>
-  </div>
   <div class="panel-body" ng-include="'~/afGuiEditor/config-form.html'" ng-if="selectedEntity === null"></div>
   <div class="panel-body" ng-include="'~/afGuiEditor/config-entity.html'" ng-if="selectedEntity !== null"></div>
 </div>

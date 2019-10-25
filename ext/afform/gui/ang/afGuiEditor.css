@@ -9,19 +9,11 @@
 #afGuiEditor-main #afGuiEditor-palette {
   flex: 1;
   margin-right: 5px;
-  box-shadow: 0 3px 18px 0 rgba(48,40,40,0.25);
 }
 
 #afGuiEditor-main #afGuiEditor-canvas {
   flex: 1;
   margin-left: 5px;
-}
-
-#afGuiEditor-main #afGuiEditor-palette-tabs {
-  width: 110px;
-  position: absolute;
-  left: 0;
-  top: 0;
 }
 
 #afGuiEditor-main #afGuiEditor-palette-tabs li > a {
@@ -35,6 +27,4 @@
 }
 
 #afGuiEditor-main #afGuiEditor-palette-config {
-  margin-left: 110px;
-  box-shadow: none;
 }
