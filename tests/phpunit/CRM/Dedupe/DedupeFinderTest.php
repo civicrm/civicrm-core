@@ -244,7 +244,6 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'email' => 'hood@example.com',
       'street_address' => 'Ambachtstraat 23',
     ];
-    CRM_Core_TemporaryErrorScope::useException();
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, NULL, ['event_id' => 1]);
 
     // Check with default Individual-General rule

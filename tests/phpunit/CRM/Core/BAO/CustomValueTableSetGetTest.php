@@ -66,7 +66,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => $badDate,
     ];
 
-    CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
     try {
       CRM_Core_BAO_CustomValueTable::setValues($params);
@@ -165,7 +164,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => $badYesNo,
     ];
 
-    CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
     try {
       CRM_Core_BAO_CustomValueTable::setValues($params);

@@ -97,7 +97,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * If modeException == true, errors are raised as exception instead of returning civicrm_errors
    * @var bool
    */
-  public static $modeException = NULL;
+  public static $modeException = TRUE;
 
   /**
    * Singleton function used to manage this object.

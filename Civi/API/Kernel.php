@@ -160,7 +160,6 @@ class Kernel {
    */
   public function runRequest($apiRequest) {
     $this->boot($apiRequest);
-    $errorScope = \CRM_Core_TemporaryErrorScope::useException();
 
     list($apiProvider, $apiRequest) = $this->resolve($apiRequest);
     $this->authorize($apiProvider, $apiRequest);

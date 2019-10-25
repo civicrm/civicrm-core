@@ -71,15 +71,12 @@ class CRM_Queue_ErrorPolicy {
       ini_set($key, 0);
     }
     set_error_handler([$this, 'onError'], $this->level);
-    // FIXME make this temporary/reversible
-    $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
   }
 
   /**
    * Disable the error policy.
    */
   public function deactivate() {
-    $this->errorScope = NULL;
     restore_error_handler();
     foreach ([
       'display_errors',

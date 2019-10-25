@@ -23,11 +23,6 @@ else {
    */
   class CiviTestListener extends \PHPUnit\Framework\BaseTestListener {
     /**
-     * @var \CRM_Core_TemporaryErrorScope
-     */
-    private $errorScope;
-
-    /**
      * @var array
      *  Ex: $cache['Some_Test_Class']['civicrm_foobar'] = 'hook_civicrm_foobar';
      *  Array(string $testClass => Array(string $hookName => string $methodName)).
@@ -52,7 +47,6 @@ else {
     public function startTest(\PHPUnit\Framework\Test $test) {
       if ($this->isCiviTest($test)) {
         error_reporting(E_ALL);
-        $this->errorScope = \CRM_Core_TemporaryErrorScope::useException();
       }
 
       if ($test instanceof HeadlessInterface) {

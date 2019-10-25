@@ -311,7 +311,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->_apiversion = 3;
 
     // REVERT
-    $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
     //  Use a temporary file for STDIN
     $GLOBALS['stdin'] = tmpfile();
     if ($GLOBALS['stdin'] === FALSE) {

@@ -164,7 +164,6 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @param $expectSql
    */
   public function testComposeQuery($inputSql, $inputParams, $expectSql) {
-    $scope = CRM_Core_TemporaryErrorScope::useException();
     try {
       $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     }
