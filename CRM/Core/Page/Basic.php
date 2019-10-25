@@ -243,6 +243,9 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     elseif ($key) {
       $object->orderBy($key . ' asc');
     }
+    elseif (property_exists($object, 'weight')) {
+      $object->orderBy('weight');
+    }
 
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
     // find all objects
@@ -279,6 +282,13 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
         }
       }
     }
+
+    // Add order changing widget to selector
+    $returnURL = CRM_Utils_System::url('civicrm/admin/reltype', "reset=1&action=browse");
+    CRM_Utils_Weight::addOrder($values, 'CRM_Contact_DAO_RelationshipType',
+      'id', $returnURL
+    );
+
     $this->assign('rows', $values);
   }
 

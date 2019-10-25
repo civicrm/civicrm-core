@@ -106,6 +106,13 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
   public $is_reserved;
 
   /**
+   * Weight of the relationship type.
+   *
+   * @var int
+   */
+  public $weight;
+
+  /**
    * Is this relationship type currently active (i.e. can be used when creating or editing relationships)?
    *
    * @var bool
@@ -315,6 +322,18 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'html' => [
             'type' => 'CheckBox',
           ],
+        ],
+        'weight' => [
+          'name' => 'weight',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Order'),
+          'description' => 'Weight of the relationship type.',
+          'required' => TRUE,
+          'default' => '1',
+          'table_name' => 'civicrm_relationship_type',
+          'entity' => 'RelationshipType',
+          'bao' => 'CRM_Contact_BAO_RelationshipType',
+          'localizable' => 0,
         ],
         'is_active' => [
           'name' => 'is_active',

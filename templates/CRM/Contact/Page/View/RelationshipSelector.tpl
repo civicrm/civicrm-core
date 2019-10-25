@@ -30,7 +30,6 @@
   <table
     class="crm-contact-{$entityInClassFormat}-selector-{$context} crm-ajax-table"
     data-ajax="{crmURL p="civicrm/ajax/contactrelationships" q="context=$context&cid=$contactId"}"
-    data-order='[[0,"asc"],[1,"asc"]]'
     style="width: 100%;">
     <thead>
     <tr>
