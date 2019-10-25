@@ -1317,7 +1317,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $order = $limit = '';
     if (!$count) {
       if (empty($params['sort'])) {
-        $order = ' ORDER BY wt ';
+        $order = ' ORDER BY wt , sort_name ';
       }
       else {
         $order = " ORDER BY {$params['sort']} ";
