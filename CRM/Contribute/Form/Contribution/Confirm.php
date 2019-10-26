@@ -35,7 +35,6 @@
  * form to process actions on the group aspect of Custom Data
  */
 class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_ContributionBase {
-  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The id of the contact associated with this contribution.
