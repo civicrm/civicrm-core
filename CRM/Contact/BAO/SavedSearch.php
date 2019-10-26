@@ -95,10 +95,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     $specialDateFields = [
       'event_start_date_low' => 'event_date_low',
       'event_end_date_high' => 'event_date_high',
-      'case_from_start_date_low' => 'case_from_date_low',
-      'case_from_start_date_high' => 'case_from_date_high',
-      'case_to_end_date_low' => 'case_to_date_low',
-      'case_to_end_date_high' => 'case_to_date_high',
     ];
 
     $fv = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'form_values');
@@ -402,8 +398,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     $relativeDates = ['relative_dates' => []];
     $specialDateFields = [
       'event_relative',
-      'case_from_relative',
-      'case_to_relative',
       'participant_relative',
       'log_date_relative',
       'birth_date_relative',

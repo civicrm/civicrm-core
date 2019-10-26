@@ -442,6 +442,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'case_from_start_date_low':
       case 'case_from_start_date_high':
+        CRM_Core_Error::deprecatedFunctionWarning('case_from is deprecated');
         $query->dateQueryBuilder($values,
           'civicrm_case', 'case_from_start_date', 'start_date', 'Start Date'
         );
@@ -449,6 +450,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'case_to_end_date_low':
       case 'case_to_end_date_high':
+        CRM_Core_Error::deprecatedFunctionWarning('case_to is deprecated');
         $query->dateQueryBuilder($values,
           'civicrm_case', 'case_to_end_date', 'end_date', 'End Date'
         );

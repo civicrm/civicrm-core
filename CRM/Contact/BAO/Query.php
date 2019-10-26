@@ -1601,21 +1601,11 @@ class CRM_Contact_BAO_Query {
       if (
         !in_array($id, $nonLegacyDateFields) && (
         preg_match('/_date_relative$/', $id) ||
-        $id == 'event_relative' ||
-        $id == 'case_from_relative' ||
-        $id == 'case_to_relative')
+        $id == 'event_relative')
       ) {
         if ($id == 'event_relative') {
           $fromRange = 'event_start_date_low';
           $toRange = 'event_end_date_high';
-        }
-        elseif ($id == 'case_from_relative') {
-          $fromRange = 'case_from_start_date_low';
-          $toRange = 'case_from_start_date_high';
-        }
-        elseif ($id == 'case_to_relative') {
-          $fromRange = 'case_to_end_date_low';
-          $toRange = 'case_to_end_date_high';
         }
         else {
           $dateComponent = explode('_date_relative', $id);
@@ -1688,9 +1678,7 @@ class CRM_Contact_BAO_Query {
       elseif (
         !in_array($id, $nonLegacyDateFields) && (
           preg_match('/_date_relative$/', $id) ||
-          $id == 'event_relative' ||
-          $id == 'case_from_relative' ||
-          $id == 'case_to_relative')
+          $id == 'event_relative')
       ) {
         // Already handled in previous loop
         continue;
