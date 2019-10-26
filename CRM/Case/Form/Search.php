@@ -100,8 +100,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $this->loadFormValues();
 
     if ($this->_force) {
-      $this->postProcess();
-      $this->set('force', 0);
+      $this->handleForcedSearch();
     }
 
     $sortID = NULL;
@@ -213,7 +212,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $this->_done = TRUE;
     $this->setFormValues();
     $this->fixFormValues();
-
     if (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
@@ -383,13 +381,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
         $this->_defaults['case_owner'] = $caseOwner;
       }
     }
-  }
-
-  /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
   }
 
   /**

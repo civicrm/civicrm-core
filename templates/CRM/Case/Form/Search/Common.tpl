@@ -38,16 +38,10 @@
   </tr>
 
   <tr>
-    <td>
-      <label>{ts}Case Start Date{/ts}</label>
-    </td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="case_from" from='_start_date_low' to='_start_date_high'}
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_start_date"}
   </tr>
   <tr>
-    <td>
-      <label>{ts}Case End Date{/ts}</label>
-    </td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="case_to" from='_end_date_low' to='_end_date_high'}
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_end_date"}
   </tr>
 
   <tr id='case_search_form'>
