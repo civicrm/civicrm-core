@@ -658,7 +658,7 @@
 
         function makeWidget(field, op) {
           var $el = $(element),
-            inputType = field.input_type;
+            inputType = field.input_type,
             dataType = field.data_type;
           if (!op) {
             op = field.serialize || dataType === 'Array' ? 'IN' : '=';
