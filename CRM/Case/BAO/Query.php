@@ -258,6 +258,8 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param array $values
    * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -284,9 +286,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         }
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case.{$name}", $op, $value, "Integer");
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Case_DAO_Case', $name, $value, $op);
-
-        $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $label, 2 => $op, 3 => $value]);
+        $query->_qill[$grouping][] = self::getQillValue('CRM_Case_DAO_Case', $name, $value, $op, $label);
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         return;
 
@@ -327,7 +327,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'case_subject':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case.subject", $op, $value, 'String');
-        $query->_qill[$grouping][] = ts("Case Subject %1 '%2'", [1 => $op, 2 => $value]);
+        $query->_qill[$grouping][] = self::getQillValue('CRM_Case_DAO_Case', $name, $value, $op, 'Case Subject');
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
         return;
@@ -582,6 +582,25 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
+   * Get the qill (search description for field) for the specified field.
+   *
+   * @todo this is private because it is the first step towards generalising rather than
+   * the final product IMHO.
+   *
+   * @param string $daoName
+   * @param string $name
+   * @param string $value
+   * @param string|array $op
+   * @param string $label
+   *
+   * @return string
+   */
+  private static function getQillValue($daoName, string $name, $value, $op, string $label) {
+    list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue($daoName, $name, $value, $op);
+    return ts('%1 %2 %3', [1 => $label, 2 => $op, 3 => $value]);
+  }
+
+  /**
    * Getter for the qill object.
    *
    * @return string
@@ -708,7 +727,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   /**
    * Add all the elements shared between case search and advanced search.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Search $form
    */
   public static function buildSearchForm(&$form) {
     //validate case configuration.
