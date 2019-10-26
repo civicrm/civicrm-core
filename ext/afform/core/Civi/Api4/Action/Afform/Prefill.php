@@ -11,7 +11,7 @@ class Prefill extends AbstractProcessor {
   protected $_data = [];
 
   protected function processForm() {
-    foreach ($this->_afformEntities as $entityName => $entity) {
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       // Load entities from args
       if (!empty($this->args[$entityName])) {
         $this->loadEntity($entity, $this->args[$entityName]);

@@ -21,12 +21,12 @@ class Submit extends AbstractProcessor {
 
   protected function processForm() {
     $entityValues = [];
-    foreach ($this->_afformEntities as $entityName => $entity) {
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       // Predetermined values override submitted values
       $entityValues[$entity['type']][$entityName] = ($entity['af-values'] ?? []) + ($this->values[$entityName] ?? []);
     }
 
-    $event = new AfformSubmitEvent($this->_afformEntities, $entityValues);
+    $event = new AfformSubmitEvent($this->_formDataModel->getEntities(), $entityValues);
     \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
     foreach ($event->entityValues as $entityType => $entities) {
       if (!empty($entities)) {

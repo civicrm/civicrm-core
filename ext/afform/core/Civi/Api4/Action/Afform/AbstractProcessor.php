@@ -2,7 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
-use Civi\Afform\Utils;
+use Civi\Afform\FormDataModel;
 use Civi\Api4\Generic\Result;
 
 /**
@@ -27,15 +27,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $_afform;
 
   /**
-   * @var array
+   * @var \Civi\Afform\FormDataModel
    *   List of entities declared by this form.
    */
-  protected $_afformEntities;
+  protected $_formDataModel;
 
   public function _run(Result $result) {
     // This will throw an exception if the form doesn't exist
     $this->_afform = (array) civicrm_api4('Afform', 'get', ['checkPermissions' => FALSE, 'where' => [['name', '=', $this->name]]], 0);
-    $this->_afformEntities = Utils::getEntities($this->_afform['layout']);
+    $this->_formDataModel = FormDataModel::create($this->_afform['layout']);
     $this->validateArgs();
     $result->exchangeArray($this->processForm());
   }
@@ -47,7 +47,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $rawArgs = $this->args;
     $this->args = [];
     foreach ($rawArgs as $arg => $val) {
-      if (!empty($this->_afformEntities[$arg]['af-url-autofill'])) {
+      if (!empty($this->_formDataModel[$arg]['af-url-autofill'])) {
         $this->args[$arg] = $val;
       }
     }
