@@ -154,7 +154,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     }
 
     if (!$ids['mailing_id']) {
-      CRM_Core_Error::fatal();
+      CRM_Core_Error::statusBounce(ts('No mailing id has been able to be determined'));
     }
 
     $params['approver_id'] = $this->_contactID;

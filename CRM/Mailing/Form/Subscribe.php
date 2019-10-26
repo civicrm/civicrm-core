@@ -115,7 +115,7 @@ ORDER BY title";
         $rows[] = $row;
       }
       if (empty($rows)) {
-        CRM_Core_Error::fatal(ts('There are no public mailing list groups to display.'));
+        throw new CRM_Core_Exception(ts('There are no public mailing list groups to display.'));
       }
       $this->assign('rows', $rows);
       $this->addFormRule(['CRM_Mailing_Form_Subscribe', 'formRule']);

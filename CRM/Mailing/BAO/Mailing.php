@@ -2251,7 +2251,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!in_array($id, $mailingIDs)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this mailing report'));
+      throw new CRM_Core_Exception(ts('You do not have permission to access this mailing report'));
     }
   }
 
@@ -2473,7 +2473,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function del($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing del function'));
     }
 
     CRM_Utils_Hook::pre('delete', 'Mailing', $id, CRM_Core_DAO::$_nullArray);
@@ -2503,7 +2503,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function delJob($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
     }
 
     \Civi::log('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead', ['civi.tag' => 'deprecated']);
