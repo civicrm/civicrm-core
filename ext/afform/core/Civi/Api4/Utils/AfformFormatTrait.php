@@ -39,7 +39,7 @@ trait AfformFormatTrait {
       return $mixed;
     }
     $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat !== 'shallow');
-    return $converter->convertArrayToHtml($mixed);
+    return $converter->convertArraysToHtml($mixed);
   }
 
 }

@@ -86,6 +86,13 @@ class CRM_Afform_ArrayHtml {
       }
     }
     $buf .= '>';
+    $buf .= $this->convertArraysToHtml($children);
+    $buf .= '</' . $tag . '>';
+    return $buf;
+  }
+
+  public function convertArraysToHtml($children) {
+    $buf = '';
 
     foreach ($children as $child) {
       if (is_string($child)) {
@@ -96,7 +103,6 @@ class CRM_Afform_ArrayHtml {
       }
     }
 
-    $buf .= '</' . $tag . '>';
     return $buf;
   }
 
@@ -118,7 +124,7 @@ class CRM_Afform_ArrayHtml {
 
     foreach ($doc->childNodes as $htmlNode) {
       if ($htmlNode instanceof DOMElement && $htmlNode->tagName === 'html') {
-        return $this->convertNodeToArray($htmlNode->firstChild->firstChild);
+        return $this->convertNodesToArray($htmlNode->firstChild->childNodes);
       }
     }
 
@@ -138,8 +144,8 @@ class CRM_Afform_ArrayHtml {
         $type = $this->pickAttrType($node->tagName, $attribute->name);
         $arr[$attribute->name] = $this->decodeAttrValue($type, $txt);
       }
-      foreach ($node->childNodes as $childNode) {
-        $arr['#children'][] = $this->convertNodeToArray($childNode);
+      if ($node->childNodes->length > 0) {
+        $arr['#children'] = $this->convertNodesToArray($node->childNodes);
       }
       return $arr;
     }
@@ -152,6 +158,19 @@ class CRM_Afform_ArrayHtml {
     else {
       throw new \RuntimeException("Unrecognized DOM node");
     }
+  }
+
+  /**
+   * @param array|DOMNodeList $nodes
+   *   List of DOMNodes
+   * @return array
+   */
+  protected function convertNodesToArray($nodes) {
+    $children = [];
+    foreach ($nodes as $childNode) {
+      $children[] = $this->convertNodeToArray($childNode);
+    }
+    return $children;
   }
 
   /**
