@@ -179,7 +179,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
-    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
+    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet - Mr. Anthony Anderson II']);
     $mut->checkMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
@@ -217,7 +217,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     // Here we set the email to an  invalid email & use check_permissions, domain email should be used.
     $email = $this->callAPISuccess('Email', 'create', ['contact_id' => 1, 'email' => 'bob@example.com']);
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id'], 'from' => $email['id'], 'check_permissions' => 1]);
-    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet', 'Registration Confirmation - Annual CiviCRM meet']);
+    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet - Mr. Anthony Anderson II', 'Registration Confirmation - Annual CiviCRM meet - Mr. Anthony Anderson II']);
     $mut->checkMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
@@ -269,7 +269,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     }
 
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
-    $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet']);
+    $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet - Mr. Anthony Anderson II']);
     $mut->checkMailLog([
       'Dear Anthony,',
       'A refund has been issued based on changes in your registration selections.',
