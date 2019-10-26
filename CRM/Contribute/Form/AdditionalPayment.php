@@ -349,6 +349,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard();
     }
 
+    // @todo we should clean $ on the form & pass in skipCleanMoney
     $trxnsData = $this->_params;
     if ($this->_paymentType == 'refund') {
       $trxnsData['total_amount'] = -$trxnsData['total_amount'];
