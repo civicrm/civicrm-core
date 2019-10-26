@@ -97,10 +97,12 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Test Get Order api for participant contribution.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetOrderParticipant() {
     $this->addOrder(FALSE, 100);
-    list($items, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -108,7 +110,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     $order = $this->callAPISuccess('Order', 'get', $params);
 
-    $this->assertEquals(2, count($order['values'][$contribution['id']]['line_items']));
+    $this->assertCount(2, $order['values'][$contribution['id']]['line_items']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);

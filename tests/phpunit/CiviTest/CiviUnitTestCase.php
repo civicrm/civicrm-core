@@ -2626,59 +2626,59 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Add participant with contribution
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function createParticipantWithContribution() {
     // creating price set, price field
     $this->_contactId = $this->individualCreate();
     $event = $this->eventCreate();
     $this->_eventId = $event['id'];
-    $eventParams = array(
+    $eventParams = [
       'id' => $this->_eventId,
       'financial_type_id' => 4,
       'is_monetary' => 1,
-    );
+    ];
     $this->callAPISuccess('event', 'create', $eventParams);
     $priceFields = $this->createPriceSet('event', $this->_eventId);
-    $participantParams = array(
+    $participantParams = [
       'financial_type_id' => 4,
       'event_id' => $this->_eventId,
       'role_id' => 1,
       'status_id' => 14,
       'fee_currency' => 'USD',
       'contact_id' => $this->_contactId,
-    );
+    ];
     $participant = $this->callAPISuccess('Participant', 'create', $participantParams);
-    $contributionParams = array(
-      'total_amount' => 150,
+    $orderParams = [
+      'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
-      'contribution_status_id' => 1,
-      'partial_payment_total' => 300.00,
-      'partial_amount_to_pay' => 150,
+      'contribution_status_id' => 'Pending',
       'contribution_mode' => 'participant',
       'participant_id' => $participant['id'],
-    );
+      'api.Payment.create' => ['total_amount' => 150],
+    ];
     foreach ($priceFields['values'] as $key => $priceField) {
-      $lineItems[1][$key] = array(
-        'price_field_id' => $priceField['price_field_id'],
-        'price_field_value_id' => $priceField['id'],
-        'label' => $priceField['label'],
-        'field_title' => $priceField['label'],
-        'qty' => 1,
-        'unit_price' => $priceField['amount'],
-        'line_total' => $priceField['amount'],
-        'financial_type_id' => $priceField['financial_type_id'],
-      );
+      $orderParams['line_items'][] = [
+        'line_item' => [
+          [
+            'price_field_id' => $priceField['price_field_id'],
+            'price_field_value_id' => $priceField['id'],
+            'label' => $priceField['label'],
+            'field_title' => $priceField['label'],
+            'qty' => 1,
+            'unit_price' => $priceField['amount'],
+            'line_total' => $priceField['amount'],
+            'financial_type_id' => $priceField['financial_type_id'],
+            'entity_table' => 'civicrm_participant',
+          ],
+        ],
+        'params' => $participant,
+      ];
     }
-    $contributionParams['line_item'] = $lineItems;
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    $paymentParticipant = array(
-      'participant_id' => $participant['id'],
-      'contribution_id' => $contribution['id'],
-    );
-    $this->callAPISuccess('ParticipantPayment', 'create', $paymentParticipant);
-    return array($lineItems, $contribution);
+    return $this->callAPISuccess('Order', 'create', $orderParams);
   }
 
   /**
