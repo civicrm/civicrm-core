@@ -1,6 +1,14 @@
 <?php
 namespace Civi\Afform;
 
+/**
+ * Class Symbols
+ * @package Civi\Afform
+ *
+ * This class repesents a list of key symbols used by an
+ * HTML document, such as element (tag) names, attribute
+ * names, and CSS class names.
+ */
 class Symbols {
 
   /**
