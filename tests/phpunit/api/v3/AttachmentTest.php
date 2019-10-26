@@ -100,6 +100,16 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       ],
       'This comes from a file',
     ];
+    $cases[] = [
+      'CRM_Core_DAO_Domain',
+      [
+        'name' => self::getFilePrefix() . 'exampleFromContent.txt',
+        'mime_type' => 'text/plain',
+        'description' => 'My test description',
+        'content' => 'My test content',
+      ],
+      'My test content',
+    ];
 
     return $cases;
   }
@@ -153,17 +163,6 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'content' => 'My test content',
       ],
       "/Malformed name/",
-    ];
-    $cases[] = [
-      'CRM_Core_DAO_Domain',
-      [
-        'name' => self::getFilePrefix() . 'exampleFromContent.txt',
-        'mime_type' => 'text/plain',
-        'description' => 'My test description',
-        'content' => 'My test content',
-        'check_permissions' => 1,
-      ],
-      "/Unrecognized target entity/",
     ];
 
     return $cases;
