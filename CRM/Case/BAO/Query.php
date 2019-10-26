@@ -260,6 +260,11 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
+    if ($query->buildDateRangeQuery($values)) {
+      // @todo - move this to Contact_Query in or near the call to
+      // $this->buildRelativeDateQuery($values);
+      return;
+    }
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $val = $names = [];
     switch ($name) {
@@ -718,12 +723,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $form->addSearchFieldMetadata(['Case' => self::getSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
 
-    CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
-    $form->addElement('hidden', 'case_from_start_date_range_error');
-    $form->addElement('hidden', 'case_to_end_date_range_error');
-    $form->addFormRule(['CRM_Case_BAO_Query', 'formRule'], $form);
-
     $form->assign('validCiviCase', TRUE);
 
     //give options when all cases are accessible.
@@ -750,28 +749,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     self::addCustomFormFields($form, ['Case']);
 
     $form->setDefaults(['case_owner' => 1]);
-  }
-
-  /**
-   * Custom form rules.
-   *
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $form
-   *
-   * @return bool|array
-   */
-  public static function formRule($fields, $files, $form) {
-    $errors = [];
-
-    if ((empty($fields['case_from_start_date_low']) || empty($fields['case_from_start_date_high'])) && (empty($fields['case_to_end_date_low']) || empty($fields['case_to_end_date_high']))) {
-      return TRUE;
-    }
-
-    CRM_Utils_Rule::validDateRange($fields, 'case_from_start_date', $errors, ts('Case Start Date'));
-    CRM_Utils_Rule::validDateRange($fields, 'case_to_end_date', $errors, ts('Case End Date'));
-
-    return empty($errors) ? TRUE : $errors;
   }
 
 }

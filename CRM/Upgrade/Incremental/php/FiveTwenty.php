@@ -95,6 +95,22 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
     }
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add "Template" contribution status', 'templateStatus');
+    $this->addTask('Update smart groups to rename filters on case_from and case_to to case_start_date and case_end_date', 'updateSmartGroups', [
+      'renameField' => [
+        ['old' => 'case_from_relative', 'new' => 'case_start_date_relative'],
+        ['old' => 'case_from_start_date_high', 'new' => 'case_start_date_high'],
+        ['old' => 'case_from_start_date_low', 'new' => 'case_start_date_low'],
+        ['old' => 'case_to_relative', 'new' => 'case_end_date_relative'],
+        ['old' => 'case_to_end_date_high', 'new' => 'case_end_date_high'],
+        ['old' => 'case_to_end_date_low', 'new' => 'case_end_date_low'],
+      ],
+    ]);
+    $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
+      'datepickerConversion' => [
+        'case_start_date',
+        'case_end_date',
+      ],
+    ]);
   }
 
   public static function templateStatus(CRM_Queue_TaskContext $ctx) {
