@@ -143,7 +143,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     try {
       $result = civicrm_api3('contact', 'get', []);
     }
-    catch (CRM_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail("This should have been a success test");
     }
     $this->assertTrue(is_array($result));

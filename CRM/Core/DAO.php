@@ -1858,7 +1858,7 @@ SELECT contact_id
   /**
    * Drop all CiviCRM tables.
    *
-   * @throws \CRM_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function dropAllTables() {
 
