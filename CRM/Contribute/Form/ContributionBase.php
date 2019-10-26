@@ -344,6 +344,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->_values['is_pay_later'] = FALSE;
         }
       }
+      if ($isPayLater) {
+        $this->setPayLaterLabel($this->_values['pay_later_text']);
+      }
 
       if ($isMonetary) {
         $this->_paymentProcessorIDs = array_filter(explode(

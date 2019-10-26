@@ -1315,6 +1315,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Check payment processor is correctly assigned for a contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function testContributionBasePreProcess() {
     //Create contribution page with only pay later enabled.
@@ -1324,6 +1327,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'currency' => 'NZD',
       'goal_amount' => 100,
       'is_pay_later' => 1,
+      'pay_later_text' => 'Send check',
       'is_monetary' => TRUE,
       'is_active' => TRUE,
       'is_email_receipt' => TRUE,

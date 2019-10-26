@@ -37,6 +37,31 @@
 trait CRM_Financial_Form_FrontEndPaymentFormTrait {
 
   /**
+   * The label for the pay later pseudoprocessor option.
+   *
+   * @var string
+   */
+  protected $payLaterLabel;
+
+  /**
+   * @return string
+   */
+  public function getPayLaterLabel(): string {
+    if ($this->payLaterLabel) {
+      return $this->payLaterLabel;
+    }
+    return $this->get('payLaterLabel') ?? '';
+  }
+
+  /**
+   * @param string $payLaterLabel
+   */
+  public function setPayLaterLabel(string $payLaterLabel) {
+    $this->set('payLaterLabel', $payLaterLabel);
+    $this->payLaterLabel = $payLaterLabel;
+  }
+
+  /**
    * Alter line items for template.
    *
    * This is an early cut of what will ideally eventually be a hooklike call to the
@@ -77,6 +102,24 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     // @todo this should be a hook that invoicing code hooks into rather than a call to it.
     $this->alterLineItemsForTemplate($tplLineItems);
     $this->assign('lineItem', $tplLineItems);
+  }
+
+  /**
+   * Get the configured processors, including the pay later processor.
+   *
+   * @return array
+   */
+  protected function getProcessors(): array {
+    $pps = [];
+    if (!empty($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $key => $processor) {
+        $pps[$key] = $processor['title'] ?? $processor['name'];
+      }
+    }
+    if ($this->getPayLaterLabel()) {
+      $pps[0] = $this->getPayLaterLabel();
+    }
+    return $pps;
   }
 
 }
