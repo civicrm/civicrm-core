@@ -64,6 +64,13 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = 'case_';
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Case';
+  }
+
+  /**
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
@@ -204,7 +211,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
     $this->fixFormValues();
 
     if (isset($this->_ssID) && empty($_POST)) {
@@ -312,19 +319,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     }
 
     return TRUE;
-  }
-
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function setDefaultValues() {
-    $defaults = [];
-    $defaults = $this->_formValues;
-    return $defaults;
   }
 
   public function fixFormValues() {
