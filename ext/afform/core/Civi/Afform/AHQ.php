@@ -13,12 +13,13 @@ class AHQ {
   /**
    * Returns all tags with a certain tag name, e.g. 'af-entity'
    *
-   * @param array $element
+   * @param array|string $element
+   *   The ArrayHtml representation of a document/fragment.
    * @param string $tagName
    * @return array
    */
   public static function getTags($element, $tagName) {
-    if ($element === []) {
+    if ($element === [] || is_string($element)) {
       return [];
     }
     $results = [];
@@ -35,7 +36,8 @@ class AHQ {
    * Returns all the real properties of a collection,
    * filtering out any array keys that start with a hashtag
    *
-   * @param array $element
+   * @param array|string $element
+   *   The ArrayHtml representation of a document/fragment.
    * @return array
    */
   public static function getProps($element) {

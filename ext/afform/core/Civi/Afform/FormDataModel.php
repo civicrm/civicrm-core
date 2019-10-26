@@ -27,6 +27,9 @@ class FormDataModel {
    */
   public static function create($layout) {
     $entities = array_column(AHQ::getTags($layout, 'af-entity'), NULL, 'name');
+    foreach (array_keys($entities) as $entity) {
+      $entities[$entity]['fields'] = [];
+    }
     self::parseFields($layout, $entities);
 
     $self = new static();
@@ -43,8 +46,14 @@ class FormDataModel {
    *   Ex: $entities['spouse']['type'] = 'Contact';
    */
   protected static function parseFields($layout, &$entities) {
+    if (!isset($layout['#children'])) {
+      return;
+    }
     foreach ($layout['#children'] as $child) {
-      if ($child['#tag'] == 'af-fieldset' && !empty($child['#children'])) {
+      if (is_string($child)) {
+        //nothing
+      }
+      elseif ($child['#tag'] == 'af-fieldset' && !empty($child['#children'])) {
         $entities[$child['model']]['fields'] = array_merge($entities[$child['model']]['fields'] ?? [], AHQ::getTags($child, 'af-field'));
       }
       elseif (!empty($child['#children'])) {
