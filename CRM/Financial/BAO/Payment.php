@@ -632,25 +632,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $ratio = 0;
     }
     foreach ($lineItems as $lineItemID => $lineItem) {
-      $lineItems[$lineItemID]['paid'] = 0;
-      $financialItems = civicrm_api3('FinancialItem', 'get', [
-        'entity_id' => $lineItemID,
-        'entity_table' => 'civicrm_line_item',
-        'options' => ['sort' => 'id DESC', 'limit' => 0],
-      ])['values'];
-      if (!empty($financialItems)) {
-        $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
-          'entity_table' => 'civicrm_financial_item',
-          'entity_id' => ['IN' => array_keys($financialItems)],
-          'options' => ['limit' => 0],
-          'financial_trxn_id.is_payment' => 1,
-        ])['values'];
-        foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
-          $lineItems[$lineItemID]['paid'] += $entityFinancialTrxn['amount'];
-        }
-        // @todo determine financial_item_id in this function - but first we need to settle on the right method.
-        // $lineItems[$lineItemID]['financial_item_id'] = key($financialItems);
-      }
+      $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
       $lineItems[$lineItemID]['balance'] = $lineItem['subTotal'] - $lineItems[$lineItemID]['paid'];
 
       if (!empty($lineItemOverrides)) {
@@ -661,6 +643,36 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
     }
     return $lineItems;
+  }
+
+  /**
+   * Get the amount paid so far against this line item.
+   *
+   * @param int $lineItemID
+   *
+   * @return float
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function getAmountOfLineItemPaid($lineItemID) {
+    $paid = 0;
+    $financialItems = civicrm_api3('FinancialItem', 'get', [
+      'entity_id' => $lineItemID,
+      'entity_table' => 'civicrm_line_item',
+      'options' => ['sort' => 'id DESC', 'limit' => 0],
+    ])['values'];
+    if (!empty($financialItems)) {
+      $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
+        'entity_table' => 'civicrm_financial_item',
+        'entity_id' => ['IN' => array_keys($financialItems)],
+        'options' => ['limit' => 0],
+        'financial_trxn_id.is_payment' => 1,
+      ])['values'];
+      foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
+        $paid += $entityFinancialTrxn['amount'];
+      }
+    }
+    return (float) $paid;
   }
 
 }
