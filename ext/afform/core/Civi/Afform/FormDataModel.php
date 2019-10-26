@@ -38,18 +38,18 @@ class FormDataModel {
   }
 
   /**
-   * @param array $layout
+   * @param array $element
    *   The root element of the layout, in shallow/deep format.
    * @param array $entities
    *   A list of entities, keyed by named.
    *   This will be updated to include 'fields'.
    *   Ex: $entities['spouse']['type'] = 'Contact';
    */
-  protected static function parseFields($layout, &$entities) {
-    if (!isset($layout['#children'])) {
+  protected static function parseFields($element, &$entities) {
+    if (!isset($element['#children'])) {
       return;
     }
-    foreach ($layout['#children'] as $child) {
+    foreach ($element['#children'] as $child) {
       if (is_string($child)) {
         //nothing
       }
