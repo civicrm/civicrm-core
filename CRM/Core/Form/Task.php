@@ -217,4 +217,55 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     return $this->queryMode ?: CRM_Contact_BAO_Query::MODE_CONTACTS;
   }
 
+  /**
+   * Given the component id, compute the contact id
+   * since it's used for things like send email.
+   *
+   * @todo At the moment this duplicates a similar function in CRM_Core_DAO
+   * because right now only the case component is using this. Since the
+   * default $orderBy is '' which is what the original does, others should be
+   * easily convertable as NFC.
+   * @todo The passed in variables should be class member variables. Shouldn't
+   * need to have passed in vars.
+   *
+   * @param $componentIDs
+   * @param string $tableName
+   * @param string $idField
+   *
+   * @return array
+   */
+  public function getContactIDsFromComponent($componentIDs, $tableName, $idField = 'id') {
+    $contactIDs = [];
+
+    if (empty($componentIDs)) {
+      return $contactIDs;
+    }
+
+    $orderBy = $this->orderBy();
+
+    $IDs = implode(',', $componentIDs);
+    $query = "
+SELECT contact_id
+  FROM $tableName
+ WHERE $idField IN ( $IDs ) $orderBy
+";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $contactIDs[] = $dao->contact_id;
+    }
+    return $contactIDs;
+  }
+
+  /**
+   * Default ordering for getContactIDsFromComponent. Subclasses can override.
+   *
+   * @return string
+   *   SQL fragment. Either return '' or a valid order clause including the
+   *   words "ORDER BY", e.g. "ORDER BY `{$this->idField}`"
+   */
+  public function orderBy() {
+    return '';
+  }
+
 }
