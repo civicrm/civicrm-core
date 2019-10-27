@@ -1587,6 +1587,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Function tests that financial records are added when Financial Type is Changed.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionChangeFinancialType() {
     $contribParams = [
