@@ -97,9 +97,11 @@ function civicrm_api3_payment_delete($params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
  * @return array
  *   Api result array
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_payment_cancel($params) {
   $eftParams = [
@@ -112,6 +114,7 @@ function civicrm_api3_payment_cancel($params) {
     'total_amount' => -$entity['amount'],
     'contribution_id' => $entity['entity_id'],
     'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, 'now'),
+    'cancelled_payment_id' => $params['id'],
   ];
 
   foreach (['trxn_id', 'payment_instrument_id'] as $permittedParam) {
