@@ -81,6 +81,9 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
   }
 
   public function testSetTtl() {
+    // This test has exhibited some flakiness. It is overridden to
+    // dump more detailed information about failures; however, it should be
+    // substantively the same.
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
