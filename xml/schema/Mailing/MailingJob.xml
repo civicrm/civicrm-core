@@ -36,6 +36,10 @@
     <default>NULL</default>
     <required>false</required>
     <comment>date on which this job was scheduled.</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>start_date</name>
@@ -46,6 +50,10 @@
     <default>NULL</default>
     <required>false</required>
     <comment>date on which this job was started.</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>end_date</name>
@@ -54,6 +62,10 @@
     <default>NULL</default>
     <required>false</required>
     <comment>date on which this job ended.</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>status</name>
