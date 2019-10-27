@@ -898,7 +898,7 @@ civicrm_relationship.is_active = 1 AND
     }
     catch (Exception $e) {
       $this->assertEquals(
-        "A fatal error was triggered: One of parameters  (value: foo@example.com) is not of the type Positive",
+        "One of parameters  (value: foo@example.com) is not of the type Positive",
         $e->getMessage()
       );
       $this->assertTrue(TRUE);
