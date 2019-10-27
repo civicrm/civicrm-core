@@ -1550,7 +1550,7 @@ FROM   civicrm_domain
           $tr['%' . $key] = $item[0];
         }
         elseif ($abort) {
-          CRM_Core_Error::fatal("{$item[0]} is not of type {$item[1]}");
+          throw new CRM_Core_Exception("{$item[0]} is not of type {$item[1]}");
         }
       }
     }

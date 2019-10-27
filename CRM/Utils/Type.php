@@ -376,7 +376,7 @@ class CRM_Utils_Type {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ', $isThrowException = FALSE) {
+  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ', $isThrowException = TRUE) {
 
     $possibleTypes = [
       'Integer',
