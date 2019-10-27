@@ -128,6 +128,21 @@ class CRM_Mailing_BAO_Query {
   }
 
   /**
+   * Get the metadata for fields to be included on the mailing search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   *
+   * @todo ideally this would be a trait included on the mailing search & advanced search
+   * rather than a static function.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [];
+    $metadata = civicrm_api3('Mailing', 'getfields', [])['values'];
+    $metadata = array_merge($metadata, civicrm_api3('MailingJob', 'getfields', [])['values']);
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * @param $query
    */
   public static function where(&$query) {
@@ -395,10 +410,14 @@ class CRM_Mailing_BAO_Query {
   /**
    * Add all the elements shared between Mailing search and advnaced search.
    *
+   * @param \CRM_Mailing_Form_Search $form
    *
-   * @param CRM_Core_Form $form
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
+    $form->addSearchFieldMetadata(['Mailing' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
+
     // mailing selectors
     $mailings = CRM_Mailing_BAO_Mailing::getMailingsList();
 
