@@ -1168,6 +1168,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test recording of amount with comma separator.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCommaSeparatorAmount() {
     $contactId = $this->individualCreate();
@@ -1176,16 +1178,15 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $contactId,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'contribution_status_id' => 8,
+      'contribution_status_id' => 'Pending',
       'payment_instrument_id' => 1,
       'receive_date' => '20080522000000',
       'receipt_date' => '20080522000000',
-      'total_amount' => '20000.00',
-      'partial_payment_total' => '20,000.00',
-      'partial_amount_to_pay' => '8,000.00',
+      'total_amount' => '20,000.00',
+      'api.Payment.create' => ['total_amount' => '8,000.00'],
     ];
 
-    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $contribution = $this->callAPISuccess('Order', 'create', $params);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
@@ -1194,7 +1195,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'return' => ['total_amount'],
       ]
     );
-    $this->assertEquals($financialTrxn['total_amount'], 8000, 'Invalid Tax amount.');
+    $this->assertEquals($financialTrxn['total_amount'], 8000, 'Invalid amount.');
   }
 
   /**

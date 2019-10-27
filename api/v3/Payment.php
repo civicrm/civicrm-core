@@ -137,6 +137,13 @@ function civicrm_api3_payment_cancel($params) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_create($params) {
+  if (empty($params['skipCleanMoney'])) {
+    foreach (['total_amount', 'net_amount', 'fee_amount'] as $field) {
+      if (isset($params[$field])) {
+        $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
+      }
+    }
+  }
   // Check if it is an update
   if (!empty($params['id'])) {
     $amount = $params['total_amount'];
