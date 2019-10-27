@@ -80,4 +80,29 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
   }
 
+  public function testSetTtl() {
+    // This test has exhibited some flakiness. It is overridden to
+    // dump more detailed information about failures; however, it should be
+    // substantively the same.
+    if (isset($this->skippedTests[__FUNCTION__])) {
+      $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+    }
+    $result = $this->cache->set('key1', 'value', 1);
+    $this->assertTrue($result, 'set() must return true if success');
+    $this->assertEquals('value', $this->cache->get('key1'));
+    sleep(2);
+    $this->assertNull($this->cache->get('key1'), 'Value must expire after ttl.');
+
+    $this->cache->set('key2', 'value', new \DateInterval('PT1S'));
+    $key2Value = $this->cache->get('key2');
+    if ($key2Value !== 'value') {
+      // dump out contents of cache.
+      var_dump($this->cache);
+      print_r(date('u') . 'Current UNIX timestamp');
+    }
+    $this->assertEquals('value', $key2Value);
+    sleep(2);
+    $this->assertNull($this->cache->get('key2'), 'Value must expire after ttl.');
+  }
+
 }
