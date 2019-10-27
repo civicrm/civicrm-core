@@ -567,6 +567,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * - 2 financial items totalling $300 linked to the Accounts receivable financial_trxn
    * - 6 entries in the civicrm_entity_financial_trxn linked to line items - totalling $450.
    * - 5 entries in the civicrm_entity_financial_trxn linked to contributions - totalling $550.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testUpdatePayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'edit contributions'];

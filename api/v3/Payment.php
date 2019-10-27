@@ -97,9 +97,11 @@ function civicrm_api3_payment_delete($params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
  * @return array
  *   Api result array
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_payment_cancel($params) {
   $eftParams = [
