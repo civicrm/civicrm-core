@@ -158,7 +158,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentEmailReceipt() {
     $mut = new CiviMailUtils($this);
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
     $event = $this->callAPISuccess('Event', 'get', []);
     $this->addLocationToEvent($event['id']);
     $params = [
@@ -206,7 +206,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testPaymentEmailReceiptFullyPaid() {
     $mut = new CiviMailUtils($this);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM'];
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -242,7 +242,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $decimalSeparator = ($thousandSeparator === ',' ? '.' : ',');
     $mut = new CiviMailUtils($this);
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
     $this->callAPISuccess('payment', 'create', [
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
@@ -286,9 +286,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test create payment api with no line item in params
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentNoLineItems() {
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
 
     //Create partial payment
     $params = [
@@ -385,7 +387,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api with line item in params
    */
   public function testCreatePaymentLineItems() {
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']]);
 
     //Create partial payment by passing line item array is params
@@ -480,7 +482,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testCancelPayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -516,7 +518,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testDeletePayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -568,7 +570,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testUpdatePayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'edit contributions'];
-    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $contribution = $this->createParticipantWithContribution();
 
     //Create partial payment by passing line item array is params
     $params = [

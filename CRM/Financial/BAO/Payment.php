@@ -196,6 +196,8 @@ class CRM_Financial_BAO_Payment {
    * @param array $params
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function sendConfirmation($params) {
 
