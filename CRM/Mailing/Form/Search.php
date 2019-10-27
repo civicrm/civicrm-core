@@ -30,7 +30,16 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
  */
-class CRM_Mailing_Form_Search extends CRM_Core_Form {
+class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
+
+  /**
+   * Get the default entity being queried.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Mailing';
+  }
 
   public function preProcess() {
     parent::preProcess();
