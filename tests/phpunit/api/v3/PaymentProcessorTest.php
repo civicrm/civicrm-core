@@ -35,6 +35,11 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
 
+  /**
+   * Set up for class.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -69,6 +74,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Create payment processor.
+   *
+   * @throws \Exception
    */
   public function testPaymentProcessorCreate() {
     $params = $this->_params;
@@ -88,6 +95,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Update payment processor.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorUpdate() {
     $params = $this->_params;
@@ -131,6 +140,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Check payment processor delete.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorDelete() {
     $result = $this->callAPISuccess('payment_processor', 'create', $this->_params);
@@ -143,6 +154,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Check with valid params array.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorsGet() {
     $params = $this->_params;
@@ -156,6 +169,35 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
     $this->assertEquals(1, $results['count']);
     $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name']);
+  }
+
+  /**
+   * Test the processor passed to the hook can access the relevant variables.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testPaymentProcessorPay() {
+    $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'hook_civicrm_alterPaymentProcessorParams']);
+    $processor = $this->dummyProcessorCreate();
+    $this->callAPISuccess('PaymentProcessor', 'pay', [
+      'payment_processor_id' => $processor->getID(),
+      'contribution_id' => 10,
+      'invoice_id' => 2,
+      'contribution_recur_id' => 3,
+      'amount' => 6,
+    ]);
+  }
+
+  /**
+   * Implements civicrm_alterPaymentProcessorParams hook.
+   *
+   * @param \CRM_Core_Payment_Dummy $paymentObject
+   */
+  public function hook_civicrm_alterPaymentProcessorParams($paymentObject) {
+    $this->assertEquals(10, $paymentObject->getContributionID());
+    $this->assertEquals(2, $paymentObject->getInvoiceID());
+    $this->assertEquals(3, $paymentObject->getContributionRecurID());
   }
 
 }
