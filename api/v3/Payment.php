@@ -114,6 +114,7 @@ function civicrm_api3_payment_cancel($params) {
     'total_amount' => -$entity['amount'],
     'contribution_id' => $entity['entity_id'],
     'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, 'now'),
+    'cancelled_payment_id' => $params['id'],
   ];
 
   foreach (['trxn_id', 'payment_instrument_id'] as $permittedParam) {

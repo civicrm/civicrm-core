@@ -157,6 +157,22 @@ class CRM_Financial_BAO_Payment {
     }
     elseif ($params['total_amount'] < 0) {
       $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
+      if (!empty($params['cancelled_payment_id'])) {
+        // Do a direct reversal of any entity_financial_trxn records being cancelled.
+        $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
+          'entity_table' => 'civicrm_financial_item',
+          'options' => ['limit' => 0],
+          'financial_trxn_id.id' => $params['cancelled_payment_id'],
+        ])['values'];
+        foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
+          civicrm_api3('EntityFinancialTrxn', 'create', [
+            'entity_table' => 'civicrm_financial_item',
+            'entity_id' => $entityFinancialTrxn['entity_id'],
+            'amount' => -$entityFinancialTrxn['amount'],
+            'financial_trxn_id' => $trxn->id,
+          ]);
+        }
+      }
     }
 
     if ($isPaymentCompletesContribution) {
@@ -399,6 +415,7 @@ class CRM_Financial_BAO_Payment {
    *   - deprecate this param
    *
    * @return CRM_Financial_DAO_FinancialTrxn
+   * @throws \CiviCRM_API3_Exception
    */
   protected static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
     list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);

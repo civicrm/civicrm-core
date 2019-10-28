@@ -622,10 +622,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'financial_trxn_id' => $payment['id'] - 1,
     ];
 
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $minParams);
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $minParams)['values'];
+    $this->assertCount(2, $eft);
     $amounts = [-33.33, -16.67];
 
-    foreach ($eft['values'] as $value) {
+    foreach ($eft as $value) {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
 
@@ -634,9 +635,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
     ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params)['values'];
     $amounts = [66.67, 33.33];
-    foreach ($eft['values'] as $value) {
+    foreach ($eft as $value) {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
     $items = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
