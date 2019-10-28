@@ -410,23 +410,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::buildAmount($this);
     }
 
-    $pps = [];
-    //@todo this could call the function on FrontEndPaymentTrait which also respects the payment processor
-    // title if configured. From my testing we don't need the 'if' around adding payment processor 0
-    // (below) - if someone else tests & confirms we can remove it, use the FrontEndPaymentTrait
-    // like the contribution page does & use the getPaymentLabel (provided we also set it)
-    // and we will get the title, if configured.
-    if (!empty($this->_paymentProcessors)) {
-      foreach ($this->_paymentProcessors as $key => $name) {
-        $pps[$key] = $name['name'];
-      }
-    }
-    // see @todo above
-    if (!empty($this->_values['event']['is_pay_later']) &&
-      ($this->_allowConfirmation || (!$this->_requireApproval && !$this->_allowWaitlist))
-    ) {
-      $pps[0] = $this->_values['event']['pay_later_text'];
-    }
+    $pps = $this->getProcessors();
     if ($this->getContactID() === 0 && !$this->_values['event']['is_multiple_registrations']) {
       //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCIDZeroOptions();
