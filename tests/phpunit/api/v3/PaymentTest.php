@@ -761,6 +761,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test create payment api for pay later contribution with partial payment.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentPayLaterPartialPayment() {
     $this->createLoggedInUser();
@@ -772,7 +774,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
     ];
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
     //Create partial payment
     $params = [
       'contribution_id' => $contribution['id'],
@@ -848,9 +850,41 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that Payment.create uses the to_account of the payment processor.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentWithProcessorWithOddFinancialAccount() {
+    $processor = $this->dummyProcessorCreate(['financial_account_id' => 'Deposit Bank Account', 'payment_instrument_id' => 'Cash']);
+    $processor2 = $this->dummyProcessorCreate(['financial_account_id' => 'Payment Processor Account', 'name' => 'p2', 'payment_instrument_id' => 'EFT']);
+    $contributionParams = [
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 'Pending',
+    ];
+    $order = $this->callAPISuccess('Order', 'create', $contributionParams);
+    $this->callAPISuccess('Payment', 'create', ['payment_processor_id' => $processor->getID(), 'total_amount' => 6, 'contribution_id' => $order['id']]);
+    $this->callAPISuccess('Payment', 'create', ['payment_processor_id' => $processor2->getID(), 'total_amount' => 15, 'contribution_id' => $order['id']]);
+    $payments = $this->callAPISuccess('Payment', 'get', ['sequential' => 1, 'contribution_id' => $order['id']])['values'];
+    $this->assertEquals('Deposit Bank Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[0]['to_financial_account_id']));
+    $this->assertEquals('Payment Processor Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[1]['to_financial_account_id']));
+    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[0]['from_financial_account_id']));
+    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[1]['from_financial_account_id']));
+    $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[0]['payment_instrument_id']));
+    $this->assertEquals('EFT', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[1]['payment_instrument_id']));
+    // $order = $this->callAPISuccessGetSingle('Order', ['id' => $processor->getID()]);
+    // $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $order['payment_instrument_id']));
+  }
+
+  /**
    * Add a location to our event.
    *
    * @param int $eventID
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function addLocationToEvent($eventID) {
     $addressParams = [
