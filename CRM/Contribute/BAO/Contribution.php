@@ -3691,7 +3691,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {
           //Update Financial Records
-          self::updateFinancialAccounts($params, 'changedStatus');
+          $callUpdateFinancialAccounts = self::updateFinancialAccountsOnContributionStatusChange($params);
+          if ($callUpdateFinancialAccounts) {
+            self::updateFinancialAccounts($params, 'changedStatus');
+          }
           $updated = TRUE;
         }
 
@@ -3807,14 +3810,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $trxnID = NULL;
     $inputParams = $params;
     $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
-
-    if ($context == 'changedStatus') {
-      $continue = self::updateFinancialAccountsOnContributionStatusChange($params);
-      // @todo - it may be that this is always false & the parent function is just a confusing wrapper for the child fn.
-      if (!$continue) {
-        return;
-      }
-    }
 
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
