@@ -1,5 +1,19 @@
 <div>
-  <a href ng-if="selectedEntity !== null" ng-click="removeEntity(selectedEntity)" class="btn btn-sm btn-danger pull-right">
+  <a href ng-click="removeEntity(selectedEntity)" class="btn btn-sm btn-danger pull-right">
     <i class="crm-i fa-trash"></i>
   </a>
+
+  <fieldset>
+    <legend>{{ ts('Values') }}</legend>
+    <div class="form-inline" ng-if="entity.data" ng-repeat="(fieldName, value) in entity.data">
+      <label>{{ getField(entity.type, fieldName).title }}:</label>
+      <input class="form-control" af-gui-field-value="getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
+      <a href class="pull-right" ng-click="removeValue(entity, fieldName)">
+        <i class="crm-i fa-times"></i>
+      </a>
+    </div>
+    <div class="form-inline">
+      <input class="form-control" ng-model="controls.addValue" crm-ui-select="{data: valuesFields}" placeholder="Add value" />
+    </div>
+  </fieldset>
 </div>

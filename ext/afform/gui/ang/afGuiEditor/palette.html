@@ -1,7 +1,9 @@
 <div id="afGuiEditor-palette-config" class="panel panel-default">
     <ul id="afGuiEditor-palette-tabs" class="panel-heading nav nav-tabs">
       <li role="presentation" ng-class="{active: selectedEntity === null}">
-        <a href ng-click="selectEntity(null)">{{ ts('Form Settings') }}</a>
+        <a href ng-click="selectEntity(null)">
+          <span>{{ ts('Form Settings') }}</span>
+        </a>
       </li>
       <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntity === entity.name}">
         <a href ng-click="selectEntity(entity.name)">
@@ -10,7 +12,7 @@
       </li>
       <li role="presentation" class="dropdown">
         <a href class="dropdown-toggle" data-toggle="dropdown">
-          <i class="crm-i fa-plus"></i>
+          <span><i class="crm-i fa-plus"></i></span>
         </a>
         <ul class="dropdown-menu">
           <li ng-repeat="entity in meta.entities">
@@ -20,5 +22,5 @@
       </li>
     </ul>
   <div class="panel-body" ng-include="'~/afGuiEditor/config-form.html'" ng-if="selectedEntity === null"></div>
-  <div class="panel-body" ng-include="'~/afGuiEditor/config-entity.html'" ng-if="selectedEntity !== null"></div>
+  <div class="panel-body" ng-include="'~/afGuiEditor/config-entity.html'" ng-repeat="entity in entities" ng-if="selectedEntity === entity.name"></div>
 </div>

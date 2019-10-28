@@ -1,30 +1,54 @@
-#afGuiEditor-main {
+#afGuiEditor {
   display: flex;
 }
 
-#afGuiEditor-main .panel.panel-default {
-  margin-bottom: 0;
+#afGuiEditor .panel.panel-default {
+  /*margin-bottom: 0;*/
 }
 
-#afGuiEditor-main #afGuiEditor-palette {
+#afGuiEditor #afGuiEditor-palette {
   flex: 1;
   margin-right: 5px;
 }
 
-#afGuiEditor-main #afGuiEditor-canvas {
+#afGuiEditor #afGuiEditor-canvas {
   flex: 1;
   margin-left: 5px;
 }
 
-#afGuiEditor-main #afGuiEditor-palette-tabs li > a {
+#afGuiEditor #afGuiEditor-palette-tabs li {
+  top: 1px;
+}
+
+#afGuiEditor #afGuiEditor-palette-tabs li > a {
   padding: 10px 15px;
   font-size: 12px;
 }
 
-#afGuiEditor-main #afGuiEditor-palette-tabs .dropdown-menu {
+#afGuiEditor #afGuiEditor-palette-tabs .dropdown-menu {
   max-height: 500px;
   overflow-y: auto;
 }
 
-#afGuiEditor-main #afGuiEditor-palette-config {
+#afGuiEditor .crm-editable-enabled,
+#afGuiEditor-palette-tabs > li > a > span {
+  display: inline-block;
+  padding: 0 4px !important;
+  border: 2px solid transparent !important;
+}
+#afGuiEditor .crm-editable-enabled:hover:not(:focus) {
+  border: 2px dashed grey !important;
+}
+#afGuiEditor .crm-editable-enabled:before,
+#afGuiEditor .crm-editable-enabled:after {
+  content: '';
+  display: none;
+}
+
+#afGuiEditor-palette-config .form-inline {
+  margin-bottom: 10px;
+}
+
+#afGuiEditor-palette-config .form-inline label {
+  min-width: 110px;
 }

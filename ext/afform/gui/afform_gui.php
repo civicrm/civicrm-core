@@ -182,16 +182,21 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     $entityApi->addWhere('name', 'NOT LIKE', $nono);
   }
 
-  $contacts = Civi\Api4\Contact::getFields()
+  $contactFields = Civi\Api4\Contact::getFields()
     ->setCheckPermissions(FALSE)
     ->setIncludeCustom(TRUE)
     ->setLoadOptions(TRUE)
     ->setAction('Create')
     ->execute();
 
+  $contactSettings = [
+    'data' => [],
+  ];
+
   $mimeType = 'text/javascript';
   $content = "CRM.afformAdminData={";
   $content .= 'entities:' . json_encode((array) $entityApi->execute(), JSON_UNESCAPED_SLASHES) . ',';
-  $content .= 'fields:' . json_encode(['Contact' => (array) $contacts], JSON_UNESCAPED_SLASHES);
+  $content .= 'fields:' . json_encode(['Contact' => (array) $contactFields], JSON_UNESCAPED_SLASHES) . ',';
+  $content .= 'settings:' . json_encode(['Contact' => $contactSettings], JSON_UNESCAPED_SLASHES);
   $content .= '}';
 }
