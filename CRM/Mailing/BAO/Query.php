@@ -32,21 +32,23 @@
  */
 class CRM_Mailing_BAO_Query {
 
-  public static $_mailingFields = NULL;
-
   /**
-   * @return array|null
+   * Get fields for the mailing & mailing job entity.
+   *
+   * @return array
    */
   public static function &getFields() {
-    if (!self::$_mailingFields) {
-      self::$_mailingFields = [];
-      $_mailingFields['mailing_id'] = [
-        'name' => 'mailing_id',
-        'title' => ts('Mailing ID'),
-        'where' => 'civicrm_mailing.id',
-      ];
-    }
-    return self::$_mailingFields;
+    $mailingFields = CRM_Mailing_BAO_Mailing::fields();
+    $mailingJobFields = CRM_Mailing_BAO_MailingJob::fields();
+
+    // In general it's good to return as many fields as could possibly be searched, but
+    // with the limitation that if the fields do not have unique names they might
+    // clobber other fields :-(
+    $fields = [
+      'mailing_id' => $mailingFields['id'],
+      'mailing_job_start_date' => $mailingJobFields['mailing_job_start_date'],
+    ];
+    return $fields;
   }
 
   /**
@@ -286,11 +288,7 @@ class CRM_Mailing_BAO_Query {
       case 'mailing_date':
       case 'mailing_date_low':
       case 'mailing_date_high':
-        // process to / from date
-        $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
-        $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
-        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         $query->dateQueryBuilder($values,
           'civicrm_mailing_job', 'mailing_date', 'start_date', 'Mailing Delivery Date'
         );
@@ -387,10 +385,7 @@ class CRM_Mailing_BAO_Query {
           if ($value != 'Scheduled' && $value != 'Canceled') {
             $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
           }
-          $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
           $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
-          $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
-
           $query->_where[$grouping][] = " civicrm_mailing_job.status = '{$value}' ";
           $query->_qill[$grouping][] = "Mailing Job Status IS \"$value\"";
         }
@@ -474,6 +469,10 @@ class CRM_Mailing_BAO_Query {
    * @param $tables
    */
   public static function tableNames(&$tables) {
+    if (isset($tables['civicrm_mailing_job'])) {
+      $tables['civicrm_mailing'] = $tables['civicrm_mailing'] ?? 1;
+      $tables['civicrm_mailing_recipients'] = $tables['civicrm_mailing_recipients'] ?? 1;
+    }
   }
 
   /**
