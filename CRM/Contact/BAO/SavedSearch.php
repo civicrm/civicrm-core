@@ -402,7 +402,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       'log_date_relative',
       'birth_date_relative',
       'deceased_date_relative',
-      'mailing_date_relative',
       'relation_date_relative',
       'relation_start_date_relative',
       'relation_end_date_relative',
