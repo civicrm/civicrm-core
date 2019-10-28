@@ -124,11 +124,22 @@ function _civicrm_api3_payment_processor_getlist_defaults(&$request) {
  *   API result array.
  *
  * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_processor_pay($params) {
+  /* @var CRM_Core_Payment $processor */
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   try {
+    $processor->setContributionID($params['contribution_id']);
+    $processor->setInvoiceID($params['invoice_id'] ?? '');
+    if (!empty($params['contact_id'])) {
+      $processor->setContactID((int) $params['contact_id']);
+    }
+    if (!empty($params['contribution_recur_id'])) {
+      $processor->setContributionRecurID((int) $params['contribution_recur_id']);
+    }
+
     $result = $processor->doPayment($params);
   }
   catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
@@ -139,7 +150,7 @@ function civicrm_api3_payment_processor_pay($params) {
     }
     throw new API_Exception('Payment failed', $code, $errorData, $e);
   }
-  return civicrm_api3_create_success(array($result), $params);
+  return civicrm_api3_create_success([$result], $params);
 }
 
 /**
@@ -149,7 +160,7 @@ function civicrm_api3_payment_processor_pay($params) {
  */
 function _civicrm_api3_payment_processor_pay_spec(&$params) {
   $params['payment_processor_id'] = [
-    'api.required' => 1,
+    'api.required' => TRUE,
     'title' => ts('Payment processor'),
     'type' => CRM_Utils_Type::T_INT,
   ];
@@ -157,6 +168,23 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
     'api.required' => TRUE,
     'title' => ts('Amount to pay'),
     'type' => CRM_Utils_Type::T_MONEY,
+  ];
+  $params['contribution_id'] = [
+    'api.required' => TRUE,
+    'title' => ts('Contribution ID'),
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['contact_id'] = [
+    'title' => ts('Contact ID'),
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['contribution_recur_id'] = [
+    'title' => ts('Contribution Recur ID'),
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['invoice_id'] = [
+    'title' => ts('Invoice ID'),
+    'type' => CRM_Utils_Type::T_STRING,
   ];
 }
 
