@@ -32,6 +32,7 @@
  * @group headless
  */
 class api_v3_ProfileTest extends CiviUnitTestCase {
+  use CRMTraits_Custom_CustomDataTrait;
 
   protected $_profileID = 0;
 
@@ -94,6 +95,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
   /**
    * Check with success.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testProfileGet() {
     $profileFieldValues = $this->_createIndividualContact();
@@ -107,6 +110,29 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result));
     }
+  }
+
+  /**
+   * Test retrieving a profile with an address custom field in it.
+   *
+   * We are checking that there is no error.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testProfileGetWithAddressCustomData() {
+    $this->_createIndividualContact();
+    $this->entity = 'Address';
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Address']);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $this->_profileID,
+      'field_name' => $this->getCustomFieldName('text'),
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'My custom field',
+      'field_type' => 'Contact',
+    ]);
+    $this->callAPISuccess('Address', 'get', ['contact_id' => $this->_contactID, 'api.Address.create' => [$this->getCustomFieldName('text') => 'my field']]);
+    $result = $this->callAPISuccess('Profile', 'get', ['profile_id' => $this->_profileID, 'contact_id' => $this->_contactID])['values'];
+    // $this->assertEquals('my field', $result[$this->getCustomFieldName('text')]);
   }
 
   /**

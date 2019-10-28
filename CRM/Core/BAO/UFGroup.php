@@ -741,8 +741,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return mixed
    */
   protected static function getCustomFields($ctype) {
-    static $customFieldCache = [];
-    if (!isset($customFieldCache[$ctype])) {
+    $cacheKey = 'uf_group_custom_fields_' . $ctype;
+    if (!Civi::cache('metadata')->has($cacheKey)) {
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, TRUE, TRUE);
 
       // hack to add custom data for components
@@ -752,9 +752,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       }
       $addressCustomFields = CRM_Core_BAO_CustomField::getFieldsForImport('Address');
       $customFields = array_merge($customFields, $addressCustomFields);
-      $customFieldCache[$ctype] = [$customFields, $addressCustomFields];
+      Civi::cache('metadata')->set($cacheKey, [$customFields, $addressCustomFields]);
     }
-    return $customFieldCache[$ctype];
+    return Civi::cache('metadata')->get($cacheKey);
   }
 
   /**
