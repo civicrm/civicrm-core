@@ -176,7 +176,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *  Default parameters to be be merged into each of the params.
    */
   public static function bulkSave($bulkParams, $defaults = []) {
-    $sql = $tables = $customFields = [];
+    $addedColumns = $sql = $tables = $customFields = [];
     foreach ($bulkParams as $index => $fieldParams) {
       $params = array_merge($defaults, $fieldParams);
       $customField = self::createCustomFieldRecord($params);
@@ -194,11 +194,19 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $params['table_name'] = $tables[$params['custom_group_id']];
       }
       $sql[$params['table_name']][] = $fieldSQL;
+      $addedColumns[$params['table_name']][] = $customField->name;
       $customFields[$index] = $customField;
     }
+
     foreach ($sql as $tableName => $statements) {
       // CRM-7007: do not i18n-rewrite this query
       CRM_Core_DAO::executeQuery("ALTER TABLE $tableName " . implode(', ', $statements), [], TRUE, NULL, FALSE, FALSE);
+
+      if (CRM_Core_Config::singleton()->logging) {
+        $logging = new CRM_Logging_Schema();
+        $logging->fixSchemaDifferencesFor($tableName, ['ADD' => $addedColumns[$tableName]]);
+      }
+
       Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
     }
     CRM_Utils_System::flushCache();
