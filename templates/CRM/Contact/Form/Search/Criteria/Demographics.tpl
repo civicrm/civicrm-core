@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5  
+ | CiviCRM version 5
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
@@ -26,12 +26,7 @@
 <div id="demographics" class="form-item">
   <table class="form-layout">
     <tr>
-      <td>
-        <label>{ts}Birth Dates{/ts}</label>
-      </td>
-    </tr>
-    <tr>
-      {include file="CRM/Core/DateRange.tpl" fieldName="birth_date" from='_low' to='_high'}
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="birth_date"}
     </tr>
     <tr>
       <td>
@@ -48,12 +43,7 @@
       </td>
     </tr>
     <tr>
-      <td>
-        <label>{ts}Deceased Dates{/ts}</label>
-      </td>
-    </tr>
-    <tr>
-      {include file="CRM/Core/DateRange.tpl" fieldName="deceased_date" from='_low' to='_high'}
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="deceased_date"}
     </tr>
     <tr>
       <td>

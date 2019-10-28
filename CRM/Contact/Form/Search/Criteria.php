@@ -36,9 +36,10 @@ class CRM_Contact_Form_Search_Criteria {
    * @param CRM_Contact_Form_Search_Advanced $form
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function basic(&$form) {
-    $form->addSearchFieldMetadata(['Contact' => self::getSearchFieldMetadata()]);
+    $form->addSearchFieldMetadata(['Contact' => self::getFilteredSearchFieldMetadata('basic')]);
     $form->addFormFieldsFromMetadata();
     self::setBasicSearchFields($form);
     $form->addElement('hidden', 'hidden_basic', 1);
@@ -262,6 +263,8 @@ class CRM_Contact_Form_Search_Criteria {
       'sort_name' => ['title' => ts('Complete OR Partial Name'), 'template_grouping' => 'basic'],
       'email' => ['title' => ts('Complete OR Partial Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
+      'birth_date' => ['name' => 'birth_date', 'template_grouping' => 'demographic'],
+      'deceased_date' => ['name' => 'deceased_date', 'template_grouping' => 'demographic'],
     ];
     $metadata = civicrm_api3('Contact', 'getfields', [])['values'];
     foreach ($fields as $fieldName => $field) {
@@ -271,16 +274,34 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
   /**
+   * Get search field metadata filtered by the template grouping field.
+   *
+   * @param string $filter
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getFilteredSearchFieldMetadata($filter) {
+    $fields = self::getSearchFieldMetadata();
+    foreach ($fields as $index => $field) {
+      if ($field['template_grouping'] !== $filter) {
+        unset($fields[$index]);
+      }
+    }
+    return $fields;
+  }
+
+  /**
    * Defines the fields that can be displayed for the basic search section.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected static function setBasicSearchFields($form) {
     $searchFields = [];
-    foreach (self::getSearchFieldMetadata() as $fieldName => $field) {
-      if ($field['template_grouping'] === 'basic') {
-        $searchFields[$fieldName] = $field;
-      }
+    foreach (self::getFilteredSearchFieldMetadata('basic') as $fieldName => $field) {
+      $searchFields[$fieldName] = $field;
     }
     $form->assign('basicSearchFields', array_merge(self::getBasicSearchFields(), $searchFields));
   }
@@ -525,9 +546,13 @@ class CRM_Contact_Form_Search_Criteria {
 
   /**
    * @param CRM_Core_Form_Search $form
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
+    $form->addSearchFieldMetadata(['Contact' => self::getFilteredSearchFieldMetadata('demographic')]);
+    $form->addFormFieldsFromMetadata();
     // radio button for gender
     $genderOptions = [];
     $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
@@ -544,11 +569,6 @@ class CRM_Contact_Form_Search_Criteria {
     $form->add('number', 'age_high', ts('Max Age'), ['class' => 'four', 'min' => 0]);
     $form->addRule('age_high', ts('Please enter a positive integer'), 'positiveInteger');
     $form->add('datepicker', 'age_asof_date', ts('As of'), NULL, FALSE, ['time' => FALSE]);
-
-    CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-
-    CRM_Core_Form_Date::buildDateRange($form, 'deceased_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-
     // radio button for is_deceased
     $form->addYesNo('is_deceased', ts('Deceased'), TRUE);
   }

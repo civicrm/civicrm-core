@@ -1601,6 +1601,8 @@ class CRM_Contact_BAO_Query {
       'case_start_date_relative',
       'case_end_date_relative',
       'mailing_job_start_date_relative',
+      'birth_date_relative',
+      'deceased_date_relative',
     ];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
@@ -7045,7 +7047,12 @@ AND   displayRelType.is_active = 1
     }
     else {
       // we have start and end dates.
-      $this->_where[$grouping][] = $fieldSpec['where'] . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
+      $where = $fieldSpec['where'];
+      if ($fieldSpec['table_name'] === 'civicrm_contact') {
+        // Special handling for contact table as it has a known alias in advanced search.
+        $where = str_replace('civicrm_contact.', 'contact_a.', $where);
+      }
+      $this->_where[$grouping][] = $where . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
 
       $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("between %1 and %2", [
         CRM_Utils_Date::customFormat($dates[0]),
