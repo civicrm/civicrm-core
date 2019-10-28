@@ -240,7 +240,9 @@
     </tr>
     <tr id="receiptText" class="crm-contribution-form-block-receipt_text"  style="display:none;">
       <td class="label">{$form.receipt_text.label}</td>
-      <td>{$form.receipt_text.html}</td>
+      <td>{$form.receipt_text.html} {help id="receipt_text"}<br />
+        <span class="description">{ts}This text will be included in the receipt sent to the contributor.{/ts}</span>
+      </td>
     </tr>
     <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
       <td class="label">{$form.receipt_date.label}</td>

@@ -103,3 +103,16 @@
 <em>{ts}Example: If you enter a payment of 60 when the scheduled amount is 50, the total pledge amount will be increased by 10.{/ts}</em>
 </p>
 {/htxt}
+
+{capture assign=messTempURL}{crmURL p='civicrm/admin/messageTemplates' q="reset=1"}{/capture}
+{htxt id="receipt_text-title"}
+  {ts}Receipt Text{/ts}
+{/htxt}
+{htxt id="receipt_text"}
+<p>
+{ts}Text entered into this field will be injected into the receipt sent to the contributor.{/ts}
+</p>
+<p>
+{ts 1=$messTempURL} The receipt sent will use the Message Template "Contributions - Receipt (off-line)" configured at <a href="%1">Administer > CiviMail > Message Templates</a> in the "System Workflow Messages" tab, this field will appear in place of the token `$formValues.receipt`. {/ts}
+</p>
+{/htxt}
