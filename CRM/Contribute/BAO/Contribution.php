@@ -3669,10 +3669,18 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               }
             }
             self::updateFinancialAccounts($params, 'changeFinancialType');
+            $params['skipLineItem'] = FALSE;
+            foreach ($params['line_item'] as &$lineItems) {
+              foreach ($lineItems as &$line) {
+                $line['financial_type_id'] = $params['financial_type_id'];
+              }
+            }
+            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changeFinancialType');
             /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
             $params['financial_account_id'] = $newFinancialAccount;
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
             self::updateFinancialAccounts($params);
+            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
             $updated = TRUE;
             $params['deferred_financial_account_id'] = $newFinancialAccount;
@@ -3694,6 +3702,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $callUpdateFinancialAccounts = self::updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
             self::updateFinancialAccounts($params, 'changedStatus');
+            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedStatus');
           }
           $updated = TRUE;
         }
@@ -3722,6 +3731,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           self::updateFinancialAccounts($params, 'changedAmount');
+          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedAmount');
           $updated = TRUE;
         }
 
@@ -3826,18 +3836,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     foreach ($params['line_item'] as $fieldId => $fields) {
       $params = self::createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $inputParams, $isARefund, $trxnIds, $fieldId);
     }
-
-    if ($context == 'changeFinancialType') {
-      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['skipLineItem'] = FALSE;
-      foreach ($params['line_item'] as &$lineItems) {
-        foreach ($lineItems as &$line) {
-          $line['financial_type_id'] = $params['financial_type_id'];
-        }
-      }
-    }
-
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
   }
 
   /**
