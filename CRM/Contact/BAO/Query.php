@@ -2179,7 +2179,7 @@ class CRM_Contact_BAO_Query {
         $realFieldName = str_replace(['_high', '_low'], '', $name);
         if (isset($this->_fields[$realFieldName])) {
           $field = $this->_fields[str_replace(['_high', '_low'], '', $realFieldName)];
-          $this->dateQueryBuilder($values, $field['table_name'], $realFieldName, $realFieldName, $field['title']);
+          $this->dateQueryBuilder($values, $field['table_name'], $realFieldName, $field['name'], $field['title']);
         }
         return;
       }
