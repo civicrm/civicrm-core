@@ -45,9 +45,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function validateArgs() {
     $rawArgs = $this->args;
+    $entities = $this->_formDataModel->getEntities();
     $this->args = [];
     foreach ($rawArgs as $arg => $val) {
-      if (!empty($this->_formDataModel[$arg]['af-url-autofill'])) {
+      if (!empty($entities[$arg]['url-autofill'])) {
         $this->args[$arg] = $val;
       }
     }
