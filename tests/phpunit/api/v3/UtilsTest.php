@@ -241,12 +241,18 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test the validate function transforms dates.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
   public function test_civicrm_api3_validate_fields() {
-    $params = ['start_date' => '2010-12-20', 'end_date' => ''];
+    $params = ['relationship_start_date' => '2010-12-20', 'relationship_end_date' => ''];
     $fields = civicrm_api3('relationship', 'getfields', ['action' => 'get']);
     _civicrm_api3_validate_fields('relationship', 'get', $params, $fields['values']);
-    $this->assertEquals('20101220000000', $params['start_date']);
-    $this->assertEquals('', $params['end_date']);
+    $this->assertEquals('20101220000000', $params['relationship_start_date']);
+    $this->assertEquals('', $params['relationship_end_date']);
   }
 
   public function test_civicrm_api3_validate_fields_membership() {
