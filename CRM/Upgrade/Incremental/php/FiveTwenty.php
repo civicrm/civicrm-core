@@ -110,6 +110,8 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
     ]);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
       'datepickerConversion' => [
+        'birth_date',
+        'deceased_date',
         'case_start_date',
         'case_end_date',
         'mailing_job_start_date',
