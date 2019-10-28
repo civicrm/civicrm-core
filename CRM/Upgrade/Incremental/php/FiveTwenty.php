@@ -103,12 +103,16 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         ['old' => 'case_to_relative', 'new' => 'case_end_date_relative'],
         ['old' => 'case_to_end_date_high', 'new' => 'case_end_date_high'],
         ['old' => 'case_to_end_date_low', 'new' => 'case_end_date_low'],
+        ['old' => 'mailing_date_relative', 'new' => 'mailing_job_start_date_relative'],
+        ['old' => 'mailing_date_high', 'new' => 'mailing_job_start_date_high'],
+        ['old' => 'mailing_date_low', 'new' => 'mailing_job_start_date_low'],
       ],
     ]);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
       'datepickerConversion' => [
         'case_start_date',
         'case_end_date',
+        'mailing_job_start_date',
       ],
     ]);
   }

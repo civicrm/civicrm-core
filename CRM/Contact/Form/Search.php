@@ -652,6 +652,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'mailing_unsubscribe',
           'mailing_date_low',
           'mailing_date_high',
+          'mailing_job_start_date_low',
+          'mailing_job_start_date_high',
+          'mailing_job_start_date_relative',
         ] as $mailingFilter) {
           $type = 'String';
           if ($mailingFilter == 'mailing_id' &&
