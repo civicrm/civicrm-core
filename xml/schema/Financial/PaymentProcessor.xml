@@ -64,6 +64,9 @@
     <title>Processor Description</title>
     <type>varchar</type>
     <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
     <comment>Payment Processor Description.</comment>
     <add>1.8</add>
   </field>
