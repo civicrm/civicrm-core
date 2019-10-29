@@ -59,6 +59,14 @@ class CRM_Afform_ArrayHtml {
       return '';
     }
 
+    if (isset($array['#comment'])) {
+      if (strpos($array['#comment'], '-->')) {
+        Civi::log()->warning('Afform: Cannot store comment with text "-->". Munging.');
+        $array['#comment'] = str_replace('-->', '-- >', $array['#comment']);
+      }
+      return sprintf('<!--%s-->', $array['#comment']);
+    }
+
     $tag = empty($array['#tag']) ? self::DEFAULT_TAG : $array['#tag'];
     unset($array['#tag']);
     $children = empty($array['#children']) ? [] : $array['#children'];
@@ -153,7 +161,8 @@ class CRM_Afform_ArrayHtml {
       return $node->textContent;
     }
     elseif ($node instanceof DOMComment) {
-      // FIXME: How to preserve comments? For the moment, discarding them.
+      $arr = ['#comment' => $node->nodeValue];
+      return $arr;
     }
     else {
       throw new \RuntimeException("Unrecognized DOM node");

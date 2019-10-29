@@ -65,7 +65,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
   public function getFormatExamples() {
     $es = [];
 
-    foreach (['empty', 'string', 'apple', 'banana', 'cherry'] as $exampleName) {
+    foreach (['empty', 'string', 'comments', 'apple', 'banana', 'cherry'] as $exampleName) {
       $exampleFile = '/formatExamples/' . $exampleName . '.php';
       $example = require __DIR__ . $exampleFile;
       $formats = ['html', 'shallow', 'deep'];
