@@ -183,7 +183,6 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     $formValues = [
       'operator' => 'AND',
       'event_relative' => 'this.month',
-      'participant_relative' => 'today',
       'participant_test' => 0,
       'title' => 'testsmart',
       'radio_ts' => 'ts_all',
@@ -197,7 +196,6 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
     $expectedResult = [
       'event' => 'this.month',
-      'participant' => 'today',
     ];
     $this->checkArrayEquals($result['relative_dates'], $expectedResult);
   }
