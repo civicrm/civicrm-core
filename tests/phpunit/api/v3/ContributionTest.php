@@ -3344,6 +3344,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test sending a mail via the API.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSendMail() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -3435,12 +3437,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Check credit card details in sent mail via API
    *
-   * @param $mut obj CiviMailUtils instance
+   * @param CiviMailUtils $mut
    * @param int $contributionID Contribution ID
    *
+   * @throws \CRM_Core_Exception
    */
   public function checkCreditCardDetails($mut, $contributionID) {
-    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $this->callAPISuccess('contribution', 'create', $this->_params);
     $this->callAPISuccess('contribution', 'sendconfirmation', [
       'id' => $contributionID,
       'receipt_from_email' => 'api@civicrm.org',
