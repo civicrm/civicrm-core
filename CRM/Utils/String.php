@@ -954,7 +954,7 @@ class CRM_Utils_String {
       return unserialize($string);
     }
     catch (UnserializeFailedException $e) {
-      throw new CRM_Core_Exception($e->getMessage());
+      return FALSE;
     }
   } 
 
