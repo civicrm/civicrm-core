@@ -160,7 +160,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
       #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
       #        $dao->save();
-      $dao->data = CRM_Utils_String::unserialize($dao->data);
+      $dao->data = unserialize($dao->data);
       $result = $dao;
     }
 
@@ -196,7 +196,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
         '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
         '2' => [$dao->id, 'Integer'],
       ]);
-      $dao->data = CRM_Utils_String::unserialize($dao->data);
+      $dao->data = unserialize($dao->data);
       return $dao;
     }
   }

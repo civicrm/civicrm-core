@@ -121,12 +121,12 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
 
   private function reobjectify($value) {
     if (is_object($value)) {
-      return CRM_Utils_String::unserialize(serialize($value));
+      return unserialize(serialize($value));
     }
     if (is_array($value)) {
       foreach ($value as $p) {
         if (is_object($p)) {
-          return CRM_Utils_String::unserialize(serialize($value));
+          return unserialize(serialize($value));
         }
       }
     }
