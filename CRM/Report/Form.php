@@ -632,7 +632,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       $formValues = CRM_Utils_Array::value('form_values', $this->_instanceValues);
       if ($formValues) {
-        $this->_formValues = unserialize($formValues);
+        $this->_formValues = CRM_Utils_String::unserialize($formValues);
       }
       else {
         $this->_formValues = NULL;

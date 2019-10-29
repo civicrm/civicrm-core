@@ -100,8 +100,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     $fv = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'form_values');
     $result = NULL;
     if ($fv) {
-      // make sure u unserialize - since it's stored in serialized form
-      $result = unserialize($fv);
+      // make sure u CRM_Utils_String::unserialize - since it's stored in serialized form
+      $result = CRM_Utils_String::unserialize($fv);
     }
 
     $specialFields = ['contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id'];

@@ -31,6 +31,9 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 
+use function xKerman\Restricted\unserialize;
+use xKerman\Restricted\UnserializeFailedException;
+
 require_once 'HTML/QuickForm/Rule/Email.php';
 
 /**
@@ -935,5 +938,24 @@ class CRM_Utils_String {
     }
     return array_values(array_unique($result));
   }
+
+  /**
+   * Use xkerman/restricted-unserialize to unserialize a string of data.
+   * @param string|NULL $string
+   *
+   * @return mixed
+   * @throws CRM_Core_Exception
+   */
+  public static function unserialize($string) {
+    if (!is_string($string)) {
+      return FALSE;
+    }
+    try {
+      return unserialize($string);
+    }
+    catch (UnserializeFailedException $e) {
+      throw new CRM_Core_Exception($e->getMessage());
+    }
+  } 
 
 }

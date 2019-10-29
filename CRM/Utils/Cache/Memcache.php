@@ -149,7 +149,7 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
     $result = $this->_cache->get($this->getTruePrefix() . $key);
-    return ($result === FALSE) ? $default : unserialize($result);
+    return ($result === FALSE) ? $default : CRM_Utils_String::unserialize($result);
   }
 
   /**
