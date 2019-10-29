@@ -157,6 +157,35 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test converting relationship fields
+   */
+  public function testSmartGroupRelationshipDateConversions() {
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['relationship_start_date_low', '=', '20191001000000'],
+        ['relationship_start_date_high', '=', '20191031235959'],
+        ['relationship_end_date_low', '=', '20191001000000'],
+        ['relationship_end_date_high', '=', '20191031235959'],
+        'relative_dates' => [
+          'relation_start' => 'this.month',
+          'relation_end' => 'this.month',
+        ],
+      ],
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->updateGroups([
+      'datepickerConversion' => [
+        'relationship_start_date',
+        'relationship_end_date',
+      ],
+    ]);
+    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
+    $this->assertEquals([], $savedSearch['form_values']['relative_dates']);
+    $this->assertEquals(['relationship_start_date_relative', '=', 'this.month'], $savedSearch['form_values'][4]);
+    $this->assertEquals(['relationship_end_date_relative', '=', 'this.month'], $savedSearch['form_values'][5]);
+  }
+
+  /**
    * Test conversion of on hold group.
    */
   public function testOnHoldConversion() {

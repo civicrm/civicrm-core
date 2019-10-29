@@ -391,6 +391,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    *
    * @param array $queryParams
    * @param array $formValues
+   * @deprecated
    */
   public static function saveRelativeDates(&$queryParams, $formValues) {
     // This is required only until all fields are converted to datepicker fields as the new format is truer to the
@@ -398,11 +399,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     $relativeDates = ['relative_dates' => []];
     $specialDateFields = [
       'event_relative',
-      'participant_relative',
       'log_date_relative',
-      'birth_date_relative',
-      'deceased_date_relative',
-      'relation_date_relative',
       'relation_action_date_relative',
     ];
     foreach ($formValues as $id => $value) {
