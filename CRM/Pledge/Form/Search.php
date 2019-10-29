@@ -397,13 +397,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
-  }
-
-  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
