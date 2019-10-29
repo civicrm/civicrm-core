@@ -265,8 +265,11 @@ class CRM_Contact_Form_Search_Criteria {
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
       'birth_date' => ['name' => 'birth_date', 'template_grouping' => 'demographic'],
       'deceased_date' => ['name' => 'deceased_date', 'template_grouping' => 'demographic'],
+      'relationship_start_date' => ['name' => 'relationship_start_date', 'template_grouping' => 'relationship'],
+      'relationship_end_date' => ['name' => 'relationship_end_date', 'template_grouping' => 'relationship'],
     ];
-    $metadata = civicrm_api3('Contact', 'getfields', [])['values'];
+    $metadata = civicrm_api3('Relationship', 'getfields', [])['values'];
+    $metadata = array_merge($metadata, civicrm_api3('Contact', 'getfields', [])['values']);
     foreach ($fields as $fieldName => $field) {
       $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
     }
@@ -509,10 +512,13 @@ class CRM_Contact_Form_Search_Criteria {
 
   /**
    * @param CRM_Core_Form_Search $form
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
-
+    $form->addSearchFieldMetadata(['Relationship' => self::getFilteredSearchFieldMetadata('relationship')]);
+    $form->addFormFieldsFromMetadata();
     $form->add('text', 'relation_description', ts('Description'), ['class' => 'twenty']);
     $allRelationshipType = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
     $form->add('select', 'relation_type_id', ts('Relationship Type'), ['' => ts('- select -')] + $allRelationshipType, FALSE, ['multiple' => TRUE, 'class' => 'crm-select2']);
@@ -532,9 +538,6 @@ class CRM_Contact_Form_Search_Criteria {
         ['id' => 'relation_target_group', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
-    CRM_Core_Form_Date::buildDateRange($form, 'relation_start_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'relation_end_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
-
     CRM_Core_Form_Date::buildDateRange($form, 'relation_active_period_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     // Add reltionship dates

@@ -511,6 +511,9 @@ class CRM_Contact_BAO_Query {
       foreach (array_keys($this->legacyHackedFields) as $fieldName) {
         $this->_fields[$fieldName]['type'] = CRM_Utils_Type::T_STRING;
       }
+      $relationMetadata = CRM_Contact_BAO_Relationship::fields();
+      $relationFields = array_intersect_key($relationMetadata, array_fill_keys(['relationship_start_date', 'relationship_end_date'], 1));
+      $this->_fields = array_merge($relationFields, $this->_fields);
 
       $fields = CRM_Core_Component::getQueryFields(!$this->_skipPermission);
       unset($fields['note']);
@@ -1595,6 +1598,8 @@ class CRM_Contact_BAO_Query {
       'pledge_create_date_relative',
       'pledge_start_date_relative',
       'pledge_payment_scheduled_date_relative',
+      'relationship_start_date_relative',
+      'relationship_end_date_relative',
       'membership_join_date_relative',
       'membership_start_date_relative',
       'membership_end_date_relative',
@@ -2020,10 +2025,10 @@ class CRM_Contact_BAO_Query {
         return;
 
       case 'relation_type_id':
-      case 'relation_start_date_high':
-      case 'relation_start_date_low':
-      case 'relation_end_date_high':
-      case 'relation_end_date_low':
+      case 'relationship_start_date_high':
+      case 'relationship_start_date_low':
+      case 'relationship_end_date_high':
+      case 'relationship_end_date_low':
       case 'relation_active_period_date_high':
       case 'relation_active_period_date_low':
       case 'relation_target_name':
@@ -4377,15 +4382,9 @@ civicrm_relationship.start_date > {$today}
    * not the main query.
    */
   public function addRelationshipDateClauses($grouping, &$where) {
-    $dateValues = [];
-    $dateTypes = [
-      'start_date',
-      'end_date',
-    ];
-
-    foreach ($dateTypes as $dateField) {
-      $dateValueLow = $this->getWhereValues('relation_' . $dateField . '_low', $grouping);
-      $dateValueHigh = $this->getWhereValues('relation_' . $dateField . '_high', $grouping);
+    foreach (['start_date', 'end_date'] as $dateField) {
+      $dateValueLow = $this->getWhereValues('relationship_' . $dateField . '_low', $grouping);
+      $dateValueHigh = $this->getWhereValues('relationship_' . $dateField . '_high', $grouping);
       if (!empty($dateValueLow)) {
         $date = date('Ymd', strtotime($dateValueLow[2]));
         $where[$grouping][] = "civicrm_relationship.$dateField >= $date";
