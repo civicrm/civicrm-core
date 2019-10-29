@@ -22,11 +22,13 @@ class CRM_Afform_ArrayHtml {
       '*' => 'text',
     ],
     'af-entity' => [
+      '#selfClose' => TRUE,
       'name' => 'text',
       'type' => 'text',
       'data' => 'js',
     ],
     'af-field' => [
+      '#selfClose' => TRUE,
       'name' => 'text',
       'defn' => 'js',
     ],

@@ -1,7 +1,7 @@
 <?php
 
 return [
-  'html' => '<div><strong>New text!</strong><af-field name="do_not_sms" defn="{label: \'Do not do any of the emailing\'}"></af-field></div>',
+  'html' => '<div><strong>New text!</strong><af-field name="do_not_sms" defn="{label: \'Do not do any of the emailing\'}" /></div>',
   'shallow' => [
     [
       '#tag' => 'div',
