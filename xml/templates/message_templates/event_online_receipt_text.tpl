@@ -199,7 +199,7 @@ You were registered by: {$payer.name}
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode ne 'notify' and !$isAmountzero and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and !$isOnWaitlist and !$isRequireApproval}
+{if $billingName}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 

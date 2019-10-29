@@ -396,7 +396,7 @@
         </tr>
        {/if}
 
-       {if $contributeMode ne 'notify' and !$isAmountzero and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and !$isOnWaitlist and !$isRequireApproval}
+       {if $billingName}
         <tr>
          <th {$headerStyle}>
           {ts}Billing Name and Address{/ts}
