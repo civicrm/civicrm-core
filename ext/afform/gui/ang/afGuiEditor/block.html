@@ -1,0 +1,6 @@
+<div ui-sortable ng-model="block['#children']">
+  <div ng-repeat="item in block['#children']">
+    <div ng-if="isItemVisible(item) && item['#tag'] === 'af-fieldset'" af-gui-fieldset="item" />
+    <div ng-if="isItemVisible(item) && item['#tag'] === 'div'" af-gui-block="item" />
+  </div>
+</div>

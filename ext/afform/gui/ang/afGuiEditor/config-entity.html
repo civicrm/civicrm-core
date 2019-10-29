@@ -16,4 +16,19 @@
       <input class="form-control" ng-model="controls.addValue" crm-ui-select="{data: valuesFields}" placeholder="Add value" />
     </div>
   </fieldset>
+
+  <fieldset>
+    <legend>{{ ts('Fields') }}</legend>
+    <ul class="crm-checkbox-list">
+      <li ng-repeat="(key, spec) in meta.fields[entity.type]" >
+        <input type="checkbox" id="field-{{ selectedEntity + '-' + key }}" />
+        <label for="field-{{ selectedEntity + '-' + key }}">{{ spec.title }}</label>
+      </li>
+    </ul>
+  </fieldset>
+
+  <fieldset>
+    <legend>{{ ts('Options') }}</legend>
+  </fieldset>
+
 </div>

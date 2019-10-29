@@ -1,10 +1,9 @@
 (function(angular, $, _) {
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'));
 
-  angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4) {
+  angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4, $parse) {
     return {
       restrict: 'A',
-      //require: 'ngModel',
       templateUrl: '~/afGuiEditor/main.html',
       scope: {
         afGuiEditor: '='
@@ -17,7 +16,7 @@
         $scope.controls = {};
         var newForm = {
           title: ts('Untitled Form'),
-          layout: {
+          layout: [{
             '#tag': 'af-form',
             ctrl: 'modelListCtrl',
             '#children': [
@@ -33,10 +32,10 @@
                 autofill: 'user'
               }
             ]
-          }
+          }]
         };
         if ($scope.afGuiEditor.name) {
-          crmApi4('Afform', 'get', {where: [['name', '=', $scope.afGuiEditor.name]]}, 0)
+          crmApi4('Afform', 'get', {where: [['name', '=', $scope.afGuiEditor.name]], layoutFormat: 'shallow'}, 0)
             .then(initialize);
         }
         else {
@@ -46,7 +45,11 @@
         function initialize(afform) {
           // Todo - show error msg if form is not found
           $scope.afform = afform;
-          $scope.entities = getTags(afform.layout, 'af-entity', 'name');
+          $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
+          evaluate($scope.layout['#children']);
+          convertTextNodes($scope.layout['#children']);
+          $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
+          $scope.fields = getAllFields($scope.layout['#children']);
         }
 
         $scope.addEntity = function(entityType) {
@@ -62,13 +65,13 @@
             name: entityType + num,
             label: entityType + ' ' + num
           };
-          $scope.afform.layout['#children'].push($scope.entities[entityType + num]);
+          $scope.layout['#children'].unshift($scope.entities[entityType + num]);
           $scope.selectEntity(entityType + num);
         };
 
         $scope.removeEntity = function(entityName) {
           delete $scope.entities[entityName];
-          $scope.afform.layout['#children'].splice(_.findIndex($scope.afform.layout['#children'], {'#tag': 'af-entity', name: entityName}), 1);
+          _.remove($scope.layout['#children'], {'#tag': 'af-entity', name: entityName});
           $scope.selectEntity(null);
         };
 
@@ -82,7 +85,8 @@
 
         $scope.valuesFields = function() {
           var fields = _.transform($scope.meta.fields[$scope.entities[$scope.selectedEntity].type], function(fields, field) {
-            fields.push({id: field.name, text: field.title, disabled: field.name in $scope.entities[$scope.selectedEntity].data});
+            var data = $scope.entities[$scope.selectedEntity].data || {};
+            fields.push({id: field.name, text: field.title, disabled: field.name in data});
           }, []);
           return {results: fields};
         };
@@ -93,10 +97,44 @@
 
         $scope.$watch('controls.addValue', function(fieldName) {
           if (fieldName) {
+            if (!$scope.entities[$scope.selectedEntity].data) {
+              $scope.entities[$scope.selectedEntity].data = {};
+            }
             $scope.entities[$scope.selectedEntity].data[fieldName] = '';
             $scope.controls.addValue = '';
           }
         });
+
+        function evaluate(collection) {
+          _.each(collection, function(item) {
+            if (_.isPlainObject(item)) {
+              evaluate(item['#children']);
+              _.each(item, function(node, idx) {
+                if (_.isString(node)) {
+                  var str = _.trim(node);
+                  if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
+                    item[idx] = $parse(str)({ts: $scope.ts});
+                  }
+                }
+              });
+            }
+          });
+        }
+
+        function convertTextNodes(collection) {
+          // Empty text nodes... just delete them.
+          _.remove(collection, function(item) {
+            return !item || (_.isString(item) && !_.trim(item));
+          });
+          // Convert other text nodes to objects
+          _.each(collection, function(item, idx) {
+            if (_.isPlainObject(item) && item['#children']) {
+              convertTextNodes(item['#children']);
+            } else if (_.isString(item)) {
+              collection[idx] = {'#text': item};
+            }
+          });
+        }
 
       }
     };
@@ -117,6 +155,60 @@
     });
     return indexBy ? _.indexBy(items, indexBy) : items;
   }
+
+  // Lists fields by entity. Note that fields for an entity can be spread across several fieldsets.
+  function getAllFields(layout) {
+    var allFields = {};
+    _.each(getTags(layout, 'af-fieldset'), function(fieldset) {
+      if (!allFields[fieldset.model]) {
+        allFields[fieldset.model] = {};
+      }
+      _.assign(allFields[fieldset.model], getTags(fieldset['#children'], 'af-field', 'name'));
+    });
+    return allFields;
+  }
+
+  angular.module('afGuiEditor').directive('afGuiBlock', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/block.html',
+      scope: {
+        block: '=afGuiBlock'
+      },
+      link: function($scope, element, attrs) {
+        $scope.isItemVisible = function(block) {
+          return (block['#tag'] === 'af-fieldset') || (block['#tag'] === 'div' && _.contains(block['class'], 'af-block'));
+        };
+      }
+    };
+  });
+
+  angular.module('afGuiEditor').directive('afGuiFieldset', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/fieldset.html',
+      scope: {
+        fieldset: '=afGuiFieldset'
+      },
+      link: function($scope, element, attrs) {
+        $scope.isItemVisible = function(block) {
+          return (block['#tag'] === 'af-field') || (block['#tag'] === 'div' && _.contains(block['class'], 'af-block'));
+        };
+      }
+    };
+  });
+
+  angular.module('afGuiEditor').directive('afGuiField', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/field.html',
+      scope: {
+        field: '=afGuiField'
+      },
+      link: function($scope, element, attrs) {
+      }
+    };
+  });
 
   // Editable titles using ngModel & html5 contenteditable
   // Cribbed from ContactLayoutEditor
