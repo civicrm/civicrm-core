@@ -302,7 +302,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     self::setModeValues();
-    if (!array_key_exists($mode, self::$_modeValues)) {
+    // Note $mode might === FALSE because array_search above failed, e.g. for searchPane='location'
+    if (empty(self::$_modeValues[$mode])) {
       $mode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
 
