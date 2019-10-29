@@ -164,7 +164,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ]);
 
     $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_financial_item', 'sequential' => 1, 'return' => ['entity_table', 'amount']])['values'];
-    // @todo check the values assigned to these as part of fixing dev/financial#34
+    $this->assertEquals(40, $result[2]['amount']);
+    $this->assertEquals(4, count($result));
   }
 
   /**

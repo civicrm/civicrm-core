@@ -56,8 +56,8 @@ class CRM_Financial_BAO_Payment {
   public static function create($params) {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($contribution['contribution_status_id'], 'name');
-
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount']);
+    $lineItems = self::getPayableLineItems($params);
 
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
@@ -95,7 +95,9 @@ class CRM_Financial_BAO_Payment {
 
       $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
 
-      // @todo - this is just weird & historical & inconsistent - why 2 tracks?
+      // @todo - this is pretty much the same as the next section now - just
+      // the getFinancialItem retrieval needs consolidating - one gets by line item, the other by
+      // price field id. One must be right the other wrong - which is which?
       if (!empty($params['line_item']) && !empty($trxn)) {
         foreach ($params['line_item'] as $values) {
           foreach ($values as $id => $amount) {
@@ -126,28 +128,39 @@ class CRM_Financial_BAO_Payment {
         }
       }
       elseif (!empty($trxn)) {
-        $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
         if (!empty($lineItems)) {
-          // get financial item
+          // @todo the difference between this and the above loop is that we are linking the
+          // financial trxn in the above loop to the last financial item that relates to the line item but
+          // here to the last financial item that relates to the price field value.
+          // Likely this difference is because one of them handles updated text fields correctly and the other
+          // doesn't - but which is which?
+          // Note that getPayableLineItems is probably the right place to determine this - see the todo there.
           list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
-          $entityParams = [
-            'contribution_total_amount' => $contribution['total_amount'],
-            'trxn_total_amount' => $params['total_amount'],
-            'trxn_id' => $trxn->id,
-          ];
-          $eftParams = [
-            'entity_table' => 'civicrm_financial_item',
-            'financial_trxn_id' => $entityParams['trxn_id'],
-          ];
+
           foreach ($lineItems as $key => $value) {
-            if ($value['qty'] == 0) {
+            if ($value['qty'] == 0 || $value['allocation'] === (float) 0) {
               continue;
             }
-            $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
-            $entityParams['line_item_amount'] = $value['line_total'];
-            CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+            $eftParams = [
+              'entity_table' => 'civicrm_financial_item',
+              'financial_trxn_id' => $trxn->id,
+              'entity_id' => $ftIds[$value['price_field_value_id']],
+              'amount' => $value['allocation'],
+            ];
+
+            civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+
             if (array_key_exists($value['price_field_value_id'], $taxItems)) {
-              $entityParams['line_item_amount'] = $taxItems[$value['price_field_value_id']]['amount'];
+              // @todo - this is expected to be broken - it should be fixed to
+              // a) have the getPayableLineItems add the amount to allocate for tax
+              // b) call EntityFinancialTrxn directly - per above.
+              // - see https://github.com/civicrm/civicrm-core/pull/14763
+              $entityParams = [
+                'contribution_total_amount' => $contribution['total_amount'],
+                'trxn_total_amount' => $params['total_amount'],
+                'trxn_id' => $trxn->id,
+                'line_item_amount' => $taxItems[$value['price_field_value_id']]['amount'],
+              ];
               $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
               CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
             }
@@ -606,6 +619,77 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         'contribution_status_id' => $status,
       ]
     );
+  }
+
+  /**
+   * Get the line items for the contribution.
+   *
+   * Retrieve the line items and wrangle the following
+   *
+   * - get the outstanding balance on a line item basis.
+   * - determine what amount is being paid on this line item - we get the total being paid
+   *   for the whole contribution and determine the ratio of the balance that is being paid
+   *   and then assign apply that ratio to each line item.
+   * - if overrides have been passed in we use those amounts instead.
+   *
+   * @param $params
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function getPayableLineItems($params): array {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+    $lineItemOverrides = CRM_Utils_Array::value('line_item', $params, []);
+    $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($params['contribution_id']);
+    if ($outstandingBalance !== 0.0) {
+      $ratio = $params['total_amount'] / $outstandingBalance;
+    }
+    else {
+      // Help we are making a payment but no money is owed. We won't allocate the overpayment to any line item.
+      $ratio = 0;
+    }
+    foreach ($lineItems as $lineItemID => $lineItem) {
+      $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
+      $lineItems[$lineItemID]['balance'] = $lineItem['subTotal'] - $lineItems[$lineItemID]['paid'];
+
+      if (!empty($lineItemOverrides)) {
+        $lineItems[$lineItemID]['allocation'] = CRM_Utils_Array::value($lineItemID, $lineItemOverrides);
+      }
+      else {
+        $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
+      }
+    }
+    return $lineItems;
+  }
+
+  /**
+   * Get the amount paid so far against this line item.
+   *
+   * @param int $lineItemID
+   *
+   * @return float
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function getAmountOfLineItemPaid($lineItemID) {
+    $paid = 0;
+    $financialItems = civicrm_api3('FinancialItem', 'get', [
+      'entity_id' => $lineItemID,
+      'entity_table' => 'civicrm_line_item',
+      'options' => ['sort' => 'id DESC', 'limit' => 0],
+    ])['values'];
+    if (!empty($financialItems)) {
+      $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
+        'entity_table' => 'civicrm_financial_item',
+        'entity_id' => ['IN' => array_keys($financialItems)],
+        'options' => ['limit' => 0],
+        'financial_trxn_id.is_payment' => 1,
+      ])['values'];
+      foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
+        $paid += $entityFinancialTrxn['amount'];
+      }
+    }
+    return (float) $paid;
   }
 
 }
