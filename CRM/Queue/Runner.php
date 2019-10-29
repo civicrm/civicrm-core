@@ -85,7 +85,7 @@ class CRM_Queue_Runner {
    */
   public static function instance($qrid) {
     if (!empty($_SESSION['queueRunners'][$qrid])) {
-      return unserialize($_SESSION['queueRunners'][$qrid]);
+      return CRM_Utils_String::unserialize($_SESSION['queueRunners'][$qrid]);
     }
     else {
       return NULL;

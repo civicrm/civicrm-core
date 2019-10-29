@@ -499,7 +499,7 @@ class CRM_Utils_Array {
    *   The input array with duplicate values removed.
    */
   public static function crmArrayUnique($array) {
-    $result = array_map("unserialize", array_unique(array_map("serialize", $array)));
+    $result = array_map("CRM_Utils_String::unserialize", array_unique(array_map("serialize", $array)));
     foreach ($result as $key => $value) {
       if (is_array($value)) {
         $result[$key] = self::crmArrayUnique($value);

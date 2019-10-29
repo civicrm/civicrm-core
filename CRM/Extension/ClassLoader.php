@@ -89,7 +89,7 @@ class CRM_Extension_ClassLoader {
       $loader = $this->buildClassLoader();
       $ser = serialize($loader);
       file_put_contents($file,
-        sprintf("<?php\nreturn unserialize(%s);", var_export($ser, 1))
+        sprintf("<?php\nreturn CRM_Utils_String::unserialize(%s);", var_export($ser, 1))
       );
     }
     return $loader->register();

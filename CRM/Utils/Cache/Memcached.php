@@ -167,7 +167,7 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
     $result = $this->_cache->get($key);
     switch ($this->_cache->getResultCode()) {
       case Memcached::RES_SUCCESS:
-        return unserialize($result);
+        return CRM_Utils_String::unserialize($result);
 
       case Memcached::RES_NOTFOUND:
         return $default;
