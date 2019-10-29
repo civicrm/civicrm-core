@@ -311,19 +311,7 @@
       </tr>
      {/if}
 
-     {if ! ($contributeMode eq 'notify' OR $contributeMode eq 'directIPN') and $is_monetary}
-      {if $is_pay_later && !$isBillingAddressRequiredForPayLater}
-       <tr>
-        <th {$headerStyle}>
-         {ts}Registered Email{/ts}
-        </th>
-       </tr>
-       <tr>
-        <td colspan="2" {$valueStyle}>
-         {$email}
-        </td>
-       </tr>
-      {elseif $amount GT 0}
+     {if $billingName}
        <tr>
         <th {$headerStyle}>
          {ts}Billing Name and Address{/ts}
@@ -336,10 +324,20 @@
          {$email}
         </td>
        </tr>
-      {/if}
+     {elseif $email}
+       <tr>
+        <th {$headerStyle}>
+         {ts}Registered Email{/ts}
+        </th>
+       </tr>
+       <tr>
+        <td colspan="2" {$valueStyle}>
+         {$email}
+        </td>
+       </tr>
      {/if}
 
-     {if $contributeMode eq 'direct' AND !$is_pay_later AND $amount GT 0}
+     {if $credit_card_type}
       <tr>
        <th {$headerStyle}>
         {ts}Credit Card Information{/ts}
