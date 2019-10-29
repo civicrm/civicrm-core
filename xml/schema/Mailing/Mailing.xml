@@ -120,6 +120,7 @@
   </foreignKey>
   <field>
     <name>name</name>
+    <uniqueName>mailing_name</uniqueName>
     <title>Mailing Name</title>
     <type>varchar</type>
     <length>128</length>

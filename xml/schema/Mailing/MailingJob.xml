@@ -69,6 +69,7 @@
   </field>
   <field>
     <name>status</name>
+    <uniqueName>mailing_job_status</uniqueName>
     <title>Mailing Job Status</title>
     <type>varchar</type>
     <length>12</length>
