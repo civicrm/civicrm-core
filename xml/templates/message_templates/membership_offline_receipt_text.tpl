@@ -89,7 +89,7 @@
 {$address}
 {/if}
 
-{if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later}
+{if $credit_card_type}
 ===========================================================
 {ts}Credit Card Information{/ts}
 
