@@ -33,6 +33,23 @@ class CRM_Afform_ArrayHtml {
     'af-fieldset' => [
       'model' => 'text',
     ],
+    'area' => ['#selfClose' => TRUE],
+    'base' => ['#selfClose' => TRUE],
+    'br' => ['#selfClose' => TRUE],
+    'col' => ['#selfClose' => TRUE],
+    'command' => ['#selfClose' => TRUE],
+    'embed' => ['#selfClose' => TRUE],
+    'hr' => ['#selfClose' => TRUE],
+    'iframe' => ['#selfClose' => TRUE],
+    'img' => ['#selfClose' => TRUE],
+    'input' => ['#selfClose' => TRUE],
+    'keygen' => ['#selfClose' => TRUE],
+    'link' => ['#selfClose' => TRUE],
+    'meta' => ['#selfClose' => TRUE],
+    'param' => ['#selfClose' => TRUE],
+    'source' => ['#selfClose' => TRUE],
+    'track' => ['#selfClose' => TRUE],
+    'wbr' => ['#selfClose' => TRUE],
   ];
 
   /**
@@ -93,9 +110,15 @@ class CRM_Afform_ArrayHtml {
         ]);
       }
     }
-    $buf .= '>';
-    $buf .= $this->convertArraysToHtml($children);
-    $buf .= '</' . $tag . '>';
+
+    if (empty($children) && $this->isSelfClosing($tag)) {
+      $buf .= ' />';
+    }
+    else {
+      $buf .= '>';
+      $buf .= $this->convertArraysToHtml($children);
+      $buf .= '</' . $tag . '>';
+    }
     return $buf;
   }
 
@@ -180,6 +203,17 @@ class CRM_Afform_ArrayHtml {
       $children[] = $this->convertNodeToArray($childNode);
     }
     return $children;
+  }
+
+  /**
+   * @param string $tag
+   *   Ex: 'img', 'div'
+   * @return bool
+   *   TRUE if the tag should look like '<img/>'.
+   *   FALSE if the tag should look like '<div></div>'.
+   */
+  protected function isSelfClosing($tag) {
+    return $this->protoSchema[$tag]['#selfClose'] ?? FALSE;
   }
 
   /**
