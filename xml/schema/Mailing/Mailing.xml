@@ -384,7 +384,7 @@
     <default>0</default>
     <comment>Is this mailing archived?</comment>
     <html>
-      <type>CheckBox</type>
+      <type>YesNo</type>
     </html>
     <add>2.2</add>
   </field>

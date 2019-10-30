@@ -1677,6 +1677,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['size'] = isset($props['size']) ? $props['size'] : 60;
         return $this->add('password', $name, $label, $props, $required);
 
+      case 'YesNo':
+        $allowClear = (bool) (!empty($props['allowClear']));
+        return $this->addYesNo($name, $label, $allowClear, $required, $props);
+
       // Check datatypes of fields
       // case 'Int':
       //case 'Float':

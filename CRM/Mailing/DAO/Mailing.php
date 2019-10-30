@@ -865,7 +865,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'bao' => 'CRM_Mailing_BAO_Mailing',
           'localizable' => 0,
           'html' => [
-            'type' => 'CheckBox',
+            'type' => 'YesNo',
           ],
         ],
         'visibility' => [
