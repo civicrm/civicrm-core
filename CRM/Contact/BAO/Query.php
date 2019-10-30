@@ -6248,6 +6248,22 @@ AND   displayRelType.is_active = 1
   }
 
   /**
+   * Get the qill (search description for field) for the specified field.
+   *
+   * @param string $daoName
+   * @param string $name
+   * @param string $value
+   * @param string|array $op
+   * @param string $label
+   *
+   * @return string
+   */
+  public static function getQillValue($daoName, string $name, $value, $op, string $label) {
+    list($op, $value) = self::buildQillForFieldValue($daoName, $name, $value, $op);
+    return ts('%1 %2 %3', [1 => $label, 2 => $op, 3 => $value]);
+  }
+
+  /**
    * Alter value to reflect wildcard settings.
    *
    * The form will have tried to guess whether this is a good field to wildcard but there is
@@ -6651,7 +6667,7 @@ AND   displayRelType.is_active = 1
         FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency
       $from
-      $where  AND civicrm_contribution.cancel_date IS NOT NULL 
+      $where  AND civicrm_contribution.cancel_date IS NOT NULL
       GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
