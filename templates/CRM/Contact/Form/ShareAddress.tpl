@@ -114,7 +114,8 @@
             });
 
             if (!addressHTML) {
-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+              var sharedContactLink =  "add?reset=1&action=update&cid=" + sharedContactId;
+              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit "+ "<a href='" + sharedContactLink + "' target='_blank'> contact </a>" + "to add an address, or select a different contact.{/ts}"{literal};
             }
 
             $contentArea.html(addressHTML);
@@ -124,5 +125,3 @@
   });
 </script>
 {/literal}
-
-
