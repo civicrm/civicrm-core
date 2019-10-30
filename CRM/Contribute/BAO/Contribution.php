@@ -2504,7 +2504,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $componentDetails['event'] = $dao->event_id;
       }
       if ($dao->participant_id) {
-        $componentDetails['participant'] = $dao->participant_id;
+        $componentDetails['participant'][] = $dao->participant_id;
       }
       if ($dao->membership_id) {
         if (!isset($componentDetails['membership'])) {
