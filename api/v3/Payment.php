@@ -201,8 +201,10 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'api.aliases' => ['payment_id'],
     ],
     'trxn_date' => [
-      'title' => ts('Cancel Date'),
+      'title' => ts('Payment Date'),
       'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+      'api.default' => 'now',
+      'api.required' => TRUE,
     ],
     'is_send_contribution_notification' => [
       'title' => ts('Send out notifications based on contribution status change?'),
@@ -321,21 +323,25 @@ function _civicrm_api3_payment_create_spec(&$params) {
 function _civicrm_api3_payment_get_spec(&$params) {
   $params = [
     'contribution_id' => [
-      'title' => 'Contribution ID',
+      'title' => ts('Contribution ID'),
       'type' => CRM_Utils_Type::T_INT,
     ],
     'entity_table' => [
-      'title' => 'Entity Table',
+      'title' => ts('Entity Table'),
       'api.default' => 'civicrm_contribution',
     ],
     'entity_id' => [
-      'title' => 'Entity ID',
+      'title' => ts('Entity ID'),
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['contribution_id'],
     ],
     'trxn_id' => [
-      'title' => 'Transaction ID',
+      'title' => ts('Transaction ID'),
       'type' => CRM_Utils_Type::T_STRING,
+    ],
+    'trxn_date' => [
+      'title' => ts('Payment Date'),
+      'type' => CRM_Utils_Type::T_TIMESTAMP,
     ],
   ];
 }

@@ -296,6 +296,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->submitPayment(70);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $this->_contributionId]);
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    $this->assertEquals('2019-04-01 00:00:00', $contribution['receive_date']);
+    $payment = $this->callAPISuccessGetSingle('Payment', ['contribution_id' => $contribution['id']]);
+    $this->assertEquals('2017-04-11 13:05:11', $payment['trxn_date']);
 
     // pay additional amount
     $this->submitPayment(30);
@@ -430,8 +433,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'total_amount' => $amount,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'trxn_date' => '2017-04-11 13:05:11',
       'payment_processor_id' => 0,
       'is_email_receipt' => $isEmailReceipt,
@@ -493,6 +494,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $orderParams = array_merge($this->_params, [
       'contribution_status_id' => 'Pending',
       'is_pay_later' => 1,
+      'receive_date' => '2019-04-01',
     ]);
     $contribution = $this->callAPISuccess('Order', 'create', $orderParams);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
