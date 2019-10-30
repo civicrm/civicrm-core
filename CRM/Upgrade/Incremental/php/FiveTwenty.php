@@ -50,6 +50,13 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
     // if ($rev == '5.12.34') {
     //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
     // }
+    if ($rev == '5.20.alpha1') {
+      if (CRM_Core_DAO::checkTableExists('civicrm_persistent') && CRM_Core_DAO::checkTableHasData('civicrm_persistent')) {
+        $preUpgradeMessage .= '<br/>' . ts("WARNING: The table \"<code>civicrm_persistent</code>\" is flagged for removal because all official records show it being unused. However, the upgrader has detected data in this copy of \"<code>civicrm_persistent</code>\". Please <a href='%1' target='_blank'>report</a> anything you can about the usage of this table. In the mean-time, the data will be preserved.", [
+          1 => 'https://civicrm.org/bug-reporting',
+        ]);
+      }
+    }
   }
 
   /**
@@ -125,6 +132,7 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         'relationship_end_date',
       ],
     ]);
+    $this->addTask('Clean up unused table "civicrm_persistent"', 'dropTableIfEmpty', 'civicrm_persistent');
   }
 
   public static function templateStatus(CRM_Queue_TaskContext $ctx) {
