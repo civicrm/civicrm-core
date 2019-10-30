@@ -1613,18 +1613,11 @@ class CRM_Contact_BAO_Query {
     foreach (array_keys($formValues) as $id) {
       if (
         !in_array($id, $nonLegacyDateFields) && (
-        preg_match('/_date_relative$/', $id) ||
-        $id == 'event_relative')
+        preg_match('/_date_relative$/', $id))
       ) {
-        if ($id == 'event_relative') {
-          $fromRange = 'event_start_date_low';
-          $toRange = 'event_end_date_high';
-        }
-        else {
-          $dateComponent = explode('_date_relative', $id);
-          $fromRange = "{$dateComponent[0]}_date_low";
-          $toRange = "{$dateComponent[0]}_date_high";
-        }
+        $dateComponent = explode('_date_relative', $id);
+        $fromRange = "{$dateComponent[0]}_date_low";
+        $toRange = "{$dateComponent[0]}_date_high";
 
         if (array_key_exists($fromRange, $formValues) && array_key_exists($toRange, $formValues)) {
           CRM_Contact_BAO_Query::fixDateValues($formValues[$id], $formValues[$fromRange], $formValues[$toRange]);
@@ -1690,8 +1683,7 @@ class CRM_Contact_BAO_Query {
       }
       elseif (
         !in_array($id, $nonLegacyDateFields) && (
-          preg_match('/_date_relative$/', $id) ||
-          $id == 'event_relative')
+          preg_match('/_date_relative$/', $id))
       ) {
         // Already handled in previous loop
         continue;
@@ -5277,12 +5269,20 @@ civicrm_relationship.start_date > {$today}
    * @param string $fieldTitle
    * @param bool $appendTimeStamp
    * @param string $dateFormat
+   * @param string|null $highDBFieldName
+   *   Optional field name for when the 'high' part of the calculation uses a different field than the 'low' part.
+   *   This is an obscure situation & one we don't want to do more of but supporting them here is the only way for now.
+   *   Examples are event date & relationship active date -in both cases we are looking for things greater than the start
+   *   date & less than the end date.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function dateQueryBuilder(
     $values, $tableName, $fieldName,
     $dbFieldName, $fieldTitle,
     $appendTimeStamp = TRUE,
-    $dateFormat = 'YmdHis'
+    $dateFormat = 'YmdHis',
+    $highDBFieldName = NULL
   ) {
     // @todo - remove dateFormat - pretty sure it's never passed in...
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -5346,9 +5346,10 @@ civicrm_relationship.start_date > {$today}
 
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
       if ($secondDate) {
+        $highDBFieldName = $highDBFieldName ?? $dbFieldName;
         $this->_where[$grouping][] = "
 ( {$tableName}.{$dbFieldName} $firstOP '$firstDate' ) AND
-( {$tableName}.{$dbFieldName} $secondOP '$secondDate' )
+( {$tableName}.{$highDBFieldName} $secondOP '$secondDate' )
 ";
         $this->_qill[$grouping][] = "$fieldTitle - $firstPhrase \"$firstDateFormat\" " . ts('AND') . " $secondPhrase \"$secondDateFormat\"";
       }
@@ -7044,15 +7045,18 @@ AND   displayRelType.is_active = 1
     $this->_whereTables[$tableName] = $this->_whereTables[$tableName] ?? 1;
 
     $dates = CRM_Utils_Date::getFromTo($value, NULL, NULL);
+    // Where end would be populated only if we are handling one of the weird ones with different from & to fields.
+    $secondWhere = $fieldSpec['where_end'] ?? $fieldSpec['where'];
     if (empty($dates[0])) {
       // ie. no start date we only have end date
-      $this->_where[$grouping][] = $fieldSpec['where'] . " <= '{$dates[1]}'";
+      $this->_where[$grouping][] = $secondWhere . " <= '{$dates[1]}'";
 
       $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("to %1", [
         CRM_Utils_Date::customFormat($dates[1]),
       ]) . ')';
     }
     elseif (empty($dates[1])) {
+
       // ie. no end date we only have start date
       $this->_where[$grouping][] = $fieldSpec['where'] . " >= '{$dates[1]}'";
 
@@ -7067,7 +7071,12 @@ AND   displayRelType.is_active = 1
         // Special handling for contact table as it has a known alias in advanced search.
         $where = str_replace('civicrm_contact.', 'contact_a.', $where);
       }
-      $this->_where[$grouping][] = $where . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
+      if ($secondWhere !== $fieldSpec['where']) {
+        $this->_where[$grouping][] = $fieldSpec['where'] . ">=  '{$dates[0]}' AND $secondWhere <='{$dates[1]}'";
+      }
+      else {
+        $this->_where[$grouping][] = $where . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
+      }
 
       $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("between %1 and %2", [
         CRM_Utils_Date::customFormat($dates[0]),
@@ -7082,6 +7091,7 @@ AND   displayRelType.is_active = 1
    * @param $values
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public function buildDateRangeQuery($values) {
     if ($this->isADateRangeField($values[0])) {

@@ -47,16 +47,15 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     $fields = array_merge($fields, CRM_Event_DAO_Event::import());
     $fields = array_merge($fields, self::getParticipantFields());
     $fields = array_merge($fields, CRM_Core_DAO_Discount::export());
-
+    $fields['event'] = self::getPseudoEventDateFieldMetadata();
     return $fields;
   }
 
   /**
    * @return array
    */
-  public static function &getParticipantFields() {
-    $fields = CRM_Event_BAO_Participant::importableFields('Individual', TRUE, TRUE);
-    return $fields;
+  public static function getParticipantFields() {
+    return CRM_Event_BAO_Participant::importableFields('Individual', TRUE, TRUE);
   }
 
   /**
@@ -249,7 +248,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
    * @param $values
-   * @param $query
+   * @param \CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     $checkPermission = empty($query->_skipPermission);
@@ -257,6 +256,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
 
     switch ($name) {
+      case 'event_low':
+      case 'event_high':
+        $query->dateQueryBuilder($values,
+          'civicrm_event', 'event', 'start_date', ts('Event Active On'), TRUE, 'YmdHis', 'end_date'
+        );
+        return;
+
       case 'event_start_date_low':
       case 'event_start_date_high':
         $query->dateQueryBuilder($values,
@@ -584,8 +590,11 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     $fields = [
       'participant_status_id',
       'participant_register_date',
+      // Super-weird but we have to make it work.....
+      'event',
     ];
     $metadata = civicrm_api3('Participant', 'getfields', [])['values'];
+    $metadata['event'] = self::getPseudoEventDateFieldMetadata();
     return array_intersect_key($metadata, array_flip($fields));
   }
 
@@ -628,11 +637,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
        FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]
     );
 
-    CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
-
-    $form->addElement('hidden', 'event_date_range_error');
-    $form->addFormRule(['CRM_Event_BAO_Query', 'formRule'], $form);
-
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', [1 => '<em>%1</em>']));
 
     $form->addSelect('participant_role_id',
@@ -672,30 +676,20 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * Check if the values in the date range are in correct chronological order.
+   * Get metadata from pseudo search field 'event'.
    *
-   * @todo Get this to work with CRM_Utils_Rule::validDateRange
-   *
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $form
-   *
-   * @return bool|array
+   * @return array
    */
-  public static function formRule($fields, $files, $form) {
-    $errors = [];
-
-    if ((empty($fields['event_start_date_low']) || empty($fields['event_end_date_high']))) {
-      return TRUE;
-    }
-    $lowDate = strtotime($fields['event_start_date_low']);
-    $highDate = strtotime($fields['event_end_date_high']);
-
-    if ($lowDate > $highDate) {
-      $errors['event_date_range_error'] = ts('Please check that your Event Date Range is in correct chronological order.');
-    }
-
-    return empty($errors) ? TRUE : $errors;
+  protected static function getPseudoEventDateFieldMetadata(): array {
+    return [
+      'name' => 'event',
+      'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+      'title' => ts('Event Active On'),
+      'table_name' => 'civicrm_event',
+      'where' => 'civicrm_event.start_date',
+      'where_end' => 'civicrm_event.end_date',
+      'html' => ['type' => 'SelectDate', 'formatType' => 'activityDateTime'],
+    ];
   }
 
 }
