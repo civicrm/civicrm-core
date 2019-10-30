@@ -103,7 +103,6 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
 
     $this->addTask('Add weight column to relationship type table', 'addColumn', 'civicrm_relationship_type',
       'weight', "INT NOT NULL COMMENT 'Relationship type weight'", TRUE, '5.20.alpha1');
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_relationship_type SET weight = id");
 
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add "Template" contribution status', 'templateStatus');
