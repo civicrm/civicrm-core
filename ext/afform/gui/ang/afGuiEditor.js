@@ -47,7 +47,6 @@
           $scope.afform = afform;
           $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
           evaluate($scope.layout['#children']);
-          convertTextNodes($scope.layout['#children']);
           $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
           $scope.fields = getAllFields($scope.layout['#children']);
         }
@@ -117,21 +116,6 @@
                   }
                 }
               });
-            }
-          });
-        }
-
-        function convertTextNodes(collection) {
-          // Empty text nodes... just delete them.
-          _.remove(collection, function(item) {
-            return !item || (_.isString(item) && !_.trim(item));
-          });
-          // Convert other text nodes to objects
-          _.each(collection, function(item, idx) {
-            if (_.isPlainObject(item) && item['#children']) {
-              convertTextNodes(item['#children']);
-            } else if (_.isString(item)) {
-              collection[idx] = {'#text': item};
             }
           });
         }
