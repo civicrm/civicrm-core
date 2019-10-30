@@ -3,13 +3,13 @@
 return [
   'html' => '<span>First</span> <span>Second</span>',
   'shallow' => [
-    ['#tag' => 'span', '#children' => ['First']],
-    ' ',
-    ['#tag' => 'span', '#children' => ['Second']],
+    ['#tag' => 'span', '#children' => [['#text' => 'First']]],
+    ['#text' => ' '],
+    ['#tag' => 'span', '#children' => [['#text' => 'Second']]],
   ],
   'deep' => [
-    ['#tag' => 'span', '#children' => ['First']],
-    ' ',
-    ['#tag' => 'span', '#children' => ['Second']],
+    ['#tag' => 'span', '#children' => [['#text' => 'First']]],
+    ['#text' => ' '],
+    ['#tag' => 'span', '#children' => [['#text' => 'Second']]],
   ],
 ];

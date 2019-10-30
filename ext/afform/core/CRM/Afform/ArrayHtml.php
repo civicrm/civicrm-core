@@ -86,6 +86,10 @@ class CRM_Afform_ArrayHtml {
       return sprintf('<!--%s-->', $array['#comment']);
     }
 
+    if (isset($array['#text'])) {
+      return $array['#text'];
+    }
+
     $tag = empty($array['#tag']) ? self::DEFAULT_TAG : $array['#tag'];
     unset($array['#tag']);
     $children = empty($array['#children']) ? [] : $array['#children'];
@@ -183,7 +187,7 @@ class CRM_Afform_ArrayHtml {
       return $arr;
     }
     elseif ($node instanceof DOMText) {
-      return $node->textContent;
+      return ['#text' => $node->textContent];
     }
     elseif ($node instanceof DOMComment) {
       $arr = ['#comment' => $node->nodeValue];

@@ -6,11 +6,11 @@ return [
     [
       '#tag' => 'div',
       '#children' => [
-        'One',
+        ['#text' => 'One'],
         ['#comment' => ' uno '],
-        ' Two ',
+        ['#text' => ' Two '],
         ['#comment' => 'dos & so on '],
-        ' Three',
+        ['#text' => ' Three'],
       ],
     ],
     ['#comment' => 'tres-a--b---c'],
@@ -19,11 +19,11 @@ return [
     [
       '#tag' => 'div',
       '#children' => [
-        'One',
+        ['#text' => 'One'],
         ['#comment' => ' uno '],
-        ' Two ',
+        ['#text' => ' Two '],
         ['#comment' => 'dos & so on '],
-        ' Three',
+        ['#text' => ' Three'],
       ],
     ],
     ['#comment' => 'tres-a--b---c'],

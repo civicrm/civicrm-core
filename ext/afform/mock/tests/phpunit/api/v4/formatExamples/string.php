@@ -2,6 +2,6 @@
 
 return [
   'html' => 'hello world',
-  'shallow' => ['hello world'],
-  'deep' => ['hello world'],
+  'shallow' => [['#text' => 'hello world']],
+  'deep' => [['#text' => 'hello world']],
 ];

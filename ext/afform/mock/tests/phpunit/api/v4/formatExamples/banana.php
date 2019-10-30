@@ -6,7 +6,7 @@ return [
     [
       '#tag' => 'div',
       '#children' => [
-        ['#tag' => 'strong', '#children' => ['New text!']],
+        ['#tag' => 'strong', '#children' => [['#text' => 'New text!']]],
         ['#tag' => 'af-field', 'name' => 'do_not_sms', 'defn' => "{label: 'Do not do any of the emailing'}"],
       ],
     ],
@@ -15,7 +15,7 @@ return [
     [
       '#tag' => 'div',
       '#children' => [
-        ['#tag' => 'strong', '#children' => ['New text!']],
+        ['#tag' => 'strong', '#children' => [['#text' => 'New text!']]],
         ['#tag' => 'af-field', 'name' => 'do_not_sms', 'defn' => ['label' => 'Do not do any of the emailing']],
       ],
     ],
