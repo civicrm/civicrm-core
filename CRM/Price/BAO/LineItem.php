@@ -669,6 +669,7 @@ WHERE li.contribution_id = %1";
    * @param $feeBlock
    * @param array $lineItems
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function changeFeeSelections(
     $params,
@@ -1046,7 +1047,6 @@ WHERE li.contribution_id = %1";
         'entity_id' => $entityID,
         'contribution_id' => $contributionID,
       ]);
-      $financialTypeChangeTrxnID = $this->addFinancialItemsOnLineItemChange($trxnID, $lineParams, $updatedContribution);
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
@@ -1246,46 +1246,6 @@ WHERE li.contribution_id = %1";
     }
 
     return $adjustedTrxn;
-  }
-
-  /**
-   * Add financial items to reflect line item change.
-   *
-   * @param bool $isCreateAdditionalFinancialTrxn
-   * @param array $lineParams
-   * @param \CRM_Contribute_BAO_Contribution $updatedContribution
-   */
-  protected function addFinancialItemsOnLineItemChange($isCreateAdditionalFinancialTrxn, $lineParams, $updatedContribution) {
-    $tempFinancialTrxnID = NULL;
-    // don't add financial item for cancelled line item
-    if ($lineParams['qty'] == 0) {
-      return NULL;
-    }
-    elseif ($isCreateAdditionalFinancialTrxn) {
-      // This routine & the return below is super uncomfortable.
-      // I have refactored to here and it is hit from
-      // testSubmitUnpaidPriceChangeWhileStillPending
-      // but I'm still skeptical it's not covered elsewhere.
-      // original comment : add financial item if ONLY financial type is changed
-      if ($lineParams['financial_type_id'] != $updatedContribution->financial_type_id) {
-        $changedFinancialTypeID = (int) $lineParams['financial_type_id'];
-        $adjustedTrxnValues = [
-          'from_financial_account_id' => NULL,
-          'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($updatedContribution->payment_instrument_id),
-          'total_amount' => $lineParams['line_total'],
-          'net_amount' => $lineParams['line_total'],
-          'status_id' => $updatedContribution->contribution_status_id,
-          'payment_instrument_id' => $updatedContribution->payment_instrument_id,
-          'contribution_id' => $updatedContribution->id,
-          'is_payment' => TRUE,
-          // since balance is 0, which means contribution is completed
-          'trxn_date' => date('YmdHis'),
-          'currency' => $updatedContribution->currency,
-        ];
-        $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
-        return $adjustedTrxn->id;
-      }
-    }
   }
 
   /**
