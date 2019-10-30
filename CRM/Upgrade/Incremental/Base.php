@@ -280,6 +280,26 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Drop a table... but only if it's empty.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @return bool
+   */
+  public static function dropTableIfEmpty($ctx, $table) {
+    if (CRM_Core_DAO::checkTableExists($table)) {
+      if (!CRM_Core_DAO::checkTableHasData($table)) {
+        CRM_Core_BAO_SchemaHandler::dropTable($table);
+      }
+      else {
+        $ctx->log->warning("dropTableIfEmpty($table): Found data. Preserved table.");
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
    * Rebuild Multilingual Schema.
    * @param CRM_Queue_TaskContext $ctx
    * @param string|null $version CiviCRM version to use if rebuilding multilingual schema

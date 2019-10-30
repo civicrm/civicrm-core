@@ -86,9 +86,6 @@ class CRM_Utils_Migrate_Import {
     $this->profileFields($xml, $idMap);
     $this->profileJoins($xml, $idMap);
 
-    // create DB Template String sample data
-    $this->dbTemplateString($xml, $idMap);
-
     // clean up all caches etc
     CRM_Core_Config::clearDBCache();
   }
@@ -364,23 +361,6 @@ AND        v.name = %1
     }
     foreach ($fields_indexed_by_group_id as $group_id => $fields) {
       CRM_Core_BAO_CustomField::bulkSave(json_decode(json_encode($fields), TRUE), ['custom_group_id' => $group_id]);
-    }
-  }
-
-  /**
-   * @param $xml
-   * @param $idMap
-   */
-  public function dbTemplateString(&$xml, &$idMap) {
-    foreach ($xml->Persistent as $persistentXML) {
-      foreach ($persistentXML->Persistent as $persistent) {
-        $persistentObj = new CRM_Core_DAO_Persistent();
-
-        if ($persistent->is_config == 1) {
-          $persistent->data = serialize(explode(',', $persistent->data));
-        }
-        $this->copyData($persistentObj, $persistent, TRUE, 'context');
-      }
     }
   }
 
