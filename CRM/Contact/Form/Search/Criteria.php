@@ -265,6 +265,7 @@ class CRM_Contact_Form_Search_Criteria {
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
       'birth_date' => ['name' => 'birth_date', 'template_grouping' => 'demographic'],
       'deceased_date' => ['name' => 'deceased_date', 'template_grouping' => 'demographic'],
+      'is_deceased' => ['is_deceased', 'template_grouping' => 'demographic'],
       'relationship_start_date' => ['name' => 'relationship_start_date', 'template_grouping' => 'relationship'],
       'relationship_end_date' => ['name' => 'relationship_end_date', 'template_grouping' => 'relationship'],
     ];
@@ -569,8 +570,6 @@ class CRM_Contact_Form_Search_Criteria {
     $form->add('number', 'age_high', ts('Max Age'), ['class' => 'four', 'min' => 0]);
     $form->addRule('age_high', ts('Please enter a positive integer'), 'positiveInteger');
     $form->add('datepicker', 'age_asof_date', ts('As of'), NULL, FALSE, ['time' => FALSE]);
-    // radio button for is_deceased
-    $form->addYesNo('is_deceased', ts('Deceased'), TRUE);
   }
 
   /**
