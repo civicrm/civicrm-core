@@ -57,11 +57,6 @@ return [
     'class' => 'CRM_Core_DAO_Component',
     'table' => 'civicrm_component',
   ],
-  'CRM_Core_DAO_Persistent' => [
-    'name' => 'Persistent',
-    'class' => 'CRM_Core_DAO_Persistent',
-    'table' => 'civicrm_persistent',
-  ],
   'CRM_Core_DAO_PrevNextCache' => [
     'name' => 'PrevNextCache',
     'class' => 'CRM_Core_DAO_PrevNextCache',
