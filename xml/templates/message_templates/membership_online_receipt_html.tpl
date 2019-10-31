@@ -392,33 +392,31 @@
       {/foreach}
      {/if}
 
-     {if ! ($contributeMode eq 'notify' OR $contributeMode eq 'directIPN') and $is_monetary}
-      {if $is_pay_later}
+     {if $billingName}
        <tr>
-        <th {$headerStyle}>
-         {ts}Registered Email{/ts}
-        </th>
-       </tr>
-       <tr>
+         <th {$headerStyle}>
+           {ts}Billing Name and Address{/ts}
+         </th>
+      </tr>
+      <tr>
         <td colspan="2" {$valueStyle}>
-         {$email}
+          {$billingName}<br />
+          {$address|nl2br}<br />
+          {$email}
         </td>
-       </tr>
-      {elseif $amount GT 0 OR $membership_amount GT 0}
-       <tr>
+      </tr>
+    {elseif $email}}
+      <tr>
         <th {$headerStyle}>
-         {ts}Billing Name and Address{/ts}
+          {ts}Registered Email{/ts}
         </th>
-       </tr>
-       <tr>
+      </tr>
+      <tr>
         <td colspan="2" {$valueStyle}>
-         {$billingName}<br />
-         {$address|nl2br}<br />
-         {$email}
+          {$email}
         </td>
-       </tr>
-      {/if}
-     {/if}
+      </tr>
+    {/if}
 
      {if $credit_card_type}
       <tr>
