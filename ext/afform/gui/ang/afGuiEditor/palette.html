@@ -1,12 +1,12 @@
 <div id="afGuiEditor-palette-config" class="panel panel-default">
     <ul id="afGuiEditor-palette-tabs" class="panel-heading nav nav-tabs">
       <li role="presentation" ng-class="{active: selectedEntity === null}">
-        <a href ng-click="selectEntity(null)">
+        <a href ng-click="editor.selectEntity(null)">
           <span>{{ ts('Form Settings') }}</span>
         </a>
       </li>
       <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntity === entity.name}">
-        <a href ng-click="selectEntity(entity.name)">
+        <a href ng-click="editor.selectEntity(entity.name)">
           <span af-gui-editable ng-model="entity.label">{{ entity.label }}</span>
         </a>
       </li>
@@ -16,7 +16,7 @@
         </a>
         <ul class="dropdown-menu">
           <li ng-repeat="entity in meta.entities">
-            <a href ng-click="addEntity(entity.name)">{{ entity.name }}</a>
+            <a href ng-click="editor.addEntity(entity.name)">{{ entity.name }}</a>
           </li>
         </ul>
       </li>

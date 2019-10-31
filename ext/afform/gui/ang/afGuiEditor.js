@@ -8,12 +8,13 @@
       scope: {
         afGuiEditor: '='
       },
-      link: function($scope, $el, $attr) {
+      controller: function($scope) {
         $scope.ts = CRM.ts();
         $scope.afform = null;
         $scope.selectedEntity = null;
         $scope.meta = CRM.afformAdminData;
         $scope.controls = {};
+        $scope.editor = this;
         var newForm = {
           title: ts('Untitled Form'),
           layout: [{
@@ -51,7 +52,7 @@
           $scope.fields = getAllFields($scope.layout['#children']);
         }
 
-        $scope.addEntity = function(entityType) {
+        this.addEntity = function(entityType) {
           var existingEntitiesofThisType = _.map(_.filter($scope.entities, {type: entityType}), 'name'),
             num = existingEntitiesofThisType.length + 1;
           // Give this new entity a unique name
@@ -65,21 +66,29 @@
             label: entityType + ' ' + num
           };
           $scope.layout['#children'].unshift($scope.entities[entityType + num]);
-          $scope.selectEntity(entityType + num);
+          this.selectEntity(entityType + num);
         };
 
-        $scope.removeEntity = function(entityName) {
+        this.removeEntity = function(entityName) {
           delete $scope.entities[entityName];
           _.remove($scope.layout['#children'], {'#tag': 'af-entity', name: entityName});
-          $scope.selectEntity(null);
+          this.selectEntity(null);
         };
 
-        $scope.selectEntity = function(entityName) {
+        this.selectEntity = function(entityName) {
           $scope.selectedEntity = entityName;
         };
 
-        $scope.getField = function(entityName, fieldName) {
-          return _.filter($scope.meta.fields[entityName], {name: fieldName})[0];
+        this.getField = function(entityType, fieldName) {
+          return _.filter($scope.meta.fields[entityType], {name: fieldName})[0];
+        };
+
+        this.getEntity = function(entityName) {
+          return $scope.entities[entityName];
+        };
+
+        this.getSelectedEntity = function() {
+          return $scope.selectedEntity;
         };
 
         $scope.valuesFields = function() {
@@ -152,32 +161,76 @@
     return allFields;
   }
 
+  // Turns a space-separated list (e.g. css classes) into an array
+  function splitClass(str) {
+    if (_.isArray(str)) {
+      return str;
+    }
+    return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
+  }
+
   angular.module('afGuiEditor').directive('afGuiBlock', function() {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/block.html',
       scope: {
-        block: '=afGuiBlock'
+        node: '=afGuiBlock',
+        entityName: '='
       },
-      link: function($scope, element, attrs) {
-        $scope.isItemVisible = function(block) {
-          return (block['#tag'] === 'af-fieldset') || (block['#tag'] === 'div' && _.contains(block['class'], 'af-block'));
-        };
-      }
-    };
-  });
+      require: '^^afGuiEditor',
+      link: function($scope, element, attrs, editor) {
+        $scope.editor = editor;
+      },
+      controller: function($scope) {
+        $scope.block = this;
+        this.node = $scope.node;
 
-  angular.module('afGuiEditor').directive('afGuiFieldset', function() {
-    return {
-      restrict: 'A',
-      templateUrl: '~/afGuiEditor/fieldset.html',
-      scope: {
-        fieldset: '=afGuiFieldset'
-      },
-      link: function($scope, element, attrs) {
-        $scope.isItemVisible = function(block) {
-          return (block['#tag'] === 'af-field') || (block['#tag'] === 'div' && _.contains(block['class'], 'af-block'));
+        this.modifyClasses = function(item, toRemove, toAdd) {
+          var classes = splitClass(item['class']);
+          if (toRemove) {
+            classes = _.difference(classes, splitClass(toRemove));
+          }
+          if (toAdd) {
+            classes = _.unique(classes.concat(splitClass(toAdd)));
+          }
+          item['class'] = classes.join(' ');
         };
+
+        this.getNodeType = function(node) {
+          if (!node) {
+            return null;
+          }
+          if (node['#tag'] === 'af-field') {
+            return 'field';
+          }
+          if (node['af-fieldset']) {
+            return 'fieldset';
+          }
+          var classes = splitClass(node['class']);
+          if (_.contains(classes, 'af-block')) {
+            return 'block';
+          }
+          if (_.contains(classes, 'af-text')) {
+            return 'text';
+          }
+          return null;
+        };
+
+        $scope.isSelectedFieldset = function(entityName) {
+          return entityName === $scope.editor.getSelectedEntity();
+        };
+
+        $scope.selectEntity = function() {
+          if ($scope.node['af-fieldset']) {
+            $scope.editor.selectEntity($scope.node['af-fieldset']);
+          }
+        };
+
+        $scope.tags = {
+          div: ts('Block'),
+          fieldset: ts('Fieldset')
+        };
+
       }
     };
   });
@@ -187,9 +240,69 @@
       restrict: 'A',
       templateUrl: '~/afGuiEditor/field.html',
       scope: {
-        field: '=afGuiField'
+        node: '=afGuiField',
+        entityName: '='
       },
-      link: function($scope, element, attrs) {
+      require: '^^afGuiEditor',
+      link: function($scope, element, attrs, editor) {
+        $scope.editor = editor;
+      },
+      controller: function($scope) {
+
+        $scope.getEntity = function() {
+          return $scope.editor.getEntity($scope.entityName);
+        };
+
+        $scope.getDefn = function() {
+          return $scope.editor.getField($scope.getEntity().type, $scope.node.name);
+        };
+      }
+    };
+  });
+
+  angular.module('afGuiEditor').directive('afGuiText', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/text.html',
+      scope: {
+        node: '=afGuiText'
+      },
+      require: '^^afGuiBlock',
+      link: {
+        pre: function($scope, element, attrs, block) {
+          $scope.block = block;
+        },
+        post: function($scope, element, attrs) {
+          if ($scope.block.node && $scope.block.node['#tag'] === 'fieldset') {
+            $scope.tags.legend = ts('Fieldset Legend');
+          }
+        }
+      },
+      controller: function($scope) {
+        $scope.tags = {
+          p: ts('Normal Text'),
+          h1: ts('Heading 1'),
+          h2: ts('Heading 2'),
+          h3: ts('Heading 3'),
+          h4: ts('Heading 4'),
+          h5: ts('Heading 5'),
+          h6: ts('Heading 6')
+        };
+
+        $scope.alignments = {
+          'text-left': ts('Align left'),
+          'text-center': ts('Align center'),
+          'text-right': ts('Align right'),
+          'text-justify': ts('Justify')
+        };
+
+        $scope.getAlign = function() {
+          return _.intersection(splitClass($scope.node['class']), _.keys($scope.alignments))[0];
+        };
+
+        $scope.setAlign = function(val) {
+          $scope.block.modifyClasses($scope.node, _.keys($scope.alignments), val);
+        };
       }
     };
   });

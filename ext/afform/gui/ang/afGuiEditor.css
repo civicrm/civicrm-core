@@ -12,7 +12,7 @@
 }
 
 #afGuiEditor #afGuiEditor-canvas {
-  flex: 1;
+  flex: 1.5;
   margin-left: 5px;
 }
 
@@ -51,4 +51,58 @@
 
 #afGuiEditor-palette-config .form-inline label {
   min-width: 110px;
+}
+
+#afGuiEditor .af-gui-bar {
+  cursor: move;
+  visibility: hidden;
+  background-color: #efefef;
+  height: 22px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-left:15px;
+}
+/* grip handle */
+#afGuiEditor .af-gui-bar:before {
+  background-size: cover;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
+  width: 10px;
+  height: 15px;
+  content: ' ';
+  display: block;
+  position: absolute;
+  left: 4px;
+  top: 5px;
+}
+
+#afGuiEditor-canvas:hover .af-gui-bar {
+  visibility: visible;
+}
+
+#afGuiEditor .af-gui-field,
+#afGuiEditor .af-gui-text,
+#afGuiEditor .af-gui-block {
+  position: relative;
+  padding: 32px 3px 3px;
+  min-height: 40px;
+  border: 2px dashed transparent;
+}
+
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected {
+  border: 2px dashed #0071bd;
+}
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
+  background-color: #0071bd;
+  visibility: visible;
+  color: white;
+}
+
+#afGuiEditor .af-gui-block {
+  padding-top: 20px;
+}
+
+#afGuiEditor .af-gui-block:hover {
+  border: 2px dashed #757575;
 }

@@ -1,13 +1,13 @@
 <div>
-  <a href ng-click="removeEntity(selectedEntity)" class="btn btn-sm btn-danger pull-right">
+  <a href ng-click="editor.removeEntity(selectedEntity)" class="btn btn-sm btn-danger pull-right">
     <i class="crm-i fa-trash"></i>
   </a>
 
   <fieldset>
     <legend>{{ ts('Values') }}</legend>
     <div class="form-inline" ng-if="entity.data" ng-repeat="(fieldName, value) in entity.data">
-      <label>{{ getField(entity.type, fieldName).title }}:</label>
-      <input class="form-control" af-gui-field-value="getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
+      <label>{{ editor.getField(entity.type, fieldName).title }}:</label>
+      <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
       <a href class="pull-right" ng-click="removeValue(entity, fieldName)">
         <i class="crm-i fa-times"></i>
       </a>
