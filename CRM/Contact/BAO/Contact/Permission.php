@@ -33,6 +33,26 @@
 class CRM_Contact_BAO_Contact_Permission {
 
   /**
+   * @var bool
+   */
+  public $useTempTable = TRUE;
+
+  /**
+   * Set whether to use a temporary table or not when building ACL Cache
+   */
+  public function setUseTemporaryTable($useTemporaryTable = TRUE) {
+    $this->useTempTable = $useTemporaryTable;
+  }
+
+  /**
+   * Get variable for determining if we should use Temporary Table or not
+   * @return bool
+   */
+  public function getUseTemporaryTable() {
+    return $this->useTempTable;
+  }
+
+  /**
    * Check which of the given contact IDs the logged in user
    *   has permissions for the operation type according to:
    *    - general permissions (e.g. 'edit all contacts')
@@ -266,15 +286,21 @@ AND    $operationClause
     WHERE    $permission
     AND ac.user_id IS NULL
     ";*/
+    $useTempTable = $this->getUseTemporaryTable();
     $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
          $from
 WHERE    $permission";
-    $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
-    $tempTable = $aclContactsTempTable->getName();
-    $aclContactsTempTable->createWithColumns('user_id int, contact_id int, operation varchar(255), UNIQUE UI_user_contact_operation (user_id,contact_id,operation)');
-    CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (user_id, contact_id, operation) {$sql}");
-    CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT user_id, contact_id, operation FROM {$tempTable}");
-    $aclContactsTempTable->drop();
+    if ($useTempTable) {
+      $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
+      $tempTable = $aclContactsTempTable->getName();
+      $aclContactsTempTable->createWithColumns('user_id int, contact_id int, operation varchar(255), UNIQUE UI_user_contact_operation (user_id,contact_id,operation)');
+      CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (user_id, contact_id, operation) {$sql}");
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT user_id, contact_id, operation FROM {$tempTable}");
+      $aclContactsTempTable->drop();
+    }
+    else {
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
+    }
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
     if (CRM_Core_Permission::check('edit my contact') ||
