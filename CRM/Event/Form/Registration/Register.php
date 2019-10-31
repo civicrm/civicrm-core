@@ -343,9 +343,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
     }
 
-    $this->add('hidden', 'scriptFee', NULL);
-    $this->add('hidden', 'scriptArray', NULL);
-
     $bypassPayment = $allowGroupOnWaitlist = $isAdditionalParticipants = FALSE;
     if ($this->_values['event']['is_multiple_registrations']) {
       // don't allow to add additional during confirmation if not preregistered.
