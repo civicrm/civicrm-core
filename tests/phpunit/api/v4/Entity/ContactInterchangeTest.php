@@ -36,6 +36,7 @@
 
 namespace api\v4\Entity;
 
+use Civi\Api4\ActivityContact;
 use Civi\Api4\Contact;
 use api\v4\UnitTestCase;
 use Civi\Test\TransactionalInterface;
@@ -56,6 +57,10 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
     $apiReaderSets = [
       ['readNameById_3', 'readNameByValueEq_3'],
       ['readNameById_4', 'readNameByValueEq_4', 'readNameByValueIn_4'],
+      ['readNameByActSubjectChain_3', /* 'readNameByActSubjectJoin_3' */],
+      ['readNameByActSubjectChain_4', 'readNameByActSubjectJoin_4'],
+      [/*'readNameByActDetailsChain_3',*/ 'readNameByActDetailsJoin_3'],
+      ['readNameByActDetailsChain_4', 'readNameByActDetailsJoin_4'],
     ];
     $strings = [
       // Values chosen for backwards compatibility.
@@ -82,7 +87,7 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
    * @dataProvider getExamples
    */
   public function testReadWriteAPI($writer, $readers, $strs) {
-    $caseName = sprintf("writer=%s, readers=%s, strs.api=%s", $writer, implode(',', $readers), $strs['api']);
+    $caseName = sprintf("writer=%s, strs.api=%s", $writer, $strs['api']);
 
     $cid = call_user_func([$this, $writer], $strs);
 
@@ -94,7 +99,17 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
     $this->assertNotEmpty($readers);
     foreach ($readers as $reader) {
       $get = call_user_func([$this, $reader], $cid, $strs);
-      $this->assertEquals($strs['api'], $get, "Check API content ($caseName)");
+      // $get = $this->autoWrapException([$this, $reader], [$cid, $strs], "Check API content (reader=$reader $caseName)");
+      $this->assertEquals($strs['api'], $get, "Check API content (reader=$reader $caseName)");
+    }
+  }
+
+  private function autoWrapException($callable, $args, $message) {
+    try {
+      return call_user_func_array($callable, $args);
+    }
+    catch (\Exception $e) {
+      throw new \Exception($message . $e->getMessage(), 0, $e);
     }
   }
 
@@ -102,6 +117,12 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
     $contact = civicrm_api3('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => $strs['api'],
+      'api.Activity.create' => [
+        'source_contact_id' => '$value.id',
+        'subject' => $strs['api'],
+        'details' => $strs['api'],
+        'activity_type_id' => 2,
+      ],
     ]);
     return $contact['id'];
   }
@@ -111,6 +132,20 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
       'values' => [
         'contact_type' => 'Individual',
         'first_name' => $strs['api'],
+      ],
+      'chain' => [
+        'my_call' => [
+          'Activity',
+          'create',
+          [
+            'values' => [
+              'source_contact_id' => '$id',
+              'subject' => $strs['api'],
+              'details' => $strs['api'],
+              'activity_type_id' => 2,
+            ],
+          ],
+        ],
       ],
     ]);
     return $contact->first()['id'];
@@ -153,6 +188,110 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
       ->addSelect('first_name')
       ->execute();
     return $get->first()['first_name'];
+  }
+
+  public function readNameByActSubjectJoin_3($cid, $strs) {
+    $get = civicrm_api3('ActivityContact', 'getsingle', [
+      'record_type_id' => 'Activity Source',
+      'activity_id.subject' => $strs['api'],
+      'return' => ['contact_id.first_name'],
+    ]);
+    return $get['contact_id.first_name'];
+  }
+
+  public function readNameByActSubjectChain_3($cid, $strs) {
+    $get = civicrm_api3('Activity', 'getsingle', [
+      'subject' => $strs['api'],
+      'api.ActivityContact.getsingle' => [
+        'activity_id' => '$value.id',
+        'record_type_id' => 'Activity Source',
+        'api.Contact.getsingle' => [
+          'id' => '$value.contact_id',
+          'return' => 'first_name',
+        ],
+      ],
+      'return' => ['id'],
+    ]);
+    return $get['api.ActivityContact.getsingle']['api.Contact.getsingle']['first_name'];
+  }
+
+  public function readNameByActSubjectJoin_4($cid, $strs) {
+    $get = ActivityContact::get()
+      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('activity.subject', '=', $strs['api'])
+      ->addSelect('contact.first_name')
+      ->execute();
+    return $get->first()['contact.first_name'];
+  }
+
+  public function readNameByActSubjectChain_4($cid, $strs) {
+    $get = ActivityContact::get()
+      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('activity.subject', '=', $strs['api'])
+      ->setSelect(['activity_id', 'contact_id'])
+      ->setChain([
+        'the_contact' => [
+          'Contact',
+          'get',
+          ['where' => [['id', '=', '$contact_id']], 'select' => ['first_name']],
+          0,
+        ],
+      ])
+      ->execute();
+    $result = $get->first();
+    return $result['the_contact']['first_name'];
+  }
+
+  public function readNameByActDetailsJoin_3($cid, $strs) {
+    $get = civicrm_api3('ActivityContact', 'getsingle', [
+      'record_type_id' => 'Activity Source',
+      'activity_id.details' => $strs['api'],
+      'return' => ['contact_id.first_name'],
+    ]);
+    return $get['contact_id.first_name'];
+  }
+
+  public function readNameByActDetailsChain_3($cid, $strs) {
+    $get = civicrm_api3('Activity', 'getsingle', [
+      'details' => $strs['api'],
+      'api.ActivityContact.getsingle' => [
+        'activity_id' => '$value.id',
+        'record_type_id' => 'Activity Source',
+        'api.Contact.getsingle' => [
+          'id' => '$value.contact_id',
+          'return' => 'first_name',
+        ],
+      ],
+      'return' => ['id'],
+    ]);
+    return $get['api.ActivityContact.getsingle']['api.Contact.getsingle']['first_name'];
+  }
+
+  public function readNameByActDetailsJoin_4($cid, $strs) {
+    $get = ActivityContact::get()
+      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('activity.details', '=', $strs['api'])
+      ->addSelect('contact.first_name')
+      ->execute();
+    return $get->first()['contact.first_name'];
+  }
+
+  public function readNameByActDetailsChain_4($cid, $strs) {
+    $get = ActivityContact::get()
+      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('activity.details', '=', $strs['api'])
+      ->setSelect(['activity_id', 'contact_id'])
+      ->setChain([
+        'the_contact' => [
+          'Contact',
+          'get',
+          ['where' => [['id', '=', '$contact_id']], 'select' => ['first_name']],
+          0,
+        ],
+      ])
+      ->execute();
+    $result = $get->first();
+    return $result['the_contact']['first_name'];
   }
 
 }
