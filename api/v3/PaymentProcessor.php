@@ -133,12 +133,27 @@ function civicrm_api3_payment_processor_pay($params) {
   try {
     $processor->setContributionID($params['contribution_id']);
     $processor->setInvoiceID($params['invoice_id'] ?? '');
+    $processor->setDescription($params['description'] ?? '');
+    $processor->setAmount((float) $params['amount']);
+    $processor->setCurrency($params['currency']);
+
+    // Set integer fields only if we have values for them
     if (!empty($params['contact_id'])) {
       $processor->setContactID((int) $params['contact_id']);
     }
     if (!empty($params['contribution_recur_id'])) {
       $processor->setContributionRecurID((int) $params['contribution_recur_id']);
     }
+
+    // do some wrangling for processors not using getters yet....
+    // This will be removed around about Civi 5.26.
+    if (empty($params['contributionRecurID'])) {
+      $params['contributionRecurID'] = $processor->getContributionRecurID();
+    }
+    if (empty($params['currencyID'])) {
+      $params['currencyID'] = $processor->getCurrency([]);
+    }
+    $processor->setInputParams($params);
 
     $result = $processor->doPayment($params);
   }
@@ -185,6 +200,12 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
   $params['invoice_id'] = [
     'title' => ts('Invoice ID'),
     'type' => CRM_Utils_Type::T_STRING,
+  ];
+  $params['currency'] = [
+    'title' => ts('Currency'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => Civi::settings()->get('defaultCurrency'),
+    'description' => ts('3 character ISO currency code - see https://www.xe.com/pt/iso4217.php'),
   ];
 }
 

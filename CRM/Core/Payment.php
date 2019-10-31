@@ -228,6 +228,15 @@ abstract class CRM_Core_Payment {
   protected $currency;
 
   /**
+   * Setter for currency.
+   *
+   * @param string $currency
+   */
+  public function setCurrency(string $currency) {
+    $this->currency = $currency;
+  }
+
+  /**
    * Payment processor generated string for the transaction ID.
    *
    * Note some gateways generate a reference for the order and one for the
@@ -246,6 +255,23 @@ abstract class CRM_Core_Payment {
    * @var float
    */
   protected $feeAmount;
+
+  /**
+   * Amount to be charged, formatted as decimal dotted e.g 10000.78 to represent 10 thousand
+   * dollars and 78 cents if using a dollar currency
+   *
+   * @var float
+   */
+  protected $amount;
+
+  /**
+   * Set amount to charge.
+   *
+   * @param float $amount
+   */
+  public function setAmount(float $amount) {
+    $this->amount = $amount;
+  }
 
   /**
    * Additional information returned by the payment processor regarding the payment outcome.
@@ -1445,7 +1471,7 @@ abstract class CRM_Core_Payment {
    *
    * @return string
    */
-  protected function getCurrency($params = []) {
+  public function getCurrency($params = []) {
     $params = array_merge($params, (array) $this->inputParams);
     return $this->currency ?? CRM_Utils_Array::value('currencyID', $params, CRM_Utils_Array::value('currency', $params));
   }
@@ -1658,6 +1684,20 @@ abstract class CRM_Core_Payment {
       throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
     return $result;
+  }
+
+  /**
+   * @return array
+   */
+  public function getInputParams(): array {
+    return $this->inputParams;
+  }
+
+  /**
+   * @param array $inputParams
+   */
+  public function setInputParams(array $inputParams) {
+    $this->inputParams = $inputParams;
   }
 
   /**
