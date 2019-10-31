@@ -399,7 +399,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     $relativeDates = ['relative_dates' => []];
     $specialDateFields = [
       'log_date_relative',
-      'relation_action_date_relative',
     ];
     foreach ($formValues as $id => $value) {
       if (in_array($id, $specialDateFields) && !empty($value)) {

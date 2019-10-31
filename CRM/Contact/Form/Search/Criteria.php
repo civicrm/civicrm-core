@@ -268,7 +268,19 @@ class CRM_Contact_Form_Search_Criteria {
       'is_deceased' => ['is_deceased', 'template_grouping' => 'demographic'],
       'relationship_start_date' => ['name' => 'relationship_start_date', 'template_grouping' => 'relationship'],
       'relationship_end_date' => ['name' => 'relationship_end_date', 'template_grouping' => 'relationship'],
+       // PseudoRelationship date field.
+      'relation_active_period_date' => [
+        'name' => 'relation_active_period_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'title' => ts('Active Period'),
+        'table_name' => 'civicrm_relationship',
+        'where' => 'civicrm_relationship.start_date',
+        'where_end' => 'civicrm_relationship.end_date',
+        'html' => ['type' => 'SelectDate', 'formatType' => 'activityDateTime'],
+        'template_grouping' => 'relationship',
+      ],
     ];
+
     $metadata = civicrm_api3('Relationship', 'getfields', [])['values'];
     $metadata = array_merge($metadata, civicrm_api3('Contact', 'getfields', [])['values']);
     foreach ($fields as $fieldName => $field) {
@@ -539,7 +551,6 @@ class CRM_Contact_Form_Search_Criteria {
         ['id' => 'relation_target_group', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
-    CRM_Core_Form_Date::buildDateRange($form, 'relation_active_period_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     // add all the custom  searchable fields
     CRM_Core_BAO_Query::addCustomFormFields($form, ['Relationship']);
