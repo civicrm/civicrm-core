@@ -172,7 +172,7 @@
 {$email}
 {/if} {* End ! is_pay_later condition. *}
 {/if}
-{if $contributeMode eq 'direct' AND !$is_pay_later AND ( $amount GT 0 OR $membership_amount GT 0 ) }
+{if $credit_card_type}
 
 ===========================================================
 {ts}Credit Card Information{/ts}

@@ -222,7 +222,7 @@
     <td>
      <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
 
-      {if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later }
+      {if $billingName}
        <tr>
         <th {$headerStyle}>
          {ts}Billing Name and Address{/ts}

@@ -79,7 +79,7 @@
 {/if}
 
 {if $isPrimary }
-{if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later  }
+{if $billingName}
 
 ===========================================================
 {ts}Billing Name and Address{/ts}
