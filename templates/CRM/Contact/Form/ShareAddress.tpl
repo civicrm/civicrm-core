@@ -115,7 +115,7 @@
 
             if (!addressHTML) {
               var sharedContactLink =  "add?reset=1&action=update&cid=" + sharedContactId;
-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit "+ "<a href='" + sharedContactLink + "' target='_blank'> contact </a>" + "to add an address, or select a different contact.{/ts}"{literal};
+              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit "+ "<a href='" + sharedContactLink + "' target='_blank'> that contact </a>" + "to add an address, or select a different contact.{/ts}"{literal};
             }
 
             $contentArea.html(addressHTML);
