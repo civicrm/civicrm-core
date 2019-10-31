@@ -119,6 +119,8 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         ['old' => 'relation_end_date_low', 'new' => 'relationship_end_date_low'],
         ['old' => 'relation_end_date_high', 'new' => 'relationship_end_date_high'],
         ['old' => 'relation_end_date_relative', 'new' => 'relationship_end_date_relative'],
+        ['old' => 'event_start_date_low', 'new' => 'event_low'],
+        ['old' => 'event_end_date_high', 'new' => 'event_high'],
       ],
     ]);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
@@ -130,6 +132,8 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         'mailing_job_start_date',
         'relationship_start_date',
         'relationship_end_date',
+        'event',
+        'relation_active_period_date',
       ],
     ]);
     $this->addTask('Clean up unused table "civicrm_persistent"', 'dropTableIfEmpty', 'civicrm_persistent');

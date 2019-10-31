@@ -73,6 +73,7 @@ class CRM_Upgrade_Incremental_SmartGroups {
       'mailing_job_start_date' => 'mailing_date',
       'relationship_start_date' => 'relation_start',
       'relationship_end_date' => 'relation_end',
+      'event' => 'event',
     ];
 
     foreach ($fields as $field) {
@@ -93,9 +94,31 @@ class CRM_Upgrade_Incremental_SmartGroups {
           }
         }
         foreach ($formValues as $index => $formValue) {
+          if (!is_array($formValue)) {
+            if ($index === $relativeFieldName) {
+              $hasRelative = TRUE;
+              if (!empty($formValue)) {
+                $isRelative = TRUE;
+              }
+              continue;
+            }
+            elseif ($index === 'event_low' || $index === 'event_high') {
+              if ($isRelative || (!$isRelative && $formValue === '')) {
+                unset($formValues[$index]);
+              }
+              else {
+                $isHigh = substr($index, -5, 5) === '_high';
+                $formValues[$index] = $this->getConvertedDateValue($formValue, $isHigh);
+              }
+            }
+            continue;
+          }
           if (!isset($formValue[0])) {
             // Any actual criteria will have this key set but skip any weird lines
             continue;
+          }
+          if ($formValue[0] === $relativeFieldName && !empty($formValue[2])) {
+            $hasRelative = TRUE;
           }
           if ($formValue[0] === $relativeFieldName && empty($formValue[2])) {
             unset($formValues[$index]);;
@@ -113,6 +136,9 @@ class CRM_Upgrade_Incremental_SmartGroups {
         if (!$isRelative) {
           if (!in_array($relativeFieldName, $relativeFieldNames)) {
             $relativeFieldNames[] = $relativeFieldName;
+            $formValues[] = [$relativeFieldName, '=', 0];
+          }
+          elseif (!$hasRelative) {
             $formValues[] = [$relativeFieldName, '=', 0];
           }
         }
@@ -180,8 +206,14 @@ class CRM_Upgrade_Incremental_SmartGroups {
     foreach ($this->getSearchesWithField($oldName) as $savedSearch) {
       $formValues = $savedSearch['form_values'];
       foreach ($formValues as $index => $formValue) {
-        if ($formValue[0] === $oldName) {
-          $formValues[$index][0] = $newName;
+        if (is_array($formValue)) {
+          if (isset($formValue[0]) && $formValue[0] === $oldName) {
+            $formValues[$index][0] = $newName;
+          }
+        }
+        elseif ($index === $oldName) {
+          $formValues[$newName] = $formValue;
+          unset($formValues[$oldName]);
         }
       }
 
