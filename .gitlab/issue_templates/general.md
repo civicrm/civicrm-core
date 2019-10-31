@@ -4,9 +4,11 @@ _Please describe your issue in detail._
 
 Reproduction steps:
 ----------------------------------------
-1. Click on the thing.
-2. Click on the other thing.
-3. The thing exploded!
+1. Click on **Contacts -> New Individual**.
+1. Entered **First Name** and **Last Name** and clicked **Save**.
+1. Got an error "**Fatal error: DB error**".
+
+````(Please include the full text of the error message. You can remove any private information like passwords. If you put it inside three backtick ` symbols it will wrap/format it nicely!)````
 
 Current behaviour:
 ----------------------------------------
@@ -22,7 +24,9 @@ Environment information:
 * __Web Server:__ _Apache/LiteSpeed/Nginx/Other_  
 * __CiviCRM Version:__ _Master_
 * __CMS:__ _Backdrop/Drupal/Joomla!/WordPress_
+* __CMS Version:__ _1.0_
 * __Database:__ _MariaDB/MySQL/Percona/Other_
+* __Database Versions:__ _10.4_
 
 Comments
 ----------------------------------------
