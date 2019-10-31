@@ -192,7 +192,7 @@
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+{if $billingName}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
