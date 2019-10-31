@@ -1,5 +1,5 @@
 (function(angular, $, _) {
-  // Example usage: <af-fieldset model="myModel"><af-field name="do_not_email" /></af-fieldset>
+  // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
   angular.module('afField').directive('afField', function() {
     return {
       restrict: 'E',

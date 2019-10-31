@@ -57,8 +57,8 @@ class FormDataModel {
       if (is_string($child)) {
         //nothing
       }
-      elseif ($child['#tag'] == 'af-fieldset' && !empty($child['#children'])) {
-        $entities[$child['model']]['fields'] = array_merge($entities[$child['model']]['fields'] ?? [], AHQ::getTags($child, 'af-field'));
+      elseif (!empty($child['af-fieldset']) && !empty($child['#children'])) {
+        $entities[$child['af-fieldset']]['fields'] = array_merge($entities[$child['af-fieldset']]['fields'] ?? [], AHQ::getTags($child, 'af-field'));
       }
       else {
         self::parseFields($child, $entities);

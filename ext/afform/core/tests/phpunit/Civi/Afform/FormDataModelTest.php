@@ -39,7 +39,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     ];
 
     $cases[] = [
-      'html' => '<af-form><af-entity type="Foo" name="foobar"/><af-fieldset model="foobar"><af-field name="propA" /><span><p><af-field name="propB" defn="{title: \'Whiz\'}" /></p></span></af-fieldset></af-form>',
+      'html' => '<af-form><af-entity type="Foo" name="foobar"/><div af-fieldset="foobar"><af-field name="propA" /><span><p><af-field name="propB" defn="{title: \'Whiz\'}" /></p></span></div></af-form>',
       'entities' => [
         'foobar' => [
           'type' => 'Foo',

@@ -310,7 +310,7 @@ function afform_civicrm_alterAngular($angular) {
       foreach (pq('af-field', $doc) as $afField) {
         /** @var DOMElement $afField */
         $fieldName = $afField->getAttribute('name');
-        $entityName = pq($afField)->parent('af-fieldset[model]')->attr('model');
+        $entityName = pq($afField)->parent('[af-fieldset]')->attr('af-fieldset');
         if (!preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
           throw new \CRM_Core_Exception("Cannot process $path: malformed entity name ($entityName)");
         }

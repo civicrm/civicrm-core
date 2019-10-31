@@ -4,7 +4,7 @@
   <af-entity type="Contact" data="{contact_type: 'Individual'}" name="parent" label="Parent" url-autofill="1" autofill="user" />
   <af-entity type="Contact" data="{contact_type: 'Individual'}" name="spouse" label="Spouse" contact-relationship="['Spouse of', 'parent']" />
 
-  <af-fieldset model="parent">
+  <div af-fieldset="parent">
     <h3>About You</h3>
 
     <af-field name="first_name" />
@@ -13,15 +13,15 @@
     <af-field name="constituent_information.Marital_Status" />
     <af-field name="constituent_information.Marriage_Date" />
     <af-field name="constituent_information.Most_Important_Issue" />
-  </af-fieldset>
+  </div>
 
-  <af-fieldset model="spouse" ng-if="modelListCtrl.getData('parent')['constituent_information.Marital_Status'] == 'M'">
+  <div af-fieldset="spouse" ng-if="modelListCtrl.getData('parent')['constituent_information.Marital_Status'] == 'M'">
     <h3>About Your Spouse</h3>
 
     <af-field name="first_name" defn='{title: ts("Spouse First Name")}' />
     <af-field name="last_name" defn='{title: ts("Spouse Last Name")}' />
     <af-field name="do_not_email" />
-  </af-fieldset>
+  </div>
 
   <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
   <button ng-click="modelListCtrl.submit()">Submit</button>

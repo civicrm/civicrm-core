@@ -1,12 +1,12 @@
 (function(angular, $, _) {
   // "afFieldset" is a basic skeletal directive.
-  // Example usage: <af-form>... <af-fieldset model="myModel">...</af-fieldset> ...</af-form>
+  // Example usage: <af-form>... <div af-fieldset="myModel">...</div> ...</af-form>
   angular.module('af').directive('afFieldset', function() {
     return {
-      restrict: 'AE',
+      restrict: 'A',
       require: '^afForm',
       scope: {
-        modelName: '@model'
+        modelName: '@afFieldset'
       },
       link: function($scope, $el, $attr, afFormCtrl) {
         $scope.afFormCtrl = afFormCtrl;
