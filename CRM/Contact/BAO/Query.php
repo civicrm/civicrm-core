@@ -513,6 +513,16 @@ class CRM_Contact_BAO_Query {
       }
       $relationMetadata = CRM_Contact_BAO_Relationship::fields();
       $relationFields = array_intersect_key($relationMetadata, array_fill_keys(['relationship_start_date', 'relationship_end_date'], 1));
+      // No good option other than hard-coding metadata for this 'special' field in.
+      $relationFields['relation_active_period_date'] = [
+        'name' => 'relation_active_period_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'title' => ts('Active Period'),
+        'table_name' => 'civicrm_relationship',
+        'where' => 'civicrm_relationship.start_date',
+        'where_end' => 'civicrm_relationship.end_date',
+        'html' => ['type' => 'SelectDate', 'formatType' => 'activityDateTime'],
+      ];
       $this->_fields = array_merge($relationFields, $this->_fields);
 
       $fields = CRM_Core_Component::getQueryFields(!$this->_skipPermission);
@@ -1608,6 +1618,7 @@ class CRM_Contact_BAO_Query {
       'mailing_job_start_date_relative',
       'birth_date_relative',
       'deceased_date_relative',
+      'relation_active_period_date_relative',
     ];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
