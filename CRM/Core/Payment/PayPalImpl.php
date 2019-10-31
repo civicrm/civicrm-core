@@ -1096,12 +1096,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     if ($outcome != 'success' && $outcome != 'successwithwarning') {
       throw new PaymentProcessorException("{$result['l_shortmessage0']} {$result['l_longmessage0']}");
-      $e = CRM_Core_Error::singleton();
-      $e->push($result['l_errorcode0'],
-        0, NULL,
-        "{$result['l_shortmessage0']} {$result['l_longmessage0']}"
-      );
-      return $e;
     }
 
     return $result;
