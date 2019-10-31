@@ -1648,6 +1648,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addRadio($name, $label, $options, $props, NULL, $required);
 
       case 'CheckBox':
+        if ($context === 'search') {
+          $this->addYesNo($name, $label, TRUE, FALSE, $props);
+          return;
+        }
         $text = isset($props['text']) ? $props['text'] : NULL;
         unset($props['text']);
         return $this->addElement('checkbox', $name, $label, $text, $props);
