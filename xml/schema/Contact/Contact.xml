@@ -870,6 +870,7 @@
   <field>
     <name>created_date</name>
     <type>timestamp</type>
+    <uniqueName>contact_created_date</uniqueName>
     <comment>When was the contact was created.</comment>
     <required>false</required>
     <export>true</export>
@@ -884,6 +885,7 @@
   <field>
     <name>modified_date</name>
     <type>timestamp</type>
+    <uniqueName>contact_modified_date</uniqueName>
     <comment>When was the contact (or closely related entity) was created or modified or deleted.</comment>
     <required>false</required>
     <export>true</export>
