@@ -35,21 +35,22 @@ class CRM_Contact_BAO_Contact_Permission {
   /**
    * @var bool
    */
-  public $useTempTable = TRUE;
+  public static $useTempTable = TRUE;
 
   /**
    * Set whether to use a temporary table or not when building ACL Cache
+   * @param bool $useTemporaryTable
    */
-  public function setUseTemporaryTable($useTemporaryTable = TRUE) {
-    $this->useTempTable = $useTemporaryTable;
+  public static function setUseTemporaryTable($useTemporaryTable = TRUE) {
+    self::$useTempTable = $useTemporaryTable;
   }
 
   /**
    * Get variable for determining if we should use Temporary Table or not
    * @return bool
    */
-  public function getUseTemporaryTable() {
-    return $this->useTempTable;
+  public static function getUseTemporaryTable() {
+    return self::$useTempTable;
   }
 
   /**
@@ -286,7 +287,7 @@ AND    $operationClause
     WHERE    $permission
     AND ac.user_id IS NULL
     ";*/
-    $useTempTable = $this->getUseTemporaryTable();
+    $useTempTable = self::getUseTemporaryTable();
     $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
          $from
 WHERE    $permission";
