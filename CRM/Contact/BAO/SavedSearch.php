@@ -398,7 +398,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     // form format and simply saves (e.g) custom_3_relative => "this.year"
     $relativeDates = ['relative_dates' => []];
     $specialDateFields = [
-      'event_relative',
       'log_date_relative',
       'relation_action_date_relative',
     ];
