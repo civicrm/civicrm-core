@@ -56,6 +56,8 @@ function civicrm_api3_report_template_get($params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -95,6 +97,8 @@ function _civicrm_api3_report_template_create_spec(&$params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_report_template_delete($params) {
   require_once 'api/v3/OptionValue.php';
@@ -138,6 +142,7 @@ function _civicrm_api3_report_template_getrows($params) {
   ]
   );
 
+  /* @var \CRM_Report_Form $reportInstance */
   $reportInstance = new $class();
   if (!empty($params['instance_id'])) {
     $reportInstance->setID($params['instance_id']);
@@ -184,6 +189,9 @@ function _civicrm_api3_report_template_getrows($params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
