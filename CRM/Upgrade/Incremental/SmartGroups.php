@@ -256,16 +256,17 @@ class CRM_Upgrade_Incremental_SmartGroups {
 
   }
 
+  /**
+   * Convert the log_date saved search date fields to their correct name
+   * default to switching to created_date as that is what the code did originally
+   */
   public function renameLogFields() {
-    $addedDate = FALSE;
+    $addedDate = TRUE;
     foreach ($this->getSearchesWithField('log_date') as $savedSearch) {
       $formValues = $savedSearch['form_values'];
       foreach ($formValues as $index => $formValue) {
         if (isset($formValue[0]) && $formValue[0] === 'log_date') {
-          if ($formValue[2] == 1) {
-            $addedDate = TRUE;
-          }
-          else {
+          if ($formValue[2] == 2) {
             $addedDate = FALSE;
           }
         }

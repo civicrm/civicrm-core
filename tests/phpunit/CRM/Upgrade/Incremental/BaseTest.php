@@ -259,6 +259,22 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         ['log_date_low', '=', '20191001000000'],
       ],
     ]);
+    // On the original search form you didn't need to select the log_date radio
+    // If it wasn't selected it defaulted to created_date filtering.
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['log_date_low', '=', '20191001000000'],
+        ['log_date_high', '=', '20191031235959'],
+        'relative_dates' => [
+          'log' => 'this.month',
+        ],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['log_date_low', '=', '20191001000000'],
+      ],
+    ]);
     $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
     $smartGroupConversionObject->renameLogFields();
     $smartGroupConversionObject->updateGroups([
@@ -288,6 +304,14 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         0 => ['log_date', '=', 2],
         1 => ['modified_date_low', '=', '2019-10-01 00:00:00'],
         2 => ['modified_date_relative', '=', 0],
+      ],
+      5 => [
+        'relative_dates' => [],
+        2 => ['created_date_relative', '=', 'this.month'],
+      ],
+      6 => [
+        0 => ['created_date_low', '=', '2019-10-01 00:00:00'],
+        1 => ['created_date_relative', '=', 0],
       ],
     ];
   }
