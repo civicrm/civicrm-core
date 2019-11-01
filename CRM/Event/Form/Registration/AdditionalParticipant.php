@@ -178,8 +178,14 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       CRM_Event_Form_Registration_Register::buildAmount($this);
     }
 
+    //Add pre and post profiles on the form.
+    foreach (['pre', 'post'] as $keys) {
+      if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
+        $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys));
+      }
+    }
+
     //add buttons
-    $js = NULL;
     if ($this->isLastParticipant(TRUE) && empty($this->_values['event']['is_monetary'])) {
       $this->submitOnce = TRUE;
     }
