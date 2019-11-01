@@ -20,6 +20,7 @@ class CRM_Afform_ArrayHtml {
   private $protoSchema = [
     '*' => [
       '*' => 'text',
+      'af-fieldset' => 'text',
     ],
     'af-entity' => [
       '#selfClose' => TRUE,
@@ -31,9 +32,6 @@ class CRM_Afform_ArrayHtml {
       '#selfClose' => TRUE,
       'name' => 'text',
       'defn' => 'js',
-    ],
-    'af-fieldset' => [
-      'model' => 'text',
     ],
     'area' => ['#selfClose' => TRUE],
     'base' => ['#selfClose' => TRUE],

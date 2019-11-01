@@ -16,7 +16,7 @@ return [
   'basePages' => [],
   'exports' => [
     'af-entity' => 'AE',
-    'af-fieldset' => 'AE',
+    'af-fieldset' => 'A',
     'af-form' => 'AE',
   ],
 ];
