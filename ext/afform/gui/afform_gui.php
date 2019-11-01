@@ -186,7 +186,8 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     ->setCheckPermissions(FALSE)
     ->setIncludeCustom(TRUE)
     ->setLoadOptions(TRUE)
-    ->setAction('Create')
+    ->setAction('create')
+    ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'options'])
     ->execute();
 
   $contactSettings = [

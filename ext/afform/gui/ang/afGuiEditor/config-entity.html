@@ -19,12 +19,11 @@
 
   <fieldset>
     <legend>{{ ts('Fields') }}</legend>
-    <ul class="crm-checkbox-list">
-      <li ng-repeat="(key, spec) in meta.fields[entity.type]" >
-        <input type="checkbox" id="field-{{ selectedEntity + '-' + key }}" />
-        <label for="field-{{ selectedEntity + '-' + key }}">{{ spec.title }}</label>
-      </li>
-    </ul>
+    <div class="af-gui-field-select-list" ui-sortable="{update: rebuildFieldList, items: '> div:not(.disabled)', connectWith: '[data-entity=' + selectedEntity + '] [ui-sortable]'}" ng-model="fieldList[selectedEntity]">
+      <div ng-repeat="field in fieldList[selectedEntity]" ng-class="{disabled: fieldInUse(selectedEntity, field.name)}">
+        {{ field.defn.title }}
+      </div>
+    </div>
   </fieldset>
 
   <fieldset>

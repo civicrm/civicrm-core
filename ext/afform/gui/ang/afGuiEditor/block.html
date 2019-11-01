@@ -5,10 +5,10 @@
     <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
   </select>
 </div>
-<div ui-sortable="{handle: '.af-gui-bar'}" ng-model="node['#children']">
+<div ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]'}" ng-model="node['#children']">
   <div ng-repeat="item in node['#children']">
     <div ng-switch="block.getNodeType(item)">
-      <div ng-switch-when="fieldset" af-gui-block="item" class="af-gui-block af-gui-fieldset" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" />
+      <div ng-switch-when="fieldset" af-gui-block="item" class="af-gui-block af-gui-fieldset" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />
       <div ng-switch-when="block" af-gui-block="item" class="af-gui-block" entity-name="entityName" />
       <div ng-switch-when="field" af-gui-field="item" class="af-gui-field" entity-name="entityName" />
       <div ng-switch-when="text" af-gui-text="item" class="af-gui-text" />

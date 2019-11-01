@@ -316,6 +316,7 @@ function afform_civicrm_alterAngular($angular) {
         }
         $entityType = $entities[$entityName]['type'];
         $getFields = civicrm_api4($entityType, 'getFields', [
+          'action' => 'create',
           'where' => [['name', '=', $fieldName]],
           'select' => ['title', 'input_type', 'input_attrs', 'options'],
           'loadOptions' => TRUE,

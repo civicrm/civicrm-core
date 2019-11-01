@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'));
 
-  angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4, $parse) {
+  angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4, $parse, $timeout) {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/main.html',
@@ -14,6 +14,7 @@
         $scope.selectedEntity = null;
         $scope.meta = CRM.afformAdminData;
         $scope.controls = {};
+        $scope.fieldList = {};
         $scope.editor = this;
         var newForm = {
           title: ts('Untitled Form'),
@@ -49,7 +50,8 @@
           $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
           evaluate($scope.layout['#children']);
           $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
-          $scope.fields = getAllFields($scope.layout['#children']);
+          expandFields($scope.layout['#children']);
+          _.each(_.keys($scope.entities), buildFieldList);
         }
 
         this.addEntity = function(entityType) {
@@ -91,10 +93,29 @@
           return $scope.selectedEntity;
         };
 
+        $scope.rebuildFieldList = function() {
+          $timeout(function() {
+            $scope.$apply(function() {
+              buildFieldList($scope.selectedEntity);
+            });
+          });
+        };
+
+        function buildFieldList(entityName) {
+          $scope.fieldList[entityName] = $scope.fieldList[entityName] || [];
+          $scope.fieldList[entityName].length = 0;
+          _.each($scope.meta.fields[$scope.entities[entityName].type], function(field) {
+            $scope.fieldList[entityName].push({
+              "#tag": "af-field",
+              name: field.name,
+              defn: _.cloneDeep(_.pick(field, ['title', 'input_type', 'input_attrs']))
+            });
+          });
+        }
+
         $scope.valuesFields = function() {
           var fields = _.transform($scope.meta.fields[$scope.entities[$scope.selectedEntity].type], function(fields, field) {
-            var data = $scope.entities[$scope.selectedEntity].data || {};
-            fields.push({id: field.name, text: field.title, disabled: field.name in data});
+            fields.push({id: field.name, text: field.title, disabled: $scope.fieldInUse($scope.selectedEntity, field.name)});
           }, []);
           return {results: fields};
         };
@@ -113,6 +134,33 @@
           }
         });
 
+        // Checks if a field is on the form or set as a value
+        $scope.fieldInUse = function(entityName, fieldName) {
+          var data = $scope.entities[entityName].data || {},
+            found = false;
+          if (fieldName in data) {
+            return true;
+          }
+          return check($scope.layout['#children']);
+          function check(group) {
+            _.each(group, function(item) {
+              if (found) {
+                return false;
+              }
+              if (_.isPlainObject(item)) {
+                if ((!item['af-fieldset'] || (item['af-fieldset'] === entityName)) && item['#children']) {
+                  check(item['#children']);
+                }
+                if (item['#tag'] === 'af-field' && item.name === fieldName) {
+                  found = true;
+                }
+              }
+            });
+            return found;
+          }
+        };
+
+        // Parse strings of javascript that php couldn't interpret
         function evaluate(collection) {
           _.each(collection, function(item) {
             if (_.isPlainObject(item)) {
@@ -125,6 +173,22 @@
                   }
                 }
               });
+            }
+          });
+        }
+
+        function expandFields(collection, entityType) {
+          _.each(collection, function (item) {
+            if (_.isPlainObject(item)) {
+              if (item['af-fieldset']) {
+                expandFields(item['#children'], $scope.editor.getEntity(item['af-fieldset']).type);
+              }
+              else if (item['#tag'] === 'af-field') {
+                item.defn = item.defn || {};
+                _.defaults(item.defn, _.cloneDeep(_.pick($scope.editor.getField(entityType, item.name), ['title', 'input_type', 'input_attrs'])));
+              } else {
+                expandFields(item['#children'], entityType);
+              }
             }
           });
         }
@@ -147,18 +211,6 @@
       }
     });
     return indexBy ? _.indexBy(items, indexBy) : items;
-  }
-
-  // Lists fields by entity. Note that fields for an entity can be spread across several fieldsets.
-  function getAllFields(layout) {
-    var allFields = {};
-    _.each(getTags(layout, 'af-fieldset'), function(fieldset) {
-      if (!allFields[fieldset.model]) {
-        allFields[fieldset.model] = {};
-      }
-      _.assign(allFields[fieldset.model], getTags(fieldset['#children'], 'af-field', 'name'));
-    });
-    return allFields;
   }
 
   // Turns a space-separated list (e.g. css classes) into an array

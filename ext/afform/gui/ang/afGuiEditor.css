@@ -64,18 +64,6 @@
   width: 100%;
   padding-left:15px;
 }
-/* grip handle */
-#afGuiEditor .af-gui-bar:before {
-  background-size: cover;
-  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
-  width: 10px;
-  height: 15px;
-  content: ' ';
-  display: block;
-  position: absolute;
-  left: 4px;
-  top: 5px;
-}
 
 #afGuiEditor-canvas:hover .af-gui-bar {
   visibility: visible;
@@ -105,4 +93,38 @@
 
 #afGuiEditor .af-gui-block:hover {
   border: 2px dashed #757575;
+}
+
+#afGuiEditor [ui-sortable] {
+  min-height: 25px;
+}
+
+#afGuiEditor .af-gui-field-select-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+#afGuiEditor .af-gui-field-select-list > div {
+  cursor: move;
+  padding-left:15px;
+  position: relative;
+}
+#afGuiEditor .af-gui-field-select-list > div.disabled {
+  cursor: auto;
+}
+#afGuiEditor .af-gui-field-select-list > div:not(.disabled):hover {
+  background-color: #efefef;
+}
+/* grip handle */
+#afGuiEditor .af-gui-bar:before,
+#afGuiEditor .af-gui-field-select-list > div:not(.disabled):hover:before {
+  background-size: cover;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
+  width: 10px;
+  height: 15px;
+  content: ' ';
+  display: block;
+  position: absolute;
+  left: 4px;
+  top: 5px;
 }
