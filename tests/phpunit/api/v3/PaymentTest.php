@@ -322,27 +322,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 50,
     ];
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
-    $expectedResult = [
-      $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
-        'total_amount' => 50,
-        'status_id' => 1,
-        'is_payment' => 1,
-      ],
-    ];
-    $this->checkPaymentResult($payment, $expectedResult);
-
-    // Check entity financial trxn created properly
-    $params = [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'financial_trxn_id' => $payment['id'],
-    ];
-
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-
-    $this->assertEquals($eft['values'][$eft['id']]['amount'], 50);
+    $this->checkPaymentIsValid($payment['id'], $contribution['id']);
 
     $params = [
       'entity_table' => 'civicrm_financial_item',
@@ -409,50 +389,34 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test create payment api with line item in params
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentLineItems() {
     $contribution = $this->createPartiallyPaidParticipantOrder();
-    $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']]);
+    $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
 
-    //Create partial payment by passing line item array is params
+    // Create partial payment by passing line item array is params.
     $params = [
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
     ];
     $amounts = [40, 10];
-    foreach ($lineItems['values'] as $id => $ignore) {
+    foreach ($lineItems as $id => $ignore) {
       $params['line_item'][] = [$id => array_pop($amounts)];
     }
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Payment with line item', 'CreatePaymentWithLineItems');
-    $expectedResult = [
-      $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
-        'total_amount' => 50,
-        'status_id' => 1,
-        'is_payment' => 1,
-      ],
-    ];
-    $this->checkPaymentResult($payment, $expectedResult);
-
-    // Check entity financial trxn created properly
-    $params = [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'financial_trxn_id' => $payment['id'],
-    ];
-
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-
-    $this->assertEquals($eft['values'][$eft['id']]['amount'], 50);
+    $payment = $this->callAPIAndDocument('Payment', 'create', $params, __FUNCTION__, __FILE__, 'Payment with line item', 'CreatePaymentWithLineItems');
+    $this->checkPaymentIsValid($payment['id'], $contribution['id']);
 
     $params = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
+      'return' => ['entity_id.entity_id', 'amount'],
     ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params)['values'];
+    $this->assertCount(2, $eft);
     $amounts = [40, 10];
-    foreach ($eft['values'] as $value) {
+    foreach ($eft as $value) {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
 
@@ -462,10 +426,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
     ];
     $amounts = [80, 20];
-    foreach ($lineItems['values'] as $id => $ignore) {
+    foreach ($lineItems as $id => $ignore) {
       $params['line_item'][] = [$id => array_pop($amounts)];
     }
-    $payment = $this->callAPISuccess('payment', 'create', $params);
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
         'from_financial_account_id' => 7,
@@ -480,13 +444,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
     ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params)['values'];
+    $this->assertCount(2, $eft);
     $amounts = [80, 20];
-    foreach ($eft['values'] as $value) {
+    foreach ($eft as $value) {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
     // Check contribution for completed status
-    $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
+    $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contribution['id']]);
 
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 300.00);
@@ -503,6 +468,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test cancel payment api
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCancelPayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
@@ -893,6 +860,34 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'loc_block_id' => $location['id'],
       'is_show_location' => TRUE,
     ]);
+  }
+
+  /**
+   * Check the created payment is valid.
+   *
+   * This is probably over-testing really since we are repetitively checking a basic function...
+   *
+   * @param int $paymentID
+   * @param int $contributionID
+   * @param int $amount
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function checkPaymentIsValid($paymentID, $contributionID, $amount = 50) {
+    $payment = $this->callAPISuccess('Payment', 'getsingle', ['financial_trxn_id' => $paymentID]);
+    $this->assertEquals(7, $payment['from_financial_account_id']);
+    $this->assertEquals(6, $payment['to_financial_account_id']);
+    $this->assertEquals(1, $payment['status_id']);
+    $this->assertEquals(1, $payment['is_payment']);
+    $this->assertEquals($amount, $payment['total_amount']);
+
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
+      'entity_id' => $contributionID,
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    ]);
+
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], $amount);
   }
 
 }
