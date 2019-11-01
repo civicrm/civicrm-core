@@ -165,7 +165,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
    */
   public static function preprocessCustomFields($entity) {
     if (!$entity) {
-      return;
+      return [];
     }
 
     $customfields = CRM_Core_BAO_CustomField::getFields($entity);
@@ -199,79 +199,76 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
    * @param obj $form
    * @param string $entity 'Campaign'
    *
-   * @return none
-   *
    */
   public static function renderCustomFieldsInForm($form, $entity) {
 
     if (!$entity) {
       return;
     }
+
     $customfields = self::preprocessCustomFields($entity);
 
-    if (!is_array($customfields)) {
-      return;
-    }
+    if (is_array($customfields)) {
+      foreach ($customfields as $dnc => $customFieldData) {
+        // First check if customfield is searchable
+        if ($customFieldData['is_searchable']) {
+          $options = [];
+          switch ($customFieldData['html_type']) {
+            case 'Multi-Select State/Province':
+              // Is this a state province ?
+              if ($customFieldData['data_type'] == 'StateProvince') {
+                // Fetch the state province list
+                $options = CRM_Core_BAO_Address::buildOptions('state_province_id', NULL, NULL);
+                $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- none -')]);
+              }
+              break;
 
-    foreach ($customfields as $dnc => $customFieldData) {
-      // First check if customfield is searchable
-      if ($customFieldData['is_searchable']) {
-        $options = [];
-        switch ($customFieldData['html_type']) {
-          case 'Multi-Select State/Province':
-            // Is this a state province ?
-            if ($customFieldData['data_type'] == 'StateProvince') {
-              // Fetch the state province list
-              $options = CRM_Core_BAO_Address::buildOptions('state_province_id', NULL, NULL);
-              $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- none -')]);
-            }
-            break;
+            case 'Multi-Select':
+              if ($customFieldData['option_group_id']) {
+                // Get the option values from that optiongroup id
+                $options = CRM_Core_OptionGroup::valuesByID(
+                    $customFieldData['option_group_id'], FALSE, FALSE, FALSE, 'label', TRUE
+                );
+                $attributes = ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- none -')];
+                $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
+              }
+              break;
 
-          case 'Multi-Select':
-            if ($customFieldData['option_group_id']) {
-              // Get the option values from that optiongroup id
-              $options = CRM_Core_OptionGroup::valuesByID(
-                  $customFieldData['option_group_id'], FALSE, FALSE, FALSE, 'label', TRUE
-              );
-              $attributes = ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- none -')];
+            case 'Select':
+              if ($customFieldData['option_group_id']) {
+                // Get the option values from that optiongroup id
+                $options = CRM_Core_OptionGroup::valuesByID(
+                    $customFieldData['option_group_id'], FALSE, FALSE, FALSE, 'label', TRUE
+                );
+                $attributes = ['class' => 'crm-select2', 'multiple' => FALSE, 'placeholder' => ts('- none -')];
+                $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
+              }
+              break;
+
+            case 'CheckBox':
+              if ($customFieldData['option_group_id']) {
+                $options = CRM_Core_OptionGroup::valuesByID(
+                    $customFieldData['option_group_id'], FALSE, FALSE, FALSE, 'label', TRUE
+                );
+                $form->addCheckBox($customFieldData['name'], $customFieldData['label'], array_flip($options), NULL, NULL, NULL, NULL, ['&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>']
+                );
+              }
+              break;
+
+            case 'Radio':
+              if ($customFieldData['data_type'] == 'Boolean') {
+                $options = ['' => '- any -', 0 => 'No', 1 => 'Yes'];
+              }
+              else {
+                $options = CRM_Core_OptionGroup::values($customFieldData['name'], FALSE, FALSE, TRUE);
+              }
+              $attributes = ['placeholder' => ts('- none -')];
               $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
-            }
-            break;
+              break;
 
-          case 'Select':
-            if ($customFieldData['option_group_id']) {
-              // Get the option values from that optiongroup id
-              $options = CRM_Core_OptionGroup::valuesByID(
-                  $customFieldData['option_group_id'], FALSE, FALSE, FALSE, 'label', TRUE
-              );
-              $attributes = ['class' => 'crm-select2', 'multiple' => FALSE, 'placeholder' => ts('- none -')];
-              $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
-            }
-            break;
-
-          case 'CheckBox':
-            if ($customFieldData['option_group_id']) {
-              $options = CRM_Core_OptionGroup::valuesByID(
-                  $customFieldData['option_group_id'], FALSE, FALSE, FALSE, 'label', TRUE
-              );
-              $form->addCheckBox($customFieldData['name'], $customFieldData['label'], array_flip($options), NULL, NULL, NULL, NULL, ['&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>']
-              );
-            }
-            break;
-
-          case 'Radio':
-            if ($customFieldData['data_type'] == 'Boolean') {
-              $options = ['' => '- any -', 0 => 'No', 1 => 'Yes'];
-            }
-            else {
-              $options = CRM_Core_OptionGroup::values($customFieldData['name'], FALSE, FALSE, TRUE);
-            }
-            $attributes = ['placeholder' => ts('- none -')];
-            $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
-            break;
-
-          default:
-            $form->add($customFieldData['html_type'], $customFieldData['name'], $customFieldData['label']);
+            default:
+              $form->add($customFieldData['html_type'], $customFieldData['name'], $customFieldData['label']);
+          }
         }
       }
     }
