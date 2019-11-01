@@ -48,7 +48,9 @@ class CRM_Core_Payment_Form {
 
     $processor['object']->setBillingProfile($billing_profile_id);
     $processor['object']->setBackOffice($isBackOffice);
-    $processor['object']->setPaymentInstrumentID($paymentInstrumentID);
+    if (isset($paymentInstrumentID)) {
+      $processor['object']->setPaymentInstrumentID($paymentInstrumentID);
+    }
     $paymentTypeName = self::getPaymentTypeName($processor);
     $form->assign('paymentTypeName', $paymentTypeName);
     $form->assign('paymentTypeLabel', self::getPaymentLabel($processor['object']));

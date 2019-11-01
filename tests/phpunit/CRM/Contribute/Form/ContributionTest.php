@@ -1010,7 +1010,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'total_amount' => 40,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',

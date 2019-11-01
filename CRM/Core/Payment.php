@@ -11,6 +11,7 @@
 
 use Civi\Payment\System;
 use Civi\Payment\Exception\PaymentProcessorException;
+use Civi\Payment\PropertyBag;
 
 /**
  * Class CRM_Core_Payment.
@@ -134,6 +135,63 @@ abstract class CRM_Core_Payment {
   protected $backOffice = FALSE;
 
   /**
+   * This is only needed during the transitional phase. In future you should
+   * pass your own PropertyBag into the method you're calling.
+   *
+   * New code should NOT use $this->propertyBag.
+   *
+   * @var Civi\Payment\PropertyBag
+   */
+  protected $propertyBag;
+
+  /**
+   * Return the payment instrument ID to use.
+   *
+   * Note:
+   * We normally SHOULD be returning the payment instrument of the payment processor.
+   * However there is an outstanding case where this needs overriding, which is
+   * when using CRM_Core_Payment_Manual which uses the pseudoprocessor (id = 0).
+   *
+   * i.e. If you're writing a Payment Processor you should NOT be using
+   * setPaymentInstrumentID() at all.
+   *
+   * @todo
+   * Ideally this exception-to-the-rule should be handled outside of this class
+   * i.e. this class's getPaymentInstrumentID method should return it from the
+   * payment processor and CRM_Core_Payment_Manual could override it to provide 0.
+   *
+   * @return int
+   */
+  public function getPaymentInstrumentID() {
+    return isset($this->paymentInstrumentID)
+      ? $this->paymentInstrumentID
+      : (int) ($this->_paymentProcessor['payment_instrument_id'] ?? 0);
+  }
+
+  /**
+   * Getter for the id Payment Processor ID.
+   *
+   * @return int
+   */
+  public function getID() {
+    return (int) $this->_paymentProcessor['id'];
+  }
+
+  /**
+   * @deprecated Set payment Instrument id - see note on getPaymentInstrumentID.
+   *
+   * By default we actually ignore the form value. The manual processor takes
+   * it more seriously.
+   *
+   * @param int $paymentInstrumentID
+   */
+  public function setPaymentInstrumentID($paymentInstrumentID) {
+    $this->paymentInstrumentID = (int) $paymentInstrumentID;
+    // See note on getPaymentInstrumentID().
+    return $this->getPaymentInstrumentID();
+  }
+
+  /**
    * @return bool
    */
   public function isBackOffice() {
@@ -147,35 +205,6 @@ abstract class CRM_Core_Payment {
    */
   public function setBackOffice($isBackOffice) {
     $this->backOffice = $isBackOffice;
-  }
-
-  /**
-   * Get payment instrument id.
-   *
-   * @return int
-   */
-  public function getPaymentInstrumentID() {
-    return $this->paymentInstrumentID ? $this->paymentInstrumentID : $this->_paymentProcessor['payment_instrument_id'];
-  }
-
-  /**
-   * Getter for the id.
-   *
-   * @return int
-   */
-  public function getID() {
-    return (int) $this->_paymentProcessor['id'];
-  }
-
-  /**
-   * Set payment Instrument id.
-   *
-   * By default we actually ignore the form value. The manual processor takes it more seriously.
-   *
-   * @param int $paymentInstrumentID
-   */
-  public function setPaymentInstrumentID($paymentInstrumentID) {
-    $this->paymentInstrumentID = $this->_paymentProcessor['payment_instrument_id'];
   }
 
   /**
@@ -669,6 +698,8 @@ abstract class CRM_Core_Payment {
    * Get the metadata of all the fields configured for this processor.
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function getAllFields() {
     $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
@@ -1042,28 +1073,32 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get the currency for the transaction.
+   * Get the currency for the transaction from the params.
    *
-   * Handle any inconsistency about how it is passed in here.
+   * Legacy wrapper. Better for a method to work on its own PropertyBag.
+   *
+   * This code now uses PropertyBag to allow for old inputs like currencyID.
    *
    * @param $params
    *
    * @return string
    */
-  protected function getCurrency($params) {
-    return CRM_Utils_Array::value('currencyID', $params, CRM_Utils_Array::value('currency', $params));
+  protected function getCurrency($params = []) {
+    $localPropertyBag = new PropertyBag();
+    $localPropertyBag->mergeLegacyInputParams($params);
+    return $localPropertyBag->getCurrency();
   }
 
   /**
-   * Get the currency for the transaction.
+   * Legacy. Better for a method to work on its own PropertyBag,
+   * but also, this function does not do very much.
    *
-   * Handle any inconsistency about how it is passed in here.
-   *
-   * @param $params
+   * @param array $params
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  protected function getAmount($params) {
+  protected function getAmount($params = []) {
     return CRM_Utils_Money::format($params['amount'], NULL, NULL, TRUE);
   }
 
@@ -1611,7 +1646,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    *
    * @return string
    */
-  protected function getPaymentDescription($params, $length = 24) {
+  protected function getPaymentDescription($params = [], $length = 24) {
     $parts = [
       'contactID',
       'contributionID',
@@ -1620,13 +1655,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
       'billing_last_name',
     ];
     $validParts = [];
-    if (isset($params['description'])) {
-      $uninformativeStrings = [
-        ts('Online Event Registration: '),
-        ts('Online Contribution: '),
-      ];
-      $params['description'] = str_replace($uninformativeStrings, '', $params['description']);
-    }
+    $params['description'] = $this->getDescription();
     foreach ($parts as $part) {
       if ((!empty($params[$part]))) {
         $validParts[] = $params[$part];
