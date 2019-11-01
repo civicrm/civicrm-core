@@ -335,15 +335,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->addElement('hidden', "email-{$this->_bltID}", 1);
       $this->add('text', 'total_amount', ts('Total Amount'), ['readonly' => TRUE], FALSE);
     }
-    $pps = [];
-    if (!empty($this->_paymentProcessors)) {
-      foreach ($this->_paymentProcessors as $key => $name) {
-        $pps[$key] = $name['name'];
-      }
-    }
-    if (!empty($this->_values['is_pay_later'])) {
-      $pps[0] = $this->_values['pay_later_text'];
-    }
+    $pps = $this->getProcessors();
 
     if (count($pps) > 1) {
       $this->addRadio('payment_processor_id', ts('Payment Method'), $pps,
@@ -356,7 +348,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->addElement('hidden', 'payment_processor_id', $key);
       if ($key === 0) {
         $this->assign('is_pay_later', $this->_values['is_pay_later']);
-        $this->assign('pay_later_text', $this->_values['pay_later_text']);
+        $this->assign('pay_later_text', $this->getPayLaterLabel());
       }
     }
 

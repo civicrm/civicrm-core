@@ -407,22 +407,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::buildAmount($this);
     }
 
-    $pps = [];
-    //@todo this processor adding fn is another one duplicated on contribute - a shared
-    // common class would make this sort of thing extractable
-    if (!empty($this->_paymentProcessors)) {
-      foreach ($this->_paymentProcessors as $key => $name) {
-        $pps[$key] = $name['name'];
-      }
-    }
+    $pps = $this->getProcessors();
     if ($this->getContactID() === 0 && !$this->_values['event']['is_multiple_registrations']) {
       //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCIDZeroOptions();
-    }
-    if (!empty($this->_values['event']['is_pay_later']) &&
-      ($this->_allowConfirmation || (!$this->_requireApproval && !$this->_allowWaitlist))
-    ) {
-      $pps[0] = $this->_values['event']['pay_later_text'];
     }
 
     if ($this->_values['event']['is_monetary']) {

@@ -68,6 +68,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'currency' => 'NZD',
       'goal_amount' => $this->testAmount,
       'is_pay_later' => 1,
+      'pay_later_text' => 'Send check',
       'is_monetary' => TRUE,
       'is_email_receipt' => TRUE,
       'receipt_from_email' => 'yourconscience@donate.com',
@@ -1932,6 +1933,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test validating a contribution page submit.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testValidate() {
     $this->setUpContributionPage();

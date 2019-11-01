@@ -34,7 +34,6 @@
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
-  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The values for the contribution db object.
