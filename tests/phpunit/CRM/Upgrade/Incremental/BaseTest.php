@@ -222,6 +222,77 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Log Date conversion
+   */
+  public function testLogDateConversion() {
+    // Create two sets of searches one set for added by and one for modified by
+    // Each set contains a relative search on this.month and a specific date search low
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['log_date', '=', 1],
+        ['log_date_low', '=', '20191001000000'],
+        ['log_date_high', '=', '20191031235959'],
+        'relative_dates' => [
+          'log' => 'this.month',
+        ],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['log_date', '=', 1],
+        ['log_date_low', '=', '20191001000000'],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['log_date', '=', 2],
+        ['log_date_low', '=', '20191001000000'],
+        ['log_date_high', '=', '20191031235959'],
+        'relative_dates' => [
+          'log' => 'this.month',
+        ],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['log_date', '=', 2],
+        ['log_date_low', '=', '20191001000000'],
+      ],
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->renameLogFields();
+    $smartGroupConversionObject->updateGroups([
+      'datepickerConversion' => [
+        'created_date',
+        'modified_date',
+      ],
+    ]);
+    $savedSearhes = $this->callAPISuccess('SavedSearch', 'get', []);
+    $expectedResults = [
+      1 => [
+        0 => ['log_date', '=', 1],
+        'relative_dates' => [],
+        3 => ['created_date_relative', '=', 'this.month'],
+      ],
+      2 => [
+        0 => ['log_date', '=', 1],
+        1 => ['created_date_low', '=', '2019-10-01 00:00:00'],
+        2 => ['created_date_relative', '=', 0],
+      ],
+      3 => [
+        0 => ['log_date', '=', 2],
+        'relative_dates' => [],
+        3 => ['modified_date_relative', '=', 'this.month'],
+      ],
+      4 => [
+        0 => ['log_date', '=', 2],
+        1 => ['modified_date_low', '=', '2019-10-01 00:00:00'],
+        2 => ['modified_date_relative', '=', 0],
+      ],
+    ];
+  }
+
+  /**
    * Test converting relationship fields
    */
   public function testSmartGroupRelationshipDateConversions() {
