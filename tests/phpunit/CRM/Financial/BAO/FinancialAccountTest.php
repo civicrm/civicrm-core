@@ -262,7 +262,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   public function testValidateFinancialAccount() {
     // Create a record with financial item having financial account as Event Fee.
-    $this->createParticipantWithContribution();
+    $this->createPartiallyPaidParticipantOrder();
     $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
     $financialAccountId = array_search('Event Fee', $financialAccounts);
     $message = CRM_Financial_BAO_FinancialAccount::validateFinancialAccount($financialAccountId);

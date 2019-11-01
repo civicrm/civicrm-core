@@ -102,7 +102,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function testGetOrderParticipant() {
     $this->addOrder(FALSE, 100);
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
 
     $params = [
       'contribution_id' => $contribution['id'],
