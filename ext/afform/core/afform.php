@@ -392,8 +392,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   }
 
   $name = $params['name'];
-  // Hmm?? $scanner = new CRM_Afform_AfformScanner();
-  // Hmm?? afform_scanner
+  /** @var \CRM_Afform_AfformScanner $scanner */
   $scanner = Civi::service('afform_scanner');
   $meta = $scanner->getMeta($name);
   // Hmm?? $scanner = new CRM_Afform_AfformScanner();
