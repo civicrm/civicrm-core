@@ -173,6 +173,7 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
     'api.required' => TRUE,
     'title' => ts('Contribution ID'),
     'type' => CRM_Utils_Type::T_INT,
+    'api.aliases' => ['order_id'],
   ];
   $params['contact_id'] = [
     'title' => ts('Contact ID'),

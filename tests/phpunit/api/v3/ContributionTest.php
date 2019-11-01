@@ -3346,12 +3346,25 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test sending a mail via the API.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSendMail() {
     $mut = new CiviMailUtils($this, TRUE);
-    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $orderParams = $this->_params;
+    $orderParams['contribution_status_id'] = 'Pending';
+    $orderParams['api.PaymentProcessor.pay'] = [
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_type' => 'Visa',
+      'credit_card_number' => 41111111111111,
+      'amount' => 5,
+    ];
+
+    $order = $this->callAPISuccess('Order', 'create', $orderParams);
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => 5, 'is_send_notification' => 0, 'order_id' => $order['id']]);
+    $address = $this->callAPISuccess('Address', 'create', ['contribution_id' => $order['id'], 'name' => 'bob', 'contact_id' => 1, 'street_address' => 'blah']);
+    $this->callAPISuccess('Contribution', 'create', ['id' => $order['id'], 'address_id' => $address['id']]);
     $this->callAPISuccess('contribution', 'sendconfirmation', [
-      'id' => $contribution['id'],
+      'id' => $order['id'],
       'receipt_from_email' => 'api@civicrm.org',
     ]);
     $mut->checkMailLog([
@@ -3361,8 +3374,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'Event',
     ]);
 
-    $this->checkCreditCardDetails($mut, $contribution['id']);
+    $this->checkCreditCardDetails($mut, $order['id']);
     $mut->stop();
+    $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
+    $this->assertEquals('bob', $tplVars['billingName']);
+    $this->assertEquals("bob\nblah\n", $tplVars['address']);
   }
 
   /**
