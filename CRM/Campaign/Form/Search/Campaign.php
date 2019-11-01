@@ -163,7 +163,6 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
    * @return array
    *
    */
-
   public static function preprocessCustomFields($entity) {
     if (!$entity) {
       return;
@@ -203,7 +202,6 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
    * @return none
    *
    */
-
   public static function renderCustomFieldsInForm($form, $entity) {
 
     if (!$entity) {
@@ -228,6 +226,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
               $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- none -')]);
             }
             break;
+
           case 'Multi-Select':
             if ($customFieldData['option_group_id']) {
               // Get the option values from that optiongroup id
@@ -238,6 +237,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
               $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
             }
             break;
+
           case 'Select':
             if ($customFieldData['option_group_id']) {
               // Get the option values from that optiongroup id
@@ -248,6 +248,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
               $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
             }
             break;
+
           case 'CheckBox':
             if ($customFieldData['option_group_id']) {
               $options = CRM_Core_OptionGroup::valuesByID(
@@ -257,6 +258,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
               );
             }
             break;
+
           case 'Radio':
             if ($customFieldData['data_type'] == 'Boolean') {
               $options = ['' => '- any -', 0 => 'No', 1 => 'Yes'];
@@ -267,6 +269,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
             $attributes = ['placeholder' => ts('- none -')];
             $form->addElement('select', $customFieldData['name'], $customFieldData['label'], $options, $attributes);
             break;
+
           default:
             $form->add($customFieldData['html_type'], $customFieldData['name'], $customFieldData['label']);
         }

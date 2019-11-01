@@ -476,6 +476,7 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
               $where[] = implode(' OR ', $or);
             }
             break;
+
           default:
             $where[] = "( {$customfields[$campaignCF]['table_name']}.{$customfields[$campaignCF]['column_name']} = '{$pdata}' )";
         }
