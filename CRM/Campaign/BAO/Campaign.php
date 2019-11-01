@@ -361,6 +361,9 @@ Order By  camp.title";
   public static function getCampaignSummary($params = [], $onlyCount = FALSE) {
     $campaigns = [];
 
+    // Fetch all Campaign related customfields
+    $customfields = CRM_Core_BAO_CustomField::getFields('Campaign');
+
     //build the limit and order clause.
     $limitClause = $orderByClause = $lookupTableJoins = NULL;
     if (!$onlyCount) {
@@ -451,6 +454,35 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
       }
       $where[] = $active;
     }
+    // Customfields in campaign, treat them properly and construct the where statement(s)
+    // TODO: Add search ranges
+    foreach ($params as $pkey => $pdata) {
+      if (substr($pkey, 0, 7) === 'custom_') {
+        $ckeys = explode('_', $pkey);
+        $campaignCF = $ckeys[1];
+        // Check the type of the customfield
+        switch ($customfields[$campaignCF]['html_type']) {
+          case 'Multi-Select':
+            $value = trim($pdata);
+            $mulValues = explode(',', $value);
+            // We got a multivalue here, lets add some prefix/suffix and do our query which will be multiple OR statements
+            $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+            foreach ($mulValues as $val) {
+              // Construct multiple OR statements
+              $or[] = "( {$customfields[$campaignCF]['table_name']}.{$customfields[$campaignCF]['column_name']} LIKE ('%{$separator}{$val}{$separator}%') )";
+            }
+            if (is_array($or)) {
+              // Implode them
+              $where[] = implode(' OR ', $or);
+            }
+            break;
+          default:
+            $where[] = "( {$customfields[$campaignCF]['table_name']}.{$customfields[$campaignCF]['column_name']} = '{$pdata}' )";
+        }
+
+        $lookupTableJoin[] = "LEFT JOIN {$customfields[$campaignCF]['table_name']} ON {$customfields[$campaignCF]['table_name']}.entity_id = campaign.id";
+      }
+    }
     $whereClause = NULL;
     if (!empty($where)) {
       $whereClause = ' WHERE ' . implode(" \nAND ", $where);
@@ -482,6 +514,12 @@ SELECT  campaign.id               as id,
       $selectClause = 'SELECT COUNT(*)';
     }
     $fromClause = 'FROM  civicrm_campaign campaign';
+
+    // As each where statement produces a new join, we only need one join per table,
+    // so we'll use array_unique to remove duplicates
+    if (is_array($lookupTableJoin)) {
+      $lookupTableJoins = implode(', ', array_unique($lookupTableJoin));
+    }
 
     $query = "{$selectClause} {$fromClause} {$lookupTableJoins} {$whereClause} {$orderByClause} {$limitClause}";
 

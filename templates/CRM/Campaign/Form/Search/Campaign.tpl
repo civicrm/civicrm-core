@@ -117,7 +117,18 @@
                 {$form.is_active.html}
               </td>
             </tr>
-
+            <tr style="width:200%;display:inline-block;">
+            {* Loop through all fields *}
+            {foreach from=$form item="field"}
+              {* If field name begins with 'custom_', then it's a customfield *}
+              {if $field.name|strpos:'custom_' === 0}
+                <td style="display:inline-block;width:25%;">
+                  {$field.label}<br />
+                  {$field.html}
+                </td>
+              {/if}
+            {/foreach}
+            </tr>
             <tr>
               <td colspan="2">
                 {if $context eq 'search'}
