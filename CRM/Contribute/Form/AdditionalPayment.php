@@ -411,14 +411,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $config->defaultCurrency
     );
 
-    if (!empty($this->_params['trxn_date'])) {
-      $this->_params['receive_date'] = $this->_params['trxn_date'];
-    }
-
-    if (empty($this->_params['receive_date'])) {
-      $this->_params['receive_date'] = date('YmdHis');
-    }
-
     if (empty($this->_params['invoice_id'])) {
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
     }
@@ -467,10 +459,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     if (!empty($result)) {
       $this->_params = array_merge($this->_params, $result);
-    }
-
-    if (empty($this->_params['receive_date'])) {
-      $this->_params['receive_date'] = $now;
     }
 
     $this->set('params', $this->_params);
