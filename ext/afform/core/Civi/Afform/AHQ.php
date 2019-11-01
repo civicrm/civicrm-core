@@ -11,6 +11,20 @@ namespace Civi\Afform;
 class AHQ {
 
   /**
+   * Given a list of would-be child nodes, combine them under a common root.
+   *
+   * @param array $children
+   * @param string $tag
+   * @return array
+   */
+  public static function makeRoot($children, $tag = 'placeholder') {
+    return [
+      '#tag' => $tag,
+      '#children' => $children,
+    ];
+  }
+
+  /**
    * Returns all tags with a certain tag name, e.g. 'af-entity'
    *
    * @param array|string $element

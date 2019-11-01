@@ -26,10 +26,7 @@ class FormDataModel {
    *   Parsed summary of the entities used in a given form.
    */
   public static function create($layout) {
-    $root = [
-      '#tag' => 'root',
-      '#children' => $layout,
-    ];
+    $root = AHQ::makeRoot($layout);
     $entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
     foreach (array_keys($entities) as $entity) {
       $entities[$entity]['fields'] = [];
