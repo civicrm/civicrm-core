@@ -152,7 +152,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     $this->assign('searchParams', json_encode($this->_searchParams));
   }
 
-  /*
+  /**
    * This function will enrich the customfield data with some more information
    * that is vital to us.
    *
@@ -181,7 +181,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     return $customfields;
   }
 
-  /*
+  /**
    * This function will add customfields into a form (passed as parameter)
    * and will render only the searchable ones
    *
