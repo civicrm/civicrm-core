@@ -481,6 +481,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->assign('registered_by_display_name', CRM_Contact_BAO_Contact::displayName($registered_by_contact_id));
       }
     }
+    else {
+      if ($this->_contactID) {
+        $defaults['contact_id'] = $this->_contactID;
+      }
+    }
 
     //setting default register date
     if ($this->_action == CRM_Core_Action::ADD) {
@@ -641,11 +646,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       return;
     }
 
-    if ($this->_single && $this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), [
-        'create' => TRUE,
-        'api' => ['extra' => ['email']],
-      ], TRUE);
+
+    $contactField = $this->addEntityRef('contact_id', ts('Contact'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+    if ($this->_context != 'standalone') {
+      $contactField->freeze();
     }
 
     $eventFieldParams = [
