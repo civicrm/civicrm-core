@@ -392,8 +392,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['financialTypeId'] = $contributionTypeId;
         $tplParams['financialTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
           $contributionTypeId);
-        // Legacy support
-        $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
         $tplParams['contributionTypeId'] = $contributionTypeId;
       }
 
