@@ -158,7 +158,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentEmailReceipt() {
     $mut = new CiviMailUtils($this);
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
     $event = $this->callAPISuccess('Event', 'get', []);
     $this->addLocationToEvent($event['id']);
     $params = [
@@ -206,7 +206,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testPaymentEmailReceiptFullyPaid() {
     $mut = new CiviMailUtils($this);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM'];
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -242,7 +242,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $decimalSeparator = ($thousandSeparator === ',' ? '.' : ',');
     $mut = new CiviMailUtils($this);
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
     $this->callAPISuccess('payment', 'create', [
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
@@ -285,12 +285,36 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test adding a payment to a pending multi-line order.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreatePaymentPendingOrderNoLineItems() {
+    $order = $this->createPendingParticipantOrder();
+    $this->callAPISuccess('Payment', 'create', [
+      'order_id' => $order['id'],
+      'total_amount' => 50,
+    ]);
+  }
+
+  /**
+   * Add participant with contribution
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createPendingParticipantOrder() {
+    return $this->callAPISuccess('Order', 'create', $this->getParticipantOrderParams());
+  }
+
+  /**
    * Test create payment api with no line item in params
    *
    * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentNoLineItems() {
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
 
     //Create partial payment
     $params = [
@@ -387,7 +411,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api with line item in params
    */
   public function testCreatePaymentLineItems() {
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']]);
 
     //Create partial payment by passing line item array is params
@@ -482,7 +506,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testCancelPayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -518,7 +542,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testDeletePayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -572,7 +596,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testUpdatePayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'edit contributions'];
-    $contribution = $this->createParticipantWithContribution();
+    $contribution = $this->createPartiallyPaidParticipantOrder();
 
     //Create partial payment by passing line item array is params
     $params = [
