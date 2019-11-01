@@ -3466,8 +3466,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->paymentProcessorID,
     ]);
     $mut->checkMailLog([
-      // credit card header
-      'Credit Card Information',
       // billing header
       'Billing Name and Address',
       // billing name
