@@ -3054,23 +3054,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public function _gatherMessageValues($input, &$values, $ids = []) {
     // set display address of contributor
+    $values['billingName'] = '';
     if ($this->address_id) {
-      $addressParams = ['id' => $this->address_id];
-      $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');
-      $addressDetails = array_values($addressDetails);
+      $addressDetails = CRM_Core_BAO_Address::getValues(['id' => $this->address_id], FALSE, 'id');
+      $addressDetails = reset($addressDetails);
+      $values['billingName'] = $addressDetails['name'] ?? '';
     }
     // Else we assign the billing address of the contribution contact.
     else {
-      $addressParams = ['contact_id' => $this->contact_id, 'is_billing' => 1];
-      $addressDetails = (array) CRM_Core_BAO_Address::getValues($addressParams);
-      $addressDetails = array_values($addressDetails);
+      $addressDetails = (array) CRM_Core_BAO_Address::getValues(['contact_id' => $this->contact_id, 'is_billing' => 1]);
+      $addressDetails = reset($addressDetails);
     }
+    $values['address'] = $addressDetails['display'] ?? '';
 
-    if (!empty($addressDetails[0]['display'])) {
-      $values['address'] = $addressDetails[0]['display'];
-    }
-
-    if ($this->_component == 'contribute') {
+    if ($this->_component === 'contribute') {
       //get soft contributions
       $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
       if (!empty($softContributions)) {
@@ -3187,6 +3184,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('first_name', $this->_relatedObjects['contact']->first_name);
     $template->assign('last_name', $this->_relatedObjects['contact']->last_name);
     $template->assign('displayName', $this->_relatedObjects['contact']->display_name);
+    $template->assign('billingName', $values['billingName']);
 
     // For some unit tests contribution cannot contain paymentProcessor information
     $billingMode = empty($this->_relatedObjects['paymentProcessor']) ? CRM_Core_Payment::BILLING_MODE_NOTIFY : $this->_relatedObjects['paymentProcessor']['billing_mode'];
@@ -4668,6 +4666,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return array
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   public static function sendMail(&$input, &$ids, $contributionID, &$values,
                                   $returnMessageText = FALSE) {
