@@ -157,6 +157,71 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test upgrading multiple Event smart groups of different formats
+   */
+  public function testMultipleEventSmartGroupDateConversions() {
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['event_start_date_low', '=', '20191001000000'],
+        ['event_end_date_high', '=', '20191031235959'],
+        'relative_dates' => [
+          'event' => 'this.month',
+        ],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['event_start_date_low', '=', '20191001000000'],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        'event_start_date_low' => '20191001000000',
+        'event_end_date_high' => '20191031235959',
+        'event_relative' => 'this.month',
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        'event_start_date_low' => '10/01/2019',
+        'event_end_date_high' => '',
+        'event_relative' => '0',
+      ],
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->renameFields([
+      ['old' => 'event_start_date_low', 'new' => 'event_low'],
+      ['old' => 'event_end_date_high', 'new' => 'event_high'],
+    ]);
+    $smartGroupConversionObject->updateGroups([
+      'datepickerConversion' => [
+        'event',
+      ],
+    ]);
+    $expectedResults = [
+      1 => [
+        'relative_dates' => [],
+        2 => ['event_relative', '=', 'this.month'],
+      ],
+      2 => [
+        0 => ['event_low', '=', '2019-10-01 00:00:00'],
+        1 => ['event_relative', '=', 0],
+      ],
+      3 => [
+        'event_relative' => 'this.month',
+      ],
+      4 => [
+        'event_relative' => 0,
+        'event_low' => '2019-10-01 00:00:00',
+      ],
+    ];
+    $savedSearches = $this->callAPISuccess('SavedSearch', 'get', []);
+    foreach ($savedSearches['values'] as $id => $savedSearch) {
+      $this->assertEquals($expectedResults[$id], $savedSearch['form_values']);
+    }
+  }
+
+  /**
    * Test converting relationship fields
    */
   public function testSmartGroupRelationshipDateConversions() {
