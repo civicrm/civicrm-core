@@ -400,7 +400,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
 
   $fileName = '~afform/' . _afform_angular_module_name($name, 'camel');
   $htmls = [
-    $fileName => file_get_contents($scanner->findFilePath($name, 'aff.html')),
+    $fileName => $scanner->getLayout($name),
   ];
   $htmls = \Civi\Angular\ChangeSet::applyResourceFilters(Civi::service('angular')->getChangeSets(), 'partials', $htmls);
 

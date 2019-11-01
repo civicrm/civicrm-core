@@ -153,6 +153,18 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
+   * @param string $formName
+   *   Ex: 'view-individual'
+   * @return string|NULL
+   *   Ex: '<em>Hello world!</em>'
+   *   NULL if no layout exists
+   */
+  public function getLayout($formName) {
+    $filePath = $this->findFilePath($formName, self::LAYOUT_FILE);
+    return $filePath === NULL ? NULL : file_get_contents($filePath);
+  }
+
+  /**
    * Get the effective metadata for all forms.
    *
    * @return array

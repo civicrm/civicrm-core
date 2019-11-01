@@ -22,11 +22,10 @@ class Get extends BasicGetAction {
     $values = [];
     foreach ($names as $name) {
       $record = $scanner->getMeta($name);
-      $layout = $scanner->findFilePath($name, 'aff.html');
-      if ($layout) {
-        // FIXME check for file existence+substance+validity
-        $html = file_get_contents($layout);
-        $record['layout'] = $this->convertHtmlToOutput($html);
+      $layout = $scanner->getLayout($name);
+      if ($layout !== NULL) {
+        // FIXME check for validity?
+        $record['layout'] = $this->convertHtmlToOutput($layout);
       }
       $values[] = $record;
     }
