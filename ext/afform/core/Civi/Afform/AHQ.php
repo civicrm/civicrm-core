@@ -19,7 +19,7 @@ class AHQ {
    * @return array
    */
   public static function getTags($element, $tagName) {
-    if ($element === [] || is_string($element)) {
+    if ($element === [] || is_string($element) || isset($element['#text'])) {
       return [];
     }
     $results = [];

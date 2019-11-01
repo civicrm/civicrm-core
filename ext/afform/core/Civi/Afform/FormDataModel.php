@@ -54,7 +54,7 @@ class FormDataModel {
       return;
     }
     foreach ($element['#children'] as $child) {
-      if (is_string($child)) {
+      if (is_string($child) || isset($child['#text'])) {
         //nothing
       }
       elseif (!empty($child['af-fieldset']) && !empty($child['#children'])) {
