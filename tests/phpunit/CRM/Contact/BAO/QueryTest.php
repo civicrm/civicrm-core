@@ -1028,46 +1028,6 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
-   * When we have a relative date in search criteria, check that convertFormValues() sets _low & _high date fields and returns other criteria.
-   * CRM-21816 fix relative dates in search bug
-   */
-  public function testConvertFormValuesCRM21816() {
-    $fv = [
-      // next 60 days
-      "member_end_date_relative" => "starting_2.month",
-      "member_end_date_low" => "20180101000000",
-      "member_end_date_high" => "20180331235959",
-      "membership_is_current_member" => "1",
-      "member_is_primary" => "1",
-    ];
-    // $fv is modified by convertFormValues()
-    $fv_orig = $fv;
-    $params = CRM_Contact_BAO_Query::convertFormValues($fv);
-
-    // restructure for easier testing
-    $modparams = [];
-    foreach ($params as $p) {
-      $modparams[$p[0]] = $p;
-    }
-
-    // Check member_end_date_low is in params
-    $this->assertTrue(is_array($modparams['member_end_date_low']));
-    // ... fv and params should match
-    $this->assertEquals($modparams['member_end_date_low'][2], $fv['member_end_date_low']);
-    // ... fv & fv_orig should be different
-    $this->assertNotEquals($fv['member_end_date_low'], $fv_orig['member_end_date_low']);
-
-    // same for member_end_date_high
-    $this->assertTrue(is_array($modparams['member_end_date_high']));
-    $this->assertEquals($modparams['member_end_date_high'][2], $fv['member_end_date_high']);
-    $this->assertNotEquals($fv['member_end_date_high'], $fv_orig['member_end_date_high']);
-
-    // Check other fv values are in params
-    $this->assertEquals($modparams['membership_is_current_member'][2], $fv_orig['membership_is_current_member']);
-    $this->assertEquals($modparams['member_is_primary'][2], $fv_orig['member_is_primary']);
-  }
-
-  /**
    * Create contributions to test summary calculations.
    *
    * financial type     | cancel_date        |total_amount| source    | line_item_financial_types  |number_line_items| line_amounts
@@ -1078,6 +1038,8 @@ civicrm_relationship.is_active = 1 AND
    * Donation           |NULL                | 300.00     |SSF         | Donation,Donation         | 2                | 200.00,100.00
    * Donation           |2019-02-13 00:00:00 | 50.00      |SSF         | Donation                  | 1                | 50.00
    * Member Dues        |2019-02-13 00:00:00 | 50.00      |SSF         | Member Dues               | 1                | 50.00
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function createContributionsForSummaryQueryTests() {
     $contactID = $this->individualCreate();

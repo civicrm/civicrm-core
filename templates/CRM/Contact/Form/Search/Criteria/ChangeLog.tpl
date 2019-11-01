@@ -26,49 +26,16 @@
 <div id="changelog" class="form-item">
   <table class="form-layout">
     <tr>
-      <td colspan="2">
-        {$form.log_date.html}
-      </td>
-    </tr>
-    <tr>
-      <td width="30%">
-        <span class="modifiedBy"><label>{ts}Modified By{/ts}</label></span>
-        <span class="hiddenElement addedBy"><label>{ts}Added By{/ts}</label></span>
-      </td>
       <td>
-        <span class="modifiedBy"><label>{ts}Modified Between{/ts}</label></span>
-        <span class="hiddenElement addedBy"><label>{ts}Added Between{/ts}</label></span>
-      </td>
-    </tr>
-    <tr>
-      <td>
+        <span class="modifiedBy"><label>{ts}Modified By{/ts}</label></span></br>
         {$form.changed_by.html}
       </td>
-      {include file="CRM/Core/DateRange.tpl" fieldName="log_date" from='_low' to='_high'}
+      <td>
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="created_date"}
+      </td>
+      <td>
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="modified_date"}
+      </td>
     </tr>
   </table>
 </div>
-
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      function updateChangeLogLabels() {
-        var changeType = $('input[name=log_date]:checked').val();
-        if (changeType == 2) {
-          $('.addedBy').hide();
-          $('.modifiedBy').show();
-        }
-        else {
-          if (changeType == 1) {
-            $('.addedBy').show();
-            $('.modifiedBy').hide();
-          }
-        }
-      }
-      $('[name=log_date]:input').change(updateChangeLogLabels);
-      updateChangeLogLabels();
-    });
-
-
-  </script>
-{/literal}
