@@ -263,6 +263,8 @@ class CRM_Contact_Form_Search_Criteria {
       'sort_name' => ['title' => ts('Complete OR Partial Name'), 'template_grouping' => 'basic'],
       'email' => ['title' => ts('Complete OR Partial Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
+      'created_date' => ['name' => 'created_date', 'template_grouping' => 'changeLog'],
+      'modified_date' => ['name' => 'modified_date', 'template_grouping' => 'changeLog'],
       'birth_date' => ['name' => 'birth_date', 'template_grouping' => 'demographic'],
       'deceased_date' => ['name' => 'deceased_date', 'template_grouping' => 'demographic'],
       'is_deceased' => ['is_deceased', 'template_grouping' => 'demographic'],
@@ -503,17 +505,15 @@ class CRM_Contact_Form_Search_Criteria {
 
   /**
    * @param CRM_Core_Form $form
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function changeLog(&$form) {
     $form->add('hidden', 'hidden_changeLog', 1);
-
+    $form->addSearchFieldMetadata(['Contact' => self::getFilteredSearchFieldMetadata('changeLog')]);
+    $form->addFormFieldsFromMetadata();
     // block for change log
     $form->addElement('text', 'changed_by', ts('Modified By'), NULL);
-
-    $dates = [1 => ts('Added'), 2 => ts('Modified')];
-    $form->addRadio('log_date', NULL, $dates, ['allowClear' => TRUE]);
-
-    CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
   }
 
   /**

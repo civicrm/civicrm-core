@@ -1600,41 +1600,6 @@ class CRM_Contact_BAO_Query {
     }
 
     self::filterCountryFromValuesIfStateExists($formValues);
-    // We shouldn't have to whitelist fields to not hack but here we are, for now.
-    $nonLegacyDateFields = [
-      'participant_register_date_relative',
-      'receive_date_relative',
-      'pledge_end_date_relative',
-      'pledge_create_date_relative',
-      'pledge_start_date_relative',
-      'pledge_payment_scheduled_date_relative',
-      'relationship_start_date_relative',
-      'relationship_end_date_relative',
-      'membership_join_date_relative',
-      'membership_start_date_relative',
-      'membership_end_date_relative',
-      'case_start_date_relative',
-      'case_end_date_relative',
-      'mailing_job_start_date_relative',
-      'birth_date_relative',
-      'deceased_date_relative',
-      'relation_active_period_date_relative',
-    ];
-    // Handle relative dates first
-    foreach (array_keys($formValues) as $id) {
-      if (
-        !in_array($id, $nonLegacyDateFields) && (
-        preg_match('/_date_relative$/', $id))
-      ) {
-        $dateComponent = explode('_date_relative', $id);
-        $fromRange = "{$dateComponent[0]}_date_low";
-        $toRange = "{$dateComponent[0]}_date_high";
-
-        if (array_key_exists($fromRange, $formValues) && array_key_exists($toRange, $formValues)) {
-          CRM_Contact_BAO_Query::fixDateValues($formValues[$id], $formValues[$fromRange], $formValues[$toRange]);
-        }
-      }
-    }
 
     foreach ($formValues as $id => $values) {
       if (self::isAlreadyProcessedForQueryFormat($values)) {
@@ -1691,13 +1656,6 @@ class CRM_Contact_BAO_Query {
         )
       ) {
         self::convertCustomRelativeFields($formValues, $params, $values, $id);
-      }
-      elseif (
-        !in_array($id, $nonLegacyDateFields) && (
-          preg_match('/_date_relative$/', $id))
-      ) {
-        // Already handled in previous loop
-        continue;
       }
       elseif (in_array($id, $entityReferenceFields) && !empty($values) && is_string($values) && (strpos($values, ',') !=
         FALSE)) {
@@ -3999,15 +3957,8 @@ WHERE  $smartGroupClause
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
-    $fieldTitle = ts('Added By');
-    foreach ($this->_params as $params) {
-      if ($params[0] == 'log_date') {
-        if ($params[2] == 2) {
-          $fieldTitle = ts('Modified By');
-        }
-        break;
-      }
-    }
+    $fieldTitle = ts('Altered By');
+
     list($qillop, $qillVal) = self::buildQillForFieldValue(NULL, 'changed_by', $name, 'LIKE');
     $this->_qill[$grouping][] = ts("%1 %2 '%3'", [
       1 => $fieldTitle,
@@ -5298,6 +5249,10 @@ civicrm_relationship.start_date > {$today}
     // @todo - remove dateFormat - pretty sure it's never passed in...
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
+    if ($tableName === 'civicrm_contact') {
+      // Special handling for contact table as it has a known alias in advanced search.
+      $tableName = 'contact_a';
+    }
     if ($name == "{$fieldName}_low" ||
       $name == "{$fieldName}_high"
     ) {

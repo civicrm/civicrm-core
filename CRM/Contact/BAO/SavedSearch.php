@@ -387,35 +387,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Store relative dates in separate array format
-   *
-   * @param array $queryParams
-   * @param array $formValues
-   * @deprecated
-   */
-  public static function saveRelativeDates(&$queryParams, $formValues) {
-    // This is required only until all fields are converted to datepicker fields as the new format is truer to the
-    // form format and simply saves (e.g) custom_3_relative => "this.year"
-    $relativeDates = ['relative_dates' => []];
-    $specialDateFields = [
-      'log_date_relative',
-    ];
-    foreach ($formValues as $id => $value) {
-      if (in_array($id, $specialDateFields) && !empty($value)) {
-        $entityName = strstr($id, '_date', TRUE);
-        if (empty($entityName)) {
-          $entityName = strstr($id, '_relative', TRUE);
-        }
-        $relativeDates['relative_dates'][$entityName] = $value;
-      }
-    }
-    // merge with original queryParams if relative date value(s) found
-    if (count($relativeDates['relative_dates'])) {
-      $queryParams = array_merge($queryParams, $relativeDates);
-    }
-  }
-
-  /**
    * Store search variables in $queryParams which were skipped while processing query params,
    * precisely at CRM_Contact_BAO_Query::fixWhereValues(...). But these variable are required in
    * building smart group criteria otherwise it will cause issues like CRM-18585,CRM-19571
