@@ -488,6 +488,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * CHeck that all tests that have created payments have created them with the right financial entities.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
+  }
+
+  /**
    * Create a batch of external API calls which can
    * be executed concurrently.
    *
@@ -1805,6 +1814,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Clean up financial entities after financial tests (so we remember to get all the tables :-))
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function quickCleanUpFinancialEntities() {
     $tablesToTruncate = [
@@ -3472,7 +3484,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
       $total = 0;
       foreach ($lineItems as $lineItem) {
-        $total += $lineItem['line_total'];
+        $total += $lineItem['line_total'] + (float) ($lineItem['tax_amount'] ?? 0);
       }
       $this->assertEquals($total, $contribution['total_amount']);
     }
