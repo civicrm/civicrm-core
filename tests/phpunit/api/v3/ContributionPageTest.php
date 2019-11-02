@@ -105,7 +105,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetBasicContributionPage($version) {
     $this->_apiversion = $version;
@@ -119,6 +122,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(1, $getResult['count']);
   }
 
+  /**
+   * Test retrieving the contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testGetContributionPageByAmount() {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->id = $createResult['id'];
@@ -273,6 +281,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test process with instant payment when more than one configured for the page.
    *
    * CRM-16923
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecurMultiProcessorInstantPayment() {
     $this->setUpContributionPage();

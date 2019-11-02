@@ -1020,6 +1020,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @param array $params
    *   Submitted values.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function submit($params) {
     //carry campaign from profile.
@@ -1028,6 +1030,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
+
+    $priceFieldOptions = $this->getPriceFieldSelection($this->_params);
 
     // @todo refactor this & leverage it from the unit tests.
     if (!empty($params['priceSetId'])) {
@@ -1041,7 +1045,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $priceOptions = [];
         while ($priceField->fetch()) {
           CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $priceOptions);
-          if (($selectedPriceOptionID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) != FALSE && $selectedPriceOptionID > 0) {
+          if (!empty($priceFieldOptions[$priceField->id])) {
+            $selectedPriceOptionID = $priceFieldOptions[$priceField->id];
             switch ($priceField->name) {
               case 'membership_amount':
                 $this->_params['selectMembership'] = $params['selectMembership'] = CRM_Utils_Array::value('membership_type_id', $priceOptions[$selectedPriceOptionID]);
@@ -1099,7 +1104,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
         foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount' && !empty($params['price_' . $fieldKey])) {
+          if ($fieldVal['name'] === 'membership_amount' && !empty($params['price_' . $fieldKey])) {
             $fieldId = $fieldVal['id'];
             $fieldOption = $params['price_' . $fieldId];
             $proceFieldAmount += $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
@@ -1335,6 +1340,31 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $this->controller = new CRM_Contribute_Controller_Contribution();
     $this->submit($params);
+  }
+
+  /**
+   * Get the subset of params that describes the selected price fields.
+   *
+   * e.g for each value like 'price_3' => 4 in params it will return [3 => 4].
+   *
+   * In this case the key is the price field and the value is either the price_field_id
+   * or, in the case of a text field, the quantity.
+   *
+   * @param array $submittedValues
+   *
+   * @return array
+   */
+  protected function getPriceFieldSelection($submittedValues) {
+    $priceFieldSelection = [];
+    foreach ($submittedValues as $fieldName => $value) {
+      if (strpos($fieldName, 'price_') === 0) {
+        $fieldID = substr($fieldName, 6);
+        if (is_numeric($fieldID)) {
+          $priceFieldSelection[$fieldID] = $value;
+        }
+      }
+    }
+    return $priceFieldSelection;
   }
 
 }
