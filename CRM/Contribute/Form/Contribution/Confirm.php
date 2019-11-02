@@ -1993,7 +1993,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($params['payment_processor_id'])) {
         $params['is_pay_later'] = 0;
       }
-      elseif ($params['amount'] !== 0) {
+      elseif (($params['amount'] ?? 0) !== 0) {
         $params['is_pay_later'] = civicrm_api3('contribution_page', 'getvalue', [
           'id' => $id,
           'return' => 'is_pay_later',
