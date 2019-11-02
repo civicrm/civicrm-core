@@ -44,16 +44,17 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     $this->assertEquals('First Name', $myField['defn']['title']);
   }
 
-  //public function testDefnOverrideTitle() {
-  //  $inputHtml = sprintf(self::PERSON_TPL,
-  //    '<div af-fieldset="person"><af-field name="first_name" defn="{title: \'Given name\'}" /></div>');
-  //  $filteredHtml = _afform_html_filter('~afform/MyForm.html', $inputHtml);
-  //  $converter = new \CRM_Afform_ArrayHtml(TRUE);
-  //  $parsed = $converter->convertHtmlToArray($filteredHtml);
-  //
-  //  $myField = $parsed[0]['#children'][1]['#children'][0];
-  //  $this->assertEquals('af-field', $myField['#tag']);
-  //  $this->assertEquals('Given name', $myField['defn']['title']);
-  //}
+  public function testDefnOverrideTitle() {
+    $inputHtml = sprintf(self::PERSON_TPL,
+      '<div af-fieldset="person"><af-field name="first_name" defn="{title: \'Given name\'}" /></div>');
+    $filteredHtml = _afform_html_filter('~afform/MyForm.html', $inputHtml);
+    $converter = new \CRM_Afform_ArrayHtml(TRUE);
+    $parsed = $converter->convertHtmlToArray($filteredHtml);
+
+    $myField = $parsed[0]['#children'][1]['#children'][0];
+    $this->assertEquals('af-field', $myField['#tag']);
+    $this->assertEquals('Given name', $myField['defn']['title']);
+    $this->assertEquals('Text', $myField['defn']['input_type']);
+  }
 
 }

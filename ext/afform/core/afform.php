@@ -329,7 +329,7 @@ function afform_civicrm_alterAngular($angular) {
             continue;
           }
           foreach ($field as &$prop) {
-            $prop = json_encode($prop, JSON_UNESCAPED_SLASHES);
+            $prop = htmlspecialchars(CRM_Utils_JS::encode($prop));
           }
           if ($existingFieldDefn) {
             $field = array_merge($field, CRM_Utils_JS::getRawProps($existingFieldDefn));
