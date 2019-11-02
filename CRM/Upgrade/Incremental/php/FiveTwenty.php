@@ -123,6 +123,9 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         ['old' => 'event_end_date_high', 'new' => 'event_high'],
       ],
     ]);
+    $this->addTask('Convert Log date searches to their final names either created date or modified date', 'updateSmartGroups', [
+      'renameLogFields' => [],
+    ]);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
       'datepickerConversion' => [
         'birth_date',
@@ -134,6 +137,8 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         'relationship_end_date',
         'event',
         'relation_active_period_date',
+        'created_date',
+        'modified_date',
       ],
     ]);
     $this->addTask('Clean up unused table "civicrm_persistent"', 'dropTableIfEmpty', 'civicrm_persistent');

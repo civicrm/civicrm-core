@@ -74,6 +74,8 @@ class CRM_Upgrade_Incremental_SmartGroups {
       'relationship_start_date' => 'relation_start',
       'relationship_end_date' => 'relation_end',
       'event' => 'event',
+      'created_date' => 'log',
+      'modified_date' => 'log',
     ];
 
     foreach ($fields as $field) {
@@ -252,6 +254,43 @@ class CRM_Upgrade_Incremental_SmartGroups {
     ])['values'];
     return $savedSearches;
 
+  }
+
+  /**
+   * Convert the log_date saved search date fields to their correct name
+   * default to switching to created_date as that is what the code did originally
+   */
+  public function renameLogFields() {
+    $addedDate = TRUE;
+    foreach ($this->getSearchesWithField('log_date') as $savedSearch) {
+      $formValues = $savedSearch['form_values'];
+      foreach ($formValues as $index => $formValue) {
+        if (isset($formValue[0]) && $formValue[0] === 'log_date') {
+          if ($formValue[2] == 2) {
+            $addedDate = FALSE;
+          }
+        }
+        if (isset($formValue[0]) && ($formValue[0] === 'log_date_high' || $formValue[0] === 'log_date_low')) {
+          $isHigh = substr($index, -5, 5) === '_high';
+          if ($addedDate) {
+            $fieldName = 'created_date';
+          }
+          else {
+            $fieldName = 'modified_date';
+          }
+          if ($isHigh) {
+            $fieldName .= '_high';
+          }
+          else {
+            $fieldName .= '_low';
+          }
+          $formValues[$index][0] = $fieldName;
+        }
+      }
+      if ($formValues !== $savedSearch['form_values']) {
+        civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $formValues]);
+      }
+    }
   }
 
 }
