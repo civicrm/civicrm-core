@@ -3360,4 +3360,34 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     return $orderParams;
   }
 
+  /**
+   * @param $payments
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validatePayments($payments) {
+    foreach ($payments as $payment) {
+      $items = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
+        'financial_trxn_id' => $payment['id'],
+        'entity_table' => 'civicrm_financial_item',
+        'return' => ['amount'],
+      ])['values'];
+      $itemTotal = 0;
+      foreach ($items as $item) {
+        $itemTotal += $item['amount'];
+      }
+      $this->assertEquals($payment['total_amount'], $itemTotal);
+    }
+  }
+
+  /**
+   * Validate all created payments.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateAllPayments() {
+    $payments = $this->callAPISuccess('Payment', 'get', ['options' => ['limit' => 0]])['values'];
+    $this->validatePayments($payments);
+  }
+
 }
