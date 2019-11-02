@@ -484,6 +484,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * CHeck that all tests that have created payments have created them with the right financial entities.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
+  }
+
+  /**
    * Create a batch of external API calls which can
    * be executed concurrently.
    *
@@ -1762,6 +1771,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Clean up financial entities after financial tests (so we remember to get all the tables :-))
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function quickCleanUpFinancialEntities() {
     $tablesToTruncate = array(
