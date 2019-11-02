@@ -282,7 +282,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         case '>=':
         case '<=':
           if ($isSerialized) {
-            continue;
+            break;
           }
           // To be precise in for these operator we can't just rely on one contact,
           // hence creating multiple contact with custom value less/more then $selectedValue respectively

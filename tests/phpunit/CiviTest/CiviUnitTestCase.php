@@ -85,7 +85,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Track tables we have modified during a test.
    * @var array
    */
-  protected $_tablesToTruncate = array();
+  protected $_tablesToTruncate = [];
 
   /**
    * @var array of temporary directory names
@@ -1522,7 +1522,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $params = array('title' => $function);
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
     $params['extends'] = $entity ? $entity : 'Contact';
-    $customGroup = $this->CustomGroupCreate($params);
+    $customGroup = $this->customGroupCreate($params);
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => $function));
     CRM_Core_PseudoConstant::flush();
 
@@ -1545,7 +1545,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $params = array('title' => $function);
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
     $params['extends'] = $entity ? $entity : 'Contact';
-    $customGroup = $this->CustomGroupCreate($params);
+    $customGroup = $this->customGroupCreate($params);
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => $function, 'html_type' => 'Multi-Select', 'default_value' => 1));
     CRM_Core_PseudoConstant::flush();
     $options = [
@@ -1852,10 +1852,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $fields = $this->callAPISuccess($entity, 'getfields', array('version' => 3, 'action' => 'get'));
     foreach ($fields['values'] as $field => $settings) {
       if (array_key_exists($field, $result)) {
-        $keys[CRM_Utils_Array::Value('name', $settings, $field)] = $field;
+        $keys[CRM_Utils_Array::value('name', $settings, $field)] = $field;
       }
       else {
-        $keys[CRM_Utils_Array::Value('name', $settings, $field)] = CRM_Utils_Array::value('name', $settings, $field);
+        $keys[CRM_Utils_Array::value('name', $settings, $field)] = CRM_Utils_Array::value('name', $settings, $field);
       }
       $type = CRM_Utils_Array::value('type', $settings);
       if ($type == CRM_Utils_Type::T_DATE) {
