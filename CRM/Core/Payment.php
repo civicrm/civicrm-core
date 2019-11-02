@@ -150,41 +150,6 @@ abstract class CRM_Core_Payment {
   protected $backOffice = FALSE;
 
   /**
-   * Contribution that is being paid.
-   *
-   * @var int
-   */
-  protected $contributionID;
-
-  /**
-   * Passed in parameters.
-   *
-   * Using individual getters & setters is preferred but these will be used if
-   * they are not available.
-   *
-   * @var array
-   */
-  protected $inputParams = [];
-
-  /**
-   * Get the contribution ID.
-   *
-   * We prefer the one set by the setter but traditional forms just pass in 'contributionID'.
-   *
-   * @return int
-   */
-  public function getContributionID(): int {
-    return $this->contributionID ?? $this->inputParams['contributionID'];
-  }
-
-  /**
-   * @param int $contributionID
-   */
-  public function setContributionID(int $contributionID) {
-    $this->contributionID = $contributionID;
-  }
-
-  /**
    * @return bool
    */
   public function isBackOffice() {
@@ -1279,7 +1244,6 @@ abstract class CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
-    $this->inputParams = $params;
     $this->_component = $component;
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
