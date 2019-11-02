@@ -440,4 +440,10 @@ function _civicrm_api3_payment_sendconfirmation_spec(&$params) {
     'title' => ts('From email; an email string or the id of a valid email'),
     'type' => CRM_Utils_Type::T_STRING,
   ];
+  $params['is_send_contribution_notification'] = [
+    'title' => ts('Send any event or contribution confirmations triggered by this payment'),
+    'description' => ts('If this payment completes a contribution it may mean receipts will go out according to busines logic if thie is set to TRUE'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => 0,
+  ];
 }

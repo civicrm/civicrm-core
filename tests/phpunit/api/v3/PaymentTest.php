@@ -621,6 +621,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'access CiviCRM', 'edit contributions'];
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
 
+    $this->validateAllPayments();
     // Check for proportional cancelled payment against lineitems.
     $minParams = [
       'entity_table' => 'civicrm_financial_item',
