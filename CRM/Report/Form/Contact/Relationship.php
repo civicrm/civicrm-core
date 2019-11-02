@@ -821,21 +821,18 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
    * @param string $from
    * @param string $to
    * @param string $type
-   * @param string $fromTime
-   * @param string $toTime
    *
    * @return null|string
    */
   public function activeClause(
     $fieldName,
-    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
-    ) {
+    $relative, $from, $to, $type = NULL) {
     $clauses = [];
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
       return NULL;
     }
 
-    list($from, $to) = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
+    list($from, $to) = $this->getFromTo($relative, $from, $to);
 
     if ($from) {
       $from = ($type == CRM_Utils_Type::T_DATE) ? substr($from, 0, 8) : $from;
