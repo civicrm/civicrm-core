@@ -214,7 +214,7 @@ class Container {
       throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
     }
     foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
-      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE);
+      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE)->setPublic(TRUE);
     }
 
     // Expose legacy singletons as services in the container.
