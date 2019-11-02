@@ -161,6 +161,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $mut->stop();
     $mut->clearMessages();
+    $this->validateAllPayments();
   }
 
   /**
@@ -175,6 +176,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // pay additional amount
     $this->submitPayment(70);
     $this->checkResults([30, 70], 2);
+    $this->validateAllPayments();
   }
 
   /**
@@ -207,6 +209,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Core_Session::singleton()->getLoggedInContactID(), $activities[0]['source_contact_id']);
     $this->assertEquals([$this->_individualId], $activities[0]['target_contact_id']);
     $this->assertEquals([], $activities[0]['assignee_contact_id']);
+    $this->validateAllPayments();
   }
 
   /**
@@ -251,6 +254,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
+    $this->validateAllPayments();
   }
 
   /**
@@ -281,6 +285,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
+    $this->validateAllPayments();
   }
 
   /**
@@ -303,6 +308,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // pay additional amount
     $this->submitPayment(30);
     $this->checkResults([30, 70], 2);
+    $this->validateAllPayments();
   }
 
   /**
@@ -320,6 +326,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $contributionMembership = $this->callAPISuccessGetSingle('Membership', ['id' => $membership['id']]);
     $membershipStatus = $this->callAPISuccessGetSingle('MembershipStatus', ['id' => $contributionMembership['status_id']]);
     $this->assertEquals('New', $membershipStatus['name']);
+    $this->validateAllPayments();
   }
 
   /**
@@ -385,6 +392,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->submitPayment(10);
     $this->checkResults([40, 20, 30, 10], 4);
+    $this->validateAllPayments();
   }
 
   /**
@@ -411,6 +419,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->submitPayment(10, 'live');
     $this->checkResults([50, 20, 20, 10], 4);
+    $this->validateAllPayments();
   }
 
   /**
