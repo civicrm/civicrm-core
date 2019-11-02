@@ -120,7 +120,17 @@ class CRM_Financial_BAO_Payment {
       }
     }
     elseif ($params['total_amount'] < 0) {
-      $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
+      list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($params['contribution_id']);
+      $trxnData = $params;
+      $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
+
+      $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
+
+      $trxnData['total_amount'] = $trxnData['net_amount'] = $trxnData['total_amount'];
+      $trxnData['from_financial_account_id'] = $arAccountId;
+      $trxnData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+      // record the entry
+      $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnData);
       if (!empty($params['cancelled_payment_id'])) {
         // Do a direct reversal of any entity_financial_trxn records being cancelled.
         $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
@@ -133,7 +143,7 @@ class CRM_Financial_BAO_Payment {
             'entity_table' => 'civicrm_financial_item',
             'entity_id' => $entityFinancialTrxn['entity_id'],
             'amount' => -$entityFinancialTrxn['amount'],
-            'financial_trxn_id' => $trxn->id,
+            'financial_trxn_id' => $financialTrxn->id,
           ]);
         }
       }
@@ -370,40 +380,6 @@ class CRM_Financial_BAO_Payment {
       $filteredParams[$templateVariable] = $params[$templateVariable];
     }
     return $filteredParams;
-  }
-
-  /**
-   * @param $contributionId
-   * @param $trxnData
-   * @param $updateStatus
-   *   - deprecate this param
-   *
-   * @return CRM_Financial_DAO_FinancialTrxn
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
-    list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
-
-    $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
-
-    $paidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
-    $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
-    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-
-    $trxnData['total_amount'] = $trxnData['net_amount'] = $trxnData['total_amount'];
-    $trxnData['from_financial_account_id'] = $arAccountId;
-    $trxnData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
-    // record the entry
-    $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnData);
-
-    // note : not using the self::add method,
-    // the reason because it performs 'status change' related code execution for financial records
-    // which in 'Pending Refund' => 'Completed' is not useful, instead specific financial record updates
-    // are coded below i.e. just updating financial_item status to 'Paid'
-    if ($updateStatus) {
-      CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $completedStatusId);
-    }
-    return $financialTrxn;
   }
 
   /**
