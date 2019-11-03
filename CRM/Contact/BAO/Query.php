@@ -579,6 +579,17 @@ class CRM_Contact_BAO_Query {
     $this->_whereTables = $this->_tables;
 
     $this->selectClause($apiEntity);
+    if (!empty($this->_cfIDs)) {
+      // @todo This function is the select function but instead of running 'select' it
+      // is running the whole query.
+      $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
+      $this->_customQuery->query();
+      $this->_select = array_merge($this->_select, $this->_customQuery->_select);
+      $this->_element = array_merge($this->_element, $this->_customQuery->_element);
+      $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
+      $this->_whereTables = array_merge($this->_whereTables, $this->_customQuery->_whereTables);
+      $this->_options = $this->_customQuery->_options;
+    }
     $isForcePrimaryOnly = !empty($apiEntity);
     $this->_whereClause = $this->whereClause($isForcePrimaryOnly);
     if (array_key_exists('civicrm_contribution', $this->_whereTables)) {
@@ -1029,18 +1040,6 @@ class CRM_Contact_BAO_Query {
     CRM_Core_Component::alterQuery($this, 'select');
 
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchQuery($this, 'select');
-
-    if (!empty($this->_cfIDs)) {
-      // @todo This function is the select function but instead of running 'select' it
-      // is running the whole query.
-      $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
-      $this->_customQuery->query();
-      $this->_select = array_merge($this->_select, $this->_customQuery->_select);
-      $this->_element = array_merge($this->_element, $this->_customQuery->_element);
-      $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
-      $this->_whereTables = array_merge($this->_whereTables, $this->_customQuery->_whereTables);
-      $this->_options = $this->_customQuery->_options;
-    }
   }
 
   /**
