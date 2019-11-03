@@ -940,11 +940,21 @@ class CRM_Utils_String {
   }
 
   /**
-   * Use xkerman/restricted-unserialize to unserialize a string of data.
+   * Safely unserialize a string of scalar or array values (but not objects!)
+   *
+   * Use `xkerman/restricted-unserialize` to unserialize strings using PHP's
+   * serialization format. `restricted-unserialize` works like PHP's built-in
+   * `unserialize` function except that it does not deserialize object instances,
+   * making it immune to PHP Object Injection {@see https://www.owasp.org/index.php/PHP_Object_Injection}
+   * vulnerabilities.
+   *
+   * Note: When dealing with user inputs, it is generally recommended to use
+   * safe, standard data interchange formats such as JSON rather than PHP's
+   * serialization format when dealing with user input.
+   *
    * @param string|NULL $string
    *
    * @return mixed
-   * @throws CRM_Core_Exception
    */
   public static function unserialize($string) {
     if (!is_string($string)) {
@@ -956,6 +966,6 @@ class CRM_Utils_String {
     catch (UnserializeFailedException $e) {
       return FALSE;
     }
-  } 
+  }
 
 }
