@@ -142,6 +142,9 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
       ],
     ]);
     $this->addTask('Clean up unused table "civicrm_persistent"', 'dropTableIfEmpty', 'civicrm_persistent');
+    $this->addTask('Convert Custom data based smart groups from jcalendar to datepicker', 'updateSmartGroups', [
+      'convertCustomSmartGroups' => NULL,
+    ]);
   }
 
   public static function templateStatus(CRM_Queue_TaskContext $ctx) {
