@@ -463,6 +463,8 @@ class CRM_Contact_BAO_Query {
    * @param string $operator
    * @param string $apiEntity
    * @param bool|null $primaryLocationOnly
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,
@@ -548,6 +550,8 @@ class CRM_Contact_BAO_Query {
    * @param string $apiEntity
    *   The api entity being called.
    *   This sort-of duplicates $mode in a confusing way. Probably not by design.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function initialize($apiEntity = NULL) {
     $this->_select = [];
@@ -3645,6 +3649,8 @@ WHERE  $smartGroupClause
    * Where / qill clause for phone type/location
    *
    * @param array $values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function phone_option_group($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -4040,6 +4046,8 @@ WHERE  $smartGroupClause
 
   /**
    * @param $values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function demographics(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
