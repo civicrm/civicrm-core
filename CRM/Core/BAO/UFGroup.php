@@ -2304,7 +2304,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   ) {
     if (!$componentId) {
       //get the contact details
-      list($contactDetails, $options) = CRM_Contact_BAO_Contact::getHierContactDetails($contactId, $fields);
+      $contactDetails = CRM_Contact_BAO_Contact::getHierContactDetails($contactId, $fields);
       $details = CRM_Utils_Array::value($contactId, $contactDetails);
       $multipleFields = ['website' => 'url'];
 
