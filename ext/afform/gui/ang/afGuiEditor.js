@@ -15,37 +15,28 @@
         $scope.meta = CRM.afformAdminData;
         $scope.controls = {};
         $scope.fieldList = {};
-        $scope.editor = this;
+        var editor = $scope.editor = this;
         var newForm = {
           title: ts('Untitled Form'),
           layout: [{
             '#tag': 'af-form',
             ctrl: 'modelListCtrl',
-            '#children': [
-              {
-                '#tag': 'af-entity',
-                type: 'Contact',
-                data: {
-                  contact_type: 'Individual'
-                },
-                name: 'Contact1',
-                label: 'Contact 1',
-                'url-autofill': '1',
-                autofill: 'user'
-              }
-            ]
+            '#children': []
           }]
         };
-        if ($scope.afGuiEditor.name) {
+        if ($scope.afGuiEditor.name && $scope.afGuiEditor.name != '0') {
+          // Todo - show error msg if form is not found
           crmApi4('Afform', 'get', {where: [['name', '=', $scope.afGuiEditor.name]], layoutFormat: 'shallow'}, 0)
             .then(initialize);
         }
         else {
-          initialize(newForm);
+          $timeout(function() {
+            initialize(_.cloneDeep(newForm));
+            editor.addEntity('Contact');
+          });
         }
 
         function initialize(afform) {
-          // Todo - show error msg if form is not found
           $scope.afform = afform;
           $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
           evaluate($scope.layout['#children']);
@@ -68,12 +59,29 @@
             label: entityType + ' ' + num
           };
           $scope.layout['#children'].unshift($scope.entities[entityType + num]);
-          this.selectEntity(entityType + num);
+          $scope.layout['#children'].push({
+            '#tag': 'fieldset',
+            'af-fieldset': entityType + num,
+            '#children': [
+              {
+                '#tag': 'legend',
+                'class': 'af-text',
+                '#children': [
+                  {
+                    '#text': entityType + ' ' + num
+                  }
+                ]
+              }
+            ]
+          });
+          buildFieldList(entityType + num);
+          return entityType + num;
         };
 
         this.removeEntity = function(entityName) {
           delete $scope.entities[entityName];
           _.remove($scope.layout['#children'], {'#tag': 'af-entity', name: entityName});
+          removeRecursive($scope.layout['#children'], {'af-fieldset': entityName});
           this.selectEntity(null);
         };
 
@@ -91,6 +99,11 @@
 
         this.getSelectedEntity = function() {
           return $scope.selectedEntity;
+        };
+
+        $scope.addEntity = function(entityType) {
+          var entityName = editor.addEntity(entityType);
+          editor.selectEntity(entityName);
         };
 
         $scope.rebuildFieldList = function() {
@@ -181,11 +194,11 @@
           _.each(collection, function (item) {
             if (_.isPlainObject(item)) {
               if (item['af-fieldset']) {
-                expandFields(item['#children'], $scope.editor.getEntity(item['af-fieldset']).type);
+                expandFields(item['#children'], editor.getEntity(item['af-fieldset']).type);
               }
               else if (item['#tag'] === 'af-field') {
                 item.defn = item.defn || {};
-                _.defaults(item.defn, _.cloneDeep(_.pick($scope.editor.getField(entityType, item.name), ['title', 'input_type', 'input_attrs'])));
+                _.defaults(item.defn, _.cloneDeep(_.pick(editor.getField(entityType, item.name), ['title', 'input_type', 'input_attrs'])));
               } else {
                 expandFields(item['#children'], entityType);
               }
@@ -219,6 +232,15 @@
       return str;
     }
     return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
+  }
+
+  function removeRecursive(collection, removeParams) {
+    _.remove(collection, removeParams);
+    _.each(collection, function(item) {
+      if (_.isPlainObject(item) && item['#children']) {
+        removeRecursive(item['#children'], removeParams);
+      }
+    });
   }
 
   angular.module('afGuiEditor').directive('afGuiBlock', function() {
@@ -320,19 +342,13 @@
         node: '=afGuiText'
       },
       require: '^^afGuiBlock',
-      link: {
-        pre: function($scope, element, attrs, block) {
-          $scope.block = block;
-        },
-        post: function($scope, element, attrs) {
-          if ($scope.block.node && $scope.block.node['#tag'] === 'fieldset') {
-            $scope.tags.legend = ts('Fieldset Legend');
-          }
-        }
+      link: function($scope, element, attrs, block) {
+        $scope.block = block;
       },
       controller: function($scope) {
         $scope.tags = {
           p: ts('Normal Text'),
+          legend: ts('Fieldset Legend'),
           h1: ts('Heading 1'),
           h2: ts('Heading 2'),
           h3: ts('Heading 3'),
