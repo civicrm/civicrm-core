@@ -463,6 +463,8 @@ class CRM_Contact_BAO_Query {
    * @param string $operator
    * @param string $apiEntity
    * @param bool|null $primaryLocationOnly
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,
@@ -548,6 +550,8 @@ class CRM_Contact_BAO_Query {
    * @param string $apiEntity
    *   The api entity being called.
    *   This sort-of duplicates $mode in a confusing way. Probably not by design.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function initialize($apiEntity = NULL) {
     $this->_select = [];
@@ -579,6 +583,17 @@ class CRM_Contact_BAO_Query {
     $this->_whereTables = $this->_tables;
 
     $this->selectClause($apiEntity);
+    if (!empty($this->_cfIDs)) {
+      // @todo This function is the select function but instead of running 'select' it
+      // is running the whole query.
+      $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
+      $this->_customQuery->query();
+      $this->_select = array_merge($this->_select, $this->_customQuery->_select);
+      $this->_element = array_merge($this->_element, $this->_customQuery->_element);
+      $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
+      $this->_whereTables = array_merge($this->_whereTables, $this->_customQuery->_whereTables);
+      $this->_options = $this->_customQuery->_options;
+    }
     $isForcePrimaryOnly = !empty($apiEntity);
     $this->_whereClause = $this->whereClause($isForcePrimaryOnly);
     if (array_key_exists('civicrm_contribution', $this->_whereTables)) {
@@ -651,7 +666,7 @@ class CRM_Contact_BAO_Query {
       if (empty($value[0])) {
         continue;
       }
-      $cfID = CRM_Core_BAO_CustomField::getKeyID(str_replace('_relative', '', $value[0]));
+      $cfID = CRM_Core_BAO_CustomField::getKeyID(str_replace(['_relative', '_low', '_high', '_to', '_high'], '', $value[0]));
       if ($cfID) {
         if (!array_key_exists($cfID, $this->_cfIDs)) {
           $this->_cfIDs[$cfID] = [];
@@ -1029,18 +1044,6 @@ class CRM_Contact_BAO_Query {
     CRM_Core_Component::alterQuery($this, 'select');
 
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchQuery($this, 'select');
-
-    if (!empty($this->_cfIDs)) {
-      // @todo This function is the select function but instead of running 'select' it
-      // is running the whole query.
-      $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
-      $this->_customQuery->query();
-      $this->_select = array_merge($this->_select, $this->_customQuery->_select);
-      $this->_element = array_merge($this->_element, $this->_customQuery->_element);
-      $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
-      $this->_whereTables = array_merge($this->_whereTables, $this->_customQuery->_whereTables);
-      $this->_options = $this->_customQuery->_options;
-    }
   }
 
   /**
@@ -3604,6 +3607,8 @@ WHERE  $smartGroupClause
    * Where / qill clause for phone type/location
    *
    * @param array $values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function phone_option_group($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3992,6 +3997,8 @@ WHERE  $smartGroupClause
 
   /**
    * @param $values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function demographics(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
