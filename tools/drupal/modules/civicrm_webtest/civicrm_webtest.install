@@ -4,7 +4,14 @@
  * Implementation of hook_enable
  */
 function civicrm_webtest_enable() {
-  user_role_grant_permissions(1, [
+  $anonymous = 1;
+  
+  // If Backdrop
+  if (function_exists('config_get')) {
+    $anonymous = 'Anonymous';
+  }
+
+  user_role_grant_permissions($anonymous, [
     'access CiviMail subscribe/unsubscribe pages',
     'access all custom data',
     'access uploaded files',
@@ -15,6 +22,7 @@ function civicrm_webtest_enable() {
   ]);
 
   $roles = user_roles();
+
   if (!in_array('civicrm_webtest_user', $roles)) {
     $role = new stdClass();
     $role->name = 'civicrm_webtest_user';
@@ -23,6 +31,17 @@ function civicrm_webtest_enable() {
   }
   else {
     $rid = array_search('civicrm_webtest_user', $roles);
+  }
+
+  // If Backdrop
+  if (function_exists('config_get')) {
+    $rid = 'civicrm_webtest_user';
+    if (!isset($roles[$rid])) {
+      $role = new stdClass();
+      $role->name = $rid;
+      $role->label = 'CiviCRM Webtest User';
+      user_role_save($role);
+    }
   }
 
   user_role_grant_permissions($rid, [
