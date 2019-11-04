@@ -516,6 +516,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    *
    * Test suite for CRM-14758: API ( contact, create ) does not always create related membership
    * and max_related property for Membership_Type and Membership entities
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateWithRelationship() {
     // Create membership type: inherited through employment, max_related = 2
@@ -691,6 +694,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * We are checking for no e-notices + only id & end_date returned
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipGetWithReturn() {
     $this->contactMembershipCreate($this->_params);
