@@ -25,6 +25,7 @@
 *}
 {* View Case Activities *}
 <div class="crm-block crm-content-block crm-case-activity-view-block">
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top" linkButtons=$actionLinks}</div>
   {if $revs}
     {strip}
       <table class="crm-info-panel">
@@ -77,7 +78,7 @@
       </table>
     {/if}
   {/if}
-  <div class="crm-submit-buttons">
-    {crmButton p='civicrm/case' q="reset=1" class='cancel' icon='times'}{ts}Done{/ts}{/crmButton}
-  </div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom" linkButtons=$actionLinks}</div>
 </div>
+
+{include file="CRM/Case/Form/ActivityToCase.tpl"}

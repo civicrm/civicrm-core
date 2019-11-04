@@ -204,6 +204,17 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       ],
     ];
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
+
+    $this->addButtons([
+      [
+        'type' => 'cancel',
+        'name' => ts('Done'),
+      ],
+    ]);
+    // Add additional action links
+    $activityDeleted = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityID, 'is_deleted');
+    $actionLinks = CRM_Case_Selector_Search::permissionedActionLinks($caseID, $contactID, CRM_Core_Session::getLoggedInContactID(), NULL, $activityTypeID, $activityDeleted, $activityID, FALSE);
+    $this->assign('actionLinks', $actionLinks);
   }
 
 }
