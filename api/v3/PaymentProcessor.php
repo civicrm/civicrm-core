@@ -131,15 +131,6 @@ function civicrm_api3_payment_processor_pay($params) {
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   try {
-    $processor->setContributionID($params['contribution_id']);
-    $processor->setInvoiceID($params['invoice_id'] ?? '');
-    if (!empty($params['contact_id'])) {
-      $processor->setContactID((int) $params['contact_id']);
-    }
-    if (!empty($params['contribution_recur_id'])) {
-      $processor->setContributionRecurID((int) $params['contribution_recur_id']);
-    }
-
     $result = $processor->doPayment($params);
   }
   catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
@@ -150,7 +141,7 @@ function civicrm_api3_payment_processor_pay($params) {
     }
     throw new API_Exception('Payment failed', $code, $errorData, $e);
   }
-  return civicrm_api3_create_success([$result], $params);
+  return civicrm_api3_create_success(array($result), $params);
 }
 
 /**
