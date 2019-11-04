@@ -6369,6 +6369,7 @@ AND   displayRelType.is_active = 1
    *
    * @return string
    *   list(string $orderByClause, string $additionalFromClause).
+   *
    * @throws \CRM_Core_Exception
    */
   protected function prepareOrderBy($sort, $sortOrder) {
