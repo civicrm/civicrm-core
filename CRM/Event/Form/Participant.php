@@ -483,7 +483,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     else {
       if ($this->_contactID) {
-        $defaults['contact_id'] = $this->_contactID;
+        $defaults[$this->_id]['contact_id'] = $this->_contactID;
       }
     }
 
