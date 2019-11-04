@@ -29,20 +29,23 @@
 {assign var='to' value=$to|default:'_high'}
 
   {if !$hideRelativeLabel}
-    {$form.$relativeName.label}<br />
+    <td class="label">
+      {$form.$relativeName.label}
+    </td>
   {/if}
-  {$form.$relativeName.html}<br />
-  <span class="crm-absolute-date-range">
-    <span class="crm-absolute-date-from">
-      {assign var=fromName value=$fieldName|cat:$from}
-      {$form.$fromName.label}
-      {$form.$fromName.html}
+  <td>
+    {$form.$relativeName.html}<br />
+    <span class="crm-absolute-date-range">
+      <span class="crm-absolute-date-from">
+        {assign var=fromName value=$fieldName|cat:$from}
+        {$form.$fromName.label}
+        {$form.$fromName.html}
+      </span>
+      <span class="crm-absolute-date-to">
+        {assign var=toName   value=$fieldName|cat:$to}
+        {$form.$toName.label}
+        {$form.$toName.html}
+      </span>
     </span>
-    <span class="crm-absolute-date-to">
-      {assign var=toName   value=$fieldName|cat:$to}
-      {$form.$toName.label}
-      {$form.$toName.html}
-    </span>
-  </span>
+  </td>
   {include file="CRM/Core/DatePickerRangejs.tpl" relativeName=$relativeName}
-

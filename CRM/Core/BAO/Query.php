@@ -47,8 +47,8 @@ class CRM_Core_BAO_Query {
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
           $elementName = 'custom_' . $fieldId;
-          if ($field['data_type'] == 'Date' && $field['is_search_range']) {
-            CRM_Core_Form_Date::buildDateRange($form, $elementName, 1, '_from', '_to', ts('From:'), FALSE);
+          if ($field['data_type'] === 'Date' && $field['is_search_range']) {
+            $form->addDatePickerRange($elementName, $field['label']);
           }
           else {
             CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
