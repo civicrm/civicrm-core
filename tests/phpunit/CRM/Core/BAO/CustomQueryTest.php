@@ -172,13 +172,15 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    */
   public function testSearchCustomDataFromAndTo() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
-    $datas = [
-      'Date' => '2015-06-06',
-      'Int' => 2,
-      'Float' => 12.123,
-      'Money' => 91.21,
+    $dataSet = [
+      'Date' => ['value' => '2015-06-06', 'sql_string' => '"20150606235959"', 'qill_string' => "'June 6th, 2015 11:59 PM'", 'qill_string_greater' => "'June 6th, 2015 12:00 AM'"],
+      // @todo - investigate the impact of using quotes on what should be an integer field.
+      'Int' => ['value' => 2, 'sql_string' => '"2"'],
+      'Float' => ['value' => 12.123, 'sql_string' => '"12.123"'],
+      'Money' => ['value' => 91.21],
     ];
-    foreach ($datas as $type => $data) {
+    foreach ($dataSet as $type => $values) {
+      $data = $values['value'];
       $isDate = ($type === 'Date');
       $customField = $this->customFieldCreate(
         [
@@ -191,14 +193,16 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       );
       $customFieldName = 'custom_' . $customField['id'];
 
-      $expectedValue = ($isDate) ? '"20150606235959"' : (($type == 'Money') ? $data : "\"$data\"");
-      $expectedQillValue = ($isDate) ? "'June 6th, 2015 11:59 PM'" : $data;
+      $expectedValue = $values['sql_string'] ?? $data;
+      $expectedQillValue = $values['qill_string'] ?? $data;
+      $toQillValue = chr(226) . chr(137) . chr(164) . ' ' . $expectedQillValue;
+      $fromQillValue = chr(226) . chr(137) . chr(165) . ' ' . ($values['qill_string_greater'] ?? $expectedQillValue);
 
       // Assigning the relevant form value to be within a custom key is normally done in
       // build field params. It would be better if it were all done in convertFormValues
       // but for now we just imitate it.
 
-      //Scenrio 2 : TO date filter
+      //Scenario 2 : TO date filter
       $formValues = [
         $customFieldName . '_to' => $data,
       ];
@@ -206,34 +210,32 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
       $queryObj->query();
-      $wierdStringThatMeansGreaterEquals = chr(226) . chr(137) . chr(164);
 
       $this->assertEquals(
-        "civicrm_value_testsearchcus_1." . strtolower($type) . "_field_{$customField['id']} <= $expectedValue",
+        'civicrm_value_testsearchcus_1.' . strtolower($type) . "_field_{$customField['id']} <= $expectedValue",
         $queryObj->_where[0][0]
       );
       $this->assertEquals($queryObj->_qill[0][0],
-        "$type field " . $wierdStringThatMeansGreaterEquals . " $expectedQillValue"
+        "$type field $toQillValue"
       );
 
-      //Scenrio 2 : FROM date filter
+      //Scenario 2 : FROM date filter
       $formValues = [
-        $customFieldName . '_from' => $data,
+        $customFieldName . '_from' => $values['value'],
       ];
 
       $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
       $queryObj->query();
-      $wierdStringThatMeansLessThanEquals = chr(226) . chr(137) . chr(165);
 
       $expectedValue = ($isDate) ? '"20150606000000"' : $expectedValue;
-      $expectedQillValue = ($isDate) ? "'June 6th, 2015 12:00 AM'" : $expectedQillValue;
       $this->assertEquals(
-        "civicrm_value_testsearchcus_1." . strtolower($type) . "_field_{$customField['id']} >= $expectedValue",
+        'civicrm_value_testsearchcus_1.' . strtolower($type) . "_field_{$customField['id']} >= $expectedValue",
         $queryObj->_where[0][0]
       );
-      $this->assertEquals($queryObj->_qill[0][0],
-        "$type field " . $wierdStringThatMeansLessThanEquals . " $expectedQillValue"
+      $this->assertEquals(
+        "$type field $fromQillValue",
+        $queryObj->_qill[0][0]
       );
     }
   }
