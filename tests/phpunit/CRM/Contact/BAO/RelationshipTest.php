@@ -243,6 +243,8 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $membershipType['id'],
       'contact_id' => $organisationID,
+      'start_date' => '2019-08-19',
+      'join_date' => '2019-07-19',
     ]);
 
     $relationshipOne = $this->callAPISuccess('Relationship', 'create', [
@@ -256,7 +258,10 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => $orgToPersonTypeId2,
     ]);
 
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $inheritedMembership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $individualID]);
+    $this->assertEquals('2019-08-19', $inheritedMembership['start_date']);
+    $this->assertEquals('2019-07-19', $inheritedMembership['join_date']);
+
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $organisationID], 1);
     // Disable the relationship & check the membership is not removed because the other relationship is still valid.
     $relationshipOne['is_active'] = 0;

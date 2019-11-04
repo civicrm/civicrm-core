@@ -1730,14 +1730,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         // contacts.
 
         // Get the Membership Type Details.
-        $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipValues['membership_type_id']);
+        $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipValues['membership_type_id']);
         // Check if contact's relationship type exists in membership type
         $relTypeDirs = [];
         if (!empty($membershipType['relationship_type_id'])) {
-          $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
+          $relTypeIds = (array) $membershipType['relationship_type_id'];
         }
         if (!empty($membershipType['relationship_direction'])) {
-          $relDirections = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
+          $relDirections = (array) $membershipType['relationship_direction'];
         }
         foreach ($relTypeIds as $key => $value) {
           $relTypeDirs[] = $value . '_' . $relDirections[$key];
@@ -1760,11 +1760,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
             ) {
               $membershipValues['status_id'] = $deceasedStatusId;
               $membershipValues['skipStatusCal'] = TRUE;
-            }
-            foreach (['join_date', 'start_date', 'end_date'] as $dateField) {
-              if (!empty($membershipValues[$dateField])) {
-                $membershipValues[$dateField] = CRM_Utils_Date::processDate($membershipValues[$dateField]);
-              }
             }
 
             if ($action & CRM_Core_Action::UPDATE) {
