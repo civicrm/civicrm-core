@@ -6,7 +6,7 @@ use Civi\Afform\FormDataModel;
 use Civi\Api4\Generic\Result;
 
 /**
- * Class Prefill
+ * Shared functionality for form submission processing.
  * @package Civi\Api4\Action\Afform
  */
 abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
