@@ -215,6 +215,11 @@ SELECT f.id, f.label, f.data_type,
 
     foreach (array_keys($this->_ids) as $id) {
       $field = $this->_fields[$id];
+
+      if ($this->_contactSearch && $field['search_table'] === 'contact_a') {
+        CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
+      }
+
       $name = $field['table_name'];
       $fieldName = 'custom_' . $field['id'];
       $this->_select["{$name}_id"] = "{$name}.id as {$name}_id";
@@ -240,9 +245,6 @@ SELECT f.id, f.label, f.data_type,
         }
         if ($joinTable != 'contact_a') {
           $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
-        }
-        elseif ($this->_contactSearch) {
-          CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
         }
       }
     }
