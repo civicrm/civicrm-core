@@ -719,6 +719,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   /**
    * Test Relationship Clause
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRelationshipClause() {
     $today = date('Ymd');
