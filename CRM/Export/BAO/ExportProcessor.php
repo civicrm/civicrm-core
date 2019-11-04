@@ -565,7 +565,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return mixed
    */
   public function getHouseholdRelationshipTypes() {
-    if (!$this->isMergeSameHousehold()) {
+    if (!$this->isMergeSameHousehold() && !$this->isMergeSameAddress()) {
       return [];
     }
     return [
@@ -973,18 +973,9 @@ class CRM_Export_BAO_ExportProcessor {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
-    $row = [];
     $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
     if ($householdMergeRelationshipType) {
-      $householdID = $this->getRelatedHouseholdID($iterationDAO->contact_id, $householdMergeRelationshipType);
-      if ($this->isHouseholdExported($householdID)) {
-        return FALSE;
-      }
-      foreach (array_keys($outputColumns) as $column) {
-        $row[$column] = $this->getRelationshipValue($householdMergeRelationshipType, $iterationDAO->contact_id, $column);
-      }
-      $this->markHouseholdExported($householdID);
-      return $row;
+      return $this->getRelatedHousehold($iterationDAO->contact_id, $outputColumns);
     }
 
     $query->convertToPseudoNames($iterationDAO);
@@ -1055,12 +1046,20 @@ class CRM_Export_BAO_ExportProcessor {
    *
    * @param $contactID
    *
-   * @return bool
+   * @return bool|string
    */
   public function getHouseholdMergeTypeForRow($contactID) {
-    if (!$this->isMergeSameHousehold()) {
-      return FALSE;
-    }
+    return $this->isMergeSameHousehold() ? $this->getHouseholdRelationshipType($contactID) : FALSE;
+  }
+
+  /**
+   * If this $contactID has a household whose details we should use get the relationship type key.
+   *
+   * @param $contactID
+   *
+   * @return string
+   */
+  public function getHouseholdRelationshipType($contactID) {
     foreach ($this->getHouseholdRelationshipTypes() as $relationshipType) {
       if (isset($this->relatedContactValues[$relationshipType][$contactID])) {
         return $relationshipType;
@@ -1384,7 +1383,7 @@ class CRM_Export_BAO_ExportProcessor {
    * be retrieved.
    */
   public function setHouseholdMergeReturnProperties() {
-    if ($this->isMergeSameHousehold()) {
+    if ($this->isMergeSameHousehold() || $this->isMergeSameAddress()) {
       $returnProperties = $this->getReturnProperties();
       $returnProperties = array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1));
       foreach ($this->getHouseholdRelationshipTypes() as $householdRelationshipType) {
@@ -2057,7 +2056,54 @@ DELETE FROM $tableName
 WHERE  id IN ( $deleteIDString )
 ";
       CRM_Core_DAO::executeQuery($sql);
+
+      // If a individual contact is linked with household, then the household contact should take precedence
+      // Get all individual contacts to find out if it has related household
+      $primaryContactIDs = explode(",", CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(DISTINCT civicrm_primary_id) FROM $tableName"));
+      list($outputColumns, $metadata) = $this->getExportStructureArrays();
+      $householdRows = [];
+      foreach ($primaryContactIDs as $primaryContactID) {
+        // if household found, store it in $householdRows, later used to replace the individual contacts with linked household
+        if (($row = $this->getRelatedHousehold($primaryContactID, $outputColumns)) && !empty($row)) {
+          $householdRows[$primaryContactID] = $row;
+        }
+      }
+
+      // replace the individual contacts with household
+      if (!empty($householdRows)) {
+        CRM_Export_BAO_Export::writeDetailsToTable($this, $householdRows, $this->getSQLColumns());
+        $deleteIDs = implode(',', array_keys($householdRows));
+        $sql = " DELETE FROM $tableName WHERE  civicrm_primary_id IN ( $deleteIDs ) ";
+        CRM_Core_DAO::executeQuery($sql);
+      }
     }
+  }
+
+  /**
+   * The function return the linked household contact of a given primary contact identified by $contactID
+   *
+   *
+   * @param int $contactID
+   * @param array $outputColumns
+   *
+   * @return mixed
+   */
+  public function getRelatedHousehold($contactID, $outputColumns) {
+    $householdRecord = [];
+    $householdMergeRelationshipType = $this->getHouseholdRelationshipType($contactID);
+    if ($householdMergeRelationshipType) {
+      $householdID = $this->getRelatedHouseholdID($contactID, $householdMergeRelationshipType);
+      if ($this->isHouseholdExported($householdID)) {
+        return FALSE;
+      }
+      foreach (array_keys($outputColumns) as $column) {
+        $householdRecord[$column] = $this->getRelationshipValue($householdMergeRelationshipType, $contactID, $column);
+      }
+      $this->markHouseholdExported($householdID);
+      return $householdRecord;
+    }
+
+    return FALSE;
   }
 
   /**
