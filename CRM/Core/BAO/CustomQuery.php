@@ -226,32 +226,15 @@ SELECT f.id, f.label, f.data_type,
       $this->_element["{$name}_id"] = 1;
       $this->_select[$fieldName] = "{$field['table_name']}.{$field['column_name']} as $fieldName";
       $this->_element[$fieldName] = 1;
-      $joinTable = $field['search_table'];
 
       $this->joinCustomTableForField($field);
-
-      if ($joinTable) {
-        $joinClause = 1;
-        $joinTableAlias = $joinTable;
-        // Set location-specific query
-        if (isset($this->_locationSpecificCustomFields[$id])) {
-          list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$id];
-          $joinTableAlias = "$locationType-address";
-          $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
-        }
-        $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
-        if (!empty($this->_ids[$id])) {
-          $this->_whereTables[$name] = $this->_tables[$name];
-        }
-        if ($joinTable != 'contact_a') {
-          $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
-        }
-      }
     }
   }
 
   /**
    * Generate the where clause and also the english language equivalent.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function where() {
     foreach ($this->_ids as $id => $values) {
@@ -483,6 +466,25 @@ SELECT f.id, f.label, f.data_type,
     $join = "\nLEFT JOIN $name ON $name.entity_id = {$field['search_table']}.id";
     $this->_tables[$name] = $this->_tables[$name] ?? $join;
     $this->_whereTables[$name] = $this->_whereTables[$name] ?? $join;
+
+    $joinTable = $field['search_table'];
+    if ($joinTable) {
+      $joinClause = 1;
+      $joinTableAlias = $joinTable;
+      // Set location-specific query
+      if (isset($this->_locationSpecificCustomFields[$field['id']])) {
+        list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$field['id']];
+        $joinTableAlias = "$locationType-address";
+        $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
+      }
+      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
+      if (!empty($this->_ids[$field['id']])) {
+        $this->_whereTables[$name] = $this->_tables[$name];
+      }
+      if ($joinTable !== 'contact_a') {
+        $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
+      }
+    }
   }
 
 }
