@@ -17,9 +17,11 @@
         $scope.getData = $scope.afFieldset.getData;
 
         $scope.getOptions = function() {
-          return _.transform($scope.defn.options, function(result, val, key) {
-            result.push({id: key, text: val});
-          }, []);
+          return {
+            results: _.transform($scope.defn.options, function(result, val, key) {
+              result.push({id: key, text: val});
+            }, [])
+          };
         };
 
         $el.addClass('af-field-type-' + _.kebabCase($scope.defn.input_type));
