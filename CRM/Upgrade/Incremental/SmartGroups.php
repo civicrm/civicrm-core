@@ -293,4 +293,37 @@ class CRM_Upgrade_Incremental_SmartGroups {
     }
   }
 
+  /**
+   * Convert Custom date fields in smart groups
+   */
+  public function convertCustomSmartGroups() {
+    $custom_date_fields = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_custom_field WHERE data_type = 'Date' AND is_search_range = 1");
+    while ($custom_date_fields->fetch()) {
+      $savedSearches = $this->getSearchesWithField('custom_' . $custom_date_fields->id);
+      foreach ($savedSearches as $savedSearch) {
+        $form_values = $savedSearch['form_values'];
+        foreach ($form_values as $index => $formValues) {
+          if ($formValues[0] === 'custom_' . $custom_date_fields->id && is_array($formValues[2])) {
+            if (isset($formValues[2]['BETWEEN'])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][0], FALSE)];
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][1], TRUE)];
+              unset($form_values[$index]);
+            }
+            if (isset($formValues[2]['>='])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['>='], FALSE)];
+              unset($form_values[$index]);
+            }
+            if (isset($formValues[2]['<='])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['<='], TRUE)];
+              unset($form_values[$index]);
+            }
+          }
+        }
+        if ($form_values !== $savedSearch['form_values']) {
+          civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $form_values]);
+        }
+      }
+    }
+  }
+
 }
