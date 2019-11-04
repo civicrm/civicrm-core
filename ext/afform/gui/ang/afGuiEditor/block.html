@@ -4,9 +4,14 @@
   <select class="pull-right" ng-model="node['#tag']">
     <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
   </select>
+  <div class="btn-group btn-group-xs pull-right" role="group">
+    <button type="button" class="btn btn-default" ng-class="{active: opt === getLayout()}" ng-repeat="(opt, label) in layouts" ng-click="setLayout(opt)" title="{{ label }}">
+      <i class="af-gui-layout-icon {{ opt }}" ></i>
+    </button>
+  </div>
 </div>
-<div ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]'}" ng-model="node['#children']">
-  <div ng-repeat="item in node['#children']">
+<div ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]'}" ng-model="node['#children']" class="af-gui-layout {{ getLayout() }}">
+  <div ng-repeat="item in node['#children']" ng-show="block.getNodeType(item)">
     <div ng-switch="block.getNodeType(item)">
       <div ng-switch-when="fieldset" af-gui-block="item" class="af-gui-block af-gui-fieldset" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />
       <div ng-switch-when="block" af-gui-block="item" class="af-gui-block" entity-name="entityName" />

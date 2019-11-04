@@ -38,6 +38,10 @@
 
         function initialize(afform) {
           $scope.afform = afform;
+          // Remove empty text nodes, they just create clutter
+          removeRecursive($scope.afform.layout, function(item) {
+            return ('#text' in item) && _.trim(item['#text']).length === 0;
+          });
           $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
           evaluate($scope.layout['#children']);
           $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
@@ -305,6 +309,24 @@
           fieldset: ts('Fieldset')
         };
 
+        $scope.layouts = {
+          'af-layout-rows': ts('Contents display as rows'),
+          'af-layout-cols': ts('Contents are evenly-spaced columns'),
+          'af-layout-inline': ts('Contents are arranged inline')
+        };
+
+        $scope.getLayout = function() {
+          return _.intersection(splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
+        };
+
+        $scope.setLayout = function(val) {
+          var classes = ['af-block'];
+          if (val !== 'af-layout-rows') {
+            classes.push(val);
+          }
+          $scope.block.modifyClasses($scope.node, _.keys($scope.layouts), classes);
+        };
+
       }
     };
   });
@@ -365,11 +387,11 @@
         };
 
         $scope.getAlign = function() {
-          return _.intersection(splitClass($scope.node['class']), _.keys($scope.alignments))[0];
+          return _.intersection(splitClass($scope.node['class']), _.keys($scope.alignments))[0] || 'text-left';
         };
 
         $scope.setAlign = function(val) {
-          $scope.block.modifyClasses($scope.node, _.keys($scope.alignments), val);
+          $scope.block.modifyClasses($scope.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
         };
       }
     };

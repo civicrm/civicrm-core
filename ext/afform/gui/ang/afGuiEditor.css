@@ -128,3 +128,29 @@
   left: 4px;
   top: 5px;
 }
+
+#afGuiEditor .af-gui-layout-icon {
+  width: 12px;
+  height: 11px;
+  display: block;
+  background-image: url('../images/icons.png');
+  background-repeat: no-repeat;
+  margin: 4px 1px;
+}
+#afGuiEditor .af-gui-layout-icon.af-layout-cols {
+  background-position: -12px 0;
+}
+#afGuiEditor .af-gui-layout-icon.af-layout-rows {
+  background-position: -24px 0;
+}
+
+#afGuiEditor .af-gui-layout.af-layout-cols {
+  display: flex;
+}
+#afGuiEditor .af-gui-layout.af-layout-cols > div {
+  flex: 1;
+}
+#afGuiEditor .af-gui-layout.af-layout-inline > div {
+  display: inline-block;
+  width: 300px;
+}

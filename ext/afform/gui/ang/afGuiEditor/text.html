@@ -4,7 +4,7 @@
     <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
   </select>
   <div class="btn-group btn-group-xs pull-right" role="group">
-    <button type="button" class="btn btn-default" ng-class="{active: (opt === getAlign()) || (opt === 'text-left' && !getAlign())}" ng-repeat="(opt, label) in alignments" ng-click="setAlign(opt)" title="{{ label }}">
+    <button type="button" class="btn btn-default" ng-class="{active: opt === getAlign()}" ng-repeat="(opt, label) in alignments" ng-click="setAlign(opt)" title="{{ label }}">
       <i class="crm-i fa-{{ opt.replace('text', 'align') }}" ></i>
     </button>
   </div>
