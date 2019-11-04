@@ -307,12 +307,15 @@ class CRM_Upgrade_Incremental_SmartGroups {
             if (isset($formValues[2]['BETWEEN'])) {
               $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][0], FALSE)];
               $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][1], TRUE)];
+              unset($form_values[$index]);
             }
             if (isset($formValues[2]['>='])) {
               $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['>='], FALSE)];
+              unset($form_values[$index]);
             }
             if (isset($formValues[2]['<='])) {
               $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['<='], TRUE)];
+              unset($form_values[$index]);
             }
           }
         }

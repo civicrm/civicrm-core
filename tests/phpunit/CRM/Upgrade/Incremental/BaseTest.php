@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
+  use CRMTraits_Custom_CustomDataTrait;
 
   public function tearDown() {
     $this->quickCleanup(['civicrm_saved_search']);
@@ -343,6 +344,62 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $this->assertEquals([], $savedSearch['form_values']['relative_dates']);
     $this->assertEquals(['relationship_start_date_relative', '=', 'this.month'], $savedSearch['form_values'][4]);
     $this->assertEquals(['relationship_end_date_relative', '=', 'this.month'], $savedSearch['form_values'][5]);
+  }
+
+  /**
+   * Test convert custom saved search
+   */
+  public function testSmartGroupCustomDateRangeSearch() {
+    $this->entity = 'Contact';
+    $this->createCustomGroupWithFieldOfType([], 'date');
+    $dateCustomFieldName = $this->getCustomFieldName('date');
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        [$dateCustomFieldName . '_relative', '=', 0],
+        [$dateCustomFieldName, '=', ['BETWEEN' => ['20191001000000', '20191031235959']]],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        [$dateCustomFieldName . '_relative', '=', 0],
+        [$dateCustomFieldName, '=', ['>=' => '20191001000000']],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        [$dateCustomFieldName . '_relative', '=', 0],
+        [$dateCustomFieldName, '=', ['<=' => '20191031235959']],
+      ],
+    ]);
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        [$dateCustomFieldName . '_relative', '=', 'this.month'],
+      ],
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->convertCustomSmartGroups();
+    $expectedResults = [
+      1 => [
+        0 => [$dateCustomFieldName . '_relative', '=', 0],
+        2 => [$dateCustomFieldName . '_low', '=', '2019-10-01 00:00:00'],
+        3 => [$dateCustomFieldName . '_high', '=', '2019-10-31 23:59:59'],
+      ],
+      2 => [
+        0 => [$dateCustomFieldName . '_relative', '=', 0],
+        2 => [$dateCustomFieldName . '_low', '=', '2019-10-01 00:00:00'],
+      ],
+      3 => [
+        0 => [$dateCustomFieldName . '_relative', '=', 0],
+        2 => [$dateCustomFieldName . '_high', '=', '2019-10-31 23:59:59'],
+      ],
+      4 => [
+        0 => [$dateCustomFieldName . '_relative', '=', 'this.month'],
+      ],
+    ];
+    $savedSearches = $this->callAPISuccess('SavedSearch', 'get', []);
+    foreach ($savedSearches['values'] as $id => $savedSearch) {
+      $this->assertEquals($expectedResults[$id], $savedSearch['form_values']);
+    }
   }
 
   /**
