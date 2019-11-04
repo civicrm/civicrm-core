@@ -81,7 +81,7 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_END = 'END';
 
   /**
-   * @var object
+   * @var array
    */
   protected $_paymentProcessor;
 
@@ -257,8 +257,6 @@ abstract class CRM_Core_Payment {
    * @todo move to factory class \Civi\Payment\System (or similar)
    *
    * @param array $params
-   *
-   * @return mixed
    */
   public static function logPaymentNotification($params) {
     $message = 'payment_notification ';
