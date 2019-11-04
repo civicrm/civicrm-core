@@ -1660,7 +1660,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
       // CRM-15829 UPDATES
       // Since we want PENDING memberships as well, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE, TRUE);
+      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE);
       // CRM-15829 UPDATES
       // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1462
       foreach ($memberships as $key => $membership) {
@@ -1672,17 +1672,15 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         if (!isset($membershipStatusRecordIds[$membershipStatusId])) {
           unset($memberships[$key]);
         }
+        //get ownerMembershipIds for related Membership
+        //this is to handle memberships being deleted and recreated
+        if (!empty($membership['owner_membership_id'])) {
+          $ownerMemIds[$cid] = $membership['owner_membership_id'];
+        }
       }
 
       if (empty($memberships)) {
         continue;
-      }
-
-      //get ownerMembershipIds for related Membership
-      //this is to handle memberships being deleted and recreated
-      if (!empty($memberships['owner_membership_ids'])) {
-        $ownerMemIds[$cid] = $memberships['owner_membership_ids'];
-        unset($memberships['owner_membership_ids']);
       }
 
       $values[$cid]['memberships'] = $memberships;
