@@ -591,7 +591,6 @@ class CRM_Contact_BAO_Query {
       $this->_select = array_merge($this->_select, $this->_customQuery->_select);
       $this->_element = array_merge($this->_element, $this->_customQuery->_element);
       $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
-      $this->_whereTables = array_merge($this->_whereTables, $this->_customQuery->_whereTables);
       $this->_options = $this->_customQuery->_options;
     }
     $isForcePrimaryOnly = !empty($apiEntity);
@@ -2077,12 +2076,12 @@ class CRM_Contact_BAO_Query {
     }
 
     if ($this->_customQuery) {
+      $this->_whereTables = array_merge($this->_whereTables, $this->_customQuery->_whereTables);
       // Added following if condition to avoid the wrong value display for 'my account' / any UF info.
       // Hope it wont affect the other part of civicrm.. if it does please remove it.
       if (!empty($this->_customQuery->_where)) {
         $this->_where = CRM_Utils_Array::crmArrayMerge($this->_where, $this->_customQuery->_where);
       }
-
       $this->_qill = CRM_Utils_Array::crmArrayMerge($this->_qill, $this->_customQuery->_qill);
     }
 
@@ -2154,7 +2153,8 @@ class CRM_Contact_BAO_Query {
         $realFieldName = str_replace(['_high', '_low'], '', $name);
         if (isset($this->_fields[$realFieldName])) {
           $field = $this->_fields[str_replace(['_high', '_low'], '', $realFieldName)];
-          $this->dateQueryBuilder($values, $field['table_name'], $realFieldName, $field['name'], $field['title']);
+          $columnName = $field['column_name'] ?? $field['name'];
+          $this->dateQueryBuilder($values, $field['table_name'], $realFieldName, $columnName, $field['title']);
         }
         return;
       }
@@ -5298,13 +5298,16 @@ civicrm_relationship.start_date > {$today}
   ) {
     // @todo - remove dateFormat - pretty sure it's never passed in...
     list($name, $op, $value, $grouping, $wildcard) = $values;
-
+    if ($name !== $fieldName && $name !== "{$fieldName}_low" && $name !== "{$fieldName}_high") {
+      CRM_Core_Error::deprecatedFunctionWarning('Date query builder called unexpectedly');
+      return;
+    }
     if ($tableName === 'civicrm_contact') {
       // Special handling for contact table as it has a known alias in advanced search.
       $tableName = 'contact_a';
     }
-    if ($name == "{$fieldName}_low" ||
-      $name == "{$fieldName}_high"
+    if ($name === "{$fieldName}_low" ||
+      $name === "{$fieldName}_high"
     ) {
       if (isset($this->_rangeCache[$fieldName]) || !$value) {
         return;
@@ -5360,7 +5363,6 @@ civicrm_relationship.start_date > {$today}
         $secondDateFormat = CRM_Utils_Date::customFormat($secondDate);
       }
 
-      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
       if ($secondDate) {
         $highDBFieldName = $highDBFieldName ?? $dbFieldName;
         $this->_where[$grouping][] = "
@@ -5411,11 +5413,13 @@ civicrm_relationship.start_date > {$today}
         $this->_where[$grouping][] = self::buildClause("{$tableName}.{$dbFieldName}", $op);
       }
 
-      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
-
       $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
       $this->_qill[$grouping][] = "$fieldTitle $op $format";
     }
+
+    // Ensure the tables are set, but don't whomp anything.
+    $this->_tables[$tableName] = $this->_tables[$tableName] ?? 1;
+    $this->_whereTables[$tableName] = $this->_whereTables[$tableName] ?? 1;
   }
 
   /**

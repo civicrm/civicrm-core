@@ -578,7 +578,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       $this->getCustomFieldName('select_date') => [
         'name' => $this->getCustomFieldName('select_date'),
         'type' => 4,
-        'title' => 'test_date',
+        'title' => 'Test Date',
         'headerPattern' => '//',
         'import' => 1,
         'custom_field_id' => $this->getCustomFieldID('select_date'),
@@ -590,7 +590,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'date_format' => 'mm/dd/yy',
         'time_format' => '1',
         'id' => $this->getCustomFieldID('select_date'),
-        'label' => 'test_date',
+        'label' => 'Test Date',
         'groupTitle' => 'Custom Group',
         'default_value' => '20090711',
         'custom_group_id' => $customGroupID,
