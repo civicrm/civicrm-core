@@ -396,7 +396,9 @@ SELECT f.id, f.label, f.data_type,
             break;
 
           case 'Date':
-            if (substr($name, -9, 9) !== '_relative') {
+            if (substr($name, -9, 9) !== '_relative'
+              && substr($name, -4, 4) !== '_low'
+              && substr($name, -5, 5) !== '_high') {
               // Relative dates are handled in the buildRelativeDateQuery function.
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
               list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);

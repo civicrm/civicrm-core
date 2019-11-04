@@ -310,7 +310,7 @@ trait CRMTraits_Custom_CustomDataTrait {
   protected function createDateCustomField($params): array {
     $params = array_merge([
       'name' => 'test_date',
-      'label' => 'test_date',
+      'label' => 'Test Date',
       'html_type' => 'Select Date',
       'data_type' => 'Date',
       'default_value' => '20090711',

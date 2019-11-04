@@ -90,6 +90,38 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test filtering by the renamed custom date fields.
+   *
+   * The conversion to date picker will result int these fields
+   * being renamed _high & _low and needing to return correctly.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSearchCustomDataDateHighLow() {
+    $this->createCustomGroupWithFieldOfType([], 'date');
+    $dateCustomFieldName = $this->getCustomFieldName('date');
+    // Assigning the relevant form value to be within a custom key is normally done in
+    // build field params. It would be better if it were all done in convertFormValues
+    // but for now we just imitate it.
+    $formValues = [
+      $dateCustomFieldName . '_low' => '2014-06-06',
+      $dateCustomFieldName . '_high' => '2015-06-06',
+    ];
+
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $queryObject = new CRM_Contact_BAO_Query($params);
+    $queryObject->query();
+    $this->assertEquals(
+      '( civicrm_value_group_with_fi_1.' . $this->getCustomFieldColumnName('date') . ' >= \'20140606000000\' ) AND
+( civicrm_value_group_with_fi_1.' . $this->getCustomFieldColumnName('date') . ' <= \'20150606235959\' )',
+      trim($queryObject->_where[0][0])
+    );
+    $this->assertEquals('Test Date - greater than or equal to "June 6th, 2014 12:00 AM" AND less than or equal to "June 6th, 2015 11:59 PM"', $queryObject->_qill[0][0]);
+    $this->assertEquals(1, $queryObject->_whereTables['civicrm_contact']);
+    $this->assertEquals('LEFT JOIN ' . $this->getCustomGroupTable() . ' ON ' . $this->getCustomGroupTable() . '.entity_id = `contact_a`.id', trim($queryObject->_whereTables[$this->getCustomGroupTable()]));
+  }
+
+  /**
    * Test filtering by relative custom data dates.
    *
    * @throws \CRM_Core_Exception
