@@ -1763,11 +1763,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               $membershipValues['status_id'] = $deceasedStatusId;
               $membershipValues['skipStatusCal'] = TRUE;
             }
-            foreach (['join_date', 'start_date', 'end_date'] as $dateField) {
-              if (!empty($membershipValues[$dateField])) {
-                $membershipValues[$dateField] = CRM_Utils_Date::processDate($membershipValues[$dateField]);
-              }
-            }
 
             if ($action & CRM_Core_Action::UPDATE) {
               //if updated relationship is already related to contact don't delete existing inherited membership
