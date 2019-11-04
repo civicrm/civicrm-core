@@ -148,7 +148,7 @@ class CRM_Core_BAO_CustomQuery {
    * @param array $locationSpecificFields
    */
   public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = []) {
-    $this->_ids = &$ids;
+    $this->_ids = $ids;
     $this->_locationSpecificCustomFields = $locationSpecificFields;
 
     $this->_select = [];
@@ -222,10 +222,6 @@ SELECT f.id, f.label, f.data_type,
       $this->_select[$fieldName] = "{$field['table_name']}.{$field['column_name']} as $fieldName";
       $this->_element[$fieldName] = 1;
       $joinTable = $field['search_table'];
-      // CRM-14265
-      if ($joinTable == 'civicrm_group' || empty($joinTable)) {
-        return;
-      }
 
       $this->joinCustomTableForField($field);
 
