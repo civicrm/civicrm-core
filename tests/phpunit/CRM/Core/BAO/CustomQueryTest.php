@@ -52,8 +52,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       "civicrm_value_testsearchcus_1.date_field_2 BETWEEN '" . date('Y') . "0101000000' AND '" . date('Y') . "1231235959'",
       $queryObj->_where[0][0]
     );
-    $this->assertEquals("date field is This calendar year (between January 1st, " . date('Y') . " 12:00 AM and December 31st, " . date('Y') . " 11:59 PM)", $queryObj->_qill[0][0]);
-    $queryObj = new CRM_Core_BAO_CustomQuery($params);
+    $this->assertEquals('date field is This calendar year (between January 1st, ' . date('Y') . " 12:00 AM and December 31st, " . date('Y') . " 11:59 PM)", $queryObj->_qill[0][0]);
+    $queryObj = new CRM_Contact_BAO_Query($params);
     $this->assertEquals([
       'id' => $dateCustomField['id'],
       'label' => 'date field',
@@ -84,7 +84,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       'name' => 'custom_' . $dateCustomField['id'],
       'type' => 4,
       'where' => 'civicrm_value_testsearchcus_' . $ids['custom_group_id'] . '.date_field_' . $dateCustomField['id'],
-    ], $queryObj->getFields()[$dateCustomField['id']]);
+      'import' => 1,
+    ], $queryObj->getFieldSpec('custom_' . $dateCustomField['id']));
 
   }
 
@@ -111,8 +112,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $dateCustomFieldName . '_to' => '2015-06-06',
     ];
 
-    $params[$dateCustomField['id']] = CRM_Contact_BAO_Query::convertFormValues($formValues);
-    $queryObj = new CRM_Core_BAO_CustomQuery($params);
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $queryObj = new CRM_Contact_BAO_Query($params);
     $queryObj->query();
     $this->assertEquals(
       'civicrm_value_testsearchcus_1.date_field_2 BETWEEN "20140606000000" AND "20150606235959"',
@@ -127,6 +128,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
   /**
    * Test filtering by relative custom data.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchCustomDataFromTo() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
@@ -156,11 +159,11 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
         $customFieldName . '_to' => $to,
       ];
 
-      $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
-      $queryObj = new CRM_Core_BAO_CustomQuery($params);
+      $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+      $queryObj = new CRM_Contact_BAO_Query($params);
       $queryObj->query();
       $this->assertEquals(
-        "civicrm_value_testsearchcus_1." . strtolower($type) . "_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
+        'civicrm_value_testsearchcus_1.' . strtolower($type) . "_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
         $queryObj->_where[0][0]
       );
       $this->assertEquals($queryObj->_qill[0][0], "$type field BETWEEN $from, $to");
@@ -169,6 +172,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
   /**
    * Test filtering by relative custom data.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchCustomDataFromAndTo() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
@@ -207,8 +212,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
         $customFieldName . '_to' => $data,
       ];
 
-      $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
-      $queryObj = new CRM_Core_BAO_CustomQuery($params);
+      $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+      $queryObj = new CRM_Contact_BAO_Query($params);
       $queryObj->query();
 
       $this->assertEquals(
@@ -224,8 +229,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
         $customFieldName . '_from' => $values['value'],
       ];
 
-      $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
-      $queryObj = new CRM_Core_BAO_CustomQuery($params);
+      $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+      $queryObj = new CRM_Contact_BAO_Query($params);
       $queryObj->query();
 
       $expectedValue = ($isDate) ? '"20150606000000"' : $expectedValue;
@@ -260,8 +265,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     // build field params. It would be better if it were all done in convertFormValues
     // but for now we just imitate it.
     $formValues = [$dateCustomFieldName => '2015-06-06'];
-    $params[$dateCustomField['id']] = CRM_Contact_BAO_Query::convertFormValues($formValues);
-    $queryObj = new CRM_Core_BAO_CustomQuery($params);
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $queryObj = new CRM_Contact_BAO_Query($params);
     $queryObj->query();
 
     $this->assertEquals(
