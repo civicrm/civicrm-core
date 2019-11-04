@@ -507,6 +507,8 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    */
   public function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
     $diffs = [];
+    $this->resetTableColumnsCache();
+
     foreach ($this->tables as $table) {
       if (empty($this->logs[$table])) {
         $this->createLogTableFor($table);
@@ -523,6 +525,17 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       // invoke the meta trigger creation call
       CRM_Core_DAO::triggerRebuild(NULL, TRUE);
     }
+  }
+
+  /**
+   * Resets columnSpecs.
+   *
+   * Resets columnSpecs static array in Civi's $statics to make sure we use the
+   * real state of the schema to perform sync operations between core and
+   * logging tables.
+   */
+  private function resetTableColumnsCache() {
+    unset(\Civi::$statics[__CLASS__]['columnSpecs']);
   }
 
   /**
