@@ -122,6 +122,43 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test filtering by the renamed custom date fields.
+   *
+   * The conversion to date picker will result int these fields
+   * being renamed _high & _low and needing to return correctly.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSearchCustomDataDateLowWithPermsInPlay() {
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access all custom data'];
+    $this->createCustomGroupWithFieldOfType([], 'date');
+    $dateCustomFieldName = $this->getCustomFieldName('date');
+    // Assigning the relevant form value to be within a custom key is normally done in
+    // build field params. It would be better if it were all done in convertFormValues
+    // but for now we just imitate it.
+    $formValues = [
+      $dateCustomFieldName . '_low' => '2014-06-06',
+    ];
+
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $queryObject = new CRM_Contact_BAO_Query($params);
+    $queryObject->query();
+    $this->assertEquals(
+      'civicrm_value_group_with_fi_1.' . $this->getCustomFieldColumnName('date') . ' >= \'20140606000000\'',
+      trim($queryObject->_where[0][0])
+    );
+    $this->assertEquals(
+      'FROM civicrm_contact contact_a   LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )  LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id )  LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)  LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1)  LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1)  LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id  
+LEFT JOIN ' . $this->getCustomGroupTable() . ' ON ' . $this->getCustomGroupTable() . '.entity_id = `contact_a`.id',
+      trim($queryObject->_fromClause)
+    );
+    $this->assertEquals('Test Date - greater than or equal to "June 6th, 2014 12:00 AM"', $queryObject->_qill[0][0]);
+    $this->assertEquals(1, $queryObject->_whereTables['civicrm_contact']);
+    $this->assertEquals('LEFT JOIN ' . $this->getCustomGroupTable() . ' ON ' . $this->getCustomGroupTable() . '.entity_id = `contact_a`.id', trim($queryObject->_whereTables[$this->getCustomGroupTable()]));
+  }
+
+  /**
    * Test filtering by relative custom data dates.
    *
    * @throws \CRM_Core_Exception

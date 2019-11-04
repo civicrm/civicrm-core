@@ -5298,7 +5298,10 @@ civicrm_relationship.start_date > {$today}
   ) {
     // @todo - remove dateFormat - pretty sure it's never passed in...
     list($name, $op, $value, $grouping, $wildcard) = $values;
-
+    if ($name !== $fieldName && $name !== "{$fieldName}_low" && $name !== "{$fieldName}_high") {
+      CRM_Core_Error::deprecatedFunctionWarning('Date query builder called unexpectedly');
+      return;
+    }
     if ($tableName === 'civicrm_contact') {
       // Special handling for contact table as it has a known alias in advanced search.
       $tableName = 'contact_a';
@@ -5360,7 +5363,6 @@ civicrm_relationship.start_date > {$today}
         $secondDateFormat = CRM_Utils_Date::customFormat($secondDate);
       }
 
-      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
       if ($secondDate) {
         $highDBFieldName = $highDBFieldName ?? $dbFieldName;
         $this->_where[$grouping][] = "
@@ -5411,11 +5413,13 @@ civicrm_relationship.start_date > {$today}
         $this->_where[$grouping][] = self::buildClause("{$tableName}.{$dbFieldName}", $op);
       }
 
-      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
-
       $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
       $this->_qill[$grouping][] = "$fieldTitle $op $format";
     }
+
+    // Ensure the tables are set, but don't whomp anything.
+    $this->_tables[$tableName] = $this->_tables[$tableName] ?? 1;
+    $this->_whereTables[$tableName] = $this->_whereTables[$tableName] ?? 1;
   }
 
   /**
