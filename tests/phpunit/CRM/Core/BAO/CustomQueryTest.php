@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
+  use CRMTraits_Custom_CustomDataTrait;
 
   /**
    * Restore database to empty state.
@@ -23,6 +24,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
   /**
    * Test filtering by relative custom data dates.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchCustomDataDateRelative() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
@@ -87,6 +90,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
   /**
    * Test filtering by relative custom data dates.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchCustomDataDateFromTo() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
@@ -108,7 +113,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
     $params[$dateCustomField['id']] = CRM_Contact_BAO_Query::convertFormValues($formValues);
     $queryObj = new CRM_Core_BAO_CustomQuery($params);
-    $queryObj->Query();
+    $queryObj->query();
     $this->assertEquals(
       'civicrm_value_testsearchcus_1.date_field_2 BETWEEN "20140606000000" AND "20150606235959"',
       $queryObj->_where[0][0]
@@ -153,7 +158,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
       $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
-      $queryObj->Query();
+      $queryObj->query();
       $this->assertEquals(
         "civicrm_value_testsearchcus_1." . strtolower($type) . "_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
         $queryObj->_where[0][0]
@@ -200,7 +205,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
       $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
-      $queryObj->Query();
+      $queryObj->query();
       $wierdStringThatMeansGreaterEquals = chr(226) . chr(137) . chr(164);
 
       $this->assertEquals(
@@ -218,7 +223,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
       $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
-      $queryObj->Query();
+      $queryObj->query();
       $wierdStringThatMeansLessThanEquals = chr(226) . chr(137) . chr(165);
 
       $expectedValue = ($isDate) ? '"20150606000000"' : $expectedValue;
@@ -235,6 +240,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
   /**
    * Test filtering by relative custom data dates.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchCustomDataDateEquals() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
@@ -253,13 +260,45 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $formValues = [$dateCustomFieldName => '2015-06-06'];
     $params[$dateCustomField['id']] = CRM_Contact_BAO_Query::convertFormValues($formValues);
     $queryObj = new CRM_Core_BAO_CustomQuery($params);
-    $queryObj->Query();
+    $queryObj->query();
 
     $this->assertEquals(
       "civicrm_value_testsearchcus_1.date_field_2 = '2015-06-06'",
       $queryObj->_where[0][0]
     );
     $this->assertEquals($queryObj->_qill[0][0], "date field = 'June 6th, 2015'");
+  }
+
+  /**
+   * Test search builder style query including custom address fields.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAddressCustomFields() {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'int');
+    $individualID = $this->individualCreate();
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $individualID,
+      'street_address' => '10 Downing Street',
+      'location_type_id' => 'Home',
+      $this->getCustomFieldName('int') => 5,
+    ]);
+
+    $queryObject = new CRM_Contact_BAO_Query(
+      [[$this->getCustomFieldName('int') . '-1', '=', 5, 1, 0]],
+      ['contact_type' => 1, 'location' => ['Home' => ['location_type' => 1, $this->getCustomFieldName('int') => 1]]]
+    );
+    $queryObject->query();
+    $tableName = $this->getCustomGroupTable();
+    $fieldName = $this->getCustomFieldColumnName('int');
+
+    $this->assertEquals([], $queryObject->_where[0]);
+    $this->assertEquals($tableName . '.' . $fieldName . ' = 5', implode(', ', $queryObject->_where[1]));
+    $this->assertEquals(1, $queryObject->_whereTables['civicrm_contact']);
+    $this->assertEquals('LEFT JOIN civicrm_address `Home-address` ON (`Home-address`.contact_id = contact_a.id AND `Home-address`.location_type_id = 1)', trim($queryObject->_whereTables['Home-address']));
+    $this->assertEquals("LEFT JOIN {$tableName} ON {$tableName}.entity_id = `Home-address`.id", trim($queryObject->_whereTables[$tableName]));
+    $this->assertEquals([], $queryObject->_qill[0]);
+    $this->assertEquals(['Enter integer here = 5'], $queryObject->_qill[1]);
   }
 
 }
