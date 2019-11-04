@@ -1769,7 +1769,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    */
   public static function getHierContactDetails($contactId, $fields) {
     $params = [['contact_id', '=', $contactId, 0, 0]];
-    $options = [];
 
     $returnProperties = self::makeHierReturnProperties($fields, $contactId);
 
@@ -1780,7 +1779,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $returnProperties['household_name'] = 1;
     $returnProperties['contact_type'] = 1;
     $returnProperties['contact_sub_type'] = 1;
-    return list($query, $options) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, $options);
+    list($query) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties);
+    return $query;
   }
 
   /**
@@ -2115,7 +2115,7 @@ ORDER BY civicrm_email.is_primary DESC";
 
     // get the contact details (hier)
     if ($contactID) {
-      list($details, $options) = self::getHierContactDetails($contactID, $fields);
+      $details = self::getHierContactDetails($contactID, $fields);
 
       $contactDetails = $details[$contactID];
       $data['contact_type'] = CRM_Utils_Array::value('contact_type', $contactDetails);
