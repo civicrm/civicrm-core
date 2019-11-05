@@ -4380,6 +4380,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //Assert if first payment and repeated payment has the same contribution amount.
     $this->assertEquals($payments[0]['total_amount'], $payments[1]['total_amount']);
     $this->callAPISuccessGetCount('Contribution', [], 2);
+
+    //Assert line item records.
+    $lineItems = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
+    foreach ($lineItems as $lineItem) {
+      $this->assertEquals($lineItem['unit_price'], $this->_params['total_amount']);
+      $this->assertEquals($lineItem['line_total'], $this->_params['total_amount']);
+    }
+    $this->callAPISuccessGetCount('Contribution', [], 2);
   }
 
   public function testGetCurrencyOptions() {
