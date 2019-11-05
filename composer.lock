@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0ac00e2168797fa522d7a6f036a5e296",
+    "content-hash": "ec0b6779b9262fd5c0b41d3eb4d5f109",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -2274,6 +2274,57 @@
                 "time"
             ],
             "time": "2019-01-11T21:59:13+00:00"
+        },
+        {
+            "name": "xkerman/restricted-unserialize",
+            "version": "1.1.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/xKerman/restricted-unserialize.git",
+                "reference": "4c6cadbb176c04d3e19b9bb8b40df12998460489"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/xKerman/restricted-unserialize/zipball/4c6cadbb176c04d3e19b9bb8b40df12998460489",
+                "reference": "4c6cadbb176c04d3e19b9bb8b40df12998460489",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "require-dev": {
+                "nikic/php-parser": "^1.4|^3.0|^4.2",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^4.8|^5.7|^6.5|^7.4|^8.2",
+                "sebastian/phpcpd": "^2.0|^3.0|^4.1",
+                "squizlabs/php_codesniffer": "^2.9|^3.4"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/function.php"
+                ],
+                "psr-4": {
+                    "xKerman\\Restricted\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "xKerman",
+                    "email": "xKhorasan@gmail.com"
+                }
+            ],
+            "description": "provide PHP Object Injection safe unserialize function",
+            "keywords": [
+                "PHP Object Injection",
+                "deserialize",
+                "unserialize"
+            ],
+            "time": "2019-08-11T00:04:39+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
