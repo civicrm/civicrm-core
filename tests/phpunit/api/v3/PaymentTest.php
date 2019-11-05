@@ -38,12 +38,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   protected $_financialTypeId = 1;
 
-  protected $_apiversion;
-
-  public $debug = 0;
-
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp() {
     parent::setUp();
@@ -67,6 +65,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test Get Payment api.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetPayment() {
     $p = [
@@ -105,10 +105,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
+    $this->validateAllPayments();
   }
 
   /**
    * Retrieve Payment using trxn_id.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetPaymentWithTrxnID() {
     $this->_individualId2 = $this->individualCreate();
@@ -151,10 +154,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
+    $this->validateAllPayments();
   }
 
   /**
    * Test email receipt for partial payment.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentEmailReceipt() {
     $mut = new CiviMailUtils($this);
@@ -196,6 +202,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
+    $this->validateAllPayments();
   }
 
   /**
@@ -229,6 +236,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
+    $this->validateAllPayments();
   }
 
   /**
@@ -237,6 +245,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @dataProvider getThousandSeparators
    *
    * @param string $thousandSeparator
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRefundEmailReceipt($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -282,6 +292,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
+    $this->validateAllPayments();
   }
 
   /**
@@ -295,6 +306,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'order_id' => $order['id'],
       'total_amount' => 50,
     ]);
+    $this->validateAllPayments();
   }
 
   /**
@@ -373,6 +385,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
+    $this->validateAllPayments();
   }
 
   /**
@@ -461,9 +474,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $paymentParticipant);
     $participant = $this->callAPISuccess('participant', 'get', ['id' => $participantPayment['participant_id']]);
     $this->assertEquals($participant['values'][$participant['id']]['participant_status'], 'Registered');
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
+    $this->validateAllPayments();
   }
 
   /**
@@ -502,10 +513,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
+    $this->validateAllPayments();
   }
 
   /**
    * Test delete payment api
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testDeletePayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
@@ -607,6 +621,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'access CiviCRM', 'edit contributions'];
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
 
+    $this->validateAllPayments();
     // Check for proportional cancelled payment against lineitems.
     $minParams = [
       'entity_table' => 'civicrm_financial_item',
@@ -662,10 +677,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
+    $this->validateAllPayments();
   }
 
   /**
    * Test create payment api for paylater contribution
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentPayLater() {
     $this->createLoggedInUser();
@@ -726,12 +744,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
+    $this->validateAllPayments();
   }
 
   /**
    * Test create payment api for pay later contribution with partial payment.
    *
    * https://lab.civicrm.org/dev/financial/issues/69
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentIncompletePaymentPartialPayment() {
     $contributionParams = [
@@ -749,6 +769,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $payments = $this->callAPISuccess('Payment', 'get', ['contribution_id' => $contribution['id']])['values'];
     $this->assertCount(1, $payments);
+    $this->validateAllPayments();
   }
 
   /**
@@ -839,6 +860,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('OptionValue', 'get', ['name' => 'Completed', 'option_group_id' => 'contribution_status', 'api.OptionValue.create' => ['label' => 'Completed']]);
     $this->callAPISuccessGetCount('Activity', ['target_contact_id' => $this->_individualId, 'activity_type_id' => 'Payment'], 2);
+    $this->validateAllPayments();
   }
 
   /**
@@ -894,6 +916,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'loc_block_id' => $location['id'],
       'is_show_location' => TRUE,
     ]);
+    $this->validateAllPayments();
   }
 
   /**
@@ -922,6 +945,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals($eft['values'][$eft['id']]['amount'], $amount);
+    $this->validateAllPayments();
   }
 
 }

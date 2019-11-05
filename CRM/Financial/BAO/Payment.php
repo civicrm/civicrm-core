@@ -49,7 +49,6 @@ class CRM_Financial_BAO_Payment {
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -81,109 +80,58 @@ class CRM_Financial_BAO_Payment {
       $paymentTrxnParams['trxn_id'] = $paymentTrxnParams['contribution_trxn_id'];
     }
 
+    $paymentTrxnParams['currency'] = $contribution['currency'];
+
+    $accountsReceivableAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
+    $paymentTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
+    $paymentTrxnParams['from_financial_account_id'] = $accountsReceivableAccount;
+
     if ($params['total_amount'] > 0) {
-      $paymentTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
-      $paymentTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
-      $paymentTrxnParams['currency'] = $contribution['currency'];
       $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
-
-      $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
-
-      // @todo - this is pretty much the same as the next section now - just
-      // the getFinancialItem retrieval needs consolidating - one gets by line item, the other by
-      // price field id. One must be right the other wrong - which is which?
-      if (!empty($params['line_item']) && !empty($trxn)) {
-        foreach ($params['line_item'] as $values) {
-          foreach ($values as $id => $amount) {
-            $p = ['id' => $id];
-            $check = CRM_Price_BAO_LineItem::retrieve($p, $defaults);
-            if (empty($check)) {
-              throw new API_Exception('Please specify a valid Line Item.');
-            }
-            // get financial item
-            $sql = "SELECT fi.id
-            FROM civicrm_financial_item fi
-            INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
-            WHERE li.contribution_id = %1 AND li.id = %2";
-            $sqlParams = [
-              1 => [$params['contribution_id'], 'Integer'],
-              2 => [$id, 'Integer'],
-            ];
-            $fid = CRM_Core_DAO::singleValueQuery($sql, $sqlParams);
-            // Record Entity Financial Trxn
-            $eftParams = [
-              'entity_table' => 'civicrm_financial_item',
-              'financial_trxn_id' => $trxn->id,
-              'amount' => $amount,
-              'entity_id' => $fid,
-            ];
-            civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
-          }
-        }
-      }
-      elseif (!empty($trxn)) {
-        if (!empty($lineItems)) {
-          // @todo the difference between this and the above loop is that we are linking the
-          // financial trxn in the above loop to the last financial item that relates to the line item but
-          // here to the last financial item that relates to the price field value.
-          // Likely this difference is because one of them handles updated text fields correctly and the other
-          // doesn't - but which is which?
-          // Note that getPayableLineItems is probably the right place to determine this - see the todo there.
-          list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
-
-          foreach ($lineItems as $key => $value) {
-            if ($value['qty'] == 0 || $value['allocation'] === (float) 0) {
-              continue;
-            }
-            $eftParams = [
-              'entity_table' => 'civicrm_financial_item',
-              'financial_trxn_id' => $trxn->id,
-              'entity_id' => $ftIds[$value['price_field_value_id']],
-              'amount' => $value['allocation'],
-            ];
-
-            civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
-
-            if (array_key_exists($value['price_field_value_id'], $taxItems)) {
-              // @todo - this is expected to be broken - it should be fixed to
-              // a) have the getPayableLineItems add the amount to allocate for tax
-              // b) call EntityFinancialTrxn directly - per above.
-              // - see https://github.com/civicrm/civicrm-core/pull/14763
-              $entityParams = [
-                'contribution_total_amount' => $contribution['total_amount'],
-                'trxn_total_amount' => $params['total_amount'],
-                'trxn_id' => $trxn->id,
-                'line_item_amount' => $taxItems[$value['price_field_value_id']]['amount'],
-              ];
-              $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
-              CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
-            }
-          }
-        }
-      }
     }
     elseif ($params['total_amount'] < 0) {
-      $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
-      if (!empty($params['cancelled_payment_id'])) {
-        // Do a direct reversal of any entity_financial_trxn records being cancelled.
-        $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
-          'entity_table' => 'civicrm_financial_item',
-          'options' => ['limit' => 0],
-          'financial_trxn_id.id' => $params['cancelled_payment_id'],
-        ])['values'];
-        foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
-          civicrm_api3('EntityFinancialTrxn', 'create', [
-            'entity_table' => 'civicrm_financial_item',
-            'entity_id' => $entityFinancialTrxn['entity_id'],
-            'amount' => -$entityFinancialTrxn['amount'],
-            'financial_trxn_id' => $trxn->id,
-          ]);
-        }
+      $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+    }
+
+    $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
+
+    if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
+      self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
+      return $trxn;
+    }
+    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
+
+    foreach ($lineItems as $key => $value) {
+      if ($value['qty'] == 0 || $value['allocation'] === (float) 0) {
+        continue;
+      }
+      $eftParams = [
+        'entity_table' => 'civicrm_financial_item',
+        'financial_trxn_id' => $trxn->id,
+        'entity_id' => $ftIds[$value['price_field_value_id']],
+        'amount' => $value['allocation'],
+      ];
+
+      civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+
+      if (array_key_exists($value['price_field_value_id'], $taxItems)) {
+        // @todo - this is expected to be broken - it should be fixed to
+        // a) have the getPayableLineItems add the amount to allocate for tax
+        // b) call EntityFinancialTrxn directly - per above.
+        // - see https://github.com/civicrm/civicrm-core/pull/14763
+        $entityParams = [
+          'contribution_total_amount' => $contribution['total_amount'],
+          'trxn_total_amount' => $params['total_amount'],
+          'trxn_id' => $trxn->id,
+          'line_item_amount' => $taxItems[$value['price_field_value_id']]['amount'],
+        ];
+        $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
+        CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
       }
     }
 
     if ($isPaymentCompletesContribution) {
-      if ($contributionStatus == 'Pending refund') {
+      if ($contributionStatus === 'Pending refund') {
         // Ideally we could still call completetransaction as non-payment related actions should
         // be outside this class. However, for now we just update the contribution here.
         // Unit test cover in CRM_Event_BAO_AdditionalPaymentTest::testTransactionInfo.
@@ -206,7 +154,7 @@ class CRM_Financial_BAO_Payment {
         $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams);
       }
     }
-    elseif ($contributionStatus === 'Pending') {
+    elseif ($contributionStatus === 'Pending' && $params['total_amount'] > 0) {
       self::updateContributionStatus($contribution['id'], 'Partially Paid');
     }
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
@@ -320,6 +268,8 @@ class CRM_Financial_BAO_Payment {
    * @param int $contributionID
    *
    * @return int
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getPaymentContactID($contributionID) {
     $contribution = civicrm_api3('Contribution', 'getsingle', [
@@ -416,61 +366,6 @@ class CRM_Financial_BAO_Payment {
   }
 
   /**
-   * @param $contributionId
-   * @param $trxnData
-   * @param $updateStatus
-   *   - deprecate this param
-   *
-   * @return CRM_Financial_DAO_FinancialTrxn
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
-    list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
-
-    $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
-
-    $paidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
-    $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
-    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-
-    $trxnData['total_amount'] = $trxnData['net_amount'] = $trxnData['total_amount'];
-    $trxnData['from_financial_account_id'] = $arAccountId;
-    $trxnData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
-    // record the entry
-    $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnData);
-
-    // note : not using the self::add method,
-    // the reason because it performs 'status change' related code execution for financial records
-    // which in 'Pending Refund' => 'Completed' is not useful, instead specific financial record updates
-    // are coded below i.e. just updating financial_item status to 'Paid'
-    if ($updateStatus) {
-      CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $completedStatusId);
-    }
-    return $financialTrxn;
-  }
-
-  /**
-   * The recordFinancialTransactions function has capricious requirements for input parameters - load them.
-   *
-   * The function needs rework but for now we need to give it what it wants.
-   *
-   * @param int $contributionId
-   *
-   * @return array
-   */
-  protected static function getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId) {
-    $getInfoOf['id'] = $contributionId;
-    $defaults = [];
-    $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults);
-
-    // build params for recording financial trxn entry
-    $params['contribution'] = $contributionDAO;
-    $params = array_merge($defaults, $params);
-    $params['skipLineItem'] = TRUE;
-    return [$contributionDAO, $params];
-  }
-
-  /**
    * Does this payment complete the contribution
    *
    * @param int $contributionID
@@ -518,11 +413,17 @@ class CRM_Financial_BAO_Payment {
    * @param $params
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
    */
   protected static function getPayableLineItems($params): array {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
-    $lineItemOverrides = CRM_Utils_Array::value('line_item', $params, []);
+    $lineItemOverrides = [];
+    if (!empty($params['line_item'])) {
+      // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
+      // Squash to [1 => 10, 2 => 40]
+      foreach ($params['line_item'] as $lineItem) {
+        $lineItemOverrides += $lineItem;
+      }
+    }
     $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($params['contribution_id']);
     if ($outstandingBalance !== 0.0) {
       $ratio = $params['total_amount'] / $outstandingBalance;
@@ -573,6 +474,33 @@ class CRM_Financial_BAO_Payment {
       }
     }
     return (float) $paid;
+  }
+
+  /**
+   * Reverse the entity financial transactions associated with the cancelled payment.
+   *
+   * The reversals are linked to the new payemnt.
+   *
+   * @param array $params
+   * @param int $trxnID
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function reverseAllocationsFromPreviousPayment($params, $trxnID) {
+    // Do a direct reversal of any entity_financial_trxn records being cancelled.
+    $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
+      'entity_table' => 'civicrm_financial_item',
+      'options' => ['limit' => 0],
+      'financial_trxn_id.id' => $params['cancelled_payment_id'],
+    ])['values'];
+    foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
+      civicrm_api3('EntityFinancialTrxn', 'create', [
+        'entity_table' => 'civicrm_financial_item',
+        'entity_id' => $entityFinancialTrxn['entity_id'],
+        'amount' => -$entityFinancialTrxn['amount'],
+        'financial_trxn_id' => $trxnID,
+      ]);
+    }
   }
 
 }
