@@ -646,7 +646,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       return;
     }
 
-    $contactField = $this->addEntityRef('contact_id', ts('Contact'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Participant'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
     if ($this->_context != 'standalone') {
       $contactField->freeze();
     }
