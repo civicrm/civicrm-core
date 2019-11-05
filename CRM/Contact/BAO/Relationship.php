@@ -1650,42 +1650,26 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     while ($dao->fetch()) {
       $membershipStatusRecordIds[$dao->id] = $dao->id;
     }
+    $deceasedStatusId = array_search('Deceased', CRM_Member_PseudoConstant::membershipStatus());
 
     // Now get the active memberships for all the contacts.
     // If contact have any valid membership(s), then add it to
     // 'values' array.
     foreach ($values as $cid => $subValues) {
-      $memParams = ['contact_id' => $cid];
-      $memberships = [];
+      $memberships = civicrm_api3('Membership', 'get', [
+        'contact_id' => $cid,
+        'status_id' => ['IN' => $membershipStatusRecordIds],
+      ])['values'];
 
-      // CRM-15829 UPDATES
-      // Since we want PENDING memberships as well, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE);
-      // CRM-15829 UPDATES
-      // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1462
       foreach ($memberships as $key => $membership) {
-
-        if (!isset($memberships[$key]['status_id'])) {
-          continue;
-        }
-        $membershipStatusId = $memberships[$key]['status_id'];
-        if (!isset($membershipStatusRecordIds[$membershipStatusId])) {
-          unset($memberships[$key]);
-        }
         //get ownerMembershipIds for related Membership
         //this is to handle memberships being deleted and recreated
         if (!empty($membership['owner_membership_id'])) {
           $ownerMemIds[$cid] = $membership['owner_membership_id'];
         }
       }
-
-      if (empty($memberships)) {
-        continue;
-      }
-
       $values[$cid]['memberships'] = $memberships;
     }
-    $deceasedStatusId = array_search('Deceased', CRM_Member_PseudoConstant::membershipStatus());
 
     // done with 'values' array.
     // Finally add / edit / delete memberships for the related contacts
@@ -1710,7 +1694,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           // @todo don't return relTypeId here - but it seems to be used later in a cryptic way (hint cryptic is not a complement).
           list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid);
           if ($isDeletable) {
-            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
+            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['contact_id']);
           }
           continue;
         }
@@ -1721,7 +1705,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           // If relationship is PAST and action is UPDATE
           // then delete the RELATED membership
           CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'],
-            $membershipValues['membership_contact_id']
+            $membershipValues['contact_id']
           );
           continue;
         }
@@ -1750,7 +1734,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
           $membershipValues['owner_membership_id'] = $membershipId;
           unset($membershipValues['id']);
-          unset($membershipValues['membership_contact_id']);
           unset($membershipValues['contact_id']);
           unset($membershipValues['membership_id']);
           foreach ($details['relatedContacts'] as $relatedContactId => $donCare) {
