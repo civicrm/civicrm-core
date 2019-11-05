@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ec0b6779b9262fd5c0b41d3eb4d5f109",
+    "content-hash": "fc2b275e88919949aad21babc71c1706",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -2230,23 +2230,16 @@
         },
         {
             "name": "tplaner/when",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tplaner/When.git",
-                "reference": "c1ec099f421bff354cc5c929f83b94031423fc80"
-            },
+            "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tplaner/When/zipball/c1ec099f421bff354cc5c929f83b94031423fc80",
-                "reference": "c1ec099f421bff354cc5c929f83b94031423fc80",
-                "shasum": ""
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.0"
+                "phpunit/phpunit": "~4.0"
             },
             "type": "library",
             "autoload": {
@@ -2254,7 +2247,6 @@
                     "When\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2267,13 +2259,11 @@
             "description": "Date/Calendar recursion library.",
             "homepage": "https://github.com/tplaner/When",
             "keywords": [
+                "DateTime",
                 "date",
-                "datetime",
                 "recurrence",
-                "repeat",
                 "time"
-            ],
-            "time": "2019-01-11T21:59:13+00:00"
+            ]
         },
         {
             "name": "xkerman/restricted-unserialize",
@@ -2616,7 +2606,7 @@
                 {
                     "name": "Tobias Nyholm",
                     "email": "tobias.nyholm@gmail.com",
-                    "homepage": "https://github.com/nyholm"
+                    "homepage": "https://github.com/Nyholm"
                 },
                 {
                     "name": "Nicolas Grekas",
@@ -2806,7 +2796,6 @@
     "stability-flags": {
         "zetacomponents/mail": 20,
         "pear/validate_finance_creditcard": 20,
-        "tplaner/when": 20,
         "cache/integration-tests": 20
     },
     "prefer-stable": false,
