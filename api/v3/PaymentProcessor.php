@@ -65,7 +65,13 @@ function _civicrm_api3_payment_processor_create_spec(&$params) {
   $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
   $params['financial_account_id']['api.default'] = CRM_Financial_BAO_PaymentProcessor::getDefaultFinancialAccountID();
   $params['financial_account_id']['api.required'] = TRUE;
+  $params['financial_account_id']['type'] = CRM_Utils_Type::T_INT;
   $params['financial_account_id']['title'] = ts('Financial Account for Processor');
+  $params['financial_account_id']['pseudoconstant'] = [
+    'table' => 'civicrm_financial_account',
+    'keyColumn' => 'id',
+    'labelColumn' => 'name',
+  ];
 }
 
 /**
