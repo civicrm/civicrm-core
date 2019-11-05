@@ -76,8 +76,8 @@
               <thead class="sticky">
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}
-                  {if ($header.sort eq 'activity_id') or ($header.sort eq 'activity_type_id') or ($header.sort eq 'case_id') }
-                  {elseif ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status') or ($header.sort eq 'activity_type') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null) }
+                  {if ($header.sort eq 'activity_id') or ($header.sort eq 'case_id') }
+                  {elseif ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status_id') or ($header.sort eq 'activity_type_id') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null) }
                     <th scope="col">
                       {if $header.sort}
                         {assign var='key' value=$header.sort}
@@ -97,7 +97,7 @@
                   {assign var=cbName value=$row.checkbox}
                   <td>{$form.$cbName.html}</td>
                   {foreach from=$columnHeaders item=header}
-                    {if ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status') or ($header.sort eq 'activity_type') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null) }
+                    {if ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status_id') or ($header.sort eq 'activity_type_id') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null) }
                       {assign var=fName value=$header.sort}
                       {if $fName eq 'sort_name'}
                          <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`"}">{$row.sort_name}</a></td>
@@ -110,7 +110,7 @@
                            {/if}
                            {if isset($row.activity_subject) AND $row.activity_subject NEQ 'NULL'}{$row.activity_subject}{else}{ts}(no subject){/ts}{/if}</a>
                          </td>
-                       {elseif ($fName eq 'activity_id') or ($fName eq 'activity_type_id') or ($fName eq 'case_id')}
+                       {elseif ($fName eq 'activity_id') or ($fName eq 'case_id')}
                        {else}
                           <td>{$row.$fName}</td>
                        {/if}
