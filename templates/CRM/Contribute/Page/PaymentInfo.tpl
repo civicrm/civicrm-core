@@ -47,7 +47,6 @@ CRM.$(function($) {
   <tr>
     <td>{$paymentInfo.total|crmMoney:$paymentInfo.currency}</td>
     <td class='right'>
-      {if $paymentInfo.paid > 0}
         {$paymentInfo.paid|crmMoney:$paymentInfo.currency}
         {if !$hideButtonLinks}
           <br/>
@@ -56,7 +55,6 @@ CRM.$(function($) {
             {ts}view payments{/ts}
           </a>
         {/if}
-      {/if}
     </td>
     <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney:$paymentInfo.currency}</td>
   </tr>
