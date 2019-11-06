@@ -288,7 +288,7 @@ class CRM_Extension_Mapper {
     // 2. The ephemeral/thread-local tier (statics) stores names
     // WITH absolute paths.
     // Return static value instead of re-running query
-    if (isset(Civi::$statics[__CLASS__]['moduleExtensions'])) {
+    if (isset(Civi::$statics[__CLASS__]['moduleExtensions']) && !$fresh) {
       return Civi::$statics[__CLASS__]['moduleExtensions'];
     }
 
