@@ -206,8 +206,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * Form preProcess function.
-   *
-   * @throws \Exception
    */
   public function preProcess() {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -223,7 +221,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $contributionID = CRM_Member_BAO_Membership::getMembershipContributionId($this->_id);
       // check delete permission for contribution
       if ($this->_id && $contributionID && !CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
-        CRM_Core_Error::fatal(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
+        CRM_Core_Error::statusBounce(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
       }
     }
 
@@ -243,7 +241,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           foreach ($contactMemberships as $mem) {
             $mem['member_of_contact_id'] = CRM_Utils_Array::value($mem['membership_type_id'], $memberorgs);
             if (!empty($mem['membership_end_date'])) {
-              $mem['membership_end_date'] = CRM_Utils_Date::customformat($mem['membership_end_date']);
+              $mem['membership_end_date'] = CRM_Utils_Date::customFormat($mem['membership_end_date']);
             }
             $mem['membership_type'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
               $mem['membership_type_id'],
