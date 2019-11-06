@@ -272,7 +272,7 @@ class CRM_Extension_Mapper {
    * @param bool $fresh
    *   whether to forcibly reload extensions list from canonical store.
    * @return array
-   *   array(array('prefix' => $, 'file' => $))
+   *   array(array('prefix' => $, 'fullName' => $, 'filePath' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {
     if (!defined('CIVICRM_DSN')) {
@@ -280,11 +280,26 @@ class CRM_Extension_Mapper {
       return [];
     }
 
-    static $moduleExtensions = NULL;
+    // The list of module files is cached in two tiers. The tiers are slightly
+    // different:
+    //
+    // 1. The persistent tier (cache) stores
+    // names WITHOUT absolute paths.
+    // 2. The ephemeral/thread-local tier (statics) stores names
+    // WITH absolute paths.
+    // Return static value instead of re-running query
+    if (isset(Civi::$statics[__CLASS__]['moduleExtensions'])) {
+      return Civi::$statics[__CLASS__]['moduleExtensions'];
+    }
+
+    $moduleExtensions = NULL;
+
+    // Checked if it's stored in the persistent cache.
     if ($this->cache && !$fresh) {
       $moduleExtensions = $this->cache->get($this->cacheKey . '_moduleFiles');
     }
 
+    // If cache is empty we build it from database.
     if (!is_array($moduleExtensions)) {
       $compat = CRM_Extension_System::getCompatibilityInfo();
 
@@ -328,6 +343,8 @@ class CRM_Extension_Mapper {
         $value['filePath'] = NULL;
       }
     });
+
+    Civi::$statics[__CLASS__]['moduleExtensions'] = $moduleExtensions;
 
     return $moduleExtensions;
   }
