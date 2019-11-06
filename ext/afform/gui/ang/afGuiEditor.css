@@ -55,18 +55,23 @@
 
 #afGuiEditor .af-gui-bar {
   cursor: move;
-  visibility: hidden;
   background-color: #efefef;
   height: 22px;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  padding-left:15px;
+  padding-left: 15px;
+  opacity: 0;
+  transition: opacity 1s 2s;
+}
+#afGuiEditor-canvas:hover .af-gui-bar {
+  opacity: 1;
+  transition: opacity .2s;
 }
 
-#afGuiEditor-canvas:hover .af-gui-bar {
-  visibility: visible;
+#afGuiEditor .af-gui-bar .btn.active {
+  background-color: #b3b3b3;
 }
 
 #afGuiEditor .af-gui-field,
