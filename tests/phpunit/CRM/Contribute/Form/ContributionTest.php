@@ -37,7 +37,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
@@ -88,6 +87,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp() {
     $this->_apiversion = 3;
@@ -133,10 +135,21 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
+  }
+
+  /**
+   * CHeck that all tests that have created payments have created them with the right financial entities.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
   }
 
   /**
@@ -982,6 +995,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function that completes the partially paid payment using Credit Card
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testPartialPaymentWithCreditCard() {
     // create a partially paid contribution by using back-office form
@@ -994,22 +1010,22 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'check_number' => substr(sha1(rand()), 0, 7),
         'billing_city-5' => 'Vancouver',
-        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       ], CRM_Core_Action::ADD
     );
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertNotEmpty($contribution);
+    $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 10, 'payment_instrument_id' => 'Cash']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
     // pay additional amount by using Credit Card
     $form = new CRM_Contribute_Form_AdditionalPayment();
     $form->testSubmit([
       'contribution_id' => $contribution['id'],
       'contact_id' => $this->_individualId,
-      'total_amount' => 50,
+      'total_amount' => 40,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],

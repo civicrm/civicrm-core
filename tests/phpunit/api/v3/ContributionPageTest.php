@@ -675,6 +675,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test submit with a membership block in place.
    *
    * We are expecting a separate payment for the membership vs the contribution.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
     $mut = new CiviMailUtils($this, TRUE);
