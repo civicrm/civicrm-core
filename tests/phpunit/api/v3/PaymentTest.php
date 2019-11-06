@@ -183,7 +183,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
-      'Total Fees: $ 300.00',
+      'Total Amount: $ 300.00',
       'This Payment Amount: $ 50.00',
       //150 was paid in the 1st payment.
       'Balance Owed: $ 100.00',
@@ -221,8 +221,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
-      'A payment has been received.',
-      'Total Fees: $ 300.00',
+      'Below you will find a receipt for this payment.',
+      'Total Amount: $ 300.00',
       'This Payment Amount: $ 150.00',
       'Balance Owed: $ 0.00',
       'Thank you for completing this payment.',
@@ -273,12 +273,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'A refund has been issued based on changes in your registration selections.',
-      'Total Fees: $ 300' . $decimalSeparator . '00',
+      'Total Amount: $ 300' . $decimalSeparator . '00',
       'Refund Amount: $ -30' . $decimalSeparator . '00',
       'Event Information and Location',
       'Paid By: Check',
       'Transaction Date: November 13th, 2018 12:01 PM',
-      'You Paid: $ 170' . $decimalSeparator . '00',
+      'Totally Paid: $ 170' . $decimalSeparator . '00',
     ]);
     $mut->stop();
     $mut->clearMessages();

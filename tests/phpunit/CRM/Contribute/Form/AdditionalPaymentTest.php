@@ -149,7 +149,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'From: site@something.com',
       'Dear Anthony,',
       'Payment Details',
-      'Total Fees: $ 100.00',
+      'Total Amount: $ 100.00',
       'This Payment Amount: $ 70.00',
       'Balance Owed: $ 0.00 ',
       'Billing Name and Address',
@@ -238,8 +238,8 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $mut->assertSubjects(['Payment Receipt - Mr. Anthony Anderson II']);
     $mut->checkMailLog([
       'Dear Anthony,',
-      'A payment has been received',
-      'Total Fees: $ 100.00',
+      'Below you will find a receipt for this payment.',
+      'Total Amount: $ 100.00',
       'This Payment Amount: $ 50.00',
       'Balance Owed: $ 20.00 ',
       'Paid By: Check',
@@ -268,8 +268,8 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->checkResults([100], 1);
 
     $mut->checkMailLog([
-      'A payment has been received',
-      'Total Fees: $ 100.00',
+      'Below you will find a receipt for this payment.',
+      'Total Amount: $ 100.00',
       'This Payment Amount: $ 100.00',
       'Balance Owed: $ 0.00 ',
       'Paid By: Credit Card',

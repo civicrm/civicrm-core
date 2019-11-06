@@ -27,7 +27,7 @@
 ===============================================================================
 {ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney}
 ------------------------------------------------------------------------------------
-
+{/if}
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}
 {/if}
