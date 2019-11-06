@@ -21,13 +21,6 @@
 class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
   /**
-   * The financial batch id, used when editing the field
-   *
-   * @var int
-   */
-  protected $_id;
-
-  /**
    * Set variables up before form is built.
    */
   public function preProcess() {

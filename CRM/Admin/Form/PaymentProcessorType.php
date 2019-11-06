@@ -19,7 +19,7 @@
  * This class generates form components for Location Type.
  */
 class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
-  protected $_id = NULL;
+  public $_id = NULL;
 
   protected $_fields = NULL;
 

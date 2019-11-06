@@ -23,13 +23,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   use CRM_Core_Form_EntityFormTrait;
 
   /**
-   * The group id, used when editing a group
-   *
-   * @var int
-   */
-  protected $_id;
-
-  /**
    * The group object, if an id is present
    *
    * @var object

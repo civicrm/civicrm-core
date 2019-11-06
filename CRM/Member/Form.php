@@ -22,12 +22,6 @@
 class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   use CRM_Core_Form_EntityFormTrait;
-  /**
-   * The id of the object being edited / created
-   *
-   * @var int
-   */
-  public $_id;
 
   /**
    * Membership Type ID

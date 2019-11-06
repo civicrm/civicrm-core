@@ -25,7 +25,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    * The default values for form fields.
