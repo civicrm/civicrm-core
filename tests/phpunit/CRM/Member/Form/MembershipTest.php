@@ -644,6 +644,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPartialPayment($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);

@@ -204,7 +204,8 @@ class CRM_Core_Resources {
    *   - string: Load translated strings. Use a specific domain.
    *
    * @return CRM_Core_Resources
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
