@@ -1595,7 +1595,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $contact = $contactId;
     }
     elseif ($action & CRM_Core_Action::UPDATE) {
-      $contact = $ids['contact'];
+      $contact = (int) $ids['contact'];
       $targetContact = [$ids['contactTarget'] => 1];
     }
 
@@ -1634,57 +1634,17 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
     }
 
-    // CRM-15829 UPDATES
-    // If we're looking for active memberships we must consider pending (id: 5) ones too.
-    // Hence we can't just call CRM_Member_BAO_Membership::getValues below with the active flag, is it would completely miss pending relatioships.
-    // As suggested by @davecivicrm, the pending status id is fetched using the CRM_Member_PseudoConstant::membershipStatus() class and method, since these ids differ from system to system.
-    $pendingStatusId = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
-
-    $query = 'SELECT * FROM `civicrm_membership_status`';
-    if ($active) {
-      $query .= ' WHERE `is_current_member` = 1 OR `id` = %1 ';
-    }
-
-    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$pendingStatusId, 'Integer']]);
-
-    while ($dao->fetch()) {
-      $membershipStatusRecordIds[$dao->id] = $dao->id;
-    }
     $deceasedStatusId = array_search('Deceased', CRM_Member_PseudoConstant::membershipStatus());
 
-    // Now get the active memberships for all the contacts.
-    // If contact have any valid membership(s), then add it to
-    // 'values' array.
-    foreach ($values as $cid => $subValues) {
-      $memberships = civicrm_api3('Membership', 'get', [
-        'contact_id' => $cid,
-        'status_id' => ['IN' => $membershipStatusRecordIds],
-      ])['values'];
-
-      foreach ($memberships as $key => $membership) {
-        //get ownerMembershipIds for related Membership
-        //this is to handle memberships being deleted and recreated
-        if (!empty($membership['owner_membership_id'])) {
-          $ownerMemIds[$cid] = $membership['owner_membership_id'];
-        }
-      }
-      $values[$cid]['memberships'] = $memberships;
-    }
-
-    // done with 'values' array.
-    // Finally add / edit / delete memberships for the related contacts
-
+    $relationshipProcessor = new CRM_Member_Utils_RelationshipProcessor(array_keys($values), $active);
     foreach ($values as $cid => $details) {
-      if (!array_key_exists('memberships', $details)) {
-        continue;
-      }
-
       $relatedContacts = array_keys(CRM_Utils_Array::value('relatedContacts', $details, []));
       $mainRelatedContactId = reset($relatedContacts);
 
-      foreach ($details['memberships'] as $membershipId => $membershipValues) {
+      foreach ($relationshipProcessor->getRelationshipMembershipsForContact((int) $cid) as $membershipId => $membershipValues) {
         $membershipInherittedFromContactID = NULL;
         if (!empty($membershipValues['owner_membership_id'])) {
+          // @todo - $membership already has this now.
           // Use get not getsingle so that we get e-notice noise but not a fatal is the membership has already been deleted.
           $inheritedFromMembership = civicrm_api3('Membership', 'get', ['id' => $membershipValues['owner_membership_id'], 'sequential' => 1])['values'][0];
           $membershipInherittedFromContactID = (int) $inheritedFromMembership['contact_id'];
@@ -1713,6 +1673,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         // add / edit the memberships for related
         // contacts.
 
+        // @todo - all these lines get 'relTypeDirs' - but it's already a key in the $membership array.
         // Get the Membership Type Details.
         $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipValues['membership_type_id']);
         // Check if contact's relationship type exists in membership type
@@ -1745,11 +1706,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               $membershipValues['skipStatusCal'] = TRUE;
             }
 
-            if ($action & CRM_Core_Action::UPDATE) {
+            if (in_array($action, [CRM_Core_Action::UPDATE, CRM_Core_Action::ADD, CRM_Core_Action::ENABLE])) {
               //if updated relationship is already related to contact don't delete existing inherited membership
-              if (in_array($relTypeId, $relTypeIds
-                ) && !empty($values[$relatedContactId]['memberships']) && !empty($ownerMemIds
-                ) && in_array($membershipValues['owner_membership_id'], $ownerMemIds[$relatedContactId])) {
+              if (in_array((int) $relatedContactId, $membershipValues['inheriting_contact_ids'], TRUE)
+                || $relatedContactId === $membershipValues['owner_contact_id']
+              ) {
                 continue;
               }
 
@@ -1758,7 +1719,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
             }
             //skip status calculation for pay later memberships.
-            if (!empty($membershipValues['status_id']) && $membershipValues['status_id'] == $pendingStatusId) {
+            if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipValues['status_id'])) {
               $membershipValues['skipStatusCal'] = TRUE;
             }
             // As long as the membership itself was not created by inheritance from the same contact

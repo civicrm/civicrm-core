@@ -276,8 +276,6 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Relationship', 'create', $relationshipOne);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
 
-    /*
-     * @todo this section not yet working due to bug in would-be-tested code.
     $relationshipTwo['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
@@ -285,7 +283,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $this->callAPISuccess('Relationship', 'delete', ['id' => $relationshipOne['id']]);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
-     */
+
   }
 
   /**
