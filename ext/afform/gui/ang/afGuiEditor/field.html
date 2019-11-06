@@ -2,5 +2,6 @@
   <span>{{ getEntity().label + ': ' + getDefn().title }}</span>
 </div>
 <div>
-  {{ node.name }}
+  <label>{{ getDefn().title }}</label>
+  <input class="form-control" disabled placeholder="{{ node.name }}" />
 </div>
