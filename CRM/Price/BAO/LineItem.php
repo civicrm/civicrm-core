@@ -296,6 +296,7 @@ WHERE li.contribution_id = %1";
         'membership_num_terms' => $dao->membership_num_terms,
         'tax_amount' => $dao->tax_amount,
         'price_set_id' => $dao->price_set_id,
+        'id' => $dao->id,
       ];
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       if (isset($lineItems[$dao->id]['financial_type_id']) && array_key_exists($lineItems[$dao->id]['financial_type_id'], $taxRates)) {

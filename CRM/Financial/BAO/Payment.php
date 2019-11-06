@@ -105,10 +105,18 @@ class CRM_Financial_BAO_Payment {
       if ($value['qty'] == 0 || $value['allocation'] === (float) 0) {
         continue;
       }
+
+      if (!empty($ftIds[$value['price_field_value_id']])) {
+        $financialItemID = $ftIds[$value['price_field_value_id']];
+      }
+      else {
+        $financialItemID = self::getNewFinancialItemID($value, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
+      }
+
       $eftParams = [
         'entity_table' => 'civicrm_financial_item',
         'financial_trxn_id' => $trxn->id,
-        'entity_id' => $ftIds[$value['price_field_value_id']],
+        'entity_id' => $financialItemID,
         'amount' => $value['allocation'],
       ];
 
@@ -413,6 +421,7 @@ class CRM_Financial_BAO_Payment {
    * @param $params
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   protected static function getPayableLineItems($params): array {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
@@ -501,6 +510,51 @@ class CRM_Financial_BAO_Payment {
         'financial_trxn_id' => $trxnID,
       ]);
     }
+  }
+
+  /**
+   * Create a financial items & return the ID.
+   *
+   * Ideally this will never be called.
+   *
+   * However, I hit a scenario in testing where 'something' had  created a pending payment with
+   * no financial items and that would result in a fatal error without handling here. I failed
+   * to replicate & am not investigating via a new test methodology
+   * https://github.com/civicrm/civicrm-core/pull/15706
+   *
+   * After this is in I will do more digging & once I feel confident new instances are not being
+   * created I will add deprecation notices into this function with a view to removing.
+   *
+   * However, I think we want to add it in 5.20 as there is a risk of users experiencing an error
+   * if there is incorrect data & we need time to ensure that what I hit was not a 'thing.
+   * (it might be the demo site data is a bit flawed & that was the issue).
+   *
+   * @param array $lineItem
+   * @param string $trxn_date
+   * @param int $contactID
+   * @param string $currency
+   *
+   * @return int
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function getNewFinancialItemID($lineItem, $trxn_date, $contactID, $currency): int {
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+      $lineItem['financial_type_id'],
+      'Income Account Is'
+    );
+    $itemParams = [
+      'transaction_date' => $trxn_date,
+      'contact_id' => $contactID,
+      'currency' => $currency,
+      'amount' => $lineItem['line_total'],
+      'description' => $lineItem['label'],
+      'status_id' => 'Unpaid',
+      'financial_account_id' => $financialAccount,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $lineItem['id'],
+    ];
+    return (int) civicrm_api3('FinancialItem', 'create', $itemParams)['id'];
   }
 
 }

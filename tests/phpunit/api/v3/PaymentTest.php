@@ -310,6 +310,29 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that Payment.create does not fail if the line items are missing.
+   *
+   * In the original spec it was anticipated that financial items would not be created
+   * for pending contributions in some circumstances. We've backed away from this and
+   * I mostly could not find a way to do it through the UI. But I did seem to once &
+   * I want to be sure that if they ARE missing no fatal occurs so this tests
+   * that in an artificial way.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAddPaymentMissingFinancialItems() {
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 50,
+      'financial_type_id' => 'Donation',
+      'contact_id' => $this->individualCreate(),
+       'contribution_status_id' => 'Pending',
+    ]);
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_financial_item');
+    $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'payment_instrument_id' => 'Check', 'total_amount' => 5]);
+    $this->validateAllPayments();
+  }
+
+  /**
    * Add participant with contribution
    *
    * @return array
