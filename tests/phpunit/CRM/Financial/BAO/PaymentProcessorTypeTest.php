@@ -43,6 +43,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'name' => 'Test_Payment_Processor',
       'title' => 'Test Payment Processor',
       'billing_mode' => 1,
+      'class_name' => 'Payment_Dummy',
     ];
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = $this->assertDBNotNull(
@@ -63,6 +64,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'name' => 'Test_Retrieve_Payment_Processor',
       'title' => 'Test Retrieve Payment Processor',
       'billing_mode' => 1,
+      'class_name' => 'Payment_Dummy',
     ];
     $defaults = [];
     CRM_Financial_BAO_PaymentProcessorType::create($params);
@@ -79,6 +81,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'title' => 'Test Set Payment Processor',
       'billing_mode' => 1,
       'is_active' => 1,
+      'class_name' => 'Payment_Dummy',
     ];
 
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessorType::create($params);
@@ -116,6 +119,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'title' => 'Test Del Payment Processor',
       'billing_mode' => 1,
       'is_active' => 1,
+      'class_name' => 'Payment_Dummy',
     ];
 
     $defaults = [];
