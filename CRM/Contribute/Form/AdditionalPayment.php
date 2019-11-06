@@ -61,7 +61,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-
+    // id = contribution ID whether called from event or contribution forms
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     parent::preProcess();
     $this->_contactId = $this->_contactID;
@@ -76,15 +76,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       CRM_Utils_System::setTitle($title);
       return;
     }
-    $entityType = 'contribution';
-    if ($this->_component == 'event') {
-      $entityType = 'participant';
-      $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
-      $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
-    }
-    else {
-      $this->_contributionId = $this->_id;
-    }
+    $this->_contributionId = $this->_id;
 
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
     $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_id);

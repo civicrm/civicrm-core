@@ -61,6 +61,28 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get the paymentInfo array
+   *
+   * @param int $participantID
+   * @param bool $getTrxnInfo
+   * @param bool $usingLineTotal
+   *
+   * @return array
+   */
+  public static function getPaymentInfo($participantID, $getTrxnInfo = FALSE, $usingLineTotal = FALSE): array {
+    $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $participantID, 'contribution_id', 'participant_id');
+    if (!$contributionId) {
+      if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'registered_by_id')) {
+        $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
+      }
+    }
+    if ($contributionId) {
+      return CRM_Contribute_BAO_Contribution::getPaymentInfo($contributionId, 'contribution', $getTrxnInfo, $usingLineTotal);
+    }
+    return [];
+  }
+
+  /**
    * Test civicrm_participant_payment_create with empty params.
    */
   public function testPaymentCreateEmptyParams() {
@@ -115,7 +137,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('participant_payment', 'create', $params);
 
     //Check if participant payment is correctly retrieved.
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_participantID4, 'event');
+    $paymentInfo = api_v3_ParticipantPaymentTest::getPaymentInfo($this->_participantID4);
     $this->assertEquals('Completed', $paymentInfo['contribution_status']);
     $this->assertEquals('100.00', $paymentInfo['total']);
   }

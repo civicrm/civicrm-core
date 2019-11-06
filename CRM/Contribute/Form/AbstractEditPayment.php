@@ -722,7 +722,7 @@ WHERE  contribution_id = {$id}
    *   Block title.
    */
   protected function assignPaymentInfoBlock() {
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, 'contribution', TRUE);
     $title = ts('View Payment');
     if (!empty($this->_component) && $this->_component == 'event') {
       $info = CRM_Event_BAO_Participant::participantDetails($this->_id);

@@ -612,7 +612,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->_individualId,
     ]);
-    $payment = CRM_Contribute_BAO_Contribution::getPaymentInfo($membership['id'], 'membership', FALSE, TRUE);
+    $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership['id'], 'contribution_id', 'membership_id');
+    $payment = api_v3_ParticipantPaymentTest::getPaymentInfo($contributionId, FALSE, TRUE);
     // Check the contribution status on membership type change whose minimum fee was less than earlier memebership
     $this->assertEquals('Pending refund', $contribution['contribution_status']);
     // Earlier paid amount

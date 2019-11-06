@@ -110,13 +110,22 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
     }
     elseif ($field == 'balance') {
+      $balancePay = NULL;
       if ($actionSearchResult->entityTable == 'civicrm_contact') {
         $balancePay = 'N/A';
       }
       elseif (!empty($actionSearchResult->entityID)) {
-        $info = \CRM_Contribute_BAO_Contribution::getPaymentInfo($actionSearchResult->entityID, 'event');
-        $balancePay = \CRM_Utils_Array::value('balance', $info);
-        $balancePay = \CRM_Utils_Money::format($balancePay);
+        $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $actionSearchResult->entityID, 'contribution_id', 'participant_id');
+        if (!$contributionId) {
+          if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $actionSearchResult->entityID, 'registered_by_id')) {
+            $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
+          }
+        }
+        if ($contributionId) {
+          $info = \CRM_Contribute_BAO_Contribution::getPaymentInfo($contributionId);
+          $balancePay = \CRM_Utils_Array::value('balance', $info);
+          $balancePay = \CRM_Utils_Money::format($balancePay);
+        }
       }
       $row->tokens($entity, $field, $balancePay);
     }

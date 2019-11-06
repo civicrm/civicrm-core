@@ -83,16 +83,18 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->assign('contactId', $this->_contactId);
     $this->assign('id', $this->_participantId);
 
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_participantId, 'event');
-    $this->_paidAmount = $paymentInfo['paid'];
-    $this->assign('paymentInfo', $paymentInfo);
-    $this->assign('feePaid', $this->_paidAmount);
+    if ($this->_contributionId) {
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId);
+      $this->_paidAmount = $paymentInfo['paid'];
+      $this->assign('paymentInfo', $paymentInfo);
+      $this->assign('feePaid', $this->_paidAmount);
 
-    $ids = CRM_Event_BAO_Participant::getParticipantIds($this->_contributionId);
-    if (count($ids) > 1) {
-      $total = CRM_Price_BAO_LineItem::getLineTotal($this->_contributionId);
-      $this->assign('totalLineTotal', $total);
-      $this->assign('lineItemTotal', $total);
+      $ids = CRM_Event_BAO_Participant::getParticipantIds($this->_contributionId);
+      if (count($ids) > 1) {
+        $total = CRM_Price_BAO_LineItem::getLineTotal($this->_contributionId);
+        $this->assign('totalLineTotal', $total);
+        $this->assign('lineItemTotal', $total);
+      }
     }
 
     $title = ts("Change selections for %1", [1 => $this->_contributorDisplayName]);

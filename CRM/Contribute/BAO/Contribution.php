@@ -4013,22 +4013,24 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return mixed
    */
   public static function getPaymentInfo($id, $component = 'contribution', $getTrxnInfo = FALSE, $usingLineTotal = FALSE) {
-    // @todo deprecate passing in component - always call with contribution.
-    if ($component == 'event') {
-      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'contribution_id', 'participant_id');
+    if ($component !== 'contribution') {
+      CRM_Core_Error::deprecatedFunctionWarning('Support for passing anything other than "contribution" for getPaymentInfo will be removed soon');
+      if ($component == 'event') {
+        $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'contribution_id', 'participant_id');
 
-      if (!$contributionId) {
-        if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $id, 'registered_by_id')) {
-          $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
-          $id = $primaryParticipantId;
-        }
         if (!$contributionId) {
-          return;
+          if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $id, 'registered_by_id')) {
+            $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
+            $id = $primaryParticipantId;
+          }
+          if (!$contributionId) {
+            return;
+          }
         }
       }
-    }
-    elseif ($component == 'membership') {
-      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $id, 'contribution_id', 'membership_id');
+      elseif ($component == 'membership') {
+        $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $id, 'contribution_id', 'membership_id');
+      }
     }
     else {
       $contributionId = $id;
