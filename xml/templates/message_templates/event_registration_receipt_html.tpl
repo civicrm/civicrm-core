@@ -67,7 +67,7 @@
     {$source}
 {/if}
     <p>&nbsp;</p>
-    <table width="600">
+    <table width="700">
       <thead>
     <tr>
 {if $line_items}
