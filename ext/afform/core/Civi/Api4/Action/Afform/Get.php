@@ -2,16 +2,13 @@
 
 namespace Civi\Api4\Action\Afform;
 
-use Civi\Api4\Generic\BasicGetAction;
-use Civi\Api4\Utils\AfformFormatTrait;
-
 /**
- * Class Get
+ * @inheritDoc
  * @package Civi\Api4\Action\Afform
  */
-class Get extends BasicGetAction {
+class Get extends \Civi\Api4\Generic\BasicGetAction {
 
-  use AfformFormatTrait;
+  use \Civi\Api4\Utils\AfformFormatTrait;
 
   public function getRecords() {
     /** @var \CRM_Afform_AfformScanner $scanner */

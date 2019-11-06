@@ -11,6 +11,7 @@
       controller: function($scope) {
         $scope.ts = CRM.ts();
         $scope.afform = null;
+        $scope.saving = false;
         $scope.selectedEntity = null;
         $scope.meta = CRM.afformAdminData;
         $scope.controls = {};
@@ -38,6 +39,7 @@
 
         function initialize(afform) {
           $scope.afform = afform;
+          $scope.changesSaved = 1;
           // Remove empty text nodes, they just create clutter
           removeRecursive($scope.afform.layout, function(item) {
             return ('#text' in item) && _.trim(item['#text']).length === 0;
@@ -47,6 +49,11 @@
           $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
           expandFields($scope.layout['#children']);
           _.each(_.keys($scope.entities), buildFieldList);
+
+          // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
+          $scope.$watch('afform', function () {
+            $scope.changesSaved = $scope.changesSaved === 1;
+          }, true);
         }
 
         this.addEntity = function(entityType) {
@@ -139,6 +146,17 @@
 
         $scope.removeValue = function(entity, fieldName) {
           delete entity.data[fieldName];
+        };
+
+        $scope.save = function() {
+          $scope.saving = true;
+          CRM.api4('Afform', 'save', {records: [JSON.parse(angular.toJson($scope.afform))]})
+            .then(function () {
+              $scope.$apply(function () {
+                $scope.saving = false;
+                $scope.changesSaved = true;
+              });
+            });
         };
 
         $scope.$watch('controls.addValue', function(fieldName) {
@@ -316,6 +334,9 @@
         };
 
         $scope.getLayout = function() {
+          if (!$scope.node) {
+            return '';
+          }
           return _.intersection(splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
         };
 

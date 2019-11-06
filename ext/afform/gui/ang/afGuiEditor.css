@@ -154,3 +154,8 @@
   display: inline-block;
   width: 300px;
 }
+
+#afGuiEditor-canvas .panel-heading .btn-group {
+  position: relative;
+  top: -8px;
+}
