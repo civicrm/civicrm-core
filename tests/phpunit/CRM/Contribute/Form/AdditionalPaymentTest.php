@@ -149,7 +149,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'From: site@something.com',
       'Dear Anthony,',
       'Payment Details',
-      'Total Amount: $ 100.00',
+      'Total Fee: $ 100.00',
       'This Payment Amount: $ 70.00',
       'Balance Owed: $ 0.00 ',
       'Billing Name and Address',
@@ -242,7 +242,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
-      'Total Amount: $ 100.00',
+      'Total Fee: $ 100.00',
       'This Payment Amount: $ 50.00',
       'Balance Owed: $ 20.00 ',
       'Paid By: Check',
@@ -273,7 +273,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $mut->checkMailLog([
       'Below you will find a receipt for this payment.',
-      'Total Amount: $ 100.00',
+      'Total Fee: $ 100.00',
       'This Payment Amount: $ 100.00',
       'Balance Owed: $ 0.00 ',
       'Paid By: Credit Card',
