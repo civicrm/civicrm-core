@@ -276,6 +276,7 @@
       require: '^^afGuiEditor',
       link: function($scope, element, attrs, editor) {
         $scope.editor = editor;
+        $scope.ts = CRM.ts();
       },
       controller: function($scope) {
         $scope.block = this;
@@ -310,6 +311,15 @@
             return 'text';
           }
           return null;
+        };
+
+        $scope.addBlock = function(type) {
+          var newBlock = {
+            '#tag': type === 'text' ? 'p' : 'div',
+            'class': 'af-' + type,
+            '#children': type == 'block' ? [] : [{'#text': ts('Enter text')}]
+          };
+          $scope.node['#children'].push(newBlock);
         };
 
         $scope.isSelectedFieldset = function(entityName) {

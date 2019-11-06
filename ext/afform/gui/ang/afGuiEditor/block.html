@@ -1,13 +1,22 @@
 <div class="af-gui-bar" ng-if="node['#tag'] != 'af-form'" ng-click="selectEntity()" >
   <span ng-if="block.getNodeType(node) == 'fieldset'">{{ editor.getEntity(entityName).label }}</span>
-  {{ node['#tag'] }}
-  <select class="pull-right" ng-model="node['#tag']">
-    <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
-  </select>
-  <div class="btn-group btn-group-xs pull-right" role="group">
-    <button type="button" class="btn btn-default" ng-class="{active: opt === getLayout()}" ng-repeat="(opt, label) in layouts" ng-click="setLayout(opt)" title="{{ label }}">
-      <i class="af-gui-layout-icon {{ opt }}" ></i>
+  <span>{{ node['#tag'] }}</span>
+  <div class="form-inline pull-right">
+    <div class="btn-group btn-group-xs" role="group">
+      <button type="button" class="btn btn-default" ng-class="{active: opt === getLayout()}" ng-repeat="(opt, label) in layouts" ng-click="setLayout(opt)" title="{{ label }}">
+        <i class="af-gui-layout-icon {{ opt }}" ></i>
+      </button>
+    </div>
+    <select ng-model="node['#tag']">
+      <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
+    </select>
+    <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-block-button" data-toggle="dropdown" title="{{ ts('Add block') }}">
+      <span><i class="crm-i fa-plus"></i></span>
     </button>
+    <ul class="dropdown-menu">
+      <li><a href ng-click="addBlock('block')">{{ ts('Add block/fieldset') }}</a></li>
+      <li><a href ng-click="addBlock('text')">{{ ts('Add text box') }}</a></li>
+    </ul>
   </div>
 </div>
 <div ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]'}" ng-model="node['#children']" class="af-gui-layout {{ getLayout() }}">
