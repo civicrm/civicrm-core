@@ -233,12 +233,12 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'period_type' => 'rolling',
       'name' => 'Inherited Membership',
       'relationship_type_id' => [$orgToPersonTypeId1, $orgToPersonTypeId2],
-      'relationship_direction' => ['b_a', 'a_b'],
+      'relationship_direction' => ['b_a', 'b_a'],
     ]);
     $membershipType = $this->callAPISuccessGetSingle('MembershipType', ['id' => $membershipType['id']]);
     // Check the metadata worked....
     $this->assertEquals([$orgToPersonTypeId1, $orgToPersonTypeId2], $membershipType['relationship_type_id']);
-    $this->assertEquals(['b_a', 'a_b'], $membershipType['relationship_direction']);
+    $this->assertEquals(['b_a', 'b_a'], $membershipType['relationship_direction']);
 
     $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $membershipType['id'],
@@ -252,11 +252,13 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'contact_id_b' => $organisationID,
       'relationship_type_id' => $orgToPersonTypeId1,
     ]);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $relationshipTwo = $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organisationID,
       'relationship_type_id' => $orgToPersonTypeId2,
     ]);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
 
     $inheritedMembership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $individualID]);
     $this->assertEquals('2019-08-19', $inheritedMembership['start_date']);
