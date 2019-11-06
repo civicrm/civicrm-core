@@ -102,7 +102,7 @@ class CRM_Financial_BAO_Payment {
     list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
 
     foreach ($lineItems as $key => $value) {
-      if ($value['qty'] == 0 || $value['allocation'] === (float) 0) {
+      if ($value['allocation'] === (float) 0) {
         continue;
       }
       $eftParams = [
