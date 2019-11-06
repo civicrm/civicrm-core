@@ -48,14 +48,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign('noACL', TRUE);
     }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
-    // @todo - I believe this cancelledStatus is unused - if someone reaches the same conclusion
-    // by grepping then the next few lines can go.
-    $cancelledStatus = TRUE;
-    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if (CRM_Utils_Array::value('contribution_status_id', $values) == array_search('Cancelled', $status)) {
-      $cancelledStatus = FALSE;
-    }
-    $this->assign('cancelledStatus', $cancelledStatus);
 
     if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
