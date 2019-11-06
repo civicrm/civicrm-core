@@ -932,7 +932,11 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
           // CRM-17718 allow for possibility of changed financial type ID having been set prior to calling this.
           $lineItem['financial_type_id'] = $financial_type_id;
         }
-        if ($lineItem['line_total'] != $total_amount) {
+        $taxAmountMatches = FALSE;
+        if ((!empty($lineItem['tax_amount']) && ($lineItem['line_total'] + $lineItem['tax_amount']) == $total_amount)) {
+          $taxAmountMatches = TRUE;
+        }
+        if ($lineItem['line_total'] != $total_amount && !$taxAmountMatches) {
           // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
           // if there is only one line item, and the UI should prevent this situation for those with more than one.
           $lineItem['line_total'] = $total_amount;
