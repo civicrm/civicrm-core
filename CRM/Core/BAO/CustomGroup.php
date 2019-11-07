@@ -2080,7 +2080,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
 
     if (!$flag) {
       $extendObjs = [];
-      CRM_Core_OptionValue::getValues(['name' => 'cg_extend_objects'], $extendObjs);
+      CRM_Core_OptionValue::getValues(['name' => 'cg_extend_objects'], $extendObjs, 'weight', TRUE);
 
       foreach ($extendObjs as $ovId => $ovValues) {
         if ($ovValues['description']) {
