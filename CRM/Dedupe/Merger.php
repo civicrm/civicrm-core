@@ -1091,8 +1091,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // CRM-15681 don't display sub-types in UI
         continue;
       }
-      $rows["move_$field"]['main'] = self::getFieldValueAndLabel($field, $main)['label'];
-      $rows["move_$field"]['other'] = self::getFieldValueAndLabel($field, $other)['label'];
+      $rows["move_$field"] = [
+        'main' => self::getFieldValueAndLabel($field, $main)['label'],
+        'other' => self::getFieldValueAndLabel($field, $other)['label'],
+        'title' => $fields[$field]['title'],
+      ];
 
       $value = self::getFieldValueAndLabel($field, $other)['value'];
       //CRM-14334
@@ -1120,7 +1123,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
 
       $migrationInfo["move_$field"] = $value;
-      $rows["move_$field"]['title'] = $fields[$field]['title'];
     }
 
     // Handle location blocks.
