@@ -2,6 +2,6 @@
   <span>{{ getEntity().label + ': ' + getDefn().title }}</span>
 </div>
 <div>
-  <label>{{ getDefn().title }}</label>
+  <label af-gui-editable ng-model="node.defn.title" default-value="getDefn().title">{{ node.defn.title || getDefn().title }}</label>
   <input class="form-control" disabled placeholder="{{ node.name }}" />
 </div>

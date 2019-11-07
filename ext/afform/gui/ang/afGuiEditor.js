@@ -34,6 +34,15 @@
           $timeout(function() {
             initialize(_.cloneDeep(newForm));
             editor.addEntity('Contact');
+            $scope.layout['#children'].push({
+              "#tag": "button",
+              "ng-click": "modelListCtrl.submit()",
+              "#children": [
+                {
+                  "#text": "Submit"
+                }
+              ]
+            });
           });
         }
 
@@ -47,7 +56,6 @@
           $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
           evaluate($scope.layout['#children']);
           $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
-          expandFields($scope.layout['#children']);
           _.each(_.keys($scope.entities), buildFieldList);
 
           // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -132,7 +140,7 @@
             $scope.fieldList[entityName].push({
               "#tag": "af-field",
               name: field.name,
-              defn: _.cloneDeep(_.pick(field, ['title', 'input_type', 'input_attrs']))
+              defn: {}
             });
           });
         }
@@ -377,11 +385,11 @@
       controller: function($scope) {
 
         $scope.getEntity = function() {
-          return $scope.editor.getEntity($scope.entityName);
+          return $scope.editor ? $scope.editor.getEntity($scope.entityName) : {};
         };
 
         $scope.getDefn = function() {
-          return $scope.editor.getField($scope.getEntity().type, $scope.node.name);
+          return $scope.editor ? $scope.editor.getField($scope.getEntity().type, $scope.node.name) : {};
         };
       }
     };
@@ -434,20 +442,23 @@
     return {
       restrict: "A",
       require: "ngModel",
+      scope: {
+        defaultValue: '='
+      },
       link: function(scope, element, attrs, ngModel) {
         var ts = CRM.ts();
 
         function read() {
           var htmlVal = element.html();
           if (!htmlVal) {
-            htmlVal = ts('Unnamed');
+            htmlVal = scope.defaultValue;
             element.html(htmlVal);
           }
           ngModel.$setViewValue(htmlVal);
         }
 
         ngModel.$render = function() {
-          element.html(ngModel.$viewValue || ' ');
+          element.html(ngModel.$viewValue || scope.defaultValue);
         };
 
         // Special handling for enter and escape keys
@@ -459,7 +470,7 @@
           }
           // Escape: undo
           if (e.which === 27) {
-            element.html(ngModel.$viewValue || ' ');
+            element.html(ngModel.$viewValue || scope.defaultValue);
             element.blur();
           }
         });

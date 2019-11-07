@@ -21,7 +21,7 @@
     <legend>{{ ts('Fields') }}</legend>
     <div class="af-gui-field-select-list" ui-sortable="{update: rebuildFieldList, items: '> div:not(.disabled)', connectWith: '[data-entity=' + selectedEntity + '] [ui-sortable]'}" ng-model="fieldList[selectedEntity]">
       <div ng-repeat="field in fieldList[selectedEntity]" ng-class="{disabled: fieldInUse(selectedEntity, field.name)}">
-        {{ field.defn.title }}
+        {{ editor.getField(editor.getEntity(selectedEntity).type, field.name).title }}
       </div>
     </div>
   </fieldset>
