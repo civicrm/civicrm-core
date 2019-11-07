@@ -107,7 +107,7 @@
   </tr>
   <tr>
     <td {$labelStyle}>
-      {ts}Total Amount{/ts}
+      {ts}Total Fee{/ts}
     </td>
     <td {$valueStyle}>
       {$totalAmount|crmMoney}
@@ -115,7 +115,7 @@
   </tr>
   <tr>
     <td {$labelStyle}>
-      {ts}Totally Paid{/ts}
+      {ts}Total Paid{/ts}
     </td>
     <td {$valueStyle}>
       {$totalPaid|crmMoney}

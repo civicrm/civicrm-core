@@ -46,8 +46,8 @@
 {ts}Contribution Details{/ts}
 
 ===============================================================================
-{ts}Total Amount{/ts}: {$totalAmount|crmMoney}
-{ts}Totally Paid{/ts}: {$totalPaid|crmMoney}
+{ts}Total Fee{/ts}: {$totalAmount|crmMoney}
+{ts}Total Paid{/ts}: {$totalPaid|crmMoney}
 {ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
 
 
