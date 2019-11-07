@@ -16,16 +16,18 @@
     <ul class="dropdown-menu">
       <li><a href ng-click="addBlock('block')">{{ ts('Add block/fieldset') }}</a></li>
       <li><a href ng-click="addBlock('text')">{{ ts('Add text box') }}</a></li>
+      <li><a href ng-click="addBlock('button')">{{ ts('Add button') }}</a></li>
     </ul>
   </div>
 </div>
-<div ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]'}" ng-model="node['#children']" class="af-gui-layout {{ getLayout() }}">
+<div ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]', cancel: 'input,textarea,button,select,option,a'}" ng-model="node['#children']" class="af-gui-layout {{ getLayout() }}">
   <div ng-repeat="item in node['#children']" ng-show="block.getNodeType(item)">
     <div ng-switch="block.getNodeType(item)">
-      <div ng-switch-when="fieldset" af-gui-block="item" class="af-gui-block af-gui-fieldset" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />
-      <div ng-switch-when="block" af-gui-block="item" class="af-gui-block" entity-name="entityName" />
-      <div ng-switch-when="field" af-gui-field="item" class="af-gui-field" entity-name="entityName" />
-      <div ng-switch-when="text" af-gui-text="item" class="af-gui-text" />
+      <div ng-switch-when="fieldset" af-gui-block="item" class="af-gui-element af-gui-block af-gui-fieldset" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />
+      <div ng-switch-when="block" af-gui-block="item" class="af-gui-element af-gui-block" entity-name="entityName" />
+      <div ng-switch-when="field" af-gui-field="item" class="af-gui-element af-gui-field" entity-name="entityName" />
+      <div ng-switch-when="text" af-gui-text="item" class="af-gui-element af-gui-text" />
+      <div ng-switch-when="button" af-gui-button="item" class="af-gui-element af-gui-button" />
     </div>
   </div>
 </div>

@@ -1,0 +1,22 @@
+<div class="af-gui-bar">
+  {{ node['#tag'] }}
+  <div class="form-inline pull-right">
+    <button type="button" class="btn btn-xs dropdown-toggle {{ getStyle() }}-outline" data-toggle="dropdown" title="{{ ts('Style') }}">
+      <span>{{ styles[getStyle()] }}</span>
+      <i class="crm-i fa-caret-down"></i>
+    </button>
+    <ul class="dropdown-menu">
+      <li ng-repeat="(style, label) in styles" class="{{ style.replace('btn', 'bg') }}">
+        <a href ng-click="setStyle(style)">{{ label }}</a>
+      </li>
+    </ul>
+  </div>
+</div>
+<button type="button" class="btn {{ getStyle() }}">
+  <span class="crm-editable-enabled" ng-click="pickIcon()" >
+    <i class="crm-i {{ node['crm-icon'] }}"></i>
+  </span>
+  <span af-gui-editable ng-model="node['#children'][0]['#text']" >
+    {{ node['#children'][0]['#text'] }}
+  </span>
+</button>

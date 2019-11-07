@@ -1,12 +1,28 @@
 (function(angular, $, _) {
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'));
 
+  var editingIcon;
+
   angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4, $parse, $timeout) {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/main.html',
       scope: {
         afGuiEditor: '='
+      },
+      link: function($scope, element, attrs) {
+        // Shoehorn in a non-angular widget for picking icons
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
+          $('#af-gui-icon-picker').crmIconPicker().change(function() {
+            if (editingIcon) {
+              $scope.$apply(function() {
+                editingIcon['crm-icon'] = $('#af-gui-icon-picker').val();
+                editingIcon = null;
+                $('#af-gui-icon-picker').val('').change();
+              });
+            }
+          });
+        });
       },
       controller: function($scope) {
         $scope.ts = CRM.ts();
@@ -36,6 +52,8 @@
             editor.addEntity('Contact');
             $scope.layout['#children'].push({
               "#tag": "button",
+              "class": 'af-button btn btn-primary',
+              "crm-icon": 'fa-check',
               "ng-click": "modelListCtrl.submit()",
               "#children": [
                 {
@@ -318,6 +336,9 @@
           if (_.contains(classes, 'af-text')) {
             return 'text';
           }
+          if (_.contains(classes, 'af-button')) {
+            return 'button';
+          }
           return null;
         };
 
@@ -327,6 +348,12 @@
             'class': 'af-' + type,
             '#children': type == 'block' ? [] : [{'#text': ts('Enter text')}]
           };
+          if (type === 'button') {
+            newBlock['#tag'] = 'button';
+            newBlock['class'] += ' btn btn-primary';
+            newBlock['crm-icon'] = 'fa-check';
+            newBlock['ng-click'] = "modelListCtrl.submit()";
+          }
           $scope.node['#children'].push(newBlock);
         };
 
@@ -432,6 +459,50 @@
         $scope.setAlign = function(val) {
           $scope.block.modifyClasses($scope.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
         };
+      }
+    };
+  });
+  
+  angular.module('afGuiEditor').directive('afGuiButton', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/button.html',
+      scope: {
+        node: '=afGuiButton'
+      },
+      require: '^^afGuiBlock',
+      link: function($scope, element, attrs, block) {
+        $scope.block = block;
+      },
+      controller: function($scope) {
+
+        // TODO: Add action selector to UI
+        // $scope.actions = {
+        //   "modelListCtrl.submit()": ts('Submit Form')
+        // };
+
+        $scope.styles = {
+          'btn-default': ts('Default'),
+          'btn-primary': ts('Primary'),
+          'btn-success': ts('Success'),
+          'btn-info': ts('Info'),
+          'btn-warning': ts('Warning'),
+          'btn-danger': ts('Danger')
+        };
+
+        $scope.getStyle = function() {
+          return _.intersection(splitClass($scope.node['class']), _.keys($scope.styles))[0] || '';
+        };
+
+        $scope.setStyle = function(val) {
+          $scope.block.modifyClasses($scope.node, _.keys($scope.styles), val);
+        };
+
+        $scope.pickIcon = function() {
+          editingIcon = $scope.node;
+          $('#af-gui-icon-picker ~ .crm-icon-picker-button').click();
+        };
+
       }
     };
   });

@@ -74,13 +74,18 @@
   background-color: #b3b3b3;
 }
 
-#afGuiEditor .af-gui-field,
-#afGuiEditor .af-gui-text,
-#afGuiEditor .af-gui-block {
+#afGuiEditor .af-gui-element {
   position: relative;
-  padding: 32px 3px 3px;
+  padding: 22px 3px 3px;
   min-height: 40px;
+}
+
+#afGuiEditor .af-gui-block {
   border: 2px dashed transparent;
+}
+
+#afGuiEditor .af-gui-block:hover {
+  border: 2px dashed #757575;
 }
 
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected {
@@ -93,14 +98,6 @@
 }
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > span {
   color: white;
-}
-
-#afGuiEditor .af-gui-block {
-  padding-top: 20px;
-}
-
-#afGuiEditor .af-gui-block:hover {
-  border: 2px dashed #757575;
 }
 
 #afGuiEditor [ui-sortable] {
