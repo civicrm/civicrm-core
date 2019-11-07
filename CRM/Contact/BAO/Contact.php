@@ -1542,6 +1542,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $cacheKeyString .= $export ? '_1' : '_0';
     $cacheKeyString .= $status ? '_1' : '_0';
     $cacheKeyString .= $search ? '_1' : '_0';
+    $cacheKeyString .= '_' . (bool) $checkPermissions;
     //CRM-14501 it turns out that the impact of permissioning here is sometimes inconsistent. The field that
     //calculates custom fields takes into account the logged in user & caches that for all users
     //as an interim fix we will cache the fields by contact
