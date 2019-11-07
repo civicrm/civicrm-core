@@ -358,13 +358,44 @@ AND        v.name = %1
     foreach ($xml->CustomFields as $customFieldsXML) {
       $total = count($customFieldsXML->CustomField);
       foreach ($customFieldsXML->CustomField as $customFieldXML) {
+        if (empty($customFieldXML->option_group_id) && isset($customFieldXML->option_group_name)) {
+          $customFieldXML->option_group_id = $this->getOptionGroupIDFromName((string) $customFieldXML->option_group_name, $idMap);
+        }
+
         $id = $idMap['custom_group'][(string ) $customFieldXML->custom_group_name];
         $fields_indexed_by_group_id[$id][] = $customFieldXML;
       }
     }
+
     foreach ($fields_indexed_by_group_id as $group_id => $fields) {
-      CRM_Core_BAO_CustomField::bulkSave(json_decode(json_encode($fields), TRUE), ['custom_group_id' => $group_id]);
+      \Civi\Api4\CustomField::save()
+        ->setCheckPermissions(FALSE)
+        ->setDefaults(['custom_group_id' => $group_id])
+        ->setRecords(json_decode(json_encode($fields), TRUE))
+        ->execute();
     }
+  }
+
+  /**
+   * Get Option Group ID.
+   *
+   * Returns an option group's ID, given its name.
+   *
+   * @param $groupName
+   * @param $idMap
+   *
+   * @return int|null
+   */
+  private function getOptionGroupIDFromName($groupName, &$idMap) {
+    if (empty($groupName)) {
+      return NULL;
+    }
+
+    if (!isset($idMap['option_group'][$groupName])) {
+      $idMap['option_group'][$groupName] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $groupName, 'id', 'name');
+    }
+
+    return $idMap['option_group'][$groupName];
   }
 
   /**
