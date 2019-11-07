@@ -71,7 +71,7 @@
           $.each(icons, function(i, icon) {
             if (!term.length || icon.replace(/-/g, '').indexOf(term) > -1) {
               var item = $('<a href="#" title="' + icon + '"/>').button({
-                icons: {primary: icon}
+                icons: {primary: icon + ' ' + $style.val()}
               });
               $place.append(item);
             }
@@ -81,20 +81,34 @@
         function displayDialog() {
           dialog.append('<style type="text/css">' +
             '#crmIconPicker {font-size: 20px;}' +
-            '#crmIconPicker .icon-search input {font-family: FontAwesome; padding-left: .5em; margin-bottom: 1em;}' +
+            '#crmIconPicker .icon-ctrls input {font-family: FontAwesome; padding-left: .5em; margin-bottom: 1em;}' +
+            '#crmIconPicker .icon-ctrls > * {display: inline-block; vertical-align: top; margin-right: 1em;}' +
+            '#crmIconPicker .icon-ctrls > button {float: right; margin-right: 0;}' +
             '#crmIconPicker a.ui-button {width: 1em; height: 1em; color: #222;}' +
             '#crmIconPicker a.ui-button .ui-icon {margin-top: -0.5em; width: auto; height: auto;}' +
             '</style>' +
-            '<div class="icon-search"><input class="crm-form-text" name="search" placeholder="&#xf002"/></div>' +
+            '<div class="icon-ctrls crm-clearfix">' +
+            '<input class="crm-form-text" name="search" placeholder="&#xf002"/>' +
+            '<select class="crm-form-select"></select>' +
+            '<button type="button" class="cancel" title=""><i class="crm-i fa-ban"></i> ' + ts('No icon') + '</button>' +
+            '</div>' +
             '<div class="icons"></div>'
           );
+          var $styleSelect = $('.icon-ctrls select', dialog);
+          CRM.utils.setOptions($styleSelect, options, ts('Normal'));
+          $styleSelect.val($style.val());
+          $styleSelect.change(function() {
+            $style.val($styleSelect.val());
+            displayIcons();
+          });
+          $('.icon-ctrls button', dialog).click(pickIcon);
           displayIcons();
           dialog.unblock();
         }
 
         function pickIcon(e) {
           var newIcon = $(this).attr('title'),
-            style = $style.val();
+            style = newIcon ? $style.val() : '';
           $input.val(newIcon + (style ? ' ' + style : '')).change();
           dialog.dialog('close');
           e.preventDefault();
@@ -103,7 +117,7 @@
         dialog = $('<div id="crmIconPicker"/>').dialog({
           title: $input.attr('title'),
           width: '80%',
-          height: 400,
+          height: '90%',
           modal: true
         }).block()
           .on('click', 'a', pickIcon)
