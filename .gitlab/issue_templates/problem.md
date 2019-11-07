@@ -1,14 +1,14 @@
-Overview:
+Overview
 ----------------------------------------
 _Please describe your problem or bug in detail._
 
-Reproduction steps:
+Reproduction steps
 ----------------------------------------
 1. Click on **Contacts -> New Individual**.
 1. Entered **First Name** and **Last Name** and clicked **Save**.
 1. Got an error "**Fatal error: DB error**".
 
-Current behaviour:
+Current behaviour
 ----------------------------------------
 _What happens currently. Please provide error messages, screenshots or gifs ([LICEcap](http://www.cockos.com/licecap/), [SilentCast](https://github.com/colinkeenan/silentcast)) where appropriate._
 
@@ -19,11 +19,11 @@ information (like passwords). The backticks will help to preserve any
 special characters or spaces.
 ```
 
-Expected behaviour:
+Expected behaviour
 ----------------------------------------
 _What should happen._
 
-Environment information:
+Environment information
 ----------------------------------------
 
 <!-- Some of the items below may not be relevant for every bug - if in doubt please include more information than you think is neccessary. -->
@@ -37,4 +37,4 @@ Environment information:
 
 Comments
 ----------------------------------------
-_Anything else you would like the reviewer to note_
+_Anything else you would like the reviewer to note._
