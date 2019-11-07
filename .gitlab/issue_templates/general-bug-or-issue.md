@@ -8,15 +8,16 @@ Reproduction steps:
 1. Entered **First Name** and **Last Name** and clicked **Save**.
 1. Got an error "**Fatal error: DB error**".
 
-```
-(Please include the full text of the error message.
-You can remove any private information like passwords.
-If you put it inside three backtick ` symbols it will wrap/format it nicely!)
-```
-
 Current behaviour:
 ----------------------------------------
-_What happens currently. Please provide screenshots or gifs ([LICEcap](http://www.cockos.com/licecap/), [SilentCast](https://github.com/colinkeenan/silentcast)) where appropriate._
+_What happens currently. Please provide error messages, screenshots or gifs ([LICEcap](http://www.cockos.com/licecap/), [SilentCast](https://github.com/colinkeenan/silentcast)) where appropriate._
+
+```
+TIP: The best way to convey an error message is to copy it in here and use
+three backtick ` symbols.  You may edit the message to remove private
+information (like passwords). The backticks will help to preserve any
+special characters or spaces.
+```
 
 Expected behaviour:
 ----------------------------------------
