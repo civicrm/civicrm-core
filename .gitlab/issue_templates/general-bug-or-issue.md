@@ -8,7 +8,11 @@ Reproduction steps:
 1. Entered **First Name** and **Last Name** and clicked **Save**.
 1. Got an error "**Fatal error: DB error**".
 
-```(Please include the full text of the error message. You can remove any private information like passwords. If you put it inside three backtick ` symbols it will wrap/format it nicely!)```
+```
+(Please include the full text of the error message.
+You can remove any private information like passwords.
+If you put it inside three backtick ` symbols it will wrap/format it nicely!)
+```
 
 Current behaviour:
 ----------------------------------------
