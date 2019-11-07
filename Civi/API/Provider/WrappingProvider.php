@@ -27,9 +27,6 @@
 
 namespace Civi\API\Provider;
 
-use Civi\API\Events;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 /**
  * A wrapping provider overrides an existing API. It has discretion to pass-through
  * to the original API (0 or many times) or to substitute with entirely different
