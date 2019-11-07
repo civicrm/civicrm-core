@@ -1109,12 +1109,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // Display a checkbox to migrate, only if the values are different
       if ($value != $main[$field]) {
         $elements[] = [
-          'advcheckbox',
-          "move_$field",
-          NULL,
-          NULL,
-          NULL,
-          $value,
+          0 => 'advcheckbox',
+          1 => "move_$field",
+          2 => NULL,
+          3 => NULL,
+          4 => NULL,
+          5 => $value,
+          'is_checked' => (!isset($main[$field]) || $main[$field] === ''),
         ];
       }
 
