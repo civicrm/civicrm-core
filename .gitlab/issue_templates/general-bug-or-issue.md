@@ -20,7 +20,7 @@ _What happens currently. Please provide screenshots or gifs ([LICEcap](http://ww
 
 Expected behaviour:
 ----------------------------------------
-_What should happen. Please provide screenshots or gifs ([LICEcap](http://www.cockos.com/licecap/), [SilentCast](https://github.com/colinkeenan/silentcast)) where appropriate._
+_What should happen._
 
 Environment information:
 ----------------------------------------
