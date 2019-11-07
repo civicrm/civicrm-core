@@ -26,6 +26,7 @@
  */
 
 namespace Civi\API\Event;
+
 use Civi\API\Provider\WrappingProvider;
 
 /**
