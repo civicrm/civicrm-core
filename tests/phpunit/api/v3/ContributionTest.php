@@ -2146,6 +2146,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test repeat contribution successfully creates line item.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransaction() {
     $originalContribution = $this->setUpRepeatTransaction($recurParams = [], 'single');
