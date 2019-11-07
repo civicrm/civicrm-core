@@ -1,6 +1,6 @@
 Overview:
 ----------------------------------------
-_Please describe your issue in detail._
+_Please describe your problem or bug in detail._
 
 Reproduction steps:
 ----------------------------------------
