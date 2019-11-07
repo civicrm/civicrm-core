@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * information about it. It needs to extend CRM_Core_Component_Info
  * abstract class.
  *
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */

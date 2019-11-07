@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -210,7 +210,7 @@ function _civicrm_api3_mailing_a_b_fill_winner($winner_id, $final_id) {
     'optout_id',
     'reply_id',
     'resubscribe_id',
-    'unsubscribe_id'
+    'unsubscribe_id',
   ];
   $f = CRM_Utils_SQL_Select::from('civicrm_mailing')
     ->where('id = #id', ['id' => $winner_id])
