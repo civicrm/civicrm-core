@@ -388,9 +388,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Use CMS-native approach
+   * @throws \CRM_Core_Exception
    */
   public function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
   /**
@@ -463,6 +464,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param mixed $realPath
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
@@ -476,7 +478,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     $cmsRootPath = $this->cmsRootPath();
     if (!$cmsRootPath) {
-      CRM_Core_Error::fatal("Could not find the install directory for WordPress");
+      throw new CRM_Core_Exception("Could not find the install directory for WordPress");
     }
     $path = Civi::settings()->get('wpLoadPhp');
     if (!empty($path)) {
@@ -486,7 +488,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php';
     }
     else {
-      CRM_Core_Error::fatal("Could not find the bootstrap file for WordPress");
+      throw new CRM_Core_Exception("Could not find the bootstrap file for WordPress");
     }
     $wpUserTimezone = get_option('timezone_string');
     if ($wpUserTimezone) {

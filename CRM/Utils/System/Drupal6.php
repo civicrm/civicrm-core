@@ -318,7 +318,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
     $dbDrupal = DB::connect($config->userFrameworkDSN);
     if (DB::isError($dbDrupal)) {
-      CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
+      throw new CRM_Core_Exception("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
     }
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';

@@ -87,7 +87,7 @@ class CRM_Utils_Request {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST', $isThrowException = FALSE) {
+  public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST', $isThrowException = TRUE) {
 
     $value = NULL;
     switch ($method) {
