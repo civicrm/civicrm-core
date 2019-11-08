@@ -2028,6 +2028,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['event_totals']['optout'] += $row['optout'];
 
       foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
+        // Get the field name from the MailingJob fields as that will not have any prefixing.
+        // dev/mailing#56
+        $field = CRM_Mailing_BAO_MailingJob::fields()[$field]['name'];
         $row[$field] = $mailing->$field;
       }
 
