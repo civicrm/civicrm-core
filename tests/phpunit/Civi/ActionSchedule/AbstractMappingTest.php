@@ -227,6 +227,20 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
       'last_name' => 'Exemplar',
       'email' => 'carol@example.org',
     ]);
+    $this->contacts['dave'] = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Dave',
+      'last_name' => 'Exemplar',
+      'email' => 'dave@example.org',
+      'do_not_email' => 1,
+    ]);
+    $this->contacts['edith'] = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Edith',
+      'last_name' => 'Exemplar',
+      'email' => 'edith@example.org',
+      'is_deceased' => 1,
+    ]);
   }
 
   /**
