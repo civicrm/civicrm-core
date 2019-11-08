@@ -538,7 +538,7 @@ LIMIT 1
    *   Array of contribution statuses in array('status id' => 'label') format
    */
   public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {
-    if ($usedFor == 'pledge') {
+    if ($usedFor === 'pledge') {
       $statusNames = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
     }
     else {
@@ -562,25 +562,29 @@ LIMIT 1
         'Pending refund',
       ]);
 
-      // Event registration and New Membership backoffice form support partially paid payment,
-      //  so exclude this status only for 'New Contribution' form
-      if ($usedFor == 'contribution') {
+      if ($usedFor === 'contribution') {
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
           'Partially paid',
         ]);
       }
-      elseif ($usedFor == 'participant') {
+      elseif ($usedFor === 'participant') {
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Cancelled',
           'Failed',
-        ]);
-      }
-      elseif ($usedFor == 'membership') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
+          'Partially paid',
+        ]);
+      }
+      elseif ($usedFor === 'membership') {
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
+          'In Progress',
+          'Cancelled',
+          'Failed',
+          'Overdue',
+          'Partially paid',
         ]);
       }
     }
