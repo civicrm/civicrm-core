@@ -368,6 +368,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_id) {
       $this->_contactID = $defaults['contact_id'];
     }
+    elseif ($this->_contactID) {
+      $defaults['contact_id'] = $this->_contactID;
+    }
 
     // Set $newCredit variable in template to control whether link to credit card mode is included.
     $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
@@ -621,11 +624,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('customDataSubType', $this->_contributionType);
     $this->assign('entityID', $this->_id);
 
-    if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), [
-        'create' => TRUE,
-        'api' => ['extra' => ['email']],
-      ], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE], TRUE);
+    if ($this->_context != 'standalone') {
+      $contactField->freeze();
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
