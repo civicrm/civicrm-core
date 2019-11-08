@@ -607,7 +607,7 @@ FROM civicrm_action_schedule cas
    *   List of error messages.
    */
   protected static function sendReminderEmail($tokenRow, $schedule, $toContactID) {
-    $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID);
+    $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID, TRUE);
     if (!$toEmail) {
       return ["email_missing" => "Couldn't find recipient's email address."];
     }
