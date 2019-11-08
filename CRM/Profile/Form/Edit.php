@@ -113,7 +113,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
       // CRM-16784: If there is no ID then this can't be an 'edit'
       else {
-        CRM_Core_Error::fatal(ts('No user/contact ID was specified, so the Profile cannot be used in edit mode.'));
+        CRM_Core_Error::statusBounce(ts('No user/contact ID was specified, so the Profile cannot be used in edit mode.'));
       }
 
     }
@@ -141,7 +141,7 @@ SELECT module,is_reserved
 
     //Remove need for Profile module type when using reserved profiles [CRM-14488]
     if (!$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
-      CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
+      CRM_Core_Error::statusBounce(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
         [1 => $this->_gid]
       ));
     }
@@ -153,7 +153,7 @@ SELECT module,is_reserved
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
-      CRM_Core_Error::fatal();
+      CRM_Core_Error::statusBounce(ts('Invalid'));
     }
 
     // set the title

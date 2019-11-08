@@ -145,7 +145,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     //CRM-4418
     if (!CRM_Core_Permission::checkActionPermission('CiviCase', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
@@ -161,7 +161,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
       foreach ($caseAttributes as $key => $label) {
         if (!CRM_Case_BAO_Case::buildOptions($key, 'create')) {
-          CRM_Core_Error::fatal(ts('You do not have any active %1', [1 => $label]));
+          CRM_Core_Error::statusBounce(ts('You do not have any active %1', [1 => $label]));
         }
       }
     }
@@ -169,20 +169,20 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::ADD) {
       $this->_activityTypeId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       if (!$this->_activityTypeId) {
-        CRM_Core_Error::fatal(ts('The Open Case activity type is missing or disabled. Please have your site administrator check Administer > Option Lists > Activity Types for the CiviCase component.'));
+        CRM_Core_Error::statusBounce(ts('The Open Case activity type is missing or disabled. Please have your site administrator check Administer > Option Lists > Activity Types for the CiviCase component.'));
       }
     }
 
     //check for case permissions.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
     }
     if (($this->_action & CRM_Core_Action::ADD) &&
       (!CRM_Core_Permission::check('access all cases and activities') &&
         !CRM_Core_Permission::check('add cases')
       )
     ) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
     }
 
     if ($this->_activityTypeFile = CRM_Activity_BAO_Activity::getFileForActivityTypeId($this->_activityTypeId,
