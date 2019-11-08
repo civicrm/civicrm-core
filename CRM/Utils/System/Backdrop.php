@@ -309,7 +309,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
 
     $dbBackdrop = DB::connect($config->userFrameworkDSN);
     if (DB::isError($dbBackdrop)) {
-      CRM_Core_Error::fatal("Cannot connect to Backdrop database via $config->userFrameworkDSN, " . $dbBackdrop->getMessage());
+      throw new CRM_Core_Exception("Cannot connect to Backdrop database via $config->userFrameworkDSN, " . $dbBackdrop->getMessage());
     }
 
     $account = $userUid = $userMail = NULL;
