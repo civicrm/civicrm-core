@@ -405,7 +405,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
       $surveyId = key(CRM_Campaign_BAO_Survey::getSurveys(TRUE, TRUE));
     }
     if (!$surveyId) {
-      CRM_Core_Error::statusBounce('Could not find valid Survey Id.');
+      CRM_Core_Error::statusBounce(ts('Could not find valid Survey Id.'));
     }
     $this->_formValues['campaign_survey_id'] = $this->_formValues['campaign_survey_id'] = $surveyId;
 

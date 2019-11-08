@@ -97,7 +97,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if (!$this->_caseId ||
       (!$this->_activityId && !$this->_activityTypeId)
     ) {
-      CRM_Core_Error::statusBounce('required params missing.');
+      CRM_Core_Error::statusBounce(ts('required params missing.'));
     }
 
     //check for case activity access.
