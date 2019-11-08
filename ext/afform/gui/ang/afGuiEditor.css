@@ -45,12 +45,25 @@
   display: none;
 }
 
-#afGuiEditor-palette-config .form-inline {
+#afGuiEditor-palette-config .af-gui-entity-values .form-inline {
   margin-bottom: 10px;
 }
 
 #afGuiEditor-palette-config .form-inline label {
   min-width: 110px;
+}
+
+#afGuiEditor input[type=search]::placeholder {
+  font-family: FontAwesome;
+  text-align: right;
+}
+#afGuiEditor input[type=search]:-ms-input-placeholder {
+  font-family: FontAwesome;
+  text-align: right;
+}
+#afGuiEditor input[type=search]::-ms-input-placeholder {
+  font-family: FontAwesome;
+  text-align: right;
 }
 
 #afGuiEditor .af-gui-bar {
@@ -68,6 +81,9 @@
 #afGuiEditor-canvas:hover .af-gui-bar {
   opacity: 1;
   transition: opacity .2s;
+}
+#afGuiEditor-canvas .panel-body > div > .af-gui-bar {
+  top: -5px;
 }
 
 #afGuiEditor .af-gui-bar .btn.active {
@@ -98,6 +114,10 @@
 }
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > span {
   color: white;
+}
+
+#afGuiEditor .af-gui-entity-fields legend {
+  margin-bottom: 0 !important;
 }
 
 #afGuiEditor [ui-sortable] {

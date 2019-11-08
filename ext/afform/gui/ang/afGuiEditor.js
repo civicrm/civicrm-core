@@ -25,13 +25,12 @@
         });
       },
       controller: function($scope) {
-        $scope.ts = CRM.ts();
+        var ts = $scope.ts = CRM.ts();
         $scope.afform = null;
         $scope.saving = false;
         $scope.selectedEntity = null;
-        $scope.meta = CRM.afformAdminData;
-        $scope.controls = {};
-        $scope.fieldList = {};
+        $scope.meta = this.meta = CRM.afformAdminData;
+        this.scope = $scope;
         var editor = $scope.editor = this;
         var newForm = {
           title: ts('Untitled Form'),
@@ -74,7 +73,6 @@
           $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
           evaluate($scope.layout['#children']);
           $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
-          _.each(_.keys($scope.entities), buildFieldList);
 
           // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
           $scope.$watch('afform', function () {
@@ -111,7 +109,6 @@
               }
             ]
           });
-          buildFieldList(entityType + num);
           return entityType + num;
         };
 
@@ -143,37 +140,6 @@
           editor.selectEntity(entityName);
         };
 
-        $scope.rebuildFieldList = function() {
-          $timeout(function() {
-            $scope.$apply(function() {
-              buildFieldList($scope.selectedEntity);
-            });
-          });
-        };
-
-        function buildFieldList(entityName) {
-          $scope.fieldList[entityName] = $scope.fieldList[entityName] || [];
-          $scope.fieldList[entityName].length = 0;
-          _.each($scope.meta.fields[$scope.entities[entityName].type], function(field) {
-            $scope.fieldList[entityName].push({
-              "#tag": "af-field",
-              name: field.name,
-              defn: {}
-            });
-          });
-        }
-
-        $scope.valuesFields = function() {
-          var fields = _.transform($scope.meta.fields[$scope.entities[$scope.selectedEntity].type], function(fields, field) {
-            fields.push({id: field.name, text: field.title, disabled: $scope.fieldInUse($scope.selectedEntity, field.name)});
-          }, []);
-          return {results: fields};
-        };
-
-        $scope.removeValue = function(entity, fieldName) {
-          delete entity.data[fieldName];
-        };
-
         $scope.save = function() {
           $scope.saving = true;
           CRM.api4('Afform', 'save', {records: [JSON.parse(angular.toJson($scope.afform))]})
@@ -183,42 +149,6 @@
                 $scope.changesSaved = true;
               });
             });
-        };
-
-        $scope.$watch('controls.addValue', function(fieldName) {
-          if (fieldName) {
-            if (!$scope.entities[$scope.selectedEntity].data) {
-              $scope.entities[$scope.selectedEntity].data = {};
-            }
-            $scope.entities[$scope.selectedEntity].data[fieldName] = '';
-            $scope.controls.addValue = '';
-          }
-        });
-
-        // Checks if a field is on the form or set as a value
-        $scope.fieldInUse = function(entityName, fieldName) {
-          var data = $scope.entities[entityName].data || {},
-            found = false;
-          if (fieldName in data) {
-            return true;
-          }
-          return check($scope.layout['#children']);
-          function check(group) {
-            _.each(group, function(item) {
-              if (found) {
-                return false;
-              }
-              if (_.isPlainObject(item)) {
-                if ((!item['af-fieldset'] || (item['af-fieldset'] === entityName)) && item['#children']) {
-                  check(item['#children']);
-                }
-                if (item['#tag'] === 'af-field' && item.name === fieldName) {
-                  found = true;
-                }
-              }
-            });
-            return found;
-          }
         };
 
         // Parse strings of javascript that php couldn't interpret
@@ -234,22 +164,6 @@
                   }
                 }
               });
-            }
-          });
-        }
-
-        function expandFields(collection, entityType) {
-          _.each(collection, function (item) {
-            if (_.isPlainObject(item)) {
-              if (item['af-fieldset']) {
-                expandFields(item['#children'], editor.getEntity(item['af-fieldset']).type);
-              }
-              else if (item['#tag'] === 'af-field') {
-                item.defn = item.defn || {};
-                _.defaults(item.defn, _.cloneDeep(_.pick(editor.getField(entityType, item.name), ['title', 'input_type', 'input_attrs'])));
-              } else {
-                expandFields(item['#children'], entityType);
-              }
             }
           });
         }
@@ -291,6 +205,100 @@
     });
   }
 
+  angular.module('afGuiEditor').directive('afGuiEntity', function($timeout) {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/entity.html',
+      scope: {
+        entity: '=afGuiEntity',
+      },
+      require: '^^afGuiEditor',
+      link: function ($scope, element, attrs, editor) {
+        $scope.editor = editor;
+      },
+      controller: function ($scope) {
+        var ts = $scope.ts = CRM.ts();
+        $scope.controls = {};
+        $scope.fieldList = [];
+
+        $scope.valuesFields = function() {
+          var fields = $scope.editor ? _.transform($scope.editor.meta.fields[$scope.entity.type], function(fields, field) {
+            fields.push({id: field.name, text: field.title, disabled: $scope.fieldInUse(field.name)});
+          }, []) : [];
+          return {results: fields};
+        };
+
+        $scope.removeValue = function(entity, fieldName) {
+          delete entity.data[fieldName];
+        };
+
+        $scope.buildFieldList = function() {
+          $scope.fieldList.length = 0;
+          var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
+          _.each($scope.editor.meta.fields[$scope.entity.type], function(field) {
+            if (!search || _.contains(field.name, search) || _.contains(field.title.toLowerCase(), search)) {
+              $scope.fieldList.push({
+                "#tag": "af-field",
+                name: field.name,
+                defn: {}
+              });
+            }
+          });
+        };
+
+        $scope.clearSearch = function() {
+          $scope.controls.fieldSearch = '';
+        };
+
+        $scope.rebuildFieldList = function() {
+          $timeout(function() {
+            $scope.$apply(function() {
+              $scope.buildFieldList();
+            });
+          });
+        };
+
+        // Checks if a field is on the form or set as a value
+        $scope.fieldInUse = function(fieldName) {
+          var data = $scope.entity.data || {},
+            found = false;
+          if (fieldName in data) {
+            return true;
+          }
+          return check($scope.editor.scope.layout['#children']);
+          function check(group) {
+            _.each(group, function(item) {
+              if (found) {
+                return false;
+              }
+              if (_.isPlainObject(item)) {
+                if ((!item['af-fieldset'] || (item['af-fieldset'] === $scope.entity.name)) && item['#children']) {
+                  check(item['#children']);
+                }
+                if (item['#tag'] === 'af-field' && item.name === fieldName) {
+                  found = true;
+                }
+              }
+            });
+            return found;
+          }
+        };
+
+        $scope.$watch('controls.addValue', function(fieldName) {
+          if (fieldName) {
+            if (!$scope.entity.data) {
+              $scope.entity.data = {};
+            }
+            $scope.entity.data[fieldName] = '';
+            $scope.controls.addValue = '';
+          }
+        });
+
+        $scope.$watch('controls.fieldSearch', $scope.buildFieldList);
+      }
+    };
+  });
+
   angular.module('afGuiEditor').directive('afGuiBlock', function() {
     return {
       restrict: 'A',
@@ -302,10 +310,10 @@
       require: '^^afGuiEditor',
       link: function($scope, element, attrs, editor) {
         $scope.editor = editor;
-        $scope.ts = CRM.ts();
       },
       controller: function($scope) {
         $scope.block = this;
+        var ts = $scope.ts = CRM.ts();
         this.node = $scope.node;
 
         this.modifyClasses = function(item, toRemove, toAdd) {
@@ -434,6 +442,8 @@
         $scope.block = block;
       },
       controller: function($scope) {
+        var ts = $scope.ts = CRM.ts();
+
         $scope.tags = {
           p: ts('Normal Text'),
           legend: ts('Fieldset Legend'),
@@ -475,6 +485,7 @@
         $scope.block = block;
       },
       controller: function($scope) {
+        var ts = $scope.ts = CRM.ts();
 
         // TODO: Add action selector to UI
         // $scope.actions = {
