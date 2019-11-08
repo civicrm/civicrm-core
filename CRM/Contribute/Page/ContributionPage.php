@@ -240,7 +240,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       $yearNow = $yearDate + 10000;
 
       $urlString = 'civicrm/contribute/search';
-      $urlParams = 'reset=1&pid=%%id%%&force=1&test=0';
+      $urlParams = 'reset=1&contribution_page_id=%%id%%&force=1&test=0';
 
       self::$_contributionLinks = array(
         CRM_Core_Action::DETACH => array(

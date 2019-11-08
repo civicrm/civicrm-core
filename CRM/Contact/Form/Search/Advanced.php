@@ -341,7 +341,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'activity_type_id',
       'status_id',
       'priority_id',
-      'contribution_page_id',
       'contribution_product_id',
       'payment_instrument_id',
       'group',
