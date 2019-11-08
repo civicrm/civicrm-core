@@ -210,7 +210,7 @@
       restrict: 'A',
       templateUrl: '~/afGuiEditor/entity.html',
       scope: {
-        entity: '=afGuiEntity',
+        entity: '=afGuiEntity'
       },
       require: '^^afGuiEditor',
       link: function ($scope, element, attrs, editor) {
@@ -350,19 +350,18 @@
           return null;
         };
 
-        $scope.addBlock = function(type) {
-          var newBlock = {
-            '#tag': type === 'text' ? 'p' : 'div',
-            'class': 'af-' + type,
-            '#children': type == 'block' ? [] : [{'#text': ts('Enter text')}]
-          };
-          if (type === 'button') {
-            newBlock['#tag'] = 'button';
-            newBlock['class'] += ' btn btn-primary';
-            newBlock['crm-icon'] = 'fa-check';
-            newBlock['ng-click'] = "modelListCtrl.submit()";
-          }
+        $scope.addBlock = function(type, props) {
+          var classes = type.split('.');
+          var newBlock = _.defaults({
+            '#tag': classes.shift(),
+            'class': classes.join(' '),
+            '#children': classes[0] === 'af-block' ? [] : [{'#text': ts('Enter text')}]
+          }, props);
           $scope.node['#children'].push(newBlock);
+        };
+
+        this.removeBlock = function(node) {
+          removeRecursive($scope.editor.scope.layout['#children'], {$$hashKey: node.$$hashKey});
         };
 
         $scope.isSelectedFieldset = function(entityName) {

@@ -1,15 +1,25 @@
 <div class="af-gui-bar">
   {{ node['#tag'] }}
   <div class="form-inline pull-right">
-    <button type="button" class="btn btn-xs dropdown-toggle {{ getStyle() }}-outline" data-toggle="dropdown" title="{{ ts('Style') }}">
-      <span>{{ styles[getStyle()] }}</span>
-      <i class="crm-i fa-caret-down"></i>
-    </button>
-    <ul class="dropdown-menu">
-      <li ng-repeat="(style, label) in styles" class="{{ style.replace('btn', 'bg') }}">
-        <a href ng-click="setStyle(style)">{{ label }}</a>
-      </li>
-    </ul>
+    <div class="btn-group pull-right">
+      <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-block-button" data-toggle="dropdown" title="{{ ts('Configure') }}">
+        <span><i class="crm-i fa-gear"></i></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href ng-click="block.removeBlock(node)"><span class="text-danger">{{ ts('Delete this button') }}</span></a></li>
+      </ul>
+    </div>
+    <div class="btn-group pull-right">
+      <button type="button" class="btn btn-xs dropdown-toggle {{ getStyle() }}-outline" data-toggle="dropdown" title="{{ ts('Style') }}">
+        <span>{{ styles[getStyle()] }}</span>
+        <i class="crm-i fa-caret-down"></i>
+      </button>
+      <ul class="dropdown-menu">
+        <li ng-repeat="(style, label) in styles" class="{{ style.replace('btn', 'bg') }}">
+          <a href ng-click="setStyle(style)">{{ label }}</a>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
 <button type="button" class="btn {{ getStyle() }}">

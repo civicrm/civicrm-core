@@ -1,12 +1,22 @@
 <div class="af-gui-bar">
   {{ node['#tag'] }}
-  <select class="pull-right" ng-model="node['#tag']">
-    <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
-  </select>
-  <div class="btn-group btn-group-xs pull-right" role="group">
-    <button type="button" class="btn btn-default" ng-class="{active: opt === getAlign()}" ng-repeat="(opt, label) in alignments" ng-click="setAlign(opt)" title="{{ label }}">
-      <i class="crm-i fa-{{ opt.replace('text', 'align') }}" ></i>
-    </button>
+  <div class="form-inline pull-right">
+    <div class="btn-group pull-right">
+      <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-block-button" data-toggle="dropdown" title="{{ ts('Configure') }}">
+        <span><i class="crm-i fa-gear"></i></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href ng-click="block.removeBlock(node)"><span class="text-danger">{{ ts('Delete this text') }}</span></a></li>
+      </ul>
+    </div>
+    <select class="pull-right" ng-model="node['#tag']" title="{{ ts('Text style') }}">
+      <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
+    </select>
+    <div class="btn-group btn-group-xs pull-right" role="group">
+      <button type="button" class="btn btn-default" ng-class="{active: opt === getAlign()}" ng-repeat="(opt, label) in alignments" ng-click="setAlign(opt)" title="{{ label }}">
+        <i class="crm-i fa-{{ opt.replace('text', 'align') }}" ></i>
+      </button>
+    </div>
   </div>
 </div>
 <p af-gui-editable ng-model="node['#children'][0]['#text']" class="{{ getAlign() + ' af-gui-text-' + node['#tag'] }}" >

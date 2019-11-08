@@ -16,6 +16,10 @@
   margin-left: 5px;
 }
 
+#afGuiEditor-canvas .panel-body {
+  padding-top: 5px;
+}
+
 #afGuiEditor #afGuiEditor-palette-tabs li {
   top: 1px;
 }
@@ -67,16 +71,19 @@
 }
 
 #afGuiEditor .af-gui-bar {
+  height: 22px;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 1s 2s;
+  position:relative;
+}
+#afGuiEditor [ui-sortable] .af-gui-bar {
   cursor: move;
   background-color: #efefef;
-  height: 22px;
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
   padding-left: 15px;
-  opacity: 0;
-  transition: opacity 1s 2s;
 }
 #afGuiEditor-canvas:hover .af-gui-bar {
   opacity: 1;
@@ -141,7 +148,7 @@
   background-color: #efefef;
 }
 /* grip handle */
-#afGuiEditor .af-gui-bar:before,
+#afGuiEditor [ui-sortable] .af-gui-bar:before,
 #afGuiEditor .af-gui-field-select-list > div:not(.disabled):hover:before {
   background-size: cover;
   background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
@@ -153,12 +160,18 @@
   left: 4px;
   top: 5px;
 }
-
+#afGuiEditor #afGuiEditor-canvas .af-gui-add-canvas-button {
+  border: 2px dashed #0071bd;
+  color: #0071bd;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
 #afGuiEditor .af-gui-add-block-button span {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px dashed grey;
+  width: 18px;
+  height: 18px;
+  border: 2px dashed #0071bd;
+  color: #0071bd;
 }
 #afGuiEditor .af-gui-add-block-button span i {
   position: relative;
