@@ -84,9 +84,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-
-    $this->_formValues = $this->getFormValues();
+    parent::preProcess();
 
     //membership ID
     $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
@@ -96,10 +94,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
     if (isset($participantId)) {
       $this->_formValues['contribution_participant_id'] = $participantId;
-    }
-
-    if ($this->_force) {
-      $this->handleForcedSearch();
     }
 
     $sortID = NULL;
@@ -277,10 +271,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->_done = TRUE;
 
     $this->setFormValues();
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->fixFormValues();
 
     // We don't show test records in summaries or dashboards
     if (empty($this->_formValues['contribution_test']) && $this->_force && !empty($this->_context) && $this->_context == 'dashboard') {
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       $this->_formValues["contribution_test"] = 0;
     }
 
@@ -289,11 +285,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       'contribution_amount_high',
     ] as $f) {
       if (isset($this->_formValues[$f])) {
+        // @todo - stop changing formValues - respect submitted form values, change a working array.
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }
     }
 
-    $config = CRM_Core_Config::singleton();
     if (!empty($_POST)) {
       $specialParams = [
         'financial_type_id',
@@ -306,10 +302,13 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'payment_instrument_id',
         'contribution_batch_id',
       ];
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams);
 
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
       if ($tags && !is_array($tags)) {
+        // @todo - stop changing formValues - respect submitted form values, change a working array.
         unset($this->_formValues['contact_tags']);
         $this->_formValues['contact_tags'][$tags] = 1;
       }
@@ -317,12 +316,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       if ($tags && is_array($tags)) {
         unset($this->_formValues['contact_tags']);
         foreach ($tags as $notImportant => $tagID) {
+          // @todo - stop changing formValues - respect submitted form values, change a working array.
           $this->_formValues['contact_tags'][$tagID] = 1;
         }
       }
 
       $group = CRM_Utils_Array::value('group', $this->_formValues);
       if ($group && !is_array($group)) {
+        // @todo - stop changing formValues - respect submitted form values, change a working array.
         unset($this->_formValues['group']);
         $this->_formValues['group'][$group] = 1;
       }
@@ -330,16 +331,18 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       if ($group && is_array($group)) {
         unset($this->_formValues['group']);
         foreach ($group as $groupID) {
+          // @todo - stop changing formValues - respect submitted form values, change a working array.
           $this->_formValues['group'][$groupID] = 1;
         }
       }
     }
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -360,6 +363,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
       $this->_action,
@@ -456,9 +460,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($contribPageId) {
       $this->_formValues['contribution_page_id'] = $contribPageId;
     }
-
-    //give values to default.
-    $this->_defaults = $this->_formValues;
   }
 
   /**

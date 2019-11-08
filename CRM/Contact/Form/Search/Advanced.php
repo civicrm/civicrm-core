@@ -201,7 +201,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $this->_ssID = $this->get('ssID');
     }
 
-    $defaults = array_merge($this->_formValues, [
+    $defaults = array_merge((array) $this->_formValues, [
       'privacy_toggle' => 1,
       'operator' => 'AND',
     ], $defaults);
