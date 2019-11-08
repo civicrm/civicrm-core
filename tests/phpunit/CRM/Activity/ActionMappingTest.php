@@ -141,10 +141,11 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
       ],
     ];
 
-    // No recipients: Dave has `do_not_email` and Edith is dead.
+    // No recipients: Dave has `do_not_email`, Edith is dead, and Francis' email
+    // is on hold.
     $cs[] = [
       '2015-02-01 00:00:00',
-      'addDaveMeeting addEdithMeeting scheduleForMeeting startOnTime useHelloFirstName recipientIsActivitySource',
+      'addDaveMeeting addEdithMeeting addFrancisMeeting scheduleForMeeting startOnTime useHelloFirstName recipientIsActivitySource',
       [],
     ];
 
@@ -203,6 +204,21 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
       'source_contact_id' => $this->contacts['edith']['id'],
       'activity_type_id' => 'Meeting',
       'subject' => 'Subject for Edith',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
+      'status_id' => 2,
+      'assignee_contact_id' => [$this->contacts['carol']['id']],
+    ]);
+  }
+
+  /**
+   * Create an activity record for Francis with type "Meeting". Francis' email
+   * is misspelled and has bounced, so he should never receive an email reminder.
+   */
+  public function addFrancisMeeting() {
+    $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $this->contacts['francis']['id'],
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Subject for Francis',
       'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
       'status_id' => 2,
       'assignee_contact_id' => [$this->contacts['carol']['id']],
