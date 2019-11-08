@@ -57,7 +57,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         $this->assign('canDelete', TRUE);
       }
       if (!CRM_Core_Permission::check('view contributions of type ' . $financialTypeID)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
     }
     elseif ($this->_action & CRM_Core_Action::VIEW) {

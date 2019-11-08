@@ -15,7 +15,7 @@ class CRM_Event_Cart_Page_AddToCart extends CRM_Core_Page {
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     if (!CRM_Core_Permission::event(CRM_Core_Permission::VIEW, $this->_id, 'register for events')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to register for this event'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to register for this event'));
     }
 
     $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();

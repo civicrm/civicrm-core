@@ -42,12 +42,14 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       //check permission for action.
       if (!CRM_Core_Permission::checkActionPermission('CiviEvent', $this->_action)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
 
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
