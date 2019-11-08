@@ -97,16 +97,22 @@ class CRM_Api4_Services {
     );
     foreach ($locations as $location) {
       $path = \CRM_Utils_File::addTrailingSlash(dirname($location)) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
-      $container->addResource(new \Symfony\Component\Config\Resource\DirectoryResource($path, ';\.php$;'));
-      foreach (glob("$path*.php") as $file) {
-        $matches = [];
-        preg_match('/(\w*).php/', $file, $matches);
-        $serviceName = $namespace . array_pop($matches);
-        $serviceClass = new \ReflectionClass($serviceName);
-        if ($serviceClass->isInstantiable()) {
-          $definition = $container->register(str_replace('\\', '_', $serviceName), $serviceName);
-          $definition->addTag($tag);
+      try {
+        $resource = new \Symfony\Component\Config\Resource\DirectoryResource($path, ';\.php$;');
+        $container->addResource($resource);
+        foreach (glob("$path*.php") as $file) {
+          $matches = [];
+          preg_match('/(\w*).php/', $file, $matches);
+          $serviceName = $namespace . array_pop($matches);
+          $serviceClass = new \ReflectionClass($serviceName);
+          if ($serviceClass->isInstantiable()) {
+            $definition = $container->register(str_replace('\\', '_', $serviceName), $serviceName);
+            $definition->addTag($tag);
+          }
         }
+      }
+      catch (\InvalidArgumentException $e) {
+        //Directory is not found so lets not do anything i suppose.
       }
     }
   }
