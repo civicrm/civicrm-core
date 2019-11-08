@@ -1839,9 +1839,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $report['mailing'] = [];
     foreach (array_keys(self::fields()) as $field) {
-      if ($field == 'mailing_modified_date') {
-        $field = 'modified_date';
-      }
+      $field = self::fields()[$field]['name'];
       $report['mailing'][$field] = $mailing->$field;
     }
 
