@@ -1,17 +1,14 @@
-<div>
-  <a href ng-click="editor.removeEntity(entity.name)" class="btn btn-sm btn-danger-outline pull-right">
-    <i class="crm-i fa-trash"></i>
-  </a>
-
+<div class="af-gui-columns">
   <fieldset class="af-gui-entity-values">
     <legend>{{ ts('Values') }}</legend>
     <div class="form-inline" ng-if="entity.data" ng-repeat="(fieldName, value) in entity.data">
-      <label>{{ editor.getField(entity.type, fieldName).title }}:</label>
+      <label>{{ editor.getField(entity.type, fieldName).title }}:</label><br />
       <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
-      <a href class="pull-right" ng-click="removeValue(entity, fieldName)">
+      <a href class="" ng-click="removeValue(entity, fieldName)">
         <i class="crm-i fa-times"></i>
       </a>
     </div>
+    <hr />
     <div class="form-inline">
       <input class="form-control" ng-model="controls.addValue" crm-ui-select="{data: valuesFields}" placeholder="Add value" />
     </div>
@@ -31,9 +28,12 @@
       </div>
     </div>
   </fieldset>
-
-  <fieldset>
-    <legend>{{ ts('Options') }}</legend>
-  </fieldset>
-
 </div>
+
+<a href ng-click="editor.removeEntity(entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: entity.type}) }}">
+  <i class="crm-i fa-trash"></i>
+</a>
+
+<fieldset>
+  <legend>{{ ts('Options') }}</legend>
+</fieldset>

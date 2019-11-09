@@ -2,10 +2,6 @@
   display: flex;
 }
 
-#afGuiEditor .panel.panel-default {
-  /*margin-bottom: 0;*/
-}
-
 #afGuiEditor #afGuiEditor-palette {
   flex: 1;
   margin-right: 5px;
@@ -16,8 +12,20 @@
   margin-left: 5px;
 }
 
-#afGuiEditor-canvas .panel-body {
+#afGuiEditor .panel-body {
+  padding: 5px 12px;
+  position: relative;
+}
+
+#afGuiEditor fieldset legend {
   padding-top: 5px;
+  font-size: 16px;
+  margin-bottom: 5px !important;
+}
+
+#afGuiEditor hr {
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
 #afGuiEditor #afGuiEditor-palette-tabs li {
@@ -29,9 +37,20 @@
   font-size: 12px;
 }
 
-#afGuiEditor #afGuiEditor-palette-tabs .dropdown-menu {
-  max-height: 500px;
-  overflow-y: auto;
+#afGuiEditor .af-gui-columns {
+  display: flex;
+  position: relative;
+  flex-wrap: wrap;
+}
+#afGuiEditor .af-gui-columns > * {
+  flex: 1;
+  min-width: 200px;
+}
+
+#afGuiEditor .af-gui-remove-entity {
+  position: absolute;
+  right: 3px;
+  top: 3px;
 }
 
 #afGuiEditor .crm-editable-enabled,
@@ -123,10 +142,6 @@
   color: white;
 }
 
-#afGuiEditor .af-gui-entity-fields legend {
-  margin-bottom: 0 !important;
-}
-
 #afGuiEditor [ui-sortable] {
   min-height: 25px;
 }
@@ -208,3 +223,13 @@
   position: relative;
   top: -8px;
 }
+
+#afGuiEditor .af-gui-button > .btn.disabled {
+  cursor: default !important;
+  color: white !important;
+}
+
+#afGuiEditor .af-gui-button > .btn-default.disabled {
+  background-color: lightgrey !important;
+}
+
