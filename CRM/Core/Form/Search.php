@@ -520,6 +520,22 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Get the string processed to determine sort order.
+   *
+   * This looks like 'sort_name_u' for Sort name ascending.
+   *
+   * @return string|null
+   */
+  protected function getSortID() {
+    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
+      return CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
+        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
+      );
+    }
+    return NULL;
+  }
+
+  /**
    * Set the metadata for the form.
    *
    * @throws \CiviCRM_API3_Exception
