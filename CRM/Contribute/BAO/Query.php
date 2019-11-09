@@ -473,12 +473,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         //all other elements are handle in this case
         $fldName = substr($name, 13);
         if (!isset($fields[$fldName])) {
-          // CRM-12597
-          CRM_Core_Session::setStatus(ts(
-              'We did not recognize the search field: %1. Please check and fix your contribution related smart groups.',
-              [1 => $fldName]
-            )
-          );
           return;
         }
         $whereTable = $fields[$fldName];
@@ -486,7 +480,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
           $value = trim($value);
         }
 
-        $dataType = "String";
+        $dataType = 'String';
         if (!empty($whereTable['type'])) {
           $dataType = CRM_Utils_Type::typeToString($whereTable['type']);
         }
