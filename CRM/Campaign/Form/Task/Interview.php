@@ -591,16 +591,9 @@ WHERE {$clause}
         $voterIdCount = count($this->_contactIds);
 
         //create temporary table to store voter ids.
-        $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_survey_respondent');
-        CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
-        $query = "
-     CREATE TEMPORARY TABLE {$tempTableName} (
-            id int unsigned NOT NULL AUTO_INCREMENT,
-            survey_contact_id int unsigned NOT NULL,
-  PRIMARY KEY ( id )
-);
-";
-        CRM_Core_DAO::executeQuery($query);
+        $tempTableName = CRM_Utils_SQL_TempTable::build()
+          ->createWithColumns('id int unsigned NOT NULL AUTO_INCREMENT, survey_contact_id int unsigned NOT NULL, PRIMARY KEY ( id )')
+          ->getName();
         $batch = 100;
         $insertedCount = 0;
         do {
