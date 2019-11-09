@@ -177,6 +177,12 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     //Execute the job and it should send the mailing to the recipients now.
     $this->callAPISuccess('job', 'process_mailing', []);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    // Ensure that loading the report produces no errors.
+    $report = CRM_Mailing_BAO_Mailing::report($result['id']);
+    // dev/mailing#56 dev/mailing#57 Ensure that for completed mailings the jobs array is not empty.
+    $this->assertTrue(!empty($report['jobs']));
+    // Ensure that mailing name is correctly stored in the report.
+    $this->assertEquals('mailing name', $report['mailing']['name']);
   }
 
   /**
