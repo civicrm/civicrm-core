@@ -112,6 +112,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * Get where clause.
    *
    * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function where(&$query) {
     self::initializeAnySoftCreditClause($query);
@@ -122,18 +125,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       if (substr($query->_params[$id][0], 0, 13) == 'contribution_' || substr($query->_params[$id][0], 0, 10) == 'financial_'  || substr($query->_params[$id][0], 0, 8) == 'payment_') {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
-        }
-        // CRM-12065
-        if (
-          $query->_params[$id][0] == 'contribution_type_id' ||
-          $query->_params[$id][0] == 'contribution_type'
-        ) {
-          CRM_Core_Session::setStatus(
-            ts('The contribution type criteria is now obsolete, please update your smart group'),
-            '',
-            'alert'
-          );
-          continue;
         }
 
         self::whereClauseSingle($query->_params[$id], $query);
