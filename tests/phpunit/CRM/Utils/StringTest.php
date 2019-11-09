@@ -405,10 +405,9 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @param string $str
    *   An unsafe serialized value.
    * @dataProvider getBadSerializeExamples
-   * @expectedException \Exception
    */
   public function testBadSerializeExamples($str) {
-    CRM_Utils_String::unserialize($str);
+    $this->assertFalse(CRM_Utils_String::unserialize($str));
   }
 
 }
