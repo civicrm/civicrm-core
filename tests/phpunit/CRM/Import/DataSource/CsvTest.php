@@ -38,7 +38,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @dataProvider getCsvFiles
    */
   public function testToCsv($fileName) {
-    $dataSource = new CRM_Import_DataSource_Csv();
+    $dataSource = new CRM_Import_DataSource_CSV();
     $params = [
       'uploadFile' => [
         'name' => __DIR__ . '/' . $fileName,
