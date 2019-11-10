@@ -244,7 +244,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'is_override' => 1,
       ],
     ];
-    $order = $this->callAPIAndDocument('order', 'create', $p, __FUNCTION__, __FILE__);
+    $order = $this->callAPIAndDocument('Order', 'create', $p, __FUNCTION__, __FILE__);
     $params = [
       'contribution_id' => $order['id'],
     ];
@@ -258,7 +258,9 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
     $this->checkPaymentResult($order, $expectedResult);
-    $this->callAPISuccessGetCount('MembershipPayment', $params, 1);
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', $params);
+
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['id']]);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $order['id'],
     ]);
