@@ -656,6 +656,8 @@ function civicrm_api3_contribution_repeattransaction($params) {
  * @param CRM_Contribute_BAO_Contribution $firstContribution
  *
  * @return mixed
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstContribution = NULL) {
   $objects = $contribution->_relatedObjects;
@@ -690,7 +692,7 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   $input['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
   $transaction = new CRM_Core_Transaction();
   return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction,
-    !empty($contribution->contribution_recur_id), $contribution, CRM_Utils_Array::value('is_post_payment_create', $params));
+     $contribution, CRM_Utils_Array::value('is_post_payment_create', $params));
 }
 
 /**

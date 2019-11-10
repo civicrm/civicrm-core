@@ -473,15 +473,14 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $ids
    * @param array $objects
    * @param CRM_Core_Transaction $transaction
-   * @param bool $recur
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
+  public function completeTransaction(&$input, &$ids, &$objects, &$transaction) {
     $contribution = &$objects['contribution'];
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $recur, $contribution);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $contribution);
   }
 
   /**
