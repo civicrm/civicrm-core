@@ -128,7 +128,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
 
     $importTableName = $this->get('importTableName');
     // do a basic sanity check here
-    if (strpos($importTableName, 'civicrm_import_job_') === 0) {
+    if (strpos($importTableName, 'civicrm_tmp') === 0 || strpos($importTableName, 'civicrm_import_job') === 0) {
       $query = "DROP TABLE IF EXISTS $importTableName";
       $db->query($query);
     }

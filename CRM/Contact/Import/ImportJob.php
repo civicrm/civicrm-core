@@ -79,7 +79,7 @@ class CRM_Contact_Import_ImportJob {
 
       // FIXME: we should regen this table's name if it exists rather than drop it
       if (!$tableName) {
-        $tableName = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
+        $tableName = CRM_Utils_SQL_TempTable::build()->setCategory('importjob')->getName();
       }
       $db->query("DROP TABLE IF EXISTS $tableName");
       $db->query("CREATE TABLE $tableName ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci $createSql");
@@ -411,7 +411,7 @@ class CRM_Contact_Import_ImportJob {
     $database = $dao->database();
     $query = "SELECT   TABLE_NAME FROM INFORMATION_SCHEMA
                   WHERE    TABLE_SCHEMA = ? AND
-                           TABLE_NAME LIKE 'civicrm_import_job_%'
+                           ( TABLE_NAME LIKE 'civicrm_tmp_%_importjob%' OR TABLE_NAME LIKE 'civicrm_import_job_%')
                   ORDER BY TABLE_NAME";
     $result = CRM_Core_DAO::executeQuery($query, array($database));
     $incompleteImportTables = array();

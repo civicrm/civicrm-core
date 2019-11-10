@@ -53,10 +53,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     //Test database user privilege to create table(Temporary) CRM-4725
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+    $tempTable1 = CRM_Utils_SQL_TempTable::build()->getName();
+    $tempTable2 = CRM_Utils_SQL_TempTable::build()->getName();
     $daoTestPrivilege = new CRM_Core_DAO();
-    $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_one(test int) ENGINE=InnoDB");
-    $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_two(test int) ENGINE=InnoDB");
-    $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS import_job_permission_one, import_job_permission_two");
+    $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable1} (test int) ENGINE=InnoDB");
+    $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable2} (test int) ENGINE=InnoDB");
+    $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS {$tempTable1}, {$tempTable2}");
     unset($errorScope);
 
     if ($daoTestPrivilege->_lastError) {
