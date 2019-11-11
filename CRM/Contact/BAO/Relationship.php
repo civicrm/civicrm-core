@@ -1865,7 +1865,8 @@ SELECT cc.id as id, cc.sort_name as name
 FROM civicrm_relationship cr, civicrm_contact cc, civicrm_relationship_type crt
 WHERE
 cr.contact_id_a         = %1 AND
-cr.is_permission_a_b    = 1 AND
+cr.is_permission_a_b    = 1 OR
+cr.is_permission_b_a    = 1 AND
 IF(cr.end_date IS NULL, 1, (DATEDIFF( CURDATE( ), cr.end_date ) <= 0)) AND
 cr.is_active = 1 AND
 cc.id = cr.contact_id_b AND
