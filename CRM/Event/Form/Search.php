@@ -90,6 +90,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later.
    *
    * @return void
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -102,13 +105,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-    $this->loadFormValues();
-
-    if ($this->_force) {
-      $this->postProcess();
-      $this->set('force', 0);
-    }
+    parent::preProcess();
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
     $selector = new CRM_Event_Selector_Search($this->_queryParams,
@@ -374,6 +371,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     if ($this->_done) {
@@ -381,16 +379,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-    $formValues = [];
-
-    if (!empty($_POST)) {
-      $formValues = $this->controller->exportValues($this->_name);
-      CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, ['participant_status_id']);
-    }
-
-    if (empty($formValues)) {
-      $formValues = $this->controller->exportValues($this->_name);
-    }
+    $formValues = $this->getFormValues();
 
     $this->submit($formValues);
   }
@@ -464,13 +453,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         $this->_single = TRUE;
       }
     }
-  }
-
-  /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
   }
 
   /**
