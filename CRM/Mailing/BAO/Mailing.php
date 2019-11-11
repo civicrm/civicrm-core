@@ -190,13 +190,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     }
 
     // Create a temp table for contact exclusion.
-    $excludeTempTablename = "excluded_recipients_temp" . substr(sha1(rand()), 0, 4);
-    $includedTempTablename = "included_recipients_temp" . substr(sha1(rand()), 0, 4);
-    $mailingGroup->query(
-      "CREATE TEMPORARY TABLE $excludeTempTablename
-            (contact_id int primary key)
-            ENGINE=HEAP"
-    );
+    $excludeTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('exrecipient')->setMemory()->createWithColumns('contact_id int primary key');
+    $excludeTempTablename = $excludeTempTable->getName();
     // populate exclude temp-table with recipients to be excluded from the list
     //  on basis of selected recipients groups and/or previous mailing
     if (!empty($recipientsGroup['Exclude'])) {
@@ -237,11 +232,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $entityColumn = $isSMSmode ? 'phone_id' : 'email_id';
     $entityTable = $isSMSmode ? CRM_Core_DAO_Phone::getTableName() : CRM_Core_DAO_Email::getTableName();
     // Get all the group contacts we want to include.
-    $mailingGroup->query(
-      "CREATE TEMPORARY TABLE $includedTempTablename
-            (contact_id int primary key, $entityColumn int)
-            ENGINE=HEAP"
-    );
+    $includedTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('inrecipient')->setMemory()->createWithColumns('contact_id int primary key, ' . $entityColumn . ' int');
+    $includedTempTablename = $includedTempTable->getName();
 
     if ($isSMSmode) {
       $criteria = [
@@ -405,8 +397,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
     // Delete the temp table.
     $mailingGroup->reset();
-    $mailingGroup->query(" DROP TEMPORARY TABLE $excludeTempTablename ");
-    $mailingGroup->query(" DROP TEMPORARY TABLE $includedTempTablename ");
+    $excludeTempTable->drop();
+    $includedTempTable->drop();
 
     CRM_Utils_Hook::alterMailingRecipients($mailingObj, $criteria, 'post');
   }

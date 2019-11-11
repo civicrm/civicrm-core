@@ -282,16 +282,14 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
   public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
     $dao = new CRM_Core_DAO();
 
-    $query = "
-CREATE TEMPORARY TABLE civicrm_email_temp_values (
-  id           int primary key,
-  reset_date   datetime
-) ENGINE = HEAP;
-";
-    CRM_Core_DAO::executeQuery($query);
+    $temporaryTable = CRM_Utils_SQL_TempTable::build()
+      ->setCategory('mailingemail')
+      ->setMemory()
+      ->createWithColumns('id int primary key, reset_date datetime');
+    $temporaryTableName = $temporaryTable->getName();
 
     $query = "
-            INSERT INTO civicrm_email_temp_values (id, reset_date)
+            INSERT INTO {$temporaryTableName} (id, reset_date)
             SELECT      civicrm_email.id as email_id,
                         max(civicrm_mailing_event_delivered.time_stamp) as reset_date
             FROM        civicrm_mailing_event_queue
@@ -309,12 +307,13 @@ CREATE TEMPORARY TABLE civicrm_email_temp_values (
 
     $query = "
 UPDATE     civicrm_email e
-INNER JOIN civicrm_email_temp_values et ON e.id = et.id
+INNER JOIN {$temporaryTableName} et ON e.id = et.id
 SET        e.on_hold = 0,
            e.hold_date = NULL,
            e.reset_date = et.reset_date
 ";
     CRM_Core_DAO::executeQuery($query);
+    $temporaryTable->drop();
   }
 
 }

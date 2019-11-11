@@ -115,14 +115,13 @@ WHERE  r.mailing_id = %1
     if ($totalLimit) {
       $limitString = "LIMIT 0, $totalLimit";
     }
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS  srcMailing_$sourceMailingId");
+    $temporaryTable = CRM_Utils_SQL_TempTable::build()
+      ->setCategory('srcmailing' . $sourceMailingId)
+      ->setMemory()
+      ->createWithColumns("mailing_recipient_id int unsigned, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id)");
+    $temporaryTableName = $temporaryTable->getName();
     $sql = "
-CREATE TEMPORARY TABLE srcMailing_$sourceMailingId
-            (mailing_recipient_id int unsigned, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
-            ENGINE=HEAP";
-    CRM_Core_DAO::executeQuery($sql);
-    $sql = "
-INSERT INTO srcMailing_$sourceMailingId (mailing_recipient_id)
+INSERT INTO {$temporaryTableName} (mailing_recipient_id)
 SELECT mr.id
 FROM   civicrm_mailing_recipients mr
 WHERE  mr.mailing_id = $sourceMailingId
@@ -132,10 +131,11 @@ $limitString
     CRM_Core_DAO::executeQuery($sql);
     $sql = "
 UPDATE civicrm_mailing_recipients mr
-INNER JOIN srcMailing_$sourceMailingId temp_mr ON temp_mr.mailing_recipient_id = mr.id
+INNER JOIN {$temporaryTableName} temp_mr ON temp_mr.mailing_recipient_id = mr.id
 SET mr.mailing_id = $newMailingID
      ";
     CRM_Core_DAO::executeQuery($sql);
+    $temporaryTable->drop();
   }
 
   /**
