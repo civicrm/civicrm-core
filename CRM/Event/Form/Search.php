@@ -482,4 +482,13 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     return ts('Find Participants');
   }
 
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);
+  }
+
 }

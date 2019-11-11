@@ -293,4 +293,13 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     return CRM_Grant_BAO_Query::getSearchFieldMetadata();
   }
 
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Grant' => $this->getEntityMetadata()]);
+  }
+
 }
