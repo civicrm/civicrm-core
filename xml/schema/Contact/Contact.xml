@@ -250,11 +250,6 @@
     <title>Website</title>
     <type>varchar</type>
     <length>128</length>
-    <html>
-      <type>Text</type>
-      <size>30</size>
-    </html>
-
     <import>true</import>
     <headerPattern>/^(home\sURL)|URL|web|site/i</headerPattern>
     <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
@@ -430,9 +425,6 @@
     <name>index_last_name</name>
     <fieldName>last_name</fieldName>
     <add>1.8</add>
-    <html>
-      <type>Text</type>
-    </html>
   </index>
   <field>
     <name>prefix_id</name>
@@ -542,6 +534,9 @@
     <export>true</export>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Email Greeting.</comment>
     <add>3.0</add>
+    <html>
+      <type>Select</type>
+    </html>
     <pseudoconstant>
       <optionGroupName>email_greeting</optionGroupName>
     </pseudoconstant>
@@ -565,9 +560,6 @@
     <length>255</length>
     <comment>Cache Email Greeting.</comment>
     <add>3.0</add>
-    <html>
-      <type>Text</type>
-    </html>
   </field>
   <field>
     <name>postal_greeting_id</name>
@@ -577,7 +569,7 @@
     <comment>FK to civicrm_option_value.id, that has to be valid registered Postal Greeting.</comment>
     <add>3.0</add>
     <html>
-      <type>Text</type>
+      <type>Select</type>
     </html>
     <pseudoconstant>
       <optionGroupName>postal_greeting</optionGroupName>
@@ -602,9 +594,6 @@
     <length>255</length>
     <comment>Cache Postal greeting.</comment>
     <add>3.0</add>
-    <html>
-      <type>Text</type>
-    </html>
   </field>
   <field>
     <name>addressee_id</name>
@@ -613,6 +602,9 @@
     <comment>FK to civicrm_option_value.id, that has to be valid registered Addressee.</comment>
     <add>3.0</add>
     <export>true</export>
+    <html>
+      <type>Select</type>
+    </html>
     <pseudoconstant>
       <optionGroupName>addressee</optionGroupName>
     </pseudoconstant>
@@ -636,9 +628,6 @@
     <length>255</length>
     <comment>Cache Addressee.</comment>
     <add>3.0</add>
-    <html>
-      <type>Text</type>
-    </html>
   </field>
   <field>
     <name>job_title</name>
@@ -673,9 +662,6 @@
     <name>UI_gender</name>
     <fieldName>gender_id</fieldName>
     <add>1.6</add>
-    <html>
-      <type>Select</type>
-    </html>
   </index>
   <field>
     <name>birth_date</name>
@@ -764,9 +750,6 @@
     <title>Household Primary Contact ID</title>
     <comment>Optional FK to Primary Contact for this household.</comment>
     <add>1.1</add>
-    <html>
-      <type>Select</type>
-    </html>
   </field>
   <foreignKey>
     <name>primary_contact_id</name>
