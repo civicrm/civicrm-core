@@ -3574,7 +3574,7 @@ WHERE  $smartGroupClause
     $dbName = $name === 'email_id' ? 'id' : $name;
 
     if (is_array($value) || $name === 'email_id') {
-      $this->_qill[$grouping][] = $this->getQillForField($name, $value, $op);
+      $this->_qill[$grouping][] = $this->getQillForField($name, $value, $op, [], ts('Email'));
       $this->_where[$grouping][] = self::buildClause('civicrm_email.' . $dbName, $op, $value, 'String');
       return;
     }
@@ -7201,19 +7201,44 @@ AND   displayRelType.is_active = 1
   /**
    * Get the qill value for the field.
    *
-   * @param $name
+   * @param string $name
    * @param array|int|string $value
-   * @param $op
+   * @param string $op
+   * @param array $fieldSpec
+   * @param string $labelOverride
+   *   Label override, if required.
    *
    * @return string
    */
-  protected function getQillForField($name, $value, $op): string {
-    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
+  public function getQillForField($name, $value, $op, $fieldSpec = [], $labelOverride = NULL): string {
+    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue($fieldSpec['bao'] ?? NULL, $name, $value, $op);
     return (string) ts("%1 %2 %3", [
-      1 => ts('Email'),
+      1 => $labelOverride ?? $fieldSpec['title'],
       2 => $qillop,
       3 => $qillVal,
     ]);
+  }
+
+  /**
+   * Where handling for any field with adequately defined metadata.
+   *
+   * @param array $fieldSpec
+   * @param string $name
+   * @param string|array|int $value
+   * @param string $op
+   * @param string|int $grouping
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function handleWhereFromMetadata($fieldSpec, $name, $value, $op, $grouping = 0) {
+    $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldSpec['where'], $op, $value, CRM_Utils_Type::typeToString($fieldSpec['type']));
+    $this->_qill[$grouping][] = $this->getQillForField($name, $value, $op, $fieldSpec);
+    if (!isset($query->_tables[$fieldSpec['table_name']])) {
+      $this->_tables[$fieldSpec['table_name']] = 1;
+    }
+    if (!isset($query->_whereTables[$fieldSpec['table_name']])) {
+      $this->_whereTables[$fieldSpec['table_name']] = 1;
+    }
   }
 
 }
