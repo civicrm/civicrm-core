@@ -954,6 +954,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int
    *   id of created contribution
+   * @throws \CRM_Core_Exception
    */
   public function contributionCreate($params) {
 
@@ -2426,6 +2427,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @param array $recurParams (Optional)
    * @param array $contributionParams (Optional)
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setupRecurringPaymentProcessorTransaction($recurParams = [], $contributionParams = []) {
     $contributionParams = array_merge([
@@ -2456,12 +2459,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     ], $recurParams));
     $this->_contributionRecurID = $contributionRecur['id'];
     $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
+    $this->ids['Contribution'][0] = $this->_contributionID;
   }
 
   /**
    * We don't have a good way to set up a recurring contribution with a membership so let's just do one then alter it
    *
    * @param array $params Optionally modify params for membership/recur (duration_unit/frequency_unit)
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setupMembershipRecurringPaymentProcessorTransaction($params = []) {
     $membershipParams = $recurParams = [];
@@ -3429,6 +3435,23 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   protected function validateAllPayments() {
     $payments = $this->callAPISuccess('Payment', 'get', ['options' => ['limit' => 0]])['values'];
     $this->validatePayments($payments);
+  }
+
+  /**
+   * Validate all created contributions.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateAllContributions() {
+    $contributions = $this->callAPISuccess('Contribution', 'get', [])['values'];
+    foreach ($contributions as $contribution) {
+      $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
+      $total = 0;
+      foreach ($lineItems as $lineItem) {
+        $total += $lineItem['line_total'];
+      }
+      $this->assertEquals($total, $contribution['total_amount']);
+    }
   }
 
 }
