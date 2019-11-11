@@ -556,6 +556,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * dev-financial-40: Test that partial payment entries in entity-financial-trxn table to ensure that reverse transaction is entered
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testPartialPaymentEntries() {
     $this->registerParticipantAndPay($this->_expensiveFee);
