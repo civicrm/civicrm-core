@@ -662,9 +662,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Create a relationship type.
+   *
    * @param array $params
    *
-   * @return mixed
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
    */
   public function relationshipTypeCreate($params = []) {
     $params = array_merge([
@@ -699,6 +703,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $params
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public function paymentProcessorTypeCreate($params = NULL) {
     if (is_null($params)) {
@@ -980,6 +985,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param int $contributionId
    *
    * @return array|int
+   * @throws \CRM_Core_Exception
    */
   public function contributionDelete($contributionId) {
     $params = [
@@ -1866,7 +1872,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @param int $delete
    * @param string $errorText
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function getAndCheck($params, $id, $entity, $delete = 1, $errorText = '') {
 
@@ -2971,6 +2977,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Enable Tax and Invoicing
+   *
+   * @param array $params
+   *
+   * @return \Civi\Core\SettingsBag
    */
   protected function enableTaxAndInvoicing($params = []) {
     // Enable component contribute setting
