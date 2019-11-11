@@ -2148,7 +2148,9 @@ AND cc.sort_name LIKE '%$name%'";
 
     $columnHeaders = self::getColumnHeaders();
     $selector = NULL;
-    CRM_Utils_Hook::searchColumns('relationship.rows', $columnHeaders, $contactRelationships, $selector);
+
+    $contextName = (CRM_Utils_Array::value('context', $params) == 'user') ? 'relationship.rows.user' : 'relationship.rows';
+    CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $contactRelationships, $selector);
 
     $relationshipsDT = [];
     $relationshipsDT['data'] = $contactRelationships;
