@@ -458,6 +458,27 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getGroupLabel() {
+    return ts('Group(s)');
+  }
+
+  /**
+   * Get the label for the tag field.
+   *
+   * We do this in a function so the 'ts' wraps the whole string to allow
+   * better translation.
+   *
+   * @return string
+   */
+  protected function getTagLabel() {
+    return ts('Tag(s)');
+  }
+
+  /**
    * we allow the controller to set force/reset externally, useful when we are being
    * driven by the wizard framework
    */
