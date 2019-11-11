@@ -133,6 +133,16 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that default header+footer are available.
+   */
+  public function testHeaderFooterOptions() {
+    $headers = $this->callAPISuccess('Mailing', 'getoptions', ['field' => 'header']);
+    $this->assertTrue(in_array('Mailing Header', $headers['values']));
+    $footers = $this->callAPISuccess('Mailing', 'getoptions', ['field' => 'footer']);
+    $this->assertTrue(in_array('Mailing Footer', $footers['values']));
+  }
+
+  /**
    * The `template_options` field should be treated a JSON object.
    *
    * This test will create, read, and update the field.
@@ -732,24 +742,19 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery($sql);
 
     foreach (['bounce', 'unsubscribe', 'opened'] as $type) {
-      $sql = "CREATE TEMPORARY TABLE mail_{$type}_temp
-(event_queue_id int, time_stamp datetime, delivered_id int)
-SELECT event_queue_id, time_stamp, id
- FROM civicrm_mailing_event_delivered
- WHERE id IN ($deliveredIds)
- ORDER BY RAND() LIMIT 0,20;";
-      CRM_Core_DAO::executeQuery($sql);
-
-      $sql = "DELETE FROM civicrm_mailing_event_delivered WHERE id IN (SELECT delivered_id FROM mail_{$type}_temp);";
-      CRM_Core_DAO::executeQuery($sql);
+      $temporaryTable = CRM_Utils_SQL_TempTable::build()->setCategory($type)->createWithQuery("SELECT event_queue_id, time_stamp, id as delivered_id
+        FROM civicrm_mailing_event_delivered
+        WHERE id IN ($deliveredIds)
+         ORDER BY RAND() LIMIT 0,20");
+      $temporaryTableName = $temporaryTable->getName();
 
       if ($type == 'unsubscribe') {
         $sql = "INSERT INTO civicrm_mailing_event_{$type} (event_queue_id, time_stamp, org_unsubscribe)
-SELECT event_queue_id, time_stamp, 1 FROM mail_{$type}_temp";
+SELECT event_queue_id, time_stamp, 1 FROM {$temporaryTableName}";
       }
       else {
         $sql = "INSERT INTO civicrm_mailing_event_{$type} (event_queue_id, time_stamp)
-SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
+SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
       }
       CRM_Core_DAO::executeQuery($sql);
     }
@@ -767,6 +772,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'clickthrough_rate' => '0%',
     ];
     $this->checkArrayEquals($expectedResult, $result['values'][$mail['id']]);
+    $temporaryTable->drop();
   }
 
   /**

@@ -11,6 +11,14 @@
  */
 class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = [];
+  use CRMTraits_Custom_CustomDataTrait;
+
+  /**
+   * Default entity for class.
+   *
+   * @var string
+   */
+  protected $entity = 'Contribution';
 
   /**
    * Setup function.
@@ -124,7 +132,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
-    $this->assertEquals('Pending', $contribution['contribution_status']);
+    $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
     $this->callAPISuccess('OptionValue', 'create', [
       'option_group_id' => 'contribution_status',
@@ -140,6 +148,35 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values['contribution_status_id'] = 'just say no';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
+
+    // Per https://lab.civicrm.org/dev/core/issues/1285 it's a bit arguable but Ok we can support id...
+    $values['contribution_status_id'] = 3;
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 3], 1);
+
+  }
+
+  /**
+   * Test dates are parsed
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testParsedCustomDates() {
+    $this->createCustomGroupWithFieldOfType([], 'date');
+    $mapperKeys = [];
+    $form = new CRM_Contribute_Import_Parser_Contribution($mapperKeys);
+    $params = [$this->getCustomFieldName('date') => '20/10/2019'];
+    CRM_Core_Session::singleton()->set('dateTypes', 32);
+    $formatted = [];
+    $form->formatInput($params, $formatted);
+    // @todo I feel like we should work towards this actually parsing $params here -
+    // & dropping formatting but
+    // per https://github.com/civicrm/civicrm-core/pull/14986 for now $formatted is parsing
+    // The issue I hit was that when I tried to extend to checking they were correctly imported
+    // I was not actually sure what correct behaviour was for what dates were accepted since
+    // on one hand the custom fields have a date format & on the other there is an input format &
+    // it seems to ignore the latter in favour of the former - which seems wrong.
+    $this->assertEquals('20191020000000', $formatted[$this->getCustomFieldName('date')]);
   }
 
   /**
@@ -155,7 +192,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    */
-  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperSoftCredit = [], $mapperPhoneType = NULL, $mapperSoftCreditType = [], $fields = NULL) {
+  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperSoftCredit = NULL, $mapperPhoneType = NULL, $mapperSoftCreditType = NULL, $fields = NULL) {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }

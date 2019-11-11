@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,6 +40,8 @@
  *
  * @return array
  *   API result Array.
+ * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_event_create($params) {
   // Required fields for creating an event
@@ -55,13 +57,6 @@ function civicrm_api3_event_create($params) {
     civicrm_api3_verify_mandatory($params, NULL, [
       'template_title',
     ]);
-  }
-
-  // Clone event from template
-  if (!empty($params['template_id']) && empty($params['id'])) {
-    $copy = CRM_Event_BAO_Event::copy($params['template_id']);
-    $params['id'] = $copy->id;
-    unset($params['template_id']);
   }
 
   _civicrm_api3_event_create_legacy_support_42($params);

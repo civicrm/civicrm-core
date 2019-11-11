@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -416,9 +416,9 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         if (substr($name, 0, 7) == 'country') {
           // make sure its different from the default country
           // iso code
-          $defaultCountry = $config->defaultContactCountry();
+          $defaultCountry = CRM_Core_BAO_Country::defaultContactCountry();
           // full name
-          $defaultCountryName = $config->defaultContactCountryName();
+          $defaultCountryName = CRM_Core_BAO_Country::defaultContactCountryName();
 
           if ($defaultCountry) {
             if ($value == $defaultCountry ||
@@ -663,8 +663,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    *   Array of address sequence.
    */
   public static function addressSequence() {
-    $config = CRM_Core_Config::singleton();
-    $addressSequence = $config->addressSequence();
+    $addressSequence = CRM_Utils_Address::sequence(\Civi::settings()->get('address_format'));
 
     $countryState = $cityPostal = FALSE;
     foreach ($addressSequence as $key => $field) {

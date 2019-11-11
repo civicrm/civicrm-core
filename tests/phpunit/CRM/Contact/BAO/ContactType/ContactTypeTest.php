@@ -200,8 +200,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test del() with valid data
-   * success expected
+   * Test del() with valid data.
    */
   public function testDel() {
 
@@ -212,11 +211,12 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $subtype = CRM_Contact_BAO_ContactType::add($params);
-
-    $del = CRM_Contact_BAO_ContactType::del($subtype->id);
     $result = CRM_Contact_BAO_ContactType::subTypes();
-    $this->assertEquals($del, TRUE);
-    $this->assertEquals(in_array($subtype->name, $result), TRUE);
+    $this->assertEquals(TRUE, in_array($subtype->name, $result, TRUE));
+    $this->callAPISuccess('ContactType', 'delete', ['id' => $subtype->id]);
+
+    $result = CRM_Contact_BAO_ContactType::subTypes();
+    $this->assertEquals(FALSE, in_array($subtype->name, $result, TRUE));
   }
 
   /**

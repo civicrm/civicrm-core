@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -387,7 +387,27 @@ return [
     'title' => ts('Maximum Attachments'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Maximum number of files (documents, images, etc.) which can be attached to emails or activities.'),
+    'description' => ts('Maximum number of files (documents, images, etc.) which can be attached to emails or activities. This setting applies to UI forms and limits the number of fields available on the form.'),
+    'help_text' => NULL,
+  ],
+  'max_attachments_backend' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'max_attachments_backend',
+    'legacy_key' => 'maxAttachmentsBackend',
+    'type' => 'Integer',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => [
+      'size' => 2,
+      'maxlength' => 8,
+    ],
+    'default' => CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND,
+    'add' => '5.20',
+    'title' => ts('Maximum Attachments For Backend Processes'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Maximum number of files (documents, images, etc.) which can be processed during backend processing such as automated inbound email processing. This should be a big number higher than the other Maximum Attachments setting above. This setting here merely provides an upper limit to prevent attacks that might overload the server.'),
     'help_text' => NULL,
   ],
   'maxFileSize' => [

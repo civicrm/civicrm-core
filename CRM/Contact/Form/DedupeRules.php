@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -62,7 +62,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     // check if $contactType is valid
     $contactTypes = civicrm_api3('Contact', 'getOptions', ['field' => "contact_type", 'context' => "validate"]);
     $contactType = CRM_Utils_Request::retrieve('contact_type', 'String', $this, FALSE, 0);
-    if (CRM_Utils_Array::value($contactType, $contactTypes['values'])) {
+    if (!empty($contactTypes['values'][$contactType])) {
       $this->_contactType = $contactType;
     }
     elseif (!empty($contactType)) {

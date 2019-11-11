@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Core_IDS {
 
@@ -126,7 +126,7 @@ class CRM_Core_IDS {
         'filter_type' => 'xml',
         'filter_path' => "{$civicrm_root}/packages/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
-        'HTML_Purifier_Path' => $civicrm_root . 'packages/IDS/vendors/htmlpurifer/HTMLPurifier.auto.php',
+        'HTML_Purifier_Path' => $civicrm_root . 'packages/IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
         'exceptions' => ['__utmz', '__utmc'],

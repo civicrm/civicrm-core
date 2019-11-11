@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -328,8 +328,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
-          //@todo - following line should not refer to undefined $postProfileTypes? figure out way to test
-          if (in_array('Individual', $preProfileTypes) || in_array('Contact', $postProfileTypes)) {
+          if (in_array('Individual', $preProfileTypes) || in_array('Contact', $preProfileTypes)) {
             //Take Individual contact ID
             $userID = CRM_Utils_Array::value('related_contact', $values);
           }
@@ -357,7 +356,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         );
       }
 
-      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_PseudoConstant::contributionPage($values['contribution_page_id']);
+      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
 
       // Set email variables explicitly to avoid leaky smarty variables.
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
@@ -667,9 +666,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @return CRM_Contribute_DAO_ContributionPage
    */
   public static function copy($id) {
+    $session = CRM_Core_Session::singleton();
+
     $fieldsFix = [
       'prefix' => [
         'title' => ts('Copy of') . ' ',
+      ],
+      'replace' => [
+        'created_id' => $session->get('userID'),
+        'created_date' => date('YmdHis'),
       ],
     ];
     $copy = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', [

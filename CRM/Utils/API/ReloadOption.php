@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 require_once 'api/Wrapper.php';
@@ -76,7 +76,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
   public function toApiOutput($apiRequest, $result) {
     $reloadMode = NULL;
     if ($apiRequest['action'] === 'create' && isset($apiRequest['params'], $apiRequest['params']['options']) && is_array($apiRequest['params']['options']) && isset($apiRequest['params']['options']['reload'])) {
-      if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
+      if (empty($result['is_error'])) {
         $reloadMode = $apiRequest['params']['options']['reload'];
       }
       $id = (!empty($apiRequest['params']['sequential'])) ? 0 : $result['id'];

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,13 +30,16 @@ require_once 'api/v3/utils.php';
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
  * class to parse contact csv files
  */
 class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
+
+  use CRM_Contact_Import_MetadataTrait;
+
   protected $_mapperKeys = [];
   protected $_mapperLocType = [];
   protected $_mapperPhoneType;
@@ -122,11 +125,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $mapperRelatedContactWebsiteType
    */
   public function __construct(
-    &$mapperKeys, $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
+    $mapperKeys, $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
     $mapperWebsiteType = [], $mapperRelatedContactWebsiteType = []
   ) {
     parent::__construct();
-    $this->_mapperKeys = &$mapperKeys;
+    $this->_mapperKeys = $mapperKeys;
     $this->_mapperLocType = &$mapperLocType;
     $this->_mapperPhoneType = &$mapperPhoneType;
     $this->_mapperWebsiteType = $mapperWebsiteType;
@@ -2054,49 +2057,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * Set field metadata.
    */
   protected function setFieldMetadata() {
-    $contactFields = CRM_Contact_BAO_Contact::importableFields($this->_contactType);
-    // exclude the address options disabled in the Address Settings
-    $fields = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
-
-    //CRM-5125
-    //supporting import for contact subtypes
-    $csType = NULL;
-    if (!empty($this->_contactSubType)) {
-      //custom fields for sub type
-      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($this->_contactSubType);
-
-      if (!empty($subTypeFields)) {
-        foreach ($subTypeFields as $customSubTypeField => $details) {
-          $fields[$customSubTypeField] = $details;
-        }
-      }
-    }
-
-    //Relationship importables
-    $this->_relationships = $relations
-      = CRM_Contact_BAO_Relationship::getContactRelationshipType(
-      NULL, NULL, NULL, $this->_contactType,
-      FALSE, 'label', TRUE, $this->_contactSubType
-    );
-    asort($relations);
-
-    foreach ($relations as $key => $var) {
-      list($type) = explode('_', $key);
-      $relationshipType[$key]['title'] = $var;
-      $relationshipType[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
-      $relationshipType[$key]['import'] = TRUE;
-      $relationshipType[$key]['relationship_type_id'] = $type;
-      $relationshipType[$key]['related'] = TRUE;
-    }
-
-    if (!empty($relationshipType)) {
-      $fields = array_merge($fields, [
-        'related' => [
-          'title' => ts('- related contact info -'),
-        ],
-      ], $relationshipType);
-    }
-    $this->setImportableFieldsMetadata($fields);
+    $this->setImportableFieldsMetadata($this->getContactImportMetadata());
+    // Probably no longer needed but here for now.
+    $this->_relationships = $this->getRelationships();
   }
 
 }

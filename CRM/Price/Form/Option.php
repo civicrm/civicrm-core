@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -357,7 +357,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $params['visibility_id'] = CRM_Utils_Array::value('visibility_id', $params, FALSE);
       $ids = [];
       if ($this->_oid) {
-        $ids['id'] = $this->_oid;
+        $params['id'] = $this->_oid;
       }
       $optionValue = CRM_Price_BAO_PriceFieldValue::create($params, $ids);
 

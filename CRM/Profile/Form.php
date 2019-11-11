@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  *
  */
 
@@ -1119,7 +1119,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $contactDetails = CRM_Contact_BAO_Contact::getHierContactDetails($this->_id,
         $greetingTypes
       );
-      $details = $contactDetails[0][$this->_id];
+      $details = $contactDetails[$this->_id];
     }
     if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
       CRM_Utils_Array::value('postal_greeting_id', $details)

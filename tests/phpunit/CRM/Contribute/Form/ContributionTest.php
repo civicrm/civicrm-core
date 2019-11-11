@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
@@ -88,6 +87,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp() {
     $this->_apiversion = 3;
@@ -133,10 +135,21 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
+  }
+
+  /**
+   * CHeck that all tests that have created payments have created them with the right financial entities.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
   }
 
   /**
@@ -592,6 +605,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitEmailReceipt() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -606,7 +622,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Contribution Information',
     ]);
     $mut->stop();
   }
@@ -631,7 +647,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Below you will find a receipt for this contribution.',
       '<testloggedin@example.com>',
     ]);
     $mut->stop();
@@ -979,6 +995,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function that completes the partially paid payment using Credit Card
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testPartialPaymentWithCreditCard() {
     // create a partially paid contribution by using back-office form
@@ -991,22 +1010,22 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'check_number' => substr(sha1(rand()), 0, 7),
         'billing_city-5' => 'Vancouver',
-        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       ], CRM_Core_Action::ADD
     );
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertNotEmpty($contribution);
+    $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 10, 'payment_instrument_id' => 'Cash']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
     // pay additional amount by using Credit Card
     $form = new CRM_Contribute_Form_AdditionalPayment();
     $form->testSubmit([
       'contribution_id' => $contribution['id'],
       'contact_id' => $this->_individualId,
-      'total_amount' => 50,
+      'total_amount' => 40,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
@@ -1312,6 +1331,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Check payment processor is correctly assigned for a contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function testContributionBasePreProcess() {
     //Create contribution page with only pay later enabled.
@@ -1321,6 +1343,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'currency' => 'NZD',
       'goal_amount' => 100,
       'is_pay_later' => 1,
+      'pay_later_text' => 'Send check',
       'is_monetary' => TRUE,
       'is_active' => TRUE,
       'is_email_receipt' => TRUE,
@@ -1621,6 +1644,65 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'membership_type_id' => $membershipTypeTwo['id'],
     ]);
     $this->assertEquals("Hello", $membership2["custom_{$membershipCustomField['id']}"]);
+  }
+
+  /**
+   * Test non-membership donation on a contribution page
+   * using membership priceset.
+   */
+  public function testDonationOnMembershipPagePriceset() {
+    $contactID = $this->individualCreate();
+    $this->createPriceSetWithPage();
+    $form = new CRM_Contribute_Form_Contribution_Confirm();
+    $form->controller = new CRM_Core_Controller();
+    $form->_params = [
+      'id' => $this->_ids['contribution_page'],
+      "qfKey" => "donotcare",
+      "priceSetId" => $this->_ids['price_set'],
+      'price_set_id' => $this->_ids['price_set'],
+      "price_" . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
+      "invoiceID" => "9a6f7b49358dc31c3604e463b225c5be",
+      "email" => "admin@example.com",
+      "currencyID" => "USD",
+      'description' => "Membership Contribution",
+      'contact_id' => $contactID,
+      'select_contact_id' => $contactID,
+      'useForMember' => 1,
+      'skipLineItem' => 0,
+      'email-5' => 'test@test.com',
+      'amount' => 10,
+      'tax_amount' => NULL,
+      'is_pay_later' => 1,
+      'is_quick_config' => 1,
+    ];
+    $form->submit($form->_params);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $contactID,
+    ]);
+    //Check no membership is created.
+    $this->callAPIFailure('Membership', 'getsingle', [
+      'contact_id' => $contactID,
+    ]);
+    $this->contributionDelete($contribution['id']);
+
+    //Choose Membership Priceset
+    $form->_params["price_{$this->_ids['price_field'][0]}"] = $this->_ids['price_field_value'][0];
+    $form->_params["amount"] = 20;
+    $form->submit($form->_params);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $contactID,
+    ]);
+    //Check membership is created for the contact.
+    $membership = $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $contactID,
+    ]);
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', [
+      'contribution_id' => $contribution['id'],
+    ]);
+    $this->assertEquals($membershipPayment['membership_id'], $membership['id']);
+    $this->membershipDelete($membership['id']);
   }
 
 }

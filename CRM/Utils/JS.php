@@ -3,7 +3,7 @@
 +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
+| Copyright CiviCRM LLC (c) 2004-2020                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -29,7 +29,7 @@
  * Parse Javascript content and extract translatable strings.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Utils_JS {
 
@@ -143,11 +143,14 @@ class CRM_Utils_JS {
    */
   public static function decode($js) {
     $js = trim($js);
-    if ($js[0] === "'" || $js[0] === '"') {
+    $first = substr($js, 0, 1);
+    $last = substr($js, -1);
+    if ($last === $first && ($first === "'" || $first === '"')) {
       // Use a temp placeholder for escaped backslashes
-      return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', '**backslash**'], ['**backslash**', "'", '"', '&', '/', '\\'], substr($js, 1, -1));
+      $backslash = chr(0) . 'backslash' . chr(0);
+      return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', $backslash], [$backslash, "'", '"', '&', '/', '\\'], substr($js, 1, -1));
     }
-    if ($js[0] === '{' || $js[0] === '[') {
+    if (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
       $obj = self::getRawProps($js);
       foreach ($obj as $idx => $item) {
         $obj[$idx] = self::decode($item);
@@ -155,6 +158,35 @@ class CRM_Utils_JS {
       return $obj;
     }
     return json_decode($js);
+  }
+
+  /**
+   * Encodes a variable to js notation (not strict json) suitable for e.g. an angular attribute.
+   *
+   * Like json_encode() but the output looks more like native javascript,
+   * with single quotes around strings and no unnecessary quotes around object keys.
+   *
+   * Ex input: [
+   *   'a' => 'Apple',
+   *   'b' => 'Banana',
+   *   'c' => [1, 2, 3],
+   * ]
+   * Ex output: {a: 'Apple', b: 'Banana', c: [1, 2, 3]}
+   *
+   * @param mixed $value
+   * @return string
+   */
+  public static function encode($value) {
+    if (is_array($value)) {
+      return self::writeObject($value, TRUE);
+    }
+    $result = json_encode($value, JSON_UNESCAPED_SLASHES);
+    // Convert double-quotes around string to single quotes
+    if (is_string($value) && substr($result, 0, 1) === '"' && substr($result, -1) === '"') {
+      $backslash = chr(0) . 'backslash' . chr(0);
+      return "'" . str_replace(['\\\\', '\\"', "'", $backslash], [$backslash, '"', "\\'", '\\\\'], substr($result, 1, -1)) . "'";
+    }
+    return $result;
   }
 
   /**
@@ -256,7 +288,7 @@ class CRM_Utils_JS {
     $brackets = isset($obj[0]) && array_keys($obj) === range(0, count($obj) - 1) ? ['[', ']'] : ['{', '}'];
     foreach ($obj as $key => $val) {
       if ($encodeValues) {
-        $val = json_encode($val, JSON_UNESCAPED_SLASHES);
+        $val = self::encode($val);
       }
       if ($brackets[0] == '{') {
         // Enclose the key in quotes unless it is purely alphanumeric

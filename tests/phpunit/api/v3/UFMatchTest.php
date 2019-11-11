@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -132,7 +132,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
    */
   public function testUFMatchGetExample($version) {
     $this->_apiversion = $version;
-    require_once 'api/v3/examples/UFMatch/Get.php';
+    require_once 'api/v3/examples/UFMatch/Get.ex.php';
     $result = UF_match_get_example();
     $expectedResult = UF_match_get_expectedresult();
     $this->assertEquals($result, $expectedResult);

@@ -548,6 +548,44 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   }
 
+  public function testRelationshipDescription() {
+    $relType = $this->callAPISuccess('RelationshipType', 'create', [
+      'name_a_b' => uniqid('a'),
+      'name_b_a' => uniqid('b'),
+    ]);
+    $contactID_a = $this->individualCreate([], 1);
+    $contactID_b = $this->individualCreate([], 2);
+    $contactID_c = $this->individualCreate([], 3);
+    $contactID_d = $this->individualCreate([], 4);
+    $desc = uniqid('rel', TRUE);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $contactID_a,
+      'contact_id_b' => $contactID_b,
+      'relationship_type_id' => $relType['id'],
+      'is_active' => 1,
+      'description' => $desc,
+    ]);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $contactID_c,
+      'contact_id_b' => $contactID_d,
+      'relationship_type_id' => $relType['id'],
+      'is_active' => 1,
+      'description' => 'nothing of interest',
+    ]);
+    $params = [
+      ['relation_description', '=', substr($desc, 3, 18), 0, 0],
+    ];
+
+    $query = new CRM_Contact_BAO_Query($params);
+    $dao = $query->searchQuery();
+    // This is a little weird but seems consistent with the behavior of the search form in general.
+    // Technically there are 2 contacts who share a relationship with the description searched for,
+    // so one might expect the search form to return both of them instead of just Contact A... but it doesn't.
+    $this->assertEquals('1', $dao->N, "Search query returns exactly 1 result?");
+    $this->assertTrue($dao->fetch(), "Search query returns success?");
+    $this->assertEquals($contactID_a, $dao->contact_id, "Search query returns contact A?");
+  }
+
   public function testNonReciprocalRelationshipTargetGroupIsCorrectResults() {
     $contactID_a = $this->individualCreate();
     $contactID_b = $this->individualCreate();
@@ -681,6 +719,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   /**
    * Test Relationship Clause
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRelationshipClause() {
     $today = date('Ymd');
@@ -860,7 +900,7 @@ civicrm_relationship.is_active = 1 AND
     }
     catch (Exception $e) {
       $this->assertEquals(
-        "A fatal error was triggered: One of parameters  (value: foo@example.com) is not of the type Positive",
+        "One of parameters  (value: foo@example.com) is not of the type Positive",
         $e->getMessage()
       );
       $this->assertTrue(TRUE);
@@ -990,46 +1030,6 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
-   * When we have a relative date in search criteria, check that convertFormValues() sets _low & _high date fields and returns other criteria.
-   * CRM-21816 fix relative dates in search bug
-   */
-  public function testConvertFormValuesCRM21816() {
-    $fv = [
-      // next 60 days
-      "member_end_date_relative" => "starting_2.month",
-      "member_end_date_low" => "20180101000000",
-      "member_end_date_high" => "20180331235959",
-      "membership_is_current_member" => "1",
-      "member_is_primary" => "1",
-    ];
-    // $fv is modified by convertFormValues()
-    $fv_orig = $fv;
-    $params = CRM_Contact_BAO_Query::convertFormValues($fv);
-
-    // restructure for easier testing
-    $modparams = [];
-    foreach ($params as $p) {
-      $modparams[$p[0]] = $p;
-    }
-
-    // Check member_end_date_low is in params
-    $this->assertTrue(is_array($modparams['member_end_date_low']));
-    // ... fv and params should match
-    $this->assertEquals($modparams['member_end_date_low'][2], $fv['member_end_date_low']);
-    // ... fv & fv_orig should be different
-    $this->assertNotEquals($fv['member_end_date_low'], $fv_orig['member_end_date_low']);
-
-    // same for member_end_date_high
-    $this->assertTrue(is_array($modparams['member_end_date_high']));
-    $this->assertEquals($modparams['member_end_date_high'][2], $fv['member_end_date_high']);
-    $this->assertNotEquals($fv['member_end_date_high'], $fv_orig['member_end_date_high']);
-
-    // Check other fv values are in params
-    $this->assertEquals($modparams['membership_is_current_member'][2], $fv_orig['membership_is_current_member']);
-    $this->assertEquals($modparams['member_is_primary'][2], $fv_orig['member_is_primary']);
-  }
-
-  /**
    * Create contributions to test summary calculations.
    *
    * financial type     | cancel_date        |total_amount| source    | line_item_financial_types  |number_line_items| line_amounts
@@ -1040,6 +1040,8 @@ civicrm_relationship.is_active = 1 AND
    * Donation           |NULL                | 300.00     |SSF         | Donation,Donation         | 2                | 200.00,100.00
    * Donation           |2019-02-13 00:00:00 | 50.00      |SSF         | Donation                  | 1                | 50.00
    * Member Dues        |2019-02-13 00:00:00 | 50.00      |SSF         | Member Dues               | 1                | 50.00
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function createContributionsForSummaryQueryTests() {
     $contactID = $this->individualCreate();

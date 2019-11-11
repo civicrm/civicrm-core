@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -109,7 +109,7 @@
     // on initial load of manage group page and
     // also to handle search filtering for initial load of same page.
     var parentsOnly = 1
-    var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">No Groups have been created for this site.{/ts}</div>'{literal};
+    var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">None found.{/ts}</div>'{literal};
     $('table.crm-group-selector').data({
       "ajax": {
         "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},

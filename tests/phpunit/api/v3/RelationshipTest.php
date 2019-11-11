@@ -3,7 +3,7 @@
  * +--------------------------------------------------------------------+
  * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2019                                |
+ * | Copyright CiviCRM LLC (c) 2004-2020                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -1301,8 +1301,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Check for e-notices on enable & disable as reported in CRM-14350
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSetActive($version) {
     $this->_apiversion = $version;
@@ -1313,8 +1317,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Test creating related memberships.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateRelatedMembership($version) {
     $this->_apiversion = $version;

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -269,7 +269,7 @@ class CRM_Core_Page_AJAX {
     }
 
     foreach ($optionalParams as $param => $type) {
-      if (CRM_Utils_Array::value($param, $_GET)) {
+      if (!empty($_GET[$param])) {
         if (!is_array($_GET[$param])) {
           $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
         }

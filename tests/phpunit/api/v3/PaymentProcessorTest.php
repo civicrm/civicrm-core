@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -123,7 +123,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
    * Test  using example code.
    */
   public function testPaymentProcessorCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessor/Create.php';
+    require_once 'api/v3/examples/PaymentProcessor/Create.ex.php';
     $result = payment_processor_create_example();
     $expectedResult = payment_processor_create_expectedresult();
     $this->assertAPISuccess($result);

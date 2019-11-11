@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -945,7 +945,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ]);
     $eventResult = $this->callAPISuccess('Event', 'getsingle', ['id' => $eventResult['id']]);
     foreach ($templateParams as $param => $value) {
-      $this->assertEquals($value, $eventResult[$param]);
+      $this->assertEquals($value, $eventResult[$param], print_r($eventResult, 1));
     }
   }
 

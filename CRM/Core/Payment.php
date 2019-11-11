@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -81,7 +81,7 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_END = 'END';
 
   /**
-   * @var object
+   * @var array
    */
   protected $_paymentProcessor;
 
@@ -175,6 +175,15 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Getter for the id.
+   *
+   * @return int
+   */
+  public function getID() {
+    return (int) $this->_paymentProcessor['id'];
+  }
+
+  /**
    * Set payment Instrument id.
    *
    * By default we actually ignore the form value. The manual processor takes it more seriously.
@@ -248,8 +257,6 @@ abstract class CRM_Core_Payment {
    * @todo move to factory class \Civi\Payment\System (or similar)
    *
    * @param array $params
-   *
-   * @return mixed
    */
   public static function logPaymentNotification($params) {
     $message = 'payment_notification ';

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -208,6 +208,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitRecur() {
     $form = $this->getForm();
@@ -408,6 +410,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitPayLater() {
     $form = $this->getForm(NULL);
@@ -459,6 +463,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitPayLaterWithBilling() {
     $form = $this->getForm(NULL);

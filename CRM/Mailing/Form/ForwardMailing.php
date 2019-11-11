@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
 
@@ -48,7 +48,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     if ($q == NULL) {
 
       // ERROR.
-      CRM_Core_Error::fatal(ts('Invalid form parameters.'));
+      throw new CRM_Core_Exception(ts('Invalid form parameters.'));
       CRM_Core_Error::statusBounce(ts('Invalid form parameters.'));
     }
     $mailing = &$q->getMailing();

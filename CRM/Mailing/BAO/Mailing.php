@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 require_once 'Mail/mime.php';
 
@@ -1839,9 +1839,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $report['mailing'] = [];
     foreach (array_keys(self::fields()) as $field) {
-      if ($field == 'mailing_modified_date') {
-        $field = 'modified_date';
-      }
+      $field = self::fields()[$field]['name'];
       $report['mailing'][$field] = $mailing->$field;
     }
 
@@ -2028,6 +2026,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['event_totals']['optout'] += $row['optout'];
 
       foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
+        // Get the field name from the MailingJob fields as that will not have any prefixing.
+        // dev/mailing#56
+        $field = CRM_Mailing_BAO_MailingJob::fields()[$field]['name'];
         $row[$field] = $mailing->$field;
       }
 
@@ -2251,7 +2252,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!in_array($id, $mailingIDs)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this mailing report'));
+      throw new CRM_Core_Exception(ts('You do not have permission to access this mailing report'));
     }
   }
 
@@ -2473,7 +2474,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function del($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing del function'));
     }
 
     CRM_Utils_Hook::pre('delete', 'Mailing', $id, CRM_Core_DAO::$_nullArray);
@@ -2503,7 +2504,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function delJob($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
     }
 
     \Civi::log('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead', ['civi.tag' => 'deprecated']);

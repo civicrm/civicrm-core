@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -114,7 +114,7 @@
             });
 
             if (!addressHTML) {
-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please click the following link to edit that contact to add an address, or select a different contact.{/ts}"{literal} + ' <a target="_blank" href="' + CRM.url('civicrm/contact/add', 'reset=1&action=update&cid=' + sharedContactId) + '">{/literal}{ts}Edit Contact Details{/ts}{literal}</a>';
             }
 
             $contentArea.html(addressHTML);
@@ -124,5 +124,3 @@
   });
 </script>
 {/literal}
-
-

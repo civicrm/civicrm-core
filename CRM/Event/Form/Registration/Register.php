@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -103,7 +103,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   protected static function isZeroAmount($fields, $form): bool {
     $isZeroAmount = FALSE;
     if (!empty($fields['priceSetId'])) {
-      if (CRM_Utils_Array::value('amount', $fields) == 0) {
+      if (empty($fields['amount'])) {
         $isZeroAmount = TRUE;
       }
     }
@@ -343,9 +343,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
     }
 
-    $this->add('hidden', 'scriptFee', NULL);
-    $this->add('hidden', 'scriptArray', NULL);
-
     $bypassPayment = $allowGroupOnWaitlist = $isAdditionalParticipants = FALSE;
     if ($this->_values['event']['is_multiple_registrations']) {
       // don't allow to add additional during confirmation if not preregistered.
@@ -410,26 +407,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::buildAmount($this);
     }
 
-    $pps = [];
-    //@todo this processor adding fn is another one duplicated on contribute - a shared
-    // common class would make this sort of thing extractable
-    $onlinePaymentProcessorEnabled = FALSE;
-    if (!empty($this->_paymentProcessors)) {
-      foreach ($this->_paymentProcessors as $key => $name) {
-        if ($name['billing_mode'] == 1) {
-          $onlinePaymentProcessorEnabled = TRUE;
-        }
-        $pps[$key] = $name['name'];
-      }
-    }
+    $pps = $this->getProcessors();
     if ($this->getContactID() === 0 && !$this->_values['event']['is_multiple_registrations']) {
       //@todo we are blocking for multiple registrations because we haven't tested
-      $this->addCIDZeroOptions($onlinePaymentProcessorEnabled);
-    }
-    if (!empty($this->_values['event']['is_pay_later']) &&
-      ($this->_allowConfirmation || (!$this->_requireApproval && !$this->_allowWaitlist))
-    ) {
-      $pps[0] = $this->_values['event']['pay_later_text'];
+      $this->addCIDZeroOptions();
     }
 
     if ($this->_values['event']['is_monetary']) {
@@ -1105,23 +1086,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->set('contributeMode', 'direct');
 
       // This code is duplicated multiple places and should be consolidated.
-      if (isset($params["state_province_id-{$this->_bltID}"]) &&
-        $params["state_province_id-{$this->_bltID}"]
-      ) {
-        $params["state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["state_province_id-{$this->_bltID}"]);
-      }
+      $params = $this->prepareParamsForPaymentProcessor($params);
 
-      if (isset($params["country_id-{$this->_bltID}"]) &&
-        $params["country_id-{$this->_bltID}"]
-      ) {
-        $params["country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["country_id-{$this->_bltID}"]);
-      }
-      if (isset($params['credit_card_exp_date'])) {
-        $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
-        $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
-      }
       if ($this->_values['event']['is_monetary']) {
-        $params['ip_address'] = CRM_Utils_System::ipAddress();
         $params['currencyID'] = $config->defaultCurrency;
         $params['invoiceID'] = $invoiceID;
       }
@@ -1155,7 +1122,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           "_qf_Register_display=1&qfKey={$this->controller->_key}",
           TRUE, NULL, FALSE
         );
-        if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
+        if (!empty($params['additional_participants'])) {
           $urlArgs = "_qf_Participant_1_display=1&rfp=1&qfKey={$this->controller->_key}";
         }
         else {
@@ -1194,7 +1161,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // If registering > 1 participant, give status message
-    if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
+    if (!empty($params['additional_participants'])) {
       $statusMsg = ts('Registration information for participant 1 has been saved.');
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     }

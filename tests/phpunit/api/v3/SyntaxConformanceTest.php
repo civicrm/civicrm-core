@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -469,6 +469,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportTemplate',
       'System',
       'Logging',
+      'Payment',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -561,6 +562,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       // fails on 5 limit - probably a set up problem
       'Setting',
       //a bit of a pseudoapi - keys by domain
+      'Payment',
+      // pseudoapi - problems with creating required sub  entities.
     ];
     return $entitiesWithout;
   }
@@ -583,6 +586,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       //a bit of a pseudoapi - keys by domain
       'Setting',
     ];
+
+    // The testSqlOperators fails sporadically on MySQL 5.5, which is deprecated anyway.
+    // Test data providers should be able to run in pre-boot environment, so we connect directly to SQL server.
+    require_once 'DB.php';
+    $db = DB::connect(CIVICRM_DSN);
+    if ($db->connection instanceof mysqli && $db->connection->server_version < 50600) {
+      $entitiesWithout[] = 'Dedupe';
+    }
+
     return $entitiesWithout;
   }
 

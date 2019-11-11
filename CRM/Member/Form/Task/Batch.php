@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -212,7 +212,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
     // handling of custom data, specifically checkbox fields.
     $dates = [
-      'join_date',
+      'membership_join_date',
       'membership_start_date',
       'membership_end_date',
     ];

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -64,6 +64,13 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = 'case_';
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Case';
+  }
+
+  /**
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
@@ -93,15 +100,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $this->loadFormValues();
 
     if ($this->_force) {
-      $this->postProcess();
-      $this->set('force', 0);
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
+      $this->handleForcedSearch();
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -123,7 +122,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::TRANSFER,
@@ -204,9 +203,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
     $this->fixFormValues();
-
     if (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
@@ -240,13 +238,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       return;
     }
 
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
-    }
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
     $selector = new CRM_Case_Selector_Search($this->_queryParams,
@@ -268,7 +259,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::SESSION,
@@ -312,19 +303,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     }
 
     return TRUE;
-  }
-
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function setDefaultValues() {
-    $defaults = [];
-    $defaults = $this->_formValues;
-    return $defaults;
   }
 
   public function fixFormValues() {
@@ -392,19 +370,21 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
-  }
-
-  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
    */
   public function getTitle() {
     return ts('Find Cases');
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Case' => CRM_Case_BAO_Query::getSearchFieldMetadata()]);
   }
 
 }

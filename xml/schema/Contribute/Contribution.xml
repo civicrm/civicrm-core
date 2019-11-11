@@ -541,4 +541,16 @@
     </html>
     <add>4.7</add>
   </field>
+   <field>
+    <name>is_template</name>
+    <title>Is a Template Contribution</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <comment>Shows this is a template for recurring contributions.</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>5.20</add>
+  </field>
 </table>

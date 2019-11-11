@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -306,7 +306,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       ];
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
-        if ($key == 'pledge_start_date' && CRM_Utils_Array::value($key, $pledgeBlockDefaults)) {
+        if ($key == 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
           $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
           $pledgeDateFields = [
             'pledge_calendar_date' => 'calendar_date',
@@ -410,6 +410,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         case 'MembershipBlock':
           $subPage = 'membership';
           $nextPage = 'thankyou';
+          break;
+
+        case 'Widget':
+          $subPage = 'widget';
+          $nextPage = 'pcp';
           break;
 
         default:

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  *
  */
 
@@ -67,8 +67,7 @@ class CRM_Core_Page_AJAX_Location {
     $entityBlock = ['contact_id' => $cid];
     $location = CRM_Core_BAO_Location::getValues($entityBlock);
 
-    $config = CRM_Core_Config::singleton();
-    $addressSequence = array_flip($config->addressSequence());
+    $addressSequence = array_flip(CRM_Utils_Address::sequence(\Civi::settings()->get('address_format')));
 
     $profileFields = CRM_Core_BAO_UFGroup::getFields($ufId, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE,
       NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL

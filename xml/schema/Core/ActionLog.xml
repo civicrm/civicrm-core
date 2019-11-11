@@ -103,6 +103,6 @@
     <default>NULL</default>
     <comment>Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)</comment>
     <add>4.6</add>
-    <change>5.14</change>
+    <change>5.17</change>
   </field>
 </table>

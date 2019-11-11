@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,9 +26,6 @@
  */
 
 namespace Civi\API\Provider;
-
-use Civi\API\Events;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * A wrapping provider overrides an existing API. It has discretion to pass-through

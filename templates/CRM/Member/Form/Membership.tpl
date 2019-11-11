@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 {if $cancelAutoRenew}
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
-    <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type, End Date or Membership Status. <a href="%1">Click here</a> if you want to cancel the automatic renewal option.{/ts}</p>
+    <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type or Membership Status. <a href="%1">Click here</a> if you want to cancel the automatic renewal option.{/ts}</p>
   </div>
 {/if}
 <div class="spacer"></div>
@@ -83,14 +83,10 @@
     </div>
     {else}
       <table class="form-layout-compressed">
-        {if $context neq 'standalone'}
-          <tr>
-            <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
-          </tr>
-        {else}
-          <td class="label">{$form.contact_id.label}</td>
-          <td>{$form.contact_id.html}</td>
-        {/if}
+        <tr class="crm-membership-form-contact-id">
+           <td class="label">{$form.contact_id.label}</td>
+           <td>{$form.contact_id.html}</td>
+        </tr>
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
           <td><span id='mem_type_id'>{$form.membership_type_id.html}</span>

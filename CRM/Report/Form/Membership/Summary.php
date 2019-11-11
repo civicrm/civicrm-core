@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
 
@@ -100,7 +100,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
           'membership_type_id' => ['title' => ts('Membership Type')],
         ],
         'filters' => [
-          'join_date' => ['type' => CRM_Utils_Type::T_DATE],
+          'membership_join_date' => ['type' => CRM_Utils_Type::T_DATE],
         ],
       ],
       'civicrm_address' => [
@@ -342,7 +342,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
       }
 
       // build chart.
-      CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
+      CRM_Utils_Chart::chart($graphRows, $this->_params['charts'], $this->_interval);
     }
     parent::endPostProcess();
   }

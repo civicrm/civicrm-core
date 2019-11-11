@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Contribute_BAO_Contribution_Utils {
 
@@ -545,14 +545,22 @@ LIMIT 1
       $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
     }
 
-    $statusNamesToUnset = [];
+    $statusNamesToUnset = [
+      // For records which represent a data template for a recurring
+      // contribution that may not yet have a payment. This status should not
+      // be available from forms. 'Template' contributions should only be created
+      // in conjunction with a ContributionRecur record, and should have their
+      // is_template field set to 1. This status excludes them from reports
+      // that are still ignorant of the is_template field.
+      'Template',
+    ];
     // on create fetch statuses on basis of component
     if (!$id) {
-      $statusNamesToUnset = [
+      $statusNamesToUnset = array_merge($statusNamesToUnset, [
         'Refunded',
         'Chargeback',
         'Pending refund',
-      ];
+      ]);
 
       // Event registration and New Membership backoffice form support partially paid payment,
       //  so exclude this status only for 'New Contribution' form
@@ -650,6 +658,19 @@ LIMIT 1
   public static function overrideDefaultCurrency($params) {
     $config = CRM_Core_Config::singleton();
     $config->defaultCurrency = CRM_Utils_Array::value('currency', $params, $config->defaultCurrency);
+  }
+
+  /**
+   * Get either the public title if set or the title of a contribution page for use in workflow message template.
+   * @param int $contribution_page_id
+   * @return string
+   */
+  public static function getContributionPageTitle($contribution_page_id) {
+    $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contribution_page_id, 'frontend_title');
+    if (empty($title)) {
+      $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contribution_page_id, 'title');
+    }
+    return $title;
   }
 
 }

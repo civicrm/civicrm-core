@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -320,7 +320,7 @@ class CRM_Utils_File {
     if (FALSE === file_get_contents($fileName)) {
       // Our file cannot be found.
       // Using 'die' here breaks this on extension upgrade.
-      throw new CRM_Exception('Could not find the SQL file.');
+      throw new CRM_Core_Exception('Could not find the SQL file.');
     }
 
     self::runSqlQuery($dsn, file_get_contents($fileName), $prefix, $dieOnErrors);

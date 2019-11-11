@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -262,7 +262,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   public function testValidateFinancialAccount() {
     // Create a record with financial item having financial account as Event Fee.
-    $this->createParticipantWithContribution();
+    $this->createPartiallyPaidParticipantOrder();
     $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
     $financialAccountId = array_search('Event Fee', $financialAccounts);
     $message = CRM_Financial_BAO_FinancialAccount::validateFinancialAccount($financialAccountId);

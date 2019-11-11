@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -74,14 +74,10 @@
   </div>
   {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
   <table class="form-layout-compressed">
-    {if $context neq 'standalone'}
-    <tr>
-      <td class="font-size12pt label"><strong><strong>{ts}Contributor{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
-    </tr>
-    {else}
+    <tr class="crm-contribution-form-block-contact_id">
       <td class="label">{$form.contact_id.label}</td>
       <td>{$form.contact_id.html}</td>
-    {/if}
+    </tr>
     <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
       <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
       {if $is_test}
@@ -364,7 +360,7 @@
     });
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes( id ) {
-      var url = "{/literal}{crmURL p='civicrm/contact/view/contribution' q='snippet=4&formType=' h=0}{literal}" + id;
+      var url = "{/literal}{crmURL p='civicrm/contact/view/contribution' q="snippet=4&id=`$entityID`&formType=" h=0}{literal}" + id;
       {/literal}
       {if $contributionMode}
         url = url + "&mode={$contributionMode}";

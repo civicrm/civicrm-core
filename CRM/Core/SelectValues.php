@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * smart caching scheme on a per domain basis
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -731,21 +731,21 @@ class CRM_Core_SelectValues {
    */
   public static function getDatePluginInputFormats() {
     return [
-      "mm/dd/yy" => ts('mm/dd/yyyy (12/31/2009)'),
-      "dd/mm/yy" => ts('dd/mm/yyyy (31/12/2009)'),
-      "yy-mm-dd" => ts('yyyy-mm-dd (2009-12-31)'),
-      "dd-mm-yy" => ts('dd-mm-yyyy (31-12-2009)'),
-      'dd.mm.yy' => ts('dd.mm.yyyy (31.12.2009)'),
-      "M d, yy" => ts('M d, yyyy (Dec 31, 2009)'),
-      'd M yy' => ts('d M yyyy (31 Dec 2009)'),
-      "MM d, yy" => ts('MM d, yyyy (December 31, 2009)'),
-      'd MM yy' => ts('d MM yyyy (31 December 2009)'),
-      "DD, d MM yy" => ts('DD, d MM yyyy (Thursday, 31 December 2009)'),
-      "mm/dd" => ts('mm/dd (12/31)'),
-      "dd-mm" => ts('dd-mm (31-12)'),
-      "yy-mm" => ts('yyyy-mm (2009-12)'),
-      'M yy' => ts('M yyyy (Dec 2009)'),
-      "yy" => ts('yyyy (2009)'),
+      'mm/dd/yy' => ts('mm/dd/yy (12/31/2009)'),
+      'dd/mm/yy' => ts('dd/mm/yy (31/12/2009)'),
+      'yy-mm-dd' => ts('yy-mm-dd (2009-12-31)'),
+      'dd-mm-yy' => ts('dd-mm-yy (31-12-2009)'),
+      'dd.mm.yy' => ts('dd.mm.yy (31.12.2009)'),
+      'M d, yy' => ts('M d, yy (Dec 31, 2009)'),
+      'd M yy' => ts('d M yy (31 Dec 2009)'),
+      'MM d, yy' => ts('MM d, yy (December 31, 2009)'),
+      'd MM yy' => ts('d MM yy (31 December 2009)'),
+      'DD, d MM yy' => ts('DD, d MM yy (Thursday, 31 December 2009)'),
+      'mm/dd' => ts('mm/dd (12/31)'),
+      'dd-mm' => ts('dd-mm (31-12)'),
+      'yy-mm' => ts('yy-mm (2009-12)'),
+      'M yy' => ts('M yy (Dec 2009)'),
+      'yy' => ts('yy (2009)'),
     ];
   }
 

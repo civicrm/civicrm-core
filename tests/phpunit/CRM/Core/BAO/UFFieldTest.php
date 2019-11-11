@@ -34,7 +34,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
         'field_type' => 'Participant',
       ],
       [
-        'field_name' => 'join_date',
+        'field_name' => 'membership_join_date',
         'field_type' => 'Membership',
       ],
       [
@@ -65,7 +65,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertEquals('participant_role', $fields['Participant']['participant_role']['name']);
 
     // already used
-    $this->assertFalse(isset($fields['Membership']['join_date']));
+    $this->assertFalse(isset($fields['Membership']['membership_join_date']));
     $this->assertEquals('end_date', $fields['Membership']['membership_end_date']['name']);
 
     // already used
@@ -130,7 +130,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertEquals('participant_note', $fields['Participant']['participant_note']['name']);
     $this->assertEquals('participant_role', $fields['Participant']['participant_role']['name']);
 
-    $this->assertEquals('join_date', $fields['Membership']['join_date']['name']);
+    $this->assertEquals('join_date', $fields['Membership']['membership_join_date']['name']);
     $this->assertEquals('end_date', $fields['Membership']['membership_end_date']['name']);
 
     $this->assertEquals('activity_date_time', $fields['Activity']['activity_date_time']['name']);
@@ -167,7 +167,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertEquals('Participant', $fields['participant_note']['field_type']);
     $this->assertEquals('Participant', $fields['participant_role']['field_type']);
 
-    $this->assertEquals('Membership', $fields['join_date']['field_type']);
+    $this->assertEquals('Membership', $fields['membership_join_date']['field_type']);
     $this->assertEquals('Membership', $fields['membership_end_date']['field_type']);
 
     $this->assertEquals('Activity', $fields['activity_date_time']['field_type']);

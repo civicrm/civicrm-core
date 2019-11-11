@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -65,7 +65,13 @@ function _civicrm_api3_payment_processor_create_spec(&$params) {
   $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
   $params['financial_account_id']['api.default'] = CRM_Financial_BAO_PaymentProcessor::getDefaultFinancialAccountID();
   $params['financial_account_id']['api.required'] = TRUE;
+  $params['financial_account_id']['type'] = CRM_Utils_Type::T_INT;
   $params['financial_account_id']['title'] = ts('Financial Account for Processor');
+  $params['financial_account_id']['pseudoconstant'] = [
+    'table' => 'civicrm_financial_account',
+    'keyColumn' => 'id',
+    'labelColumn' => 'name',
+  ];
 }
 
 /**
@@ -124,8 +130,10 @@ function _civicrm_api3_payment_processor_getlist_defaults(&$request) {
  *   API result array.
  *
  * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_processor_pay($params) {
+  /* @var CRM_Core_Payment $processor */
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   try {
@@ -149,14 +157,32 @@ function civicrm_api3_payment_processor_pay($params) {
  */
 function _civicrm_api3_payment_processor_pay_spec(&$params) {
   $params['payment_processor_id'] = [
-    'api.required' => 1,
+    'api.required' => TRUE,
     'title' => ts('Payment processor'),
     'type' => CRM_Utils_Type::T_INT,
   ];
   $params['amount'] = [
     'api.required' => TRUE,
-    'title' => ts('Amount to refund'),
+    'title' => ts('Amount to pay'),
     'type' => CRM_Utils_Type::T_MONEY,
+  ];
+  $params['contribution_id'] = [
+    'api.required' => TRUE,
+    'title' => ts('Contribution ID'),
+    'type' => CRM_Utils_Type::T_INT,
+    'api.aliases' => ['order_id'],
+  ];
+  $params['contact_id'] = [
+    'title' => ts('Contact ID'),
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['contribution_recur_id'] = [
+    'title' => ts('Contribution Recur ID'),
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['invoice_id'] = [
+    'title' => ts('Invoice ID'),
+    'type' => CRM_Utils_Type::T_STRING,
   ];
 }
 
@@ -167,16 +193,20 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
  *
  * @return array
  *   API result array.
- * @throws CiviCRM_API3_Exception
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Civi\Payment\Exception\PaymentProcessorException
  */
 function civicrm_api3_payment_processor_refund($params) {
+  /** @var \CRM_Core_Payment $processor */
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
-  $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $params['payment_processor_id'])));
+  $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   if (!$processor->supportsRefund()) {
-    throw API_Exception('Payment Processor does not support refund');
+    throw new API_Exception('Payment Processor does not support refund');
   }
   $result = $processor->doRefund($params);
-  return civicrm_api3_create_success(array($result), $params);
+  return civicrm_api3_create_success([$result], $params);
 }
 
 /**
@@ -187,7 +217,7 @@ function civicrm_api3_payment_processor_refund($params) {
  */
 function _civicrm_api3_payment_processor_refund_spec(&$params) {
   $params['payment_processor_id'] = [
-    'api.required' => 1,
+    'api.required' => TRUE,
     'title' => ts('Payment processor'),
     'type' => CRM_Utils_Type::T_INT,
   ];

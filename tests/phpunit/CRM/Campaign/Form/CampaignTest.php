@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -55,7 +55,6 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
       'custom' => [],
       'campaign_type_id' => 1,
     ], $form);
-    var_dump($form);
     $campaign = $this->callAPISuccess('campaign', 'get', ['id' => $result['id']]);
     $this->assertEquals('10000', $campaign['values'][$campaign['id']]['goal_revenue']);
   }

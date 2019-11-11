@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -323,7 +323,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // set page title
     $title = "{$contactImage} {$displayName}";
     if ($contactDetails[$contactId]['isDeceased']) {
-      $title .= '  <span class="crm-contact-deceased">(deceased)</span>';
+      $title .= '  <span class="crm-contact-deceased">(' . ts('deceased') . ')</span>';
     }
     if ($isDeleted) {
       $title = "<del>{$title}</del>";

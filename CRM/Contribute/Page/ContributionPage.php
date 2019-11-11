@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -384,9 +384,18 @@ AND         cp.page_type = 'contribute'
       $this, TRUE, 0, 'GET'
     );
 
-    CRM_Contribute_BAO_ContributionPage::copy($gid);
+    $copy = CRM_Contribute_BAO_ContributionPage::copy($gid);
 
-    CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
+    $urlString = CRM_Utils_System::currentPath();
+    $urlParams = 'reset=1';
+
+    // Redirect to copied contribution page
+    if ($copy->id) {
+      $urlString = 'civicrm/admin/contribute/settings';
+      $urlParams .= '&action=update&id=' . $copy->id;
+    }
+
+    CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
   }
 
   /**

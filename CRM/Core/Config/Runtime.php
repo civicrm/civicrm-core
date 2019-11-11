@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -163,6 +163,8 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
         \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''),
         // e.g. port-based vhosts
         \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''),
+        // e.g. unit testing
+        defined('CIVICRM_TEST') ? 1 : 0,
         // Depending on deployment arch, these signals *could* be redundant, but who cares?
       ]));
     }

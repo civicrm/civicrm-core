@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Contact_BAO_Contact_Utils {
 
@@ -243,33 +243,6 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * Get the count of  contact loctions.
-   *
-   * @param int $contactId
-   *   Contact id.
-   *
-   * @return int
-   *   max locations for the contact
-   */
-  public static function maxLocations($contactId) {
-    $contactLocations = [];
-
-    // find number of location blocks for this contact and adjust value accordinly
-    // get location type from email
-    $query = "
-( SELECT location_type_id FROM civicrm_email   WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_phone   WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_im      WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_address WHERE contact_id = {$contactId} )
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    return $dao->N;
-  }
-
-  /**
    * Create Current employer relationship for a individual.
    *
    * @param int $contactID
@@ -469,9 +442,6 @@ WHERE id={$contactId}; ";
    *
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
-
-    $config = CRM_Core_Config::singleton();
-
     $form->assign('contact_type', $contactType);
     $form->assign('fieldSetTitle', $title);
     $form->assign('contactEditMode', TRUE);
@@ -509,7 +479,7 @@ WHERE id={$contactId}; ";
         );
     }
 
-    $addressSequence = $config->addressSequence();
+    $addressSequence = CRM_Utils_Address::sequence(\Civi::settings()->get('address_format'));
     $form->assign('addressSequence', array_fill_keys($addressSequence, 1));
 
     //Primary Phone

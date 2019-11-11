@@ -19,17 +19,16 @@
   organization: Agileware
   jira        : agileware
 
-- github      : agilewarealok
-  name        : Alok Patel
-  organization: Agileware
-  jira        : agilewarealok
-
 - github      : agileware-dev
   name        : Agileware Team
   organization: Agileware
 
 - github      : agileware-fj
   name        : Francis Whittle
+  organization: Agileware
+
+- github      : agileware-pengyi
+  name        : Pengyi Zhang
   organization: Agileware
 
 - github      : ajdavis
@@ -339,6 +338,10 @@
   organization: DevApp
   jira        : devmate
 
+- github      : Dawnthorn
+  name        : Peter Haight
+  organization: Giant Rabbit
+
 - github      : dlobo
   name        : Donald Lobo
   jira        : lobo
@@ -346,6 +349,8 @@
 - github      : dkguru
   organization: Jesper Angelo
   jira        : dkguru
+
+- github      : don-alejandro-z
 
 - name        : Samuel Haskell
   jira        : dotsam
@@ -468,6 +473,9 @@
 - name        : Fernando Rodríguez
   organization: Amnistía Internacional España
   jira        : Fernando
+
+- github      : fkohrt
+  name        : Florian Kohrt
 
 - github      : fliespl
   name        : Arkadiusz Rzadkowolski
@@ -1245,6 +1253,9 @@
   name        : Rubén Pineda
   organization: iXiam
 
+- github      : ryanlrobinson
+  name        : Ryan L. Robinson
+
 - github      : scoobird
   name        : Morgan Robinson
   organization: Palante Technology Cooperative
@@ -1260,6 +1271,10 @@
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
   jira        : samuelsov
+
+- gitub       : sushant
+  organization: OSSeed Technologies LLP
+  name        : Sushant Paste
 
 - name        : Peter Petrik
   organization: Skvare
@@ -1315,6 +1330,9 @@
 - github      : sluc23
   name        : Luciano Spiegel
   organization: iXiam
+
+- github      : smaen123
+  organization: Kilakwa Associates
 
 - name        : Shira Miller
   jira        : smmd
@@ -1537,7 +1555,7 @@
 
 - github      : wmortada
   name        : William Mortada
-  organization: Community IT Academy
+  organization: a-n The Artists Information Company
   jira        : wmortada
 
 - name        : Philipp Michael
@@ -1560,3 +1578,7 @@
 - github      : hosseinamin
   name        : Hossein Amin
   jira        : hosseinamin
+
+- github      : reecebenson
+  name        : Reece Benson
+  organization: Circle Interactive

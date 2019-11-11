@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -96,7 +96,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       list($this->userDisplayName,
         $this->userEmail
         ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-      $this->assign('displayName', $this->userDisplayName);
     }
 
     $this->setPageTitle(ts('Pledge'));
@@ -153,6 +152,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->assign('installments', $defaults['installments']);
     }
     else {
+      if ($this->_contactID) {
+        $defaults['contact_id'] = $this->_contactID;
+      }
       // default values.
       $defaults['create_date'] = date('Y-m-d');
       $defaults['start_date'] = date('Y-m-d');
@@ -211,11 +213,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       return;
     }
 
-    if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), [
-        'create' => TRUE,
-        'api' => ['extra' => ['email']],
-      ], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Contact'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+    if ($this->_context != 'standalone') {
+      $contactField->freeze();
     }
 
     $showAdditionalInfo = FALSE;
@@ -544,12 +544,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->paymentId = NULL;
       // send Acknowledgment mail.
       CRM_Pledge_BAO_Pledge::sendAcknowledgment($this, $params);
-
-      if (!isset($this->userEmail)) {
-        list($this->userDisplayName,
-          $this->userEmail
-          ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-      }
 
       $statusMsg .= ' ' . ts("An acknowledgment email has been sent to %1.<br />", [1 => $this->userEmail]);
 

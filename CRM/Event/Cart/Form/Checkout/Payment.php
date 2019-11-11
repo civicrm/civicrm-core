@@ -47,7 +47,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     if ($participant->must_wait) {
       $participant_status = 'On waitlist';
     }
-    elseif (CRM_Utils_Array::value('is_pay_later', $params, FALSE)) {
+    elseif (!empty($params['is_pay_later'])) {
       $participant_status = 'Pending from pay later';
     }
     else {
@@ -82,11 +82,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $participant->save();
 
     if (!empty($params['contributionID'])) {
-      $payment_params = [
+      $participantPaymentParams = [
         'participant_id' => $participant->id,
         'contribution_id' => $params['contributionID'],
       ];
-      CRM_Event_BAO_ParticipantPayment::create($payment_params);
+      civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
     }
 
     $transaction->commit();
@@ -597,21 +597,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @throws Exception
    */
   public function make_payment(&$params) {
-    $config = CRM_Core_Config::singleton();
-    if (isset($params["billing_state_province_id-{$this->_bltID}"]) && $params["billing_state_province_id-{$this->_bltID}"]) {
-      $params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["billing_state_province_id-{$this->_bltID}"]);
-    }
-
-    if (isset($params["billing_country_id-{$this->_bltID}"]) && $params["billing_country_id-{$this->_bltID}"]) {
-      $params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-{$this->_bltID}"]);
-    }
-    $params['ip_address'] = CRM_Utils_System::ipAddress();
-    $params['currencyID'] = $config->defaultCurrency;
+    $params = $this->prepareParamsForPaymentProcessor($params);
+    $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, TRUE);
-    $params['month'] = $params['credit_card_exp_date']['M'];
-    $params['year'] = $params['credit_card_exp_date']['Y'];
+
     try {
       $result = $payment->doPayment($params);
     }
@@ -714,7 +705,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $config = CRM_Core_Config::singleton();
     $default_country = new CRM_Core_DAO_Country();
-    $default_country->iso_code = $config->defaultContactCountry();
+    $default_country->iso_code = CRM_Core_BAO_Country::defaultContactCountry();
     $default_country->find(TRUE);
     $defaults["billing_country_id-{$this->_bltID}"] = $default_country->id;
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
 
@@ -149,7 +149,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => [1],
           ],
           'financial_type_id' => [
@@ -491,7 +491,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
 
       if (array_key_exists('civicrm_contribution_contribution_status_id', $row)) {
         if ($value = $row['civicrm_contribution_contribution_status_id']) {
-          $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+          $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value, 'label');
         }
       }
 

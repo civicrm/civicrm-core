@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Membership';
   protected $_params;
   protected $_ids = [];
@@ -88,6 +87,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp() {
     $this->_apiversion = 3;
@@ -140,6 +141,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an empty contact_select_id value
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function testFormRuleEmptyContact() {
     $params = [
@@ -641,6 +644,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPartialPayment($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -712,13 +718,15 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitRecur() {
     CRM_Core_Session::singleton()->getStatus(TRUE);
     $pendingVal = $this->callAPISuccessGetValue('OptionValue', [
       'return' => "id",
       'option_group_id' => "contribution_status",
-      'label' => "Pending",
+      'label' => "Pending Label**",
     ]);
     //Update label for Pending contribution status.
     $this->callAPISuccess('OptionValue', 'create', [
@@ -1083,6 +1091,57 @@ Expires: ',
       'contact_id' => $orgID,
     ]);
     $this->assertEquals(1, $contributionResultAfterRelationshipDelete['count'], "Contribution has been wrongly deleted.");
+  }
+
+  /**
+   * dev/core/issues/860:
+   * Test creating two memberships via price set in the back end with a discount,
+   * checking that the line items have correct amounts.
+   */
+  public function testTwoMembershipsViaPriceSetInBackendWithDiscount() {
+    // Register buildAmount hook to apply discount.
+    $this->hookClass->setHook('civicrm_buildAmount', [$this, 'buildAmountMembershipDiscount']);
+
+    // Create two memberships for individual $this->_individualId, via a price set in the back end.
+    $this->createTwoMembershipsViaPriceSetInBackEnd($this->_individualId);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $this->_individualId,
+    ]);
+    // Note: we can't check for the contribution total being discounted, because the total is set
+    // when the contribution is created via $form->testSubmit(), but buildAmount isn't called
+    // until testSubmit() runs. Fixing that might involve making testSubmit() more sophisticated,
+    // or just hacking total_amount for this case.
+
+    $lineItemResult = $this->callAPISuccess('LineItem', 'get', [
+      'contribution_id' => $contribution['id'],
+    ]);
+    $this->assertEquals(2, $lineItemResult['count']);
+    $discountedItems = 0;
+    foreach ($lineItemResult['values'] as $lineItem) {
+      if (CRM_Utils_String::startsWith($lineItem['label'], 'Long Haired Goat')) {
+        $this->assertEquals(15.0, $lineItem['line_total']);
+        $this->assertEquals('Long Haired Goat - one leg free!', $lineItem['label']);
+        $discountedItems++;
+      }
+    }
+    $this->assertEquals(1, $discountedItems);
+  }
+
+  /**
+   * Implements hook_civicrm_buildAmount() for testTwoMembershipsViaPriceSetInBackendWithDiscount().
+   */
+  public function buildAmountMembershipDiscount($pageType, &$form, &$amount) {
+    foreach ($amount as $id => $priceField) {
+      if (is_array($priceField['options'])) {
+        foreach ($priceField['options'] as $optionId => $option) {
+          if ($option['membership_type_id'] == 15) {
+            // Long Haired Goat membership discount.
+            $amount[$id]['options'][$optionId]['amount'] = $option['amount'] * 0.75;
+            $amount[$id]['options'][$optionId]['label'] = $option['label'] . ' - one leg free!';
+          }
+        }
+      }
+    }
   }
 
   /**

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 
@@ -137,7 +137,7 @@ SELECT     civicrm_email.id as email_id
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     if (!$dao->fetch()) {
-      CRM_Core_Error::fatal('Please file an issue with the backtrace');
+      throw new CRM_Core_Exception('Please file an issue with the backtrace');
       return $success;
     }
 

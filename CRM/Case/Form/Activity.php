@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -97,12 +97,12 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if (!$this->_caseId ||
       (!$this->_activityId && !$this->_activityTypeId)
     ) {
-      CRM_Core_Error::fatal('required params missing.');
+      CRM_Core_Error::statusBounce(ts('required params missing.'));
     }
 
     //check for case activity access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
     }
     //validate case id.
     if ($this->_caseId &&
@@ -111,7 +111,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $params = ['type' => 'any'];
       $allCases = CRM_Case_BAO_Case::getCases(TRUE, $params);
       if (count(array_intersect($this->_caseId, array_keys($allCases))) == 0) {
-        CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
       }
     }
 
@@ -123,7 +123,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $this->_activityTypeId
       );
       if (!$valid) {
-        CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
       }
     }
 

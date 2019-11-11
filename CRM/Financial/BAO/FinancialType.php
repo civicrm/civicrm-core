@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
@@ -487,7 +487,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       $realSetting = \Civi::$statics[__CLASS__]['is_acl_enabled'] = Civi::settings()->get('acl_financial_type');
       if (!$realSetting) {
         $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-        if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
+        if (!empty($contributeSettings['acl_financial_type'])) {
           \Civi::$statics[__CLASS__]['is_acl_enabled'] = TRUE;
         }
       }

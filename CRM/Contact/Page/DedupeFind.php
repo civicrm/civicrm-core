@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   protected $_cid = NULL;
@@ -105,13 +105,13 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       'reset' => 1,
       'rgid' => $rgid,
       'gid' => $gid,
-      'limit' => $limit,
+      'limit' => (int) $limit,
       'criteria' => $criteria,
     ];
     $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
     $this->assign('isSelected', $this->isSelected());
     $criteria = json_decode($criteria, TRUE);
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, TRUE, $limit);
     $this->assign('cacheKey', $cacheKeyString);
 
     if ($context == 'search') {
@@ -129,7 +129,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     }
     elseif ($action & CRM_Core_Action::MAP) {
       // do a batch merge if requested
-      $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, 'safe', 75, 2, $criteria);
+      $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, 'safe', 75, 2, $criteria, TRUE, NULL, $limit);
 
       $skippedCount = CRM_Utils_Request::retrieve('skipped', 'Positive', $this, FALSE, 0);
       $skippedCount = $skippedCount + count($result['skipped']);

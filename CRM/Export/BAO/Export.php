@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -69,9 +69,6 @@ class CRM_Export_BAO_Export {
    *
    * @param array $exportParams
    * @param string $queryOperator
-   *
-   * @return array|null
-   *   An array can be requested from within a unit test.
    *
    * @throws \CRM_Core_Exception
    */
@@ -118,6 +115,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
     $processor->setComponentTable($componentTable);
     $processor->setComponentClause($componentClause);
+    $processor->setIds($ids);
 
     list($query, $queryString) = $processor->runQuery($params, $order);
 
@@ -130,6 +128,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     if ($processor->isMergeSameAddress()) {
       foreach (array_keys($processor->getAdditionalFieldsForSameAddressMerge()) as $field) {
+        if ($field === 'id') {
+          $field = 'civicrm_primary_id';
+        }
         $processor->setColumnAsCalculationOnly($field);
       }
     }
@@ -205,15 +206,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $processor->mergeSameAddress();
       }
 
-      // In order to be able to write a unit test against this function we need to suppress
-      // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
-      if (empty($exportParams['suppress_csv_for_testing'])) {
-        $processor->writeCSVFromTable();
-      }
-      else {
-        // return tableName sqlColumns headerRows in test context
-        return [$processor->getTemporaryTable(), $sqlColumns, $processor->getHeaderRows(), $processor];
-      }
+      $processor->writeCSVFromTable();
 
       // delete the export temp table and component table
       $sql = "DROP TABLE IF EXISTS " . $processor->getTemporaryTable();

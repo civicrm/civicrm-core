@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
@@ -83,7 +83,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @return CRM_Event_DAO_Event
    */
   public static function add(&$params) {
-    CRM_Utils_System::flushCache();
     $financialTypeId = NULL;
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Event', $params['id'], $params);
@@ -133,6 +132,13 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         $params['created_id'] = $session->get('userID');
       }
       $params['created_date'] = date('YmdHis');
+
+      // Clone from template
+      if (!empty($params['template_id'])) {
+        $copy = self::copy($params['template_id']);
+        $params['id'] = $copy->id;
+        unset($params['template_id']);
+      }
     }
 
     $event = self::add($params);
@@ -927,6 +933,7 @@ WHERE civicrm_event.is_active = 1
    * @throws \CRM_Core_Exception
    */
   public static function copy($id, $params = []) {
+    $session = CRM_Core_Session::singleton();
     $eventValues = [];
 
     //get the required event values.
@@ -941,13 +948,22 @@ WHERE civicrm_event.is_active = 1
 
     CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $eventParams, $eventValues, $returnProperties);
 
-    $fieldsFix = ['prefix' => ['title' => ts('Copy of') . ' ']];
+    $fieldsFix = [
+      'prefix' => [
+        'title' => ts('Copy of') . ' ',
+      ],
+      'replace' => [
+        'created_id' => $session->get('userID'),
+        'created_date' => date('YmdHis'),
+      ],
+    ];
     if (empty($eventValues['is_show_location'])) {
       $fieldsFix['prefix']['is_show_location'] = 0;
     }
 
     $blockCopyOfCustomValue = (!empty($params['custom']));
 
+    /** @var \CRM_Event_DAO_Event $copyEvent */
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       ['id' => $id],
       // since the location is sharable, lets use the same loc_block_id.
@@ -1054,7 +1070,7 @@ WHERE civicrm_event.is_active = 1
    * @return array|null
    * @throws \CiviCRM_API3_Exception
    */
-  public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
+  public static function sendMail($contactID, $values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
     $template = CRM_Core_Smarty::singleton();
     $gIds = [
@@ -1136,6 +1152,15 @@ WHERE civicrm_event.is_active = 1
 
         // @todo - the goal is that all params available to the message template are explicitly defined here rather than
         // 'in a smattering of places'. Note that leakage can happen between mailings when not explicitly defined.
+        if ($postProfileID) {
+          $customPostTitles = empty($profilePost[1]) ? NULL : [];
+          foreach ($postProfileID as $offset => $id) {
+            $customPostTitles[$offset] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $id);
+          }
+        }
+        else {
+          $customPostTitles = NULL;
+        }
         $tplParams = array_merge($values, $participantParams, [
           'email' => $email,
           'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
@@ -1145,8 +1170,9 @@ WHERE civicrm_event.is_active = 1
           'customPre' => $profilePre[0],
           'customPre_grouptitle' => empty($profilePre[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $preProfileID)],
           'customPost' => $profilePost[0],
-          'customPost_grouptitle' => empty($profilePost[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $postProfileID)],
+          'customPost_grouptitle' => $customPostTitles,
           'participantID' => $participantId,
+          'contactID' => $contactID,
           'conference_sessions' => $sessions,
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
@@ -1357,6 +1383,15 @@ WHERE civicrm_event.is_active = 1
         }
 
         CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+
+        //dev/event#10
+        //If the event profile includes a note field and the submitted value of
+        //that field is "", then remove the old note returned by getValues.
+        if (isset($participantParams['note']) && empty($participantParams['note'])) {
+          $noteKeyPos = array_search('note', array_keys($fields));
+          $valuesKeys = array_keys($values);
+          $values[$valuesKeys[$noteKeyPos]] = "";
+        }
 
         if (isset($fields['participant_status_id']['title']) &&
           isset($values[$fields['participant_status_id']['title']]) &&

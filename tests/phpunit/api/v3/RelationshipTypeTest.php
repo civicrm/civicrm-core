@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
+| Copyright CiviCRM LLC (c) 2004-2020                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -29,7 +29,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -124,7 +124,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
    */
   public function testRelationshipTypeCreateExample($version) {
     $this->_apiversion = $version;
-    require_once 'api/v3/examples/RelationshipType/Create.php';
+    require_once 'api/v3/examples/RelationshipType/Create.ex.php';
     $result = relationship_type_create_example();
     $expectedResult = relationship_type_create_expectedresult();
     $this->assertAPISuccess($result);

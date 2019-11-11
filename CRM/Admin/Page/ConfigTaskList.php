@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -56,6 +56,17 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
     $this->assign('destination', $destination);
 
     $this->assign('registerSite', htmlspecialchars('https://civicrm.org/register-your-site?src=iam&sid=' . CRM_Utils_System::getSiteID()));
+
+    //Provide ability to optionally display some component checklist items when components are on
+    $result = civicrm_api3('Setting', 'get', [
+      'sequential' => 1,
+      'return' => ["enable_components"],
+    ]);
+    $enabled = array();
+    foreach ($result['values'][0]['enable_components'] as $component) {
+      $enabled[$component] = 1;
+    }
+    $this->assign('enabledComponents', $enabled);
 
     return parent::run();
   }

@@ -148,6 +148,11 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count']);
   }
 
+  /**
+   * Test overriding a membership but not providing status.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testImportOverriddenMembershipButWithoutStatus() {
     $this->individualCreate(['email' => 'anthony_anderson2@civicrm.org']);
 
@@ -155,7 +160,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'mapper[0][0]' => 'email',
       'mapper[1][0]' => 'membership_type_id',
       'mapper[2][0]' => 'membership_start_date',
-      'mapper[3][0]' => 'is_override',
+      'mapper[3][0]' => 'member_is_override',
     ];
     $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
     $membershipImporter->init();
@@ -184,7 +189,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'email',
       'membership_type_id',
       'membership_start_date',
-      'is_override',
+      'member_is_override',
       'status_id',
     ]);
 
@@ -207,7 +212,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'mapper[0][0]' => 'email',
       'mapper[1][0]' => 'membership_type_id',
       'mapper[2][0]' => 'membership_start_date',
-      'mapper[3][0]' => 'is_override',
+      'mapper[3][0]' => 'member_is_override',
       'mapper[4][0]' => 'status_id',
       'mapper[5][0]' => 'status_override_end_date',
     ];
@@ -235,7 +240,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'mapper[0][0]' => 'email',
       'mapper[1][0]' => 'membership_type_id',
       'mapper[2][0]' => 'membership_start_date',
-      'mapper[3][0]' => 'is_override',
+      'mapper[3][0]' => 'member_is_override',
       'mapper[4][0]' => 'status_id',
       'mapper[5][0]' => 'status_override_end_date',
     ];
@@ -275,7 +280,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'email',
       'membership_type_id',
       'membership_start_date',
-      'is_override',
+      'member_is_override',
       'status_id',
     ]);
 

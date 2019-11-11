@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,8 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
-
-
-require_once 'api/api.php';
 
 /**
  * class to parse membership csv files
@@ -43,8 +38,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
   protected $_mapperKeys;
 
-  private $_contactIdIndex;
-  private $_totalAmountIndex;
   private $_membershipTypeIndex;
   private $_membershipStatusIndex;
 
@@ -93,16 +86,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     $this->setActiveFields($this->_mapperKeys);
 
     // FIXME: we should do this in one place together with Form/MapField.php
-    $this->_contactIdIndex = -1;
     $this->_membershipTypeIndex = -1;
     $this->_membershipStatusIndex = -1;
 
     $index = 0;
     foreach ($this->_mapperKeys as $key) {
       switch ($key) {
-        case 'membership_contact_id':
-          $this->_contactIdIndex = $index;
-          break;
 
         case 'membership_type_id':
           $this->_membershipTypeIndex = $index;
@@ -335,7 +324,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               $params[$key] = $this->parsePseudoConstantField($val, $this->fieldMetadata[$key]);
               break;
 
-            case 'is_override':
+            case 'member_is_override':
               $params[$key] = CRM_Utils_String::strtobool($val);
               break;
           }
@@ -374,7 +363,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       else {
         //fix for CRM-2219 Update Membership
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (!empty($formatted['is_override']) && empty($formatted['status_id'])) {
+        if (!empty($formatted['member_is_override']) && empty($formatted['status_id'])) {
           array_unshift($values, 'Required parameter missing: Status');
           return CRM_Import_Parser::ERROR;
         }
@@ -425,7 +414,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
       $joinDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
 
-      if ($this->_contactIdIndex < 0) {
+      if (!$this->isContactIDColumnPresent()) {
         $error = $this->checkContactDuplicate($formatValues);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
@@ -449,7 +438,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             //fix for CRM-3570, exclude the statuses those having is_admin = 1
             //now user can import is_admin if is override is true.
             $excludeIsAdmin = FALSE;
-            if (empty($formatted['is_override'])) {
+            if (empty($formatted['member_is_override'])) {
               $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
             }
             $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
@@ -464,7 +453,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             if (empty($formatted['status_id'])) {
               $formatted['status_id'] = $calcStatus['id'];
             }
-            elseif (empty($formatted['is_override'])) {
+            elseif (empty($formatted['member_is_override'])) {
               if (empty($calcStatus)) {
                 array_unshift($values, 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
                 return CRM_Import_Parser::ERROR;
@@ -539,7 +528,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         //fix for CRM-3570, exclude the statuses those having is_admin = 1
         //now user can import is_admin if is override is true.
         $excludeIsAdmin = FALSE;
-        if (empty($formatted['is_override'])) {
+        if (empty($formatted['member_is_override'])) {
           $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
         }
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
@@ -553,7 +542,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         if (empty($formatted['status_id'])) {
           $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
         }
-        elseif (empty($formatted['is_override'])) {
+        elseif (empty($formatted['member_is_override'])) {
           if (empty($calcStatus)) {
             array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
             return CRM_Import_Parser::ERROR;
@@ -747,6 +736,15 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     }
 
     return NULL;
+  }
+
+  /**
+   * Is the contact ID mapped.
+   *
+   * @return bool
+   */
+  protected function isContactIDColumnPresent(): bool {
+    return in_array('membership_contact_id', $this->_mapperKeys, TRUE);
   }
 
 }

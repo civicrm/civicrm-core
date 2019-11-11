@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,18 +28,19 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
  *  Access Control Cache.
  */
-class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
+class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
 
   public static $_cache = NULL;
 
   /**
-   * @param int $id
+   * Build an array of ACLs for a specific ACLed user
+   * @param int $id - contact_id of the ACLed user
    *
    * @return mixed
    */
@@ -91,12 +92,14 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
-   * @param array $cache
+   * Store ACLs for a specific user in the `civicrm_acl_cache` table
+   * @param int $id - contact_id of the ACLed user
+   * @param array $cache - key civicrm_acl.id - values is the details of the ACL.
+   *
    */
   public static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
-      $dao = new CRM_ACL_DAO_Cache();
+      $dao = new CRM_ACL_BAO_Cache();
       if ($id) {
         $dao->contact_id = $id;
       }
@@ -109,7 +112,9 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
+   * Remove entries from civicrm_acl_cache for a specified ACLed user
+   * @param int $id - contact_id of the ACLed user
+   *
    */
   public static function deleteEntry($id) {
     if (self::$_cache &&
@@ -127,7 +132,9 @@ WHERE contact_id = %1
   }
 
   /**
-   * @param int $id
+   * Update ACL caches `civicrm_acl_cache` and `civicrm_acl_contact_cache for the specified ACLed user
+   * @param int $id - contact_id of ACLed user to update caches for.
+   *
    */
   public static function updateEntry($id) {
     // rebuilds civicrm_acl_cache
@@ -172,6 +179,15 @@ WHERE  modified_date IS NULL
     else {
       CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
     }
+  }
+
+  /**
+   * Remove Entries from `civicrm_acl_contact_cache` for a specific ACLed user
+   * @param int $userID - contact_id of the ACLed user
+   *
+   */
+  public static function deleteContactCacheEntry($userID) {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_acl_contact_cache WHERE user_id = %1", [1 => [$userID, 'Positive']]);
   }
 
 }

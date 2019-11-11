@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,12 +35,10 @@
   {else}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
-      {if $context eq 'standalone'}
         <tr class="crm-grant-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html}</td>
         </tr>
-      {/if}
       <tr class="crm-grant-form-block-status_id">
          <td class="label">{$form.status_id.label}</td>
          <td>{$form.status_id.html}</td>

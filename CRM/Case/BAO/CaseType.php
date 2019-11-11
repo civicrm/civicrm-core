@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -219,7 +219,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   protected static function encodeXmlString($str) {
     // PHP 5.4: return htmlspecialchars($str, ENT_XML1, 'UTF-8')
-    return htmlspecialchars($str);
+    if (is_scalar($str)) {
+      return htmlspecialchars($str);
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**

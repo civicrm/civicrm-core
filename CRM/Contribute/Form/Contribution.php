@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -368,6 +368,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_id) {
       $this->_contactID = $defaults['contact_id'];
     }
+    elseif ($this->_contactID) {
+      $defaults['contact_id'] = $this->_contactID;
+    }
 
     // Set $newCredit variable in template to control whether link to credit card mode is included.
     $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
@@ -621,11 +624,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('customDataSubType', $this->_contributionType);
     $this->assign('entityID', $this->_id);
 
-    if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), [
-        'create' => TRUE,
-        'api' => ['extra' => ['email']],
-      ], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE], TRUE);
+    if ($this->_context != 'standalone') {
+      $contactField->freeze();
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
@@ -665,10 +666,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $componentDetails = [];
     if ($this->_id) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-      if (CRM_Utils_Array::value('membership', $componentDetails)) {
+      if (!empty($componentDetails['membership'])) {
         $component = 'membership';
       }
-      elseif (CRM_Utils_Array::value('participant', $componentDetails)) {
+      elseif (!empty($componentDetails['participant'])) {
         $component = 'participant';
       }
     }
@@ -831,8 +832,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       $isCancelledStatus = ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'));
 
-      if (CRM_Utils_Array::value('membership', $componentDetails) ||
-        CRM_Utils_Array::value('participant', $componentDetails) ||
+      if (!empty($componentDetails['membership']) ||
+        !empty($componentDetails['participant']) ||
         // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
         // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
         $isCancelledStatus
@@ -1710,7 +1711,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function invoicingPostProcessHook($submittedValues, $action, $lineItem) {
 
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    if (!CRM_Utils_Array::value('invoicing', $invoiceSettings)) {
+    if (empty($invoiceSettings['invoicing'])) {
       return;
     }
     $taxRate = [];

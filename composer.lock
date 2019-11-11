@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "027475804731d7ef0bd3e0feb2139d3c",
+    "content-hash": "0da5b3e43131bb261a779ef723ab7d8b",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -81,6 +81,57 @@
             "time": "2018-01-23T06:26:55+00:00"
         },
         {
+            "name": "civicrm/composer-downloads-plugin",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/civicrm/composer-downloads-plugin.git",
+                "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
+                "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1",
+                "php": ">=5.6",
+                "togos/gitignore": "~1.1.1"
+            },
+            "require-dev": {
+                "composer/composer": "~1.0",
+                "friendsofphp/php-cs-fixer": "^2.3",
+                "phpunit/phpunit": "^5.7",
+                "totten/process-helper": "^1.0.1"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "LastCall\\DownloadsPlugin\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "LastCall\\DownloadsPlugin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rob Bayliss",
+                    "email": "rob@lastcallmedia.com"
+                },
+                {
+                    "name": "Tim Otten",
+                    "email": "totten@civicrm.org"
+                }
+            ],
+            "description": "Composer plugin for downloading additional files within any composer package.",
+            "time": "2019-08-22T10:56:51+00:00"
+        },
+        {
             "name": "cweagans/composer-patches",
             "version": "1.6.5",
             "source": {
@@ -126,29 +177,33 @@
         },
         {
             "name": "dompdf/dompdf",
-            "version": "v0.8.0",
+            "version": "v0.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "0f418c6b58fdeafc2a0e80eb1fa5e644e185089c"
+                "reference": "75f13c700009be21a1965dc2c5b68a8708c22ba2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/0f418c6b58fdeafc2a0e80eb1fa5e644e185089c",
-                "reference": "0f418c6b58fdeafc2a0e80eb1fa5e644e185089c",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/75f13c700009be21a1965dc2c5b68a8708c22ba2",
+                "reference": "75f13c700009be21a1965dc2c5b68a8708c22ba2",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
-                "ext-gd": "*",
                 "ext-mbstring": "*",
                 "phenx/php-font-lib": "0.5.*",
-                "phenx/php-svg-lib": "0.2.*",
-                "php": ">=5.3.0"
+                "phenx/php-svg-lib": "0.3.*",
+                "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.8.*",
+                "phpunit/phpunit": "^4.8|^5.5|^6.5",
                 "squizlabs/php_codesniffer": "2.*"
+            },
+            "suggest": {
+                "ext-gd": "Needed to process images",
+                "ext-gmagick": "Improves image processing performance",
+                "ext-imagick": "Improves image processing performance"
             },
             "type": "library",
             "extra": {
@@ -184,7 +239,7 @@
             ],
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
-            "time": "2017-02-16T02:40:40+00:00"
+            "time": "2018-12-14T02:40:31+00:00"
         },
         {
             "name": "electrolinux/phpquery",
@@ -1108,25 +1163,28 @@
         },
         {
             "name": "phenx/php-svg-lib",
-            "version": "v0.2",
+            "version": "v0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PhenX/php-svg-lib.git",
-                "reference": "de291bec8449b89acfe85691b5c71434797959dc"
+                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/de291bec8449b89acfe85691b5c71434797959dc",
-                "reference": "de291bec8449b89acfe85691b5c71434797959dc",
+                "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
+                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
                 "shasum": ""
             },
             "require": {
-                "sabberworm/php-css-parser": "6.0.*"
+                "sabberworm/php-css-parser": "^8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.5|^6.5"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Svg\\": "src/"
+                "psr-4": {
+                    "Svg\\": "src/Svg"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1141,7 +1199,7 @@
             ],
             "description": "A library to read, parse and export to PDF SVG files.",
             "homepage": "https://github.com/PhenX/php-svg-lib",
-            "time": "2016-12-13T20:25:45+00:00"
+            "time": "2019-09-11T20:02:13+00:00"
         },
         {
             "name": "phpoffice/common",
@@ -1561,20 +1619,24 @@
         },
         {
             "name": "sabberworm/php-css-parser",
-            "version": "6.0.1",
+            "version": "8.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabberworm/PHP-CSS-Parser.git",
-                "reference": "9ea4b00c569b19f731d0c2e0e802055877ff40c2"
+                "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/9ea4b00c569b19f731d0c2e0e802055877ff40c2",
-                "reference": "9ea4b00c569b19f731d0c2e0e802055877ff40c2",
+                "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
+                "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "codacy/coverage": "^1.4",
+                "phpunit/phpunit": "~4.8"
             },
             "type": "library",
             "autoload": {
@@ -1598,7 +1660,7 @@
                 "parser",
                 "stylesheet"
             ],
-            "time": "2015-08-24T08:48:52+00:00"
+            "time": "2019-02-22T07:42:52+00:00"
         },
         {
             "name": "symfony/config",
@@ -2108,6 +2170,39 @@
             "time": "2018-10-16T17:24:05+00:00"
         },
         {
+            "name": "togos/gitignore",
+            "version": "1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TOGoS/PHPGitIgnore.git",
+                "reference": "32bc0830e4123f670adcbf5ddda5bef362f4f4d4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TOGoS/PHPGitIgnore/zipball/32bc0830e4123f670adcbf5ddda5bef362f4f4d4",
+                "reference": "32bc0830e4123f670adcbf5ddda5bef362f4f4d4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "require-dev": {
+                "togos/simpler-test": "1.1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "TOGoS_GitIgnore_": "src/main/php/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Parser for .gitignore (and sparse-checkout, and anything else using the same format) files",
+            "time": "2019-04-19T19:16:58+00:00"
+        },
+        {
             "name": "totten/ca-config",
             "version": "v17.05.0",
             "source": {
@@ -2143,6 +2238,94 @@
             "description": "Default configuration for certificate authorities",
             "homepage": "https://github.com/totten/ca_config",
             "time": "2017-05-10T20:08:17+00:00"
+        },
+        {
+            "name": "tplaner/when",
+            "version": "3.0.0+php53",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "When\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tom Planer",
+                    "email": "tplaner@gmail.com"
+                }
+            ],
+            "description": "Date/Calendar recursion library.",
+            "homepage": "https://github.com/tplaner/When",
+            "keywords": [
+                "DateTime",
+                "date",
+                "recurrence",
+                "time"
+            ]
+        },
+        {
+            "name": "xkerman/restricted-unserialize",
+            "version": "1.1.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/xKerman/restricted-unserialize.git",
+                "reference": "4c6cadbb176c04d3e19b9bb8b40df12998460489"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/xKerman/restricted-unserialize/zipball/4c6cadbb176c04d3e19b9bb8b40df12998460489",
+                "reference": "4c6cadbb176c04d3e19b9bb8b40df12998460489",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "require-dev": {
+                "nikic/php-parser": "^1.4|^3.0|^4.2",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^4.8|^5.7|^6.5|^7.4|^8.2",
+                "sebastian/phpcpd": "^2.0|^3.0|^4.1",
+                "squizlabs/php_codesniffer": "^2.9|^3.4"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/function.php"
+                ],
+                "psr-4": {
+                    "xKerman\\Restricted\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "xKerman",
+                    "email": "xKhorasan@gmail.com"
+                }
+            ],
+            "description": "provide PHP Object Injection safe unserialize function",
+            "keywords": [
+                "PHP Object Injection",
+                "deserialize",
+                "unserialize"
+            ],
+            "time": "2019-08-11T00:04:39+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -2628,6 +2811,8 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "~7.0"
+    },
     "platform-dev": []
 }

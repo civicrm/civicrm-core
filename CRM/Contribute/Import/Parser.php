@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
@@ -427,20 +427,34 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
+   * Store the soft credit field information.
+   *
+   * This  was perhaps done this way on the believe that a lot of code pain
+   * was worth it to avoid negligible-cost array iterations. Perhaps we could prioritise
+   * readability & maintainability next since we can just work with functions to retrieve
+   * data from the metadata.
+   *
    * @param array $elements
    */
   public function setActiveFieldSoftCredit($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_softCreditField = $elements[$i];
+    foreach ((array) $elements as $i => $element) {
+      $this->_activeFields[$i]->_softCreditField = $element;
     }
   }
 
   /**
+   * Store the soft credit field type information.
+   *
+   * This  was perhaps done this way on the believe that a lot of code pain
+   * was worth it to avoid negligible-cost array iterations. Perhaps we could prioritise
+   * readability & maintainability next since we can just work with functions to retrieve
+   * data from the metadata.
+   *
    * @param array $elements
    */
   public function setActiveFieldSoftCreditType($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_softCreditType = $elements[$i];
+    foreach ((array) $elements as $i => $element) {
+      $this->_activeFields[$i]->_softCreditType = $element;
     }
   }
 

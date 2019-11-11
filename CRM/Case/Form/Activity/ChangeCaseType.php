@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -119,7 +119,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       $params['id'] = $form->_id;
     }
 
-    if (CRM_Utils_Array::value('is_reset_timeline', $params) == 0) {
+    if (empty($params['is_reset_timeline'])) {
       unset($params['reset_date_time']);
     }
   }

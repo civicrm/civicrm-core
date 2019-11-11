@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -191,7 +191,6 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     // Ideally per CRM-17075 we will use entity reference fields heavily in the form layer & convert to the
     // sql operator syntax at the query layer.
     if (!$isSearchBuilder) {
-      CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
       CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
       $savedSearch->form_values = serialize($queryParams);
     }

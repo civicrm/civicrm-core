@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -626,7 +626,7 @@ MODIFY      {$columnName} varchar( $length )
       2 => [$table_name, 'String'],
       3 => [$constraint_name, 'String'],
     ];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
     if ($dao->fetch()) {
       return TRUE;
@@ -644,7 +644,7 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function safeRemoveFK($table_name, $constraint_name) {
     if (self::checkFKExists($table_name, $constraint_name)) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", []);
+      CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", [], TRUE, NULL, FALSE, FALSE);
       return TRUE;
     }
     return FALSE;

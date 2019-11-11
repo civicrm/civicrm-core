@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -430,6 +430,30 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   public function testIsFullyFormedUrl($url, $expected) {
     $this->assertEquals($expected, CRM_Core_Resources::isFullyFormedUrl($url));
+  }
+
+  /**
+   * Test for hook_civicrm_entityRefFilters().
+   *
+   */
+  public function testEntityRefFiltersHook() {
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_entityRefFilters', [$this, 'entityRefFilters']);
+    $data = CRM_Core_Resources::getEntityRefMetadata();
+    $this->assertEquals(count($data['links']['Contact']), 4);
+    $this->assertEquals(!empty($data['links']['Contact']['new_staff']), TRUE);
+  }
+
+  /**
+   * @param array $filters
+   * @param array $links
+   */
+  public function entityRefFilters(&$filters, &$links) {
+    $links['Contact']['new_staff'] = [
+      'label' => ts('New Staff'),
+      'url' => '/civicrm/profile/create&reset=1&context=dialog&gid=5',
+      'type' => 'Individual',
+      'icon' => 'fa-user',
+    ];
   }
 
 }

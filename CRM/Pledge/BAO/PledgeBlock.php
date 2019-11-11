@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
 
@@ -301,8 +301,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       }
       $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits, ['aria-label' => ts('Frequency Units')]);
       // CRM-18854
-      if (CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
-        if (CRM_Utils_Array::value('pledge_start_date', $pledgeBlock)) {
+      if (!empty($pledgeBlock['is_pledge_start_date_visible'])) {
+        if (!empty($pledgeBlock['pledge_start_date'])) {
           $defaults = array();
           $date = (array) json_decode($pledgeBlock['pledge_start_date']);
           foreach ($date as $field => $value) {
@@ -335,7 +335,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
             $form->setDefaults($defaults);
             $form->assign('start_date_display', $paymentDate);
             $form->assign('start_date_editable', FALSE);
-            if (CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+            if (!empty($pledgeBlock['is_pledge_start_date_editable'])) {
               $form->assign('start_date_editable', TRUE);
               if ($field == 'calendar_month') {
                 $form->assign('is_date', FALSE);

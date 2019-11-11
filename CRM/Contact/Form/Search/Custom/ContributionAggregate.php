@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -226,20 +226,29 @@ civicrm_contact AS contact_a {$this->_aclFrom}
       );
     }
 
-    foreach (CRM_Contact_BAO_Query::convertFormValues($dateParams) as $values) {
-      list($name, $op, $value) = $values;
-      if (strstr($name, '_low')) {
-        if (strlen($value) == 10) {
-          $value .= ' 00:00:00';
-        }
-        $clauses[] = "contrib.receive_date >= '{$value}'";
+    if ($dateParams['receive_date_relative']) {
+      list($relativeFrom, $relativeTo) = CRM_Utils_Date::getFromTo($dateParams['receive_date_relative'], $dateParams['receive_date_low'], $dateParams['receive_date_high']);
+    }
+    else {
+      if (strlen($dateParams['receive_date_low']) == 10) {
+        $relativeFrom = $dateParams['receive_date_low'] . ' 00:00:00';
       }
       else {
-        if (strlen($value) == 10) {
-          $value .= ' 23:59:59';
-        }
-        $clauses[] = "contrib.receive_date <= '{$value}'";
+        $relativeFrom = $dateParams['receive_date_low'];
       }
+      if (strlen($dateParams['receive_date_high']) == 10) {
+        $relativeTo = $dateParams['receive_date_high'] . ' 23:59:59';
+      }
+      else {
+        $relativeTo = $dateParams['receive_date_high'];
+      }
+    }
+
+    if ($relativeFrom) {
+      $clauses[] = "contrib.receive_date >= '{$relativeFrom}'";
+    }
+    if ($relativeTo) {
+      $clauses[] = "contrib.receive_date <= '{$relativeTo}'";
     }
 
     if ($includeContactIDs) {

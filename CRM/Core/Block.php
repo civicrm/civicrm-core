@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -528,19 +528,6 @@ class CRM_Core_Block {
       $values[] = $value;
     }
     self::setProperty(self::MAIL, 'templateValues', array('shortCuts' => $values));
-  }
-
-  /**
-   * Create the list of shortcuts for the application and format is as a block.
-   */
-  private static function setTemplateMenuValues() {
-    $config = CRM_Core_Config::singleton();
-
-    $path = 'navigation';
-    $values = CRM_Core_Menu::getNavigation();
-    if ($values) {
-      self::setProperty(self::MENU, 'templateValues', array('menu' => $values));
-    }
   }
 
   /**

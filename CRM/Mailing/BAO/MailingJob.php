@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 require_once 'Mail.php';
@@ -585,7 +585,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     static $smtpConnectionErrors = 0;
 
     if (!is_object($mailer) || empty($fields)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Either mailer is not an object or we don\'t have recipients to send to in this group');
     }
 
     // get the return properties
@@ -989,7 +989,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
           $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
         }
         if (!$activityTypeID) {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Execption(ts('No relevant activity type found when recording Mailing Event delivered Activity'));
         }
       }
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -496,7 +496,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   public static function isAPIJobAllowedToRun($params) {
     $environment = CRM_Core_Config::environment(NULL, TRUE);
     if ($environment != 'Production') {
-      if (CRM_Utils_Array::value('runInNonProductionEnvironment', $params)) {
+      if (!empty($params['runInNonProductionEnvironment'])) {
         $mailing = Civi::settings()->get('mailing_backend_store');
         if ($mailing) {
           Civi::settings()->set('mailing_backend', $mailing);

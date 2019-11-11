@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -827,7 +827,7 @@ SELECT  id
       if (in_array($field['field_name'], $validBillingFields)) {
         $validProfileFields[] = $field['field_name'];
       }
-      if (CRM_Utils_Array::value('is_required', $field)) {
+      if (!empty($field['is_required'])) {
         $requiredProfileFields[] = $field['field_name'];
       }
     }
@@ -970,6 +970,7 @@ SELECT  id
         'membership_type_id',
         'member_is_test',
         'is_override',
+        'member_is_override',
         'status_override_end_date',
         'status_id',
         'member_is_pay_later'

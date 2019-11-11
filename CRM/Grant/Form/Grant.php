@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -142,6 +142,11 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
         $defaults['amount_granted'] = CRM_Utils_Money::format($defaults['amount_granted'], NULL, '%a');
       }
     }
+    else {
+      if ($this->_contactID) {
+        $defaults['contact_id'] = $this->_contactID;
+      }
+    }
 
     return $defaults;
   }
@@ -224,8 +229,9 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       ],
     ]);
 
-    if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Applicant'), ['create' => TRUE], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Applicant'), ['create' => TRUE], TRUE);
+    if ($this->_context != 'standalone') {
+      $contactField->freeze();
     }
   }
 

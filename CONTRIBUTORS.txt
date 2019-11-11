@@ -7,7 +7,7 @@ Code Contributors for 5.x
 CiviCRM - Coleman Watts, Tim Otten
 
 AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck
-Agileware - Alok Patel, Francis Whittle, Justin Freeman
+Agileware - Francis Whittle, Justin Freeman, Pengyi Zhang
 Andrew Thompson
 applicado
 Australian Greens - Seamus Lee
@@ -18,7 +18,7 @@ Caltha - Tomasz Pietrzkowski
 CEDC - Laryn Kragt Bakker
 Chris Burgess
 CiviCoop - Jaap Jansma
-CiviDesk - Sunil Pawar, Yashodha Chaku
+CiviDesk - Sunil Pawar, Sushant Paste, Yashodha Chaku
 CompuCorp - Camilo Rodriguez, Davi Alexandre, Debarshi Bhaumik, Michael Devery,
     Mukesh Ram, Omar Abu Hussein, René Olivo, Vinu Varshith Sekar
 Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove

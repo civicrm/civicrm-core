@@ -3,7 +3,7 @@
 +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
+| Copyright CiviCRM LLC (c) 2004-2020                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -38,7 +38,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @dataProvider getCsvFiles
    */
   public function testToCsv($fileName) {
-    $dataSource = new CRM_Import_DataSource_Csv();
+    $dataSource = new CRM_Import_DataSource_CSV();
     $params = [
       'uploadFile' => [
         'name' => __DIR__ . '/' . $fileName,

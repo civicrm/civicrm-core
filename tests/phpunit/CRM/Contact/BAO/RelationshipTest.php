@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -46,6 +46,8 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    *
    * This method is called after a test is executed.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function tearDown() {
     $this->quickCleanup([
@@ -57,10 +59,15 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * Test Relationship Type Options Will Return Specified Type
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testRelationshipTypeOptionsWillReturnSpecifiedType() {
     $orgToOrgType = 'A_B_relationship';
     $orgToOrgReverseType = 'B_A_relationship';
-    civicrm_api3('RelationshipType', 'create', [
+    $this->callAPISuccess('RelationshipType', 'create', [
       'name_a_b' => $orgToOrgType,
       'name_b_a' => $orgToOrgReverseType,
       'contact_type_a' => 'Organization',
@@ -226,16 +233,18 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'period_type' => 'rolling',
       'name' => 'Inherited Membership',
       'relationship_type_id' => [$orgToPersonTypeId1, $orgToPersonTypeId2],
-      'relationship_direction' => ['b_a', 'a_b'],
+      'relationship_direction' => ['b_a', 'b_a'],
     ]);
     $membershipType = $this->callAPISuccessGetSingle('MembershipType', ['id' => $membershipType['id']]);
     // Check the metadata worked....
     $this->assertEquals([$orgToPersonTypeId1, $orgToPersonTypeId2], $membershipType['relationship_type_id']);
-    $this->assertEquals(['b_a', 'a_b'], $membershipType['relationship_direction']);
+    $this->assertEquals(['b_a', 'b_a'], $membershipType['relationship_direction']);
 
     $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $membershipType['id'],
       'contact_id' => $organisationID,
+      'start_date' => '2019-08-19',
+      'join_date' => '2019-07-19',
     ]);
 
     $relationshipOne = $this->callAPISuccess('Relationship', 'create', [
@@ -243,24 +252,32 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'contact_id_b' => $organisationID,
       'relationship_type_id' => $orgToPersonTypeId1,
     ]);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $relationshipTwo = $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organisationID,
       'relationship_type_id' => $orgToPersonTypeId2,
     ]);
-
-    /*
-     * @todo this section not yet working due to bug in would-be-tested code.
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
+    $inheritedMembership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $individualID]);
+    $this->assertEquals('2019-08-19', $inheritedMembership['start_date']);
+    $this->assertEquals('2019-07-19', $inheritedMembership['join_date']);
+
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $organisationID], 1);
+    // Disable the relationship & check the membership is not removed because the other relationship is still valid.
+    $relationshipOne['is_active'] = 0;
+    $this->callAPISuccess('Relationship', 'create', array_merge($relationshipOne, ['is_active' => 0]));
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
     $relationshipTwo['is_active'] = 0;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
-    $relationshipOne['is_active'] = 0;
-    $this->callAPISuccess('Relationship', 'create', $relationshipOne);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
+
     $relationshipOne['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipOne);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
     $relationshipTwo['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
@@ -268,7 +285,54 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $this->callAPISuccess('Relationship', 'delete', ['id' => $relationshipOne['id']]);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
-     */
+
+  }
+
+  /**
+   * Test CRM_Contact_BAO_Relationship::add() function directly.
+   *
+   * In general it's preferred to use the Relationship-create api since it does
+   * checks and such before calling add(). There are already some good tests
+   * for the api, but since it does some more business logic after too the
+   * tests might not be checking exactly the same thing.
+   */
+  public function testBAOAdd() {
+    // add a new type
+    $relationship_type_id_1 = $this->relationshipTypeCreate([
+      'name_a_b' => 'Food poison tester is',
+      'name_b_a' => 'Food poison tester for',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+    ]);
+
+    // add some people
+    $contact_id_1 = $this->individualCreate();
+    $contact_id_2 = $this->individualCreate([], 1);
+
+    // create new relationship (using BAO)
+    $params = [
+      'relationship_type_id' => $relationship_type_id_1,
+      'contact_id_a' => $contact_id_1,
+      'contact_id_b' => $contact_id_2,
+    ];
+    $relationshipObj = CRM_Contact_BAO_Relationship::add($params);
+    $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
+    $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
+    $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
+    $this->assertEquals($relationshipObj->is_active, 1);
+
+    // demonstrate PR 15103 - should fail before the patch and pass after
+    $today = date('Ymd');
+    $params = [
+      'id' => $relationshipObj->id,
+      'end_date' => $today,
+    ];
+    $relationshipObj = CRM_Contact_BAO_Relationship::add($params);
+    $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
+    $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
+    $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
+    $this->assertEquals($relationshipObj->is_active, 1);
+    $this->assertEquals($relationshipObj->end_date, $today);
   }
 
 }

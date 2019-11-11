@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Mailing_Page_Confirm extends CRM_Core_Page {
 
@@ -47,7 +47,7 @@ class CRM_Mailing_Page_Confirm extends CRM_Core_Page {
       !$subscribe_id ||
       !$hash
     ) {
-      CRM_Core_Error::fatal(ts("Missing input parameters"));
+      throw new CRM_Core_Exception(ts("Missing input parameters"));
     }
 
     $result = CRM_Mailing_Event_BAO_Confirm::confirm($contact_id, $subscribe_id, $hash);

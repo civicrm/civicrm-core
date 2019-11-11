@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -271,6 +271,22 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $groupType = $this->callAPISuccess('Group', 'getvalue', ['return' => 'group_type', 'id' => $group['id']]);
 
     $this->assertAPIArrayComparison([2, 1], $groupType);
+  }
+
+  /**
+   * Test / demonstrate behaviour when attempting to filter by group_type.
+   *
+   * Per https://lab.civicrm.org/dev/core/issues/1321 the group_type filter is deceptive
+   * - it only filters on exact match not 'is one of'.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGroupWithGroupTypeFilter() {
+    $this->groupCreate(['group_type' => ['Access Control'], 'name' => 'access_list', 'title' => 'access list']);
+    $this->groupCreate(['group_type' => ['Mailing List'], 'name' => 'mailing_list', 'title' => 'mailing list']);
+    $this->groupCreate(['group_type' => ['Access Control', 'Mailing List'], 'name' => 'group', 'title' => 'group']);
+    $group = $this->callAPISuccessGetSingle('Group', ['return' => 'id,title,group_type', 'group_type' => 'Mailing List']);
+    $this->assertEquals('mailing list', $group['title']);
   }
 
   /**

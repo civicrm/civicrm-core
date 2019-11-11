@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -126,9 +126,11 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
+   * This is public so we can retrieve the filter name via hooks etc. and apply conditional logic (eg. loading javascript conditionals).
+   *
    * @return string
    */
-  protected function getSettingPageFilter() {
+  public function getSettingPageFilter() {
     if (!isset($this->_filter)) {
       // Get the last URL component without modifying the urlPath property.
       $urlPath = array_values($this->urlPath);
@@ -249,6 +251,10 @@ trait CRM_Admin_Form_SettingTrait {
         if ($setting == 'max_attachments') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
+        }
+        if ($setting == 'max_attachments_backend') {
+          //temp hack @todo fix to get from metadata
+          $this->addRule('max_attachments_backend', ts('Value should be a positive number'), 'positiveInteger');
         }
         if ($setting == 'maxFileSize') {
           //temp hack

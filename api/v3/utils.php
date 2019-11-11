@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -389,6 +389,9 @@ function _civicrm_api3_get_BAO($name) {
     // Dedupe is a pseudoentity for PrevNextCache - but accessing dedupe related info
     // not the other cache info like search results (which could in fact be in Redis or another cache engine)
     $name = 'PrevNextCache';
+  }
+  if ($name === 'Payment') {
+    $name = 'FinancialTrxn';
   }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {

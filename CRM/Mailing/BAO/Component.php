@@ -3,7 +3,7 @@
 /**
  * @deprecated copy of renamed class.
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Mailing_BAO_Component extends CRM_Mailing_BAO_MailingComponent {
 

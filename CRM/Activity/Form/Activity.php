@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -323,30 +323,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       );
     }
 
-    // Assigning Activity type name.
-    if ($this->_activityTypeId) {
-      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
-      if ($activityTName[$this->_activityTypeId]) {
-        $this->_activityTypeName = $activityTName[$this->_activityTypeId];
-        $this->assign('activityTName', $activityTName[$this->_activityTypeId]);
-      }
-      // Set title.
-      if (isset($activityTName)) {
-        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-
-        if ($this->_currentlyViewedContactId) {
-          $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
-          // Check if this is default domain contact CRM-10482.
-          if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
-            $displayName .= ' (' . ts('default organization') . ')';
-          }
-          CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
-        }
-        else {
-          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityName]));
-        }
-      }
-    }
+    $this->assignActivityType();
 
     // Check the mode when this form is called either single or as
     // search task action.
@@ -460,6 +437,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         || $path == 'civicrm/contact/search/advanced'
         || $path == 'civicrm/contact/search/custom'
         || $path == 'civicrm/group/search'
+        || $path == 'civicrm/contact/search/builder'
       ) {
         $urlString = $path;
       }
@@ -483,6 +461,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // when custom data is included in this page
+    $this->assign('cid', $this->_currentlyViewedContactId);
     if (!empty($_POST['hidden_custom'])) {
       // We need to set it in the session for the code below to work.
       // CRM-3014
@@ -666,7 +645,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
       ['' => '- ' . ts('select') . ' -'] + $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, [
-        'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
+        'onchange' => "CRM.buildCustomData( 'Activity', this.value, false, false, false, false, false, false, {$this->_currentlyViewedContactId});",
         'class' => 'crm-select2 required',
       ]
     );
@@ -744,7 +723,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('surveyActivity', $this->_isSurveyActivity);
 
     // Add the "Activity Separation" field
-    $actionIsAdd = $this->_action != CRM_Core_Action::UPDATE;
+    $actionIsAdd = ($this->_action != CRM_Core_Action::UPDATE && $this->_action != CRM_Core_Action::VIEW);
     $separationIsPossible = $this->supportsActivitySeparation;
     if ($actionIsAdd && $separationIsPossible) {
       $this->addRadio(
@@ -1243,6 +1222,48 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if ($this->_activityTypeFile) {
       $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
       $className::endPostProcess($this, $params, $activity);
+    }
+  }
+
+  /**
+   * For the moment keeping this the same as the original pulled from preProcess(). Also note the "s" at the end of the function name - planning to change that but in baby steps.
+   *
+   * @return string[]
+   */
+  public function getActivityTypeDisplayLabels() {
+    return CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
+  }
+
+  /**
+   * For the moment this is just pulled from preProcess
+   */
+  public function assignActivityType() {
+    if ($this->_activityTypeId) {
+      $activityTypeDisplayLabels = $this->getActivityTypeDisplayLabels();
+      if ($activityTypeDisplayLabels[$this->_activityTypeId]) {
+        $this->_activityTypeName = $activityTypeDisplayLabels[$this->_activityTypeId];
+
+        // At the moment this is duplicating other code in this section, but refactoring in small steps.
+        $activityTypeObj = new CRM_Activity_BAO_ActivityType($this->_activityTypeId);
+        $this->assign('activityTypeNameAndLabel', $activityTypeObj->getActivityType());
+      }
+      // Set title.
+      if (isset($activityTypeDisplayLabels)) {
+        // FIXME - it's not clear why the if line just above is needed here and why we can't just set this once above and re-use. What is interesting, but can't possibly be the reason, is that the first if block will fail if the label is the string '0', whereas this one won't. But who would have an activity type called '0'?
+        $activityTypeDisplayLabel = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeDisplayLabels);
+
+        if ($this->_currentlyViewedContactId) {
+          $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
+          // Check if this is default domain contact CRM-10482.
+          if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
+            $displayName .= ' (' . ts('default organization') . ')';
+          }
+          CRM_Utils_System::setTitle($displayName . ' - ' . $activityTypeDisplayLabel);
+        }
+        else {
+          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityTypeDisplayLabel]));
+        }
+      }
     }
   }
 

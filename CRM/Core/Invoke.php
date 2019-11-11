@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * Serves as a wrapper between the UserFrameWork and Core CRM
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Core_Invoke {
 
@@ -193,12 +193,6 @@ class CRM_Core_Invoke {
     $template->assign('formTpl', 'default');
 
     if ($item) {
-      // CRM-7656 - make sure we send a clean sanitized path to create printer friendly url
-      $printerFriendly = CRM_Utils_System::makeURL(
-          'snippet', FALSE, FALSE,
-          CRM_Utils_Array::value('path', $item)
-        ) . '2';
-      $template->assign('printerFriendly', $printerFriendly);
 
       if (!array_key_exists('page_callback', $item)) {
         CRM_Core_Error::debug('Bad item', $item);

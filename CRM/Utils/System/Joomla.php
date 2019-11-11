@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -265,8 +265,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if ($config->userFrameworkFrontend) {
       $script = 'index.php';
-      if (JRequest::getVar("Itemid") && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
-        $Itemid = "{$separator}Itemid=" . JRequest::getVar("Itemid");
+
+      // Get Itemid using JInput::get()
+      $input = Joomla\CMS\Factory::getApplication()->input;
+      $itemIdNum = $input->get("Itemid");
+      if ($itemIdNum && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
+        $Itemid = "{$separator}Itemid=" . $itemIdNum;
       }
     }
 
@@ -469,9 +473,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Use CMS-native approach
+   * @throws \CRM_Core_Exception.
    */
   public function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
   /**
@@ -834,23 +839,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Output code from error function.
-   * @param string $content
-   */
-  public function outputError($content) {
-    if (class_exists('JErrorPage')) {
-      $error = new Exception($content);
-      JErrorPage::render($error);
-    }
-    elseif (class_exists('JError')) {
-      JError::raiseError('CiviCRM-001', $content);
-    }
-    else {
-      parent::outputError($content);
-    }
-  }
-
-  /**
    * @inheritDoc
    */
   public function synchronizeUsers() {
@@ -896,9 +884,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       }
       else {
         $contactMatching++;
-      }
-      if (is_object($match)) {
-        $match->free();
       }
     }
 

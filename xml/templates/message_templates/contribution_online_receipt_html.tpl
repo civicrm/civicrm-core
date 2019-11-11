@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="500" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -28,14 +28,12 @@
 
     {if $is_pay_later}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
-    {else}
-     <p>{ts}Please print this confirmation for your records.{/ts}</p>
     {/if}
 
    </td>
   </tr>
   </table>
-  <table width="500" style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
+  <table style="width:100%; max-width:500px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
 
      {if $amount}
 
@@ -313,19 +311,7 @@
       </tr>
      {/if}
 
-     {if ! ($contributeMode eq 'notify' OR $contributeMode eq 'directIPN') and $is_monetary}
-      {if $is_pay_later && !$isBillingAddressRequiredForPayLater}
-       <tr>
-        <th {$headerStyle}>
-         {ts}Registered Email{/ts}
-        </th>
-       </tr>
-       <tr>
-        <td colspan="2" {$valueStyle}>
-         {$email}
-        </td>
-       </tr>
-      {elseif $amount GT 0}
+     {if $billingName}
        <tr>
         <th {$headerStyle}>
          {ts}Billing Name and Address{/ts}
@@ -338,10 +324,20 @@
          {$email}
         </td>
        </tr>
-      {/if}
+     {elseif $email}
+       <tr>
+        <th {$headerStyle}>
+         {ts}Registered Email{/ts}
+        </th>
+       </tr>
+       <tr>
+        <td colspan="2" {$valueStyle}>
+         {$email}
+        </td>
+       </tr>
      {/if}
 
-     {if $contributeMode eq 'direct' AND !$is_pay_later AND $amount GT 0}
+     {if $credit_card_type}
       <tr>
        <th {$headerStyle}>
         {ts}Credit Card Information{/ts}

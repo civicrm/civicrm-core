@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /*
@@ -879,9 +879,14 @@ function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTyp
   $params['activity_date_time'] = $result['date'];
   $params['details'] = $result['body'];
 
-  for ($i = 1; $i <= 5; $i++) {
+  $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
+  for ($i = 1; $i <= $numAttachments; $i++) {
     if (isset($result["attachFile_$i"])) {
       $params["attachFile_$i"] = $result["attachFile_$i"];
+    }
+    else {
+      // No point looping 100 times if there's only one attachment
+      break;
     }
   }
 

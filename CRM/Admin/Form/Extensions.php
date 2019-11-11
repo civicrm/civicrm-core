@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -205,7 +205,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         'version' => 3,
         'key' => $this->_key,
       ]);
-      if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
+      if (empty($result['is_error'])) {
         CRM_Core_Session::setStatus("", ts('Extension Upgraded'), "success");
       }
       else {

@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -84,7 +84,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
       // when we come from a form which displays all the location elements (like the edit form or the inline block
       // elements, we can skip the below check. The below check adds quite a feq queries to an already overloaded
       // form
-      if (!CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE)) {
+      if (empty($params['updateBlankLocInfo'])) {
         // make sure contact should have only one primary block, CRM-5051
         self::checkPrimaryBlocks(CRM_Utils_Array::value('contact_id', $params));
       }

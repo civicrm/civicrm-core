@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -401,26 +401,6 @@ class CRM_Contact_Import_ImportJob {
       return $tagAdditions;
     }
     return FALSE;
-  }
-
-  /**
-   * @return array
-   */
-  public static function getIncompleteImportTables() {
-    $dao = new CRM_Core_DAO();
-    $database = $dao->database();
-    $query = "SELECT   TABLE_NAME FROM INFORMATION_SCHEMA
-                  WHERE    TABLE_SCHEMA = ? AND
-                           TABLE_NAME LIKE 'civicrm_import_job_%'
-                  ORDER BY TABLE_NAME";
-    $result = CRM_Core_DAO::executeQuery($query, array($database));
-    $incompleteImportTables = array();
-    while ($importTable = $result->fetch()) {
-      if (!self::isComplete($importTable)) {
-        $incompleteImportTables[] = $importTable;
-      }
-    }
-    return $incompleteImportTables;
   }
 
 }

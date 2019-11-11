@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Mailing_Form_Approve extends CRM_Core_Form {
 
@@ -154,7 +154,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     }
 
     if (!$ids['mailing_id']) {
-      CRM_Core_Error::fatal();
+      CRM_Core_Error::statusBounce(ts('No mailing id has been able to be determined'));
     }
 
     $params['approver_id'] = $this->_contactID;

@@ -514,7 +514,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'import' => 1,
         'custom_field_id' => $this->getCustomFieldID('text'),
         'options_per_line' => NULL,
-        'text_length' => NULL,
+        'text_length' => 300,
         'data_type' => 'String',
         'html_type' => 'Text',
         'is_search_range' => '0',
@@ -537,6 +537,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'where' => 'civicrm_value_custom_group_' . $customGroupID . '.enter_text_here_' . $this->getCustomFieldID('text'),
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
+        'maxlength' => 300,
       ],
       $this->getCustomFieldName('select_string') => [
         'name' => $this->getCustomFieldName('select_string'),
@@ -577,7 +578,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       $this->getCustomFieldName('select_date') => [
         'name' => $this->getCustomFieldName('select_date'),
         'type' => 4,
-        'title' => 'test_date',
+        'title' => 'Test Date',
         'headerPattern' => '//',
         'import' => 1,
         'custom_field_id' => $this->getCustomFieldID('select_date'),
@@ -585,11 +586,11 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'text_length' => NULL,
         'data_type' => 'Date',
         'html_type' => 'Select Date',
-        'is_search_range' => '0',
+        'is_search_range' => '1',
         'date_format' => 'mm/dd/yy',
         'time_format' => '1',
         'id' => $this->getCustomFieldID('select_date'),
-        'label' => 'test_date',
+        'label' => 'Test Date',
         'groupTitle' => 'Custom Group',
         'default_value' => '20090711',
         'custom_group_id' => $customGroupID,
@@ -638,6 +639,38 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
       ],
+      $this->getCustomFieldName('int') => [
+        'name' => $this->getCustomFieldName('int'),
+        'type' => CRM_Utils_Type::T_INT,
+        'title' => 'Enter integer here',
+        'headerPattern' => '//',
+        'import' => 1,
+        'custom_field_id' => $this->getCustomFieldID('int'),
+        'options_per_line' => NULL,
+        'text_length' => NULL,
+        'data_type' => 'Int',
+        'html_type' => 'Text',
+        'is_search_range' => '1',
+        'id' => $this->getCustomFieldID('int'),
+        'label' => 'Enter integer here',
+        'groupTitle' => 'Custom Group',
+        'default_value' => '4',
+        'custom_group_id' => $customGroupID,
+        'extends' => 'Contact',
+        'extends_entity_column_value' => NULL,
+        'extends_entity_column_id' => NULL,
+        'is_view' => '0',
+        'is_multiple' => '0',
+        'option_group_id' => NULL,
+        'date_format' => NULL,
+        'time_format' => NULL,
+        'is_required' => '1',
+        'table_name' => 'civicrm_value_custom_group_' . $customGroupID,
+        'column_name' => $this->getCustomFieldColumnName('int'),
+        'where' => 'civicrm_value_custom_group_' . $customGroupID . '.' . $this->getCustomFieldColumnName('int'),
+        'extends_table' => 'civicrm_contact',
+        'search_table' => 'contact_a',
+      ],
     ];
     $this->assertEquals($expected, CRM_Core_BAO_CustomField::getFieldsForImport());
   }
@@ -673,6 +706,29 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertContains('`test_link_2` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL', $dao->Create_Table);
     $this->assertContains('KEY `INDEX_my_text` (`my_text`)', $dao->Create_Table);
+  }
+
+  /**
+   * Check that outputting the display value for a file field with No description doesn't generate error
+   */
+  public function testFileDisplayValueNoDescription() {
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Individual',
+      'title' => 'Test Contact File Custom Group',
+    ]);
+    $fileField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'File',
+      'html_type' => 'File',
+      'default_value' => '',
+    ]);
+    $filePath = Civi::paths()->getPath('[civicrm.files]/custom/test_file.txt');
+    $file = $this->callAPISuccess('File', 'create', [
+      'uri' => $filePath,
+    ]);
+    $individual = $this->individualCreate(['custom_' . $fileField['id'] => $file['id']]);
+    $expectedDisplayValue = CRM_Core_BAO_File::paperIconAttachment('*', $file['id'])[$file['id']];
+    $this->assertEquals($expectedDisplayValue, CRM_Core_BAO_CustomField::displayValue($file['id'], $fileField['id']));
   }
 
 }

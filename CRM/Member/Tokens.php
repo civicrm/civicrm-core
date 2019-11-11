@@ -4,7 +4,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -93,6 +93,9 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
     if (in_array($field, ['start_date', 'end_date', 'join_date'])) {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
+    }
+    elseif ($field == 'fee') {
+      $row->tokens($entity, $field, \CRM_Utils_Money::format($actionSearchResult->$field, NULL, NULL, TRUE));
     }
     elseif (isset($actionSearchResult->$field)) {
       $row->tokens($entity, $field, $actionSearchResult->$field);

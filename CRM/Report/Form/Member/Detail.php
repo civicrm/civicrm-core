@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
@@ -115,7 +115,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'source' => ['title' => ts('Source')],
         ],
         'filters' => [
-          'join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'membership_join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'membership_start_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'membership_end_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'owner_membership_id' => [
@@ -225,7 +225,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
           ],
           'total_amount' => ['title' => ts('Contribution Amount')],
@@ -317,7 +317,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $checkList = [];
 
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $repeatFound = FALSE;

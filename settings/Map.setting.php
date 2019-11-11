@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  * Settings metadata file
@@ -51,7 +51,7 @@ return [
     ],
     'default' => NULL,
     'title' => 'Geo Provider Key',
-    'description' => 'Enter the API key or Application ID associated with your geocoding provider (not required for Yahoo).',
+    'description' => 'Enter the API key or Application ID associated with your geocoding provider.',
   ],
   'geoProvider' => [
     'add' => '4.7',

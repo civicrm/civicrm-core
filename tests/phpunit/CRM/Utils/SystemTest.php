@@ -114,4 +114,68 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Demonstrate the, um, "flexibility" of isNull
+   */
+  public function testIsNull() {
+    $this->assertTrue(CRM_Utils_System::isNull(NULL));
+    $this->assertTrue(CRM_Utils_System::isNull(''));
+    $this->assertTrue(CRM_Utils_System::isNull('null'));
+    // Not sure how to test this one because phpunit itself throws an error.
+    // $this->assertTrue(CRM_Utils_System::isNull($someUnsetVariable));
+
+    // but...
+    $this->assertFalse(CRM_Utils_System::isNull('NULL'));
+    $this->assertFalse(CRM_Utils_System::isNull('Null'));
+
+    // probably ok?
+    $this->assertTrue(CRM_Utils_System::isNull([]));
+
+    // ok
+    $this->assertFalse(CRM_Utils_System::isNull(0));
+
+    // sure
+    $arr = [
+      1 => NULL,
+    ];
+    $this->assertTrue(CRM_Utils_System::isNull($arr[1]));
+    $this->assertTrue(CRM_Utils_System::isNull($arr));
+
+    // but then a little confusing
+    $arr = [
+      'IN' => NULL,
+    ];
+    $this->assertFalse(CRM_Utils_System::isNull($arr));
+
+    // now just guessing
+    $obj = new StdClass();
+    $this->assertFalse(CRM_Utils_System::isNull($obj));
+    $obj->anything = NULL;
+    $this->assertFalse(CRM_Utils_System::isNull($obj));
+
+    // this is ok
+    $arr = [
+      1 => [
+        'foo' => 'bar',
+      ],
+      2 => [
+        'a' => NULL,
+      ],
+    ];
+    $this->assertFalse(CRM_Utils_System::isNull($arr));
+
+    $arr = [
+      1 => $obj,
+    ];
+    $this->assertFalse(CRM_Utils_System::isNull($arr));
+
+    // sure
+    $arr = [
+      1 => NULL,
+      2 => '',
+      3 => 'null',
+    ];
+    $this->assertTrue(CRM_Utils_System::isNull($arr));
+  }
+
 }

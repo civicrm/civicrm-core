@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -80,6 +80,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     if (!empty($contactDetails)) {
       foreach ($contactDetails as $key => $value) {
         $assignee = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($key);
+        $assigneeContact = [];
         foreach ($assignee as $values) {
           $assigneeContact[] = CRM_Contact_BAO_Contact::displayName($values);
         }

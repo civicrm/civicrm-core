@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -244,6 +244,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       ];
       $defaults = [];
       if ($self->_action == CRM_Core_Action::ADD) {
+        // @todo replace with call to CRM_Financial_BAO_FinancialAccount getSalesTaxFinancialAccount
         $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
         $isTax = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $values['financial_account_id'], 'is_tax');
         if ($values['account_relationship'] == $relationshipId) {

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -47,7 +47,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param CRM $contact
+   * @param CRM_Contact_BAO_Contact $contact
    *   Contact object.
    *
    * @return CRM_Contact_BAO_Contact

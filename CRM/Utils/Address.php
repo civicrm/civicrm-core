@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Address Utilities
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Utils_Address {
 
@@ -343,7 +343,7 @@ class CRM_Utils_Address {
         $alternateName = $alternate2;
       }
       //Include values which prepend 'billing_' to country and state_province.
-      if (CRM_Utils_Array::value($alternateName, $params)) {
+      if (!empty($params[$alternateName])) {
         if (empty($value) || !is_numeric($value)) {
           $value = $params[$alternateName];
         }

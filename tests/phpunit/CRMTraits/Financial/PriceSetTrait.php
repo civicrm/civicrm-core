@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@ trait CRMTraits_Financial_PriceSetTrait {
    *   Financial Types, if an override is intended.
    */
   protected function createContributionWithTwoLineItemsAgainstPriceSet($params, $lineItemFinancialTypes = []) {
-    $params = array_merge(['total_amount' => 300, 'financial_type_id' => 'Donation'], $params);
+    $params = array_merge(['total_amount' => 300, 'financial_type_id' => 'Donation', 'contribution_status_id' => 'Pending'], $params);
     $priceFields = $this->createPriceSet('contribution');
     foreach ($priceFields['values'] as $key => $priceField) {
       $financialTypeID = (!empty($lineItemFinancialTypes) ? array_shift($lineItemFinancialTypes) : $priceField['financial_type_id']);
@@ -58,7 +58,8 @@ trait CRMTraits_Financial_PriceSetTrait {
         'entity_table' => 'civicrm_contribution',
       ];
     }
-    $this->callAPISuccess('order', 'create', $params);
+    $order = $this->callAPISuccess('Order', 'create', $params);
+    $this->callAPISuccess('Payment', 'create', ['contribution_id' => $order['id'], 'total_amount' => $params['total_amount']]);
   }
 
 }

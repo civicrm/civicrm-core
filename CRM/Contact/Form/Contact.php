@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -227,7 +227,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
         if ($defaults['is_deceased']) {
-          $displayName .= '  <span class="crm-contact-deceased">(deceased)</span>';
+          $displayName .= '  <span class="crm-contact-deceased">(' . ts('deceased') . ')</span>';
         }
         $displayName = ts('Edit %1', [1 => $displayName]);
 

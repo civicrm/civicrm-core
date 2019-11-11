@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -47,8 +47,9 @@
  *   Associative array of property name/value.
  *   pairs to get profile field values
  *
- * @throws API_Exception
  * @return array
+ * @throws \CRM_Core_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_profile_get($params) {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ? TRUE : FALSE;

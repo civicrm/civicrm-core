@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
  * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -286,9 +287,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // we do not want to display recently viewed items, so turn off
     $this->assign('displayRecent', FALSE);
-    // Contribution page values are cleared from session, so can't use normal Printer Friendly view.
-    // Use Browser Print instead.
-    $this->assign('browserPrint', TRUE);
 
     // action
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -345,6 +343,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $isPayLater = FALSE;
           $this->_values['is_pay_later'] = FALSE;
         }
+      }
+      if ($isPayLater) {
+        $this->setPayLaterLabel($this->_values['pay_later_text']);
       }
 
       if ($isMonetary) {
@@ -471,7 +472,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       CRM_Utils_Array::value('cancelSubscriptionUrl', $this->_values)
     );
 
-    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $this->_values['title']));
+    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
+
+    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $title));
     $this->_defaults = [];
 
     $this->_amount = $this->get('amount');

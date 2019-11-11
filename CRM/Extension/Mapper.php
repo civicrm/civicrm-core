@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@
  * module-extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Extension_Mapper {
 
@@ -286,6 +286,8 @@ class CRM_Extension_Mapper {
     }
 
     if (!is_array($moduleExtensions)) {
+      $compat = CRM_Extension_System::getCompatibilityInfo();
+
       // Check canonical module list
       $moduleExtensions = [];
       $sql = '
@@ -296,6 +298,9 @@ class CRM_Extension_Mapper {
       ';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
+        if (!empty($compat[$dao->full_name]['force-uninstall'])) {
+          continue;
+        }
         try {
           $moduleExtensions[] = [
             'prefix' => $dao->file,

@@ -15,7 +15,7 @@
 
 
 <center>
- <table width="700" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -31,9 +31,9 @@
      <p>{$event.confirm_email_text|htmlize}</p>
 
     {else}
-     <p>{ts}Thank you for your participation.{/ts}
-     {if $participant_status}{ts 1=$participant_status}This letter is a confirmation that your registration has been received and your status has been updated to <strong> %1</strong>.{/ts}
-     {else}{if $isOnWaitlist}{ts}This letter is a confirmation that your registration has been received and your status has been updated to <strong>waitlisted</strong>.{/ts}{else}{ts}This letter is a confirmation that your registration has been received and your status has been updated to <strong>registered<strong>.{/ts}{/if}{/if}.</p>
+     <p>{ts}Thank you for your registration.{/ts}
+     {if $participant_status}{ts 1=$participant_status}This is a confirmation that your registration has been received and your status has been updated to <strong> %1</strong>.{/ts}
+     {else}{if $isOnWaitlist}{ts}This is a confirmation that your registration has been received and your status has been updated to <strong>waitlisted</strong>.{/ts}{else}{ts}This is a confirmation that your registration has been received and your status has been updated to <strong>registered<strong>.{/ts}{/if}{/if}</p>
 
     {/if}
 
@@ -50,15 +50,13 @@
      {/if}
     {elseif $is_pay_later && !$isAmountzero && !$isAdditionalParticipant}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
-    {else}
-     <p>{ts}Please print this confirmation for your records.{/ts}</p>
     {/if}
 
    </td>
   </tr>
   <tr>
    <td>
-    <table width="700" style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
+    <table style="width:100%; max-width:700px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
      <tr>
       <th {$headerStyle}>
        {ts}Event Information and Location{/ts}
@@ -248,9 +246,9 @@
             {if $individual}
               <tr {$participantTotal}>
                 <td colspan=3>{ts}Participant Total{/ts}</td>
-                <td  colspan=2>{$individual.$priceset.totalAmtWithTax-$individual.$priceset.totalTaxAmt|crmMoney}</td>
-                <td  colspan=1>{$individual.$priceset.totalTaxAmt|crmMoney}</td>
-                <td  colspan=2>{$individual.$priceset.totalAmtWithTax|crmMoney}</td>
+                <td colspan=2>{$individual.$priceset.totalAmtWithTax-$individual.$priceset.totalTaxAmt|crmMoney}</td>
+                <td colspan=1>{$individual.$priceset.totalTaxAmt|crmMoney}</td>
+                <td colspan=2>{$individual.$priceset.totalAmtWithTax|crmMoney}</td>
               </tr>
             {/if}
            </table>
@@ -398,7 +396,7 @@
         </tr>
        {/if}
 
-       {if $contributeMode ne 'notify' and !$isAmountzero and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and !$isOnWaitlist and !$isRequireApproval}
+       {if $billingName}
         <tr>
          <th {$headerStyle}>
           {ts}Billing Name and Address{/ts}
@@ -412,7 +410,7 @@
         </tr>
        {/if}
 
-       {if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+       {if $credit_card_type}
         <tr>
          <th {$headerStyle}>
           {ts}Credit Card Information{/ts}
@@ -505,8 +503,6 @@
       </td>
      </tr>
     {/if}
-   </td>
-  </tr>
  </table>
 </center>
 

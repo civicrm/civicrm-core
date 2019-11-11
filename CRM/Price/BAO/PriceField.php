@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -61,6 +61,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return CRM_Price_BAO_PriceField
    */
   public static function add(&$params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'PriceField', CRM_Utils_Array::value('id', $params), $params);
+
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
@@ -70,6 +73,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
 
     $priceFieldBAO->save();
+    CRM_Utils_Hook::post($hook, 'PriceField', $priceFieldBAO->id, $priceFieldBAO);
     return $priceFieldBAO;
   }
 
@@ -112,6 +116,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       ]);
       foreach ($fieldOptions['values'] as $option) {
         $optionsIds['id'] = $option['id'];
+        $params['option_id'] = [1 => $option['id']];
         // CRM-19741 If we are dealing with price fields that are Text only set the field value label to match
         if (!empty($params['id']) && $priceField->label != $option['label']) {
           $fieldValue = new CRM_Price_DAO_PriceFieldValue();
@@ -173,10 +178,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
         if ($opIds = CRM_Utils_Array::value('option_id', $params)) {
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
-            $optionsIds['id'] = $opId;
+            $options['id'] = $opId;
           }
           else {
-            $optionsIds['id'] = NULL;
+            $options['id'] = NULL;
           }
         }
         try {

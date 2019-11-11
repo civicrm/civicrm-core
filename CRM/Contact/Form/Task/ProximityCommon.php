@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -107,9 +107,7 @@ class CRM_Contact_Form_Task_ProximityCommon {
       if (empty($fields['prox_state_province_id']) || empty($fields['prox_country_id'])) {
         $errors["prox_state_province_id"] = ts("Country AND State/Province are required to search by distance.");
       }
-      if (!CRM_Utils_Array::value('prox_postal_code', $fields) and
-        !CRM_Utils_Array::value('prox_city', $fields)
-      ) {
+      if (empty($fields['prox_postal_code']) && empty($fields['prox_city'])) {
         $errors["prox_distance"] = ts("City OR Postal Code are required to search by distance.");
       }
     }

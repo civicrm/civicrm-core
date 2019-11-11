@@ -3,7 +3,7 @@
  * +--------------------------------------------------------------------+
  * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2019                                |
+ * | Copyright CiviCRM LLC (c) 2004-2020                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -1118,8 +1118,6 @@ class CRM_GCD {
       $group->group_type = "12";
       $group->visibility = 'Public Pages';
       $group->is_active = 1;
-      $group->save();
-      $group->buildClause();
       $group->save();
     }
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
@@ -112,6 +112,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * Get where clause.
    *
    * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function where(&$query) {
     self::initializeAnySoftCreditClause($query);
@@ -122,18 +125,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       if (substr($query->_params[$id][0], 0, 13) == 'contribution_' || substr($query->_params[$id][0], 0, 10) == 'financial_'  || substr($query->_params[$id][0], 0, 8) == 'payment_') {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
-        }
-        // CRM-12065
-        if (
-          $query->_params[$id][0] == 'contribution_type_id' ||
-          $query->_params[$id][0] == 'contribution_type'
-        ) {
-          CRM_Core_Session::setStatus(
-            ts('The contribution type criteria is now obsolete, please update your smart group'),
-            '',
-            'alert'
-          );
-          continue;
         }
 
         self::whereClauseSingle($query->_params[$id], $query);
@@ -160,24 +151,14 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $quoteValue = "\"$value\"";
     }
 
-    // These are legacy names.
-    // @todo enotices when these are hit so we can start to elimnate them.
-    $fieldAliases = [
-      'financial_type' => 'financial_type_id',
-      'contribution_page' => 'contribution_page_id',
-      'payment_instrument' => 'payment_instrument_id',
-      // or payment_instrument_id?
-      'contribution_payment_instrument' => 'contribution_payment_instrument_id',
-      'contribution_status' => 'contribution_status_id',
-    ];
+    $fieldAliases = self::getLegacySupportedFields();
 
-    $name = isset($fieldAliases[$name]) ? $fieldAliases[$name] : $name;
+    $fieldName = $name = self::getFieldName($values);
     $qillName = $name;
     if (in_array($name, $fieldAliases)) {
       $qillName = array_search($name, $fieldAliases);
     }
     $pseudoExtraParam = [];
-    $fieldName = str_replace(['_high', '_low'], '', $name);
     $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
     $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
     $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
@@ -492,12 +473,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         //all other elements are handle in this case
         $fldName = substr($name, 13);
         if (!isset($fields[$fldName])) {
-          // CRM-12597
-          CRM_Core_Session::setStatus(ts(
-              'We did not recognize the search field: %1. Please check and fix your contribution related smart groups.',
-              [1 => $fldName]
-            )
-          );
           return;
         }
         $whereTable = $fields[$fldName];
@@ -505,7 +480,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
           $value = trim($value);
         }
 
-        $dataType = "String";
+        $dataType = 'String';
         if (!empty($whereTable['type'])) {
           $dataType = CRM_Utils_Type::typeToString($whereTable['type']);
         }
@@ -933,7 +908,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * Add all the elements shared between contribute search and advnaced search.
+   * Add all the elements shared between contribute search and advanced search.
    *
    * @param \CRM_Contribute_Form_Search $form
    *
@@ -986,7 +961,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       ts('Personal Campaign Page'),
       CRM_Contribute_PseudoConstant::pcPage(), FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]);
 
-    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
+    $statusValues = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search');
     $form->add('select', 'contribution_status_id',
       ts('Contribution Status'), $statusValues,
       FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']

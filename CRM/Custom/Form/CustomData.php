@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -49,10 +49,11 @@ class CRM_Custom_Form_CustomData {
    *   e.g Student for contact type
    * @param null|string $subName value in civicrm_custom_group.extends_entity_column_id
    * @param null|int $groupCount number of entities that could have custom data
+   * @param null|int $contact_id contact ID associated with the custom data.
    *
    * @throws \CRM_Core_Exception
    */
-  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1) {
+  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1, $contact_id = NULL) {
     $entityName = $form->getDefaultEntity();
     $entityID = $form->getEntityId();
     // FIXME: If the form has been converted to use entityFormTrait then getEntitySubTypeId() will exist.
@@ -80,6 +81,7 @@ class CRM_Custom_Form_CustomData {
     $form->assign('customDataType', $entityName);
     $form->assign('customDataSubType', $entitySubType);
     $form->assign('entityID', $entityID);
+    $form->assign('cid', $contact_id);
   }
 
   /**

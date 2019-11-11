@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -287,9 +287,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     // If ACL applies to the current user, update cache before running the import.
     if (!CRM_Core_Permission::check('view all contacts')) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
-      CRM_ACL_BAO_Cache::updateEntry($userID);
+      $userID = CRM_Core_Session::getLoggedInContactID();
+      CRM_ACL_BAO_Cache::deleteEntry($userID);
+      CRM_ACL_BAO_Cache::deleteContactCacheEntry($userID);
     }
 
     CRM_Utils_Address_USPS::disable($this->_disableUSPS);

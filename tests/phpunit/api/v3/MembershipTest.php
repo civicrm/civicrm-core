@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -221,14 +221,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $this->_membershipID,
     ]);
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
   }
 
   /**
@@ -516,6 +516,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    *
    * Test suite for CRM-14758: API ( contact, create ) does not always create related membership
    * and max_related property for Membership_Type and Membership entities
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateWithRelationship() {
     // Create membership type: inherited through employment, max_related = 2
@@ -691,6 +694,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * We are checking for no e-notices + only id & end_date returned
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipGetWithReturn() {
     $this->contactMembershipCreate($this->_params);

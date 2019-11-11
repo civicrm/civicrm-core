@@ -294,8 +294,7 @@ class civicrm_cli {
    * @return bool
    */
   private function _validateOptions() {
-    $required = $this->_required_arguments;
-    while (list(, $var) = each($required)) {
+    foreach ($this->_required_arguments as $var) {
       $index = '_' . $var;
       if (empty($this->$index)) {
         $missing_arg = '--' . $var;

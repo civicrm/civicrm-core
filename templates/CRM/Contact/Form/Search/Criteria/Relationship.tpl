@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,22 +54,22 @@
       </td>
     </tr>
     <tr>
-      <td colspan="2"><label>{ts}Start Date{/ts}</label></td>
+      <td colspan="2">
+        {$form.relation_description.label}<br />
+        {$form.relation_description.html}
+      </td>
     </tr>
     <tr>
-      {include file="CRM/Core/DateRange.tpl" fieldName="relation_start_date" from='_low' to='_high'}
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="relationship_start_date"}
     </tr>
     <tr>
-      <td colspan="2"><label>{ts}End Date{/ts}</label></td>
-    </tr>
-    <tr>
-      {include file="CRM/Core/DateRange.tpl" fieldName="relation_end_date" from='_low' to='_high'}
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="relationship_end_date"}
     </tr>
     <tr>
       <td colspan="2"><label>{ts}Active Period{/ts}</label> {help id="id-relationship-active-period" file="CRM/Contact/Form/Search/Advanced.hlp"}<br /></td>
     </tr>
     <tr>
-      {include file="CRM/Core/DateRange.tpl" fieldName="relation_active_period_date" from='_low' to='_high'}
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="relation_active_period_date" hideRelativeLabel=1}
     </tr>
     {if $relationshipGroupTree}
       <tr>

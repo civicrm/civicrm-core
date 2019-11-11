@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -374,6 +374,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
   $params['payment_instrument_id']['api.aliases'] = ['contribution_payment_instrument', 'payment_instrument'];
   $params['contact_id'] = CRM_Utils_Array::value('contribution_contact_id', $params);
   $params['contact_id']['api.aliases'] = ['contribution_contact_id'];
+  $params['is_template']['api.default'] = 0;
   unset($params['contribution_contact_id']);
 }
 
@@ -394,55 +395,6 @@ function _civicrm_api3_contribute_format_params($params, &$values) {
   //legacy way of formatting from v2 api - v3 way is to define metadata & do it in the api layer
   _civicrm_api3_filter_fields_for_bao('Contribution', $params, $values);
   return [];
-}
-
-/**
- * Adjust Metadata for Transact action.
- *
- * The metadata is used for setting defaults, documentation & validation.
- *
- * @param array $params
- *   Array of parameters determined by getfields.
- */
-function _civicrm_api3_contribution_transact_spec(&$params) {
-  $fields = civicrm_api3('Contribution', 'getfields', ['action' => 'create']);
-  $params = array_merge($params, $fields['values']);
-  $params['receive_date']['api.default'] = 'now';
-}
-
-/**
- * Process a transaction and record it against the contact.
- *
- * @param array $params
- *   Input parameters.
- *
- * @return array
- *   contribution of created or updated record (or a civicrm error)
- */
-function civicrm_api3_contribution_transact($params) {
-  // Set some params specific to payment processing
-  // @todo - fix this function - none of the results checked by civicrm_error would ever be an array with
-  // 'is_error' set
-  // also trxn_id is not saved.
-  // but since there is no test it's not desirable to jump in & make the obvious changes.
-  $params['payment_processor_mode'] = empty($params['is_test']) ? 'live' : 'test';
-  $params['amount'] = $params['total_amount'];
-  if (!isset($params['net_amount'])) {
-    $params['net_amount'] = $params['amount'];
-  }
-  if (!isset($params['invoiceID']) && isset($params['invoice_id'])) {
-    $params['invoiceID'] = $params['invoice_id'];
-  }
-
-  // Some payment processors expect a unique invoice_id - generate one if not supplied
-  $params['invoice_id'] = CRM_Utils_Array::value('invoice_id', $params, md5(uniqid(rand(), TRUE)));
-
-  $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor'], $params['payment_processor_mode']);
-  $paymentProcessor['object']->doPayment($params);
-
-  $params['payment_instrument_id'] = $paymentProcessor['object']->getPaymentInstrumentID();
-
-  return civicrm_api('Contribution', 'create', $params);
 }
 
 /**
@@ -612,6 +564,15 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
       'optionGroupName' => 'accept_creditcard',
     ],
   ];
+  // At some point we will deprecate this api in favour of calling payment create which will in turn call this
+  // api if appropriate to transition related entities and send receipts - ie. financial responsibility should
+  // not exist in completetransaction. For now we just need to allow payment.create to force a bypass on the
+  // things it does itself.
+  $params['is_post_payment_create'] = [
+    'title' => 'Is this being called from payment create?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'description' => 'The \'correct\' flow is to call payment.create for the financial side & for that to call completecontribution for the entity & receipt management. However, we need to still support completetransaction directly for legacy reasons',
+  ];
 }
 
 /**
@@ -669,6 +630,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
       'fee_amount',
       'financial_type_id',
       'contribution_status_id',
+      'membership_id',
     ];
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
@@ -728,7 +690,7 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   $input['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
   $transaction = new CRM_Core_Transaction();
   return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction,
-    !empty($contribution->contribution_recur_id), $contribution);
+    !empty($contribution->contribution_recur_id), $contribution, CRM_Utils_Array::value('is_post_payment_create', $params));
 }
 
 /**
@@ -800,4 +762,14 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
     'name' => 'payment_processor_id',
     'type' => CRM_Utils_Type::T_INT,
   ];
+}
+
+/**
+ * Declare deprecated functions.
+ *
+ * @return array
+ *   Array of deprecated actions
+ */
+function _civicrm_api3_contribution_deprecation() {
+  return ['transact' => 'Contribute.transact is ureliable & unsupported - see https://docs.civicrm.org/dev/en/latest/financial/OrderAPI/  for how to move on'];
 }

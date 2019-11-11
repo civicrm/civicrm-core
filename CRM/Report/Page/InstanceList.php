@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -282,6 +282,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
       ];
     }
+    CRM_Utils_Hook::links('view.report.links',
+      $className,
+      $instanceID,
+      $actions
+    );
 
     return $actions;
   }

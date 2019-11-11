@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -405,7 +405,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
       $surveyId = key(CRM_Campaign_BAO_Survey::getSurveys(TRUE, TRUE));
     }
     if (!$surveyId) {
-      CRM_Core_Error::fatal('Could not find valid Survey Id.');
+      CRM_Core_Error::statusBounce(ts('Could not find valid Survey Id.'));
     }
     $this->_formValues['campaign_survey_id'] = $this->_formValues['campaign_survey_id'] = $surveyId;
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -63,7 +63,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
   public static function preProcessCommon(&$form) {
     $form->_grantIds = [];
 
-    $values = $form->controller->exportValues('Search');
+    $values = $form->controller->exportValues($form->get('searchFormName'));
 
     $form->_task = $values['task'];
     $tasks = CRM_Grant_Task::tasks();

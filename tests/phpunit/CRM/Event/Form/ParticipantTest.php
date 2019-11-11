@@ -82,6 +82,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'contribution_status_id' => 2,
       'payment_instrument_id' => 1,
+      'receive_date' => date('Y-m-d'),
     ]);
     $participants = $this->callAPISuccess('Participant', 'get', []);
     $this->assertEquals(1, $participants['count']);
@@ -101,6 +102,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(55, $sum);
 
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participants['id'], 'participant', $contribution['id'], $this->eventFeeBlock, $lineItem);
+    // Check that no payment records have been created.
+    // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happend.
+    $payments = $this->callAPISuccess('Payment', 'get', [])['values'];
+    $this->assertCount(0, $payments);
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participants['id'], 'participant');
     // Participants is updated to 0 but line remains.
     $this->assertEquals(0, $lineItem[1]['subTotal']);
@@ -163,7 +168,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ]);
 
     $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_financial_item', 'sequential' => 1, 'return' => ['entity_table', 'amount']])['values'];
-    // @todo check the values assigned to these as part of fixing dev/financial#34
+    $this->assertEquals(40, $result[2]['amount']);
+    $this->assertEquals(4, count($result));
   }
 
   /**

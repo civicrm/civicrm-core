@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -65,10 +65,6 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
 
     if (!CRM_Utils_System::checkPHPVersion(5, FALSE)) {
       $errors['_qf_default'] = ts('Mapping features require PHP version 5 or greater');
-    }
-
-    if (!$fields['mapAPIKey'] && ($fields['mapProvider'] != '' && $fields['mapProvider'] == 'Yahoo')) {
-      $errors['mapAPIKey'] = "Map Provider key is a required field.";
     }
 
     if ($fields['mapProvider'] == 'OpenStreetMaps' && $fields['geoProvider'] == '') {

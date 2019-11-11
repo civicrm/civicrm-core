@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
@@ -73,7 +73,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ],
         ],
         'filters' => [
-          'join_date' => [
+          'membership_join_date' => [
             'title' => ts('Member Since'),
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
@@ -165,7 +165,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
           ],
         ],
         'grouping' => 'member-fields',
@@ -524,10 +524,10 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
           'xname' => ts('Member Since / Member Type'),
           'yname' => ts('Fees'),
         ];
-        CRM_Utils_OpenFlashChart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
+        CRM_Utils_Chart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
       }
       else {
-        CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
+        CRM_Utils_Chart::chart($graphRows, $this->_params['charts'], $this->_interval);
       }
     }
     $this->assign('chartType', $this->_params['charts']);
@@ -595,7 +595,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
             implode(",", $this->_params['status_id_value']);
         }
         $url = CRM_Report_Utils_Report::getNextUrl('member/detail',
-          "reset=1&force=1&join_date_from={$dateStart}&join_date_to={$dateEnd}{$typeUrl}{$statusUrl}",
+          "reset=1&force=1&membership_join_date_from={$dateStart}&membership_join_date_to={$dateEnd}{$typeUrl}{$statusUrl}",
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
         $row['civicrm_membership_join_date_start'] = CRM_Utils_Date::format($row['civicrm_membership_join_date_start']);

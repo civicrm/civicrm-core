@@ -22,7 +22,12 @@ trait Api3TestTrait {
    * @return array
    */
   public function versionThreeAndFour() {
-    return [[3], [4]];
+    $r = [[3]];
+    global $civicrm_root;
+    if (file_exists("$civicrm_root/Civi/Api4") || file_exists("$civicrm_root/ext/api4")) {
+      $r[] = [4];
+    }
+    return $r;
   }
 
   /**
@@ -142,6 +147,8 @@ trait Api3TestTrait {
    *   better or worse )
    *
    * @return array|int
+   *
+   * @throws \CRM_Core_Exception
    */
   public function callAPISuccess($entity, $action, $params = [], $checkAgainst = NULL) {
     $params = array_merge([
@@ -572,13 +579,11 @@ trait Api3TestTrait {
       }
       // Resolve custom field names
       foreach ($custom as $group => $fields) {
-        if (isset($row[$group])) {
-          foreach ($fields as $field => $v3FieldName) {
-            if (isset($row[$group][$field])) {
-              $result[$index][$v3FieldName] = $row[$group][$field];
-            }
+        foreach ($fields as $field => $v3FieldName) {
+          if (isset($row["$group.$field"])) {
+            $result[$index][$v3FieldName] = $row["$group.$field"];
+            unset($result[$index]["$group.$field"]);
           }
-          unset($result[$index][$group]);
         }
       }
     }

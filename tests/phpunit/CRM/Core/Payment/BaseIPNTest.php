@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -179,7 +179,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
     $this->assertTrue(is_array($msg), "Message returned as an array in line");
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertContains('<p>Please print this confirmation for your records.</p>', $msg['html']);
     $this->assertContains('Membership Type: General', $msg['body']);
   }
 
@@ -219,7 +218,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
     $this->assertTrue(is_array($msg), "Message returned as an array in line" . __LINE__);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertContains('<p>Please print this confirmation for your records.</p>', $msg['html']);
     $this->assertContains('Membership Type: General', $msg['body']);
   }
 
@@ -259,8 +257,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
     $this->assertTrue(is_array($msg), "Message returned as an array in line" . __LINE__);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertContains('<p>Please print this confirmation for your records.</p>', $msg['html']);
-    $this->assertContains('Thank you for your participation', $msg['body']);
+    $this->assertContains('Thank you for your registration', $msg['body']);
   }
 
   /**
@@ -273,7 +270,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);
     $mut->checkMailLog([
-      'Thank you for your participation',
+      'Thank you for your registration',
       'Annual CiviCRM meet',
       'Mr. Anthony Anderson II',
     ]);

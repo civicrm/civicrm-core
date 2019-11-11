@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -241,7 +241,6 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    * @throws \Exception
    */
   public function testCaseStatusByCaseType() {
-    $this->markTestIncomplete('Cannot figure out why this passes locally but fails on Jenkins.');
     $statusName = md5(mt_rand());
     $template = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $this->caseTypeId]);
     unset($template['id']);

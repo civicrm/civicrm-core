@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -54,9 +54,11 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     //Test database user privilege to create table(Temporary) CRM-4725
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $daoTestPrivilege = new CRM_Core_DAO();
-    $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_one(test int) ENGINE=InnoDB");
-    $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_two(test int) ENGINE=InnoDB");
-    $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS import_job_permission_one, import_job_permission_two");
+    $tempTable1 = CRM_Utils_SQL_TempTable::build()->getName();
+    $tempTable2 = CRM_Utils_SQL_TempTable::build()->getName();
+    $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable1} (test int) ENGINE=InnoDB");
+    $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable2} (test int) ENGINE=InnoDB");
+    $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS {$tempTable1}, {$tempTable2}");
     unset($errorScope);
 
     if ($daoTestPrivilege->_lastError) {

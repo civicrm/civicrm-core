@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -245,7 +245,10 @@ function civicrm_api3_extension_download($params) {
     throw new API_Exception('Cannot resolve download url for extension. Try adding parameter "url"');
   }
 
-  foreach (CRM_Extension_System::singleton()->getDownloader()->checkRequirements() as $requirement) {
+  if (!isset($info)) {
+    $info = NULL;
+  }
+  foreach (CRM_Extension_System::singleton()->getDownloader()->checkRequirements($info) as $requirement) {
     return civicrm_api3_create_error($requirement['message']);
   }
 

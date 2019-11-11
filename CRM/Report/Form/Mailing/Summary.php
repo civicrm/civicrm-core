@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
@@ -42,7 +42,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
   protected $_charts = [
     '' => 'Tabular',
-    'bar_3dChart' => 'Bar Chart',
+    'barchart' => 'Bar Chart',
   ];
 
   /**
@@ -625,7 +625,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $chartInfo['xSize'] = ((count($rows) * 125) + (count($rows) * count($criteria) * 40));
 
     // build the chart.
-    CRM_Utils_OpenFlashChart::buildChart($chartInfo, $this->_params['charts']);
+    CRM_Utils_Chart::buildChart($chartInfo, $this->_params['charts']);
     $this->assign('chartType', $this->_params['charts']);
   }
 

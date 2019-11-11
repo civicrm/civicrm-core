@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -78,7 +78,7 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
     elseif ($context == 'angPage') {
       $angPage = CRM_Utils_Request::retrieve('angPage', 'String', $this);
       if (!preg_match(':^[a-zA-Z0-9\-_/]+$:', $angPage)) {
-        CRM_Core_Error::fatal('Malformed return URL');
+        throw new CRM_Core_Exception('Malformed return URL');
       }
       $backUrl = CRM_Utils_System::url('civicrm/a/#/' . $angPage);
       $backUrlTitle = ts('Back to Report');

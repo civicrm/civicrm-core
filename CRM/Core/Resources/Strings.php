@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Manage translatable strings on behalf of resource files.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Core_Resources_Strings {
 
@@ -68,7 +68,7 @@ class CRM_Core_Resources_Strings {
    * @return array
    *   List of translatable strings.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function get($bucket, $file, $format) {
     // array($file => array(...strings...))
@@ -97,7 +97,8 @@ class CRM_Core_Resources_Strings {
    *   Type of file (e.g. 'text/javascript', 'text/html').
    * @return array
    *   List of translatable strings.
-   * @throws Exception
+   *
+   * @throws CRM_Core_Exception
    */
   public function extract($file, $format) {
     switch ($format) {
@@ -109,7 +110,7 @@ class CRM_Core_Resources_Strings {
         return CRM_Utils_JS::parseStrings(file_get_contents($file));
 
       default:
-        throw new Exception("Cannot extract strings: Unrecognized file type.");
+        throw new CRM_Core_Exception('Cannot extract strings: Unrecognized file type.');
     }
   }
 

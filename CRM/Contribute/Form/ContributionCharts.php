@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
 
@@ -173,11 +173,11 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         $monthlyChart = TRUE;
       }
 
-      $values['divName'] = "open_flash_chart_{$chartKey}";
+      $values['divName'] = "chart_{$chartKey}";
       $funName = ($chartType == 'bvg') ? 'barChart' : 'pieChart';
 
       // build the chart objects.
-      $values['object'] = CRM_Utils_OpenFlashChart::$funName($values);
+      $values['object'] = CRM_Utils_Chart::$funName($values);
 
       //build the urls.
       $urlCnt = 0;
@@ -230,8 +230,8 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     // finally assign this chart data to template.
     $this->assign('hasYearlyChart', $yearlyChart);
     $this->assign('hasByMonthChart', $monthlyChart);
-    $this->assign('hasOpenFlashChart', empty($chartData) ? FALSE : TRUE);
-    $this->assign('openFlashChartData', json_encode($chartData));
+    $this->assign('hasChart', empty($chartData) ? FALSE : TRUE);
+    $this->assign('chartData', json_encode($chartData ?? []));
   }
 
 }

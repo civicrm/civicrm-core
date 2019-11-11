@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  *
  * Class to handled upgrading any saved searches with changed patterns.
  */
@@ -56,20 +56,34 @@ class CRM_Upgrade_Incremental_SmartGroups {
    */
   public function datePickerConversion($fields) {
     $fieldPossibilities = $relativeFieldNames = [];
-    foreach ($fields as $field) {
-      $fieldPossibilities[] = $field;
-      $fieldPossibilities[] = $field . '_high';
-      $fieldPossibilities[] = $field . '_low';
-    }
     $relativeDateMappings = [
       'activity_date_time' => 'activity',
       'participant_register_date' => 'participant',
       'receive_date' => 'contribution',
       'contribution_cancel_date' => 'contribution_cancel',
+      'membership_join_date' => 'member_join',
+      'membership_start_date' => 'member_start',
+      'membership_end_date' => 'member_end',
+      'pledge_payment_scheduled_date' => 'pledge_payment',
+      'pledge_create_date' => 'pledge_create',
+      'pledge_end_date' => 'pledge_end',
+      'pledge_start_date' => 'pledge_start',
+      'case_start_date' => 'case_from',
+      'case_end_date' => 'case_to',
+      'mailing_job_start_date' => 'mailing_date',
+      'relationship_start_date' => 'relation_start',
+      'relationship_end_date' => 'relation_end',
+      'event' => 'event',
+      'created_date' => 'log',
+      'modified_date' => 'log',
     ];
 
     foreach ($fields as $field) {
       foreach ($this->getSearchesWithField($field) as $savedSearch) {
+        // Only populate field possibilities as we go to convert each field
+        $fieldPossibilities[] = $field;
+        $fieldPossibilities[] = $field . '_high';
+        $fieldPossibilities[] = $field . '_low';
         $formValues = $savedSearch['form_values'];
         $isRelative = $hasRelative = FALSE;
         $relativeFieldName = $field . '_relative';
@@ -82,9 +96,31 @@ class CRM_Upgrade_Incremental_SmartGroups {
           }
         }
         foreach ($formValues as $index => $formValue) {
+          if (!is_array($formValue)) {
+            if ($index === $relativeFieldName) {
+              $hasRelative = TRUE;
+              if (!empty($formValue)) {
+                $isRelative = TRUE;
+              }
+              continue;
+            }
+            elseif ($index === 'event_low' || $index === 'event_high') {
+              if ($isRelative || (!$isRelative && $formValue === '')) {
+                unset($formValues[$index]);
+              }
+              else {
+                $isHigh = substr($index, -5, 5) === '_high';
+                $formValues[$index] = $this->getConvertedDateValue($formValue, $isHigh);
+              }
+            }
+            continue;
+          }
           if (!isset($formValue[0])) {
             // Any actual criteria will have this key set but skip any weird lines
             continue;
+          }
+          if ($formValue[0] === $relativeFieldName && !empty($formValue[2])) {
+            $hasRelative = TRUE;
           }
           if ($formValue[0] === $relativeFieldName && empty($formValue[2])) {
             unset($formValues[$index]);;
@@ -102,6 +138,9 @@ class CRM_Upgrade_Incremental_SmartGroups {
         if (!$isRelative) {
           if (!in_array($relativeFieldName, $relativeFieldNames)) {
             $relativeFieldNames[] = $relativeFieldName;
+            $formValues[] = [$relativeFieldName, '=', 0];
+          }
+          elseif (!$hasRelative) {
             $formValues[] = [$relativeFieldName, '=', 0];
           }
         }
@@ -169,8 +208,14 @@ class CRM_Upgrade_Incremental_SmartGroups {
     foreach ($this->getSearchesWithField($oldName) as $savedSearch) {
       $formValues = $savedSearch['form_values'];
       foreach ($formValues as $index => $formValue) {
-        if ($formValue[0] === $oldName) {
-          $formValues[$index][0] = $newName;
+        if (is_array($formValue)) {
+          if (isset($formValue[0]) && $formValue[0] === $oldName) {
+            $formValues[$index][0] = $newName;
+          }
+        }
+        elseif ($index === $oldName) {
+          $formValues[$newName] = $formValue;
+          unset($formValues[$oldName]);
         }
       }
 
@@ -209,6 +254,76 @@ class CRM_Upgrade_Incremental_SmartGroups {
     ])['values'];
     return $savedSearches;
 
+  }
+
+  /**
+   * Convert the log_date saved search date fields to their correct name
+   * default to switching to created_date as that is what the code did originally
+   */
+  public function renameLogFields() {
+    $addedDate = TRUE;
+    foreach ($this->getSearchesWithField('log_date') as $savedSearch) {
+      $formValues = $savedSearch['form_values'];
+      foreach ($formValues as $index => $formValue) {
+        if (isset($formValue[0]) && $formValue[0] === 'log_date') {
+          if ($formValue[2] == 2) {
+            $addedDate = FALSE;
+          }
+        }
+        if (isset($formValue[0]) && ($formValue[0] === 'log_date_high' || $formValue[0] === 'log_date_low')) {
+          $isHigh = substr($index, -5, 5) === '_high';
+          if ($addedDate) {
+            $fieldName = 'created_date';
+          }
+          else {
+            $fieldName = 'modified_date';
+          }
+          if ($isHigh) {
+            $fieldName .= '_high';
+          }
+          else {
+            $fieldName .= '_low';
+          }
+          $formValues[$index][0] = $fieldName;
+        }
+      }
+      if ($formValues !== $savedSearch['form_values']) {
+        civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $formValues]);
+      }
+    }
+  }
+
+  /**
+   * Convert Custom date fields in smart groups
+   */
+  public function convertCustomSmartGroups() {
+    $custom_date_fields = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_custom_field WHERE data_type = 'Date' AND is_search_range = 1");
+    while ($custom_date_fields->fetch()) {
+      $savedSearches = $this->getSearchesWithField('custom_' . $custom_date_fields->id);
+      foreach ($savedSearches as $savedSearch) {
+        $form_values = $savedSearch['form_values'];
+        foreach ($form_values as $index => $formValues) {
+          if ($formValues[0] === 'custom_' . $custom_date_fields->id && is_array($formValues[2])) {
+            if (isset($formValues[2]['BETWEEN'])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][0], FALSE)];
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][1], TRUE)];
+              unset($form_values[$index]);
+            }
+            if (isset($formValues[2]['>='])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['>='], FALSE)];
+              unset($form_values[$index]);
+            }
+            if (isset($formValues[2]['<='])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['<='], TRUE)];
+              unset($form_values[$index]);
+            }
+          }
+        }
+        if ($form_values !== $savedSearch['form_values']) {
+          civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $form_values]);
+        }
+      }
+    }
   }
 
 }

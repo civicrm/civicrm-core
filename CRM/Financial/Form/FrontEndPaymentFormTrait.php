@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,38 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
  * This class holds functionality shared between various front end forms.
  */
 trait CRM_Financial_Form_FrontEndPaymentFormTrait {
+
+  /**
+   * The label for the pay later pseudoprocessor option.
+   *
+   * @var string
+   */
+  protected $payLaterLabel;
+
+  /**
+   * @return string
+   */
+  public function getPayLaterLabel(): string {
+    if ($this->payLaterLabel) {
+      return $this->payLaterLabel;
+    }
+    return $this->get('payLaterLabel') ?? '';
+  }
+
+  /**
+   * @param string $payLaterLabel
+   */
+  public function setPayLaterLabel(string $payLaterLabel) {
+    $this->set('payLaterLabel', $payLaterLabel);
+    $this->payLaterLabel = $payLaterLabel;
+  }
 
   /**
    * Alter line items for template.
@@ -77,6 +102,24 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     // @todo this should be a hook that invoicing code hooks into rather than a call to it.
     $this->alterLineItemsForTemplate($tplLineItems);
     $this->assign('lineItem', $tplLineItems);
+  }
+
+  /**
+   * Get the configured processors, including the pay later processor.
+   *
+   * @return array
+   */
+  protected function getProcessors(): array {
+    $pps = [];
+    if (!empty($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $key => $processor) {
+        $pps[$key] = $processor['title'] ?? $processor['name'];
+      }
+    }
+    if ($this->getPayLaterLabel()) {
+      $pps[0] = $this->getPayLaterLabel();
+    }
+    return $pps;
   }
 
 }

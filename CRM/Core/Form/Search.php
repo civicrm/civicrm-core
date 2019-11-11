@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -70,7 +70,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * @var string
    */
-  protected $_context = NULL;
+  protected $_context;
 
   /**
    * The list of tasks or actions that a searcher can perform on a result set.
@@ -125,14 +125,31 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Prepare for search by loading options from the url, handling force searches, retrieving form values.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function preProcess() {
+    $this->loadStandardSearchOptionsFromUrl();
+    if ($this->_force) {
+      $this->handleForcedSearch();
+    }
+    $this->_formValues = $this->getFormValues();
+  }
+
+  /**
    * This virtual function is used to set the default values of various form elements.
    *
    * @return array|NULL
    *   reference to the array of default values
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
-    $defaults = (array) $this->_formValues;
+    // Use the form values stored to the form. Ideally 'formValues'
+    // would remain 'pure' & another array would be wrangled.
+    // We don't do that - so we want the version of formValues stored early on.
+    $defaults = (array) $this->get('formValues');
     foreach (array_keys($this->getSearchFieldMetadata()) as $entity) {
       $defaults = array_merge($this->getEntityDefaults($entity), $defaults);
     }
@@ -145,17 +162,15 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @throws \Exception
    */
   protected function setFormValues() {
-    if (!empty($_POST) && !$this->_force) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    elseif ($this->_force) {
-      $this->_formValues = $this->setDefaultValues();
-    }
+    $this->_formValues = $this->getFormValues();
+    $this->set('formValues', $this->_formValues);
     $this->convertTextStringsToUseLikeOperator();
   }
 
   /**
    * Common buildForm tasks required by all searches.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     CRM_Core_Resources::singleton()
@@ -181,6 +196,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * The goal is to describe all fields in metadata and handle from metadata rather
    * than existing ad hoc handling.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function addFormFieldsFromMetadata() {
     $this->addFormRule(['CRM_Core_Form_Search', 'formRule'], $this);
@@ -188,9 +205,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
       foreach ($fields as $fieldName => $fieldSpec) {
         $fieldType = $fieldSpec['type'] ?? '';
-        if ($fieldType === CRM_Utils_Type::T_DATE || $fieldType === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+        if ($fieldType === CRM_Utils_Type::T_DATE || $fieldType === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) || $fieldType === CRM_Utils_Type::T_TIMESTAMP) {
           $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
-          $this->addDatePickerRange($fieldName, $title, ($fieldType === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
+          $this->addDatePickerRange($fieldName, $title, ($fieldType === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) || $fieldType === CRM_Utils_Type::T_TIMESTAMP));
         }
         else {
           // Not quite sure about moving to a mix of keying by entity vs permitting entity to
@@ -287,7 +304,12 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       if (empty($_POST[$fieldName])) {
         $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), NULL, NULL, 'GET');
         if ($value !== NULL) {
-          $defaults[$fieldName] = $value;
+          if ($fieldSpec['html']['type'] === 'Select') {
+            $defaults[$fieldName] = explode(',', $value);
+          }
+          else {
+            $defaults[$fieldName] = $value;
+          }
         }
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || ($fieldSpec['type'] === CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
           $low = CRM_Utils_Request::retrieveValue($fieldName . '_low', 'Timestamp', NULL, NULL, 'GET');
@@ -321,7 +343,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       foreach ($fields as $fieldName => $field) {
         if (!empty($this->_formValues[$fieldName]) && empty($field['options']) && empty($field['pseudoconstant'])) {
           if (in_array($field['type'], [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT])) {
-            $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', $this->_formValues[$fieldName])];
+            $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', trim($this->_formValues[$fieldName]))];
           }
         }
       }
@@ -337,7 +359,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, ['class' => 'select-rows']);
     if (!empty($rows)) {
       foreach ($rows as $row) {
-        if (CRM_Utils_Array::value('checkbox', $row)) {
+        if (!empty($row['checkbox'])) {
           $this->addElement('checkbox', $row['checkbox'], NULL, NULL, ['class' => 'select-row']);
         }
       }
@@ -365,6 +387,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * Note that for translation purposes the full string works better than using 'prefix' hence we use override-able functions
    * to define the string.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function addSortNameField() {
     $title = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail();
@@ -374,7 +398,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $title,
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
     );
-    $this->searchFieldMetadata['Contact']['sort_name'] = ['name' => 'sort_name', 'title' => $title, 'type' => CRM_Utils_Type::T_STRING];
+    $this->searchFieldMetadata['Contact']['sort_name'] = array_merge(CRM_Contact_DAO_Contact::fields()['sort_name'], ['name' => 'sort_name', 'title' => $title, 'type' => CRM_Utils_Type::T_STRING]);
   }
 
   /**
@@ -408,6 +432,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
 
   /**
    * Add generic fields that specify the contact.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function addContactSearchFields() {
     if (!$this->isFormInViewOrEditMode()) {
@@ -445,8 +471,31 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getGroupLabel() {
+    return ts('Group(s)');
+  }
+
+  /**
+   * Get the label for the tag field.
+   *
+   * We do this in a function so the 'ts' wraps the whole string to allow
+   * better translation.
+   *
+   * @return string
+   */
+  protected function getTagLabel() {
+    return ts('Tag(s)');
+  }
+
+  /**
    * we allow the controller to set force/reset externally, useful when we are being
    * driven by the wizard framework
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function loadStandardSearchOptionsFromUrl() {
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
@@ -475,6 +524,63 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
       }
     }
+  }
+
+  /**
+   * Get the form values.
+   *
+   * @todo consolidate with loadFormValues()
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFormValues() {
+    if (!empty($_POST) && !$this->_force) {
+      return $this->controller->exportValues($this->_name);
+    }
+    if ($this->_force) {
+      return $this->setDefaultValues();
+    }
+    return (array) $this->get('formValues');
+  }
+
+  /**
+   * Get the string processed to determine sort order.
+   *
+   * This looks like 'sort_name_u' for Sort name ascending.
+   *
+   * @return string|null
+   */
+  protected function getSortID() {
+    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
+      return CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
+        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
+      );
+    }
+    return NULL;
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {}
+
+  /**
+   * Handle force=1 in the url.
+   *
+   * Search field metadata is normally added in buildForm but we are bypassing that in this flow
+   * (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function handleForcedSearch() {
+    $this->setSearchMetadata();
+    $this->addContactSearchFields();
+    $this->postProcess();
+    $this->set('force', 0);
   }
 
 }

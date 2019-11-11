@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Core_I18n {
 
@@ -326,6 +326,7 @@ class CRM_Core_I18n {
    *   The params of the translation (if any).
    *   - domain: string|array a list of translation domains to search (in order)
    *   - context: string
+   *   - skip_translation: flag (do only escape/replacement, skip the actual translation)
    *
    * @return string
    *   the translated string
@@ -378,23 +379,25 @@ class CRM_Core_I18n {
     $raw = !empty($params['raw']);
     unset($params['raw']);
 
-    if (!empty($domain)) {
-      // It might be prettier to cast to an array, but this is high-traffic stuff.
-      if (is_array($domain)) {
-        foreach ($domain as $d) {
-          $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
-          if ($candidate != $text) {
-            $text = $candidate;
-            break;
+    if (!isset($params['skip_translation'])) {
+      if (!empty($domain)) {
+        // It might be prettier to cast to an array, but this is high-traffic stuff.
+        if (is_array($domain)) {
+          foreach ($domain as $d) {
+            $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
+            if ($candidate != $text) {
+              $text = $candidate;
+              break;
+            }
           }
+        }
+        else {
+          $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
         }
       }
       else {
-        $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
+        $text = $this->crm_translate_raw($text, NULL, $count, $plural, $context);
       }
-    }
-    else {
-      $text = $this->crm_translate_raw($text, NULL, $count, $plural, $context);
     }
 
     // replace the numbered %1, %2, etc. params if present
@@ -768,7 +771,7 @@ class CRM_Core_I18n {
  *   the translated string
  */
 function ts($text, $params = []) {
-  static $areSettingsAvailable = FALSE;
+  static $bootstrapReady = FALSE;
   static $lastLocale = NULL;
   static $i18n = NULL;
   static $function = NULL;
@@ -778,13 +781,18 @@ function ts($text, $params = []) {
   }
 
   // When the settings become available, lookup customTranslateFunction.
-  if (!$areSettingsAvailable) {
-    $areSettingsAvailable = (bool) \Civi\Core\Container::getBootService('settings_manager');
-    if ($areSettingsAvailable) {
+  if (!$bootstrapReady) {
+    $bootstrapReady = (bool) \Civi\Core\Container::isContainerBooted();
+    if ($bootstrapReady) {
+      // just got ready: determine whether there is a working custom translation function
       $config = CRM_Core_Config::singleton();
       if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
         $function = $config->customTranslateFunction;
       }
+    }
+    else {
+      // don't _translate_ anything until bootstrap has progressed enough
+      $params['skip_translation'] = 1;
     }
   }
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * The default values in general, should reflect production values (minimizes chances of screwing up)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 require_once 'Log.php';
@@ -471,6 +471,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @deprecated
    */
   public function addressSequence() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Address::sequence(Civi::settings()->get(\'address_format\')');
     return CRM_Utils_Address::sequence(Civi::settings()->get('address_format'));
   }
 
@@ -478,6 +479,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @deprecated
    */
   public function defaultContactCountry() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountry');
     return CRM_Core_BAO_Country::defaultContactCountry();
   }
 
@@ -485,6 +487,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @deprecated
    */
   public function defaultContactCountryName() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountryName');
     return CRM_Core_BAO_Country::defaultContactCountryName();
   }
 

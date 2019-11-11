@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -174,41 +174,18 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     $button = substr($this->controller->getButtonName(), -4);
 
-    $this->add('hidden', 'scriptFee', NULL);
-    $this->add('hidden', 'scriptArray', NULL);
-
     if ($this->_values['event']['is_monetary']) {
       CRM_Event_Form_Registration_Register::buildAmount($this);
     }
-    $first_name = $last_name = NULL;
-    $pre = $post = [];
-    foreach ([
-      'pre',
-      'post',
-    ] as $keys) {
+
+    //Add pre and post profiles on the form.
+    foreach (['pre', 'post'] as $keys) {
       if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
         $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys));
-        $$keys = CRM_Core_BAO_UFGroup::getFields($this->_values['additional_custom_' . $keys . '_id']);
-      }
-      foreach ([
-        'first_name',
-        'last_name',
-      ] as $name) {
-        if (array_key_exists($name, $$keys) &&
-          CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
-        ) {
-          $$name = 1;
-        }
       }
     }
 
-    $required = ($button == 'skip' ||
-      $this->_values['event']['allow_same_participant_emails'] == 1 &&
-      ($first_name && $last_name)
-    ) ? FALSE : TRUE;
-
     //add buttons
-    $js = NULL;
     if ($this->isLastParticipant(TRUE) && empty($this->_values['event']['is_monetary'])) {
       $this->submitOnce = TRUE;
     }

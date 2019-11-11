@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,8 +45,7 @@
                     {$form.$element_name_from.html|crmAddClass:six}
                     &nbsp;&nbsp;{$form.$element_name_to.label}&nbsp;&nbsp;{$form.$element_name_to.html|crmAddClass:six}
                   {elseif $element.skip_calendar NEQ true }
-                    <td class="label"><label for='{$element_name}'>{$element.label}</label>
-                    {include file="CRM/Core/DateRange.tpl" fieldName=$element_name from='_from' to='_to'}</td><td>
+                    {include file="CRM/Core/DatePickerRangeCustomField.tpl" fieldName=$element_name hideRelativeLabel=0}<td>
                   {/if}
             {else}
                 <td class="label">{$form.$element_name.label}</td><td>

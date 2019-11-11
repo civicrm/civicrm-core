@@ -3,7 +3,7 @@
 +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
+| Copyright CiviCRM LLC (c) 2004-2020                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -203,6 +203,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     return [
       ['{a: \'Apple\', \'b\': "Banana", c: [1, 2, 3]}', ['a' => 'Apple', 'b' => 'Banana', 'c' => [1, 2, 3]]],
       ['true', TRUE],
+      [' ', NULL],
       ['false', FALSE],
       ['null', NULL],
       ['"true"', 'true'],
@@ -212,6 +213,10 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       ["{  }", []],
       [" [   ]", []],
       [" [ 2   ]", [2]],
+      [
+        '{a: "parse error no closing bracket"',
+        NULL,
+      ],
       [
         '{a: ["foo", \'bar\'], "b": {a: [\'foo\', "bar"], b: {\'a\': ["foo", "bar"], b: {}}}}',
         ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => []]]],
@@ -230,6 +235,39 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    */
   public function testDecode($input, $expectedOutput) {
     $this->assertEquals($expectedOutput, CRM_Utils_JS::decode($input));
+  }
+
+  public static function encodeExamples() {
+    return [
+      [
+        ['a' => 'Apple', 'b' => 'Banana', 'c' => [0, -2, 3.15]],
+        "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
+      ],
+      [
+        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo\\\\'oo", '"bar"'], 'b' => []]]],
+        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\\\\\\\\\'oo', '\"bar\"'], b: {}}}}",
+      ],
+      [TRUE, 'true'],
+      [' ', "' '"],
+      [FALSE, 'false'],
+      [NULL, 'null'],
+      ['true', "'true'"],
+      ['"false"', "'\"false\"'"],
+      ['0.5', "'0.5'"],
+      [0.5, '0.5'],
+      [[], "{}"],
+    ];
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider encodeExamples
+   */
+  public function testEncode($input, $expectedOutput) {
+    $result = CRM_Utils_JS::encode($input);
+    $this->assertEquals($expectedOutput, $result);
+    $this->assertEquals($input, CRM_Utils_JS::decode($result));
   }
 
   /**

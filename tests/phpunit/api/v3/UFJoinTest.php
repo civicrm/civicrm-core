@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -255,7 +255,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
    */
   public function testUFJoinCreateExample($version) {
     $this->_apiversion = $version;
-    require_once 'api/v3/examples/UFJoin/Create.php';
+    require_once 'api/v3/examples/UFJoin/Create.ex.php';
     $result = UF_join_create_example();
     $expectedResult = UF_join_create_expectedresult();
     $this->assertEquals($result, $expectedResult);

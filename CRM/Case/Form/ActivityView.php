@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -204,6 +204,17 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       ],
     ];
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
+
+    $this->addButtons([
+      [
+        'type' => 'cancel',
+        'name' => ts('Done'),
+      ],
+    ]);
+    // Add additional action links
+    $activityDeleted = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityID, 'is_deleted');
+    $actionLinks = CRM_Case_Selector_Search::permissionedActionLinks($caseID, $contactID, CRM_Core_Session::getLoggedInContactID(), NULL, $activityTypeID, $activityDeleted, $activityID, FALSE);
+    $this->assign('actionLinks', $actionLinks);
   }
 
 }

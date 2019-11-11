@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -75,7 +75,6 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     CRM_Event_BAO_Event::retrieve($params, $values['event']);
 
     if (!$values['event']['is_active']) {
-      // form is inactive, die a fatal death
       CRM_Utils_System::setUFMessage(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'));
       return CRM_Utils_System::permissionDenied();
     }
@@ -86,7 +85,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     if (!empty($values['event']['is_template'])) {
       // form is an Event Template
-      CRM_Core_Error::fatal(ts('The page you requested is currently unavailable.'));
+      CRM_Core_Error::statusBounce(ts('The page you requested is currently unavailable.'));
     }
 
     // Add Event Type to $values in case folks want to display it

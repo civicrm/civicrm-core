@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -120,6 +120,30 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test what happens when a contact is set to decesaed
+   */
+  public function testDecesasedRecepient() {
+    $contactID = $this->individualCreate(['first_name' => 'test dead recipeint', 'email' => 'mailtestdead@civicrm.org']);
+    $this->callAPISuccess('group_contact', 'create', [
+      'contact_id' => $contactID,
+      'group_id' => $this->_groupID,
+      'status' => 'Added',
+    ]);
+    $this->createContactsInGroup(2, $this->_groupID);
+    Civi::settings()->add([
+      'mailerBatchLimit' => 2,
+    ]);
+    $mailing = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $this->assertEquals(3, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
+    $this->_mut->assertRecipients([]);
+    $this->callAPISuccess('Contact', 'create', ['id' => $contactID, 'is_deceased' => 1, 'contact_type' => 'Individual']);
+    $this->callAPISuccess('job', 'process_mailing', []);
+    // Check that the deceased contact is not found in the mailing.
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+
+  }
+
+  /**
    * Test pause and resume on Mailing.
    */
   public function testPauseAndResumeMailing() {
@@ -153,6 +177,12 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     //Execute the job and it should send the mailing to the recipients now.
     $this->callAPISuccess('job', 'process_mailing', []);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    // Ensure that loading the report produces no errors.
+    $report = CRM_Mailing_BAO_Mailing::report($result['id']);
+    // dev/mailing#56 dev/mailing#57 Ensure that for completed mailings the jobs array is not empty.
+    $this->assertTrue(!empty($report['jobs']));
+    // Ensure that mailing name is correctly stored in the report.
+    $this->assertEquals('mailing name', $report['mailing']['name']);
   }
 
   /**

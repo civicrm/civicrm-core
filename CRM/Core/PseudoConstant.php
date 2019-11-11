@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Core_PseudoConstant {
 
@@ -836,9 +836,9 @@ WHERE  id = %1";
       self::populate(self::$country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active', $whereClause);
 
       // if default country is set, percolate it to the top
-      if ($config->defaultContactCountry()) {
+      if (CRM_Core_BAO_Country::defaultContactCountry()) {
         $countryIsoCodes = self::countryIsoCode();
-        $defaultID = array_search($config->defaultContactCountry(), $countryIsoCodes);
+        $defaultID = array_search(CRM_Core_BAO_Country::defaultContactCountry(), $countryIsoCodes);
         if ($defaultID !== FALSE) {
           $default[$defaultID] = CRM_Utils_Array::value($defaultID, self::$country);
           self::$country = $default + self::$country;
@@ -1454,6 +1454,7 @@ WHERE  id = %1
    */
   public static function &getExtensions() {
     if (!self::$extensions) {
+      $compat = CRM_Extension_System::getCompatibilityInfo();
       self::$extensions = [];
       $sql = '
         SELECT full_name, label
@@ -1462,6 +1463,9 @@ WHERE  id = %1
       ';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
+        if (!empty($compat[$dao->full_name]['force-uninstall'])) {
+          continue;
+        }
         self::$extensions[$dao->full_name] = $dao->label;
       }
     }

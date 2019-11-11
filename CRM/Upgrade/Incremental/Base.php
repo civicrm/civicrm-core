@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5  .alpha1                                         |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -275,6 +275,26 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function dropIndex($ctx, $table, $indexName) {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists($table, $indexName);
+
+    return TRUE;
+  }
+
+  /**
+   * Drop a table... but only if it's empty.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @return bool
+   */
+  public static function dropTableIfEmpty($ctx, $table) {
+    if (CRM_Core_DAO::checkTableExists($table)) {
+      if (!CRM_Core_DAO::checkTableHasData($table)) {
+        CRM_Core_BAO_SchemaHandler::dropTable($table);
+      }
+      else {
+        $ctx->log->warning("dropTableIfEmpty($table): Found data. Preserved table.");
+      }
+    }
 
     return TRUE;
   }

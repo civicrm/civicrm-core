@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -55,9 +55,10 @@ class CRM_Utils_Cache {
    *   An array of configuration params.
    *
    * @return \CRM_Utils_Cache
+   * @throws \CRM_Core_Exception
    */
   public function __construct(&$config) {
-    CRM_Core_Error::fatal(ts('this is just an interface and should not be called directly'));
+    throw new CRM_Core_Exception(ts('this is just an interface and should not be called directly'));
   }
 
   /**

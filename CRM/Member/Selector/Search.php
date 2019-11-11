@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -62,7 +62,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     'contact_type',
     'sort_name',
     'membership_type',
-    'join_date',
+    'membership_join_date',
     'membership_start_date',
     'membership_end_date',
     'membership_source',
@@ -493,7 +493,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         ],
         [
           'name' => ts('Member Since'),
-          'sort' => 'join_date',
+          'sort' => 'membership_join_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
         ],
         [

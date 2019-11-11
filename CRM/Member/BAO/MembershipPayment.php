@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -72,6 +72,10 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     // table. However, at this stage we have both - there is still quite a bit of refactoring to do to set the line_iten entity_id right the first time
     // however, we can assume at this stage that any contribution id will have only one line item with that membership type in the line item table
     // OR the caller will have taken responsibility for updating the line items themselves so we will update using SQL here
+    if (!empty($params['isSkipLineItem'])) {
+      // Caller has taken responsibility for updating the line items.
+      return $dao;
+    }
     if (!isset($params['membership_type_id'])) {
       $membership_type_id = civicrm_api3('membership', 'getvalue', [
         'id' => $dao->membership_id,

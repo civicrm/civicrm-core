@@ -8,7 +8,7 @@ echo "<?php\n";
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -79,7 +79,7 @@ class CRM_Upgrade_Incremental_php_<?php echo $camelNumber; ?> extends CRM_Upgrad
   //   * @param string $rev
   //   */
   //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   //    $this->addTask('Do the foo change', 'taskFoo', ...);
   //    // Additional tasks here...
   //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.

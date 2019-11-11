@@ -85,6 +85,12 @@
   </item>
   <item>
      <path>civicrm/api</path>
+     <page_callback>CRM_Core_Page_Redirect</page_callback>
+     <page_arguments>url=civicrm/api3</page_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/api3</path>
      <page_callback>CRM_Admin_Page_APIExplorer</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <title>CiviCRM API v3</title>

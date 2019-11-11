@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -114,7 +114,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         CRM_Core_Session::singleton()->pushUserContext($browseUrl);
       }
 
-      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid, json_decode($this->criteria, TRUE));
+      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";
@@ -225,13 +225,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
           // @todo consider enabling if it is an add & defaulting to true.
           $element[4] = array_merge((array) CRM_Utils_Array::value(4, $element, []), ['disabled' => TRUE]);
         }
-        $this->addElement($element[0],
+        $newCheckBox = $this->addElement($element[0],
           $element[1],
           array_key_exists('2', $element) ? $element[2] : NULL,
           array_key_exists('3', $element) ? $element[3] : NULL,
           array_key_exists('4', $element) ? $element[4] : NULL,
           array_key_exists('5', $element) ? $element[5] : NULL
         );
+        if (!empty($element['is_checked'])) {
+          $newCheckBox->setChecked(TRUE);
+        }
       }
 
       // add related table elements
@@ -331,7 +334,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     if ($this->next && $this->_mergeId) {
-      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE));
+      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";

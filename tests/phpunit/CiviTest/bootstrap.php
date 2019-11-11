@@ -24,7 +24,31 @@ if (CIVICRM_UF === 'UnitTests') {
   Civi\Test::headless()->apply();
 }
 
+spl_autoload_register(function($class) {
+  _phpunit_mockoloader('api\\v4\\', "tests/phpunit/api/v4/", $class);
+  _phpunit_mockoloader('Civi\\Api4\\', "tests/phpunit/api/v4/Mock/Api4/", $class);
+});
+
 // ------------------------------------------------------------------------------
+
+/**
+ * @param $prefix
+ * @param $base_dir
+ * @param $class
+ */
+function _phpunit_mockoloader($prefix, $base_dir, $class) {
+  $len = strlen($prefix);
+  if (strncmp($prefix, $class, $len) !== 0) {
+    return;
+  }
+
+  global $civicrm_root;
+  $relative_class = substr($class, $len);
+  $file = $civicrm_root . '/' . $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+  if (file_exists($file)) {
+    require $file;
+  }
+}
 
 /**
  * Call the "cv" command.

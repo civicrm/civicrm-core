@@ -1812,16 +1812,6 @@ input.crm-form-entityref {
 
 /* Set/alter ICONS */
 
-#crm-container div#printer-friendly {
-  float: right;
-  position: relative;
-  margin: -2em 0.5em 0 0;
-}
-/* For Joomla, margin 0 works correctly */
-#crm-container table#crm-content div#printer-friendly {
-  margin: 0;
-}
-
 #crm-container .order-icon {
   height: 15px;
   width: 10px;
@@ -3658,6 +3648,9 @@ span.crm-status-icon {
 .crm-container.crm-public .select2-container,
 .crm-container.crm-public .select2-results {
   font-size: 14px;
+}
+.crm-container.crm-public .select2-container * {
+  box-sizing: content-box;
 }
 .crm-container.crm-public .select2-container .select2-choice {
   padding: 5px 5px 5px 8px;

@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -31,7 +31,7 @@
  * All DAO classes should inherit from this class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 if (!defined('DB_DSN_MODE')) {
@@ -234,26 +234,22 @@ class CRM_Core_DAO extends DB_DataObject {
       if ($fkDAO->find(TRUE)) {
         $this->$dbName = $fkDAO->id;
       }
-      $fkDAO->free();
     }
 
     elseif (in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)) {
       $depObject = new $FKClassName();
       $depObject->find(TRUE);
       $this->$dbName = $depObject->id;
-      $depObject->free();
     }
     elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $fieldName == 'member_of_contact_id') {
       // FIXME: the fields() metadata is not specific enough
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, ['contact_type' => 'Organization']);
       $this->$dbName = $depObject->id;
-      $depObject->free();
     }
     else {
       //if it is required we need to generate the dependency object first
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
       $this->$dbName = $depObject->id;
-      $depObject->free();
     }
   }
 
@@ -567,6 +563,7 @@ class CRM_Core_DAO extends DB_DataObject {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this);
         \Civi::service('dispatcher')->dispatch("civi.dao.postUpdate", $event);
       }
+      $this->clearDbColumnValueCache();
     }
     else {
       $this->insert();
@@ -619,6 +616,8 @@ class CRM_Core_DAO extends DB_DataObject {
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
     \Civi::service('dispatcher')->dispatch("civi.dao.postDelete", $event);
     $this->free();
+
+    $this->clearDbColumnValueCache();
 
     return $result;
   }
@@ -1065,6 +1064,18 @@ LIKE %1
   }
 
   /**
+   * Check if a given table has data.
+   *
+   * @param string $tableName
+   * @return bool
+   *   TRUE if $tableName has at least one record.
+   */
+  public static function checkTableHasData($tableName) {
+    $c = CRM_Core_DAO::singleValueQuery(sprintf('SELECT count(*) c FROM `%s`', $tableName));
+    return $c > 0;
+  }
+
+  /**
    * @param $version
    *
    * @return bool
@@ -1196,12 +1207,16 @@ FROM   civicrm_domain
       CRM_Core_Error::fatal();
     }
 
-    $cacheKey = "{$daoName}:{$searchValue}:{$returnColumn}:{$searchColumn}";
-    if (self::$_dbColumnValueCache === NULL) {
-      self::$_dbColumnValueCache = [];
+    self::$_dbColumnValueCache = self::$_dbColumnValueCache ?? [];
+
+    while (strpos($daoName, '_BAO_') !== FALSE) {
+      $daoName = get_parent_class($daoName);
     }
 
-    if (!array_key_exists($cacheKey, self::$_dbColumnValueCache) || $force) {
+    if ($force ||
+      empty(self::$_dbColumnValueCache[$daoName][$searchColumn][$searchValue]) ||
+      !array_key_exists($returnColumn, self::$_dbColumnValueCache[$daoName][$searchColumn][$searchValue])
+    ) {
       $object = new $daoName();
       $object->$searchColumn = $searchValue;
       $object->selectAdd();
@@ -1211,11 +1226,10 @@ FROM   civicrm_domain
       if ($object->find(TRUE)) {
         $result = $object->$returnColumn;
       }
-      $object->free();
 
-      self::$_dbColumnValueCache[$cacheKey] = $result;
+      self::$_dbColumnValueCache[$daoName][$searchColumn][$searchValue][$returnColumn] = $result;
     }
-    return self::$_dbColumnValueCache[$cacheKey];
+    return self::$_dbColumnValueCache[$daoName][$searchColumn][$searchValue][$returnColumn];
   }
 
   /**
@@ -1512,7 +1526,7 @@ FROM   civicrm_domain
    * @return string
    * @throws Exception
    */
-  public static function composeQuery($query, $params, $abort = TRUE) {
+  public static function composeQuery($query, $params = [], $abort = TRUE) {
     $tr = [];
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
@@ -1548,7 +1562,7 @@ FROM   civicrm_domain
           $tr['%' . $key] = $item[0];
         }
         elseif ($abort) {
-          CRM_Core_Error::fatal("{$item[0]} is not of type {$item[1]}");
+          throw new CRM_Core_Exception("{$item[0]} is not of type {$item[1]}");
         }
       }
     }
@@ -1856,7 +1870,7 @@ SELECT contact_id
   /**
    * Drop all CiviCRM tables.
    *
-   * @throws \CRM_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function dropAllTables() {
 
@@ -1980,6 +1994,12 @@ SELECT contact_id
     // Prefer to instantiate BAO's instead of DAO's (when possible)
     // so that assignTestValue()/assignTestFK() can be overloaded.
     $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    if ($baoName === 'CRM_Financial_BAO_FinancialTrxn') {
+      // OMG OMG OMG this is so incredibly bad. The BAO is insanely named.
+      // @todo create a new class called what the BAO SHOULD be
+      // that extends BAO-crazy-name.... migrate.
+      $baoName = 'CRM_Core_BAO_FinancialTrxn';
+    }
     if (class_exists($baoName)) {
       $daoName = $baoName;
     }
@@ -2952,6 +2972,22 @@ SELECT contact_id
     }
     CRM_Core_DAO::appendPseudoConstantsToFields($fields);
     return $fields;
+  }
+
+  /**
+   * Remove item from static cache during update/delete operations
+   */
+  private function clearDbColumnValueCache() {
+    $daoName = get_class($this);
+    while (strpos($daoName, '_BAO_') !== FALSE) {
+      $daoName = get_parent_class($daoName);
+    }
+    if (isset($this->id)) {
+      unset(self::$_dbColumnValueCache[$daoName]['id'][$this->id]);
+    }
+    if (isset($this->name)) {
+      unset(self::$_dbColumnValueCache[$daoName]['name'][$this->name]);
+    }
   }
 
 }

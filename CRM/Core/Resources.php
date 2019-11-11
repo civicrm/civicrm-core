@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  | Copyright CiviCRM LLC (c) 2004-2020                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -38,7 +38,7 @@ use Civi\Core\Event\GenericHookEvent;
  * should incorporte services for aggregation, minimization, etc.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -204,7 +204,8 @@ class CRM_Core_Resources {
    *   - string: Load translated strings. Use a specific domain.
    *
    * @return CRM_Core_Resources
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
@@ -933,7 +934,7 @@ class CRM_Core_Resources {
       }
     }
 
-    CRM_Utils_Hook::entityRefFilters($data['filters']);
+    CRM_Utils_Hook::entityRefFilters($data['filters'], $data['links']);
 
     return $data;
   }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -84,16 +84,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
+    parent::preProcess();
 
     //membership ID
     $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
@@ -103,22 +94,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
     if (isset($participantId)) {
       $this->_formValues['contribution_participant_id'] = $participantId;
-    }
-
-    if ($this->_force) {
-      // Search field metadata is normally added in buildForm but we are bypassing that in this flow
-      // (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
-      $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
-      $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
-      $this->postProcess();
-      $this->set('force', 0);
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -139,7 +114,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::TRANSFER,
@@ -159,16 +134,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * @throws \Exception
    */
   public function setDefaultValues() {
-    $lowReceiveDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
-    if (!empty($lowReceiveDate)) {
-      $this->_formValues['receive_date_low'] = date('Y-m-d H:i:s', strtotime($lowReceiveDate));
-      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_low not start');
-    }
-    $highReceiveDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
-    if (!empty($highReceiveDate)) {
-      $this->_formValues['receive_date_high'] = date('Y-m-d H:i:s', strtotime($highReceiveDate));
-      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
-    }
+    $this->setDeprecatedDefaults();
     $this->_defaults = parent::setDefaultValues();
 
     $this->_defaults = array_merge($this->getEntityDefaults('ContributionRecur'), $this->_defaults);
@@ -289,10 +255,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->_done = TRUE;
 
     $this->setFormValues();
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->fixFormValues();
 
     // We don't show test records in summaries or dashboards
     if (empty($this->_formValues['contribution_test']) && $this->_force && !empty($this->_context) && $this->_context == 'dashboard') {
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       $this->_formValues["contribution_test"] = 0;
     }
 
@@ -301,11 +269,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       'contribution_amount_high',
     ] as $f) {
       if (isset($this->_formValues[$f])) {
+        // @todo - stop changing formValues - respect submitted form values, change a working array.
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }
     }
 
-    $config = CRM_Core_Config::singleton();
     if (!empty($_POST)) {
       $specialParams = [
         'financial_type_id',
@@ -318,10 +286,13 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'payment_instrument_id',
         'contribution_batch_id',
       ];
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams);
 
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
       if ($tags && !is_array($tags)) {
+        // @todo - stop changing formValues - respect submitted form values, change a working array.
         unset($this->_formValues['contact_tags']);
         $this->_formValues['contact_tags'][$tags] = 1;
       }
@@ -329,12 +300,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       if ($tags && is_array($tags)) {
         unset($this->_formValues['contact_tags']);
         foreach ($tags as $notImportant => $tagID) {
+          // @todo - stop changing formValues - respect submitted form values, change a working array.
           $this->_formValues['contact_tags'][$tagID] = 1;
         }
       }
 
       $group = CRM_Utils_Array::value('group', $this->_formValues);
       if ($group && !is_array($group)) {
+        // @todo - stop changing formValues - respect submitted form values, change a working array.
         unset($this->_formValues['group']);
         $this->_formValues['group'][$group] = 1;
       }
@@ -342,16 +315,18 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       if ($group && is_array($group)) {
         unset($this->_formValues['group']);
         foreach ($group as $groupID) {
+          // @todo - stop changing formValues - respect submitted form values, change a working array.
           $this->_formValues['group'][$groupID] = 1;
         }
       }
     }
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -363,13 +338,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $formName = $stateMachine->getTaskFormName();
       $this->controller->resetPage($formName);
       return;
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -389,7 +357,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::SESSION,
@@ -468,9 +436,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($contribPageId) {
       $this->_formValues['contribution_page_id'] = $contribPageId;
     }
-
-    //give values to default.
-    $this->_defaults = $this->_formValues;
   }
 
   /**
@@ -480,6 +445,34 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Find Contributions');
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
+  }
+
+  /**
+   * Handling for url params that are deprecated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function setDeprecatedDefaults() {
+    $lowReceiveDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
+    if (!empty($lowReceiveDate)) {
+      $this->_formValues['receive_date_low'] = date('Y-m-d H:i:s', strtotime($lowReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_low not start');
+    }
+    $highReceiveDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
+    if (!empty($highReceiveDate)) {
+      $this->_formValues['receive_date_high'] = date('Y-m-d H:i:s', strtotime($highReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
+    }
   }
 
 }

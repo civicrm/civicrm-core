@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -59,7 +59,9 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
       // see logging setting for eg.
       $existingViewOptions = Civi::settings()->get('contact_view_options');
 
-      $displayValue = CRM_Core_OptionGroup::getValue('contact_view_options', 'CiviMail', 'name');
+      $displayViewOptions = CRM_Core_OptionGroup::values('contact_view_options', TRUE, FALSE, FALSE, NULL, 'name');
+      $displayValue = $displayViewOptions['CiviMail'];
+
       $viewOptions = explode(CRM_Core_DAO::VALUE_SEPARATOR, $existingViewOptions);
 
       if (!in_array($displayValue, $viewOptions)) {

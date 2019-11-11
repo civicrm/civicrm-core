@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -523,7 +523,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'end_date',
     ];
 
-    if (!CRM_Utils_Array::value('absolute_date', $params)) {
+    if (empty($params['absolute_date'])) {
       $params['absolute_date'] = 'null';
     }
     foreach ($moreKeys as $mkey) {
@@ -577,7 +577,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
 
-    if (CRM_Utils_Array::value('is_repeat', $values) == 0) {
+    if (empty($values['is_repeat'])) {
       $params['repetition_frequency_unit'] = 'null';
       $params['repetition_frequency_interval'] = 'null';
       $params['end_frequency_unit'] = 'null';

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -302,7 +302,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     self::setModeValues();
-    if (!array_key_exists($mode, self::$_modeValues)) {
+    // Note $mode might === FALSE because array_search above failed, e.g. for searchPane='location'
+    if (empty(self::$_modeValues[$mode])) {
       $mode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
 
@@ -652,6 +653,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'mailing_unsubscribe',
           'mailing_date_low',
           'mailing_date_high',
+          'mailing_job_start_date_low',
+          'mailing_job_start_date_high',
+          'mailing_job_start_date_relative',
         ] as $mailingFilter) {
           $type = 'String';
           if ($mailingFilter == 'mailing_id' &&
@@ -755,13 +759,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     $controller->moveFromSessionToTemplate();
-  }
-
-  /**
-   * @return array
-   */
-  public function &getFormValues() {
-    return $this->_formValues;
   }
 
   /**
@@ -919,6 +916,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     // can't by pass acls by passing search criteria in the url.
     $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
     $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);
   }
 
 }

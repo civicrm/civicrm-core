@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
 
@@ -49,7 +49,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @return CRM_Financial_BAO_FinancialAccount
    */
-  public static function retrieve(&$params, $defaults = []) {
+  public static function retrieve(&$params, &$defaults = []) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->copyValues($params);
     if ($financialAccount->find(TRUE)) {
@@ -268,6 +268,19 @@ WHERE cft.id = %1
       }
     }
     return Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId];
+  }
+
+  /**
+   * Get the sales tax financial account id for the financial type id.
+   *
+   * This is a helper wrapper to make the function name more readable.
+   *
+   * @param int $financialAccountID
+   *
+   * @return int
+   */
+  public static function getSalesTaxFinancialAccount($financialAccountID) {
+    return self::getFinancialAccountForFinancialTypeByRelationship($financialAccountID, 'Sales Tax Account is');
   }
 
   /**

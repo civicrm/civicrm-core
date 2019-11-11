@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,13 +52,37 @@ trait CRMTraits_Custom_CustomDataTrait {
   public function createCustomGroup($params = []) {
     $params = array_merge([
       'title' => 'Custom Group',
-      'extends' => [$this->entity],
+      'extends' => [$this->entity ?? 'Contact'],
       'weight' => 5,
       'style' => 'Inline',
       'max_multiple' => 0,
     ], $params);
-    $this->ids['CustomGroup'][$params['title']] = $this->callAPISuccess('CustomGroup', 'create', $params)['id'];
-    return $this->ids['CustomGroup'][$params['title']];
+    $identifier = $params['name'] ?? $params['title'];
+    $this->ids['CustomGroup'][$identifier] = $this->callAPISuccess('CustomGroup', 'create', $params)['id'];
+    return $this->ids['CustomGroup'][$identifier];
+  }
+
+  /**
+   * Get the table_name for the specified custom group.
+   *
+   * @param string $identifier
+   *
+   * @return string
+   */
+  public function getCustomGroupTable($identifier = 'Custom Group') {
+    return $this->callAPISuccessGetValue('CustomGroup', ['id' => $this->ids['CustomGroup'][$identifier], 'return' => 'table_name']);
+  }
+
+  /**
+   * Get the the column name for the identified custom field.
+   *
+   * @param string $key
+   *   Identifier - generally keys map to data type - eg. 'text', 'int' etc.
+   *
+   * @return string
+   */
+  protected function getCustomFieldColumnName($key) {
+    return $this->callAPISuccessGetValue('CustomField', ['id' => $this->getCustomFieldID($key), 'return' => 'column_name']);
   }
 
   /**
@@ -71,20 +95,29 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = '') {
-    $supported = ['text', 'select'];
-    if (!in_array($customFieldType, $supported)) {
+  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL) {
+    $supported = ['text', 'select', 'date', 'int'];
+    if (!in_array($customFieldType, $supported, TRUE)) {
       throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
     $groupParams['title'] = empty($groupParams['title']) ? $identifier . 'Group with field ' . $customFieldType : $groupParams['title'];
+    $groupParams['name'] = $identifier ?? 'Custom Group';
     $this->createCustomGroup($groupParams);
     switch ($customFieldType) {
       case 'text':
-        $customField = $this->createTextCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['title']]]);
+        $customField = $this->createTextCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
         break;
 
       case 'select':
-        $customField = $this->createSelectCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['title']]]);
+        $customField = $this->createSelectCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
+        break;
+
+      case 'int':
+        $customField = $this->createIntCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
+        break;
+
+      case 'date':
+        $customField = $this->createDateCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
         break;
     }
     $this->ids['CustomField'][$identifier . $customFieldType] = $customField['id'];
@@ -102,20 +135,12 @@ trait CRMTraits_Custom_CustomDataTrait {
     $customField = $this->createSelectCustomField(['custom_group_id' => $customGroupID]);
     $ids['select_string'] = $customField['id'];
 
-    $params = [
-      'custom_group_id' => $customGroupID,
-      'name' => 'test_date',
-      'label' => 'test_date',
-      'html_type' => 'Select Date',
-      'data_type' => 'Date',
-      'default_value' => '20090711',
-      'weight' => 3,
-      'time_format' => 1,
-    ];
-
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
-
+    $customField = $this->createDateCustomField(['custom_group_id' => $customGroupID]);
     $ids['select_date'] = $customField['id'];
+
+    $customField = $this->createIntCustomField(['custom_group_id' => $customGroupID]);
+    $ids['int'] = $customField['id'];
+
     $params = [
       'custom_group_id' => $customGroupID,
       'name' => 'test_link',
@@ -164,8 +189,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return string
    */
   protected function getCustomFieldName($key) {
-    $linkField = 'custom_' . $this->getCustomFieldID($key);
-    return $linkField;
+    return 'custom_' . $this->getCustomFieldID($key);
   }
 
   /**
@@ -180,8 +204,31 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return string
    */
   protected function getCustomFieldID($key) {
-    $linkField = $this->ids['CustomField'][$key];
-    return $linkField;
+    return $this->ids['CustomField'][$key];
+  }
+
+  /**
+   * Create a custom text fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createIntCustomField($params = []) {
+    $params = array_merge([
+      'label' => 'Enter integer here',
+      'html_type' => 'Text',
+      'data_type' => 'Int',
+      'default_value' => '4',
+      'weight' => 1,
+      'is_required' => 1,
+      'sequential' => 1,
+      'is_searchable' => 1,
+      'is_search_range' => 1,
+    ], $params);
+
+    return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
   }
 
   /**
@@ -202,6 +249,7 @@ trait CRMTraits_Custom_CustomDataTrait {
       'is_required' => 1,
       'sequential' => 1,
       'is_searchable' => 1,
+      'text_length' => 300,
     ], $params);
 
     return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
@@ -246,6 +294,30 @@ trait CRMTraits_Custom_CustomDataTrait {
       'is_searchable' => 0,
       'is_active' => 1,
       'option_values' => $optionValue,
+    ], $params);
+
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    return $customField['values'][$customField['id']];
+  }
+
+  /**
+   * Create a custom field of  type date.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createDateCustomField($params): array {
+    $params = array_merge([
+      'name' => 'test_date',
+      'label' => 'Test Date',
+      'html_type' => 'Select Date',
+      'data_type' => 'Date',
+      'default_value' => '20090711',
+      'weight' => 3,
+      'is_searchable' => 1,
+      'is_search_range' => 1,
+      'time_format' => 1,
     ], $params);
 
     $customField = $this->callAPISuccess('custom_field', 'create', $params);

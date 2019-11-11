@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
+| Copyright CiviCRM LLC (c) 2004-2020                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -162,7 +162,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('payment_processor', 'create', $paymentProceParams);
     $this->_ids['paymentProcessID'] = $result['id'];
-    require_once 'api/v3/examples/PaymentProcessor/Create.php';
+    require_once 'api/v3/examples/PaymentProcessor/Create.ex.php';
     $this->assertAPISuccess($result);
   }
 

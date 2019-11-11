@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,8 +33,7 @@
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
-  {include file="CRM/Core/DateRange.tpl" fieldName="event" from='_start_date_low' to='_end_date_high' label="<label>Event Dates</label>"}
-</tr>
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="event" colspan="2"}</tr>
 <tr>
   {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="participant_register_date" colspan="2"}
 </tr>

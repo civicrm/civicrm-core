@@ -100,6 +100,16 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       ],
       'This comes from a file',
     ];
+    $cases[] = [
+      'CRM_Core_DAO_Domain',
+      [
+        'name' => self::getFilePrefix() . 'exampleFromContent.txt',
+        'mime_type' => 'text/plain',
+        'description' => 'My test description',
+        'content' => 'My test content',
+      ],
+      'My test content',
+    ];
 
     return $cases;
   }
@@ -153,17 +163,6 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'content' => 'My test content',
       ],
       "/Malformed name/",
-    ];
-    $cases[] = [
-      'CRM_Core_DAO_Domain',
-      [
-        'name' => self::getFilePrefix() . 'exampleFromContent.txt',
-        'mime_type' => 'text/plain',
-        'description' => 'My test description',
-        'content' => 'My test content',
-        'check_permissions' => 1,
-      ],
-      "/Unrecognized target entity/",
     ];
 
     return $cases;
@@ -332,7 +331,14 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $getResult['count']);
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
-      $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
+      if ($field == 'url') {
+        $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult['values'][$fileId][$field], 0, -15));
+        $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult['values'][$fileId][$field], -3));
+        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult['values'][$fileId][$field], -14, 10), 2);
+      }
+      else {
+        $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
+      }
     }
     $this->assertTrue(!isset($getResult['values'][$fileId]['content']));
 
@@ -342,8 +348,16 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       'return' => ['content'],
     ]);
     $this->assertEquals($expectedContent, $getResult2['values'][$fileId]['content']);
+    // Do this again even though we just tested above to demonstrate that these fields should be returned even if you only ask to return 'content'.
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
-      $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
+      if ($field == 'url') {
+        $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult2['values'][$fileId][$field], 0, -15));
+        $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult2['values'][$fileId][$field], -3));
+        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult2['values'][$fileId][$field], -14, 10), 2);
+      }
+      else {
+        $this->assertEquals($createResult['values'][$fileId][$field], $getResult2['values'][$fileId][$field], "Expect field $field to match");
+      }
     }
   }
 

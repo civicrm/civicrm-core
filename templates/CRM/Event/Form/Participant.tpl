@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -227,17 +227,10 @@
         {else} {* If action is other than Delete *}
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
-          {if $single and $context neq 'standalone'}
-            <tr class="crm-participant-form-block-displayName">
-              <td class="label font-size12pt"><label>{ts}Participant{/ts}</label></td>
-              <td class="font-size12pt view-value">{$displayName}&nbsp;</td>
-            </tr>
-            {else}
-            <tr class="crm-participant-form-contact-id">
-              <td class="label">{$form.contact_id.label}</td>
-              <td>{$form.contact_id.html}</td>
-            </tr>
-          {/if}
+          <tr class="crm-participant-form-contact-id">
+            <td class="label">{$form.contact_id.label}</td>
+            <td>{$form.contact_id.html}</td>
+          </tr>
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
               <tr class="crm-participant-form-block-additionalParticipants">

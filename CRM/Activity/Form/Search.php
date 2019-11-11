@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -345,13 +345,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
-  }
-
-  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
@@ -362,6 +355,13 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   protected function getEntityMetadata() {
     return CRM_Activity_BAO_Query::getSearchFieldMetadata();
+  }
+
+  /**
+   * Set the metadata for the form.
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Activity' => $this->getEntityMetadata()]);
   }
 
 }

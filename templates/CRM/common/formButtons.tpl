@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,10 +24,29 @@
  +--------------------------------------------------------------------+
 *}
 
-{* Loops through $form.buttons.html array and assigns separate spans with classes to allow theming
-   by button and name. crmBtnType grabs type keyword from button name (e.g. 'upload', 'next', 'back', 'cancel') so
-   types of buttons can be styled differently via css. *}
 {crmRegion name='form-buttons'}
+{* Loops through $linkButtons and assigns html "a" (link) buttons to the template. Used for additional entity functions such as "Move to Case" or "Renew Membership" *}
+{if $linkButtons}
+  {foreach from=$linkButtons item=linkButton}
+    {if $linkButton.accesskey}
+      {capture assign=accessKey}accesskey="{$linkButton.accessKey}"{/capture}
+    {else}{assign var="accessKey" value=""}
+    {/if}
+    {if $linkButton.icon}
+      {capture assign=icon}<i class="crm-i {$linkButton.icon}"></i> {/capture}
+    {else}{assign var="icon" value=""}
+    {/if}
+    {if $linkButton.ref}
+      {capture assign=linkname}name="{$linkButton.ref}"{/capture}
+    {else}{capture assign=linkname}name="{$linkButton.name}"{/capture}
+    {/if}
+    <a class="button" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {$linkButton.extra}><span>{$icon}{$linkButton.title}</span></a>
+  {/foreach}
+{/if}
+
+{* Loops through $form.buttons.html array and assigns separate spans with classes to allow theming by button and name.
+ * crmBtnType grabs type keyword from button name (e.g. 'upload', 'next', 'back', 'cancel') so types of buttons can be styled differently via css.
+ *}
 {foreach from=$form.buttons item=button key=key name=btns}
   {if $key|substring:0:4 EQ '_qf_'}
     {if $location}

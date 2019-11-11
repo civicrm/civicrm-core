@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -144,6 +144,10 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     // CRM-16512 - Hide related contact table if user lacks permission to view self
     if (!empty($dashboardOptions['Permissioned Orgs']) && CRM_Core_Permission::check('view my contact')) {
+      $columnHeaders = CRM_Contact_BAO_Relationship::getColumnHeaders();
+      $contactRelationships = $selector = NULL;
+      CRM_Utils_Hook::searchColumns('relationship.columns', $columnHeaders, $contactRelationships, $selector);
+      $this->assign('columnHeaders', $columnHeaders);
       $dashboardElements[] = [
         'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
