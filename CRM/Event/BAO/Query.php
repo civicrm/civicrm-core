@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2020
- * $Id$
- *
  */
 class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
@@ -226,10 +224,11 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * @param $query
+   * Get event related where clauses.
+   *
+   * @param \CRM_Contact_BAO_Query $query
    */
   public static function where(&$query) {
-    $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
         continue;
@@ -240,7 +239,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
-        $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
@@ -249,11 +247,14 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * @param $values
    * @param \CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
     $checkPermission = empty($query->_skipPermission);
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
+    $fieldSpec = $fields[$values[0]] ?? [];
 
     switch ($name) {
       case 'event_low':
@@ -362,9 +363,9 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'participant_status_id':
-        if ($value && is_array($value) && strpos($op, 'IN') === FALSE) {
-          $op = 'IN';
-        }
+        $query->handleWhereFromMetadata($fieldSpec, $name, $value, $op);
+        return;
+
       case 'participant_status':
       case 'participant_source':
       case 'participant_id':
@@ -377,7 +378,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
         $qillName = $name;
         if (in_array($name, [
-          'participant_status_id',
           'participant_source',
           'participant_id',
           'participant_contact_id',
