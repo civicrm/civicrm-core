@@ -1020,6 +1020,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @param array $params
    *   Submitted values.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function submit($params) {
     //carry campaign from profile.
@@ -1079,19 +1081,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $params['separate_amount'] = $params['amount'];
-    $memFee = NULL;
-    if (!empty($params['selectMembership'])) {
-      if (empty($this->_membershipTypeValues)) {
-        $this->_membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this,
-          (array) $params['selectMembership']
-        );
-      }
-      $membershipTypeValues = $this->_membershipTypeValues[$params['selectMembership']];
-      $memFee = $membershipTypeValues['minimum_fee'];
-      if (!$params['amount'] && !$this->_separateMembershipPayment) {
-        $params['amount'] = $memFee ? $memFee : 0;
-      }
-    }
+    // @todo - stepping through the code indicates that amount is always set before this point so it never matters.
+    // Move more of the above into this function...
+    $params['amount'] = $this->getMainContributionAmount($params);
     //If the membership & contribution is used in contribution page & not separate payment
     $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
     $proceFieldAmount = 0;
@@ -1208,12 +1200,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title));
     $params['button'] = $this->controller->getButtonName();
     // required only if is_monetary and valid positive amount
-    // @todo it seems impossible for $memFee to be greater than 0 & $params['amount'] not to
-    // be & by requiring $memFee down here we make it harder to do a sensible refactoring of the function
-    // above (ie. extract the amount in a small function).
     if ($this->_values['is_monetary'] &&
       !empty($this->_paymentProcessor) &&
-      ((float ) $params['amount'] > 0.0 || $memFee > 0.0)
+      ((float) $params['amount'] > 0.0 || $this->hasSeparateMembershipPaymentAmount($params))
     ) {
       // The concept of contributeMode is deprecated - as should be the 'is_monetary' setting.
       $this->setContributeMode();
@@ -1330,11 +1319,25 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Function for unit tests on the postProcess function.
    *
    * @param array $params
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit($params) {
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $this->controller = new CRM_Contribute_Controller_Contribution();
     $this->submit($params);
+  }
+
+  /**
+   * Has a separate membership payment amount been configured.
+   *
+   * @param array $params
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function hasSeparateMembershipPaymentAmount($params) {
+    return $this->_separateMembershipPayment && (int) CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'];
   }
 
 }

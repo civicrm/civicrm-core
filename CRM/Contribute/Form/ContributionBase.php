@@ -1394,4 +1394,28 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     return new CRM_Core_Payment_Manual();
   }
 
+  /**
+   * Get the amount for the main contribution.
+   *
+   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
+   * winds up here as the main spaghetti shrinks.
+   *
+   * If there is a separate membership contribution this is the 'other one'. Otherwise there
+   * is only one.
+   *
+   * @param $params
+   *
+   * @return float
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getMainContributionAmount($params) {
+    if (!empty($params['selectMembership'])) {
+      if (empty($params['amount']) && !$this->_separateMembershipPayment) {
+        return CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'] ?? 0;
+      }
+    }
+    return $params['amount'] ?? 0;
+  }
+
 }
