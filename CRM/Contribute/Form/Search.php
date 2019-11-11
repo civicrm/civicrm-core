@@ -134,16 +134,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * @throws \Exception
    */
   public function setDefaultValues() {
-    $lowReceiveDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
-    if (!empty($lowReceiveDate)) {
-      $this->_formValues['receive_date_low'] = date('Y-m-d H:i:s', strtotime($lowReceiveDate));
-      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_low not start');
-    }
-    $highReceiveDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
-    if (!empty($highReceiveDate)) {
-      $this->_formValues['receive_date_high'] = date('Y-m-d H:i:s', strtotime($highReceiveDate));
-      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
-    }
+    $this->setDeprecatedDefaults();
     $this->_defaults = parent::setDefaultValues();
 
     $this->_defaults = array_merge($this->getEntityDefaults('ContributionRecur'), $this->_defaults);
@@ -464,6 +455,24 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   protected function setSearchMetadata() {
     $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
     $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
+  }
+
+  /**
+   * Handling for url params that are deprecated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function setDeprecatedDefaults() {
+    $lowReceiveDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
+    if (!empty($lowReceiveDate)) {
+      $this->_formValues['receive_date_low'] = date('Y-m-d H:i:s', strtotime($lowReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_low not start');
+    }
+    $highReceiveDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
+    if (!empty($highReceiveDate)) {
+      $this->_formValues['receive_date_high'] = date('Y-m-d H:i:s', strtotime($highReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
+    }
   }
 
 }
