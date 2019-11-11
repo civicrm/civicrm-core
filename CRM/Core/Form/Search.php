@@ -304,7 +304,12 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       if (empty($_POST[$fieldName])) {
         $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), NULL, NULL, 'GET');
         if ($value !== NULL) {
-          $defaults[$fieldName] = $value;
+          if ($fieldSpec['html']['type'] === 'Select') {
+            $defaults[$fieldName] = explode(',', $value);
+          }
+          else {
+            $defaults[$fieldName] = $value;
+          }
         }
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || ($fieldSpec['type'] === CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
           $low = CRM_Utils_Request::retrieveValue($fieldName . '_low', 'Timestamp', NULL, NULL, 'GET');
@@ -393,7 +398,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $title,
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
     );
-    $this->searchFieldMetadata['Contact']['sort_name'] = ['name' => 'sort_name', 'title' => $title, 'type' => CRM_Utils_Type::T_STRING];
+    $this->searchFieldMetadata['Contact']['sort_name'] = array_merge(CRM_Contact_DAO_Contact::fields()['sort_name'], ['name' => 'sort_name', 'title' => $title, 'type' => CRM_Utils_Type::T_STRING]);
   }
 
   /**

@@ -86,23 +86,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
-
-    if ($this->_force) {
-      $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);
-      $this->addFormFieldsFromMetadata();
-      $this->postProcess();
-      $this->set('force', 0);
-    }
+    parent::preProcess();
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $selector = new CRM_Member_Selector_Search($this->_queryParams,
@@ -241,7 +225,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
