@@ -228,52 +228,44 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function registerParticipantAndPay($actualPaidAmt = NULL) {
-    $params = [
-      'send_receipt' => 1,
-      'is_test' => 0,
-      'is_pay_later' => 0,
-      'event_id' => $this->_eventId,
-      'register_date' => date('Y-m-d') . ' 00:00:00',
-      'role_id' => 1,
-      'status_id' => 1,
-      'source' => 'Event_' . $this->_eventId,
-      'contact_id' => $this->_contactId,
-      //'fee_level' => CRM_Core_DAO::VALUE_SEPARATOR.'Expensive Room'.CRM_Core_DAO::VALUE_SEPARATOR,
-    ];
-    $participant = $this->callAPISuccess('Participant', 'create', $params);
-    $this->_participantId = $participant['id'];
-
     $actualPaidAmt = $actualPaidAmt ?: $this->_expensiveFee;
-
-    $contributionParams = [
-      'total_amount' => $actualPaidAmt,
+    $lineItems = CRM_Price_BAO_LineItem::buildLineItemsForSubmittedPriceField(['price_' . $this->priceSetFieldID => $this->expensiveFeeValueID]);
+    $orderParams = [
+      'total_amount' => $this->_expensiveFee,
       'source' => 'Test set with information',
       'currency' => 'USD',
       'receipt_date' => date('Y-m-d') . ' 00:00:00',
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
       'payment_instrument_id' => 4,
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Pending',
       'receive_date' => date('Y-m-d') . ' 00:00:00',
-      'skipLineItem' => 1,
-      'partial_payment_total' => $this->_expensiveFee,
-      'partial_amount_to_pay' => $actualPaidAmt,
+      'line_items' => [],
+      'api.Payment.create' => ['total_amount' => $actualPaidAmt],
     ];
+    foreach ($lineItems as $lineItem) {
+      $orderParams['line_items'][] = [
+        'line_item' => [array_merge($lineItem, ['entity_table' => 'civicrm_participant'])],
+        'params' => [
+          'send_receipt' => 1,
+          'is_pay_later' => 0,
+          'event_id' => $this->_eventId,
+          'register_date' => date('Y-m-d') . ' 00:00:00',
+          'role_id' => 1,
+          'status_id' => 1,
+          'source' => 'Event_' . $this->_eventId,
+          'contact_id' => $this->_contactId,
+        ],
+      ];
+    }
 
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    $this->_contributionId = $contribution['id'];
+    $order = $this->callAPISuccess('Order', 'create', $orderParams);
+    $this->_contributionId = $order['id'];
 
-    $this->callAPISuccess('participant_payment', 'create', [
-      'participant_id' => $this->_participantId,
+    $this->_participantId = $this->callAPISuccess('participant_payment', 'getvalue', [
+      'return' => 'participant_id',
       'contribution_id' => $this->_contributionId,
     ]);
-
-    $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
-
-    $lineItems = CRM_Price_BAO_LineItem::buildLineItemsForSubmittedPriceField($priceSetParams);
-    CRM_Price_BAO_PriceSet::processAmount($this->_feeBlock, $priceSetParams, $lineItems);
-    $lineItemVal[$this->_priceSetID] = $lineItems;
-    CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $this->getContributionObject($contribution['id']), 'civicrm_participant');
     $this->balanceCheck($this->_expensiveFee);
     $this->assertEquals(($this->_expensiveFee - $actualPaidAmt), CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
@@ -281,6 +273,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM19273() {
     $this->registerParticipantAndPay();
@@ -307,6 +300,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * CRM-21245: Test that Contribution status doesn't changed to 'Pending Refund' from 'Partially Paid' if the partially paid amount is lower then newly selected fee amount
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM21245() {
     $this->registerParticipantAndPay(50);
@@ -323,6 +317,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Test that proper financial items are recorded for cancelled line items
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM20611() {
     $this->registerParticipantAndPay();
@@ -363,12 +358,10 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals($financialItems['count'], 2, 'Financial Items for Cancelled fee is not proper');
 
-    $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $expectedAmount = 100.00;
     foreach ($financialItems['values'] as $id => $financialItem) {
       $this->assertEquals($expectedAmount, $financialItem['amount']);
       $this->assertNotEmpty($financialItem['financial_account_id']);
-      $this->assertEquals($contributionCompletedStatusID, $financialItem['status_id']);
       $expectedAmount = -$expectedAmount;
     }
   }
@@ -482,6 +475,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * CRM-17151: Test that Contribution status change to 'Completed' if balance is zero.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM17151() {
     $this->registerParticipantAndPay();
@@ -490,7 +484,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
     $completedStatusId = array_search('Completed', $contributionStatuses);
-    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Payment t be completed');
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Payment be completed');
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
@@ -509,6 +503,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Test that recording a refund when fee selection is 0 works
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testRefundWithFeeAmount0() {
     $this->registerParticipantAndPay();
@@ -549,13 +544,10 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals($financialItems['count'], 2, 'Financial Items for Cancelled fee is not proper');
 
-    $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $expectedAmount = 100.00;
     foreach ($financialItems['values'] as $id => $financialItem) {
       $this->assertEquals($expectedAmount, $financialItem['amount']);
       $this->assertNotEmpty($financialItem['financial_account_id']);
-      $this->assertNotEmpty($financialItem['financial_account_id']);
-      $this->assertEquals($contributionCompletedStatusID, $financialItem['status_id']);
       $expectedAmount = -$expectedAmount;
     }
   }
@@ -605,6 +597,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * dev-financial-40: Test that refund payment entries in entity-financial-trxn table to ensure that reverse transaction is entered on fee change to lesser amount
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testRefundPaymentEntries() {
     $this->registerParticipantAndPay($this->_expensiveFee);
