@@ -55,11 +55,7 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   }
 
   public function buildTempTable() {
-    $randomNum = md5(uniqid());
-    $this->_tableName = "civicrm_temp_custom_{$randomNum}";
-    $sql = "
-CREATE TEMPORARY TABLE {$this->_tableName} (
-  id int unsigned NOT NULL AUTO_INCREMENT,
+    $sql = "id int unsigned NOT NULL AUTO_INCREMENT,
   contact_id int unsigned NOT NULL,
   participant_id int unsigned NOT NULL,
 ";
@@ -76,12 +72,10 @@ CREATE TEMPORARY TABLE {$this->_tableName} (
     }
 
     $sql .= "
-PRIMARY KEY ( id ),
-UNIQUE INDEX unique_participant_id ( participant_id )
-) ENGINE=HEAP
-";
+      PRIMARY KEY ( id ),
+      UNIQUE INDEX unique_participant_id ( participant_id )";
 
-    CRM_Core_DAO::executeQuery($sql);
+    $this->_tableName = CRM_Utils_SQL_TempTable::build()->setCategory('priceset')->setMemory()->createWithColumns($sql)->getName();
   }
 
   public function fillTable() {
