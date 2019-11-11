@@ -916,6 +916,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     // can't by pass acls by passing search criteria in the url.
     $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
     $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);
   }
 
 }
