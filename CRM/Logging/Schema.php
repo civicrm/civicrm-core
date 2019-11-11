@@ -446,6 +446,17 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $cols = $this->columnsWithDiffSpecs($table, "log_$table");
     }
 
+    // If a column that already exists on logging table is being added, we
+    // should treat it as a modification.
+    $this->resetSchemaCacheForTable("log_$table");
+    $logTableSchema = $this->columnSpecsOf("log_$table");
+    foreach ($cols['ADD'] as $colKey => $col) {
+      if (array_key_exists($col, $logTableSchema)) {
+        $cols['MODIFY'][] = $col;
+        unset($cols['ADD'][$colKey]);
+      }
+    }
+
     // use the relevant lines from CREATE TABLE to add colums to the log table
     $create = $this->_getCreateQuery($table);
     foreach ((['ADD', 'MODIFY']) as $alterType) {
@@ -467,7 +478,19 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
     }
 
+    $this->resetSchemaCacheForTable("log_$table");
+
     return TRUE;
+  }
+
+  /**
+   * Resets schema cache for the given table.
+   *
+   * @param string $table
+   *   Name of the table.
+   */
+  private function resetSchemaCacheForTable($table) {
+    unset(\Civi::$statics[__CLASS__]['columnSpecs'][$table]);
   }
 
   /**
