@@ -357,4 +357,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     return CRM_Activity_BAO_Query::getSearchFieldMetadata();
   }
 
+  /**
+   * Set the metadata for the form.
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Activity' => $this->getEntityMetadata()]);
+  }
+
 }
