@@ -160,44 +160,41 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     return;
   }
 
-  // Things that can't be handled by afform. TODO: Need a better way to do this. Maybe add core metadata about what each entity is for, and filter on that.
-  $entityBlacklist = [
-    'ACL',
-    'ActionSchedule',
-    'ActivityContact',
-    'Afform%',
-    'CaseContact',
-    'EntityTag',
-    'GroupContact',
-    'GroupNesting',
-    'GroupOrganization',
-    'Setting',
-    'System',
-    'UF%',
-  ];
-  $entityApi = Civi\Api4\Entity::get()
-    ->setCheckPermissions(FALSE)
-    ->setSelect(['name', 'description']);
-  foreach ($entityBlacklist as $nono) {
-    $entityApi->addWhere('name', 'NOT LIKE', $nono);
+  $entityWhitelist = $data = [];
+
+  // First scan the entityDefaults directory for our list of supported entities
+  // FIXME: Need a way to load this from other extensions too
+  foreach (glob(__DIR__ . '/ang/afGuiEditor/entityDefaults/*.json') as $file) {
+    $matches = [];
+    preg_match('/([-a-z_A-Z0-9]*).json/', $file, $matches);
+    $entityWhitelist[] = $entity = $matches[1];
+    // No json_decode, the files are not strict json and will go through angular.$parse clientside
+    $data['defaults'][$entity] = trim(CRM_Utils_JS::stripComments(file_get_contents($file)));
   }
 
-  $contactFields = Civi\Api4\Contact::getFields()
+  $data['entities'] = (array) Civi\Api4\Entity::get()
     ->setCheckPermissions(FALSE)
-    ->setIncludeCustom(TRUE)
-    ->setLoadOptions(TRUE)
-    ->setAction('create')
-    ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'options'])
+    ->setSelect(['name', 'description'])
+    ->addWhere('name', 'IN', $entityWhitelist)
     ->execute();
 
-  $contactSettings = [
-    'data' => [],
-  ];
+  foreach ($entityWhitelist as $entityName) {
+    $api = 'Civi\\Api4\\' . $entityName;
+    $data['fields'][$entityName] = (array) $api::getFields()
+      ->setCheckPermissions(FALSE)
+      ->setIncludeCustom(TRUE)
+      ->setLoadOptions(TRUE)
+      ->setAction('create')
+      ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'options'])
+      ->addWhere('input_type', 'IS NOT NULL')
+      ->execute()
+      ->indexBy('name');
+  }
+
+  // Now adjust the field metadata
+  // FIXME: This should probably be a callback event or something to allow extensions to tweak the metadata for their entities
+  $data['fields']['Contact']['contact_type']['required_data'] = TRUE;
 
   $mimeType = 'text/javascript';
-  $content = "CRM.afformAdminData={";
-  $content .= 'entities:' . json_encode((array) $entityApi->execute(), JSON_UNESCAPED_SLASHES) . ',';
-  $content .= 'fields:' . json_encode(['Contact' => (array) $contactFields], JSON_UNESCAPED_SLASHES) . ',';
-  $content .= 'settings:' . json_encode(['Contact' => $contactSettings], JSON_UNESCAPED_SLASHES);
-  $content .= '}';
+  $content = "CRM.afformAdminData=" . json_encode($data, JSON_UNESCAPED_SLASHES) . ';';
 }

@@ -4,7 +4,7 @@
     <div class="form-inline" ng-if="entity.data" ng-repeat="(fieldName, value) in entity.data">
       <label>{{ editor.getField(entity.type, fieldName).title }}:</label><br />
       <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
-      <a href class="" ng-click="removeValue(entity, fieldName)">
+      <a href class="" ng-click="removeValue(entity, fieldName)" ng-if="!editor.getField(entity.type, fieldName).required_data">
         <i class="crm-i fa-times"></i>
       </a>
     </div>
@@ -36,4 +36,5 @@
 
 <fieldset>
   <legend>{{ ts('Options') }}</legend>
+  <div ng-include="'~/afGuiEditor/entityConfig/' + entity.type + '.html'"></div>
 </fieldset>

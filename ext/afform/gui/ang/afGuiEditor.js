@@ -87,12 +87,12 @@
           while (_.contains(existingEntitiesofThisType, entityType + num)) {
             num++;
           }
-          $scope.entities[entityType + num] = {
+          $scope.entities[entityType + num] = _.assign($parse(this.meta.defaults[entityType])($scope), {
             '#tag': 'af-entity',
             type: entityType,
             name: entityType + num,
             label: entityType + ' ' + num
-          };
+          });
           $scope.layout['#children'].unshift($scope.entities[entityType + num]);
           $scope.layout['#children'].push({
             '#tag': 'fieldset',
@@ -124,7 +124,7 @@
         };
 
         this.getField = function(entityType, fieldName) {
-          return _.filter($scope.meta.fields[entityType], {name: fieldName})[0];
+          return $scope.meta.fields[entityType][fieldName];
         };
 
         this.getEntity = function(entityName) {
@@ -150,6 +150,16 @@
               });
             });
         };
+
+        $scope.$watch('afform.title', function(newTitle, oldTitle) {
+          if (typeof oldTitle === 'string') {
+            _.each($scope.entities, function(entity) {
+              if (entity.data && entity.data.source === oldTitle) {
+                entity.data.source = newTitle;
+              }
+            });
+          }
+        });
 
         // Parse strings of javascript that php couldn't interpret
         function evaluate(collection) {
@@ -505,7 +515,7 @@
         };
 
         $scope.setStyle = function(val) {
-          $scope.block.modifyClasses($scope.node, _.keys($scope.styles), val);
+          $scope.block.modifyClasses($scope.node, _.keys($scope.styles), ['btn', val]);
         };
 
         $scope.pickIcon = function() {
