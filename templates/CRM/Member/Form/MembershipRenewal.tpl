@@ -58,6 +58,10 @@
     </div>
     <div>{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
+      <tr class="crm-member-membershiprenew-form-block-contact-id">
+        <td class="label">{$form.contact_id.label}</td>
+        <td>{$form.contact_id.html}</td>
+      </tr>
       <tr class="crm-member-membershiprenew-form-block-org_name">
         <td class="label">{ts}Membership Organization and Type{/ts}</td>
         <td class="html-adjust">{$orgName}&nbsp;&nbsp;-&nbsp;&nbsp;{$memType}
