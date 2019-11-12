@@ -1524,7 +1524,7 @@ FROM   civicrm_domain
    * @param bool $abort
    *
    * @return string
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function composeQuery($query, $params = [], $abort = TRUE) {
     $tr = [];

@@ -175,9 +175,9 @@ trait DbTestTrait {
    * @param array $params
    * @param string $message
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
-  public function assertDBQuery($expected, $query, $params = array(), $message = '') {
+  public function assertDBQuery($expected, $query, $params = [], $message = '') {
     if ($message) {
       $message .= ': ';
     }
