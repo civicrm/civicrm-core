@@ -119,7 +119,8 @@
     <div>
       <p>
         {if $hasAccessToAllCases}
-          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><i class="crm-i fa-print"></i> {ts}Print Report{/ts}</a>
+{* todo: There is $reportUrl defined in CRM/Case/Form/CaseView.php which I think was the original. Can we just use that again? Or update it since it doesn't seem to be used? What is the difference between having the /print on the end and without /print ? *}
+          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn="}"><i class="crm-i fa-print"></i> {ts}Print Report{/ts}</a>
         {/if}
 
         {if !empty($exportDoc)}
