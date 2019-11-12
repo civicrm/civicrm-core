@@ -280,7 +280,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Consider mailings that were completed not more than $maxDays ago.
    */
   public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
-    $dao = new CRM_Core_DAO();
 
     $temporaryTable = CRM_Utils_SQL_TempTable::build()
       ->setCategory('mailingemail')
