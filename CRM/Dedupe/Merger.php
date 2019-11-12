@@ -934,12 +934,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = []) {
 
     $conflicts = self::getConflicts($migrationInfo, $mainId, $otherId, $mode);
-
-    if (!empty($conflicts)) {
-      // if there are conflicts and mode is aggressive, allow hooks to decide if to skip merges
-      return (bool) $migrationInfo['skip_merge'];
-    }
-    return FALSE;
+    // A hook could have set skip_merge in order to alter merge behaviour.
+    // This is a something we might ideally deprecate since they really 'should'
+    // mess with the conflicts array instead.
+    return (bool) ($migrationData['skip_merge'] ?? !empty($conflicts));
   }
 
   /**
@@ -2354,7 +2352,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         unset($conflicts[$key]);
       }
     }
-    $migrationInfo['skip_merge'] = $migrationData['skip_merge'] ?? !empty($conflicts);
     return self::formatConflictArray($conflicts, $migrationInfo['rows'], $migrationInfo['main_details']['location_blocks'], $migrationInfo['other_details']['location_blocks'], $mainId, $otherId);
   }
 
