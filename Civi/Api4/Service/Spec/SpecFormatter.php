@@ -82,6 +82,8 @@ class SpecFormatter {
       $field->setCustomFieldId(ArrayHelper::value('id', $data));
       $field->setCustomGroupName($data['custom_group.name']);
       $field->setTitle(ArrayHelper::value('label', $data));
+      $field->setHelpPre(ArrayHelper::value('help_pre', $data));
+      $field->setHelpPost(ArrayHelper::value('help_post', $data));
       $field->setOptions(self::customFieldHasOptions($data));
       if (\CRM_Core_BAO_CustomField::isSerialized($data)) {
         $field->setSerialize(\CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND);
