@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset>
+  <rule ref="PSR2" />
+  <rule ref="PEAR.Commenting.FunctionComment">
+    <exclude-pattern>test/*</exclude-pattern>
+  </rule>
+  <file>src</file>
+  <file>test</file>
+</ruleset>

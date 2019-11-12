@@ -1,0 +1,87 @@
+language: php
+sudo: required
+service:
+  - docker
+
+php: dummy                  # this is needed for allow_failures setting
+
+stages:
+  - name: test
+  - name: check dependencies
+    if: type = cron
+
+jobs:
+  allow_failures:
+    - php: nightly
+
+  exclude:
+    - php: dummy
+
+  include:
+    - &test
+      stage: test
+      php: nightly
+      sudo: false
+      env: USE_DOCKER=0 PHP_VERSION=nightly TEST=test
+      before_install:
+        - if [ $USE_DOCKER -eq 1 ]; then docker build -t xkerman/php-$PHP_VERSION -f docker/Dockerfile.$PHP_VERSION docker; fi
+      install:
+        - rm composer.lock
+        - if [ $USE_DOCKER -eq 0 ]; then composer install --no-interaction; fi
+        - if [ $USE_DOCKER -eq 1 ]; then curl -s -O https://getcomposer.org/composer.phar; fi
+      script:
+        - if [ $USE_DOCKER -eq 0 ]; then composer $TEST; fi
+        - if [ $USE_DOCKER -eq 1 -a $PHP_VERSION != '5.2' ]; then docker run -v $(pwd):/tmp  -w /tmp xkerman/php-$PHP_VERSION sh -c 'php -v && php composer.phar install --no-interaction && php composer.phar test-legacy'; fi
+        - if [ $USE_DOCKER -eq 1 -a $PHP_VERSION = '5.2' ]; then git diff --exit-code -- generated; fi
+        - if [ $USE_DOCKER -eq 1 -a $PHP_VERSION = '5.2' ]; then docker run -v $(pwd):/tmp  -w /tmp xkerman/php-$PHP_VERSION sh -c 'php -v && php /usr/local/php/phpunit/phpunit.php --configuration phpunit.php52.xml'; fi
+      after_success:
+        - if [ $USE_DOCKER -eq 1 ]; then sudo chown -R $(whoami) ./report; fi
+        - bash <(curl -s https://codecov.io/bash) -c -F $(echo $PHP_VERSION | sed -e 's/\./_/g')
+    - <<: *test
+      php: '7.4snapshot'
+      sudo: false
+      env: USE_DOCKER=0 PHP_VERSION=7.4 TEST=test
+    - <<: *test
+      php: '7.3'
+      sudo: false
+      env: USE_DOCKER=0 PHP_VERSION=7.3 TEST=test
+    - <<: *test
+      php: '7.2'
+      sudo: false
+      env: USE_DOCKER=0 PHP_VERSION=7.2 TEST=test
+    - <<: *test
+      php: '7.1'
+      sudo: false
+      env: USE_DOCKER=0 PHP_VERSION=7.1 TEST=test
+    - <<: *test
+      php: '7.0'
+      sudo: false
+      env: USE_DOCKER=0 PHP_VERSION=7.0 TEST=test
+    - <<: *test
+      php: '5.6'
+      sudo: false
+      env: USE_DOCKER=0 PHP_VERSION=5.6 TEST=test-legacy
+    - <<: *test
+      php: '5.6'
+      sudo: required
+      env: USE_DOCKER=1 PHP_VERSION=5.5
+    - <<: *test
+      php: '5.6'
+      sudo: required
+      env: USE_DOCKER=1 PHP_VERSION=5.4
+    - <<: *test
+      php: '5.6'
+      sudo: required
+      env: USE_DOCKER=1 PHP_VERSION=5.3
+    - <<: *test
+      php: '5.6'
+      sudo: required
+      env: USE_DOCKER=1 PHP_VERSION=5.2
+
+    - stage: check dependencies
+      php: 7.3
+      sudo: false
+      install:
+        - composer install
+      script:
+        - composer outdated --direct --strict

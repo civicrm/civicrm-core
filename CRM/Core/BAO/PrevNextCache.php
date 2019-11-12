@@ -302,7 +302,7 @@ FROM   civicrm_prevnext_cache pn
     $count = 0;
     while ($dao->fetch()) {
       if (self::is_serialized($dao->data)) {
-        $main[$count] = unserialize($dao->data);
+        $main[$count] = CRM_Utils_String::unserialize($dao->data);
       }
       else {
         $main[$count] = $dao->data;
@@ -334,7 +334,7 @@ FROM   civicrm_prevnext_cache pn
    * @return bool
    */
   public static function is_serialized($string) {
-    return (@unserialize($string) !== FALSE);
+    return (@CRM_Utils_String::unserialize($string) !== FALSE);
   }
 
   /**
@@ -507,7 +507,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
     foreach ($prevNextId as $id) {
       $dao->id = $id;
       if ($dao->find(TRUE)) {
-        $originalData = unserialize($dao->data);
+        $originalData = CRM_Utils_String::unserialize($dao->data);
         $srcFields = ['ID', 'Name'];
         $swapFields = ['srcID', 'srcName', 'dstID', 'dstName'];
         $data = array_diff_assoc($originalData, array_fill_keys($swapFields, 1));

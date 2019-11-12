@@ -487,7 +487,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
         $recontactInterval = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
           $surveyId, 'recontact_interval'
         );
-        $recontactInterval = unserialize($recontactInterval);
+        $recontactInterval = CRM_Utils_String::unserialize($recontactInterval);
         if ($surveyId &&
           is_array($recontactInterval) &&
           !empty($recontactInterval)

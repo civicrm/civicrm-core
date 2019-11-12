@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="generated/test/xKerman/Restricted/bootstrap.test.php">
+  <testsuites>
+    <testsuite name="restricted-unserialize">
+      <directory>generated/test</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist processUncoveredFilesFromWhitelist="true">
+      <directory suffix=".php">generated/src</directory>
+      <exclude>
+        <directory suffix="bootstrap.php">generated/src/xKerman/Restricted</directory>
+        <!-- work around for https://github.com/sebastianbergmann/php-code-coverage/issues/102-->
+        <directory suffix="Interface.php">generated/src/xKerman/Restricted</directory>
+        <directory suffix="Exception.php">generated/src/xKerman/Restricted</directory>
+      </exclude>
+    </whitelist>
+  </filter>
+  <logging>
+    <log type="coverage-clover" target="report/coverage/clover.xml" />
+    <log type="coverage-html" target="report/coverage" />
+    <log type="coverage-text" target="php://stdout" showOnlySummary="true" />
+  </logging>
+  <php>
+    <ini name="error_reporting" value="-1" />
+  </php>
+</phpunit>

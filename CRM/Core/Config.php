@@ -565,7 +565,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       WHERE is_domain = 1 AND name = "installed"
     ');
     while ($dao->fetch()) {
-      $value = unserialize($dao->value);
+      $value = CRM_Utils_String::unserialize($dao->value);
       if (!empty($value)) {
         Civi::settings()->set('installed', 1);
         return;
