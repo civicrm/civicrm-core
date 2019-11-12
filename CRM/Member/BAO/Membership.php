@@ -758,7 +758,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     if ($dao->find(TRUE)) {
       CRM_Core_DAO::storeValues($dao, $membershipBlock);
       if (!empty($membershipBlock['membership_types'])) {
-        $membershipTypes = unserialize($membershipBlock['membership_types']);
+        $membershipTypes = CRM_Utils_String::unserialize($membershipBlock['membership_types']);
         if (!is_array($membershipTypes)) {
           return $membershipBlock;
         }

@@ -51,7 +51,7 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
     if ($dao->find(TRUE)) {
       CRM_Core_DAO::storeValues($dao, $defaults);
       if (CRM_Utils_Array::value('is_config', $defaults) == 1) {
-        $defaults['data'] = unserialize($defaults['data']);
+        $defaults['data'] = CRM_Utils_String::unserialize($defaults['data']);
       }
       return $dao;
     }
@@ -97,7 +97,7 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
       $persisntentDAO->find();
 
       while ($persisntentDAO->fetch()) {
-        $contextNameData[$context][$persisntentDAO->name] = $persisntentDAO->is_config == 1 ? unserialize($persisntentDAO->data) : $persisntentDAO->data;
+        $contextNameData[$context][$persisntentDAO->name] = $persisntentDAO->is_config == 1 ? CRM_Utils_String::unserialize($persisntentDAO->data) : $persisntentDAO->data;
       }
     }
     if (empty($name)) {

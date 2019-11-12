@@ -2927,7 +2927,7 @@ SELECT contact_id
         return strlen($value) ? json_decode($value, TRUE) : [];
 
       case self::SERIALIZE_PHP:
-        return strlen($value) ? unserialize($value, ['allowed_classes' => FALSE]) : [];
+        return strlen($value) ? CRM_Utils_String::unserialize($value) : [];
 
       case self::SERIALIZE_COMMA:
         return explode(',', trim(str_replace(', ', '', $value)));
