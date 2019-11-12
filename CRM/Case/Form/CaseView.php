@@ -104,12 +104,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->_caseType = $caseTypeName;
     $this->assign('caseDetails', $this->_caseDetails);
 
-    $reportUrl = CRM_Utils_System::url('civicrm/case/report',
-      "reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&asn=",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('reportUrl', $reportUrl);
-
     // add to recently viewed
 
     $url = CRM_Utils_System::url('civicrm/contact/view/case',
