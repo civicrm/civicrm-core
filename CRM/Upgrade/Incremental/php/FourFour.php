@@ -757,17 +757,24 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * Get all the word-replacements stored in config-arrays
    * and write them out as records in civicrm_word_replacement.
    *
-   * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
-   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
-   * step behaves consistently even as the BAO evolves in future versions.
-   * However, if there's a bug in here prior to 4.4.0, we should apply the
-   * bugfix in both places.
+   * Note: This function uses a direct SQL query instead of API, because a
+   * language field was later added, which breaks this function. If changes
+   * are done here in the future, also compare with CRM_Core_BAO_WordReplacement.
    */
   public static function rebuildWordReplacementTable() {
-    civicrm_api3('word_replacement', 'replace', [
-      'options' => ['match' => ['domain_id', 'find_word']],
-      'values' => array_filter(self::getConfigArraysAsAPIParams(FALSE), [__CLASS__, 'isValidWordReplacement']),
-    ]);
+    $replacements = array_filter(self::getConfigArraysAsAPIParams(FALSE), [__CLASS__, 'isValidWordReplacement']);
+
+    foreach ($replacements as $value) {
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_word_replacement (find_word, replace_word, is_active, match_type, domain_id)
+        VALUES (%1, %2, %3, %4, %5)", [
+          1 => [$value['find_word'], 'String'],
+          2 => [$value['replace_word'], 'String'],
+          3 => [$value['is_active'], 'Integer'],
+          4 => [$value['match_type'], 'String'],
+          5 => [$value['domain_id'], 'Integer'],
+        ]);
+    }
+
     CRM_Core_BAO_WordReplacement::rebuild();
   }
 

@@ -67,21 +67,46 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_21_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Remove civicrm_word_replacement keys', 'removeWordReplacementsKeys');
+    $this->addTask('Add civicrm_word_replacement language column', 'addWordReplacementsLanguageColumn');
+    $this->addTask('Re-Create civicrm_word_replacement keys', 'recreateWordReplacementsLanguageKeys');
+    $this->addTask('Drop domain locale_custom_strings column', 'dropDomainLocaleCustomStringsColumn');
+  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  public static function removeWordReplacementsKeys(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_word_replacement', 'FK_civicrm_word_replacement_domain_id');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_word_replacement DROP KEY UI_domain_find');
+    return TRUE;
+  }
+
+  public static function addWordReplacementsLanguageColumn(CRM_Queue_TaskContext $ctx) {
+    self::addColumn($ctx, 'civicrm_word_replacement', 'language', "varchar(5) default null COMMENT 'Word Replacement Language'");
+    return TRUE;
+  }
+
+  public static function recreateWordReplacementsLanguageKeys(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_word_replacement ADD unique key `UI_domain_find` (`domain_id`,`find_word`, `language`)');
+
+    $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
+      'fk_table_name' => 'civicrm_domain',
+      'fk_field_name' => 'id',
+      'name' => 'domain_id',
+      'fk_attributes' => ' ON DELETE CASCADE',
+    ], "\n", " ADD ", 'civicrm_word_replacement');
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement " . $sql, [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
+
+  public static function dropDomainLocaleCustomStringsColumn(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_domain', 'locale_custom_strings', FALSE, TRUE);
+    return TRUE;
+  }
 
 }

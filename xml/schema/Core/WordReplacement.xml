@@ -48,6 +48,7 @@
     <name>UI_domain_find</name>
     <fieldName>domain_id</fieldName>
     <fieldName>find_word</fieldName>
+    <fieldName>language</fieldName>
     <unique>true</unique>
     <add>4.4</add>
   </index>
@@ -76,6 +77,18 @@
     </pseudoconstant>
     <comment>FK to Domain ID. This is for Domain specific word replacement</comment>
     <add>1.1</add>
+  </field>
+  <field>
+    <name>language</name>
+    <title>Word Replacement Language</title>
+    <type>varchar</type>
+    <length>5</length>
+    <pseudoconstant>
+      <optionGroupName>languages</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <comment>Word Replacement Language</comment>
+    <add>5.21</add>
   </field>
   <foreignKey>
     <name>domain_id</name>
