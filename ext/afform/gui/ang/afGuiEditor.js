@@ -422,11 +422,13 @@
         node: '=afGuiField',
         entityName: '='
       },
-      require: '^^afGuiEditor',
-      link: function($scope, element, attrs, editor) {
-        $scope.editor = editor;
+      require: ['^^afGuiEditor', '^^afGuiBlock'],
+      link: function($scope, element, attrs, ctrls) {
+        $scope.editor = ctrls[0];
+        $scope.block = ctrls[1];
       },
       controller: function($scope) {
+        var ts = $scope.ts = CRM.ts();
 
         $scope.getEntity = function() {
           return $scope.editor ? $scope.editor.getEntity($scope.entityName) : {};
@@ -435,6 +437,68 @@
         $scope.getDefn = function() {
           return $scope.editor ? $scope.editor.getField($scope.getEntity().type, $scope.node.name) : {};
         };
+
+        $scope.getOptions = function() {
+          return {
+            results: _.transform($scope.getProp('options'), function(result, val, key) {
+              result.push({id: key, text: val});
+            }, [])
+          };
+        };
+
+        $scope.getProp = function(propName) {
+          var path = propName.split('.'),
+            item = path.pop(),
+            localDefn = drillDown($scope.node.defn || {}, path);
+          if (typeof localDefn[item] !== 'undefined') {
+            return localDefn[item];
+          }
+          return drillDown($scope.getDefn(), path)[item];
+        };
+
+        $scope.toggleRequired = function() {
+          getSet('required', !getSet('required'));
+          return false;
+        };
+
+        $scope.toggleHelp = function(position) {
+          getSet('help_' + position, getSet('help_' + position) === null ? ($scope.getDefn()['help_' + position] || ts('Enter text')) : null);
+          return false;
+        };
+
+        // Getter/setter for definition props
+        $scope.getSet = function(propName) {
+          return _.wrap(propName, getSet);
+        };
+
+        // Returns a reference to a path n-levels deep within an object
+        function drillDown(parent, path) {
+          var container = parent;
+          _.each(path, function(level) {
+            container[level] = container[level] || {};
+            container = container[level];
+          });
+          return container;
+        }
+
+        // Getter/setter callback
+        function getSet(propName, val) {
+          if (arguments.length > 1) {
+            var path = propName.split('.'),
+              item = path.pop(),
+              localDefn = drillDown($scope.node, ['defn'].concat(path)),
+              fieldDefn = drillDown($scope.getDefn(), path);
+            // Set the value if different than the field defn, otherwise unset it
+            if (typeof val !== 'undefined' && val !== fieldDefn[item]) {
+              localDefn[item] = val;
+            } else {
+              delete localDefn[item];
+            }
+            return val;
+          }
+          return $scope.getProp(propName);
+        }
+
       }
     };
   });
@@ -510,12 +574,12 @@
           'btn-danger': ts('Danger')
         };
 
-        $scope.getStyle = function() {
+        // Getter/setter for ng-model
+        $scope.getSetStyle = function(val) {
+          if (arguments.length) {
+            return $scope.block.modifyClasses($scope.node, _.keys($scope.styles), ['btn', val]);
+          }
           return _.intersection(splitClass($scope.node['class']), _.keys($scope.styles))[0] || '';
-        };
-
-        $scope.setStyle = function(val) {
-          $scope.block.modifyClasses($scope.node, _.keys($scope.styles), ['btn', val]);
         };
 
         $scope.pickIcon = function() {

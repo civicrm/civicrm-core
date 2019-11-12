@@ -1,7 +1,51 @@
-<div class="af-gui-bar">
-  <span>{{ getEntity().label + ': ' + getDefn().title }}</span>
+<div class="af-gui-bar" title="{{ getEntity().label + ': ' + getDefn().title }}">
+  <div class="form-inline pull-right">
+
+    <div class="btn-group">
+      <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-block-button" data-toggle="dropdown" title="{{ ts('Configure') }}">
+        <span><i class="crm-i fa-gear"></i></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li title="{{ ts('Field type') }}">
+          <a href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+            <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}">
+              <option ng-repeat="(opt, label) in editor.meta.widgets" value="{{ opt }}">{{ label }}</option>
+            </select>
+          </a>
+        </li>
+        <li title="{{ ts('Require this field') }}">
+          <a href ng-click="toggleRequired(); $event.stopPropagation();">
+            <i class="crm-i" ng-class="{'fa-square-o': !getProp('required'), 'fa-check-square-o': getProp('required')}"></i>
+            {{ ts('Required') }}
+          </a>
+        </li>
+        <li title="{{ ts('Show help text above this field') }}">
+          <a href ng-click="toggleHelp('pre'); $event.stopPropagation();">
+            <i class="crm-i" ng-class="{'fa-square-o': !getProp('help_pre'), 'fa-check-square-o': getProp('help_pre')}"></i>
+            {{ ts('Pre help text') }}
+          </a>
+        </li>
+        <li title="{{ ts('Show help text below this field') }}">
+          <a href ng-click="toggleHelp('post'); $event.stopPropagation();">
+            <i class="crm-i" ng-class="{'fa-square-o': !getProp('help_post'), 'fa-check-square-o': getProp('help_post')}"></i>
+            {{ ts('Post help text') }}
+          </a>
+        </li>
+        <li title="{{ ts('Remove field from form') }}">
+          <a href ng-click="block.removeBlock(node)"><span class="text-danger">{{ ts('Delete this field') }}</span></a>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>
-<div>
-  <label af-gui-editable ng-model="node.defn.title" default-value="getDefn().title">{{ node.defn.title || getDefn().title }}</label>
-  <input class="form-control" disabled placeholder="{{ node.name }}" />
+<label ng-class="{'af-gui-field-required': getProp('required')}" class="af-gui-node-title">
+  <span af-gui-editable ng-model="node.defn.title" default-value="getDefn().title">{{ getProp('title') }}</span>
+</label>
+<div class="af-gui-field-help" ng-if="getProp('help_pre') !== null">
+  <span af-gui-editable ng-model="node.defn.help_pre" default-value="getDefn().help_pre">{{ getProp('help_pre') }}</span>
 </div>
+<div class="af-gui-field-widget af-gui-field-widget-{{ getProp('input_type').toLowerCase() }}" ng-include="'~/afGuiEditor/widgets/' + getProp('input_type') + '.html'"></div>
+<div class="af-gui-field-help" ng-if="getProp('help_post') !== null">
+  <span af-gui-editable ng-model="node.defn.help_post" default-value="getDefn().help_post">{{ getProp('help_post') }}</span>
+</div>
+

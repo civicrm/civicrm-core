@@ -185,7 +185,7 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
       ->setIncludeCustom(TRUE)
       ->setLoadOptions(TRUE)
       ->setAction('create')
-      ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'options'])
+      ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize'])
       ->addWhere('input_type', 'IS NOT NULL')
       ->execute()
       ->indexBy('name');
@@ -194,6 +194,14 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   // Now adjust the field metadata
   // FIXME: This should probably be a callback event or something to allow extensions to tweak the metadata for their entities
   $data['fields']['Contact']['contact_type']['required_data'] = TRUE;
+
+  // Scan for input types
+  // FIXME: Need a way to load this from other extensions too
+  foreach (glob(__DIR__ . '/ang/afGuiEditor/widgets/*.html') as $file) {
+    $matches = [];
+    preg_match('/([-a-z_A-Z0-9]*).html/', $file, $matches);
+    $data['widgets'][$matches[1]] = $matches[1];
+  }
 
   $mimeType = 'text/javascript';
   $content = "CRM.afformAdminData=" . json_encode($data, JSON_UNESCAPED_SLASHES) . ';';

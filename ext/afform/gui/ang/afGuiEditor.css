@@ -95,10 +95,12 @@
   opacity: 0;
   transition: opacity 1s 2s;
   position:relative;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
 }
 #afGuiEditor [ui-sortable] .af-gui-bar {
   cursor: move;
-  background-color: #efefef;
+  background-color: #f2f2f2;
   position: absolute;
   top: 0;
   left: 0;
@@ -118,12 +120,17 @@
 
 #afGuiEditor .af-gui-element {
   position: relative;
-  padding: 22px 3px 3px;
-  min-height: 40px;
+  padding: 0 3px 3px;
 }
 
 #afGuiEditor .af-gui-block {
   border: 2px dashed transparent;
+  padding-top: 22px;
+  min-height: 40px;
+}
+
+#afGuiEditor .af-gui-block-type-fieldset {
+  box-shadow: 0 0 5px #bbbbbb;
 }
 
 #afGuiEditor .af-gui-block:hover {
@@ -224,12 +231,92 @@
   top: -8px;
 }
 
+#afGuiEditor .af-gui-button {
+  padding-left: 15px;
+}
+
 #afGuiEditor .af-gui-button > .btn.disabled {
   cursor: default !important;
   color: white !important;
+}
+#afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
+  border-color: #f4f4f4 !important;
 }
 
 #afGuiEditor .af-gui-button > .btn-default.disabled {
   background-color: lightgrey !important;
 }
 
+#afGuiEditor .af-gui-node-title {
+  margin-left: 5px;
+  margin-right: 20px;
+  position: relative;
+}
+
+#afGuiEditor .af-gui-field-required:after {
+  content: '*';
+  color: #cf3458;
+  position: relative;
+  left: -4px;
+}
+
+#afGuiEditor li a.af-gui-field-select-in-dropdown {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  background-color: white !important;
+  cursor: default;
+}
+
+#afGuiEditor .af-gui-field-widget input[type=text].form-control {
+  color: #9a9a9a;
+}
+
+#afGuiEditor .af-gui-field-widget-number input[type=text].form-control {
+  background-image: url('../images/number.png');
+  background-repeat: no-repeat;
+  background-position: center right 6px;
+}
+
+#afGuiEditor .af-gui-field-widget input.crm-form-date {
+  width: 140px;
+  margin-right: -2px;
+}
+#afGuiEditor .af-gui-field-widget input.crm-form-time {
+  width: 80px;
+}
+
+#afGuiEditor .af-gui-text-h1 {
+  font-weight: bolder;
+  font-size: 16px;
+}
+
+#afGuiEditor .af-gui-text-h2 {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+#afGuiEditor .af-gui-text-legend,
+#afGuiEditor .af-gui-text-h3 {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#afGuiEditor .af-gui-text-legend {
+  text-decoration: underline;
+}
+
+#afGuiEditor .af-gui-text-h4 {
+  font-weight: bold;
+}
+
+#afGuiEditor .af-gui-text-h5 {
+  font-weight: 600;
+}
+
+#afGuiEditor .af-gui-text-h6 {
+  font-weight: 500;
+}
+
+#afGuiEditor .af-gui-field-help {
+  font-style: italic;
+}
