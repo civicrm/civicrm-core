@@ -14,6 +14,7 @@
  * @property bool|string $is_active
  * @property string|null $match_type
  * @property int|string|null $domain_id
+ * @property string|null $language
  */
 class CRM_Core_DAO_WordReplacement extends CRM_Core_DAO_Base {
 }

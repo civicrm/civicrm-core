@@ -39,6 +39,20 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
       'add' => '1.8',
     ]);
 
+    $this->addTask('Add WordReplacement.language', 'alterSchemaField', 'WordReplacement', 'language', [
+      'title' => ts('Language'),
+      'sql_type' => 'varchar(5)',
+      'input_type' => 'Select',
+      'description' => ts('Word Replacement Language'),
+      'add' => '6.20',
+      'default_callback' => ['CRM_Core_I18n', 'getLocale'],
+      'pseudoconstant' => [
+        'option_group_name' => 'languages',
+        'key_column' => 'name',
+      ],
+    ]);
+    $this->addTask('Update WordReplacement index and backfill language', 'updateWordReplacements');
+
     $this->addTask('Add time to existing cases based on time of open case activity ', 'backFillCaseStartTime');
   }
 
@@ -77,6 +91,93 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     ";
     $params = [0 => [$activityTypeId, "Integer"]];
     \CRM_Core_DAO::executeQuery($sql, $params);
+
+    return TRUE;
+  }
+
+  /**
+   * Update WordReplacement index and backfill language.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function updateWordReplacements(CRM_Queue_TaskContext $ctx): bool {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_word_replacement', 'temp_domain_id')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_word_replacement ADD INDEX temp_domain_id (domain_id)');
+    }
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_word_replacement', 'UI_domain_find');
+
+    // Backfill language on existing rows from domain's default language
+    $domains = CRM_Core_DAO::executeQuery('SELECT id, locale_custom_strings FROM civicrm_domain');
+    while ($domains->fetch()) {
+      $domainId = (int) $domains->id;
+      $lang = CRM_Core_DAO::singleValueQuery("SELECT v.value FROM civicrm_setting v WHERE v.name = 'lcMessages' AND v.domain_id = %1", [
+        1 => [$domainId, 'Integer'],
+      ]);
+      $lang = $lang ? CRM_Utils_String::unserialize($lang) : 'en_US';
+      if (!$lang) {
+        $lang = 'en_US';
+      }
+
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_word_replacement SET language = %1 WHERE domain_id = %2 AND (language IS NULL OR language = '')", [
+        1 => [$lang, 'String'],
+        2 => [$domainId, 'Integer'],
+      ]);
+
+      // Migrate any serialized locale_custom_strings
+      if (!empty($domains->locale_custom_strings)) {
+        $lcs = CRM_Utils_String::unserialize($domains->locale_custom_strings);
+        if (is_array($lcs)) {
+          foreach ($lcs as $locale => $statuses) {
+            if (!is_array($statuses)) {
+              continue;
+            }
+            foreach ($statuses as $status => $matchTypes) {
+              if (!is_array($matchTypes)) {
+                continue;
+              }
+              $isActive = ($status === 'enabled') ? 1 : 0;
+              foreach ($matchTypes as $matchType => $words) {
+                if (!is_array($words)) {
+                  continue;
+                }
+                foreach ($words as $findWord => $replaceWord) {
+                  if ($findWord === '' || $replaceWord === '') {
+                    continue;
+                  }
+                  $exists = CRM_Core_DAO::singleValueQuery("
+                    SELECT id FROM civicrm_word_replacement
+                    WHERE domain_id = %1 AND find_word = %2 AND language = %3
+                  ", [
+                    1 => [$domainId, 'Integer'],
+                    2 => [$findWord, 'String'],
+                    3 => [$locale, 'String'],
+                  ]);
+                  if (!$exists) {
+                    CRM_Core_DAO::executeQuery("
+                      INSERT INTO civicrm_word_replacement (domain_id, find_word, replace_word, is_active, match_type, language)
+                      VALUES (%1, %2, %3, %4, %5, %6)
+                    ", [
+                      1 => [$domainId, 'Integer'],
+                      2 => [$findWord, 'String'],
+                      3 => [$replaceWord, 'String'],
+                      4 => [$isActive, 'Integer'],
+                      5 => [$matchType, 'String'],
+                      6 => [$locale, 'String'],
+                    ]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_word_replacement', 'UI_domain_find')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_word_replacement ADD UNIQUE KEY UI_domain_find (domain_id, find_word, language)');
+    }
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_word_replacement', 'temp_domain_id');
 
     return TRUE;
   }

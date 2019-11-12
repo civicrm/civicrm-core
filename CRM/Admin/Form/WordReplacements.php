@@ -42,12 +42,6 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    * Pre process function.
    */
   public function preProcess() {
-    // This controller was originally written to CRUD $config->locale_custom_strings,
-    // but that's no longer the canonical store. Re-sync from canonical store to ensure
-    // that we display that latest data. This is inefficient - at some point, we
-    // should rewrite this UI.
-    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
-
     $this->_soInstance = CRM_Utils_Request::retrieve('instance', 'Positive', NULL, FALSE, NULL, 'GET');
     $this->assign('soInstance', $this->_soInstance);
   }
@@ -63,10 +57,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     }
 
     $this->_defaults = [];
-
-    $config = CRM_Core_Config::singleton();
-
-    $values = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($config->lcMessages);
+    $tsLocale = CRM_Core_I18n::getLocale();
+    $values = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($tsLocale);
     $i = 1;
 
     $enableDisable = [
@@ -97,8 +89,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $config = CRM_Core_Config::singleton();
-    $values = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($config->lcMessages);
+    $tsLocale = CRM_Core_I18n::getLocale();
+    $values = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($tsLocale);
 
     //CRM-14179
     $instances = 0;
@@ -165,20 +157,23 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   public static function formRule($values) {
     $errors = [];
 
-    $oldValues = $values['old'] ?? NULL;
-    $newValues = $values['new'] ?? NULL;
-    $enabled = $values['enabled'] ?? NULL;
-    $exactMatch = $values['cb'] ?? NULL;
+    $oldValues = $values['old'] ?? [];
+    $newValues = $values['new'] ?? [];
+    $enabled = $values['enabled'] ?? [];
+    $exactMatch = $values['cb'] ?? [];
 
     foreach ($oldValues as $k => $v) {
-      if ($v && !$newValues[$k]) {
+      $cleanOld = trim(CRM_Utils_String::purifyHTML(htmlspecialchars_decode((string) $v)));
+      $cleanNew = trim(CRM_Utils_String::purifyHTML(htmlspecialchars_decode((string) ($newValues[$k] ?? ''))));
+
+      if ($cleanOld && !$cleanNew) {
         $errors['new[' . $k . ']'] = ts('Please Enter the value for Replacement Word');
       }
-      elseif (!$v && $newValues[$k]) {
+      elseif (!$cleanOld && $cleanNew) {
         $errors['old[' . $k . ']'] = ts('Please Enter the value for Original Word');
       }
-      elseif ((empty($newValues[$k]) && empty($oldValues[$k]))
-        && (!empty($enabled[$k]) || !empty($exactMatch[$k]))
+      elseif ((empty($cleanNew) && empty($cleanOld))
+        && (!empty($enabled[$k]) || !empty($exactMatch[$k]) || !empty($v) || !empty($newValues[$k]))
       ) {
         $errors['old[' . $k . ']'] = ts('Please Enter the value for Original Word');
         $errors['new[' . $k . ']'] = ts('Please Enter the value for Replacement Word');
@@ -193,43 +188,49 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $this->_numStrings = count($params['old']);
+    $this->_numStrings = count($params['old'] ?? []);
+    $tsLocale = CRM_Core_I18n::getLocale();
+    $domainID = CRM_Core_Config::domainID();
 
-    $enabled['exactMatch'] = $enabled['wildcardMatch'] = $disabled['exactMatch'] = $disabled['wildcardMatch'] = [];
+    $values = [];
     for ($i = 1; $i <= $this->_numStrings; $i++) {
       if (!empty($params['new'][$i]) && !empty($params['old'][$i])) {
-        if (isset($params['enabled']) && !empty($params['enabled'][$i])) {
-          if (!empty($params['cb'][$i])) {
-            $enabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
-          }
-          else {
-            $enabled['wildcardMatch'] += [$params['old'][$i] => $params['new'][$i]];
-          }
-        }
-        else {
-          if (isset($params['cb']) && is_array($params['cb']) && array_key_exists($i, $params['cb'])) {
-            $disabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
-          }
-          else {
-            $disabled['wildcardMatch'] += [$params['old'][$i] => $params['new'][$i]];
-          }
+        // String may have simple HTML entities (usually 'strong' or 'a'),
+        // and will be escaped by QuickForm. To avoid having to whitelist
+        // all of old[*] and new[*] patterns, we unescape, check for XSS,
+        // and the API itself has whitelisted find_word and replace_word.
+        $findWord = trim(CRM_Utils_String::purifyHTML(htmlspecialchars_decode($params['old'][$i])));
+        $replaceWord = trim(CRM_Utils_String::purifyHTML(htmlspecialchars_decode($params['new'][$i])));
+        if ($findWord !== '' && $replaceWord !== '') {
+          $values[] = [
+            'find_word' => $findWord,
+            'replace_word' => $replaceWord,
+            'is_active' => !empty($params['enabled'][$i]),
+            'match_type' => !empty($params['cb'][$i]) ? 'exactMatch' : 'wildcardMatch',
+          ];
         }
       }
     }
 
-    $overrides = [
-      'enabled' => $enabled,
-      'disabled' => $disabled,
+    $where = [
+      ['domain_id', '=', $domainID],
+      ['language', '=', $tsLocale],
     ];
 
-    $config = CRM_Core_Config::singleton();
-    CRM_Core_BAO_WordReplacement::setLocaleCustomStrings($config->lcMessages, $overrides);
+    if (empty($values)) {
+      civicrm_api4('WordReplacement', 'delete', [
+        'where' => $where,
+      ]);
+    }
+    else {
+      civicrm_api4('WordReplacement', 'replace', [
+        'where' => $where,
+        'match' => ['find_word', 'domain_id', 'language'],
+        'records' => $values,
+      ]);
+    }
 
-    // This controller was originally written to CRUD $config->locale_custom_strings,
-    // but that's no longer the canonical store. Sync changes to canonical store
-    // (civicrm_word_replacement table in the database).
-    // This is inefficient - at some point, we should rewrite this UI.
-    CRM_Core_BAO_WordReplacement::rebuildWordReplacementTable();
+    CRM_Core_BAO_WordReplacement::rebuild();
 
     CRM_Core_Session::setStatus("", ts("Settings Saved"), "success");
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/options/wordreplacements',
