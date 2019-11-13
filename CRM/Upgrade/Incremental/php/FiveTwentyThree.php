@@ -29,6 +29,14 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
     // if ($rev == '5.12.34') {
     //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
     // }
+    if ($rev == '5.23.alpha1' && version_compare($currentVer, '4.7', '>=')) {
+      if ($this->hasConfigBackendData()) {
+        $preUpgradeMessage .= '<br/>' . ts("WARNING: The column \"<code>civicrm_domain.config_backend</code>\" is <a href='%2'>flagged for removal</a>. However, the upgrader has detected data in this copy of \"<code>civicrm_domain.config_backend</code>\". Please <a href='%1' target='_blank'>report</a> anything you can about the usage of this column. In the mean-time, the data will be preserved.", [
+          1 => 'https://civicrm.org/bug-reporting',
+          2 => 'https://lab.civicrm.org/dev/core/issues/1387',
+        ]);
+      }
+    }
   }
 
   /**
@@ -75,6 +83,11 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
     $this->addTask('Remove Google + location option', 'removeGooglePlusOption');
     $this->addTask('dev/mailing#59 Add in IMAP_XOAUTH2 protocol option for mailbox access', 'addXoauth2ProtocolOption');
     $this->addTask('dev/translation#34 Fix contact-reference option for Postal Code', 'fixContactRefOptionPostalCode');
+
+    // (dev/core#1387) This column was dropped in 4.7.alpha1, but it was still created on new installs.
+    if (!$this->hasConfigBackendData()) {
+      $this->addTask('Drop column "civicrm_domain.config_backend"', 'dropColumn', 'civicrm_domain', 'config_backend');
+    }
   }
 
   /**
@@ -144,6 +157,14 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
       ->execute();
 
     return TRUE;
+  }
+
+  /**
+   * @return bool
+   */
+  private function hasConfigBackendData() {
+    return CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend')
+    && CRM_Core_DAO::singleValueQuery('SELECT count(*) c FROM `civicrm_domain` WHERE config_backend IS NOT NULL') > 0;
   }
 
 }
