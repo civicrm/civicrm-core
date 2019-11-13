@@ -117,7 +117,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    */
   protected function getResult() {
     if (!$this->result) {
-      $this->setResult(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'status_id', 'Pending'));
+      $this->setResult(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
     }
     return $this->result;
   }
