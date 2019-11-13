@@ -263,7 +263,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     //CRM-16950
     $taxRate = $this->getTaxRateForFinancialType($this->allMembershipTypeDetails[$defaults['membership_type_id']]['financial_type_id']);
 
-    $contactField = $this->addEntityRef('contact_id', ts('Contact'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Member'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
     $contactField->freeze();
 
     // auto renew options if enabled for the membership
