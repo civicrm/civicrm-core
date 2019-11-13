@@ -267,7 +267,12 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));
       $templatesToUpdate = [];
       if (!empty($workFlowID)) {
-        $templatesToUpdate[] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_msg_template WHERE workflow_id = $workFlowID AND is_reserved = 1");
+        // This could be empty if the template was deleted. It should not happen,
+        // but has been seen in the wild (ex: marketing/civicrm-website#163).
+        $id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_msg_template WHERE workflow_id = $workFlowID AND is_reserved = 1");
+        if ($id) {
+          $templatesToUpdate[] = $id;
+        }
         $defaultTemplateID = CRM_Core_DAO::singleValueQuery("
           SELECT default_template.id FROM civicrm_msg_template reserved
           LEFT JOIN civicrm_msg_template default_template
@@ -280,11 +285,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           $templatesToUpdate[] = $defaultTemplateID;
         }
 
-        CRM_Core_DAO::executeQuery("
-          UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
-            1 => [$content, 'String'],
-          ]
-        );
+        if (!empty($templatesToUpdate)) {
+          CRM_Core_DAO::executeQuery("
+            UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
+              1 => [$content, 'String'],
+            ]
+          );
+        }
       }
     }
   }
