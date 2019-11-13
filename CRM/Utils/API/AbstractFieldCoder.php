@@ -30,7 +30,7 @@
  * of all fields (except for some black-listed skip-fields).
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'api/Wrapper.php';

@@ -37,7 +37,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * whitelist, then it generates an error.
  *
  * @package Civi
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class WhitelistSubscriber implements EventSubscriberInterface {
 

@@ -30,7 +30,7 @@
  * when the actual value is NULL or "". Rewrite the output.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'api/Wrapper.php';

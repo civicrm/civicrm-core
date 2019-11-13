@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @deprecated
  */
 class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {

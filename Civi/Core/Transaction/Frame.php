@@ -33,7 +33,7 @@ namespace Civi\Core\Transaction;
  * and any nested frames are SQL savepoints (SAVEPOINT foo/ROLLBACK TO SAVEPOINT).
  *
  * @package Civi
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class Frame {
 

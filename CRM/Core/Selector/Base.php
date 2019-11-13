@@ -32,7 +32,7 @@
  * and display names
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */

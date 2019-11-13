@@ -34,7 +34,7 @@
  * supported right now, XML support will be added as and when needed
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 interface CRM_Core_Selector_API {
 

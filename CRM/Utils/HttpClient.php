@@ -34,7 +34,7 @@
  * want to deal with that so late in the 4.3 dev cycle.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_HttpClient {
 

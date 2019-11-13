@@ -29,7 +29,7 @@
  * Metadata for an extension (e.g. the extension's "info.xml" file)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_Info {
 

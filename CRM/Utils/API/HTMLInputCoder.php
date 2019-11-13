@@ -35,7 +35,7 @@
  * escaping scheme and consequently remove HTMLInputCoder.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   private $skipFields = NULL;

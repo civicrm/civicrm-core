@@ -34,7 +34,7 @@ namespace Civi\Core\SqlTrigger;
  * This class is a generalization of CRM-10554 with the aim of enabling CRM-20958.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class TimestampTriggers {
 

@@ -32,7 +32,7 @@
  * process
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  */
 class CRM_Core_Controller_Simple extends CRM_Core_Controller {

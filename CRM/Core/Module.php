@@ -31,7 +31,7 @@
  * a Joomla Plugin.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Module {
 

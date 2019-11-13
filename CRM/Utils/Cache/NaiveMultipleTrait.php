@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  * The traditional CRM_Utils_Cache_Interface did not support multiple-key
  * operations. To get drop-in compliance with PSR-16, we use a naive adapter.

@@ -29,7 +29,7 @@
  * This class stores logic for managing schema upgrades in CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_Upgrades {
 
