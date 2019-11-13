@@ -322,19 +322,24 @@ function afform_civicrm_alterAngular($angular) {
           'loadOptions' => TRUE,
         ]);
         // Merge field definition data with whatever's already in the markup
-        foreach ($getFields as $field) {
+        $deep = ['input_attrs'];
+        foreach ($getFields as $fieldInfo) {
           $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
           if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
             // If it's not an object, don't mess with it.
             continue;
           }
-          foreach ($field as &$prop) {
-            $prop = htmlspecialchars(CRM_Utils_JS::encode($prop));
+          $fieldDefn = $existingFieldDefn ? CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
+          foreach ($fieldInfo as $name => $prop) {
+            // Merge array props 1 level deep
+            if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
+              $fieldDefn[$name] = CRM_Utils_JS::writeObject(CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['CRM_Utils_JS', 'encode'], $prop));
+            }
+            elseif (!isset($fieldDefn[$name])) {
+              $fieldDefn[$name] = CRM_Utils_JS::encode($prop);
+            }
           }
-          if ($existingFieldDefn) {
-            $field = array_merge($field, CRM_Utils_JS::getRawProps($existingFieldDefn));
-          }
-          pq($afField)->attr('defn', CRM_Utils_JS::writeObject($field));
+          pq($afField)->attr('defn', htmlspecialchars(CRM_Utils_JS::writeObject($fieldDefn)));
         }
       }
     });
