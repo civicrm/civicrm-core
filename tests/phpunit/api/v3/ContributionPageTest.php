@@ -360,7 +360,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
     ];
 
     $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
@@ -381,11 +381,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
@@ -430,11 +429,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'email-Primary' => 'billy-goat@the-bridge.net',
       'payment_processor_id' => $this->_paymentProcessor['id'],
       'credit_card_number' => '4111111111111111',
@@ -472,7 +470,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruffier',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'email-Primary' => 'billy-goat@the-new-bridge.net',
       'payment_processor_id' => $this->params['payment_processor_id'],
     ];
@@ -510,7 +508,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'is_pay_later' => 1,
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'email-Primary' => 'billy-goat@the-bridge.net',
     ];
 
@@ -535,14 +533,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
+      'amount' => 10,
     ];
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contributions = $this->callAPISuccess('contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']]);
     $this->assertCount(2, $contributions['values']);
     $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1]);
@@ -1257,7 +1255,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
@@ -1314,7 +1312,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
@@ -1401,7 +1399,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
