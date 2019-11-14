@@ -185,10 +185,20 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
       ->setIncludeCustom(TRUE)
       ->setLoadOptions(TRUE)
       ->setAction('create')
-      ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize'])
+      ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'])
       ->addWhere('input_type', 'IS NOT NULL')
       ->execute()
       ->indexBy('name');
+
+    // TODO: Teach the api to return options in this format
+    foreach ($data['fields'][$entityName] as $name => $field) {
+      if (!empty($field['options'])) {
+        $data['fields'][$entityName][$name]['options'] = CRM_Utils_Array::makeNonAssociative($field['options'], 'key', 'label');
+      }
+      else {
+        unset($data['fields'][$entityName][$name]['options']);
+      }
+    }
   }
 
   // Now adjust the field metadata
@@ -197,10 +207,10 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
 
   // Scan for input types
   // FIXME: Need a way to load this from other extensions too
-  foreach (glob(__DIR__ . '/ang/afGuiEditor/widgets/*.html') as $file) {
+  foreach (glob(__DIR__ . '/ang/afGuiEditor/inputType/*.html') as $file) {
     $matches = [];
     preg_match('/([-a-z_A-Z0-9]*).html/', $file, $matches);
-    $data['widgets'][$matches[1]] = $matches[1];
+    $data['inputType'][$matches[1]] = $matches[1];
   }
 
   $mimeType = 'text/javascript';

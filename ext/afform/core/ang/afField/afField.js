@@ -16,15 +16,21 @@
         $scope.fieldId = $scope.afFieldset.getDefn().modelName + '-' + $scope.fieldName;
         $scope.getData = $scope.afFieldset.getData;
 
+        $el.addClass('af-field-type-' + _.kebabCase($scope.defn.input_type));
+      },
+      controller: function($scope) {
+
         $scope.getOptions = function() {
+          return $scope.defn.options || [{key: '1', label: ts('Yes')}, {key: '0', label: ts('No')}];
+        };
+
+        $scope.select2Options = function() {
           return {
-            results: _.transform($scope.defn.options, function(result, val, key) {
-              result.push({id: key, text: val});
+            results: _.transform($scope.getOptions(), function(result, opt) {
+              result.push({id: opt.key, text: opt.label});
             }, [])
           };
         };
-
-        $el.addClass('af-field-type-' + _.kebabCase($scope.defn.input_type));
       }
     };
   });

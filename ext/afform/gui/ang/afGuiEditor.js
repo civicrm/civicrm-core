@@ -429,23 +429,65 @@
       },
       controller: function($scope) {
         var ts = $scope.ts = CRM.ts();
+        $scope.editingOptions = false;
+        var yesNo = [
+          {key: '1', label: ts('Yes')},
+          {key: '0', label: ts('No')}
+        ];
 
         $scope.getEntity = function() {
           return $scope.editor ? $scope.editor.getEntity($scope.entityName) : {};
         };
 
-        $scope.getDefn = function() {
+        $scope.getDefn = this.getDefn = function() {
           return $scope.editor ? $scope.editor.getField($scope.getEntity().type, $scope.node.name) : {};
         };
 
-        $scope.getOptions = function() {
+        $scope.hasOptions = function() {
+          var inputType = $scope.getProp('input_type');
+          return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && !$scope.getDefn().options);
+        };
+
+        $scope.getOptions = this.getOptions = function() {
+          if ($scope.node.defn && $scope.node.defn.options) {
+            return $scope.node.defn.options;
+          }
+          return $scope.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
+        };
+
+        $scope.select2Options = function() {
           return {
-            results: _.transform($scope.getProp('options'), function(result, val, key) {
-              result.push({id: key, text: val});
+            results: _.transform($scope.getOptions(), function(result, opt) {
+              result.push({id: opt.key, text: opt.label});
             }, [])
           };
         };
 
+        $scope.resetOptions = function() {
+          delete $scope.node.defn.options;
+        };
+
+        $scope.editOptions = function() {
+          $scope.editingOptions = true;
+          $('#afGuiEditor').addClass('af-gui-editing-options');
+        };
+
+        $scope.inputTypeCanBe = function(type) {
+          var defn = $scope.getDefn();
+          switch (type) {
+            case 'CheckBox':
+            case 'Radio':
+            case 'Select':
+              return !(!defn.options && defn.data_type !== 'Boolean');
+
+            case 'TextArea':
+            case 'RichTextEditor':
+              return (defn.data_type === 'Text' || defn.data_type === 'String');
+          }
+          return true;
+        };
+
+        // Returns a value from either the local field defn or the base defn
         $scope.getProp = function(propName) {
           var path = propName.split('.'),
             item = path.pop(),
@@ -456,13 +498,19 @@
           return drillDown($scope.getDefn(), path)[item];
         };
 
+        // Checks for a value in either the local field defn or the base defn
+        $scope.propIsset = function(propName) {
+          var val = $scope.getProp(propName);
+          return !(typeof val === 'undefined' || val === null);
+        };
+
         $scope.toggleRequired = function() {
           getSet('required', !getSet('required'));
           return false;
         };
 
         $scope.toggleHelp = function(position) {
-          getSet('help_' + position, getSet('help_' + position) === null ? ($scope.getDefn()['help_' + position] || ts('Enter text')) : null);
+          getSet('help_' + position, $scope.propIsset('help_' + position) ? null : ($scope.getDefn()['help_' + position] || ts('Enter text')));
           return false;
         };
 
@@ -470,16 +518,6 @@
         $scope.getSet = function(propName) {
           return _.wrap(propName, getSet);
         };
-
-        // Returns a reference to a path n-levels deep within an object
-        function drillDown(parent, path) {
-          var container = parent;
-          _.each(path, function(level) {
-            container[level] = container[level] || {};
-            container = container[level];
-          });
-          return container;
-        }
 
         // Getter/setter callback
         function getSet(propName, val) {
@@ -498,7 +536,64 @@
           }
           return $scope.getProp(propName);
         }
+        this.getSet = getSet;
 
+        this.setEditingOptions = function(val) {
+          $scope.editingOptions = val;
+        };
+
+        // Returns a reference to a path n-levels deep within an object
+        function drillDown(parent, path) {
+          var container = parent;
+          _.each(path, function(level) {
+            container[level] = container[level] || {};
+            container = container[level];
+          });
+          return container;
+        }
+      }
+    };
+  });
+
+  angular.module('afGuiEditor').directive('afGuiEditOptions', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/editOptions.html',
+      scope: true,
+      require: '^^afGuiField',
+      link: function ($scope, element, attrs, afGuiField) {
+        $scope.field = afGuiField;
+        $scope.options = JSON.parse(angular.toJson(afGuiField.getOptions()));
+        var optionKeys = _.map($scope.options, 'key');
+        $scope.deletedOptions = _.filter(JSON.parse(angular.toJson(afGuiField.getDefn().options || [])), function(item) {
+          return !_.contains(optionKeys, item.key);
+        });
+        $scope.originalLabels = _.transform(afGuiField.getDefn().options || [], function(originalLabels, item) {
+          originalLabels[item.key] = item.label;
+        }, {});
+      },
+      controller: function ($scope) {
+        var ts = $scope.ts = CRM.ts();
+
+        $scope.deleteOption = function(option, $index) {
+          $scope.options.splice($index, 1);
+          $scope.deletedOptions.push(option);
+        };
+
+        $scope.restoreOption = function(option, $index) {
+          $scope.deletedOptions.splice($index, 1);
+          $scope.options.push(option);
+        };
+        
+        $scope.save = function() {
+          $scope.field.getSet('options', JSON.parse(angular.toJson($scope.options)));
+          $scope.close();
+        };
+
+        $scope.close = function() {
+          $scope.field.setEditingOptions(false);
+          $('#afGuiEditor').removeClass('af-gui-editing-options');
+        };
       }
     };
   });
@@ -587,6 +682,29 @@
           $('#af-gui-icon-picker ~ .crm-icon-picker-button').click();
         };
 
+      }
+    };
+  });
+
+  // Connect bootstrap dropdown.js with angular
+  // Allows menu content to be conditionally rendered only if open
+  // This gives a large performance boost for a page with lots of menus
+  angular.module('afGuiEditor').directive('afGuiMenu', function() {
+    return {
+      restrict: 'A',
+      link: function($scope, element, attrs) {
+        $scope.menu = {};
+        element
+          .on('show.bs.dropdown', function() {
+            $scope.$apply(function() {
+              $scope.menu.open = true;
+            });
+          })
+          .on('hidden.bs.dropdown', function() {
+            $scope.$apply(function() {
+              $scope.menu.open = false;
+            });
+          });
       }
     };
   });

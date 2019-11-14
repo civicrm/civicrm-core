@@ -125,7 +125,8 @@
 
 #afGuiEditor .af-gui-block {
   border: 2px dashed transparent;
-  padding-top: 22px;
+  position: relative;
+  padding: 22px 3px 3px;
   min-height: 40px;
 }
 
@@ -171,7 +172,8 @@
 }
 /* grip handle */
 #afGuiEditor [ui-sortable] .af-gui-bar:before,
-#afGuiEditor .af-gui-field-select-list > div:not(.disabled):hover:before {
+#afGuiEditor .af-gui-field-select-list > div:not(.disabled):hover:before,
+#afGuiEditor [af-gui-edit-options] [ui-sortable] li:before {
   background-size: cover;
   background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
   width: 10px;
@@ -267,22 +269,31 @@
   cursor: default;
 }
 
-#afGuiEditor .af-gui-field-widget input[type=text].form-control {
+#afGuiEditor .af-gui-field-input input[type=text].form-control {
   color: #9a9a9a;
 }
 
-#afGuiEditor .af-gui-field-widget-number input[type=text].form-control {
+#afGuiEditor .af-gui-field-input-number input[type=text].form-control {
   background-image: url('../images/number.png');
   background-repeat: no-repeat;
   background-position: center right 6px;
 }
 
-#afGuiEditor .af-gui-field-widget input.crm-form-date {
+#afGuiEditor .af-gui-field-input input.crm-form-date {
   width: 140px;
   margin-right: -2px;
 }
-#afGuiEditor .af-gui-field-widget input.crm-form-time {
+#afGuiEditor .af-gui-field-input input.crm-form-time {
   width: 80px;
+}
+
+#afGuiEditor .af-gui-field-input-type-radio label.radio {
+  font-weight: normal;
+  margin-right: 10px;
+}
+#afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
+  margin: 0;
+
 }
 
 #afGuiEditor .af-gui-text-h1 {
@@ -319,4 +330,70 @@
 
 #afGuiEditor .af-gui-field-help {
   font-style: italic;
+}
+
+
+#afGuiEditor.af-gui-editing-options {
+  pointer-events: none;
+  cursor: default;
+}
+#afGuiEditor.af-gui-editing-options .panel-heading,
+#afGuiEditor.af-gui-editing-options .af-gui-element,
+.af-gui-editing-options #afGuiEditor-palette .panel-body > * {
+  opacity: .5;
+}
+#afGuiEditor.af-gui-editing-options .af-gui-block {
+  border: 2px solid transparent;
+}
+#afGuiEditor.af-gui-editing-options .af-gui-bar:not(.af-gui-edit-options-bar) {
+  visibility: hidden;
+}
+#afGuiEditor.af-gui-editing-options .af-gui-bar:before {
+  background: none;
+}
+
+#afGuiEditor [af-gui-edit-options] {
+  border: 2px solid #0071bd;
+  pointer-events: auto;
+  cursor: auto;
+  padding-top: 35px;
+  position: relative;
+}
+
+#afGuiEditor [af-gui-edit-options] .af-gui-edit-options-bar {
+  height: 30px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  width: 100%;
+  background-color: #f2f2f2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-left: 15px;
+}
+#afGuiEditor [af-gui-edit-options] ul[ui-sortable] {
+  padding: 5px 20px 0;
+}
+#afGuiEditor [af-gui-edit-options] ul[ui-sortable] li {
+  list-style: none;
+  padding-left: 15px;
+  position: relative;
+  background-color:#e7ecf1;
+  cursor: move;
+}
+#afGuiEditor [af-gui-edit-options] ul[ui-sortable] li:nth-child(even) {
+  background-color:#f2f2f2;
+}
+#afGuiEditor [af-gui-edit-options] ul[ui-sortable] li > div {
+  width: calc(100% - 30px);
+  display: inline-block;
+}
+#afGuiEditor [af-gui-edit-options] ul.af-gui-edit-options-deleted li > div {
+  text-decoration: line-through;
+}
+#afGuiEditor [af-gui-edit-options] ul[ui-sortable] li .btn-xs {
+  border: 0 none;
+}
+#afGuiEditor [af-gui-edit-options] h5 {
+  margin-left: 20px;
 }

@@ -1,10 +1,10 @@
 <div class="af-gui-bar">
   <div class="form-inline pull-right">
-    <div class="btn-group pull-right">
+    <div class="btn-group pull-right" af-gui-menu>
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-block-button" data-toggle="dropdown" title="{{ ts('Configure') }}">
         <span><i class="crm-i fa-gear"></i></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" ng-if="menu.open">
         <li title="{{ ts('Text style') }}">
           <a href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
             <select class="form-control" ng-model="node['#tag']">
@@ -21,6 +21,7 @@
             </div>
           </a>
         </li>
+        <li role="separator" class="divider"></li>
         <li>
           <a href ng-click="block.removeBlock(node)"><span class="text-danger">{{ ts('Delete this text') }}</span></a>
         </li>

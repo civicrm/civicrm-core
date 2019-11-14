@@ -329,6 +329,11 @@ function afform_civicrm_alterAngular($angular) {
             // If it's not an object, don't mess with it.
             continue;
           }
+          // TODO: Teach the api to return options in this format
+          if (!empty($fieldInfo['options'])) {
+            $fieldInfo['options'] = CRM_Utils_Array::makeNonAssociative($fieldInfo['options'], 'key', 'label');
+          }
+
           $fieldDefn = $existingFieldDefn ? CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
           foreach ($fieldInfo as $name => $prop) {
             // Merge array props 1 level deep
