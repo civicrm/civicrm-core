@@ -722,6 +722,24 @@ LIMIT  1
    */
   public static function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
 
+    $template = self::populateCaseReportTemplate($clientID, $caseID, $activitySetName, $params, $form);
+
+    // now run the template
+    $contents = $template->fetch('CRM/Case/XMLProcessor/Report.tpl');
+    return $contents;
+  }
+
+  /**
+   * @param int $clientID
+   * @param int $caseID
+   * @param string $activitySetName
+   * @param array $params
+   * @param CRM_Core_Form $form
+   *
+   * @return CRM_Core_Smarty
+   */
+  public static function populateCaseReportTemplate($clientID, $caseID, $activitySetName, $params, $form) {
+
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('caseId', $caseID);
@@ -778,9 +796,7 @@ LIMIT  1
     $form->getActivities($clientID, $caseID, $activityTypes, $activities);
     $template->assign_by_ref('activities', $activities);
 
-    // now run the template
-    $contents = $template->fetch('CRM/Case/XMLProcessor/Report.tpl');
-    return $contents;
+    return $template;
   }
 
   public static function printCaseReport() {
