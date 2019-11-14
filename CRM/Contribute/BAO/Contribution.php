@@ -2881,24 +2881,22 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       // make sure event exists and is valid
       $event = new CRM_Event_BAO_Event();
       $event->id = $ids['event'];
-      if ($ids['event'] &&
-        !$event->find(TRUE)
-      ) {
+      if ($ids['event'] && !$event->find(TRUE)) {
         throw new Exception("Could not find event: " . $ids['event']);
       }
 
-      $this->_relatedObjects['event'] = &$event;
+      $this->_relatedObjects['event'] = $event;
 
-      $participant = new CRM_Event_BAO_Participant();
-      $participant->id = $ids['participant'];
-      if ($ids['participant'] &&
-        !$participant->find(TRUE)
-      ) {
-        throw new Exception("Could not find participant: " . $ids['participant']);
+      foreach ($ids['participant'] ?? [] as $participantID) {
+        $participant = new CRM_Event_BAO_Participant();
+        $participant->id = $participantID;
+        if (!$participant->find(TRUE)) {
+          throw new Exception("Could not find participant: " . $participantID);
+        }
+        $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
+
+        $this->_relatedObjects['participant'][] = $participant;
       }
-      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
-
-      $this->_relatedObjects['participant'] = &$participant;
 
       // get the payment processor id from event - this is inaccurate see CRM-16923
       // in future we should look at throwing an exception here rather than an dubious guess.
@@ -3194,7 +3192,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     else {
-      $values = array_merge($values, $this->loadEventMessageTemplateParams((int) $ids['event'], (int) $this->_relatedObjects['participant']->id, $this->id));
+      $values = array_merge($values,
+        $this->loadEventMessageTemplateParams((int) $ids['event'], (int) $this->_relatedObjects['participant']->id, $this->id)
+      );
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
@@ -4464,7 +4464,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $inputContributionWhiteList[] = 'financial_type_id';
     }
 
-    $participant = CRM_Utils_Array::value('participant', $objects);
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
     $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = CRM_Utils_Array::value('event', $objects);
@@ -4557,9 +4556,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           // @todo this should be set by the function that sends the mail after sending.
           $contributionParams['receipt_date'] = $changeDate;
         }
-        $participantParams['id'] = $participant->id;
-        $participantParams['status_id'] = 'Registered';
-        civicrm_api3('Participant', 'create', $participantParams);
+        foreach ($objects['participant'] as $participantObject) {
+          // Update all related participants to registered
+          $participantParams['id'] = $participantObject->id;
+          $participantParams['status_id'] = 'Registered';
+          civicrm_api3('Participant', 'create', $participantParams);
+        }
       }
     }
 
