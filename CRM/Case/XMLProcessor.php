@@ -83,7 +83,7 @@ class CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  public function &allActivityTypes($indexName = TRUE, $all = FALSE) {
+  public static function &allActivityTypes($indexName = TRUE, $all = FALSE) {
     if (self::$activityTypes === NULL) {
       self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
     }
