@@ -868,7 +868,7 @@ class CRM_Core_Resources {
       '$breakMin' => $params['breakpoint'] . 'px',
       '$breakMax' => ($params['breakpoint'] - 1) . 'px',
       '$menubarColor' => $menubarColor,
-      '$menuItemColor' => $params['menuItemColor'] ?? 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($menubarColor)) . ", .9)",
+      '$menuItemColor' => $params['menuItemColor'] ?? $menubarColor,
       '$highlightColor' => $params['highlightColor'] ?? CRM_Utils_Color::getHighlight($menubarColor),
       '$textColor' => $params['textColor'] ?? CRM_Utils_Color::getContrast($menubarColor, '#333', '#ddd'),
     ];
