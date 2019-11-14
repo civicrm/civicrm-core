@@ -2684,9 +2684,15 @@ div.crm-container form {
   width: 9em;
 }
 
-.crm-container input.dateplugin::placeholder,
-.crm-container input.crm-form-date::placeholder,
-.crm-container input.crm-form-time::placeholder {
+.crm-container input.crm-placeholder-icon::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
+}
+.crm-container input.crm-placeholder-icon::-ms-input-placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
+}
+.crm-container input.crm-placeholder-icon:-ms-input-placeholder {
   font-family: "FontAwesome";
   text-align: right;
 }
