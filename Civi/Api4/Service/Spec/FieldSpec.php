@@ -90,6 +90,16 @@ class FieldSpec {
   protected $serialize;
 
   /**
+   * @var string
+   */
+  protected $helpPre;
+
+  /**
+   * @var string
+   */
+  protected $helpPost;
+
+  /**
    * Aliases for the valid data types
    *
    * @var array
@@ -302,6 +312,34 @@ class FieldSpec {
     $this->inputAttrs = $inputAttrs;
 
     return $this;
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public function getHelpPre() {
+    return $this->helpPre;
+  }
+
+  /**
+   * @param string|NULL $helpPre
+   */
+  public function setHelpPre($helpPre) {
+    $this->helpPre = is_string($helpPre) && strlen($helpPre) ? $helpPre : NULL;
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public function getHelpPost() {
+    return $this->helpPost;
+  }
+
+  /**
+   * @param string|NULL $helpPost
+   */
+  public function setHelpPost($helpPost) {
+    $this->helpPost = is_string($helpPost) && strlen($helpPost) ? $helpPost : NULL;
   }
 
   /**

@@ -58,6 +58,14 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
   public function fields() {
     $fields = parent::fields();
     $fields[] = [
+      'name' => 'help_pre',
+      'data_type' => 'String',
+    ];
+    $fields[] = [
+      'name' => 'help_post',
+      'data_type' => 'String',
+    ];
+    $fields[] = [
       'name' => 'custom_field_id',
       'data_type' => 'Integer',
     ];

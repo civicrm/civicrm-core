@@ -66,6 +66,8 @@ class SpecFormatter {
       $field->setCustomFieldId(ArrayHelper::value('id', $data));
       $field->setCustomGroupName($data['custom_group.name']);
       $field->setTitle(ArrayHelper::value('label', $data));
+      $field->setHelpPre(ArrayHelper::value('help_pre', $data));
+      $field->setHelpPost(ArrayHelper::value('help_post', $data));
       $field->setOptions(self::customFieldHasOptions($data));
       if (\CRM_Core_BAO_CustomField::isSerialized($data)) {
         $field->setSerialize(\CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND);
@@ -144,41 +146,6 @@ class SpecFormatter {
     $inputAttrs = ArrayHelper::value('html', $data, []);
     unset($inputAttrs['type']);
 
-    if (!$inputType) {
-      // If no html type is set, guess
-      switch ($dataTypeName) {
-        case 'Int':
-          $inputType = 'Number';
-          $inputAttrs['min'] = 0;
-          break;
-
-        case 'Text':
-          $inputType = ArrayHelper::value('type', $data) === \CRM_Utils_Type::T_LONGTEXT ? 'TextArea' : 'Text';
-          break;
-
-        case 'Timestamp':
-          $inputType = 'Date';
-          $inputAttrs['time'] = TRUE;
-          break;
-
-        case 'Date':
-          $inputAttrs['time'] = FALSE;
-          break;
-
-        case 'Time':
-          $inputType = 'Date';
-          $inputAttrs['time'] = TRUE;
-          $inputAttrs['date'] = FALSE;
-          break;
-
-        default:
-          $map = [
-            'Email' => 'Email',
-            'Boolean' => 'Checkbox',
-          ];
-          $inputType = ArrayHelper::value($dataTypeName, $map, 'Text');
-      }
-    }
     if (strstr($inputType, 'Multi-Select') || ($inputType == 'Select' && !empty($data['serialize']))) {
       $inputAttrs['multiple'] = TRUE;
       $inputType = 'Select';

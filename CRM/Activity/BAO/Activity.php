@@ -2124,6 +2124,7 @@ AND cl.modified_id  = c.id
         ],
       ];
       $fields = array_merge($Activityfields, $exportableFields);
+      $fields['activity_type_id']['title'] = ts('Activity Type ID');
     }
     else {
       // Set title to activity fields.
