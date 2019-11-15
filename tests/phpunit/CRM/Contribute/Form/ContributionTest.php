@@ -1080,6 +1080,10 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function for FT without tax.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function testSubmitWithOutSaleTax() {
     $this->enableTaxAndInvoicing();
@@ -1104,15 +1108,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals(NULL, $contribution['tax_amount']);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 1);
     $this->callAPISuccessGetCount('FinancialItem', [], 1);
-    $lineItem = $this->callAPISuccessGetSingle(
-      'LineItem',
-      [
-        'contribution_id' => $contribution['id'],
-        'return' => ['line_total', 'tax_amount'],
-      ]
-    );
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'return' => ['line_total', 'tax_amount'],
+    ]);
     $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertTrue(empty($lineItem['tax_amount']));
+    $this->assertEquals(0.00, $lineItem['tax_amount']);
   }
 
   /**
