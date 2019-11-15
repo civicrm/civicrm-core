@@ -478,7 +478,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return;
     }
 
-    $contactField = $this->addEntityRef('contact_id', ts('Contact'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Member'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
     if ($this->_context != 'standalone') {
       $contactField->freeze();
     }
