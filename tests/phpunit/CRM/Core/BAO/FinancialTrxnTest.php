@@ -231,7 +231,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'contribution_status_id' => 8,
+      'contribution_status_id' => 'Pending',
       'payment_instrument_id' => 4,
       'total_amount' => 300.00,
       'fee_amount' => 0.00,
