@@ -200,15 +200,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with not array.
-   */
-  public function testCustomGroupCreateNotArray() {
-    $params = NULL;
-    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
    * Check without title.
    */
   public function testCustomGroupCreateNoTitle() {
@@ -334,15 +325,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   public function testCustomGroupDeleteWithoutGroupID() {
     $customGroup = $this->callAPIFailure('custom_group', 'delete', []);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: id');
-  }
-
-  /**
-   * Check with no array.
-   */
-  public function testCustomGroupDeleteNoArray() {
-    $params = NULL;
-    $customGroup = $this->callAPIFailure('custom_group', 'delete', $params);
-    $this->assertEquals($customGroup['error_message'], 'Input variable `params` is not an array');
   }
 
   /**

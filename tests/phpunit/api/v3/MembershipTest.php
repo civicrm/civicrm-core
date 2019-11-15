@@ -101,14 +101,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_membership_delete() with invalid Membership Id.
-   */
-  public function testMembershipDeleteWithInvalidMembershipId() {
-    $membershipId = 'membership';
-    $this->callAPIFailure('membership', 'delete', $membershipId);
-  }
-
-  /**
    * Test membership deletion and with the preserve contribution param.
    */
   public function testMembershipDeletePreserveContribution() {

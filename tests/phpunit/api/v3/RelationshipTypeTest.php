@@ -250,17 +250,6 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with params Not Array.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypesGetParamsNotArray($version) {
-    $this->_apiversion = $version;
-
-    $results = $this->callAPIFailure('relationship_type', 'get', 'string');
-  }
-
-  /**
    * Check with valid params array.
    * @param int $version
    * @dataProvider versionThreeAndFour

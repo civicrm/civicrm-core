@@ -189,7 +189,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('mailing', 'create', $this->_params);
     $this->_mut->assertRecipients([]);
-    $this->callAPIFailure('job', 'process_mailing', "Failure in api call for job process_mailing:  Job has not been executed as it is a non-production environment.");
+    $result = $this->callAPIFailure('job', 'process_mailing', []);
+    $this->assertEquals($result['error_message'], "Job has not been executed as it is a Staging (non-production) environment.");
 
     // Test with runInNonProductionEnvironment param.
     $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);

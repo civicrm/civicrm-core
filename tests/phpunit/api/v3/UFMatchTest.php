@@ -76,16 +76,6 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGetUFMatchIDWrongParam($version) {
-    $this->_apiversion = $version;
-    $params = 'a string';
-    $result = $this->callAPIFailure('uf_match', 'get', $params);
-  }
-
-  /**
    * Fetch uf id by contact id.
    * @param int $version
    * @dataProvider versionThreeAndFour
@@ -97,16 +87,6 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPIAndDocument('uf_match', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['uf_id'], 42);
-  }
-
-  /**
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGetUFIDWrongParam($version) {
-    $this->_apiversion = $version;
-    $params = 'a string';
-    $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
 
   /**

@@ -1752,9 +1752,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   public function testDeleteParamsNotArrayContribution() {
+    $this->expectException(TypeError::class);
     $params = 'contribution_id= 1';
     $contribution = $this->callAPIFailure('contribution', 'delete', $params);
-    $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
   }
 
   public function testDeleteWrongParamContribution() {

@@ -41,20 +41,6 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  /**
-   * Test that the api responds correctly to null params.
-   *
-   * Do not copy and paste.
-   *
-   * Tests like this that test the wrapper belong in the SyntaxConformance class
-   * (which already has a 'not array test)
-   * I have left this here in case 'null' isn't covered in that class
-   * but don't copy it only any other classes
-   */
-  public function testMailingNullParams() {
-    $this->callAPIFailure('MailingContact', 'get', NULL);
-  }
-
   public function testMailingContactGetFields() {
     $result = $this->callAPISuccess('MailingContact', 'getfields', [
       'action' => 'get',

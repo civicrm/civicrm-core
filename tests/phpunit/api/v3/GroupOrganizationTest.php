@@ -84,17 +84,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_group_organization_get with wrong params.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupOrganizationGetWithWrongParams() {
-    $params = 'groupOrg';
-    $result = $this->callAPIFailure('group_organization', 'get', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
    * Test civicrm_group_organization_get invalid keys.
    *
    * @dataProvider versionThreeAndFour
@@ -150,17 +139,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with invalid params.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupOrganizationCreateParamsNotArray() {
-    $params = 'group_org';
-    $result = $this->callAPIFailure('group_organization', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
    * Check with invalid params keys.
    *
    * @dataProvider versionThreeAndFour
@@ -174,17 +152,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_group_organization_remove methods
-
-  /**
-   * Test civicrm_group_organization_remove with params not an array.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupOrganizationDeleteParamsNotArray() {
-    $params = 'delete';
-    $result = $this->callAPIFailure('group_organization', 'delete', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
 
   /**
    * Test civicrm_group_organization_remove with empty params.

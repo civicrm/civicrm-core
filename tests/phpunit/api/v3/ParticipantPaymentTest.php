@@ -61,14 +61,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_participant_payment_create with wrong params type.
-   */
-  public function testPaymentCreateWrongParamsType() {
-    $params = 'a string';
-    $this->callAPIFailure('participant_payment', 'create', $params);
-  }
-
-  /**
    * Test civicrm_participant_payment_create with empty params.
    */
   public function testPaymentCreateEmptyParams() {
@@ -129,15 +121,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_participant_payment_create methods
-
-  /**
-   * Test civicrm_participant payment create with wrong params type.
-   */
-  public function testPaymentUpdateWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('participant_payment', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
-  }
 
   /**
    * Check with empty array.
@@ -266,14 +249,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'id' => $this->_participantPaymentID,
     ];
     $this->callAPISuccess('participant_payment', 'delete', $params);
-  }
-
-  /**
-   * Test civicrm_participant_payment_delete with wrong params type.
-   */
-  public function testPaymentDeleteWrongParamsType() {
-    $params = 'a string';
-    $this->callAPIFailure('participant_payment', 'delete', $params);
   }
 
   /**

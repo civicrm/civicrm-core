@@ -646,15 +646,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_update methods
 
   /**
-   * Test civicrm_participant_update with wrong params type.
-   */
-  public function testUpdateWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('participant', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
-  }
-
-  /**
    * Check with empty array.
    */
   public function testUpdateEmptyParams() {
@@ -719,14 +710,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_participant_delete methods
-
-  /**
-   * Test civicrm_participant_delete with wrong params type.
-   */
-  public function testDeleteWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('participant', 'delete', $params);
-  }
 
   /**
    * Test civicrm_participant_delete with empty params.

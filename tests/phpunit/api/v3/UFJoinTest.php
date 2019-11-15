@@ -85,17 +85,6 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
-  public function testUFJoinEditWrongParamsType($version) {
-    $this->_apiversion = $version;
-    $params = 'a string';
-    $result = $this->callAPIFailure('uf_join', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
   public function testUFJoinEditWithoutUFGroupId($version) {
     $this->_apiversion = $version;
     $params = [
