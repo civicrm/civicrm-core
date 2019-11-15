@@ -103,7 +103,7 @@
     <div>
       <p>
         {if $hasAccessToAllCases}
-          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><i class="crm-i fa-print"></i> {ts}Print Report{/ts}</a>
+          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn="}"><i class="crm-i fa-print"></i> {ts}Print Report{/ts}</a>
         {/if}
 
         {if !empty($exportDoc)}

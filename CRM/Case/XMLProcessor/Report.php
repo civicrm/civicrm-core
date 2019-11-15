@@ -177,13 +177,6 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
       $map[$aType['id']] = $aType;
     }
 
-    // get all core activities
-    $coreActivityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
-
-    foreach ($coreActivityTypes as $aType) {
-      $map[$aType['id']] = $aType;
-    }
-
     $activityTypeIDs = implode(',', array_keys($map));
     $query = "
 SELECT a.*, c.id as caseID
@@ -776,7 +769,7 @@ LIMIT  1
       $activityTypes = $form->getActivityTypes($xml, $activitySetName);
     }
     else {
-      $activityTypes = CRM_Case_XMLProcessor::allActivityTypes();
+      $activityTypes = CRM_Case_XMLProcessor::allActivityTypes(FALSE, TRUE);
     }
 
     if (!$activityTypes) {
