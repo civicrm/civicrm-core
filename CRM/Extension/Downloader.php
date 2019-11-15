@@ -71,7 +71,7 @@ class CRM_Extension_Downloader {
 
     if (empty($errors) && !CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
       CRM_Core_Session::setStatus(ts('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.'));
-      CRM_Core_Error::debug_log_message('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
+      Civi::log()->debug('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
     }
 
     if ($extensionInfo) {
@@ -105,7 +105,7 @@ class CRM_Extension_Downloader {
     $destDir = $this->containerDir . DIRECTORY_SEPARATOR . $key;
 
     if (!$downloadUrl) {
-      CRM_Core_Error::fatal(ts('Cannot install this extension - downloadUrl is not set!'));
+      throw new CRM_Extension_Exception(ts('Cannot install this extension - downloadUrl is not set!'));
     }
 
     if (!$this->fetch($downloadUrl, $filename)) {
@@ -196,6 +196,7 @@ class CRM_Extension_Downloader {
    * @param $extractedZipPath
    *
    * @return bool
+   * @throws CRM_Core_Exception
    */
   public function validateFiles($key, $extractedZipPath) {
     $filename = $extractedZipPath . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME;
@@ -213,7 +214,7 @@ class CRM_Extension_Downloader {
     }
 
     if ($newInfo->key != $key) {
-      CRM_Core_Error::fatal(ts('Cannot install - there are differences between extdir XML file and archive XML file!'));
+      throw new CRM_Core_Exception(ts('Cannot install - there are differences between extdir XML file and archive XML file!'));
     }
 
     return TRUE;

@@ -32,12 +32,12 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
   /**
    * @param CRM_Extension_Info $info
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function onPreInstall(CRM_Extension_Info $info) {
     $customReports = $this->getCustomReportsByName();
     if (array_key_exists($info->key, $customReports)) {
-      CRM_Core_Error::fatal(ts('This report is already registered.'));
+      throw new CRM_Core_Exception(ts('This report is already registered.'));
     }
 
     if ($info->typeInfo['component'] === 'Contact') {
@@ -48,7 +48,7 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
       $compId = $comp->componentID;
     }
     if (empty($compId)) {
-      CRM_Core_Error::fatal(ts('Component for which you are trying to install the extension (%1) is currently disabled.', [1 => $info->typeInfo['component']]));
+      throw new CRM_Core_Exception(ts('Component for which you are trying to install the extension (%1) is currently disabled.', [1 => $info->typeInfo['component']]));
     }
     $weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
       ['option_group_id' => $this->groupId]
@@ -74,11 +74,6 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
    * @return bool
    */
   public function onPreUninstall(CRM_Extension_Info $info) {
-
-    //        if( !array_key_exists( $info->key, $this->customReports ) ) {
-    //            CRM_Core_Error::fatal( 'This report is not registered.' );
-    //        }
-
     $customReports = $this->getCustomReportsByName();
     $cr = $this->getCustomReportsById();
     $id = $cr[$customReports[$info->key]];
