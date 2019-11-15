@@ -105,7 +105,7 @@ class CRM_Extension_Downloader {
     $destDir = $this->containerDir . DIRECTORY_SEPARATOR . $key;
 
     if (!$downloadUrl) {
-      CRM_Core_Error::fatal('Cannot install this extension - downloadUrl is not set!');
+      CRM_Core_Error::fatal(ts('Cannot install this extension - downloadUrl is not set!'));
     }
 
     if (!$this->fetch($downloadUrl, $filename)) {
@@ -213,7 +213,7 @@ class CRM_Extension_Downloader {
     }
 
     if ($newInfo->key != $key) {
-      CRM_Core_Error::fatal('Cannot install - there are differences between extdir XML file and archive XML file!');
+      CRM_Core_Error::fatal(ts('Cannot install - there are differences between extdir XML file and archive XML file!'));
     }
 
     return TRUE;
