@@ -61,6 +61,7 @@
 {/if}
 
 {* custom data group *}
+{* This shows ACTIVITY custom fields, as opposed to CASE custom fields, so is not a duplicate of the other custom data block below. *}
 {if $groupTree}
     <tr>
        <td colspan="2">{include file="CRM/Custom/Form/CustomData.tpl"}</td>
@@ -97,6 +98,7 @@
     </tr>
 {/if}
 
+{* This shows CASE custom fields, as opposed to ACTIVITY custom fields, so is not a duplicate of the other custom data block above. *}
 <tr class="crm-case-form-block-custom_data">
     <td colspan="2">
       {include file="CRM/common/customDataBlock.tpl"}
