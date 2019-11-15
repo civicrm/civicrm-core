@@ -705,6 +705,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function getTimeZoneString() {
+    $timezone = drupal_get_user_timezone();
+    return $timezone;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function setUFLocale($civicrm_language) {
     $langcode = substr(str_replace('_', '', $civicrm_language), 0, 2);
     $languageManager = \Drupal::languageManager();
