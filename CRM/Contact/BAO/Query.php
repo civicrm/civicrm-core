@@ -1187,7 +1187,10 @@ class CRM_Contact_BAO_Query {
               $this->_select["{$tName}_id"] = "{$aName}.{$pf}_id as `{$tName}_id`";
             }
             else {
-              $this->_select["{$tName}_id"] = "`$tName`.id as `{$tName}_id`";
+              // custom table on address are special and treated after -- see https://lab.civicrm.org/dev/core/issues/1399
+              if (empty($field['custom_field_id']) || !array_key_exists($field['custom_field_id'], $addressCustomFieldIds)) {
+                $this->_select["{$tName}_id"] = "`$tName`.id as `{$tName}_id`";
+              }
             }
 
             $this->_element["{$tName}_id"] = 1;
