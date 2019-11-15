@@ -27,6 +27,8 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
   /**
    * CRM-19722 - Check CRM_Contribute_Form_Task::preProcessCommon()
    * executes without any error after sorting the search result.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPreProcessCommonAfterSorting() {
     $fields = [
@@ -47,6 +49,10 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
         'financial_type_id' => $financialTypes[$i],
         'contribution_status_id' => $status[$i],
       ];
+      if ($status[$i] === 'Partially paid') {
+        $contributionParams['contribution_status_id'] = 'Pending';
+        $contributionParams['api.Payment.create'] = ['total_amount' => 50];
+      }
       $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
       $contributionIds[] = $contribution['id'];
     }

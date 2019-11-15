@@ -1307,7 +1307,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
