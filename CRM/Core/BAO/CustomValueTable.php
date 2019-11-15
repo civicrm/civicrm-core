@@ -420,7 +420,7 @@ class CRM_Core_BAO_CustomValueTable {
     if (!$entityID) {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
-      CRM_Core_Error::fatal('Please file an issue with the backtrace');
+      CRM_Core_Error::fatal(ts('Please file an issue with the backtrace'));
       return NULL;
     }
 

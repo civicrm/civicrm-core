@@ -102,7 +102,7 @@ class CRM_Core_Invoke {
         return CRM_Utils_System::redirect();
       }
       else {
-        CRM_Core_Error::fatal('You do not have permission to execute this url');
+        CRM_Core_Error::fatal(ts('You do not have permission to execute this url'));
       }
     }
   }

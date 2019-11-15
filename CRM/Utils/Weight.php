@@ -424,7 +424,7 @@ class CRM_Utils_Weight {
 
     // Validate $_GET values b/c subsequent code reads $_GET (via CRM_Utils_Request::retrieve)
     if (!$signer->validate($signature, $_GET)) {
-      CRM_Core_Error::fatal('Request signature is invalid');
+      CRM_Core_Error::fatal(ts('Request signature is invalid'));
     }
 
     // Note: Ensure this list matches self::$SIGNABLE_FIELDS

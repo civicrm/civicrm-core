@@ -62,7 +62,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $userSystem = CRM_Core_Config::singleton()->userSystem;
     $session = CRM_Core_Session::singleton();
     if (!is_object($session)) {
-      CRM_Core_Error::fatal('wow, session is not an object?');
+      CRM_Core_Error::fatal(ts('wow, session is not an object?'));
       return;
     }
 

@@ -66,12 +66,12 @@ class CRM_Utils_HttpClient {
   public function fetch($remoteFile, $localFile) {
     // Download extension zip file ...
     if (!function_exists('curl_init')) {
-      CRM_Core_Error::fatal('Cannot install this extension - curl is not installed!');
+      CRM_Core_Error::fatal(ts('Cannot install this extension - curl is not installed!'));
     }
 
     list($ch, $caConfig) = $this->createCurl($remoteFile);
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
-      CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
+      CRM_Core_Error::fatal(ts('Cannot install this extension - does not support SSL'));
     }
 
     $fp = @fopen($localFile, "w");

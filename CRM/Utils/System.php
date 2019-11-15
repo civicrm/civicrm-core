@@ -1075,7 +1075,7 @@ class CRM_Utils_System {
 
       // pattern check
       if (!CRM_Utils_System::isVersionFormatValid($version)) {
-        CRM_Core_Error::fatal('Unknown codebase version.');
+        CRM_Core_Error::fatal(ts('Unknown codebase version.'));
       }
     }
 
@@ -1177,7 +1177,7 @@ class CRM_Utils_System {
       Civi::log()->warning('CiviCRM thinks site is not SSL, redirecting to {url}', ['url' => $url]);
       if (!self::checkURL($url, TRUE)) {
         if ($abort) {
-          CRM_Core_Error::fatal('HTTPS is not set up on this machine');
+          CRM_Core_Error::fatal(ts('HTTPS is not set up on this machine'));
         }
         else {
           CRM_Core_Session::setStatus(ts('HTTPS is not set up on this machine'), ts('Warning'), 'alert');
