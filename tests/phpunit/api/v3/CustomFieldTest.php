@@ -32,16 +32,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with no array.
-   */
-  public function testCustomFieldCreateNoArray() {
-    $fieldParams = NULL;
-
-    $customField = $this->callAPIFailure('custom_field', 'create', $fieldParams);
-    $this->assertEquals($customField['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
    * Check with no label.
    */
   public function testCustomFieldCreateWithoutLabel() {
@@ -405,15 +395,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_custom_field_delete methods
-
-  /**
-   * Check with no array.
-   */
-  public function testCustomFieldDeleteNoArray() {
-    $params = NULL;
-    $customField = $this->callAPIFailure('custom_field', 'delete', $params);
-    $this->assertEquals($customField['error_message'], 'Input variable `params` is not an array');
-  }
 
   /**
    * Check without Field ID.

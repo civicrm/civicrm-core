@@ -811,21 +811,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_get
-   * @param $Entity
-   */
-  public function testEmptyParam_getString($Entity) {
-
-    if (in_array($Entity, $this->toBeImplemented['get'])) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_get to be implemented");
-      return;
-    }
-    $result = $this->callAPIFailure($Entity, 'Get', 'string');
-    $this->assertEquals(2000, $result['error_code']);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
-  }
-
-  /**
-   * @dataProvider entities_get
    * @Xdepends testEmptyParam_get // no need to test the simple if the empty doesn't work/is skipped. doesn't seem to work
    * @param $Entity
    */
@@ -1318,15 +1303,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @dataProvider entities
-   */
-  public function testCreateWrongTypeParamTag_create() {
-    $result = civicrm_api("Tag", 'Create', 'this is not a string');
-    $this->assertEquals(1, $result['is_error']);
-    $this->assertEquals("Input variable `params` is not an array", $result['error_message']);
-  }
-
-  /**
    * @dataProvider entities_updatesingle
    *
    * limitations include the problem with avoiding loops when creating test objects -
@@ -1589,15 +1565,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testInvalidID_delete($Entity) {
     $result = $this->callAPIFailure($Entity, 'Delete', ['id' => 999999]);
-  }
-
-  /**
-   * @dataProvider entities
-   */
-  public function testDeleteWrongTypeParamTag_delete() {
-    $result = civicrm_api("Tag", 'Delete', 'this is not a string');
-    $this->assertEquals(1, $result['is_error']);
-    $this->assertEquals("Input variable `params` is not an array", $result['error_message']);
   }
 
   /**

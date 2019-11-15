@@ -92,14 +92,6 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   ///////////////// civicrm_membershipPayment_get methods
 
   /**
-   * Test civicrm_membershipPayment_get with wrong params type.
-   */
-  public function testGetWrongParamsType() {
-    $params = 'eeee';
-    $GetWrongParamsType = $this->callAPIFailure('membership_payment', 'get', $params, 'Input variable `params` is not an array');
-  }
-
-  /**
    * Test civicrm_membershipPayment_get - success expected.
    */
   public function testGet() {

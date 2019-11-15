@@ -91,13 +91,6 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with No array.
-   */
-  public function testPaymentProcessorTypeDeleteParamsNotArray() {
-    $result = $this->callAPIFailure('payment_processor_type', 'delete', 'string');
-  }
-
-  /**
    * Check if required fields are not passed.
    */
   public function testPaymentProcessorTypeDeleteWithoutRequired() {
@@ -139,14 +132,6 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $params = [];
     $result = $this->callAPIFailure('payment_processor_type', 'create', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: name, title, class_name, billing_mode');
-  }
-
-  /**
-   * Check with No array.
-   */
-  public function testPaymentProcessorTypeUpdateParamsNotArray() {
-    $result = $this->callAPIFailure('payment_processor_type', 'create', 'string');
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
   }
 
   /**

@@ -757,17 +757,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_event_search with wrong params type.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testSearchWrongParamsType($version) {
-    $this->_apiversion = $version;
-    $params = 'a string';
-    $result = $this->callAPIFailure('event', 'get', $params);
-  }
-
-  /**
    * Test civicrm_event_search with empty params.
    * @param int $version
    * @dataProvider versionThreeAndFour
