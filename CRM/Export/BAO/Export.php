@@ -190,6 +190,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $processor->mergeSameAddress();
       }
 
+      if (!empty($exportParams['suppress_csv_for_testing'])) {
+        return [$processor->getTemporaryTable(), $sqlColumns];
+      }
+
       $processor->writeCSVFromTable();
 
       // delete the export temp table and component table

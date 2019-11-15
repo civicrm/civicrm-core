@@ -973,6 +973,7 @@ class CRM_Export_BAO_ExportProcessor {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
+    $row = [];
     $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
     if ($householdMergeRelationshipType) {
       return $this->getRelatedHousehold($iterationDAO->contact_id, $outputColumns);
@@ -1984,7 +1985,6 @@ class CRM_Export_BAO_ExportProcessor {
    * Merge contacts with the same address.
    */
   public function mergeSameAddress() {
-
     $tableName = $this->getTemporaryTable();
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
@@ -2002,8 +2002,9 @@ SELECT    r1.id                 as copy_id,
           r2.addressee          as master_addressee,
           r2.addressee_id       as master_addressee_id
 FROM      $tableName r1
-INNER JOIN civicrm_address adr ON r1.master_id   = adr.id
-INNER JOIN $tableName      r2  ON adr.contact_id = r2.civicrm_primary_id
+INNER JOIN civicrm_address adr1 ON r1.civicrm_primary_id   = adr1.contact_id AND r1.master_id IS NOT NULL
+INNER JOIN civicrm_address adr2 ON adr2.id = adr1.master_id
+INNER JOIN $tableName      r2  ON adr2.contact_id = r2.civicrm_primary_id
 ORDER BY  r1.id";
     $this->buildMasterCopyArray($sql, TRUE);
 
