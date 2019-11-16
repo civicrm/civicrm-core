@@ -2364,11 +2364,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-19945 Tests that Contribute.repeattransaction DOES NOT renew a membership when contribution status=Failed
    *
    * @dataProvider contributionStatusProvider
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionMembershipRenewContributionNotCompleted($contributionStatus) {
     // Completed status should renew so we don't test that here
-    // In Progress status is only for recurring contributions so we don't test that here
-    if (in_array($contributionStatus['name'], ['Completed', 'In Progress'])) {
+    // In Progress status was never actually intended to be available for contributions.
+    // Partially paid is not valid.
+    if (in_array($contributionStatus['name'], ['Completed', 'In Progress', 'Partially paid'])) {
       return;
     }
     list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
