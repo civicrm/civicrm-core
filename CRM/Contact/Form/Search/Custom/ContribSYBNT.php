@@ -213,7 +213,7 @@ count(contrib_1.id) AS donation_count
       !empty($this->exclude_end_date) ||
       !empty($this->is_first_amount)
     ) {
-      $from .= " LEFT JOIN XG_CustomSearch_SYBNT xg ON xg.contact_id = contact_a.id ";
+      $from .= " LEFT JOIN {$this->_xgTableName} xg ON xg.contact_id = contact_a.id ";
     }
 
     return $from;
@@ -253,11 +253,11 @@ count(contrib_1.id) AS donation_count
     ) {
 
       // first create temp table to store contact ids
-      $sql = "DROP TEMPORARY TABLE IF EXISTS XG_CustomSearch_SYBNT";
+      $this->_xgTable = CRM_Utils_SQL_TempTable::build()->setMemory();
+      $this->_xgTableName = $this->_xgTable->getName();
+      $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_xgTableName}";
       CRM_Core_DAO::executeQuery($sql);
-
-      $sql = "CREATE TEMPORARY TABLE XG_CustomSearch_SYBNT ( contact_id int primary key) ENGINE=HEAP";
-      CRM_Core_DAO::executeQuery($sql);
+      $this->_xgTable->createWithColumns('contact_id int primary key');
 
       $excludeClauses = [];
       if ($this->exclude_start_date) {
@@ -290,7 +290,7 @@ count(contrib_1.id) AS donation_count
       if ($excludeClause || $havingClause) {
         // Run subquery
         $query = "
-REPLACE   INTO XG_CustomSearch_SYBNT
+REPLACE   INTO {$this->_xgTableName}
 SELECT   DISTINCT contact_id AS contact_id
 FROM     civicrm_contribution c
 WHERE    c.is_test = 0
@@ -305,7 +305,7 @@ GROUP BY c.contact_id
       // now ensure we dont consider donors that are not first time
       if ($this->is_first_amount) {
         $query = "
-REPLACE  INTO XG_CustomSearch_SYBNT
+REPLACE  INTO {$this->_xgTableName}
 SELECT   DISTINCT contact_id AS contact_id
 FROM     civicrm_contribution c
 WHERE    c.is_test = 0
