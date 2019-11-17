@@ -1619,12 +1619,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->assign('receive_date', $params['receive_date']);
       }
 
-      $participant = [['participant_id', '=', $participants[0]->id, 0, 0]];
-      // check whether its a test drive ref CRM-3075
-      if (!empty($this->_defaultValues['is_test'])) {
-        $participant[] = ['participant_test', '=', 1, 0, 0];
-      }
-
       $customGroup = [];
       //format submitted data
       foreach ($params['custom'] as $fieldID => $values) {
