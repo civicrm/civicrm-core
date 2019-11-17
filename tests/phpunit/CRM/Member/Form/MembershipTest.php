@@ -867,6 +867,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test if membership is updated to New after contribution
    * is updated from Partially paid to Completed.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitUpdateMembershipFromPartiallyPaid() {
     $memStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
@@ -878,15 +881,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('MembershipPayment', [
       'membership_id' => $membership['id'],
     ]);
-
-    //Update contribution to Partially paid.
-    $prevContribution = $this->callAPISuccess('Contribution', 'create', [
-      'id' => $contribution['contribution_id'],
-      'contribution_status_id' => 'Partially paid',
+    $prevContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['contribution_id'],
+      'payment_instrument_id' => 'Cash',
+      'total_amount' => 5,
     ]);
-    $prevContribution = $prevContribution['values'][1];
 
-    //Complete the contribution from offline form.
+    // Complete the contribution from offline form.
     $form = new CRM_Contribute_Form_Contribution();
     $submitParams = [
       'id' => $contribution['contribution_id'],
