@@ -555,19 +555,13 @@ WHERE  id = %1";
    * This function is not really a BAO function so the location is misleading.
    *
    * @param CRM_Core_Form $form
-   * @param int $id
    *   Form entity id.
    * @param string $entityTable
    * @param bool $validOnly
    * @param int $priceSetId
    *   Price Set ID
-   *
-   * @return bool|false|int|null
    */
-  public static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
-    if (!$priceSetId) {
-      $priceSetId = self::getFor($entityTable, $id);
-    }
+  public static function initSet(&$form, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
 
     //check if price set is is_config
     if (is_numeric($priceSetId)) {
@@ -650,10 +644,7 @@ WHERE  id = %1";
       }
       $form->set('priceSetId', $form->_priceSetId);
       $form->set('priceSet', $form->_priceSet);
-
-      return $priceSetId;
     }
-    return FALSE;
   }
 
   /**
