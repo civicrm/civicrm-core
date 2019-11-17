@@ -193,7 +193,7 @@ ORDER BY   donation_amount desc
 
     if ($justIDs) {
       $tempTable = CRM_Utils_SQL_TempTable::build()->createWithQuery($sql);
-      $sql = "SELECT contact_a.id as contact_id FROM {$tempTable->getName()} as contact_a";
+      $sql = "SELECT contact_a.id as contact_id FROM {$tempTable->getName()} c INNER JOIN civicrm_contact contact_a ON c.id = contact_a.id";
     }
     return $sql;
   }
