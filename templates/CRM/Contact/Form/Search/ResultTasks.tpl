@@ -83,12 +83,15 @@
         {$form.task.html}
      {/if}
      {if $action eq 512}
-       {$form._qf_Advanced_next_action.html}
+       {$form.$actionButtonName.html}
      {elseif $action eq 8192}
+       {* todo - just use action button name per above  - test *}
        {$form._qf_Builder_next_action.html}&nbsp;&nbsp;
      {elseif $action eq 16384}
+       {* todo - just use action button name per above - test *}
        {$form._qf_Custom_next_action.html}&nbsp;&nbsp;
      {else}
+       {* todo - just use action button name per above  - test *}
        {$form._qf_Basic_next_action.html}
      {/if}
      </td>
