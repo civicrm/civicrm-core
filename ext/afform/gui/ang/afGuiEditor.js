@@ -384,6 +384,28 @@
           }
         };
 
+        // Validates that a drag-n-drop action is allowed
+        $scope.onDrop = function(event, ui) {
+          var sort = ui.item.sortable;
+          // Check if this is a callback for an item dropped into a different container
+          // @see https://github.com/angular-ui/ui-sortable notes on canceling
+          if (!sort.received && sort.source[0] !== sort.droptarget[0]) {
+            var $source = $(sort.source[0]),
+              $target = $(sort.droptarget[0]),
+              $item = $(ui.item[0]);
+            // Fields cannot be dropped outside their own entity
+            if ($item.is('[af-gui-field]') || $item.has('[af-gui-field]').length) {
+              if ($source.closest('[data-entity]').attr('data-entity') !== $target.closest('[data-entity]').attr('data-entity')) {
+                return sort.cancel();
+              }
+            }
+            // Entity-fieldsets cannot be dropped into other entity-fieldsets
+            if (($item.is('[data-entity]') || $item.has('[data-entity]').length) && $target.closest('[data-entity]').length) {
+              return sort.cancel();
+            }
+          }
+        };
+
         $scope.tags = {
           div: ts('Block'),
           fieldset: ts('Fieldset')
