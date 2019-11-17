@@ -38,22 +38,23 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       'name' => 'case_status',
       'format.only_id' => 1,
     ));
-    $optionValues = array(
+    $optionValues = [
       'Medical evaluation' => 'Medical evaluation',
       'Mental health evaluation' => "Mental health evaluation",
       'Secure temporary housing' => 'Secure temporary housing',
       'Long-term housing plan' => 'Long-term housing plan',
       'ADC referral' => 'ADC referral',
       'Income and benefits stabilization' => 'Income and benefits stabilization',
-    );
+    ];
     foreach ($optionValues as $name => $label) {
-      $activityTypes = $this->callAPISuccess('option_value', 'Create', array(
-        'option_group_id' => 2,
+      $activityTypes = CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+        'option_group_id' => 'activity_type',
         'name' => $name,
         'label' => $label,
-        'component_id' => 7,
-      ));
+        'component_id' => 'CiviCase',
+      ]);
       // store for cleanup
+      // @todo is this ever used?
       $this->optionValues[] = $activityTypes['id'];
     }
 
