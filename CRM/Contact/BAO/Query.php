@@ -7217,10 +7217,10 @@ AND   displayRelType.is_active = 1
   public function handleWhereFromMetadata($fieldSpec, $name, $value, $op, $grouping = 0) {
     $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldSpec['where'], $op, $value, CRM_Utils_Type::typeToString($fieldSpec['type']));
     $this->_qill[$grouping][] = $this->getQillForField($name, $value, $op, $fieldSpec);
-    if (!isset($query->_tables[$fieldSpec['table_name']])) {
+    if (!isset($this->_tables[$fieldSpec['table_name']])) {
       $this->_tables[$fieldSpec['table_name']] = 1;
     }
-    if (!isset($query->_whereTables[$fieldSpec['table_name']])) {
+    if (!isset($this->_whereTables[$fieldSpec['table_name']])) {
       $this->_whereTables[$fieldSpec['table_name']] = 1;
     }
   }
