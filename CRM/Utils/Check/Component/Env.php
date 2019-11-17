@@ -891,8 +891,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     // Use mysqli_query() to avoid logging an error message.
-    if (mysqli_query(CRM_Core_DAO::getConnection()->connection, 'CREATE TEMPORARY TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB')) {
-      CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE civicrm_utf8mb4_test');
+    $mb4testTableName = CRM_Utils_SQL_TempTable::build()->setCategory('utf8mb4test')->getName();
+    if (mysqli_query(CRM_Core_DAO::getConnection()->connection, 'CREATE TEMPORARY TABLE ' . $mb4testTableName . ' (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB')) {
+      CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE ' . $mb4testTableName);
     }
     else {
       $messages[] = new CRM_Utils_Check_Message(
