@@ -118,14 +118,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     $now = date('YmdHis');
 
-    // fix dates that already exist
-    $dates = ['create_date', 'start_date', 'end_date', 'cancel_date', 'modified_date'];
-    foreach ($dates as $name) {
-      if ($recur->$name) {
-        $recur->$name = CRM_Utils_Date::isoToMysql($recur->$name);
-      }
-    }
-
     //load new contribution object if required.
     if (!$first) {
       // create a contribution and then get it processed
