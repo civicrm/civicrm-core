@@ -6,50 +6,7 @@
         <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-block-button" data-toggle="dropdown" title="{{ ts('Configure') }}">
           <span><i class="crm-i fa-gear"></i></span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open">
-          <li title="{{ ts('Field type') }}">
-            <a href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
-              <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}">
-                <option ng-repeat="(type, label) in editor.meta.inputType" value="{{ type }}" ng-if="inputTypeCanBe(type)">{{ label }}</option>
-              </select>
-            </a>
-          </li>
-          <li title="{{ ts('Require this field') }}">
-            <a href ng-click="toggleRequired(); $event.stopPropagation();">
-              <i class="crm-i" ng-class="{'fa-square-o': !getProp('required'), 'fa-check-square-o': getProp('required')}"></i>
-              {{ ts('Required') }}
-            </a>
-          </li>
-          <li title="{{ ts('Show help text above this field') }}">
-            <a href ng-click="toggleHelp('pre'); $event.stopPropagation();">
-              <i class="crm-i" ng-class="{'fa-square-o': !propIsset('help_pre'), 'fa-check-square-o': propIsset('help_pre')}"></i>
-              {{ ts('Pre help text') }}
-            </a>
-          </li>
-          <li title="{{ ts('Show help text below this field') }}">
-            <a href ng-click="toggleHelp('post'); $event.stopPropagation();">
-              <i class="crm-i" ng-class="{'fa-square-o': !propIsset('help_post'), 'fa-check-square-o': propIsset('help_post')}"></i>
-              {{ ts('Post help text') }}
-            </a>
-          </li>
-          <li role="separator" class="divider" ng-if="hasOptions()"></li>
-          <li title="{{ ts('Reset the option list for this field') }}" ng-if="hasOptions()" ng-click="$event.stopPropagation()">
-            <a href ng-click="resetOptions()">
-              <i class="crm-i fa-{{ node.defn.options ? '' : 'check-' }}circle-o"></i>
-              {{ ts('Use default option list') }}
-            </a>
-          </li>
-          <li title="{{ ts('Customize the option list for this field') }}" ng-if="hasOptions()">
-            <a href ng-click="editOptions()">
-              <i class="crm-i fa-{{ !node.defn.options ? '' : 'check-' }}circle-o"></i>
-              {{ ts('Customize field options') }}
-            </a>
-          </li>
-          <li role="separator" class="divider"></li>
-          <li title="{{ ts('Remove field from form') }}">
-            <a href ng-click="block.removeBlock(node)"><span class="text-danger">{{ ts('Delete this field') }}</span></a>
-          </li>
-        </ul>
+        <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open" ng-include="'~/afGuiEditor/field-menu.html'"></ul>
       </div>
     </div>
   </div>

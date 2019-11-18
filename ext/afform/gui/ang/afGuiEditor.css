@@ -262,13 +262,30 @@
   left: -4px;
 }
 
-#afGuiEditor li a.af-gui-field-select-in-dropdown {
-  padding-top: 2px;
-  padding-bottom: 2px;
-  background-color: white !important;
+#afGuiEditor .dropdown-menu li {
   cursor: default;
 }
 
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
+  padding: 2px 19px 2px 21px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.5384615385;
+  color: #4d4d69;
+  white-space: nowrap;
+}
+
+#afGuiEditor .dropdown-menu li > * > label {
+  font-weight: normal;
+}
+
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {
+  max-width: 120px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* For editing field placeholder text */
 #afGuiEditor .af-gui-field-input input[type=text].form-control {
   color: #9a9a9a;
 }

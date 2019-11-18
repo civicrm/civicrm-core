@@ -4,17 +4,7 @@
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-block-button" data-toggle="dropdown" title="{{ ts('Configure') }}">
         <span><i class="crm-i fa-gear"></i></span>
       </button>
-      <ul class="dropdown-menu" ng-if="menu.open">
-        <li title="{{ ts('Button style') }}">
-          <a href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown" >
-            <select class="form-control {{ getSetStyle().replace('btn', 'text') }}" ng-model="getSetStyle" ng-model-options="{getterSetter: true}">
-              <option ng-repeat="(style, label) in styles" class="{{ style.replace('btn', 'bg') }}" value="{{ style }}">{{ ts('Color: %1', {1: label}) }}</option>
-            </select>
-          </a>
-        </li>
-        <li role="separator" class="divider"></li>
-        <li><a href ng-click="block.removeBlock(node)"><span class="text-danger">{{ ts('Delete this button') }}</span></a></li>
-      </ul>
+      <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/button-menu.html'"></ul>
     </div>
   </div>
 </div>
