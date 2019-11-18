@@ -166,6 +166,10 @@
   organization: British Humanist Association
   jira        : awestbha
 
+- github      : bjendres
+  name        : Björn Endres
+  organization: SYSTOPIA Organisationsberatung
+
 - name        : Ben Jarlett
   jira        : benjarlett
 
@@ -565,6 +569,10 @@
   organization: Hartmann Computer Consulting
   jira        : peterhartmann
 
+- name        : Heather Oliver
+  organization: Red Hot Irons
+  github      : HROliver
+  
 - name        : Heather Oliver
   organization: GMCVO Databases
   jira        : heather oliver
@@ -1029,6 +1037,10 @@
   name        : Monish Deb
   organization: JMA Consulting
   jira        : monish.deb
+
+- github      : mountev
+  organization: Mountev Ltd
+  name        : Mountev Ltd
 
 - name        : Martin Peth
   organization: Systopia
