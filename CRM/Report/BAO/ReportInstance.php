@@ -267,7 +267,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
     if ($instance->find(TRUE)) {
       CRM_Core_DAO::storeValues($instance, $defaults);
-      $instance->free();
       return $instance;
     }
     return NULL;

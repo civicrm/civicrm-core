@@ -594,6 +594,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
+
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
@@ -862,7 +863,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       $eventId = CRM_Utils_Array::value('event_id', $values);
-      if (!empty($contactId) && !empty($eventId)) {
+
+      $event = new CRM_Event_DAO_Event();
+      $event->id = $eventId;
+      $event->find(TRUE);
+
+      if (!$event->allow_same_participant_emails && !empty($contactId) && !empty($eventId)) {
         $cancelledStatusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Cancelled');
         $dupeCheck = new CRM_Event_BAO_Participant();
         $dupeCheck->contact_id = $contactId;
@@ -1250,10 +1256,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // CRM-15622: fix for incorrect contribution.fee_amount
       $paymentParams['fee_amount'] = NULL;
-      $result = $payment->doPayment($paymentParams);
-
-      if (is_a($result, 'CRM_Core_Error')) {
-        CRM_Core_Error::displaySessionError($result);
+      try {
+        $result = $payment->doPayment($paymentParams);
+      }
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        // @todo un comment the following line out when we are creating a contribution before we get to this point
+        // see dev/financial#53 about ensuring we create a pending contribution before we try processing payment
+        // CRM_Contribute_BAO_Contribution::failPayment($contributionID);
+        CRM_Core_Session::singleton()->setStatus($e->getMessage());
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/participant',
           "reset=1&action=add&cid={$this->_contactId}&context=participant&mode={$this->_mode}"
         ));

@@ -5,12 +5,6 @@
 
 // ODDITY: This only loads if CiviCase is active.
 
-CRM_Core_Resources::singleton()->addSetting([
-  'crmCaseType' => [
-    'REL_TYPE_CNAME' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
-  ],
-]);
-
 return [
   'ext' => 'civicrm',
   'js' => ['ang/crmCaseType.js'],

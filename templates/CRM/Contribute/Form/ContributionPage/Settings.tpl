@@ -38,6 +38,9 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
   <tr class="crm-contribution-contributionpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='title' id=$contributionPageID}{/if}</td><td>{$form.title.html}<br/>
+            <span class="description">{ts}This title will be displayed at the top of the page unless the frontend title field is filled out.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</td>
+  </tr>
+  <tr class="crm-contribution-contributionpage-settings-form-block-frontend-title"><td class="label">{$form.contribution_page_frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='frontend_title' id=$contributionPageID}{/if}</td><td>{$form.contribution_page_frontend_title.html}<br/>
             <span class="description">{ts}This title will be displayed at the top of the page.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</td>
   </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-financial_type_id"><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}<br />
@@ -153,16 +156,20 @@
         <td>&nbsp;</td>
         <td>{$form.is_share.html} {$form.is_share.label} {help id="id-is_share"}</td>
       </tr>
-    <tr class="crm-contribution-contributionpage-settings-form-block-is_active"><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}<br />
+        <tr class="crm-contribution-contributionpage-settings-form-block-is_active">
+        <td>&nbsp;</td>  
+        <td>{$form.is_active.html} {$form.is_active.label}</td>
+      </tr>
   {if $contributionPageID}
-        <span class="description">
+        <tr class="crm-contribution-contributionpage-settings-form-block-info_link">
+        <td>&nbsp;</td>  
+        <td class="description">
           {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
               {ts}When your page is active, you can link people to the page by copying and pasting the following URL:{/ts}<br />
               <strong>{crmURL a=1 fe=1 p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}</strong>
           {elseif $config->userFramework EQ 'Joomla'}
               {ts 1=$title}When your page is active, create front-end links to the contribution page using the Menu Manager. Select <strong>Administer CiviCRM &raquo; CiviContribute &raquo; Manage Contribution Pages</strong> and select <strong>%1</strong> for the contribution page.{/ts}
           {/if}
-    </span>
       {/if}
   </td>
   </tr>

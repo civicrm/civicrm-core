@@ -159,8 +159,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->assign('pendingRefund', array_search('Pending refund', $statuses));
     $this->assign('participantStatus', $this->_participantStatus);
 
-    $config = CRM_Core_Config::singleton();
-    $this->assign('currencySymbol', $config->defaultCurrencySymbol);
+    $this->assign('currencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
 
     // line items block
     $lineItem = $event = [];
@@ -244,7 +243,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     // email sending
     if (!empty($params['send_receipt'])) {
       $fetchParticipantVals = ['id' => $this->_participantId];
-      CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails, CRM_Core_DAO::$_nullArray);
+      CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
       $participantParams = array_merge($params, $participantDetails[$this->_participantId]);
       $mailSent = $this->emailReceipt($participantParams);
     }

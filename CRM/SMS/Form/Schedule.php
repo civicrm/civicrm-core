@@ -32,6 +32,8 @@
  */
 class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
+  public $submitOnce = TRUE;
+
   /**
    * Set variables up before form is built.
    */
@@ -86,7 +88,6 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
         'name' => ts('Submit Mass SMS'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
-        'js' => ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"],
       ],
       [
         'type' => 'cancel',

@@ -471,6 +471,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @deprecated
    */
   public function addressSequence() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Address::sequence(Civi::settings()->get(\'address_format\')');
     return CRM_Utils_Address::sequence(Civi::settings()->get('address_format'));
   }
 
@@ -478,6 +479,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @deprecated
    */
   public function defaultContactCountry() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountry');
     return CRM_Core_BAO_Country::defaultContactCountry();
   }
 
@@ -485,6 +487,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @deprecated
    */
   public function defaultContactCountryName() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountryName');
     return CRM_Core_BAO_Country::defaultContactCountryName();
   }
 
@@ -496,6 +499,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @return string
    */
   public function defaultCurrencySymbol($defaultCurrency = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultCurrencySymbol');
     return CRM_Core_BAO_Country::defaultCurrencySymbol($defaultCurrency);
   }
 
@@ -561,7 +565,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       WHERE is_domain = 1 AND name = "installed"
     ');
     while ($dao->fetch()) {
-      $value = unserialize($dao->value);
+      $value = CRM_Utils_String::unserialize($dao->value);
       if (!empty($value)) {
         Civi::settings()->set('installed', 1);
         return;

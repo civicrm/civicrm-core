@@ -61,6 +61,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return CRM_Price_BAO_PriceField
    */
   public static function add(&$params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'PriceField', CRM_Utils_Array::value('id', $params), $params);
+
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
@@ -70,6 +73,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
 
     $priceFieldBAO->save();
+    CRM_Utils_Hook::post($hook, 'PriceField', $priceFieldBAO->id, $priceFieldBAO);
     return $priceFieldBAO;
   }
 
@@ -82,7 +86,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_DAO_PriceField
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function create(&$params) {
     if (empty($params['id']) && empty($params['name'])) {
@@ -110,6 +116,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       ]);
       foreach ($fieldOptions['values'] as $option) {
         $optionsIds['id'] = $option['id'];
+        $params['option_id'] = [1 => $option['id']];
         // CRM-19741 If we are dealing with price fields that are Text only set the field value label to match
         if (!empty($params['id']) && $priceField->label != $option['label']) {
           $fieldValue = new CRM_Price_DAO_PriceFieldValue();
@@ -171,10 +178,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
         if ($opIds = CRM_Utils_Array::value('option_id', $params)) {
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
-            $optionsIds['id'] = $opId;
+            $options['id'] = $opId;
           }
           else {
-            $optionsIds['id'] = NULL;
+            $options['id'] = NULL;
           }
         }
         try {

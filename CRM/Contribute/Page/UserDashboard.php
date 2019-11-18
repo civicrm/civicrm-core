@@ -96,7 +96,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $recur->is_test = 0;
     $recur->find();
 
-    $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
 
     $recurRow = [];
     $recurIDs = [];

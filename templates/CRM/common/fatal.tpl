@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* error.tpl: Display page for fatal errors. Provides complete HTML doc.*}
-{if $config->userFramework != 'Joomla' and $config->userFramework != 'WordPress'}
+{if $config->userFramework != 'WordPress'}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
@@ -89,7 +89,7 @@ function toggle( element ) {
 }
 </script>
 {/literal}
-{if $config->userFramework != 'Joomla' and $config->userFramework != 'WordPress'}
+{if $config->userFramework != 'WordPress'}
 </body>
 </html>
 {/if}

@@ -640,4 +640,29 @@ LIMIT 1
     return $statuses;
   }
 
+  /**
+   * CRM-8254 / CRM-6907 - override default currency if applicable
+   * these lines exist to support a non-default currency on the form but are probably
+   * obsolete & meddling wth the defaultCurrency is not the right approach....
+   *
+   * @param array $params
+   */
+  public static function overrideDefaultCurrency($params) {
+    $config = CRM_Core_Config::singleton();
+    $config->defaultCurrency = CRM_Utils_Array::value('currency', $params, $config->defaultCurrency);
+  }
+
+  /**
+   * Get either the public title if set or the title of a contribution page for use in workflow message template.
+   * @param int $contribution_page_id
+   * @return string
+   */
+  public static function getContributionPageTitle($contribution_page_id) {
+    $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contribution_page_id, 'frontend_title');
+    if (empty($title)) {
+      $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contribution_page_id, 'title');
+    }
+    return $title;
+  }
+
 }

@@ -156,7 +156,7 @@ class CRM_Core_BAO_ConfigSetting {
 
         //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
         // Ed: This doesn't sound good.
-        // CRM_Core_BAO_Cache::deleteGroup('navigation');
+        // Civi::cache('navigation')->flush();
       }
       else {
         $requestLocale = NULL;

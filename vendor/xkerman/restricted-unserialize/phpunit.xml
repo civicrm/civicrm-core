@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+  <testsuites>
+    <testsuite name="restricted-unserialize">
+      <directory>test</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist processUncoveredFilesFromWhitelist="true">
+      <directory suffix=".php">src</directory>
+    </whitelist>
+  </filter>
+  <logging>
+    <log type="coverage-clover" target="report/coverage/clover.xml" />
+    <log type="coverage-html" target="report/coverage" />
+    <log type="coverage-text" target="php://stdout" showOnlySummary="true" />
+  </logging>
+  <php>
+    <ini name="error_reporting" value="-1" />
+  </php>
+</phpunit>

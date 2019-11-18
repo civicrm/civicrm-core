@@ -416,10 +416,8 @@ WHERE  v.option_group_id = g.id
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
     if ($dao->fetch()) {
-      $dao->free();
       return $dao->value;
     }
-    $dao->free();
     return NULL;
   }
 

@@ -605,9 +605,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
         }
 
         if ($addCaptcha && !$viewOnly) {
-          $captcha = CRM_Utils_ReCAPTCHA::singleton();
-          $captcha->add($this);
-          $this->assign("isCaptcha", TRUE);
+          CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
         }
       }
     }

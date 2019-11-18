@@ -54,7 +54,7 @@
       <td class="label">
         <label>{ts}Total amount entered{/ts}</label>
       </td>
-      <td class="right">{$config->defaultCurrencySymbol} <span class="batch-actual-total"></span></td>
+      <td class="right">{$defaultCurrencySymbol} <span class="batch-actual-total"></span></td>
     </tr>
   </table>
 

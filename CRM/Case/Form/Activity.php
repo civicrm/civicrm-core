@@ -178,29 +178,20 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $caseType = $this->_caseType[$casePos];
         $activityInst = $xmlProcessor->getMaxInstance($caseType);
 
-        // If not bounce back and also provide activity edit link
+        // If not bounce back and also provide activity edit link if only one existing activity
         if (isset($activityInst[$this->_activityTypeName])) {
           $activityCount = CRM_Case_BAO_Case::getCaseActivityCount($caseId, $this->_activityTypeId);
-          if ($activityCount >= $activityInst[$this->_activityTypeName]) {
-            if ($activityInst[$this->_activityTypeName] == 1) {
-              $atArray = ['activity_type_id' => $this->_activityTypeId];
-              $activities = CRM_Case_BAO_Case::getCaseActivity($caseId,
-                $atArray,
-                $this->_currentUserId
-              );
-              $activityId = CRM_Utils_Array::first(array_keys($activities['data']));
-              $editUrl = CRM_Utils_System::url('civicrm/case/activity',
-                "reset=1&cid={$this->_currentlyViewedContactId}&caseid={$caseId}&action=update&id={$activityId}"
-              );
-            }
-            CRM_Core_Error::statusBounce(ts("You can not add another '%1' activity to this case. %2",
-                [
-                  1 => $this->_activityTypeName,
-                  2 => ts("Do you want to <a %1>edit the existing activity</a>?", [1 => "href='$editUrl'"]),
-                ]
-              ),
-              $url
-            );
+          $editUrl = self::checkMaxInstances(
+            $caseId,
+            $this->_activityTypeId,
+            $activityInst[$this->_activityTypeName],
+            $this->_currentUserId,
+            $this->_currentlyViewedContactId,
+            $activityCount
+          );
+          $bounceMessage = self::getMaxInstancesBounceMessage($editUrl, $this->_activityTypeName, $activityInst[$this->_activityTypeName], $activityCount);
+          if ($bounceMessage) {
+            CRM_Core_Error::statusBounce($bounceMessage, $url);
           }
         }
       }
@@ -743,6 +734,95 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     ]);
 
     return array_column($definitions['values'], 'definition', 'name');
+  }
+
+  /**
+   * Get the edit link for a case activity
+   *
+   * This isn't here for reusability - it was a pull out
+   * from preProcess to make it easier to test.
+   * There is CRM_Case_Selector_Search::addCaseActivityLinks but it would
+   * need some rejigging, and there's also a FIXME note there already.
+   *
+   * @param int $caseId
+   * @param int $activityTypeId
+   * @param int $currentUserId
+   * @param int $currentlyViewedContactId
+   *
+   * @return string
+   */
+  public static function getCaseActivityEditLink($caseId, $activityTypeId, $currentUserId, $currentlyViewedContactId) {
+    $atArray = ['activity_type_id' => $activityTypeId];
+    $activities = CRM_Case_BAO_Case::getCaseActivity($caseId,
+      $atArray,
+      $currentUserId
+    );
+    $firstActivity = CRM_Utils_Array::first($activities['data']);
+    $activityId = empty($firstActivity['DT_RowId']) ? 0 : $firstActivity['DT_RowId'];
+    return CRM_Utils_System::url('civicrm/case/activity',
+      "reset=1&cid={$currentlyViewedContactId}&caseid={$caseId}&action=update&id={$activityId}"
+    );
+  }
+
+  /**
+   * Check the current activity count against max instances for a given case id and activity type.
+   *
+   * This isn't here for reusability - it was a pull out
+   * from preProcess to make it easier to test.
+   *
+   * @param int $caseId
+   * @param int $activityTypeId
+   * @param int $maxInstances
+   * @param int $currentUserId
+   * @param int $currentlyViewedContactId
+   * @param int $activityCount
+   *
+   * @return string
+   *   If there is more than one existing activity of the given type then it's not clear which url to return so return null for the url.
+   */
+  public static function checkMaxInstances($caseId, $activityTypeId, $maxInstances, $currentUserId, $currentlyViewedContactId, $activityCount) {
+    $editUrl = NULL;
+    if ($activityCount >= $maxInstances) {
+      if ($maxInstances == 1) {
+        $editUrl = self::getCaseActivityEditLink($caseId, $activityTypeId, $currentUserId, $currentlyViewedContactId);
+      }
+    }
+    return $editUrl;
+  }
+
+  /**
+   * Compute the message text for the bounce message when max_instances is reached, depending on whether it's one or more than one.
+   *
+   * @param string $editUrl
+   * @param string $activityTypeName
+   *   This is actually label!! But we do want label though in this function.
+   * @param int $maxInstances
+   * @param int $activityCount
+   *   Count of existing activities of the given type on the case
+   *
+   * @return string
+   */
+  public static function getMaxInstancesBounceMessage($editUrl, $activityTypeName, $maxInstances, $activityCount) {
+    $bounceMessage = NULL;
+    if ($activityCount >= $maxInstances) {
+      if ($maxInstances == 1) {
+        $bounceMessage = ts("You can not add another '%1' activity to this case. %2",
+          [
+            1 => $activityTypeName,
+            2 => ts("Do you want to <a %1>edit the existing activity</a>?", [1 => "href='$editUrl'"]),
+          ]
+        );
+      }
+      else {
+        // More than one instance, so don't provide a link. What would it be a link to anyway?
+        $bounceMessage = ts("You can not add another '%1' activity to this case.",
+          [
+            1 => $activityTypeName,
+          ]
+        );
+      }
+    }
+    return $bounceMessage;
   }
 
 }

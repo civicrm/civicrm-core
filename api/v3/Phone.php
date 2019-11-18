@@ -56,6 +56,10 @@ function _civicrm_api3_phone_create_spec(&$params) {
   $params['phone']['api.required'] = 1;
   // hopefully change to use handleprimary
   $params['is_primary']['api.default'] = 0;
+  $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+  if ($defaultLocation) {
+    $params['location_type_id']['api.default'] = $defaultLocation->id;
+  }
 }
 
 /**

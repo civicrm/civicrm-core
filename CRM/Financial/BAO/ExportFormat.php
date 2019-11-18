@@ -209,11 +209,10 @@ abstract class CRM_Financial_BAO_ExportFormat {
 
     // create activity.
     $subject .= ' ' . ts('Batch') . '[' . $values['title'] . ']';
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
     $activityParams = [
-      'activity_type_id' => array_search('Export Accounting Batch', $activityTypes),
+      'activity_type_id' => 'Export Accounting Batch',
       'subject' => $subject,
-      'status_id' => 2,
+      'status_id' => 'Completed',
       'activity_date_time' => date('YmdHis'),
       'source_contact_id' => $session->get('userID'),
       'source_record_id' => $values['id'],
@@ -226,8 +225,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
         'upload_date' => date('YmdHis'),
       ],
     ];
-
-    CRM_Activity_BAO_Activity::create($activityParams);
+    civicrm_api3('Activity', 'create', $activityParams);
   }
 
   /**

@@ -180,6 +180,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ],
           'cancel_date' => [
             'title' => ts('Cancelled / Refunded Date'),
+            'name' => 'contribution_cancel_date',
           ],
           'cancel_reason' => [
             'title' => ts('Cancellation / Refund Reason'),
@@ -235,7 +236,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
             'default' => [1],
             'type' => CRM_Utils_Type::T_INT,
           ],
@@ -243,6 +244,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'cancel_date' => [
             'title' => ts('Cancelled / Refunded Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'name' => 'contribution_cancel_date',
           ],
           'cancel_reason' => [
             'title' => ts('Cancellation / Refund Reason'),
@@ -378,7 +380,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $contributionOrSoftVal = $this->getElementValue('contribution_or_soft_value');
     if ($contributionOrSoftVal[0] == 'contributions_only') {
       $groupBySoft = $this->getElementValue('group_bys');
-      if (CRM_Utils_Array::value('soft_credit_id', $groupBySoft)) {
+      if (!empty($groupBySoft['soft_credit_id'])) {
         $this->setElementError('group_bys', ts('You cannot group by soft credit when displaying contributions only.  Please uncheck "Soft Credit" in the Grouping tab.'));
       }
     }
@@ -631,7 +633,7 @@ UNION ALL
     $entryFound = FALSE;
     $display_flag = $prev_cid = $cid = 0;
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
     $batches = CRM_Batch_BAO_Batch::getBatches();

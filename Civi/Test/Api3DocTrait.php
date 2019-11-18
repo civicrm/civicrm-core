@@ -123,8 +123,10 @@ trait Api3DocTrait {
       if (!is_dir($civicrm_root . "/api/v3/examples/$entity")) {
         mkdir($civicrm_root . "/api/v3/examples/$entity");
       }
-      $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.php", "w+b");
-      fwrite($f, $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl'));
+      $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.ex.php", "w+b");
+      $contents = $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl');
+      $contents = \CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
+      fwrite($f, $contents);
       fclose($f);
     }
   }

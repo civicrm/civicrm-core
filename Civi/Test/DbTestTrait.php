@@ -169,10 +169,13 @@ trait DbTestTrait {
    *
    * Example: $this->assertSql(2, 'select count(*) from foo where foo.bar like "%1"',
    * array(1 => array("Whiz", "String")));
+   *
    * @param $expected
    * @param $query
    * @param array $params
    * @param string $message
+   *
+   * @throws \Exception
    */
   public function assertDBQuery($expected, $query, $params = array(), $message = '') {
     if ($message) {

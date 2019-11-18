@@ -232,7 +232,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $contact_id = NULL
   ) {
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $open = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();

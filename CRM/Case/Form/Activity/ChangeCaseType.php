@@ -119,7 +119,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       $params['id'] = $form->_id;
     }
 
-    if (CRM_Utils_Array::value('is_reset_timeline', $params) == 0) {
+    if (empty($params['is_reset_timeline'])) {
       unset($params['reset_date_time']);
     }
   }

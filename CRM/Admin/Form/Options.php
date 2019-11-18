@@ -400,7 +400,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
       if ($validate === FALSE) {
         CRM_Core_Session::setStatus(
-          ts('Data Type of the value field for this option value does not match ' . $dataType),
+          ts('Data Type of the value field for this option value does not match %1.', [1 => $dataType]),
           ts('Value field Data Type mismatch'));
       }
     }

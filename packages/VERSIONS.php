@@ -8,6 +8,7 @@
  *  + Introduction
  *  + License Abbreviations
  *  + How-To: Manual upgrade of a forked package
+ *  + How-To: Migrate a package to composer
  *  + Package List: PEAR
  *  + Package List: Manually installed
  *  + Package List: Payment processors
@@ -53,13 +54,53 @@
  * How-To: Manual upgrade of a forked package
  * ==========================================
  *
- * 1. download old version of upstream and overwrite packages with it (pear install Archive_Tar-1.3.3)
+ * 1. download old version of upstream and overwrite packages with it (pear install Archive_Tar-1.3.3).
+ *    If the version is not obvious, you may need to check a few different versions.
  * 2. if there are differences, it means we patched the package – do a *reverse* diff and save to a patch file (git diff -R > /tmp/Archive_Tar.diff)
  * 3. download current version and overwrite
  * 4. if there were differences, copy any files that we patched in the old version to packages.orig
  * 5. if there were differences, apply the patch from 2. (patch -p1 < /tmp/Archive_Tar.diff)
  * 6. update this file and commit
  *
+ *
+ * How-To: Migrate a package to composer
+ * =====================================
+ *
+ * To improve maintainability, it is desirable to migrate PHP dependencies from `civicrm-packages.git`
+ * to `civicrm-core.git:composer.json`. This is a somewhat painstaking process, but it makes future
+ * upgrades easier.
+ *
+ * A. Assess situation
+ *     1. Determine the old/active version of the package `Foo`.
+ *     2. Download the old/active version of package `Foo`, overwriting the copy in `packages/Foo`
+ *     3. Check for for differences. If there are some, it means we patched the package – do
+ *        a *reverse* diff and save to a patch file (`git diff -R > /tmp/Archive_Tar.diff`)
+ *     4. Determine if the patches are still relevent in newer releases of the package.
+ *     5. Determine if changing the live path of the package will impact anything.
+ *        In particular, look out for hard-coded references to `packages/Foo`. Ideally, check `universe`.
+ *     6. Revert/undo any changes you made during assessment.
+ * B. Prepare PRs
+ *     1. For `civicrm-core.git`, prepare a branch with a few commits:
+ *
+ *        Update `composer.json` and `composer.lock`. Be careful to *only* update necessary packages
+ *        and to use versions that work in Civi's minimum requirements (PHP/MySQL versions).
+ *
+ *        If your assessment found important patches, then use `composer.json` to re-apply
+ *        those patches (e.g.`extra: patches: ...` or `post-install-cmd`).
+ *
+ *        Cleanup any hard-coded references to `packages/Foo`.
+ *
+ *     2. For `civicrm-packages.git`, prepare a branch. Remove the old code.
+ *     3. Locally, test that the new combination works.
+ *     4. Submit two PRs for `civicrm-core.git` and `civicrm-packages.git`. In the description
+ *        or comments, provide cross-links. (Reviewers will need to be aware of both PRs so they
+ *        can test appropriately.)
+ * C. Review the PRs
+ *     The reviewer will need to setup both patches and include them in a test-run.
+ *     There is no fully automatic bot for this test scenario.
+ *     One way to test this is with civibuild and civi-test-run:
+ *        civibuild create mytest --type drupal-clean --patch <github-pr-url-1> --patch <github-pr-url-2> ...
+ *        civi-test-run -b mytest -j /tmp/junit-output
  *
  * Package List: PEAR
  * ==================

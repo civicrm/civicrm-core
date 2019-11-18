@@ -117,17 +117,10 @@ function civicrmtheme_custom_theme() {
     return;
   }
 
-  // Get the menu items.
-  $args = explode('?', $_GET['q']);
-  $path = $args[0];
-
-  // Get the menu for above URL.
-  $item = CRM_Core_Menu::get($path);
-
   // Check for public pages
   // If public page and civicrm public theme is set, apply civicrm public theme
   // If user does not have access to CiviCRM use the public page for the error message
-  if (!user_access('access CiviCRM') || CRM_Utils_Array::value('is_public', $item)) {
+  if (!user_access('access CiviCRM') || CRM_Core_Config::singleton()->userSystem->isFrontEndPage()) {
     if ($public_theme) {
       return $public_theme;
     }

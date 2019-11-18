@@ -51,7 +51,7 @@ return [
     ],
     'default' => NULL,
     'title' => 'Geo Provider Key',
-    'description' => 'Enter the API key or Application ID associated with your geocoding provider (not required for Yahoo).',
+    'description' => 'Enter the API key or Application ID associated with your geocoding provider.',
   ],
   'geoProvider' => [
     'add' => '4.7',

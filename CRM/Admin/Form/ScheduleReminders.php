@@ -523,7 +523,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'end_date',
     ];
 
-    if (!CRM_Utils_Array::value('absolute_date', $params)) {
+    if (empty($params['absolute_date'])) {
       $params['absolute_date'] = 'null';
     }
     foreach ($moreKeys as $mkey) {
@@ -577,7 +577,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
 
-    if (CRM_Utils_Array::value('is_repeat', $values) == 0) {
+    if (empty($values['is_repeat'])) {
       $params['repetition_frequency_unit'] = 'null';
       $params['repetition_frequency_interval'] = 'null';
       $params['end_frequency_unit'] = 'null';

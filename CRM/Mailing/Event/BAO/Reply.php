@@ -371,7 +371,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $reply = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();

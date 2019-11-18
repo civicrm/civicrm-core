@@ -227,8 +227,7 @@ SELECT f.id, f.label, f.data_type,
         return;
       }
 
-      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
-      $this->_whereTables[$name] = $this->_tables[$name];
+      $this->joinCustomTableForField($field);
 
       if ($joinTable) {
         $joinClause = 1;
@@ -292,6 +291,8 @@ SELECT f.id, f.label, f.data_type,
 
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
 
+        // Ensure the table is joined in (eg if in where but not select).
+        $this->joinCustomTableForField($field);
         switch ($field['data_type']) {
           case 'String':
           case 'StateProvince':
@@ -414,9 +415,12 @@ SELECT f.id, f.label, f.data_type,
             break;
 
           case 'Date':
-            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
-            list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
-            $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+            if (substr($name, -9, 9) !== '_relative') {
+              // Relative dates are handled in the buildRelativeDateQuery function.
+              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
+              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
+              $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+            }
             break;
 
           case 'File':
@@ -469,6 +473,18 @@ SELECT f.id, f.label, f.data_type,
       implode(' ', $this->_tables),
       $whereStr,
     ];
+  }
+
+  /**
+   * Join the custom table for the field in (if not already in the query).
+   *
+   * @param array $field
+   */
+  protected function joinCustomTableForField($field) {
+    $name = $field['table_name'];
+    $join = "\nLEFT JOIN $name ON $name.entity_id = {$field['search_table']}.id";
+    $this->_tables[$name] = $this->_tables[$name] ?? $join;
+    $this->_whereTables[$name] = $this->_whereTables[$name] ?? $join;
   }
 
 }

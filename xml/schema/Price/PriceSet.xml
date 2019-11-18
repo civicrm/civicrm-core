@@ -8,11 +8,14 @@
   <log>true</log>
   <field>
     <name>id</name>
-    <title>Price Set ID</title>
+    <title>Price Set</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Set</comment>
     <add>1.8</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>

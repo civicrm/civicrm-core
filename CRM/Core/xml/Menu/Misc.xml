@@ -47,13 +47,6 @@
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/standalone/register</path>
-     <title>Registration Page</title>
-     <page_callback>CRM_Standalone_Form_Register</page_callback>
-     <access_callback>1</access_callback>
-     <is_public>true</is_public>
-  </item>
-  <item>
      <path>civicrm/file</path>
      <title>Browse Uploaded files</title>
      <access_arguments>access uploaded files</access_arguments>
@@ -210,6 +203,7 @@
     <path>civicrm/ajax/l10n-js</path>
     <page_callback>CRM_Core_Resources::outputLocalizationJS</page_callback>
     <access_callback>1</access_callback>
+    <is_public>true</is_public>
   </item>
   <item>
     <path>civicrm/shortcode</path>

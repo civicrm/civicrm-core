@@ -259,7 +259,10 @@ class HTML_QuickForm_hierselect extends HTML_QuickForm_group
      */
     function setValue($value)
     {
-        $this->_nbElements = count($value);
+        // $value could be a string or an array - prior to php 7.2 count handled both, returning 0 for NULL
+        // or an empty array.
+        // https://stackoverflow.com/questions/20257983/why-the-count-function-returns-1-for-false-and-0-for-null
+        $this->_nbElements = is_array($value) ? count($value) : ($value === NULL ? 0 : 1);
         parent::setValue($value);
         $this->_setOptions();
     } // end func setValue

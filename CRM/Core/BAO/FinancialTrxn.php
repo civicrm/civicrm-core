@@ -119,7 +119,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults = []) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
     $financialItem->copyValues($params);
     if ($financialItem->find(TRUE)) {
@@ -735,6 +735,25 @@ WHERE ceft.entity_id = %1";
     self::createDeferredTrxn(CRM_Utils_Array::value('line_item', $inputParams), $currentContribution, TRUE, 'changePaymentInstrument');
 
     return TRUE;
+  }
+
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * Always set is_payment to 1 as this is used for Payment api as  well as FinancialTrxn.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName === 'is_payment') {
+      $this->is_payment = 1;
+    }
+    else {
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
+    }
   }
 
 }

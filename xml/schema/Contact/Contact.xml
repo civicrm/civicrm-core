@@ -351,7 +351,9 @@
     <length>32</length>
     <comment>API Key for validating requests related to this contact.</comment>
     <add>2.2</add>
-    <protected>true</protected>
+    <permission>
+      <or>administer CiviCRM, edit api keys</or>
+    </permission>
   </field>
   <index>
     <name>index_api_key</name>
@@ -494,6 +496,8 @@
       <optionGroupName>communication_style</optionGroupName>
     </pseudoconstant>
     <export>true</export>
+    <import>true</import>
+    <headerPattern>/style/i</headerPattern>
     <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.</comment>
     <add>4.4</add>
     <html>
@@ -872,6 +876,11 @@
     <default>NULL</default>
     <add>4.3</add>
   </field>
+  <index>
+    <name>index_created_date</name>
+    <fieldName>created_date</fieldName>
+    <add>5.18</add>
+  </index>
   <field>
     <name>modified_date</name>
     <type>timestamp</type>
@@ -881,4 +890,9 @@
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <add>4.3</add>
   </field>
+  <index>
+    <name>index_modified_date</name>
+    <fieldName>modified_date</fieldName>
+    <add>5.18</add>
+  </index>
 </table>

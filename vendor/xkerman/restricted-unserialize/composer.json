@@ -1,0 +1,52 @@
+{
+    "name": "xkerman/restricted-unserialize",
+    "description": "provide PHP Object Injection safe unserialize function",
+    "type": "library",
+    "keywords": ["unserialize", "deserialize", "PHP Object Injection"],
+    "require": {
+        "php": ">=5.2"
+    },
+    "require-dev": {
+        "phpmd/phpmd": "^2.6",
+        "phpunit/phpunit": "^4.8|^5.7|^6.5|^7.4|^8.2",
+        "sebastian/phpcpd": "^2.0|^3.0|^4.1",
+        "squizlabs/php_codesniffer": "^2.9|^3.4",
+        "nikic/php-parser": "^1.4|^3.0|^4.2"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "xKerman",
+            "email": "xKhorasan@gmail.com"
+        }
+    ],
+    "autoload": {
+        "files": ["src/function.php"],
+        "psr-4": {
+            "xKerman\\Restricted\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "xKerman\\Restricted\\Test\\": "test"
+        }
+    },
+    "scripts": {
+        "test": [
+            "phpcs",
+            "phpmd src/ text ./phpmd.xml",
+            "phpcpd src/",
+            "phpdbg -qrr ./vendor/bin/phpunit"
+        ],
+        "test-legacy": [
+            "phpcs",
+            "phpmd src/ text ./phpmd.xml",
+            "phpcpd src/",
+            "phpunit"
+        ],
+        "generate": [
+            "rm -rf generated/",
+            "php bin/generate.php"
+        ]
+    }
+}

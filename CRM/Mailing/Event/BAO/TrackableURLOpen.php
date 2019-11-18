@@ -292,7 +292,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     $offset = NULL, $rowCount = NULL, $sort = NULL, $contact_id = NULL
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $click = self::getTableName();
     $url = CRM_Mailing_BAO_TrackableURL::getTableName();

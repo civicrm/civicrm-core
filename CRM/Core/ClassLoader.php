@@ -193,7 +193,7 @@ class CRM_Core_ClassLoader {
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
     // Use absolute path, since we don't know the content of include_path yet.
     // CRM-11304
-    $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifer/HTMLPurifier/Bootstrap.php';
+    $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
     if (file_exists($file)) {
       return $file;
     }
@@ -205,6 +205,12 @@ class CRM_Core_ClassLoader {
    * @param $class
    */
   public function loadClass($class) {
+    if ($class === 'CiviCRM_API3_Exception') {
+      //call internal error class api/Exception first
+      // allow api/Exception class call external error class
+      // CiviCRM_API3_Exception
+      require_once 'api/Exception.php';
+    }
     if (
       // Only load classes that clearly belong to CiviCRM.
       // Note: api/v3 does not use classes, but api_v3's test-suite does

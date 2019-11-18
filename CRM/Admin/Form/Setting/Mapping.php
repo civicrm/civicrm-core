@@ -67,10 +67,6 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
       $errors['_qf_default'] = ts('Mapping features require PHP version 5 or greater');
     }
 
-    if (!$fields['mapAPIKey'] && ($fields['mapProvider'] != '' && $fields['mapProvider'] == 'Yahoo')) {
-      $errors['mapAPIKey'] = "Map Provider key is a required field.";
-    }
-
     if ($fields['mapProvider'] == 'OpenStreetMaps' && $fields['geoProvider'] == '') {
       $errors['geoProvider'] = "Please select a Geocoding Provider - Open Street Maps does not provide geocoding.";
     }

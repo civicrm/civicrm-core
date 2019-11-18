@@ -196,14 +196,12 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-
+    $this->setFormValues();
     if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
       $specialParams = [
         'activity_type_id',
         'status_id',
         'priority_id',
-        'activity_text',
       ];
       $changeNames = [
         'status_id' => 'activity_status_id',
@@ -344,13 +342,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     if (!empty($this->_defaults)) {
       $this->setDefaults($this->_defaults);
     }
-  }
-
-  /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
   }
 
   /**

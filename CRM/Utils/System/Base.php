@@ -415,6 +415,19 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Is a front end page being accessed.
+   *
+   * Generally this would be a contribution form or other public page as opposed to a backoffice page (like contact edit).
+   *
+   * @todo Drupal uses the is_public setting - clarify & rationalise. See https://github.com/civicrm/civicrm-drupal/pull/546/files
+   *
+   * @return bool
+   */
+  public function isFrontEndPage() {
+    return CRM_Core_Config::singleton()->userFrameworkFrontend;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination

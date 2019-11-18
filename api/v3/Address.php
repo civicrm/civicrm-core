@@ -42,7 +42,7 @@
  * @return array
  *   API result array
  */
-function civicrm_api3_address_create(&$params) {
+function civicrm_api3_address_create($params) {
   _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Address', $params);
   /**
    * If street_parsing, street_address has to be parsed into
@@ -125,6 +125,10 @@ function _civicrm_api3_address_create_spec(&$params) {
     'name' => 'world_region',
     'type' => CRM_Utils_Type::T_TEXT,
   ];
+  $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+  if ($defaultLocation) {
+    $params['location_type_id']['api.default'] = $defaultLocation->id;
+  }
 }
 
 /**
@@ -163,6 +167,6 @@ function civicrm_api3_address_delete($params) {
  * @return array
  *   API result array
  */
-function civicrm_api3_address_get(&$params) {
+function civicrm_api3_address_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');
 }

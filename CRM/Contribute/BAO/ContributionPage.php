@@ -328,8 +328,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
-          //@todo - following line should not refer to undefined $postProfileTypes? figure out way to test
-          if (in_array('Individual', $preProfileTypes) || in_array('Contact', $postProfileTypes)) {
+          if (in_array('Individual', $preProfileTypes) || in_array('Contact', $preProfileTypes)) {
             //Take Individual contact ID
             $userID = CRM_Utils_Array::value('related_contact', $values);
           }
@@ -357,7 +356,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         );
       }
 
-      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_PseudoConstant::contributionPage($values['contribution_page_id']);
+      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
 
       // Set email variables explicitly to avoid leaky smarty variables.
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
@@ -734,7 +733,7 @@ FROM civicrm_premiums
 WHERE entity_table = 'civicrm_contribution_page'
       AND entity_id ={$id}";
 
-    $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
+    $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
         CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', [

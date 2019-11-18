@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/ACL</base>
-  <class>Cache</class>
+  <class>ACLCache</class>
   <name>civicrm_acl_cache</name>
   <comment>Cache for acls and contacts</comment>
   <add>1.6</add>

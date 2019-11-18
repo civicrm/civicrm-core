@@ -46,7 +46,7 @@
                 {foreach from=$contribute_rows item=row}
                     <tr id='rowid{$row.contribution_id}'
                         class="{cycle values="odd-row,even-row"}{if $row.cancel_date} disabled{/if}">
-                        <td>{$row.total_amount|crmMoney:$row.currency} {if $row.amount_level } - {$row.amount_level} {/if}
+                        <td>{$row.total_amount|crmMoney:$row.currency} {if $row.amount_level && !is_array($row.amount_level)} - {$row.amount_level} {/if}
                             {if $row.contribution_recur_id}
                                 <br/>
                                 {ts}(Recurring Contribution){/ts}

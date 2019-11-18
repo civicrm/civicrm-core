@@ -155,9 +155,6 @@ br.clear {
 #header, #content {
   width: 100%;
 }
-#header {
-  background-color: #69c;
-}
 #logo {
   vertical-align: middle;
   border: 0;

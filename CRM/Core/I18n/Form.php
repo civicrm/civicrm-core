@@ -78,7 +78,10 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
     if ($widget['type'] == 'RichTextEditor') {
       $widget['type'] = 'wysiwyg';
-      $attributes['class'] .= ' collapsed';
+      $attributes['class'] = 'collapsed';
+    }
+    elseif ($widget['type'] == 'Text') {
+      $attributes['class'] = 'huge';
     }
 
     $languages = CRM_Core_I18n::languages(TRUE);

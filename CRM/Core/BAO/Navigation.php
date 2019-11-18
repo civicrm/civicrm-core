@@ -165,7 +165,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     $config = CRM_Core_Config::singleton();
 
     // check if we can retrieve from database cache
-    $navigations = CRM_Core_BAO_Cache::getItem('navigation', $cacheKeyString);
+    $navigations = Civi::cache('navigation')->get($cacheKeyString);
 
     if (!$navigations) {
       $domainID = CRM_Core_Config::domainID();
@@ -186,7 +186,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $navigations = [];
       self::_getNavigationLabel($pidGroups[''], $navigations);
 
-      CRM_Core_BAO_Cache::setItem($navigations, 'navigation', $cacheKeyString);
+      Civi::cache('navigation')->set($cacheKeyString, $navigations);
     }
     return $navigations;
   }
@@ -567,7 +567,9 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $ser = serialize($newKey);
       $query = "UPDATE civicrm_setting SET value = '$ser' WHERE name='navigation' AND contact_id IS NOT NULL";
       CRM_Core_DAO::executeQuery($query);
-      CRM_Core_BAO_Cache::deleteGroup('navigation');
+      Civi::cache('navigation')->flush();
+      // reset ACL and System caches
+      CRM_Core_BAO_Cache::resetCaches();
     }
     else {
       // before inserting check if contact id exists in db

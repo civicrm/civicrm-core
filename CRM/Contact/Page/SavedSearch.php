@@ -91,7 +91,7 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
           $row['description'] = $group->description;
 
           $row['id'] = $savedSearch->id;
-          $formValues = unserialize($savedSearch->form_values);
+          $formValues = CRM_Utils_String::unserialize($savedSearch->form_values);
           $query = new CRM_Contact_BAO_Query($formValues);
           $row['query_detail'] = $query->qill();
 

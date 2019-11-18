@@ -121,7 +121,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         break;
 
       case 'create':
-        $ids = [];
         $params = [
           'contact_id' => CRM_Utils_Request::retrieve('rid', 'Positive', $this),
           'membership_type_id' => $owner['membership_type_id'],
@@ -136,6 +135,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'skipStatusCal' => TRUE,
           'createActivity' => TRUE,
         ];
+        // @todo stop passing $ids here (we are only doing so because of passbyreference)
+        $ids = [];
         CRM_Member_BAO_Membership::create($params, $ids);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', [1 => $relatedDisplayName]),

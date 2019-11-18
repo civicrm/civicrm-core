@@ -66,7 +66,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
     }
 
     // Check if this StatusPreference already exists.
-    if (empty($params['id']) && CRM_Utils_Array::value('name', $params)) {
+    if (empty($params['id']) && !empty($params['name'])) {
       $statusPreference->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
       $statusPreference->name = $params['name'];
 

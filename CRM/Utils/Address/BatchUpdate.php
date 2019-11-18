@@ -254,7 +254,6 @@ class CRM_Utils_Address_BatchUpdate {
         $address->id = $dao->address_id;
         $address->copyValues($addressParams);
         $address->save();
-        $address->free();
       }
     }
 

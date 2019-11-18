@@ -341,4 +341,16 @@ abstract class Mapping implements MappingInterface {
    */
   abstract public function createQuery($schedule, $phase, $defaultParams);
 
+  /**
+   * Determine whether a schedule based on this mapping should
+   * reset the reminder state if the trigger date changes.
+   *
+   * @return bool
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   */
+  public function resetOnTriggerDateChange($schedule) {
+    return FALSE;
+  }
+
 }

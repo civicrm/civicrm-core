@@ -153,7 +153,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         }
       }
       if (!empty($tables)) {
-        $message = ts('The following tables have an entry for this financial type: %1', ['%1' => implode(', ', $tables)]);
+        $message = ts('The following tables have an entry for this financial type: %1', [1 => implode(', ', $tables)]);
 
         $errors = [];
         $errors['is_error'] = 1;
@@ -217,27 +217,32 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       return FALSE;
     }
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    $prefix = ts('CiviCRM') . ': ';
-    $actions = ['add', 'view', 'edit', 'delete'];
+    $actions = [
+      'add' => ts('add'),
+      'view' => ts('view'),
+      'edit' => ts('edit'),
+      'delete' => ts('delete'),
+    ];
+
     foreach ($financialTypes as $id => $type) {
-      foreach ($actions as $action) {
+      foreach ($actions as $action => $action_ts) {
         if ($descriptions) {
           $permissions[$action . ' contributions of type ' . $type] = [
-            $prefix . ts($action . ' contributions of type ') . $type,
-            ts(ucfirst($action) . ' contributions of type ') . $type,
+            ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
+            ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
           ];
         }
         else {
-          $permissions[$action . ' contributions of type ' . $type] = $prefix . ts($action . ' contributions of type ') . $type;
+          $permissions[$action . ' contributions of type ' . $type] = ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]);
         }
       }
     }
     if (!$descriptions) {
-      $permissions['administer CiviCRM Financial Types'] = $prefix . ts('administer CiviCRM Financial Types');
+      $permissions['administer CiviCRM Financial Types'] = ts('CiviCRM: administer CiviCRM Financial Types');
     }
     else {
       $permissions['administer CiviCRM Financial Types'] = [
-        $prefix . ts('administer CiviCRM Financial Types'),
+        ts('CiviCRM: administer CiviCRM Financial Types'),
         ts('Administer access to Financial Types'),
       ];
     }
@@ -482,7 +487,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       $realSetting = \Civi::$statics[__CLASS__]['is_acl_enabled'] = Civi::settings()->get('acl_financial_type');
       if (!$realSetting) {
         $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-        if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
+        if (!empty($contributeSettings['acl_financial_type'])) {
           \Civi::$statics[__CLASS__]['is_acl_enabled'] = TRUE;
         }
       }

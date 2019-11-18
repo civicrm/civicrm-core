@@ -150,7 +150,7 @@ class SettingsBag {
     if (!$isUpgradeMode || \CRM_Core_DAO::checkTableExists('civicrm_setting')) {
       $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
       while ($dao->fetch()) {
-        $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
+        $this->values[$dao->name] = ($dao->value !== NULL) ? \CRM_Utils_String::unserialize($dao->value) : NULL;
       }
     }
 
@@ -355,7 +355,7 @@ class SettingsBag {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
-          unserialize($dao->value),
+          \CRM_Utils_String::unserialize($dao->value),
           $value,
           $metadata,
           $this->domainId

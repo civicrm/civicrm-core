@@ -55,9 +55,6 @@ class ChangeSet implements ChangeSetInterface {
           if (preg_match($filter['regex'], $path)) {
             if ($doc === NULL) {
               $doc = \phpQuery::newDocument($html, 'text/html');
-              if (\CRM_Core_Config::singleton()->debug && !$coder->checkConsistentHtml($html)) {
-                throw new \CRM_Core_Exception("Cannot process $path: inconsistent markup. Use check-angular.php to investigate.");
-              }
             }
             call_user_func($filter['callback'], $doc, $path);
           }

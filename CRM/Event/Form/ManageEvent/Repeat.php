@@ -26,7 +26,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
   public function preProcess() {
     parent::preProcess();
-    $this->assign('selectedChild', 'repeat');
+    $this->setSelectedChild('repeat');
     $this->assign('currentEventId', $this->_id);
 
     $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
@@ -207,7 +207,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getRelatedEntities);
       //Check if participants exists for events
       foreach ($getRelatedEntities as $key => $value) {
-        if (!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $eventID) {
+        if (empty($participantDetails['countByID'][$value['id']]) && $value['id'] != $eventID) {
           //CRM_Event_BAO_Event::del($value['id']);
           $eventIdsWithNoRegistration[] = $value['id'];
         }

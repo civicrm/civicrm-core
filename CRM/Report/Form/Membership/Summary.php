@@ -100,7 +100,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
           'membership_type_id' => ['title' => ts('Membership Type')],
         ],
         'filters' => [
-          'join_date' => ['type' => CRM_Utils_Type::T_DATE],
+          'membership_join_date' => ['type' => CRM_Utils_Type::T_DATE],
         ],
       ],
       'civicrm_address' => [

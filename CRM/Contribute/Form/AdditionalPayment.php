@@ -67,12 +67,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   protected $fromEmailId = NULL;
 
-  protected $_fromEmails = NULL;
-
   protected $_view = NULL;
 
   public $_action = NULL;
 
+  /**
+   * Pre process form.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function preProcess() {
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -89,18 +92,14 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       CRM_Utils_System::setTitle($title);
       return;
     }
-    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
-
     $entityType = 'contribution';
     if ($this->_component == 'event') {
       $entityType = 'participant';
       $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
       $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
-      $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($eventId);
     }
     else {
       $this->_contributionId = $this->_id;
-      $this->_fromEmails['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
     }
 
     $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType);
@@ -118,11 +117,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_paymentType = 'owed';
     }
     else {
-      CRM_Core_Error::fatal(ts('No payment information found for this record'));
+      throw new CRM_Core_Exception(ts('No payment information found for this record'));
     }
 
     if (!empty($this->_mode) && $this->_paymentType == 'refund') {
-      CRM_Core_Error::fatal(ts('Credit card payment is not for Refund payments use'));
+      throw new CRM_Core_Exception(ts('Credit card payment is not for Refund payments use'));
     }
 
     list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
@@ -139,6 +138,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * Is this function being called from a datatable selector.
    *
    * If so we don't want to show the buttons.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function isBeingCalledFromSelectorContext() {
     return CRM_Utils_Request::retrieve('selector', 'Positive');
@@ -215,7 +216,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     //add receipt for offline contribution
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails['from_email_id']);
+    if ($this->_component === 'event') {
+      $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
+    }
+
+    $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Financial_BAO_Payment::getValidFromEmailsForPayment($eventID ?? NULL));
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
@@ -323,8 +328,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   /**
    * Process Payments.
+   *
    * @param array $submittedValues
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public function submit($submittedValues) {
     $this->_params = $submittedValues;
@@ -335,20 +342,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_component == 'event') {
       $participantId = $this->_id;
     }
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution',
-      'contribution_status_id',
-      ['labelColumn' => 'name']
-    );
-    $contributionStatusID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id');
-    if ($contributionStatuses[$contributionStatusID] == 'Pending') {
-      civicrm_api3('Contribution', 'create',
-        [
-          'id' => $this->_contributionId,
-          'contribution_status_id' => array_search('Partially paid', $contributionStatuses),
-          'is_pay_later' => 0,
-        ]
-      );
-    }
 
     if ($this->_mode) {
       // process credit card
@@ -356,19 +349,16 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard();
     }
 
-    $defaults = [];
-    $contribution = civicrm_api3('Contribution', 'getsingle', [
-      'return' => ["contribution_status_id"],
-      'id' => $this->_contributionId,
-    ]);
-    $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
-    $paymentID = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $this->_params, $this->_paymentType, $participantId);
-    // Fetch the contribution & do proportional line item assignment
-    $params = ['id' => $this->_contributionId];
-    $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
-    // @todo - this line needs to be moved to the Payment.create api - it's not form layer appropriate.
-    // testing required.
-    CRM_Contribute_BAO_Contribution::addPayments([$contribution], $contributionStatusId);
+    $trxnsData = $this->_params;
+    if ($this->_paymentType == 'refund') {
+      $trxnsData['total_amount'] = -$trxnsData['total_amount'];
+    }
+    $trxnsData['participant_id'] = $participantId;
+    $trxnsData['contribution_id'] = $this->_contributionId;
+    // From the
+    $trxnsData['is_send_contribution_notification'] = FALSE;
+    $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
+
     if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_contributionId]);
       if ($membershipPaymentCount) {
@@ -385,7 +375,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $statusMsg = ts('The payment record has been processed.');
     // send email
     if (!empty($paymentID) && !empty($this->_params['is_email_receipt'])) {
-      $sendResult = civicrm_api3('Payment', 'sendconfirmation', ['id' => $paymentID])['values'][$paymentID];
+      $sendResult = civicrm_api3('Payment', 'sendconfirmation', ['id' => $paymentID, 'from' => $submittedValues['from_email_address']])['values'][$paymentID];
       if ($sendResult['is_sent']) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }

@@ -64,7 +64,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @return int
    */
   public static function add(&$params) {
-    return CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
+    return CRM_Contact_BAO_Contact::createProfileContact($params);
   }
 
   /**

@@ -244,7 +244,7 @@
         }
       })
         .on('resize', function() {
-          if ($(window).width() >= 768 && $mainMenuState[0].checked) {
+          if (!isMobile() && $mainMenuState[0].checked) {
             $mainMenuState[0].click();
           }
           handleResize();
@@ -438,11 +438,16 @@
   }
 
   function handleResize() {
-    if ($(window).width() >= 768 && $('#civicrm-menu').height() > 50) {
+    if (!isMobile() && ($('#civicrm-menu').height() >= (2 * $('#civicrm-menu > li').height()))) {
       $('body').addClass('crm-menubar-wrapped');
     } else {
       $('body').removeClass('crm-menubar-wrapped');
     }
+  }
+
+  // Figure out if we've hit the mobile breakpoint, based on the rule in crm-menubar.css
+  function isMobile() {
+    return $('.crm-menubar-toggle-btn', '#civicrm-menu-nav').css('top') !== '-99999px';
   }
 
   function traverse(items, itemName, op) {

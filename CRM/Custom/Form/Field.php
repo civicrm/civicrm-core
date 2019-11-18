@@ -1019,7 +1019,7 @@ SELECT id
     $this->_id = $customField->id;
 
     // reset the cache
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    Civi::cache('fields')->flush();
 
     $msg = '<p>' . ts("Custom field '%1' has been saved.", [1 => $customField->label]) . '</p>';
 
