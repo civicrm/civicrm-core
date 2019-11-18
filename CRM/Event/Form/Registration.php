@@ -621,10 +621,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField, $priceSetId);
+      CRM_Price_BAO_PriceSet::initSet($form, 'civicrm_event', $getAllPriceField, $priceSetId);
     }
     else {
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField);
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
+      CRM_Price_BAO_PriceSet::initSet($form, 'civicrm_event', $getAllPriceField, $priceSetId);
     }
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
