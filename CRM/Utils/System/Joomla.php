@@ -562,7 +562,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     if (!defined('_JEXEC') && $loadDefines) {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
-      define('JPATH_BASE', $joomlaBase . '/administrator');
+      // dev/core#1384 - Replace / by Ds to ensure correct value of JPATH_BASE in the
+      // Windows environment.
+      define('JPATH_BASE', $joomlaBase . DS . 'administrator');
       require $joomlaBase . '/administrator/includes/defines.php';
     }
 
