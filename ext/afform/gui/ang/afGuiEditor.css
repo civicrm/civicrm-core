@@ -316,6 +316,19 @@
 #afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
   margin: 0;
 }
+#afGuiEditor .af-gui-field-input-type-select .input-group-btn {
+  position: initial;
+}
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle {
+  padding: 3px 11px;
+}
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
+  width: 100%;
+  right: 0;
+}
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu a {
+  cursor: default;
+}
 
 #afGuiEditor .af-gui-text-h1 {
   font-weight: bolder;

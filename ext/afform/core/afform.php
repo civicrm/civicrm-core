@@ -333,6 +333,10 @@ function afform_civicrm_alterAngular($angular) {
           if (!empty($fieldInfo['options'])) {
             $fieldInfo['options'] = CRM_Utils_Array::makeNonAssociative($fieldInfo['options'], 'key', 'label');
           }
+          // Default placeholder for select inputs
+          if ($fieldInfo['input_type'] === 'Select') {
+            $fieldInfo['input_attrs'] = ($fieldInfo['input_attrs'] ?? []) + ['placeholder' => ts('Select')];
+          }
 
           $fieldDefn = $existingFieldDefn ? CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
           foreach ($fieldInfo as $name => $prop) {

@@ -534,14 +534,6 @@
           return $scope.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
         };
 
-        $scope.select2Options = function() {
-          return {
-            results: _.transform($scope.getOptions(), function(result, opt) {
-              result.push({id: opt.key, text: opt.label});
-            }, [])
-          };
-        };
-
         $scope.resetOptions = function() {
           delete $scope.node.defn.options;
         };
