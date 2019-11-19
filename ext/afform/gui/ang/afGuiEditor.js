@@ -870,8 +870,8 @@
             if (field.fk_entity) {
               $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}});
             } else if (field.options) {
-              var options = _.transform(field.options, function(options, val, key) {
-                options.push({id: key, text: val});
+              var options = _.transform(field.options, function(options, val) {
+                options.push({id: val.key, text: val.label});
               }, []);
               $el.select2({data: options, multiple: multi});
             } else if (dataType === 'Boolean') {
