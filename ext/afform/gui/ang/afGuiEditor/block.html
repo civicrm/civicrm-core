@@ -35,8 +35,8 @@
 <div ui-sortable="{handle: '.af-gui-bar', update: onDrop, connectWith: '[ui-sortable]', cancel: 'input,textarea,button,select,option,a'}" ng-model="node['#children']" class="af-gui-layout {{ getLayout() }}">
   <div ng-repeat="item in node['#children']" >
     <div ng-switch="block.getNodeType(item)">
-      <div ng-switch-when="fieldset" af-gui-block="item" class="af-gui-block af-gui-fieldset af-gui-block-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />
-      <div ng-switch-when="block" af-gui-block="item" class="af-gui-block af-gui-block-type-{{ item['#tag'] }}" entity-name="entityName" />
+      <div ng-switch-when="fieldset" af-gui-block="item" style="{{ item.style }}" class="af-gui-block af-gui-fieldset af-gui-block-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />
+      <div ng-switch-when="block" af-gui-block="item" style="{{ item.style }}" class="af-gui-block af-gui-block-type-{{ item['#tag'] }}" entity-name="entityName" />
       <div ng-switch-when="field" af-gui-field="item" entity-name="entityName" />
       <div ng-switch-when="text" af-gui-text="item" class="af-gui-element af-gui-text" />
       <div ng-switch-when="button" af-gui-button="item" class="af-gui-element af-gui-button" />

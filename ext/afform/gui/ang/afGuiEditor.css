@@ -285,6 +285,11 @@
   padding-right: 5px;
 }
 
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type=color] {
+  width: 30px;
+  padding: 2px 4px;
+}
+
 /* For editing field placeholder text */
 #afGuiEditor .af-gui-field-input input[type=text].form-control {
   color: #9a9a9a;
@@ -310,7 +315,6 @@
 }
 #afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
   margin: 0;
-
 }
 
 #afGuiEditor .af-gui-text-h1 {
@@ -348,7 +352,6 @@
 #afGuiEditor .af-gui-field-help {
   font-style: italic;
 }
-
 
 #afGuiEditor.af-gui-editing-options {
   pointer-events: none;

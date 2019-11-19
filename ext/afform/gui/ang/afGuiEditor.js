@@ -322,7 +322,7 @@
         $scope.editor = editor;
       },
       controller: function($scope) {
-        $scope.block = this;
+        var block = $scope.block = this;
         var ts = $scope.ts = CRM.ts();
         this.node = $scope.node;
 
@@ -429,8 +429,65 @@
           if (val !== 'af-layout-rows') {
             classes.push(val);
           }
-          $scope.block.modifyClasses($scope.node, _.keys($scope.layouts), classes);
+          block.modifyClasses($scope.node, _.keys($scope.layouts), classes);
         };
+
+        $scope.getSetBorderWidth = function(width) {
+          return getSetBorderProp(0, arguments.length ? width : null);
+        };
+
+        $scope.getSetBorderStyle = function(style) {
+          return getSetBorderProp(1, arguments.length ? style : null);
+        };
+
+        $scope.getSetBorderColor = function(color) {
+          return getSetBorderProp(2, arguments.length ? color : null);
+        };
+
+        $scope.getSetBackgroundColor = function(color) {
+          if (!arguments.length) {
+            return block.getStyles($scope.node)['background-color'] || '#ffffff';
+          }
+          block.setStyle($scope.node, 'background-color', color);
+        };
+        
+        function getSetBorderProp(idx, val) {
+          var border = getBorder() || ['1px', '', '#000000'];
+          if (val === null) {
+            return border[idx];
+          }
+          border[idx] = val;
+          block.setStyle($scope.node, 'border', val ? border.join(' ') : null);
+        }
+
+        this.getStyles = function(node) {
+          return !node || !node.style ? {} : _.transform(node.style.split(';'), function(styles, style) {
+            var keyVal = _.map(style.split(':'), _.trim);
+            if (keyVal.length > 1 && keyVal[1].length) {
+              styles[keyVal[0]] = keyVal[1];
+            }
+          }, {});
+        };
+
+        this.setStyle = function(node, name, val) {
+          var styles = block.getStyles(node);
+          styles[name] = val;
+          if (!val) {
+            delete styles[name];
+          }
+          if (_.isEmpty(styles)) {
+            delete node.style;
+          } else {
+            node.style = _.transform(styles, function(combined, val, name) {
+              combined.push(name + ': ' + val);
+            }, []).join('; ');
+          }
+        };
+
+        function getBorder() {
+          var border = _.map((block.getStyles($scope.node).border || '').split(' '), _.trim);
+          return border.length > 2 ? border : null;
+        }
 
       }
     };
@@ -659,6 +716,19 @@
         $scope.setAlign = function(val) {
           $scope.block.modifyClasses($scope.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
         };
+
+        $scope.styles = _.transform(CRM.afformAdminData.styles, function(styles, val, key) {
+          styles['text-' + key] = val;
+        });
+
+        // Getter/setter for ng-model
+        $scope.getSetStyle = function(val) {
+          if (arguments.length) {
+            return $scope.block.modifyClasses($scope.node, _.keys($scope.styles), val === 'text-default' ? null : val);
+          }
+          return _.intersection(splitClass($scope.node['class']), _.keys($scope.styles))[0] || 'text-default';
+        };
+
       }
     };
   });
@@ -682,14 +752,9 @@
         //   "modelListCtrl.submit()": ts('Submit Form')
         // };
 
-        $scope.styles = {
-          'btn-default': ts('Default'),
-          'btn-primary': ts('Primary'),
-          'btn-success': ts('Success'),
-          'btn-info': ts('Info'),
-          'btn-warning': ts('Warning'),
-          'btn-danger': ts('Danger')
-        };
+        $scope.styles = _.transform(CRM.afformAdminData.styles, function(styles, val, key) {
+          styles['btn-' + key] = val;
+        });
 
         // Getter/setter for ng-model
         $scope.getSetStyle = function(val) {

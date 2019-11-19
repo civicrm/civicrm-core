@@ -8,6 +8,6 @@
     </div>
   </div>
 </div>
-<p class="af-gui-node-title {{ getAlign() + ' af-gui-text-' + node['#tag'] }}" >
+<p class="af-gui-node-title {{ node['class'] + ' af-gui-text-' + node['#tag'] }}" >
   <span af-gui-editable ng-model="node['#children'][0]['#text']">{{ node['#children'][0]['#text'] }}</span>
 </p>

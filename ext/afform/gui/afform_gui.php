@@ -213,6 +213,15 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     $data['inputType'][$matches[1]] = $matches[1];
   }
 
+  $data['styles'] = [
+    'default' => ts('Default'),
+    'primary' => ts('Primary'),
+    'success' => ts('Success'),
+    'info' => ts('Info'),
+    'warning' => ts('Warning'),
+    'danger' => ts('Danger'),
+  ];
+
   $mimeType = 'text/javascript';
   $content = "CRM.afformAdminData=" . json_encode($data, JSON_UNESCAPED_SLASHES) . ';';
 }
