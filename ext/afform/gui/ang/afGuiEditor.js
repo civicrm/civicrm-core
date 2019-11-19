@@ -1,4 +1,5 @@
 (function(angular, $, _) {
+  "use strict";
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'));
 
   var editingIcon;
