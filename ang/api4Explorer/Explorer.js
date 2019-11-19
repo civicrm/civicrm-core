@@ -207,7 +207,7 @@
       _.each($scope.params, function(param, key) {
         if (param != $scope.availableParams[key].default && !(typeof param === 'object' && _.isEmpty(param))) {
           if (_.contains($scope.availableParams[key].type, 'array') && (typeof objectParams[key] === 'undefined')) {
-            params[key] = parseYaml(_.cloneDeep(param));
+            params[key] = parseYaml(JSON.parse(angular.toJson(param)));
           } else {
             params[key] = param;
           }
@@ -238,6 +238,9 @@
     function parseYaml(input) {
       if (typeof input === 'undefined') {
         return undefined;
+      }
+      if (input === '') {
+        return '';
       }
       if (_.isObject(input) || _.isArray(input)) {
         _.each(input, function(item, index) {
@@ -490,6 +493,9 @@
       if (typeof val === 'undefined') {
         return '';
       }
+      if (val === null || val === true || val === false) {
+        return JSON.stringify(val).toUpperCase();
+      }
       indent = (typeof indent === 'number') ? _.repeat(' ', indent) : (indent || '');
       var ret = '',
         baseLine = indent ? indent.slice(0, -2) : '',
@@ -626,6 +632,11 @@
           _.each(values, function(clause, index) {
             if (typeof clause !== 'undefined' && !clause[0]) {
               values.splice(index, 1);
+            }
+            if (typeof clause[1] === 'string' && _.contains(clause[1], 'NULL')) {
+              clause.length = 2;
+            } else if (typeof clause[1] === 'string' && clause.length == 2) {
+              clause.push('');
             }
           });
         }, true);

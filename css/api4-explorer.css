@@ -148,10 +148,10 @@
 #bootstrap-theme.api4-explorer-page .api4-chain-index,
 #bootstrap-theme.api4-explorer-page .api4-index,
 #bootstrap-theme.api4-explorer-page .api4-chain-action {
-  width: 70px;
+  width: 90px;
 }
 #bootstrap-theme.api4-explorer-page .api4-chain-params {
-  width: calc( 100% - 346px);
+  width: calc(100% - 386px);
 }
 
 #bootstrap-theme.api4-explorer-page .api4-add-where-group-menu {
