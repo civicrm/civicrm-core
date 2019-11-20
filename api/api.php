@@ -81,7 +81,7 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
  *
  * @return array
  */
-function civicrm_api3(string $entity, string $action, array $params = []) {
+function civicrm_api3(string $entity, string $action, array $params = []): array {
   $params['version'] = 3;
   $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
