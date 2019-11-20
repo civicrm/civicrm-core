@@ -33,12 +33,12 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
    * @param CRM_Extension_Info $info
    *
    * @return bool
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function onPreInstall(CRM_Extension_Info $info) {
     $customSearchesByName = $this->getCustomSearchesByName();
     if (array_key_exists($info->key, $customSearchesByName)) {
-      CRM_Core_Error::fatal(ts('This custom search is already registered.'));
+      throw new CRM_Core_Exception(ts('This custom search is already registered.'));
     }
 
     $weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',

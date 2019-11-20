@@ -34,17 +34,18 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * @inheritDoc
    *
    * @param CRM_Extension_Info $info
+   * @throws CRM_Core_Exception
    */
   public function onPreInstall(CRM_Extension_Info $info) {
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
 
     if (array_key_exists($info->key, $paymentProcessorTypes)) {
-      CRM_Core_Error::fatal(ts('This payment processor type is already installed.'));
+      throw new CRM_Core_Exception(ts('This payment processor type is already installed.'));
     }
 
     $ppByName = $this->_getAllPaymentProcessorTypes('name');
     if (array_key_exists($info->name, $ppByName)) {
-      CRM_Core_Error::fatal(ts('This payment processor type already exists.'));
+      throw new CRM_Core_Exception(ts('This payment processor type already exists.'));
     }
 
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
@@ -82,7 +83,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
         break;
 
       default:
-        CRM_Core_Error::fatal(ts('Billing mode in info file has wrong value.'));
+        throw new CRM_Core_Exception(ts('Billing mode in info file has wrong value.'));
     }
 
     $dao->is_recur = trim($info->typeInfo['isRecur']);
