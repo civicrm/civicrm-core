@@ -359,3 +359,9 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
     background-color: inherit;
   }
 }
+
+:root {
+  --crm-menubar-height: $menubarHeight;
+  --crm-menubar-offset: 0px;
+  --crm-menubar-height-plus-offset: $menubarHeight;
+}

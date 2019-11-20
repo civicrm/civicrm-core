@@ -234,6 +234,20 @@
       }
       $('body').addClass('crm-menubar-visible crm-menubar-' + CRM.menubar.position);
     },
+    getHeight: function() {
+      if (isMobile() || !$('#civicrm-menu').is(':visible')) {
+        return 0;
+      } else {
+        return $('#civicrm-menu').height();
+      }
+    },
+    getOffset: function() {
+      if (isMobile() || !$('#civicrm-menu').is(':visible')) {
+        return 0;
+      } else {
+        return $('#civicrm-menu').offset().top;
+      }
+    },
     initializeResponsive: function() {
       var $mainMenuState = $('#crm-menubar-state');
       // hide mobile menu beforeunload
@@ -443,6 +457,13 @@
     } else {
       $('body').removeClass('crm-menubar-wrapped');
     }
+    try {
+      var height = CRM.menubar.getHeight(),
+        offset = CRM.menubar.getOffset();
+      document.documentElement.style.setProperty('--crm-menubar-height', '' + height + 'px');
+      document.documentElement.style.setProperty('--crm-menubar-offset', '' + offset + 'px');
+      document.documentElement.style.setProperty('--crm-menubar-height-plus-offset', '' + (height + offset) + 'px');
+    } catch(e) {}
   }
 
   // Figure out if we've hit the mobile breakpoint, based on the rule in crm-menubar.css
