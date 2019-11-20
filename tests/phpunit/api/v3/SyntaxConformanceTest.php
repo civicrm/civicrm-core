@@ -663,6 +663,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'is_primary',
         ],
       ],
+      'FinancialTrxn' => [
+        'cant_update' => [
+          // Altering fee amount will also cause net_amount to be recalculated.
+          'fee_amount',
+        ],
+      ],
       'Navigation' => [
         'cant_update' => [
           // Weight is deliberately altered when this is changed - skip.

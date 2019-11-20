@@ -55,6 +55,14 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
 
+    if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
+      if (!isset($params['total_amount'])) {
+        $trxn->fetch();
+        $params['total_amount'] = $trxn->total_amount;
+      }
+      $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
+    }
+
     if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
       $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
