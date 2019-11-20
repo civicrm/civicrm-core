@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0da5b3e43131bb261a779ef723ab7d8b",
+    "content-hash": "4a18bb520b3027bfca3b0ef8516b1988",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -2244,7 +2244,9 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
+                "reference": null,
+                "shasum": null
             },
             "require": {
                 "php": ">=5.3.0"
@@ -2617,7 +2619,7 @@
                 {
                     "name": "Tobias Nyholm",
                     "email": "tobias.nyholm@gmail.com",
-                    "homepage": "https://github.com/nyholm"
+                    "homepage": "https://github.com/Nyholm"
                 },
                 {
                     "name": "Nicolas Grekas",
