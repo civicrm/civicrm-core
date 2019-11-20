@@ -1598,6 +1598,25 @@ if (!CRM.vars) CRM.vars = {};
     return (yiq >= 128) ? 'black' : 'white';
   };
 
+  // based on https://github.com/janl/mustache.js/blob/master/mustache.js
+  // If you feel the need to use this function, consider whether assembling HTML
+  // via DOM might be a cleaner approach rather than using string concatenation.
+  CRM.utils.escapeHtml = function(string) {
+    var entityMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '/': '&#x2F;',
+      '`': '&#x60;',
+      '=': '&#x3D;'
+    };
+    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
+      return entityMap[s];
+    });
+  }
+
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
   $.ajaxPrefilter(function(s) {
     if (s.crossDomain) {

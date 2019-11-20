@@ -57,7 +57,7 @@ function civicrm_api3_saved_search_create($params) {
     }
     else {
       // Assume that form_values is serialized.
-      $params["formValues"] = unserialize($params["form_values"]);
+      $params["formValues"] = \CRM_Utils_String::unserialize($params["form_values"]);
     }
   }
 
@@ -109,7 +109,7 @@ function _civicrm_api3_saved_search_result_cleanup(&$result) {
     // Only clean up the values if there are values. (A getCount operation
     // for example does not return values.)
     foreach ($result['values'] as $key => $value) {
-      $result['values'][$key]['form_values'] = unserialize($value['form_values']);
+      $result['values'][$key]['form_values'] = \CRM_Utils_String::unserialize($value['form_values']);
     }
   }
 }

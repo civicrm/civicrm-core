@@ -609,13 +609,13 @@ UNION (
       // Move module_data into main item.
       if (isset(self::$_menuCache[$menu->path]['module_data'])) {
         CRM_Utils_Array::extend(self::$_menuCache[$menu->path],
-          unserialize(self::$_menuCache[$menu->path]['module_data']));
+          CRM_Utils_String::unserialize(self::$_menuCache[$menu->path]['module_data']));
         unset(self::$_menuCache[$menu->path]['module_data']);
       }
 
       // Unserialize other elements.
       foreach (self::$_serializedElements as $element) {
-        self::$_menuCache[$menu->path][$element] = unserialize($menu->$element);
+        self::$_menuCache[$menu->path][$element] = CRM_Utils_String::unserialize($menu->$element);
 
         if (strpos($path, $menu->path) !== FALSE) {
           $menuPath = &self::$_menuCache[$menu->path];

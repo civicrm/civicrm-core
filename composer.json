@@ -37,14 +37,14 @@
     "php": "~7.0",
     "dompdf/dompdf" : "0.8.*",
     "electrolinux/phpquery": "^0.9.6",
-    "symfony/config": "^2.8.44 || ~3.0",
+    "symfony/config": "^2.8.50 || ~3.0",
     "symfony/polyfill-iconv": "~1.0",
-    "symfony/dependency-injection": "^2.8.44 || ~3.0",
-    "symfony/event-dispatcher": "^2.8.44 || ~3.0",
-    "symfony/filesystem": "^2.8.44 || ~3.0",
-    "symfony/process": "^2.8.44 || ~3.0",
+    "symfony/dependency-injection": "^2.8.50 || ~3.0",
+    "symfony/event-dispatcher": "^2.8.50 || ~3.0",
+    "symfony/filesystem": "^2.8.50 || ~3.0",
+    "symfony/process": "^2.8.50 || ~3.0",
     "psr/log": "~1.1",
-    "symfony/finder": "^2.8.44 || ~3.0",
+    "symfony/finder": "^2.8.50 || ~3.0",
     "tecnickcom/tcpdf" : "6.2.*",
     "totten/ca-config": "~17.05",
     "zetacomponents/base": "1.9.*",
@@ -64,7 +64,8 @@
     "pear/log": "1.13.1",
     "katzien/php-mime-type": "2.1.0",
     "civicrm/composer-downloads-plugin": "^2.0",
-    "league/csv": "^9.2"
+    "league/csv": "^9.2",
+    "xkerman/restricted-unserialize": "~1.1"
   },
   "require-dev": {
     "cache/integration-tests": "dev-master"

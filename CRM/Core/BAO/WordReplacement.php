@@ -239,7 +239,7 @@ WHERE  domain_id = %1
         $params["domain_id"] = $value["id"];
         $params["options"] = ['wp-rebuild' => $rebuildEach];
         // Unserialize word match string.
-        $localeCustomArray = unserialize($value["locale_custom_strings"]);
+        $localeCustomArray = CRM_Utils_String::unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
           $wordMatchArray = [];
           // Only return the replacement strings of the current language,
@@ -315,7 +315,7 @@ WHERE  domain_id = %1
       1 => [$domainId, 'Integer'],
     ]);
     while ($domain->fetch()) {
-      return empty($domain->locale_custom_strings) ? [] : unserialize($domain->locale_custom_strings);
+      return empty($domain->locale_custom_strings) ? [] : CRM_Utils_String::unserialize($domain->locale_custom_strings);
     }
   }
 
