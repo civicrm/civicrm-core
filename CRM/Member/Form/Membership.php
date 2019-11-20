@@ -513,10 +513,27 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
       $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
-      //CRM-18827 - override the default value if total_amount is submitted
-      if (!empty($this->_submitValues['total_amount'])) {
+
+      // CRM-18827 - override the default value if total_amount is submitted
+      // dev/core#778 - This should only happen for the selected membership type!
+      $isSelectedMembershipType = $values['id'] === $this->_submitValues['membership_type_id'][1];
+      if ($isSelectedMembershipType && !empty($this->_submitValues['total_amount'])) {
         $totalAmount = $this->_submitValues['total_amount'];
+
+        $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+        $financial_type_id = CRM_Utils_Array::value('financial_type_id', $values);
+        $membershipTypeTaxRate = CRM_Utils_Array::value($financial_type_id, $taxRates);
+
+        /**
+         * dev/core#778: If value was submitted, tax rates will have been added,
+         * so we need to subtract them, otw they will get recalculated and added
+         * again by front-end!
+         */
+        if (!empty($membershipTypeTaxRate)) {
+          $totalAmount = $totalAmount / (1 + $membershipTypeTaxRate / 100);
+        }
       }
+
       // build membership info array, which is used when membership type is selected to:
       // - set the payment information block
       // - set the max related block
