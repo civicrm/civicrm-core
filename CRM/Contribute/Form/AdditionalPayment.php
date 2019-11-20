@@ -242,7 +242,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $js = NULL;
     // render backoffice payment fields only on offline mode
     if (!$this->_mode) {
-      $js = ['onclick' => "return verify( );"];
+      $js = ['onclick' => 'return verify( );'];
 
       $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
@@ -258,11 +258,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         $attributes['fee_amount']
       );
       $this->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
-
-      $this->add('text', 'net_amount', ts('Net Amount'),
-        $attributes['net_amount']
-      );
-      $this->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
     }
 
     $buttonName = $this->_refund ? 'Record Refund' : 'Record Payment';
@@ -299,10 +294,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($self->_paymentType == 'refund' && $fields['total_amount'] != abs($self->_refund)) {
       $errors['total_amount'] = ts('Refund amount must equal refund due amount.');
     }
-    $netAmt = (float) $fields['total_amount'] - (float) CRM_Utils_Array::value('fee_amount', $fields, 0);
-    if (!empty($fields['net_amount']) && $netAmt != $fields['net_amount']) {
-      $errors['net_amount'] = ts('Net amount should be equal to the difference between payment amount and fee amount.');
-    }
+
     if ($self->_paymentProcessor['id'] === 0 && empty($fields['payment_instrument_id'])) {
       $errors['payment_instrument_id'] = ts('Payment method is a required field');
     }

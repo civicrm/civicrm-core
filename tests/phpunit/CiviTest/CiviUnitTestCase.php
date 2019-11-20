@@ -3320,4 +3320,60 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     return $csv;
   }
 
+  /**
+   * Get parameters to set up a multi-line participant order.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getParticipantOrderParams() {
+    $this->_contactId = $this->individualCreate();
+    $event = $this->eventCreate();
+    $this->_eventId = $event['id'];
+    $eventParams = [
+      'id' => $this->_eventId,
+      'financial_type_id' => 4,
+      'is_monetary' => 1,
+    ];
+    $this->callAPISuccess('event', 'create', $eventParams);
+    $priceFields = $this->createPriceSet('event', $this->_eventId);
+    $participantParams = [
+      'financial_type_id' => 4,
+      'event_id' => $this->_eventId,
+      'role_id' => 1,
+      'status_id' => 14,
+      'fee_currency' => 'USD',
+      'contact_id' => $this->_contactId,
+    ];
+    $participant = $this->callAPISuccess('Participant', 'create', $participantParams);
+    $orderParams = [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $this->_contactId,
+      'financial_type_id' => 4,
+      'contribution_status_id' => 'Pending',
+      'contribution_mode' => 'participant',
+      'participant_id' => $participant['id'],
+    ];
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $orderParams['line_items'][] = [
+        'line_item' => [
+          [
+            'price_field_id' => $priceField['price_field_id'],
+            'price_field_value_id' => $priceField['id'],
+            'label' => $priceField['label'],
+            'field_title' => $priceField['label'],
+            'qty' => 1,
+            'unit_price' => $priceField['amount'],
+            'line_total' => $priceField['amount'],
+            'financial_type_id' => $priceField['financial_type_id'],
+            'entity_table' => 'civicrm_participant',
+          ],
+        ],
+        'params' => $participant,
+      ];
+    }
+    return $orderParams;
+  }
+
 }
