@@ -3975,6 +3975,31 @@ WHERE  $smartGroupClause
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
     $fieldTitle = ts('Altered By');
+    
+    foreach ($this->_params as $params) {
+      if ($params[0] == 'log_date') {
+        // Create civcirm_log temp table with logs of contacts created
+        $datesTable = CRM_Utils_SQL_TempTable::build()->setCategory('dates')->setMemory();
+        $datesTableName = $datesTable->getName();
+        $datesTable->createWithColumns('id int primary key, contact_id int');
+        $dateRange = "INSERT INTO {$datesTableName} (contact_id, id)
+                      SELECT cl.entity_id, MIN(cl.id)
+                      FROM civicrm_log cl
+                      WHERE cl.entity_table = 'civicrm_contact'
+                      GROUP BY cl.entity_id ";
+        CRM_Core_DAO::executeQuery($dateRange);
+
+        if ($params[2] == 2) {
+          $fieldTitle = ts('Modified By');
+          // Only contacts modified
+          $this->_where[$grouping][] = "NOT EXISTS (SELECT id FROM {$datesTableName} cl WHERE cl.id = civicrm_log.id)";
+        } else {
+          // Only contacts added
+          $this->_where[$grouping][] = "EXISTS (SELECT id FROM {$datesTableName} cl WHERE cl.id = civicrm_log.id)";
+        }
+        break;
+      }
+    }
 
     list($qillop, $qillVal) = self::buildQillForFieldValue(NULL, 'changed_by', $name, 'LIKE');
     $this->_qill[$grouping][] = ts("%1 %2 '%3'", [
@@ -3993,18 +4018,10 @@ WHERE  $smartGroupClause
     $this->_useDistinct = TRUE;
 
     // CRM-11281, default to added date if not set
-    $fieldTitle = ts('Added Date');
-    $fieldName = 'created_date';
-    foreach (array_keys($this->_params) as $id) {
-      if ($this->_params[$id][0] == 'log_date') {
-        if ($this->_params[$id][2] == 2) {
-          $fieldTitle = ts('Modified Date');
-          $fieldName = 'modified_date';
-        }
-      }
-    }
+    $fieldTitle = ts('Modified Date');
+    $fieldName = 'modified_date';
 
-    $this->dateQueryBuilder($values, 'contact_a', 'log_date', $fieldName, $fieldTitle);
+    $this->dateQueryBuilder($values, 'civicrm_log', 'log_date', $fieldName, $fieldTitle);
 
     self::$_openedPanes[ts('Change Log')] = TRUE;
   }
