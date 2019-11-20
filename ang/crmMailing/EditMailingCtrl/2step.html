@@ -17,7 +17,7 @@
           <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
             <div crm-attachments="attachments"></div>
           </div>
-          <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
+          <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')" ng-if="mailingFields.header_id.options.length > 0 || mailingFields.footer_id.options.length > 0">
             <div crm-mailing-block-header-footer crm-mailing="mailing"></div>
           </div>
           <div crm-ui-tab id="tab-pub" crm-title="ts('Publication')">
