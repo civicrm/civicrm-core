@@ -23,6 +23,8 @@
  *
  * @return array
  *   Array of financial transactions which are payments, if error an array with an error id and error message
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_get($params) {
   $financialTrxn = [];
@@ -34,7 +36,10 @@ function civicrm_api3_payment_get($params) {
   if (isset($params['trxn_id'])) {
     $params['financial_trxn_id.trxn_id'] = $params['trxn_id'];
   }
-  $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
+  $eftParams = $params;
+  unset($eftParams['return']);
+  // @todo - why do we fetch EFT params at all?
+  $eft = civicrm_api3('EntityFinancialTrxn', 'get', $eftParams);
   if (!empty($eft['values'])) {
     $eftIds = [];
     foreach ($eft['values'] as $efts) {
@@ -67,9 +72,10 @@ function civicrm_api3_payment_get($params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
  * @return array
  *   Api result array
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_delete($params) {
   return civicrm_api3('FinancialTrxn', 'delete', $params);
@@ -119,7 +125,6 @@ function civicrm_api3_payment_cancel($params) {
  * @return array
  *   Api result array
  *
- * @throws \API_Exception
  * @throws \CRM_Core_Exception
  * @throws \CiviCRM_API3_Exception
  */
@@ -171,6 +176,10 @@ function _civicrm_api3_payment_create_spec(&$params) {
     'total_amount' => [
       'api.required' => 1,
       'title' => ts('Total Payment Amount'),
+      'type' => CRM_Utils_Type::T_FLOAT,
+    ],
+    'fee_amount' => [
+      'title' => ts('Fee Amount'),
       'type' => CRM_Utils_Type::T_FLOAT,
     ],
     'payment_processor_id' => [
@@ -332,6 +341,11 @@ function _civicrm_api3_payment_get_spec(&$params) {
     'trxn_date' => [
       'title' => ts('Payment Date'),
       'type' => CRM_Utils_Type::T_TIMESTAMP,
+    ],
+    'financial_trxn_id' => [
+      'title' => ts('Payment ID'),
+      'type' => CRM_Utils_Type::T_INT,
+      'api.aliases' => ['payment_id', 'id'],
     ],
   ];
 }
