@@ -29,7 +29,7 @@
         var ts = $scope.ts = CRM.ts();
         $scope.afform = null;
         $scope.saving = false;
-        $scope.selectedEntity = null;
+        $scope.selectedEntityName = null;
         $scope.meta = this.meta = CRM.afformAdminData;
         this.scope = $scope;
         var editor = $scope.editor = this;
@@ -71,9 +71,9 @@
           removeRecursive($scope.afform.layout, function(item) {
             return ('#text' in item) && _.trim(item['#text']).length === 0;
           });
-          $scope.layout = getTags($scope.afform.layout, 'af-form')[0];
+          $scope.layout = findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
           evaluate($scope.layout['#children']);
-          $scope.entities = getTags($scope.layout['#children'], 'af-entity', 'name');
+          $scope.entities = findRecursive($scope.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
           // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
           $scope.$watch('afform', function () {
@@ -94,8 +94,11 @@
             name: entityType + num,
             label: entityType + ' ' + num
           });
-          $scope.layout['#children'].unshift($scope.entities[entityType + num]);
-          $scope.layout['#children'].push({
+          // Add this af-entity tag after the last existing one
+          var pos = 1 + _.findLastIndex($scope.layout['#children'], {'#tag': 'af-entity'});
+          $scope.layout['#children'].splice(pos, 0, $scope.entities[entityType + num]);
+          // Create a new af-fieldset container for the entity
+          var fieldset = {
             '#tag': 'fieldset',
             'af-fieldset': entityType + num,
             '#children': [
@@ -109,19 +112,26 @@
                 ]
               }
             ]
-          });
+          };
+          // Attempt to place the new af-fieldset after the last one on the form
+          pos = 1 + _.findLastIndex($scope.layout['#children'], 'af-fieldset');
+          if (pos) {
+            $scope.layout['#children'].splice(pos, 0, fieldset);
+          } else {
+            $scope.layout['#children'].push(fieldset);
+          }
           return entityType + num;
         };
 
         this.removeEntity = function(entityName) {
           delete $scope.entities[entityName];
-          _.remove($scope.layout['#children'], {'#tag': 'af-entity', name: entityName});
+          removeRecursive($scope.layout['#children'], {'#tag': 'af-entity', name: entityName});
           removeRecursive($scope.layout['#children'], {'af-fieldset': entityName});
           this.selectEntity(null);
         };
 
         this.selectEntity = function(entityName) {
-          $scope.selectedEntity = entityName;
+          $scope.selectedEntityName = entityName;
         };
 
         this.getField = function(entityType, fieldName) {
@@ -132,8 +142,8 @@
           return $scope.entities[entityName];
         };
 
-        this.getSelectedEntity = function() {
-          return $scope.selectedEntity;
+        this.getselectedEntityName = function() {
+          return $scope.selectedEntityName;
         };
 
         $scope.addEntity = function(entityType) {
@@ -183,20 +193,29 @@
     };
   });
 
-  function getTags(collection, tagName, indexBy) {
-    var items = [];
+  // Recursively searches a collection and its children using _.filter
+  // Returns an array of all matches, or an object if the indexBy param is used
+  function findRecursive(collection, predicate, indexBy) {
+    var items = _.filter(collection, predicate);
     _.each(collection, function(item) {
-      if (item && typeof item === 'object') {
-        if (item['#tag'] === tagName) {
-          items.push(item);
-        }
-        var childTags = item['#children'] ? getTags(item['#children'], tagName) : [];
-        if (childTags.length) {
-          Array.prototype.push.apply(items, childTags);
+      if (_.isPlainObject(item) && item['#children']) {
+        var childMatches = findRecursive(item['#children'], predicate);
+        if (childMatches.length) {
+          Array.prototype.push.apply(items, childMatches);
         }
       }
     });
     return indexBy ? _.indexBy(items, indexBy) : items;
+  }
+
+  // Applies _.remove() to an item and its children
+  function removeRecursive(collection, removeParams) {
+    _.remove(collection, removeParams);
+    _.each(collection, function(item) {
+      if (_.isPlainObject(item) && item['#children']) {
+        removeRecursive(item['#children'], removeParams);
+      }
+    });
   }
 
   // Turns a space-separated list (e.g. css classes) into an array
@@ -205,15 +224,6 @@
       return str;
     }
     return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
-  }
-
-  function removeRecursive(collection, removeParams) {
-    _.remove(collection, removeParams);
-    _.each(collection, function(item) {
-      if (_.isPlainObject(item) && item['#children']) {
-        removeRecursive(item['#children'], removeParams);
-      }
-    });
   }
 
   angular.module('afGuiEditor').directive('afGuiEntity', function($timeout) {
@@ -376,7 +386,7 @@
         };
 
         $scope.isSelectedFieldset = function(entityName) {
-          return entityName === $scope.editor.getSelectedEntity();
+          return entityName === $scope.editor.getselectedEntityName();
         };
 
         $scope.selectEntity = function() {
