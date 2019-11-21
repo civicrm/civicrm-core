@@ -264,7 +264,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_soft_credit_type_id',
         'contribution_status_id',
         'contribution_trxn_id',
-        'contribution_page_id',
         'contribution_product_id',
         'invoice_id',
         'payment_instrument_id',
@@ -456,6 +455,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if (!empty($highReceiveDate)) {
       $this->_formValues['receive_date_high'] = date('Y-m-d H:i:s', strtotime($highReceiveDate));
       CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
+    }
+    //check for contribution page id.
+    $contribPageId = CRM_Utils_Request::retrieve('pid', 'Positive', $this);
+    if ($contribPageId) {
+      CRM_Core_Error::deprecatedFunctionWarning('pass contribution_page_id');
+      $this->_formValues['contribution_page_id'] = $contribPageId;
     }
   }
 

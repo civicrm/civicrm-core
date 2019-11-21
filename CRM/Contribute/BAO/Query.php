@@ -886,6 +886,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'invoice_number',
       'receive_date',
       'contribution_cancel_date',
+      'contribution_page_id',
     ];
     $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
@@ -925,12 +926,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::VIEW);
     $form->addSelect('financial_type_id',
       ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => $financialTypes]
-    );
-
-    $form->add('select', 'contribution_page_id',
-      ts('Contribution Page'),
-      CRM_Contribute_PseudoConstant::contributionPage(),
-      FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]
     );
 
     // use contribution_payment_instrument_id instead of payment_instrument_id
