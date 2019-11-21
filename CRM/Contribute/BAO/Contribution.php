@@ -4580,13 +4580,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $input['payment_processor'] = $paymentProcessorId;
     }
 
-    if (!empty($contribution->_relatedObjects['participant'])) {
-      $input['contribution_mode'] = 'participant';
-      $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
-    }
-    elseif (!empty($contribution->_relatedObjects['membership'])) {
+    if (empty($contribution->_relatedObjects['participant']) && !empty($contribution->_relatedObjects['membership'])) {
+      // @fixme Can we remove this if altogether? - we removed the participant if / else and left relatedObjects['participant'] to ensure behaviour didn't change but it is probably not required.
       // @todo - use getRelatedMemberships instead
-      $input['contribution_mode'] = 'membership';
       $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
       $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $input);
       $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
