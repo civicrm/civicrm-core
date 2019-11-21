@@ -555,26 +555,26 @@ AND   con.contribution_status_id = {$pendingStatus}
     CRM_Core_DAO::executeQuery($sql);
 
     //create a temp table to hold financial account id related to payment instruments
-    $tempTableName1 = CRM_Core_DAO::createTempTableName();
+    $tempTable1 = CRM_Utils_SQL_TempTable::build()->setCategory('upgrade43')->setDurable();
 
     $sql = "
-CREATE TEMPORARY TABLE {$tempTableName1}
 SELECT     ceft.financial_account_id financial_account_id, cov.value as instrument_id
 FROM       civicrm_entity_financial_account ceft
 INNER JOIN civicrm_option_value cov ON cov.id = ceft.entity_id AND ceft.entity_table = 'civicrm_option_value'
 INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
 WHERE      cog.name = 'payment_instrument'
 ";
-    CRM_Core_DAO::executeQuery($sql);
+    $tempTable1->createWithQuery($sql);
+    $tempTableName1 = $tempTable1->getName();
 
     //CRM-12141
     $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id(200));";
     CRM_Core_DAO::executeQuery($sql);
 
     //create temp table to process completed / cancelled contribution
-    $tempTableName2 = CRM_Core_DAO::createTempTableName();
+    $tempTable2 = CRM_Utils_SQL_TempTable::build()->setCategory('upgrade43')->setDurable();
+    $tempTableName2 = $tempTable2->getName();
     $sql = "
-CREATE TEMPORARY TABLE {$tempTableName2}
 SELECT con.id as contribution_id, con.payment_instrument_id,
        IF(con.currency IN ('{$validCurrencyCodes}'), con.currency, '{$defaultCurrency}') as currency,
        con.total_amount, con.net_amount, con.fee_amount, con.trxn_id, con.contribution_status_id,
@@ -603,7 +603,7 @@ LEFT JOIN {$tempTableName1} tpi
        ON con.payment_instrument_id = tpi.instrument_id
 WHERE     con.contribution_status_id IN ({$completedStatus}, {$cancelledStatus})
 ";
-    CRM_Core_DAO::executeQuery($sql);
+    $tempTable2->createWithQuery($sql);
 
     // CRM-12141
     $sql = "ALTER TABLE {$tempTableName2} ADD INDEX index_action (action);";
