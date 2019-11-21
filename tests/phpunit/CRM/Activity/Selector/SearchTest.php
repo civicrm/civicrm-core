@@ -47,4 +47,42 @@ class CRM_Activity_Selector_SearchTest extends CiviUnitTestCase {
     $this->assertEquals("civicrm_activity.location = 'Baker Street'", $queryObject->_where[''][0]);
   }
 
+  public function testActivityOrderBy() {
+    $sortVars = [
+      1 => [
+        'name' => 'activity_date_time',
+        'sort' => 'activity_date_time',
+        'direction' => 2,
+        'title' => 'Date',
+      ],
+      2 => [
+        'name' => 'activity_type_id',
+        'sort' => 'activity_type_id',
+        'direction' => 4,
+        'title' => 'Type',
+      ],
+      3 => [
+        'name' => 'activity_subject',
+        'sort' => 'activity_subject',
+        'direction' => 4,
+        'title' => 'Subject',
+      ],
+      4 => [
+        'name' => 'source_contact',
+        'sort' => 'source_contact',
+        'direction' => 4,
+        'title' => 'Added By',
+      ],
+      5 => [
+        'name' => 'activity_status',
+        'sort' => 'activity_status',
+        'direction' => 1,
+        'title' => 'Status',
+      ],
+    ];
+    $sort = new CRM_Utils_Sort($sortVars, '5_u');
+    $searchSelector = new CRM_Activity_Selector_Search($queryParams, CRM_Core_Action::VIEW);
+    $searchSelector->getRows(4, 0, 50, $sort);
+  }
+
 }
