@@ -117,6 +117,9 @@ function civicrm_api3_order_create($params) {
     }
   }
   $contributionParams = $params;
+  // If this is nested we need to set sequential to 0 as sequential handling is done
+  // in create_success & id will be miscalculated...
+  $contributionParams['sequential'] = 0;
   foreach ($contributionParams as $key => $value) {
     // Unset chained keys so the code does not attempt to do this chaining twice.
     // e.g if calling 'api.Payment.create' We want to finish creating the order first.

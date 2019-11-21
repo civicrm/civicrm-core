@@ -2467,10 +2467,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'payment_processor_id' => $this->_paymentProcessorID,
       // processor provided ID - use contact ID as proxy.
       'processor_id' => $this->_contactID,
-      'api.contribution.create' => $contributionParams,
-    ], $recurParams));
+      'api.Order.create' => $contributionParams,
+    ], $recurParams))['values'][0];
     $this->_contributionRecurID = $contributionRecur['id'];
-    $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
+    $this->_contributionID = $contributionRecur['api.Order.create']['id'];
     $this->ids['Contribution'][0] = $this->_contributionID;
   }
 
@@ -2492,7 +2492,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     $this->ids['membership_type'] = $this->membershipTypeCreate($membershipParams);
     //create a contribution so our membership & contribution don't both have id = 1
-    if ($this->callAPISuccess('Contribution', 'getcount', []) == 0) {
+    if ($this->callAPISuccess('Contribution', 'getcount', []) === 0) {
       $this->contributionCreate([
         'contact_id' => $this->_contactID,
         'is_test' => 1,
@@ -2502,42 +2502,42 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'receive_date' => '2019-07-25 07:34:23',
       ]);
     }
-    $this->setupRecurringPaymentProcessorTransaction($recurParams);
 
-    $this->ids['membership'] = $this->callAPISuccess('membership', 'create', [
+    $this->ids['membership'] = $this->callAPISuccess('Membership', 'create', [
       'contact_id' => $this->_contactID,
       'membership_type_id' => $this->ids['membership_type'],
-      'contribution_recur_id' => $this->_contributionRecurID,
       'format.only_id' => TRUE,
       'source' => 'Payment',
+      'skipLineItem' => TRUE,
     ]);
-    //CRM-15055 creates line items we don't want so get rid of them so we can set up our own line items
-    CRM_Core_DAO::executeQuery("TRUNCATE civicrm_line_item");
-
-    $this->callAPISuccess('line_item', 'create', [
-      'entity_table' => 'civicrm_membership',
-      'entity_id' => $this->ids['membership'],
-      'contribution_id' => $this->_contributionID,
-      'label' => 'General',
-      'qty' => 1,
-      'unit_price' => 200,
-      'line_total' => 200,
-      'financial_type_id' => 1,
-      'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', [
-        'return' => 'id',
-        'label' => 'Membership Amount',
-        'options' => ['limit' => 1, 'sort' => 'id DESC'],
-      ]),
-      'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', [
-        'return' => 'id',
-        'label' => 'General',
-        'options' => ['limit' => 1, 'sort' => 'id DESC'],
-      ]),
+    $this->setupRecurringPaymentProcessorTransaction($recurParams, [
+      'line_items' => [
+        [
+          'line_item' => [
+            [
+              'entity_table' => 'civicrm_membership',
+              'entity_id' => $this->ids['membership'],
+              'label' => 'General',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+              'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', [
+                'return' => 'id',
+                'label' => 'Membership Amount',
+                'options' => ['limit' => 1, 'sort' => 'id DESC'],
+              ]),
+              'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', [
+                'return' => 'id',
+                'label' => 'General',
+                'options' => ['limit' => 1, 'sort' => 'id DESC'],
+              ]),
+            ],
+          ],
+        ],
+      ],
     ]);
-    $this->callAPISuccess('membership_payment', 'create', [
-      'contribution_id' => $this->_contributionID,
-      'membership_id' => $this->ids['membership'],
-    ]);
+    $this->callAPISuccess('Membership', 'create', ['id' => $this->ids['membership'], 'contribution_recur_id' => $this->_contributionRecurID]);
   }
 
   /**
