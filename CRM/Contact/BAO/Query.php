@@ -4184,7 +4184,9 @@ WHERE  $smartGroupClause
     $relationshipTempTable = NULL;
     if (self::$_relType == 'reciprocal') {
       $where = [];
-      self::$_relationshipTempTable = $relationshipTempTable = CRM_Core_DAO::createTempTableName('civicrm_rel');
+      self::$_relationshipTempTable = $relationshipTempTable = CRM_Utils_SQL_TempTable::build()
+        ->createWithColumns("`contact_id` int(10) unsigned NOT NULL DEFAULT '0', `contact_id_alt` int(10) unsigned NOT NULL DEFAULT '0', relationship_id int unsigned, KEY `contact_id` (`contact_id`), KEY `contact_id_alt` (`contact_id_alt`)")
+        ->getName();
       if ($nameClause) {
         $where[$grouping][] = " sort_name $nameClause ";
       }
@@ -4307,13 +4309,7 @@ civicrm_relationship.start_date > {$today}
         $whereClause = str_replace('contact_b', 'c', $whereClause);
       }
       $sql = "
-        CREATE TEMPORARY TABLE {$relationshipTempTable}
-          (
-            `contact_id` int(10) unsigned NOT NULL DEFAULT '0',
-            `contact_id_alt` int(10) unsigned NOT NULL DEFAULT '0',
-            KEY `contact_id` (`contact_id`),
-            KEY `contact_id_alt` (`contact_id_alt`)
-          )
+        INSERT INTO {$relationshipTempTable} (contact_id, contact_id_alt, relationship_id)
           (SELECT contact_id_b as contact_id, contact_id_a as contact_id_alt, civicrm_relationship.id
             FROM civicrm_relationship
             INNER JOIN  civicrm_contact c ON civicrm_relationship.contact_id_a = c.id

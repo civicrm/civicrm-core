@@ -2119,6 +2119,7 @@ SELECT contact_id
    * @see CRM_Utils_SQL_TempTable
    */
   public static function createTempTableName($prefix = 'civicrm', $addRandomString = TRUE, $string = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Utils_SQL_TempTable interface to create temporary tables');
     $tableName = $prefix . "_temp";
 
     if ($addRandomString) {
