@@ -244,6 +244,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $fieldDef
    * @param int $counter
    *   The globally-unique ID of the test object.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     $dbName = $fieldDef['name'];
@@ -304,9 +306,8 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_TIME:
-          CRM_Core_Error::fatal("T_TIME shouldn't be used.");
-          //$object->$dbName='000000';
-          //break;
+          throw new CRM_Core_Exception('T_TIME shouldn\'t be used.');
+
         case CRM_Utils_Type::T_CCNUM:
           $this->$dbName = '4111 1111 1111 1111';
           break;
@@ -913,6 +914,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return bool
    *   true if constraint exists, false otherwise
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function checkConstraintExists($tableName, $constraint) {
     static $show = [];
@@ -922,7 +925,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
       if (!$dao->fetch()) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('query failed');
       }
 
       $show[$tableName] = $dao->Create_Table;
@@ -936,7 +939,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param array $tables
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    *
    * @return bool
    *   true if CONSTRAINT keyword exists, false otherwise
@@ -949,7 +952,7 @@ class CRM_Core_DAO extends DB_DataObject {
         $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
         if (!$dao->fetch()) {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Show create table failed.');
         }
 
         $show[$tableName] = $dao->Create_Table;
@@ -975,6 +978,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return bool
    *   true if in format, false otherwise
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function checkFKConstraintInFormat($tableName, $columnName) {
     static $show = [];
@@ -984,7 +989,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $dao = CRM_Core_DAO::executeQuery($query);
 
       if (!$dao->fetch()) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('query failed');
       }
 
       $show[$tableName] = $dao->Create_Table;
@@ -1179,6 +1184,8 @@ FROM   civicrm_domain
    *
    * @return string|null
    *   Value of $returnColumn in the retrieved record
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
     if (
@@ -1188,7 +1195,7 @@ FROM   civicrm_domain
       // adding this here since developers forget to check for an id
       // or for the 'null' (which is a bad DAO kludge)
       // and hence we get the first value in the db
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('getFieldValue failed');
     }
 
     self::$_dbColumnValueCache = self::$_dbColumnValueCache ?? [];
