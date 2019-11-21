@@ -505,7 +505,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
         $tempTable = CRM_Utils_SQL_TempTable::build();
         $tempTableName = $tempTable->getName();
         CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
-        $tempTable->createWithColumns('id int unsigned NOT NULL AUTO_INCREMENT, survey_contact_id int unsigned NOT NULL, PRIMARY KEY ( id )')
+        $tempTable->createWithColumns('id int unsigned NOT NULL AUTO_INCREMENT, survey_contact_id int unsigned NOT NULL, PRIMARY KEY ( id )');
 
         $batch = 100;
         $insertedCount = 0;
