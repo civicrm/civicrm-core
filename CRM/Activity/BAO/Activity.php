@@ -2129,6 +2129,7 @@ AND cl.modified_id  = c.id
         'activity_status' => [
           'title' => ts('Activity Status'),
           'name' => 'activity_status',
+          'where' => 'civicrm_activity.status_id',
           'type' => CRM_Utils_Type::T_STRING,
           'searchByLabel' => TRUE,
         ],

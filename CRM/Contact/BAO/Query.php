@@ -6470,7 +6470,7 @@ AND   displayRelType.is_active = 1
           if (empty($fieldSpec['bao'])) {
             continue;
           }
-          $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['name'], NULL, [
+          $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['field_name'] ?? $fieldSpec['name'], NULL, [
             'orderColumn' => CRM_Utils_Array::value('labelColumn', $pseudoConstantMetadata, 'label'),
           ]);
           $fieldIDsInOrder = implode(',', array_keys($sortedOptions));
