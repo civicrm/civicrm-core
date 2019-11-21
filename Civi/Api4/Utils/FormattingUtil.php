@@ -65,6 +65,8 @@ class FormattingUtil {
         $params[$name] = 'null';
       }
     }
+
+    \CRM_Utils_API_HTMLInputCoder::singleton()->encodeRow($params);
   }
 
   /**
@@ -110,6 +112,11 @@ class FormattingUtil {
       case 'Date':
         $value = date('Ymd', strtotime($value));
         break;
+    }
+
+    $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
+    if (!$hic->isSkippedField($fieldSpec['name'])) {
+      $value = $hic->encodeValue($value);
     }
   }
 

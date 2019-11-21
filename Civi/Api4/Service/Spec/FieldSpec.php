@@ -60,7 +60,7 @@ class FieldSpec {
   protected $requiredIf;
 
   /**
-   * @var array|boolean
+   * @var array|bool
    */
   protected $options;
 
@@ -98,6 +98,11 @@ class FieldSpec {
    * @var string
    */
   protected $helpPost;
+
+  /**
+   * @var array
+   */
+  protected $permission;
 
   /**
    * Aliases for the valid data types
@@ -278,6 +283,22 @@ class FieldSpec {
     $this->serialize = $serialize;
 
     return $this;
+  }
+
+  /**
+   * @param array $permission
+   * @return $this
+   */
+  public function setPermission($permission) {
+    $this->permission = $permission;
+    return $this;
+  }
+
+  /**
+   * @return array
+   */
+  public function getPermission() {
+    return $this->permission;
   }
 
   /**

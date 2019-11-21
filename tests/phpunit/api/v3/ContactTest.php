@@ -632,8 +632,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('B', $result['values'][$contactId]['last_name']);
     $this->assertEquals('abcd1234', $result['values'][$contactId]['api_key']);
 
+    // Should also be returned via join
+    $joinResult = $this->callAPISuccessGetSingle('Email', [
+      'check_permissions' => 1,
+      'contact_id' => $contactId,
+      'return' => 'contact_id.api_key',
+    ]);
+    $field = $this->_apiversion == 4 ? 'contact.api_key' : 'contact_id.api_key';
+    $this->assertEquals('abcd1234', $joinResult[$field]);
+
     // Restricted return -- because we don't have permission
-    $config->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
+    $config->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'edit all contacts'];
     $result = $this->callAPISuccess('Contact', 'create', [
       'check_permissions' => 1,
       'id' => $contactId,
@@ -642,6 +651,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('A4', $result['values'][$contactId]['first_name']);
     $this->assertEquals('B', $result['values'][$contactId]['last_name']);
     $this->assertTrue(empty($result['values'][$contactId]['api_key']));
+
+    // Should also be restricted via join
+    $joinResult = $this->callAPISuccessGetSingle('Email', [
+      'check_permissions' => 1,
+      'contact_id' => $contactId,
+      'return' => ['email', 'contact_id.api_key'],
+    ]);
+    $this->assertTrue(empty($joinResult['contact_id.api_key']));
   }
 
   /**
