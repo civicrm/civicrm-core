@@ -28,6 +28,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test create method (create and update modes).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreate() {
     $contactId = $this->individualCreate();
@@ -671,10 +673,16 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * addPayments() method (add and edit modes of participant)
+   * addPayments() method (add and edit modes of participant).
+   *
+   * Add Payments is part of an old, flawed, code flow.
    */
   public function testAddPayments() {
-    list($lineItems, $contribution) = $this->addParticipantWithContribution();
+    $contribution = $this->addParticipantWithContribution();
+    // Delete existing financial_trxns. This is because we are testing a code flow we
+    // want to deprecate & remove & the test relies on bad data asa starting point.
+    // End goal is the Order.create->Payment.create flow.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_financial_trxn WHERE entity_table = "civicrm_financial_item"');
     CRM_Contribute_BAO_Contribution::addPayments([$contribution]);
     $this->checkItemValues($contribution);
   }
@@ -701,9 +709,16 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * assignProportionalLineItems() method (add and edit modes of participant)
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testAssignProportionalLineItems() {
-    list($lineItems, $contribution) = $this->addParticipantWithContribution();
+    $contribution = $this->addParticipantWithContribution();
+    // Delete existing financial_trxns. This is because we are testing a code flow we
+    // want to deprecate & remove & the test relies on bad data asa starting point.
+    // End goal is the Order.create->Payment.create flow.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_financial_trxn WHERE entity_table = "civicrm_financial_item"');
     $params = [
       'contribution_id' => $contribution->id,
       'total_amount' => 150.00,
@@ -719,25 +734,16 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * Add participant with contribution
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function addParticipantWithContribution() {
     // creating price set, price field
     $this->_contactId = $this->individualCreate();
-    $event = $this->eventCreate();
+    $event = $this->eventCreatePaid([]);
     $this->_eventId = $event['id'];
-    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
-    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
-    $paramsSet['is_active'] = TRUE;
-    $paramsSet['financial_type_id'] = 4;
-    $paramsSet['extends'] = 1;
-
-    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
-    $priceSetId = $priceset->id;
-
-    //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created priceset'
-    );
+    $priceSetId = $this->priceSetID;
     $paramsField = [
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
@@ -751,7 +757,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => ['1' => 1, '2' => 1],
-      'price_set_id' => $priceset->id,
+      'price_set_id' => $this->priceSetID,
       'is_enter_qty' => 1,
       'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
     ];
@@ -775,16 +781,15 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
     $participant = CRM_Event_BAO_Participant::add($participantParams);
     $contributionParams = [
-      'total_amount' => 150,
+      'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
-      'contribution_status_id' => 1,
-      'partial_payment_total' => 300.00,
-      'partial_amount_to_pay' => 150,
+      'contribution_status_id' => 'Pending',
       'contribution_mode' => 'participant',
       'participant_id' => $participant->id,
       'sequential' => TRUE,
+      'api.Payment.create' => ['total_amount' => 150],
     ];
 
     foreach ($priceFields['values'] as $key => $priceField) {
@@ -812,7 +817,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $contributionObject->id = $contribution['id'];
     $contributionObject->find(TRUE);
 
-    return [$lineItems, $contributionObject];
+    return $contributionObject;
   }
 
   /**

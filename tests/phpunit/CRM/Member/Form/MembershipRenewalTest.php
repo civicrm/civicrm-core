@@ -98,6 +98,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Clean up after each test.
    */
   public function tearDown() {
+    $this->validateAllPayments();
+    $this->validateAllContributions();
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(
       [
