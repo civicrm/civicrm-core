@@ -66,7 +66,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     'thankyou_date',
     'contribution_status_id',
     'contribution_status',
-    'cancel_date',
+    'contribution_cancel_date',
     'product_name',
     'is_test',
     'contribution_recur_id',

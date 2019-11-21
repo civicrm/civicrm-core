@@ -76,7 +76,16 @@ function civicrm_api3_iats_payments_get_journal($params) {
       }
     }
   }
-  $limit = 25;
+  if (isset($params['options']['sort'])) {
+    $sort = $params['options']['sort'];
+    $i++;
+    $select .= " ORDER BY %$i";
+    $args[$i] = array($sort, 'String');
+  }
+  else { // by default, get the most recent entry
+    $select .= " ORDER BY id DESC";
+  }
+  $limit = 1;
   if (isset($params['options']['limit'])) {
     $limit = (integer) $params['options']['limit'];
   }
@@ -84,12 +93,6 @@ function civicrm_api3_iats_payments_get_journal($params) {
     $i++;
     $select .= " LIMIT %$i";
     $args[$i] = array($limit, 'Integer');
-  }
-  if (isset($params['options']['sort'])) {
-    $sort = $params['options']['sort'];
-    $i++;
-    $select .= " ORDER BY %$i";
-    $args[$i] = array($sort, 'String');
   }
 
   $values = array();
@@ -104,6 +107,10 @@ function civicrm_api3_iats_payments_get_journal($params) {
         }
       }
       $key = $dao->tnid;
+      // also return some of this data in "normalized" field names
+      $record['transaction_id'] = $record['tnid'];
+      $record['client_code'] = $record['cstc'];
+      $record['auth_result'] = $record['rst'];
       $values[$key] = $record;
     }
   }

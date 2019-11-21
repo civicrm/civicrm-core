@@ -185,8 +185,7 @@ class PrototypedArrayNode extends ArrayNode
     protected function finalizeValue($value)
     {
         if (false === $value) {
-            $msg = sprintf('Unsetting key for path "%s", value: %s', $this->getPath(), json_encode($value));
-            throw new UnsetKeyException($msg);
+            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s', $this->getPath(), json_encode($value)));
         }
 
         foreach ($value as $k => $v) {
@@ -199,8 +198,7 @@ class PrototypedArrayNode extends ArrayNode
         }
 
         if (\count($value) < $this->minNumberOfElements) {
-            $msg = sprintf('The path "%s" should have at least %d element(s) defined.', $this->getPath(), $this->minNumberOfElements);
-            $ex = new InvalidConfigurationException($msg);
+            $ex = new InvalidConfigurationException(sprintf('The path "%s" should have at least %d element(s) defined.', $this->getPath(), $this->minNumberOfElements));
             $ex->setPath($this->getPath());
 
             throw $ex;
@@ -232,8 +230,7 @@ class PrototypedArrayNode extends ArrayNode
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && \is_int($k) && !$isAssoc) {
-                    $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
-                    $ex = new InvalidConfigurationException($msg);
+                    $ex = new InvalidConfigurationException(sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath()));
                     $ex->setPath($this->getPath());
 
                     throw $ex;
@@ -262,8 +259,7 @@ class PrototypedArrayNode extends ArrayNode
                 }
 
                 if (array_key_exists($k, $normalized)) {
-                    $msg = sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath());
-                    $ex = new DuplicateKeyException($msg);
+                    $ex = new DuplicateKeyException(sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath()));
                     $ex->setPath($this->getPath());
 
                     throw $ex;
@@ -314,11 +310,7 @@ class PrototypedArrayNode extends ArrayNode
             // no conflict
             if (!array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
-                    $ex = new InvalidConfigurationException(sprintf(
-                        'You are not allowed to define new elements for path "%s". '.
-                        'Please define all elements for this path in one config file.',
-                        $this->getPath()
-                    ));
+                    $ex = new InvalidConfigurationException(sprintf('You are not allowed to define new elements for path "%s". Please define all elements for this path in one config file.', $this->getPath()));
                     $ex->setPath($this->getPath());
 
                     throw $ex;
@@ -342,27 +334,31 @@ class PrototypedArrayNode extends ArrayNode
      * one is same as this->keyAttribute and the other is 'value', then the prototype will be different.
      *
      * For example, assume $this->keyAttribute is 'name' and the value array is as follows:
-     * array(
+     *
      *     array(
-     *         'name' => 'name001',
-     *         'value' => 'value001'
+     *         array(
+     *             'name' => 'name001',
+     *             'value' => 'value001'
+     *         )
      *     )
-     * )
      *
      * Now, the key is 0 and the child node is:
-     * array(
-     *    'name' => 'name001',
-     *    'value' => 'value001'
-     * )
+     *
+     *     array(
+     *        'name' => 'name001',
+     *        'value' => 'value001'
+     *     )
      *
      * When normalizing the value array, the 'name' element will removed from the child node
      * and its value becomes the new key of the child node:
-     * array(
-     *     'name001' => array('value' => 'value001')
-     * )
+     *
+     *     array(
+     *         'name001' => array('value' => 'value001')
+     *     )
      *
      * Now only 'value' element is left in the child node which can be further simplified into a string:
-     * array('name001' => 'value001')
+     *
+     *     array('name001' => 'value001')
      *
      * Now, the key becomes 'name001' and the child node becomes 'value001' and
      * the prototype of child node 'name001' should be a ScalarNode instead of an ArrayNode instance.

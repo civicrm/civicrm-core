@@ -762,7 +762,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       // @todo return this & fix query to do pseudoconstant thing.
       'contribution_status' => 1,
       'currency' => 1,
-      'cancel_date' => 1,
+      'contribution_cancel_date' => 1,
       'contribution_recur_id' => 1,
     ];
     if (self::isSiteHasProducts()) {

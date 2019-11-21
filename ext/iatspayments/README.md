@@ -57,8 +57,6 @@ Extension Testing Notes
 
   * iATS Payments SWIPE: not easy to test - even if you have an Encrypted USB Card Reader (sourced by iATS Payments) you will need a physical fake credit card with: 4222222222222220 security code = 123 and any future Expiration date in the magnetic strip - to process any $amount.
 
-  * iATS Payments UK Direct Debit: use 12345678 for Account Number; 000000 for Sort Code
-
 7. iATS has another test VISA: 41111111111111111 security code = 123 and any future Expiration date
 
 8. Reponses for a transaction with VISA: 41111111111111111 depend on the $amount processed - as follows
@@ -76,23 +74,18 @@ Extension Testing Notes
   * 16.00 REJ: 2;
   * Other Amount REJ: 15
 
-9. After completing a TEST payment -> check the Contributions -> Dashboard. Credit Card Transactions are authorized (=Completed) right away. ACH/EFT + UK direct Debit will be (=Pending).
+9. After completing a TEST payment -> check the Contributions -> Dashboard. Credit Card Transactions are authorized (=Completed) right away. ACH/EFT will be (=Pending).
 
 10. Visit https://home.iatspayments.com -> and click the Client Login button (top right)
   * Login with TEST88 and TEST88
   * hit Reports -> Journal - Credit Card Transactions -> Get Journal -> if it has been a busy day there will be lots of transactions here - so hit display all and scroll down to see the transaction you just processed via CiviCRM.
   * hit Reports -> Journal - ACHEFT Transactions -> List Batches (the test transaction will be here until it is sent to the bank for processing - after that - and depending on the Result - it will appear in either the ACHEFT Approval or the ACHEFT Reject journal.
 
-11. For iATS Payments UK Direct Debit -> visit: https://www.uk.iatspayments.com
-  * Login with UDDD88 and DDTESTUK
-  * hit Virtual Terminal -> Customer Database -> Search by Name -> hit Edit icon (on the left) -> to see all details, including the Reference Number (which should match up with what you saw on your Thank you screen in CiviCRM). 
-  * NOTE: Each charity needs to have a BACS accredited supplier vet their CiviCRM Direct Debit - Contribution Pages
+11. If things don't look right, you can turn on Drupal and CiviCRM logging - try another TEST transaction - and then see some detailed logging of the SOAP exchanges for more hints about where it might have gone wrong.
 
-12. If things don't look right, you can turn on Drupal and CiviCRM logging - try another TEST transaction - and then see some detailed logging of the SOAP exchanges for more hints about where it might have gone wrong.
+12. To test recurring contributions - try creating a recurring contribution for every day and then go back the next day and manually trigger Scheduled Job: iATS Payments Recurring Contributions
 
-13. To test recurring contributions - try creating a recurring contribution for every day and then go back the next day and manually trigger Scheduled Job: iATS Payments Recurring Contributions
-
-14. To test ACH/EFT contributions - manually run Scheduled Job: iATS Payments Verification - it will check with iATS to see if there is any word from the bank yet. How long it takes before a yeah or neah is available depends on the day of the week and the time the transaction is submitted. It can take overnight (over weekend) to get a verification. 
+13. To test ACH/EFT contributions - manually run Scheduled Job: iATS Payments Verification - it will check with iATS to see if there is any word from the bank yet. How long it takes before a yeah or neah is available depends on the day of the week and the time the transaction is submitted. It can take overnight (over weekend) to get a verification. 
 
 Once you're happy all is well - then all you need to do is update the Payment Processor data - with your own iATS' Agent Code and Password.
 
@@ -123,3 +116,5 @@ Please note that ACH Returns require manually processing. iATS Payments will not
 Caution on the use of Pricesets in recurring contributions. This extension will try to use the original transactions' line items. But there are two separate issues here. First, CiviCRM API does an incomplete job with the bookkeeping of line items, so if you need detailed bookkeeping of line items in recurring contributions, you may be disappointed. Separately, if the total amount of the recurring contribution has changed, then there's no machine way of reliably re-allocating it into the original line items, so in that case, they are not used at all. Though not always ideal, a workaround might be to do different transactions for different types of CiviCRM payments instead.
 
 Please post an issue to the github repository if you have any questions.
+=======
+# com.iatspayments.civicrm

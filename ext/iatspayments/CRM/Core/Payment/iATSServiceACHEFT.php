@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Affero General Public
  * License with this program; if not, see http://www.gnu.org/licenses/
  *
- * This code provides glue between CiviCRM payment model and the iATS Payment model encapsulated in the iATS_Service_Request object
+ * This code provides glue between CiviCRM payment model and the iATS Payment model encapsulated in the CRM_Iats_iATSServiceRequest object
  */
 
 /**
@@ -65,6 +65,139 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
   }
 
   /**
+   * Get array of fields that should be displayed on the payment form for ACH/EFT (badly named as debit cards).
+   *
+   * @return array
+   */
+
+  protected function getDirectDebitFormFields() {
+    $fields = parent::getDirectDebitFormFields();
+    $fields[] = 'bank_account_type';
+    // print_r($fields); die();
+    return $fields;
+  }
+
+  /**
+   * Return an array of all the details about the fields potentially required for payment fields.
+   *
+   * Only those determined by getPaymentFormFields will actually be assigned to the form
+   *
+   * @return array
+   *   field metadata
+   */
+  public function getPaymentFormFieldsMetadata() {
+    $metadata = parent::getPaymentFormFieldsMetadata();
+    $metadata['bank_account_type'] = [
+      'htmlType' => 'Select',
+      'name' => 'bank_account_type',
+      'title' => ts('Account type'),
+      'is_required' => TRUE,
+      'attributes' => ['CHECKING' => 'Chequing', 'SAVING' => 'Savings'],
+    ];
+    return $metadata;
+  }
+
+
+  /**
+   * Opportunity for the payment processor to override the entire form build.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   *   Should form building stop at this point?
+   *
+   * Add ACH/EFT per currency instructions, also do parent (cc) form building to allow future
+   * recurring on public pages.
+   *
+   * return (!empty($form->_paymentFields));
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function buildForm(&$form) {
+    // If a form allows ACH/EFT and enables recurring, set recurring to the default. 
+    if (isset($form->_elementIndex['is_recur'])) {
+      // Make recurring contrib default to true.
+      $form->setDefaults(array('is_recur' => 1));
+    }
+    $currency = iats_getCurrency($form);
+    // my javascript will (should, not yet) use the currency to rewrite some labels
+    $jsVariables = [
+      'currency' => $currency,
+    ];
+    CRM_Core_Resources::singleton()->addVars('iats', $jsVariables);
+    CRM_Core_Resources::singleton()->addScriptFile('com.iatspayments.civicrm', 'js/dd_acheft.js', 10);
+    // add in a billing block template in a currency dependent way.
+    $fname = 'buildForm_' . $currency;
+    if ($currency && method_exists($this,$fname)) {
+      // add in the common fields and rules first to allow modifications
+      //$this->addCommonFields($form, $form->_paymentFields);
+      //$this->addRules($form, $form->_paymentFields);
+      $this->$fname($form);
+    }
+    // Else, I'm handling an unexpected currency.
+    elseif ($currency) {
+      CRM_Core_Region::instance('billing-block')->add(array(
+        'template' => 'CRM/Iats/BillingBlockDirectDebitExtra_Other.tpl',
+      ));
+    }
+    return parent::buildForm($form);
+  }
+
+
+  /**
+   * Customization for USD ACH-EFT billing block.
+   */
+  protected function buildForm_USD(&$form) {
+    /*
+    $element = $form->getElement('account_holder');
+    $element->setLabel(ts('Name of Account Holder'));
+    $element = $form->getElement('bank_account_number');
+    $element->setLabel(ts('Bank Account Number'));
+    $element = $form->getElement('bank_identification_number');
+    $element->setLabel(ts('Bank Routing Number')); */
+    /* if (empty($form->billingFieldSets['direct_debit']['fields']['bank_identification_number']['is_required'])) {
+      $form->addRule('bank_identification_number', ts('%1 is a required field.', array(1 => ts('Bank Routing Number'))), 'required');
+  } */
+    CRM_Core_Region::instance('billing-block')->add(array(
+      'template' => 'CRM/Iats/BillingBlockDirectDebitExtra_USD.tpl',
+    ));
+  }
+  
+  /**
+   * Customization for CAD ACH-EFT billing block.
+   *
+   * Add some elements (bank number and transit number) that are used to
+   * generate the bank identification number, which is hidden.
+   * I can't do this in the usual way because it's currency-specific.
+   * Note that this is really just an interface convenience, the ACH/EFT
+   * North American interbank system is consistent across US and Canada.
+   */
+  protected function buildForm_CAD(&$form) {
+    $form->addElement('text', 'cad_bank_number', ts('Bank Number (3 digits)'));
+    $form->addRule('cad_bank_number', ts('%1 is a required field.', array(1 => ts('Bank Number'))), 'required');
+    $form->addRule('cad_bank_number', ts('%1 must contain only digits.', array(1 => ts('Bank Number'))), 'numeric');
+    $form->addRule('cad_bank_number', ts('%1 must be of length 3.', array(1 => ts('Bank Number'))), 'rangelength', array(3, 3));
+    $form->addElement('text', 'cad_transit_number', ts('Transit Number (5 digits)'));
+    $form->addRule('cad_transit_number', ts('%1 is a required field.', array(1 => ts('Transit Number'))), 'required');
+    $form->addRule('cad_transit_number', ts('%1 must contain only digits.', array(1 => ts('Transit Number'))), 'numeric');
+    $form->addRule('cad_transit_number', ts('%1 must be of length 5.', array(1 => ts('Transit Number'))), 'rangelength', array(5, 5));
+    /* minor customization of labels + make them required  */
+    /* $element = $form->getElement('account_holder');
+    $element->setLabel(ts('Name of Account Holder'));
+    $element = $form->getElement('bank_account_number');
+    $element->setLabel(ts('Account Number'));
+    $form->addRule('bank_account_number', ts('%1 must contain only digits.', array(1 => ts('Bank Account Number'))), 'numeric'); */
+    /* the bank_identification_number is hidden and then populated using jquery, in the custom template  */
+    /* $element = $form->getElement('bank_identification_number');
+    $element->setLabel(ts('Bank Number + Transit Number')); */
+    // print_r($form); die();
+    CRM_Core_Resources::singleton()->addScriptFile('com.iatspayments.civicrm', 'js/dd_cad.js', 10);
+    CRM_Core_Region::instance('billing-block')->add(array(
+      'template' => 'CRM/Iats/BillingBlockDirectDebitExtra_CAD.tpl',
+    ));
+  }
+
+
+  /**
    *
    */
   public function doDirectPayment(&$params) {
@@ -73,12 +206,11 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
       return self::error('Unexpected error, missing profile');
     }
     // Use the iATSService object for interacting with iATS, mostly the same for recurring contributions.
-    require_once "CRM/iATS/iATSService.php";
     // We handle both one-time and recurring ACH/EFT
     $isRecur = CRM_Utils_Array::value('is_recur', $params) && $params['contributionRecurID'];
     $methodType = $isRecur ? 'customer' : 'process';
     $method = $isRecur ? 'create_acheft_customer_code' : 'acheft';
-    $iats = new iATS_Service_Request(array('type' => $methodType, 'method' => $method, 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
+    $iats = new CRM_Iats_iATSServiceRequest(array('type' => $methodType, 'method' => $method, 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
     $request = $this->convertParams($params, $method);
     $request['customerIPAddress'] = (function_exists('ip_address') ? ip_address() : $_SERVER['REMOTE_ADDR']);
     $credentials = array(
@@ -91,9 +223,6 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
       // Process the soap response into a readable result, logging any transaction.
       $result = $iats->result($response);
       if ($result['status']) {
-        // Always set pending status.
-        $params['contribution_status_id'] = 2;
-        // For future versions, the proper key.
         $params['payment_status_id'] = 2;
         $params['trxn_id'] = trim($result['remote_id']) . ':' . time();
         $params['gross_amount'] = $params['amount'];
@@ -116,7 +245,7 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
       }
     }
     else {
-      // Save the client info in my custom table
+      // Save the customer info in to the CiviCRM core payment_token table
       $customer = $iats->result($response);
       if (!$customer['status']) {
         return self::error($customer['reasonMessage']);
@@ -124,8 +253,6 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
       else {
         $processresult = $response->PROCESSRESULT;
         $customer_code = (string) $processresult->CUSTOMERCODE;
-        // $exp = sprintf('%02d%02d', ($params['year'] % 100), $params['month']);.
-        $exp = '0000';
         $email = '';
         if (isset($params['email'])) {
           $email = $params['email'];
@@ -136,27 +263,57 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
         elseif (isset($params['email-Primary'])) {
           $email = $params['email-Primary'];
         }
-        $query_params = array(
-          1 => array($customer_code, 'String'),
-          2 => array($request['customerIPAddress'], 'String'),
-          3 => array($exp, 'String'),
-          4 => array($params['contactID'], 'Integer'),
-          5 => array($email, 'String'),
-          6 => array($params['contributionRecurID'], 'Integer'),
-        );
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_iats_customer_codes
-          (customer_code, ip, expiry, cid, email, recur_id) VALUES (%1, %2, %3, %4, %5, %6)", $query_params);
-        $allow_days = $this->getSettings('days');
-        // Also test for a specific recieve date request that is not today.
-        $receive_date_request = CRM_Utils_Array::value('receive_date', $params);
-        $today = date('Ymd');
-        // If the receive_date is set to sometime today, unset it.
-        if (!empty($receive_date_request) && 0 === strpos($receive_date_request, $today)) {
-          unset($receive_date_request);
+        $payment_token_params = [
+          'token' => $customer_code,
+          'ip_address' => $request['customerIPAddress'],
+          'contact_id' => $params['contactID'],
+          'email' => $email,
+          'payment_processor_id' => $this->_paymentProcessor['id'],
+        ];
+        $token_result = civicrm_api3('PaymentToken', 'create', $payment_token_params);
+        // Upon success, save the token table's id back in the recurring record.
+        if (!empty($token_result['id'])) {
+          civicrm_api3('ContributionRecur', 'create', [
+            'id' => $params['contributionRecurID'],
+            'payment_token_id' => $token_result['id'],
+          ]);
         }
-        // Normally, run the (first) transaction immediately, unless the admin setting is in force or a specific request is being made.
-        if (max($allow_days) <= 0 && empty($receive_date_request)) {
-          $iats = new iATS_Service_Request(array('type' => 'process', 'method' => 'acheft_with_customer_code', 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
+        // Test for admin setting that limits allowable transaction days
+        $allow_days = $this->getSettings('days');
+        // Test for a specific receive date request and convert to a timestamp, default now
+        $receive_date = CRM_Utils_Array::value('receive_date', $params);
+        // my front-end addition to will get stripped out of the params, do a
+        // work-around
+        if (empty($receive_date)) {
+          $receive_date = CRM_Utils_Array::value('receive_date', $_POST);
+        }
+        $receive_ts = empty($receive_date) ? time() : strtotime($receive_date);
+        // If the admin setting is in force, ensure it's compatible.
+        if (max($allow_days) > 0) {
+          $receive_ts = CRM_Iats_Transaction::contributionrecur_next($receive_ts, $allow_days);
+        }
+        // convert to a reliable format
+        $receive_date = date('Ymd', $receive_ts);
+        $today = date('Ymd');
+        // If the receive_date is NOT today, then
+        // create a pending contribution and adjust the next scheduled date.
+        if ($receive_date !== $today) {
+          // I've got a schedule to adhere to!
+          // set the receieve time to 3:00 am for a better admin experience
+          $update = array(
+            'payment_status_id' => 2,
+            'receive_date' => date('Ymd', $receive_ts) . '030000',
+          );
+          // update the recurring and contribution records with the receive date,
+          // i.e. make up for what core doesn't do
+          $this->updateRecurring($params, $update);
+          $this->updateContribution($params, $update);
+          // and now return the updates to core via the params
+          $params = array_merge($params, $update);
+          return $params;
+        }
+        else {
+          $iats = new CRM_Iats_iATSServiceRequest(array('type' => 'process', 'method' => 'acheft_with_customer_code', 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
           $request = array('invoiceNum' => $params['invoiceID']);
           $request['total'] = sprintf('%01.2f', CRM_Utils_Rule::cleanMoney($params['amount']));
           $request['customerCode'] = $customer_code;
@@ -168,10 +325,12 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
             $update = array(
               'trxn_id' => trim($result['remote_id']) . ':' . time(),
               'gross_amount' => $params['amount'],
-              'payment_status_id' => 2
+              'payment_status_id' => 2,
             );
-            // Setting the next_sched_contribution_date param setting is not doing anything, commented out.
-            $this->setRecurReturnParams($params, $update);
+            // Setting the next_sched_contribution_date param doesn't do anything, 
+            // work around in updateRecurring
+            $this->updateRecurring($params, $update);
+            $params = array_merge($params, $update);
             // Core assumes that a pending result will have no transaction id, but we have a useful one.
             if (!empty($params['contributionID'])) {
               $contribution_update = array('id' => $params['contributionID'], 'trxn_id' => $update['trxn_id']);
@@ -189,20 +348,6 @@ class CRM_Core_Payment_iATSServiceACHEFT extends CRM_Core_Payment_iATSService {
           else {
             return self::error($result['reasonMessage']);
           }
-        }
-        // Otherwise, I have a schedule to adhere to.
-        else {    
-          // Note that the admin general setting restricting allowable days may update a specific request.
-          $receive_timestamp = empty($receive_date_request) ? time() : strtotime($receive_date_request);
-          $next_sched_contribution_timestamp = (max($allow_days) > 0) ? _iats_contributionrecur_next($receive_timestamp, $allow_days) 
-            : $receive_timestamp;
-          // set the receieve time to 3:00 am for a better admin experience
-          $update = array(
-            'payment_status_id' => 2,
-            'receive_date' => date('Ymd', $next_sched_contribution_timestamp) . '030000',
-          );
-          $this->setRecurReturnParams($params, $update);
-          return $params;
         }
       }
       return $params;

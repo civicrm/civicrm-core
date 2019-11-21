@@ -1,0 +1,47 @@
+/* crypto css */
+
+.cryptogram-section {
+  display: none;
+}
+
+#firstpay-iframe {
+  width: 100%;
+  xmin-height: 220px;
+  zoom: 1;
+  display: block;
+  border: none;
+  overflow: hidden;
+}
+
+/* override default firstpay styling with shoreditch-y css */
+
+.firstpay-container {
+  font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 12px;
+  padding: 0;
+  width: 300px;
+}
+
+.firstpay-label {
+  display: none;
+  font-weight: 600;
+  color: #464354;
+  margin: 4px 0;
+}
+
+.firstpay-input {
+  font-size: 13px;
+  padding: 5px 0;
+  border-radius: 3px;
+  vertical-align: middle;
+  max-width: 100%;
+  margin: 4px 0;
+
+.firstpay-input {
+  background: #fff;
+  border-color: #c2cfd8;
+  border-radius: 2px;
+  box-shadow: 0 0 3px 0 rgba(0,0,0,0.2) inset;
+  color: #4d4d69;
+}
+

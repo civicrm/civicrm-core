@@ -1,20 +1,5 @@
 -- install sql for iATS Services extension, create a table to hold custom codes
 
-CREATE TABLE `civicrm_iats_customer_codes` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Custom code Id',
-  `customer_code` varchar(255) NOT NULL COMMENT 'Customer code returned from iATS',
-  `ip` varchar(255) DEFAULT NULL COMMENT 'Last IP from which this customer code was accessed or created',
-  `expiry` varchar(4) DEFAULT NULL COMMENT 'CC expiry yymm',
-  `cid` int(10) unsigned DEFAULT '0' COMMENT 'CiviCRM contact id',
-  `email` varchar(255) DEFAULT NULL COMMENT 'Customer-constituent Email address',
-  `recur_id` int(10) unsigned DEFAULT '0' COMMENT 'CiviCRM recurring_contribution table id',
-  PRIMARY KEY ( `id` ),
-  UNIQUE INDEX (`customer_code`),
-  KEY (`cid`),
-  KEY (`email`),
-  KEY (`recur_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table to store customer codes';
-
 CREATE TABLE `civicrm_iats_request_log` (
   `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Request Log Id',
   `invoice_num` varchar(255) NOT NULL COMMENT 'Invoice number being sent to iATS',
@@ -61,22 +46,6 @@ CREATE TABLE `civicrm_iats_verify` (
   KEY (`auth_result`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table to store verification information';
 
-CREATE TABLE `civicrm_iats_ukdd_validate` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'UK DirectDebit validation Id',
-  `customer_code` varchar(255) NOT NULL COMMENT 'Customer code returned from iATS',
-  `acheft_reference_num` varchar(255) NOT NULL COMMENT 'Reference number returned from iATS',
-  `cid` int(10) unsigned DEFAULT '0' COMMENT 'CiviCRM contact id',
-  `recur_id` int(10) unsigned DEFAULT '0' COMMENT 'CiviCRM recurring_contribution table id',
-  `validated` int(10) unsigned DEFAULT '0' COMMENT 'Status id of 0 or 1 (after validation)',
-  `validated_datetime` datetime COMMENT 'Date time of validation',
-  `xml` longtext COMMENT 'XML response to initial validation request',
-  PRIMARY KEY ( `id` ),
-  KEY (`customer_code`),
-  KEY (`acheft_reference_num`),
-  KEY (`cid`),
-  KEY (`recur_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table to store UK Direct Debit validation information';
-
 CREATE TABLE `civicrm_iats_journal` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'CiviCRM Journal Id',
   `iats_id` int unsigned DEFAULT NULL COMMENT 'iATS Journal Id',
@@ -107,5 +76,36 @@ CREATE TABLE `civicrm_iats_journal` (
   KEY (`financial_trxn_id`),
   KEY (`contribution_id`),
   KEY (`verify_datetime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table to iATS journal transactions imported via the iATSPayments ReportLink.'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table to iATS journal transactions imported via the iATSPayments ReportLink.';
 
+CREATE TABLE `civicrm_iats_faps_journal` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'CiviCRM Journal Id',
+  `transactionId` int unsigned DEFAULT NULL COMMENT 'FAPS Transaction Id',
+  `authCode` varchar(255) NOT NULL COMMENT 'Authentication code',
+  `isAch` boolean DEFAULT '0' COMMENT 'Transaction type: is ACH',
+  `cardType` varchar(255) NOT NULL COMMENT 'Card Type',
+  `processorId` varchar(255) NOT NULL COMMENT 'Unique merchant account identifier',
+  `cimRefNumber` varchar(255) NOT NULL COMMENT 'CIM Reference Number',
+  `orderId` varchar(255) COMMENT 'Order Id = Invoice Number',
+  `transDateAndTime` datetime NOT NULL COMMENT 'DateTime',
+  `amount` decimal(20,2) COMMENT 'Amount',
+  `authResponse` varchar(255) COMMENT 'Response',
+  `currency` varchar(3) COMMENT 'Currency',
+  `status_id` int(10) unsigned DEFAULT '0' COMMENT 'Status of the payment',
+  `financial_trxn_id` int(10) unsigned DEFAULT '0' COMMENT 'Foreign key into CiviCRM financial trxn table id',
+  `cid` int(10) unsigned DEFAULT '0' COMMENT 'CiviCRM contact id',
+  `contribution_id` int(10) unsigned DEFAULT '0' COMMENT 'CiviCRM contribution table id',
+  `recur_id` int(10) unsigned DEFAULT '0' COMMENT 'CiviCRM recurring_contribution table id',
+  `verify_datetime` datetime COMMENT 'Date time of verification',
+  PRIMARY KEY ( `id` ),
+  UNIQUE KEY (`transactionId`,`processorId`,`authResponse`),
+  KEY (`authCode`),
+  KEY (`isAch`),
+  KEY (`cardType`),
+  KEY (`authResponse`),
+  KEY (`orderId`),
+  KEY (`transDateAndTime`),
+  KEY (`financial_trxn_id`),
+  KEY (`contribution_id`),
+  KEY (`verify_datetime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table of iATS/FAPS transactions imported via the query api.'
