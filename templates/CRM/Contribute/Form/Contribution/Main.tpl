@@ -67,7 +67,9 @@
   {/if}
 
   <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
+    {crmRegion name="contribution-main-intro-pre"}{/crmRegion}
     {$intro_text}
+    {crmRegion name="contribution-main-intro-post"}{/crmRegion}
   </div>
   {include file="CRM/common/cidzero.tpl"}
   {if $islifetime or $ispricelifetime }
