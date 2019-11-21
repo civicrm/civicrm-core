@@ -38,8 +38,8 @@ class CRM_Financial_BAO_Payment {
    */
   public static function create($params) {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($contribution['contribution_status_id'], 'name');
-    $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount']);
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
+    $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
     $lineItems = self::getPayableLineItems($params);
 
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date'];
@@ -358,14 +358,18 @@ class CRM_Financial_BAO_Payment {
   }
 
   /**
-   * Does this payment complete the contribution
+   * Does this payment complete the contribution.
    *
    * @param int $contributionID
    * @param float $paymentAmount
+   * @param string $previousStatus
    *
    * @return bool
    */
-  protected static function isPaymentCompletesContribution($contributionID, $paymentAmount) {
+  protected static function isPaymentCompletesContribution($contributionID, $paymentAmount, $previousStatus) {
+    if ($previousStatus === 'Completed') {
+      return FALSE;
+    }
     $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionID);
     $cmp = bccomp($paymentAmount, $outstandingBalance, 5);
     return ($cmp == 0 || $cmp == 1);
