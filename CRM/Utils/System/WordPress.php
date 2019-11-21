@@ -558,23 +558,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
     else {
-      $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
-
-      //might be windows installation.
-      $firstVar = array_shift($pathVars);
-      if ($firstVar) {
-        $cmsRoot = $firstVar;
-      }
-
-      //start w/ csm dir search.
-      foreach ($pathVars as $var) {
-        $cmsRoot .= "/$var";
-        if ($this->validInstallDir($cmsRoot)) {
-          //stop as we found bootstrap.
-          $valid = TRUE;
-          break;
-        }
-      }
+      $setting = Civi::settings()->get('wpLoadPhp');
+      $path = str_replace('wp-load.php', '', $setting);
+      $cmsRoot = rtrim($path, '/\\');
+      $valid = TRUE;
     }
 
     return ($valid) ? $cmsRoot : NULL;
