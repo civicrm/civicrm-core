@@ -237,7 +237,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'fee_amount' => 0.00,
       'net_amount' => 300.00,
     ];
-    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][7];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     //make a payment one cent short
     $params = [
       'contribution_id' => $contribution['id'],
