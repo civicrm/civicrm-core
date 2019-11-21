@@ -1042,6 +1042,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $params
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function eventCreatePaid($params) {
     $event = $this->eventCreate($params);

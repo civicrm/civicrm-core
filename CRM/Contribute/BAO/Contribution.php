@@ -4841,12 +4841,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Function to add payments for contribution
-   * for Partially Paid status
+   * Function to add payments for contribution for Partially Paid status
+   *
+   * @deprecated this is known to be flawed and possibly buggy.
+   *
+   * Replace with Order.create->Payment.create flow.
    *
    * @param array $contributions
    * @param string $contributionStatusId
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function addPayments($contributions, $contributionStatusId = NULL) {
     // get financial trxn which is a payment
