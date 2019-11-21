@@ -72,18 +72,18 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function recur(&$input, &$ids, &$objects, $first) {
+  public function recur($input, $ids, $objects, $first) {
     if (!isset($input['txnType'])) {
       Civi::log()->debug('PayPalIPN: Could not find txn_type in input request');
       echo "Failure: Invalid parameters<p>";
       return;
     }
 
-    if ($input['txnType'] == 'subscr_payment' &&
-      $input['paymentStatus'] != 'Completed'
+    if ($input['txnType'] === 'subscr_payment' &&
+      $input['paymentStatus'] !== 'Completed'
     ) {
       Civi::log()->debug('PayPalIPN: Ignore all IPN payments that are not completed');
-      echo "Failure: Invalid parameters<p>";
+      echo 'Failure: Invalid parameters<p>';
       return;
     }
 
