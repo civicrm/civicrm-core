@@ -136,6 +136,11 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     return $defaults;
   }
 
+  /**
+   * Build form.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function buildQuickForm() {
 
     $statuses = CRM_Event_PseudoConstant::participantStatus();
@@ -152,7 +157,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     //retrieve custom information
     $this->_values = [];
-    CRM_Event_Form_Registration::initEventFee($this, $event['id']);
+
+    CRM_Event_Form_Registration::initEventFee($this, $event['id'], $this->_action !== CRM_Core_Action::UPDATE);
     CRM_Event_Form_Registration_Register::buildAmount($this, TRUE);
 
     if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $this->_values))) {
@@ -217,6 +223,12 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     return $errors;
   }
 
+  /**
+   * Post process form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
