@@ -252,6 +252,8 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       return;
     }
     list($name, $op, $value, $grouping, $wildcard) = $values;
+    $fields = CRM_Case_BAO_Case::fields();
+    $fieldSpec = $fields[$values[0]] ?? [];
     $val = $names = [];
     switch ($name) {
 
@@ -315,10 +317,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'case_subject':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case.subject", $op, $value, 'String');
-        $query->_qill[$grouping][] = CRM_Contact_BAO_Query::getQillValue('CRM_Case_DAO_Case', $name, $value, $op, 'Case Subject');
-        $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
-        $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
+        $query->handleWhereFromMetadata($fieldSpec, $name, $value, $op);
         return;
 
       case 'case_source_contact_id':

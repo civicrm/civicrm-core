@@ -80,12 +80,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-    $this->loadFormValues();
-
-    if ($this->_force) {
-      $this->handleForcedSearch();
-    }
+    parent::preProcess();
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Case_Selector_Search($this->_queryParams,
@@ -188,6 +183,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = TRUE;
     $this->setFormValues();
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->fixFormValues();
     if (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
@@ -196,19 +192,22 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     //search for civicase
     if (!$this->_force) {
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       if (array_key_exists('case_owner', $this->_formValues) && !$this->_formValues['case_owner']) {
         $this->_formValues['case_owner'] = 0;
       }
     }
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -256,37 +255,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       $query->setSkipPermission(TRUE);
     }
     $controller->run();
-  }
-
-  /**
-   * Add the rules (mainly global rules) for form.
-   *
-   * All local rules are added near the element
-   *
-   * @see valid_date
-   */
-  public function addRules() {
-    $this->addFormRule(['CRM_Case_Form_Search', 'formRule']);
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   * @param array $files
-   * @param object $form
-   *
-   * @return array|bool
-   */
-  public static function formRule($fields, $files, $form) {
-    $errors = [];
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
   }
 
   public function fixFormValues() {
