@@ -815,13 +815,13 @@
           var htmlVal = element.html();
           if (!htmlVal) {
             htmlVal = scope.defaultValue;
-            element.html(htmlVal);
+            element.text(htmlVal);
           }
           ngModel.$setViewValue(htmlVal);
         }
 
         ngModel.$render = function() {
-          element.html(ngModel.$viewValue || scope.defaultValue);
+          element.text(ngModel.$viewValue || scope.defaultValue);
         };
 
         // Special handling for enter and escape keys
