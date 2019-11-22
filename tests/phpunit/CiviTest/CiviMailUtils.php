@@ -168,20 +168,19 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    * @param string $type
    *   'raw'|'ezc'.
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
+   *
    * @return array(ezcMail)|array(string)
    */
   public function getAllMessages($type = 'raw') {
-    $msgs = array();
+    $msgs = [];
 
     if ($this->_webtest) {
-      throw new Exception("Not implemented: getAllMessages for WebTest");
+      throw new CRM_Core_Exception('Not implemented: getAllMessages for WebTest');
     }
-    else {
-      $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id');
-      while ($dao->fetch()) {
-        $msgs[] = $dao->headers . "\n\n" . $dao->body;
-      }
+    $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id');
+    while ($dao->fetch()) {
+      $msgs[] = $dao->headers . "\n\n" . $dao->body;
     }
 
     switch ($type) {
