@@ -905,6 +905,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
     $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
     $this->addSearchFieldMetadata(['Grant' => CRM_Grant_BAO_Query::getSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['Case' => CRM_Case_BAO_Query::getSearchFieldMetadata()]);
   }
 
 }
