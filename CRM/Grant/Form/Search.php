@@ -75,13 +75,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-    $this->loadFormValues();
-
-    if ($this->_force) {
-      $this->postProcess();
-      $this->set('force', 0);
-    }
+    parent::preProcess();
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Grant_Selector_Search($this->_queryParams,
@@ -156,7 +150,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = TRUE;
 
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
     $this->fixFormValues();
 
     if (isset($this->_ssID) && empty($_POST)) {
@@ -168,7 +162,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -213,17 +206,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function &setDefaultValues() {
-    return $this->_formValues;
-  }
-
   public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
@@ -250,13 +232,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
         $this->_single = TRUE;
       }
     }
-  }
-
-  /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
   }
 
   /**
