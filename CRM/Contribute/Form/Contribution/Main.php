@@ -1124,12 +1124,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
       }
-      $component = '';
+
       if ($this->_membershipBlock) {
-        $component = 'membership';
+        $this->processAmountAndGetAutoRenew($this->_values['fee'], $params, $lineItem[$priceSetId], $priceSetId);
+      }
+      else {
+        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $priceSetId);
       }
 
-      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component, $priceSetId);
       if ($params['tax_amount']) {
         $this->set('tax_amount', $params['tax_amount']);
       }

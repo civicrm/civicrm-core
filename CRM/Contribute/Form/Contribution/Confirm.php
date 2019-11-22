@@ -1967,7 +1967,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $priceFields = $priceFields[$priceSetID]['fields'];
     $lineItems = [];
-    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution', $priceSetID);
+    $form->processAmountAndGetAutoRenew($priceFields, $paramsProcessedForForm, $lineItems, $priceSetID);
     $form->_lineItem = [$priceSetID => $lineItems];
     $membershipPriceFieldIDs = [];
     foreach ((array) $lineItems as $lineItem) {

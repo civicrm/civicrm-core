@@ -1153,7 +1153,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // END Fix for dev/core/issues/860
 
     CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-      $formValues, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
+      $formValues, $lineItem[$this->_priceSetId], $this->_priceSetId);
 
     if (!empty($formValues['tax_amount'])) {
       $params['tax_amount'] = $formValues['tax_amount'];
