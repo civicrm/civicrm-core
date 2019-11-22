@@ -548,10 +548,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // load BootStrap here if needed
     // We are a valid Joomla entry point.
+    // dev/core#1384 Use DS to ensure a correct JPATH_BASE in Windows
     if (!defined('_JEXEC') && $loadDefines) {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
-      define('JPATH_BASE', $joomlaBase . '/administrator');
+      define('JPATH_BASE', $joomlaBase . DS . 'administrator');
       require $joomlaBase . '/administrator/includes/defines.php';
     }
 
