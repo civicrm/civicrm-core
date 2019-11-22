@@ -682,12 +682,14 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       'title' => ts('Case Tag(s)'),
       'type' => CRM_Utils_Type::T_INT,
       'is_pseudofield' => TRUE,
+      'html' => ['type' => 'Select2'],
     ];
     if (CRM_Core_Permission::check('access all cases and activities')) {
       $metadata['case_owner'] = [
         'title' => ts('Cases'),
         'type' => CRM_Utils_Type::T_INT,
         'is_pseudofield' => TRUE,
+        'html' => ['type' => 'Radio'],
       ];
     }
     if (!CRM_Core_Permission::check('administer CiviCase')) {
