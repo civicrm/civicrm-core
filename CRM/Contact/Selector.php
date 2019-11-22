@@ -1023,11 +1023,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // the other alternative of running the FULL query will just be incredibly inefficient
     // and slow things down way too much on large data sets / complex queries
 
-    $selectSQL = "SELECT DISTINCT %1, contact_a.id, contact_a.sort_name";
+    $selectSQL = CRM_Core_DAO::composeQuery("SELECT DISTINCT %1, contact_a.id, contact_a.sort_name", [1 => [$cacheKey, 'String']]);
 
     $sql = str_ireplace(["SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"], $selectSQL, $sql);
     try {
-      Civi::service('prevnext')->fillWithSql($cacheKey, $sql, [1 => [$cacheKey, 'String']]);
+      Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
     }
     catch (CRM_Core_Exception $e) {
       if ($coreSearch) {
