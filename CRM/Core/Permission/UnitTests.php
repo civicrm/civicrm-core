@@ -13,20 +13,19 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
- *
+ * Unit Test mock permission class.
  */
 class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
 
   /**
-   * permission mapping to stub check() calls
+   * Permission mapping to stub check() calls.
+   *
    * @var array
    */
-  public $permissions = NULL;
+  public $permissions = [];
 
   /**
    * Given a permission string, check for access requirements
@@ -39,15 +38,15 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
    *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
-    if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+    if ($str === CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
     }
-    if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+    if ($str === CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
 
     // return the stubbed permission (defaulting to true if the array is missing)
-    return is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;
+    return is_array($this->permissions) ? in_array($str, $this->permissions, TRUE) : TRUE;
   }
 
   /**
