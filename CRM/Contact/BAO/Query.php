@@ -6430,7 +6430,10 @@ AND   displayRelType.is_active = 1
           // Pretty sure this validation ALSO happens in the order clause & this can't be reached but...
           // this might give some early warning.
           CRM_Utils_Type::validate($fieldIDsInOrder, 'CommaSeparatedIntegers');
-          $order = str_replace("$field", "field({$fieldSpec['name']},$fieldIDsInOrder)", $order);
+          // use where if it's set to fully qualify ambiguous column names
+          // i.e. civicrm_contribution.contribution_status_id instead of contribution_status_id
+          $pseudoColumnName = $fieldSpec['where'] ?? $fieldSpec['name'];
+          $order = str_replace("$field", "field($pseudoColumnName,$fieldIDsInOrder)", $order);
         }
         //CRM-12565 add "`" around $field if it is a pseudo constant
         // This appears to be for 'special' fields like locations with appended numbers or hyphens .. maybe.
