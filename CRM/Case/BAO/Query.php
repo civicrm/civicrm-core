@@ -693,6 +693,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   public static function getSearchFieldMetadata() {
     $fields = ['case_type_id', 'case_status_id', 'case_start_date', 'case_end_date', 'case_subject', 'case_id', 'case_deleted'];
     $metadata = civicrm_api3('Case', 'getfields', [])['values'];
+    $metadata['case_id'] = $metadata['id'];
     $metadata = array_intersect_key($metadata, array_flip($fields));
     $metadata['case_tags'] = [
       'title' => ts('Case Tag(s)'),
