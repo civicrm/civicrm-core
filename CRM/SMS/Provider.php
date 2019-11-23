@@ -32,6 +32,7 @@ abstract class CRM_SMS_Provider {
    * @param bool $force
    *
    * @return object
+   * @throws CRM_Core_Exception
    */
   public static function &singleton($providerParams = array(), $force = FALSE) {
     $mailingID = CRM_Utils_Array::value('mailing_id', $providerParams);
@@ -47,7 +48,7 @@ abstract class CRM_SMS_Provider {
     }
 
     if (!$providerName) {
-      CRM_Core_Error::fatal('Provider not known or not provided.');
+      throw new CRM_Core_Exception('Provider not known or not provided.');
     }
 
     $providerName = CRM_Utils_Type::escape($providerName, 'String');
@@ -62,7 +63,7 @@ abstract class CRM_SMS_Provider {
       else {
         // If we are running unit tests we simulate an SMS provider with the name "CiviTestSMSProvider"
         if ($providerName !== 'CiviTestSMSProvider') {
-          CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
+          throw new CRM_Core_Exception("Could not locate extension for {$providerName}.");
         }
         $providerClass = 'CiviTestSMSProvider';
       }

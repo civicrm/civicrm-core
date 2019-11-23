@@ -25,7 +25,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    */
   public function preProcess() {
     if (!CRM_SMS_BAO_Provider::activeProviderCount()) {
-      CRM_Core_Error::fatal(ts('The <a href="%1">SMS Provider</a> has not been configured or is not active.', [1 => CRM_Utils_System::url('civicrm/admin/sms/provider', 'reset=1')]));
+      CRM_Core_Error::statusBounce(ts('The <a href="%1">SMS Provider</a> has not been configured or is not active.', [1 => CRM_Utils_System::url('civicrm/admin/sms/provider', 'reset=1')]));
     }
 
     $session = CRM_Core_Session::singleton();

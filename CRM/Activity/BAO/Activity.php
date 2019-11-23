@@ -1336,20 +1336,18 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $errMsgs[] = PEAR::raiseError('Contact Does not accept SMS', NULL, PEAR_ERROR_RETURN);
       }
       else {
-        $sendResult = self::sendSMSMessage(
-          $contactId,
-          $tokenText,
-          $smsProviderParams,
-          $activityID,
-          $sourceContactId
-        );
-
-        if (PEAR::isError($sendResult)) {
-          // Collect all of the PEAR_Error objects
-          $errMsgs[] = $sendResult;
-        }
-        else {
+        try {
+          $sendResult = self::sendSMSMessage(
+            $contactId,
+            $tokenText,
+            $smsProviderParams,
+            $activityID,
+            $sourceContactId
+          );
           $success++;
+        }
+        catch (CRM_Core_Exception $e) {
+          $errMsgs[] = $e->getMessage();
         }
       }
     }
@@ -1381,8 +1379,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   The activity ID that tracks the message.
    * @param int $sourceContactID
    *
-   * @return bool|PEAR_Error
-   *   true on success or PEAR_Error object
+   * @return bool true on success
+   * @throws CRM_Core_Exception
    */
   public static function sendSMSMessage(
     $toID,
@@ -1411,11 +1409,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     // make sure both phone are valid
     // and that the recipient wants to receive sms
     if (empty($toPhoneNumber)) {
-      return PEAR::raiseError(
-        'Recipient phone number is invalid or recipient does not want to receive SMS',
-        NULL,
-        PEAR_ERROR_RETURN
-      );
+      throw new CRM_Core_Exception('Recipient phone number is invalid or recipient does not want to receive SMS');
     }
 
     $recipient = $toPhoneNumber;
@@ -1425,7 +1419,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $smsProviderParams['provider_id']]);
     $sendResult = $providerObj->send($recipient, $smsProviderParams, $tokenText, NULL, $sourceContactID);
     if (PEAR::isError($sendResult)) {
-      return $sendResult;
+      throw new CRM_Core_Exception($sendResult->getMessage());
     }
 
     // add activity target record for every sms that is sent
