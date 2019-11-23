@@ -38,17 +38,6 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     CRM_Utils_System::setTitle(ts('Dropdown Options'));
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->add('text',
-      'name',
-      ts('Name'),
-      CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionGroup', 'name'),
-      TRUE
-    );
-    $this->addRule('name',
-      ts('Name already exists in Database.'),
-      'objectExists',
-      ['CRM_Core_DAO_OptionGroup', $this->_id]
-    );
 
     $this->add('text',
       'title',
@@ -90,6 +79,33 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     }
 
     $this->assign('id', $this->_id);
+    $this->addFormRule(['CRM_Admin_Form_OptionGroup', 'formRule'], $this);
+  }
+
+  /**
+   * Global form rule.
+   *
+   * @param array $fields
+   *   The input form values.
+   *
+   * @param $files
+   * @param $self
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
+   */
+  public static function formRule($fields, $files, $self) {
+    $errors = [];
+    if ($self->_id) {
+      $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $self->_id, 'name');
+    }
+    else {
+      $name = CRM_Utils_String::titleToVar(strtolower($fields['title']));
+    }
+    if (!CRM_Core_DAO::objectExists($name, 'CRM_Core_DAO_OptionGroup', $self->_id)) {
+      $errors['title'] = ts('Option Group name ' . $name . ' already exists in the database. Option Group Names need to be unique');
+    }
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**

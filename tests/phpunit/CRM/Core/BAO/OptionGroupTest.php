@@ -40,11 +40,11 @@ class CRM_Core_BAO_OptionGroupTest extends CiviUnitTestCase {
   public function testEnsureOptionGroupExistsNewValue() {
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'Bombed']);
     $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', ['field' => 'option_group_id'])['values'];
-    $this->assertTrue(in_array('Bombed', $optionGroups));
+    $this->assertTrue(in_array('bombed', $optionGroups));
 
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'Bombed Again']);
     $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', ['field' => 'option_group_id'])['values'];
-    $this->assertTrue(in_array('Bombed Again', $optionGroups));
+    $this->assertTrue(in_array('bombed_again', $optionGroups));
   }
 
 }

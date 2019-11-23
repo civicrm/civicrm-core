@@ -94,7 +94,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   public function testGetOptionCreateFailOnDuplicate() {
     $params = [
       'sequential' => 1,
-      'name' => 'civicrm_dup entry',
+      'name' => 'civicrm_dup_entry',
       'is_reserved' => 1,
       'is_active' => 1,
     ];

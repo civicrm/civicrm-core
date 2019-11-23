@@ -393,7 +393,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
   public function testCreateOptionValueWithSameValueDiffOptionGroup() {
     $og = $this->callAPISuccess('option_group', 'create', [
-      'name' => 'our test Option Group for with group id',
+      'name' => 'our test Option Group',
       'is_active' => 1,
     ]);
     // create a option value
@@ -401,7 +401,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       ['option_group_id' => $og['id'], 'label' => 'test option value']
     );
     $og2 = $this->callAPISuccess('option_group', 'create', [
-      'name' => 'our test Option Group for with group id 2',
+      'name' => 'our test Option Group 2',
       'is_active' => 1,
     ]);
     // update option value without 'option_group_id'
