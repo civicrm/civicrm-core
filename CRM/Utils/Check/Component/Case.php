@@ -397,4 +397,114 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * Check any xml definitions stored as external files to see if they
+   * have label as the role and where the label is different from the name.
+   * We don't have to think about edge cases because there are already
+   * status checks above for those.
+   *
+   * @return array<CRM_Utils_Check_Message>
+   *   An empty array, or a list of warnings
+   */
+  public function checkExternalXmlFileRoleNames() {
+    $messages = [];
+
+    // Get config for relationship types
+    $relationship_types = civicrm_api3('RelationshipType', 'get', [
+      'options' => ['limit' => 0],
+    ])['values'];
+    // keyed on name, with id as the value, e.g. 'Case Coordinator is' => 10
+    $names_a_b = array_column($relationship_types, 'id', 'name_a_b');
+    $names_b_a = array_column($relationship_types, 'id', 'name_b_a');
+    $labels_a_b = array_column($relationship_types, 'id', 'label_a_b');
+    $labels_b_a = array_column($relationship_types, 'id', 'label_b_a');
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_case_type WHERE definition IS NULL OR definition=''");
+    while ($dao->fetch()) {
+      $case_type = civicrm_api3('CaseType', 'get', [
+        'id' => $dao->id,
+      ])['values'][$dao->id];
+      if (empty($case_type['definition'])) {
+        $messages[] = new CRM_Utils_Check_Message(
+          __FUNCTION__ . "missingcasetypedefinition",
+          '<p>' . ts('Unable to locate xml file for Case Type "<em>%1</em>".',
+          [
+            1 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
+          ]) . '</p>',
+          ts('Missing Case Type Definition'),
+          \Psr\Log\LogLevel::ERROR,
+          'fa-exclamation'
+        );
+        continue;
+      }
+
+      if (empty($case_type['definition']['caseRoles'])) {
+        $messages[] = new CRM_Utils_Check_Message(
+          __FUNCTION__ . "missingcaseroles",
+          '<p>' . ts('CaseRoles seems to be missing in the xml file for Case Type "<em>%1</em>".',
+          [
+            1 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
+          ]) . '</p>',
+          ts('Missing Case Roles'),
+          \Psr\Log\LogLevel::ERROR,
+          'fa-exclamation'
+        );
+        continue;
+      }
+
+      // Loop thru each role in the xml.
+      foreach ($case_type['definition']['caseRoles'] as $role) {
+        $name_to_suggest = NULL;
+        $xml_name = $role['name'];
+        if (isset($names_a_b[$xml_name]) || isset($names_b_a[$xml_name])) {
+          // It matches a name, so either name and label are the same or it's
+          // an edge case already dealt with by core status checks, so do
+          // nothing.
+          continue;
+        }
+        elseif (isset($labels_b_a[$xml_name])) {
+          // $labels_b_a[$xml_name] gives us the id, so then look up name_b_a
+          // from the original relationship_types array which is keyed on id.
+          // We do b_a first because it's the more standard one, although it
+          // will only make a difference in edge cases which we leave to the
+          // other checks.
+          $name_to_suggest = $relationship_types[$labels_b_a[$xml_name]]['name_b_a'];
+        }
+        elseif (isset($labels_a_b[$xml_name])) {
+          $name_to_suggest = $relationship_types[$labels_a_b[$xml_name]]['name_a_b'];
+        }
+
+        // If it didn't match any name or label then that's weird.
+        if (empty($name_to_suggest)) {
+          $messages[] = new CRM_Utils_Check_Message(
+            __FUNCTION__ . "invalidcaserole",
+            '<p>' . ts('CaseRole "<em>%1</em>" in the xml file for Case Type "<em>%2</em>" doesn\'t seem to match any existing relationship type.',
+            [
+              1 => htmlspecialchars($xml_name),
+              2 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
+            ]) . '</p>',
+            ts('Invalid Case Role'),
+            \Psr\Log\LogLevel::ERROR,
+            'fa-exclamation'
+          );
+        }
+        else {
+          $messages[] = new CRM_Utils_Check_Message(
+            __FUNCTION__ . "suggestedchange",
+            '<p>' . ts('Please edit the XML file for case type "<em>%2</em>" so that the case role label "<em>%1</em>" is changed to its corresponding name "<em>%3</em>". Using label is deprecated as of version 5.20.',
+            [
+              1 => htmlspecialchars($xml_name),
+              2 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
+              3 => htmlspecialchars($name_to_suggest),
+            ]) . '</p>',
+            ts('Case Role using display label instead of internal machine name'),
+            \Psr\Log\LogLevel::WARNING,
+            'fa-code'
+          );
+        }
+      }
+    }
+    return $messages;
+  }
+
 }
