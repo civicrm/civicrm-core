@@ -64,31 +64,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST) && !$this->controller->isModal()) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
-
-    if (empty($this->_formValues)) {
-      if (isset($this->_ssID)) {
-        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-      }
-    }
-
-    if ($this->_force) {
-      // pledge related dates
-      $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
-      $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
-      $this->addFormFieldsFromMetadata();
-      $this->postProcess();
-      $this->set('force', 0);
-    }
+    parent::preProcess();
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Pledge_Selector_Search($this->_queryParams,
@@ -235,7 +211,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
