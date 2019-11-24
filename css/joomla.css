@@ -371,6 +371,11 @@ div#toolbar-box, div#toolbar-box div.m{
   display: block;
 }
 
+/* dev/core#874 the width:auto styling above causes the menubar colour picker to be squeezed */
+.crm-container input.crm-form-color {
+  width: 3.6em;
+}
+
 /* Remove Joomla subhead toolbar & whitespace border */
 	
 body.admin.com_civicrm .subhead-collapse {
