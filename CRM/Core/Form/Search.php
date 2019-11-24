@@ -434,6 +434,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
           'class' => 'crm-select2',
         ]
       );
+      $this->searchFieldMetadata['Contact']['group'] = ['name' => 'group', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'html' => ['type' => 'Select']];
     }
 
     $contactTags = CRM_Core_BAO_Tag::getTags();
@@ -446,10 +447,13 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         ]
       );
     }
+    $this->searchFieldMetadata['Contact']['contact_tags'] = ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'html' => ['type' => 'Select']];
     $this->addField('contact_type', ['entity' => 'Contact']);
+    $this->searchFieldMetadata['contact']['contact_type'] = CRM_Contact_DAO_Contact::fields()['contact_type'];
 
     if (CRM_Core_Permission::check('access deleted contacts') && Civi::settings()->get('contact_undelete')) {
       $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
+      $this->searchFieldMetadata['Contact']['deleted_contacts'] = ['name' => 'deleted_contacts', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'html' => ['type' => 'Checkbox']];
     }
 
   }
