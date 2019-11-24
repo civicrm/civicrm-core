@@ -1914,31 +1914,14 @@ class CRM_Export_BAO_ExportProcessor {
     while ($dao->fetch()) {
       $masterID = $dao->master_id;
       $copyID = $dao->copy_id;
-      $masterPostalGreeting = $dao->master_postal_greeting;
-      $masterAddressee = $dao->master_addressee;
       $copyAddressee = $dao->copy_addressee;
 
-      if (!$sharedAddress) {
-        if (!isset($this->contactGreetingFields[$dao->master_contact_id])) {
-          $this->contactGreetingFields[$dao->master_contact_id] = $this->replaceMergeTokens($dao->master_contact_id);
-        }
-        $masterPostalGreeting = CRM_Utils_Array::value('postal_greeting',
-          $this->contactGreetingFields[$dao->master_contact_id], $dao->master_postal_greeting
-        );
-        $masterAddressee = CRM_Utils_Array::value('addressee',
-          $this->contactGreetingFields[$dao->master_contact_id], $dao->master_addressee
-        );
-
-        if (!isset($contactGreetingTokens[$dao->copy_contact_id])) {
-          $this->contactGreetingFields[$dao->copy_contact_id] = $this->replaceMergeTokens($dao->copy_contact_id);
-        }
-        $copyPostalGreeting = CRM_Utils_Array::value('postal_greeting',
-          $this->contactGreetingFields[$dao->copy_contact_id], $dao->copy_postal_greeting
-        );
-        $copyAddressee = CRM_Utils_Array::value('addressee',
-          $this->contactGreetingFields[$dao->copy_contact_id], $dao->copy_addressee
-        );
-      }
+      $this->cacheContactGreetings((int) $dao->master_contact_id);
+      $this->cacheContactGreetings((int) $dao->copy_contact_id);
+      $masterPostalGreeting = $this->getContactGreeting((int) $dao->master_contact_id, 'postal_greeting', $dao->master_postal_greeting);
+      $masterAddressee = $this->getContactGreeting((int) $dao->master_contact_id, 'addressee', $dao->master_addressee);
+      $copyPostalGreeting = $this->getContactGreeting((int) $dao->copy_contact_id, 'postal_greeting', $dao->copy_postal_greeting);
+      $copyAddressee  = $this->getContactGreeting((int) $dao->copy_contact_id, 'addressee', $dao->copy_addressee);
 
       if (!isset($merge[$masterID])) {
         // check if this is an intermediate child
@@ -2411,6 +2394,35 @@ LIMIT $offset, $limit
       $componentDetails,
       NULL,
       FALSE
+    );
+  }
+
+  /**
+   * Cache the greeting fields for the given contact.
+   *
+   * @param int $contactID
+   */
+  protected function cacheContactGreetings(int $contactID) {
+    if (!isset($this->contactGreetingFields[$contactID])) {
+      $this->contactGreetingFields[$contactID] = $this->replaceMergeTokens($contactID);
+    }
+  }
+
+  /**
+   * Get the greeting value for the given contact.
+   *
+   * The values have already been cached so we are grabbing the value at this point.
+   *
+   * @param int $contactID
+   * @param string $type
+   *   postal_greeting|addressee|email_greeting
+   * @param string $default
+   *
+   * @return string
+   */
+  protected function getContactGreeting(int $contactID, string $type, string $default) {
+    return CRM_Utils_Array::value($type,
+      $this->contactGreetingFields[$contactID], $default
     );
   }
 
