@@ -646,7 +646,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'mergeSameHousehold' => TRUE,
     ]);
     $row = $this->csv->fetchOne();
-    $this->assertEquals(1, count($this->csv));
+    $this->assertCount(1, $this->csv);
     $this->assertEquals('Portland', $row['City']);
     $this->assertEquals('ME', $row['State']);
     $this->assertEquals($householdID, $row['Household ID']);
@@ -1212,6 +1212,46 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ],
     ]);
     $this->assertEquals('Contact ID', $this->csv->getHeader()[0]);
+  }
+
+  /**
+   * Test to ensure that 'Merge All Contacts with the Same Address' works on export.
+   *
+   * 3 contacts are created A, B and C where A and B are individual contacts that share same address via master_id.
+   * C is a household contact whose member is contact A.
+   *
+   * These 3 contacts are selected for export with 'Merge All Contacts with the Same Address' = TRUE
+   * And at the end export table contain only 1 contact i.e. is C as A and B got merged into 1 as they share same address but then A is Household member of C.
+   * So C take preference over A and thus C is exported as result.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testMergeSameAddressOnExport() {
+    $this->individualCreate();
+    $householdID = $this->setUpHousehold()[0];
+    $contactIDs = array_merge($this->contactIDs, [$householdID]);
+    // Empty existing addresses & start fresh.
+    $this->callAPISuccess('Address', 'get', ['api.Address.delete' => 1]);
+    foreach ($contactIDs as $id) {
+      $this->callAPISuccess('Address', 'create', [
+        'city' => 'Portland',
+        'street_address' => 'Ambachtstraat 23',
+        'state_province_id' => 'Maine',
+        'location_type_id' => 'Home',
+        'contact_id' => $id,
+      ]);
+    }
+
+    $this->doExportTest([
+      'selectAll' => FALSE,
+      'ids' => $contactIDs,
+      'mergeSameAddress' => TRUE,
+    ]);
+    // @todo - the below is commented out because it does not yet work.
+    //$this->assertCount(1, $this->csv);
+    $row = $this->csv->fetchOne();
+    //$this->assertEquals('Household', $this->csv->fetchOne()['Contact Type']);
   }
 
   /**
