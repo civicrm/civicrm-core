@@ -143,7 +143,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Set the form values based on input and preliminary processing.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setFormValues() {
     $this->_formValues = $this->getFormValues();
