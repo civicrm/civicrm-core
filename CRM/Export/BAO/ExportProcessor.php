@@ -92,6 +92,16 @@ class CRM_Export_BAO_ExportProcessor {
   protected $ids = [];
 
   /**
+   * Greeting options mapping to various greeting ids.
+   *
+   * This stores the option values for the addressee, postal_greeting & email_greeting
+   * option groups.
+   *
+   * @var array
+   */
+  protected $greetingOptions = [];
+
+  /**
    * Get additional non-visible fields for address merge purposes.
    *
    * @return array
@@ -390,6 +400,17 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setAdditionalFieldsForPostalExport();
     $this->setHouseholdMergeReturnProperties();
     $this->setGreetingStringsForSameAddressMerge($formValues);
+    $this->setGreetingOptions();
+  }
+
+  /**
+   * Set the greeting options, if relevant.
+   */
+  public function setGreetingOptions() {
+    if ($this->isMergeSameAddress()) {
+      $this->greetingOptions['addressee'] = CRM_Core_OptionGroup::values('addressee');
+      $this->greetingOptions['postal_greeting'] = CRM_Core_OptionGroup::values('postal_greeting');
+    }
   }
 
   /**
@@ -1905,23 +1926,15 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function buildMasterCopyArray($sql, $sharedAddress = FALSE) {
 
-    $addresseeOptions = CRM_Core_OptionGroup::values('addressee');
-    $postalOptions = CRM_Core_OptionGroup::values('postal_greeting');
-
     $merge = $parents = [];
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
       $masterID = $dao->master_id;
       $copyID = $dao->copy_id;
-      $copyAddressee = $dao->copy_addressee;
 
       $this->cacheContactGreetings((int) $dao->master_contact_id);
       $this->cacheContactGreetings((int) $dao->copy_contact_id);
-      $masterPostalGreeting = $this->getContactGreeting((int) $dao->master_contact_id, 'postal_greeting', $dao->master_postal_greeting);
-      $masterAddressee = $this->getContactGreeting((int) $dao->master_contact_id, 'addressee', $dao->master_addressee);
-      $copyPostalGreeting = $this->getContactGreeting((int) $dao->copy_contact_id, 'postal_greeting', $dao->copy_postal_greeting);
-      $copyAddressee  = $this->getContactGreeting((int) $dao->copy_contact_id, 'addressee', $dao->copy_addressee);
 
       if (!isset($merge[$masterID])) {
         // check if this is an intermediate child
@@ -1934,9 +1947,9 @@ class CRM_Export_BAO_ExportProcessor {
         }
         else {
           $merge[$masterID] = [
-            'addressee' => $masterAddressee,
+            'addressee' => $this->getContactGreeting((int) $dao->master_contact_id, 'addressee', $dao->master_addressee),
             'copy' => [],
-            'postalGreeting' => $masterPostalGreeting,
+            'postalGreeting' => $this->getContactGreeting((int) $dao->master_contact_id, 'postal_greeting', $dao->master_postal_greeting),
           ];
           $merge[$masterID]['emailGreeting'] = &$merge[$masterID]['postalGreeting'];
         }
@@ -1944,26 +1957,19 @@ class CRM_Export_BAO_ExportProcessor {
       $parents[$copyID] = $masterID;
 
       if (!$sharedAddress && !array_key_exists($copyID, $merge[$masterID]['copy'])) {
-
+        $copyPostalGreeting = $this->getContactPortionOfGreeting((int) $dao->copy_contact_id, (int) $dao->copy_postal_greeting_id, 'postal_greeting', $dao->copy_postal_greeting);
         if ($copyPostalGreeting) {
-          $this->trimNonTokensFromAddressString($copyPostalGreeting,
-            $postalOptions[$dao->copy_postal_greeting_id],
-            $this->getPostalGreetingTemplate()
-          );
           $merge[$masterID]['postalGreeting'] = "{$merge[$masterID]['postalGreeting']}, {$copyPostalGreeting}";
           // if there happens to be a duplicate, remove it
           $merge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $merge[$masterID]['postalGreeting']);
         }
 
+        $copyAddressee = $this->getContactPortionOfGreeting((int) $dao->copy_contact_id, (int) $dao->copy_addressee_id, 'addressee', $dao->copy_addressee);
         if ($copyAddressee) {
-          $this->trimNonTokensFromAddressString($copyAddressee,
-            $addresseeOptions[$dao->copy_addressee_id],
-            $this->getAddresseeGreetingTemplate()
-          );
           $merge[$masterID]['addressee'] = "{$merge[$masterID]['addressee']}, " . trim($copyAddressee);
         }
       }
-      $merge[$masterID]['copy'][$copyID] = $copyAddressee;
+      $merge[$masterID]['copy'][$copyID] = $copyAddressee ?? $dao->copy_addressee;
     }
 
     return $merge;
@@ -2424,6 +2430,31 @@ LIMIT $offset, $limit
     return CRM_Utils_Array::value($type,
       $this->contactGreetingFields[$contactID], $default
     );
+  }
+
+  /**
+   * Get the portion of the greeting string that relates to the contact.
+   *
+   * For example if the greeting id 'Dear Sarah' we are going to combine it with 'Dear Mike'
+   * so we want to strip the 'Dear ' and just get 'Sarah
+   * @param int $contactID
+   * @param int $greetingID
+   * @param string $type
+   *   postal_greeting, addressee (email_greeting not currently implemented for unknown reasons.
+   * @param string $defaultGreeting
+   *
+   * @return mixed|string
+   */
+  protected function getContactPortionOfGreeting(int $contactID, int $greetingID, string $type, string $defaultGreeting) {
+    $copyPostalGreeting = $this->getContactGreeting($contactID, $type, $defaultGreeting);
+    $template = $type === 'postal_greeting' ? $this->getPostalGreetingTemplate() : $this->getAddresseeGreetingTemplate();
+    if ($copyPostalGreeting) {
+      $copyPostalGreeting = $this->trimNonTokensFromAddressString($copyPostalGreeting,
+        $this->greetingOptions[$type][$greetingID],
+        $template
+      );
+    }
+    return $copyPostalGreeting;
   }
 
 }
