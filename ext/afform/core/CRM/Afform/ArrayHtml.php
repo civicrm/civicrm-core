@@ -115,6 +115,10 @@ class CRM_Afform_ArrayHtml {
       }
     }
 
+    if (isset($array['#markup'])) {
+      return $buf . '>' . $array['#markup'] . '</' . $tag . '>';
+    }
+
     if (empty($children) && $this->isSelfClosing($tag)) {
       $buf .= ' />';
     }
@@ -175,12 +179,20 @@ class CRM_Afform_ArrayHtml {
       $arr = ['#tag' => $node->tagName];
       foreach ($node->attributes as $attribute) {
         $txt = $attribute->textContent;
-
         $type = $this->pickAttrType($node->tagName, $attribute->name);
         $arr[$attribute->name] = $this->decodeAttrValue($type, $txt);
       }
       if ($node->childNodes->length > 0) {
-        $arr['#children'] = $this->convertNodesToArray($node->childNodes);
+        // In shallow mode, return "af-markup" blocks as-is
+        if (!$this->deepCoding && !empty($arr['class']) && strpos($arr['class'], 'af-markup') !== FALSE) {
+          $arr['#markup'] = '';
+          foreach ($node->childNodes as $child) {
+            $arr['#markup'] .= $child->ownerDocument->saveXML($child);
+          }
+        }
+        else {
+          $arr['#children'] = $this->convertNodesToArray($node->childNodes);
+        }
       }
       return $arr;
     }
@@ -188,8 +200,7 @@ class CRM_Afform_ArrayHtml {
       return ['#text' => $node->textContent];
     }
     elseif ($node instanceof DOMComment) {
-      $arr = ['#comment' => $node->nodeValue];
-      return $arr;
+      return ['#comment' => $node->nodeValue];
     }
     else {
       throw new \RuntimeException("Unrecognized DOM node");
@@ -235,15 +246,7 @@ class CRM_Afform_ArrayHtml {
       return 'text';
     }
 
-    if (isset($this->protoSchema[$tag][$attrName])) {
-      return $this->protoSchema[$tag][$attrName];
-    }
-
-    if (isset($this->protoSchema['*'][$attrName])) {
-      return $this->protoSchema['*'][$attrName];
-    }
-
-    return $this->protoSchema['*']['*'];
+    return $this->protoSchema[$tag][$attrName] ?? $this->protoSchema['*'][$attrName] ?? $this->protoSchema['*']['*'];
   }
 
   /**

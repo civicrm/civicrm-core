@@ -1,34 +1,9 @@
 <li><a href ng-click="addBlock('div.af-block')">{{ ts('Add block') }}</a></li>
 <li><a href ng-click="addBlock('p.af-text')">{{ ts('Add text box') }}</a></li>
+<li><a href ng-click="addBlock('div.af-markup', {'#markup': false})">{{ ts('Add rich content') }}</a></li>
 <li><a href ng-click="addBlock('button.af-button.btn-primary', {'crm-icon': 'fa-check', 'ng-click': 'modelListCtrl.submit()'})">{{ ts('Add button') }}</a></li>
 <li role="separator" class="divider"></li>
-<li>
-  <div class="af-gui-field-select-in-dropdown form-inline" ng-click="$event.stopPropagation()">
-    <select class="form-control" ng-model="getSetBorderStyle" ng-model-options="{getterSetter: true}">
-      <option value="">{{ ts('No border') }}</option>
-      <option value="solid">{{ ts('Solid') }}</option>
-      <option value="dotted">{{ ts('Dotted') }}</option>
-      <option value="dashed">{{ ts('Dashed') }}</option>
-      <option value="double">{{ ts('Double') }}</option>
-      <option value="groove">{{ ts('Groove') }}</option>
-      <option value="ridge">{{ ts('Ridge') }}</option>
-      <option value="inset">{{ ts('Inset') }}</option>
-      <option value="outset">{{ ts('Outset') }}</option>
-    </select>
-    <select class="form-control" ng-if="block.getStyles(node).border" ng-model="getSetBorderWidth" ng-model-options="{getterSetter: true}">
-      <option ng-repeat="num in ['1px', '2px', '3px', '4px', '5px', '6px', '7px', '8px', '9px']" value="{{ num }}">{{ num }}</option>
-    </select>
-    <input type="color" class="form-control" ng-if="block.getStyles(node).border" ng-model="getSetBorderColor" ng-model-options="{getterSetter: true}"/>
-  </div>
-</li>
-<li>
-  <div class="af-gui-field-select-in-dropdown form-inline" ng-click="$event.stopPropagation()">
-    <label>{{ ts('Background:') }}</label>
-    <input type="color" class="form-control" ng-model="getSetBackgroundColor" ng-model-options="{getterSetter: true}"/>
-    <a href class="" ng-click="getSetBackgroundColor(null)" ng-if="block.getStyles(node)['background-color']">
-      <i class="crm-i fa-times"></i>
-    </a>
-  </div>
-</li>
+<li af-gui-menu-item-border="node"></li>
+<li af-gui-menu-item-background="node"></li>
 <li role="separator" class="divider"></li>
 <li><a href ng-click="block.removeBlock(node)"><span class="text-danger">{{ ts('Delete this block') }}</span></a></li>

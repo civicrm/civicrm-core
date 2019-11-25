@@ -337,17 +337,6 @@
         var ts = $scope.ts = CRM.ts();
         this.node = $scope.node;
 
-        this.modifyClasses = function(item, toRemove, toAdd) {
-          var classes = splitClass(item['class']);
-          if (toRemove) {
-            classes = _.difference(classes, splitClass(toRemove));
-          }
-          if (toAdd) {
-            classes = _.unique(classes.concat(splitClass(toAdd)));
-          }
-          item['class'] = classes.join(' ');
-        };
-
         this.getNodeType = function(node) {
           if (!node) {
             return null;
@@ -368,6 +357,9 @@
           if (_.contains(classes, 'af-button')) {
             return 'button';
           }
+          if (_.contains(classes, 'af-markup')) {
+            return 'markup';
+          }
           return null;
         };
 
@@ -376,8 +368,12 @@
           var newBlock = _.defaults({
             '#tag': classes.shift(),
             'class': classes.join(' '),
-            '#children': classes[0] === 'af-block' ? [] : [{'#text': ts('Enter text')}]
           }, props);
+          if (classes[0] === 'af-block') {
+            newBlock['#children'] = [];
+          } else if (classes[0] === 'af-text' || classes[0] === 'af-button') {
+            newBlock['#children'] = [{'#text': ts('Enter text')}];
+          }
           $scope.node['#children'].push(newBlock);
         };
 
@@ -440,65 +436,8 @@
           if (val !== 'af-layout-rows') {
             classes.push(val);
           }
-          block.modifyClasses($scope.node, _.keys($scope.layouts), classes);
+          modifyClasses($scope.node, _.keys($scope.layouts), classes);
         };
-
-        $scope.getSetBorderWidth = function(width) {
-          return getSetBorderProp(0, arguments.length ? width : null);
-        };
-
-        $scope.getSetBorderStyle = function(style) {
-          return getSetBorderProp(1, arguments.length ? style : null);
-        };
-
-        $scope.getSetBorderColor = function(color) {
-          return getSetBorderProp(2, arguments.length ? color : null);
-        };
-
-        $scope.getSetBackgroundColor = function(color) {
-          if (!arguments.length) {
-            return block.getStyles($scope.node)['background-color'] || '#ffffff';
-          }
-          block.setStyle($scope.node, 'background-color', color);
-        };
-        
-        function getSetBorderProp(idx, val) {
-          var border = getBorder() || ['1px', '', '#000000'];
-          if (val === null) {
-            return border[idx];
-          }
-          border[idx] = val;
-          block.setStyle($scope.node, 'border', val ? border.join(' ') : null);
-        }
-
-        this.getStyles = function(node) {
-          return !node || !node.style ? {} : _.transform(node.style.split(';'), function(styles, style) {
-            var keyVal = _.map(style.split(':'), _.trim);
-            if (keyVal.length > 1 && keyVal[1].length) {
-              styles[keyVal[0]] = keyVal[1];
-            }
-          }, {});
-        };
-
-        this.setStyle = function(node, name, val) {
-          var styles = block.getStyles(node);
-          styles[name] = val;
-          if (!val) {
-            delete styles[name];
-          }
-          if (_.isEmpty(styles)) {
-            delete node.style;
-          } else {
-            node.style = _.transform(styles, function(combined, val, name) {
-              combined.push(name + ': ' + val);
-            }, []).join('; ');
-          }
-        };
-
-        function getBorder() {
-          var border = _.map((block.getStyles($scope.node).border || '').split(' '), _.trim);
-          return border.length > 2 ? border : null;
-        }
 
       }
     };
@@ -551,7 +490,7 @@
 
         $scope.editOptions = function() {
           $scope.editingOptions = true;
-          $('#afGuiEditor').addClass('af-gui-editing-options');
+          $('#afGuiEditor').addClass('af-gui-editing-content');
         };
 
         $scope.inputTypeCanBe = function(type) {
@@ -674,7 +613,7 @@
 
         $scope.close = function() {
           $scope.field.setEditingOptions(false);
-          $('#afGuiEditor').removeClass('af-gui-editing-options');
+          $('#afGuiEditor').removeClass('af-gui-editing-content');
         };
       }
     };
@@ -717,7 +656,7 @@
         };
 
         $scope.setAlign = function(val) {
-          $scope.block.modifyClasses($scope.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
+          modifyClasses($scope.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
         };
 
         $scope.styles = _.transform(CRM.afformAdminData.styles, function(styles, val, key) {
@@ -727,7 +666,7 @@
         // Getter/setter for ng-model
         $scope.getSetStyle = function(val) {
           if (arguments.length) {
-            return $scope.block.modifyClasses($scope.node, _.keys($scope.styles), val === 'text-default' ? null : val);
+            return modifyClasses($scope.node, _.keys($scope.styles), val === 'text-default' ? null : val);
           }
           return _.intersection(splitClass($scope.node['class']), _.keys($scope.styles))[0] || 'text-default';
         };
@@ -735,7 +674,62 @@
       }
     };
   });
-  
+
+  var richtextId = 0;
+  angular.module('afGuiEditor').directive('afGuiMarkup', function($sce, $timeout) {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/markup.html',
+      scope: {
+        node: '=afGuiMarkup'
+      },
+      require: '^^afGuiBlock',
+      link: function($scope, element, attrs, block) {
+        $scope.block = block;
+        // CRM.wysiwyg doesn't work without a dom id
+        $scope.id = 'af-markup-editor-' + richtextId++;
+
+        // When creating a new markup block, go straight to edit mode
+        $timeout(function() {
+          if ($scope.node['#markup'] === false) {
+            $scope.edit();
+          }
+        });
+      },
+      controller: function($scope) {
+        var ts = $scope.ts = CRM.ts();
+
+        $scope.getMarkup = function() {
+          return $sce.trustAsHtml($scope.node['#markup'] || '');
+        };
+
+        $scope.edit = function() {
+          $('#afGuiEditor').addClass('af-gui-editing-content');
+          $scope.editingMarkup = true;
+          CRM.wysiwyg.create('#' + $scope.id);
+          CRM.wysiwyg.setVal('#' + $scope.id, $scope.node['#markup'] || '<p></p>');
+        };
+
+        $scope.save = function() {
+          $scope.node['#markup'] = CRM.wysiwyg.getVal('#' + $scope.id);
+          $scope.close();
+        };
+
+        $scope.close = function() {
+          CRM.wysiwyg.destroy('#' + $scope.id);
+          $('#afGuiEditor').removeClass('af-gui-editing-content');
+          // If a newly-added block was canceled, just remove it
+          if ($scope.node['#markup'] === false) {
+            $scope.block.removeBlock($scope.node);
+          } else {
+            $scope.editingMarkup = false;
+          }
+        };
+      }
+    };
+  });
+
+
   angular.module('afGuiEditor').directive('afGuiButton', function() {
     return {
       restrict: 'A',
@@ -762,7 +756,7 @@
         // Getter/setter for ng-model
         $scope.getSetStyle = function(val) {
           if (arguments.length) {
-            return $scope.block.modifyClasses($scope.node, _.keys($scope.styles), ['btn', val]);
+            return modifyClasses($scope.node, _.keys($scope.styles), ['btn', val]);
           }
           return _.intersection(splitClass($scope.node['class']), _.keys($scope.styles))[0] || '';
         };
@@ -795,6 +789,67 @@
               $scope.menu.open = false;
             });
           });
+      }
+    };
+  });
+
+  // Menu item to control the border property of a node
+  angular.module('afGuiEditor').directive('afGuiMenuItemBorder', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/menu-item-border.html',
+      scope: {
+        node: '=afGuiMenuItemBorder'
+      },
+      link: function($scope, element, attrs) {
+        var ts = $scope.ts = CRM.ts();
+
+        $scope.getSetBorderWidth = function(width) {
+          return getSetBorderProp($scope.node, 0, arguments.length ? width : null);
+        };
+
+        $scope.getSetBorderStyle = function(style) {
+          return getSetBorderProp($scope.node, 1, arguments.length ? style : null);
+        };
+
+        $scope.getSetBorderColor = function(color) {
+          return getSetBorderProp($scope.node, 2, arguments.length ? color : null);
+        };
+
+        function getSetBorderProp(node, idx, val) {
+          var border = getBorder(node) || ['1px', '', '#000000'];
+          if (val === null) {
+            return border[idx];
+          }
+          border[idx] = val;
+          setStyle(node, 'border', val ? border.join(' ') : null);
+        }
+
+        function getBorder(node) {
+          var border = _.map((getStyles(node).border || '').split(' '), _.trim);
+          return border.length > 2 ? border : null;
+        }
+      }
+    };
+  });
+
+  // Menu item to control the background property of a node
+  angular.module('afGuiEditor').directive('afGuiMenuItemBackground', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '~/afGuiEditor/menu-item-background.html',
+      scope: {
+        node: '=afGuiMenuItemBackground'
+      },
+      link: function($scope, element, attrs) {
+        var ts = $scope.ts = CRM.ts();
+
+        $scope.getSetBackgroundColor = function(color) {
+          if (!arguments.length) {
+            return getStyles($scope.node)['background-color'] || '#ffffff';
+          }
+          setStyle($scope.node, 'background-color', color);
+        };
       }
     };
   });
@@ -936,5 +991,40 @@
       }
     };
   });
+
+  function getStyles(node) {
+    return !node || !node.style ? {} : _.transform(node.style.split(';'), function(styles, style) {
+      var keyVal = _.map(style.split(':'), _.trim);
+      if (keyVal.length > 1 && keyVal[1].length) {
+        styles[keyVal[0]] = keyVal[1];
+      }
+    }, {});
+  }
+
+  function setStyle(node, name, val) {
+    var styles = getStyles(node);
+    styles[name] = val;
+    if (!val) {
+      delete styles[name];
+    }
+    if (_.isEmpty(styles)) {
+      delete node.style;
+    } else {
+      node.style = _.transform(styles, function(combined, val, name) {
+        combined.push(name + ': ' + val);
+      }, []).join('; ');
+    }
+  }
+
+  function modifyClasses(node, toRemove, toAdd) {
+    var classes = splitClass(node['class']);
+    if (toRemove) {
+      classes = _.difference(classes, splitClass(toRemove));
+    }
+    if (toAdd) {
+      classes = _.unique(classes.concat(splitClass(toAdd)));
+    }
+    node['class'] = classes.join(' ');
+  }
 
 })(angular, CRM.$, CRM._);

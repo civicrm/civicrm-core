@@ -24,6 +24,7 @@
     <ul class="dropdown-menu" ng-if="menu.open">
       <li><a href ng-click="addBlock('div.af-block')">{{ ts('Add block') }}</a></li>
       <li><a href ng-click="addBlock('p.af-text')">{{ ts('Add text box') }}</a></li>
+      <li><a href ng-click="addBlock('div.af-markup', {'#markup': false})">{{ ts('Add rich content') }}</a></li>
       <li><a href ng-click="addBlock('button.af-button.btn-primary', {'crm-icon': 'fa-check', 'ng-click': 'modelListCtrl.submit()'})">{{ ts('Add button') }}</a></li>
       <li role="separator" class="divider"></li>
       <li ng-repeat="entity in editor.scope.entities">
@@ -39,6 +40,7 @@
       <div ng-switch-when="block" af-gui-block="item" style="{{ item.style }}" class="af-gui-block af-gui-block-type-{{ item['#tag'] }}" entity-name="entityName" />
       <div ng-switch-when="field" af-gui-field="item" entity-name="entityName" />
       <div ng-switch-when="text" af-gui-text="item" class="af-gui-element af-gui-text" />
+      <div ng-switch-when="markup" af-gui-markup="item" class="af-gui-markup" />
       <div ng-switch-when="button" af-gui-button="item" class="af-gui-element af-gui-button" />
     </div>
   </div>

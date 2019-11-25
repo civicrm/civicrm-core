@@ -138,6 +138,29 @@
   border: 2px dashed #757575;
 }
 
+#afGuiEditor .af-gui-markup {
+  padding: 22px 3px 3px;
+  position: relative;
+}
+
+#afGuiEditor div.af-gui-markup-content {
+  display: block;
+  position: relative;
+  padding: 0 !important;
+}
+
+#afGuiEditor .af-gui-markup-content-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#afGuiEditor .af-gui-markup-content:hover .af-gui-markup-content-overlay {
+  background-color: rgba(255, 255, 255, .2);
+}
+
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected {
   border: 2px dashed #0071bd;
 }
@@ -366,34 +389,38 @@
   font-style: italic;
 }
 
-#afGuiEditor.af-gui-editing-options {
+#afGuiEditor.af-gui-editing-content {
   pointer-events: none;
   cursor: default;
 }
-#afGuiEditor.af-gui-editing-options .panel-heading,
-#afGuiEditor.af-gui-editing-options .af-gui-element,
-.af-gui-editing-options #afGuiEditor-palette .panel-body > * {
+#afGuiEditor.af-gui-editing-content .panel-heading,
+#afGuiEditor.af-gui-editing-content .af-gui-element,
+#afGuiEditor.af-gui-editing-content .af-gui-markup-content,
+.af-gui-editing-content #afGuiEditor-palette .panel-body > * {
   opacity: .5;
 }
-#afGuiEditor.af-gui-editing-options .af-gui-block {
+#afGuiEditor.af-gui-editing-content .af-gui-block {
   border: 2px solid transparent;
 }
-#afGuiEditor.af-gui-editing-options .af-gui-bar:not(.af-gui-edit-options-bar) {
+#afGuiEditor.af-gui-editing-content .af-gui-bar {
   visibility: hidden;
 }
-#afGuiEditor.af-gui-editing-options .af-gui-bar:before {
+#afGuiEditor.af-gui-editing-content .af-gui-bar:before {
   background: none;
 }
 
-#afGuiEditor [af-gui-edit-options] {
-  border: 2px solid #0071bd;
+#afGuiEditor .af-gui-content-editing-area {
   pointer-events: auto;
   cursor: auto;
   padding-top: 35px;
   position: relative;
 }
 
-#afGuiEditor [af-gui-edit-options] .af-gui-edit-options-bar {
+#afGuiEditor [af-gui-edit-options] {
+  border: 2px solid #0071bd;
+}
+
+#afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar {
   height: 30px;
   font-family: "Courier New", Courier, monospace;
   font-size: 12px;
