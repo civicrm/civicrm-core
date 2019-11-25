@@ -11,6 +11,7 @@ namespace Dompdf\FrameReflower;
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\Text as TextFrameDecorator;
 use Dompdf\FontMetrics;
+use Dompdf\Helpers;
 
 /**
  * Reflows text frames.
@@ -204,7 +205,7 @@ class Text extends AbstractFrameReflower
             default:
                 break;
             case "capitalize":
-                $text = mb_convert_case($text, MB_CASE_TITLE);
+                $text = Helpers::mb_ucwords($text);
                 break;
             case "uppercase":
                 $text = mb_convert_case($text, MB_CASE_UPPER);
@@ -220,8 +221,9 @@ class Text extends AbstractFrameReflower
             default:
             case "normal":
                 $frame->set_text($text = $this->_collapse_white_space($text));
-                if ($text == "")
+                if ($text == "") {
                     break;
+                }
 
                 $split = $this->_line_break($text);
                 break;
@@ -296,8 +298,9 @@ class Text extends AbstractFrameReflower
                 $t = $frame->get_text();
 
                 // Remove any trailing newlines
-                if ($split > 1 && $t[$split - 1] === "\n" && !$frame->is_pre())
+                if ($split > 1 && $t[$split - 1] === "\n" && !$frame->is_pre()) {
                     $frame->set_text(mb_substr($t, 0, -1));
+                }
 
                 // Do we need to trim spaces on wrapped lines? This might be desired, however, we
                 // can't trim the lines here or the layout will be affected if trimming the line
@@ -322,19 +325,18 @@ class Text extends AbstractFrameReflower
             $is_inline_frame = ($parent instanceof \Dompdf\FrameDecorator\Inline);
 
             if ((!$is_inline_frame && !$frame->get_next_sibling()) /* ||
-          ( $is_inline_frame && !$parent->get_next_sibling())*/
+            ( $is_inline_frame && !$parent->get_next_sibling())*/
             ) { // fails <b>BOLD <u>UNDERLINED</u></b> becomes <b>BOLD<u>UNDERLINED</u></b>
                 $t = rtrim($t);
             }
 
             if ((!$is_inline_frame && !$frame->get_prev_sibling()) /* ||
-          ( $is_inline_frame && !$parent->get_prev_sibling())*/
+            ( $is_inline_frame && !$parent->get_prev_sibling())*/
             ) { //  <span><span>A<span>B</span> C</span></span> fails (the whitespace is removed)
                 $t = ltrim($t);
             }
 
             $frame->set_text($t);
-
         }
 
         // Set our new width
@@ -465,9 +467,18 @@ class Text extends AbstractFrameReflower
             $style->border_right_width,
             $style->margin_right), $line_width);
         $min += $delta;
+        $min_word = $min;
         $max += $delta;
 
-        return $this->_min_max_cache = array($min, $max, "min" => $min, "max" => $max);
+        if ($style->word_wrap === 'break-word') {
+            // If it is allowed to break words, the min width is the widest character.
+            // But for performance reasons, we only check the first character.
+            $char = mb_substr($str, 0, 1);
+            $min_char = $this->getFontMetrics()->getTextWidth($char, $font, $size, $word_spacing, $char_spacing);
+            $min = $delta + $min_char;
+        }
+
+        return $this->_min_max_cache = array($min, $max, $min_word, "min" => $min, "max" => $max, 'min_word' => $min_word);
     }
 
     /**
