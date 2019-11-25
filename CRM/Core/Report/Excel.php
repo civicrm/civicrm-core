@@ -64,10 +64,10 @@ class CRM_Core_Report_Excel {
       $colNo = 0;
 
       foreach ($row as $j => $value) {
-        if (!isset($value) || is_null($value)) {
+        if (!isset($value) || is_null($value) || $value === '') {
           $schema_insert .= '';
         }
-        elseif ($value == '0' || $value != '') {
+        else {
           // loic1 : always enclose fields
           //$value = ereg_replace("\015(\012)?", "\012", $value);
           $value = preg_replace("/\015(\012)?/", "\012", $value);
@@ -88,9 +88,6 @@ class CRM_Core_Report_Excel {
           }
 
           $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, $value) . $enclosed;
-        }
-        else {
-          $schema_insert .= '';
         }
 
         if ($colNo < $fields_cnt - 1) {
