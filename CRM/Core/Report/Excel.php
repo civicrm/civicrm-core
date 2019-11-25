@@ -50,12 +50,7 @@ class CRM_Core_Report_Excel {
 
     $schema_insert = '';
     foreach ($header as $field) {
-      if ($enclosed == '') {
-        $schema_insert .= stripslashes($field);
-      }
-      else {
-        $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, stripslashes($field)) . $enclosed;
-      }
+      $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, stripslashes($field)) . $enclosed;
       $schema_insert .= $seperator;
     }
     // end while
@@ -85,28 +80,23 @@ class CRM_Core_Report_Excel {
           // loic1 : always enclose fields
           //$value = ereg_replace("\015(\012)?", "\012", $value);
           $value = preg_replace("/\015(\012)?/", "\012", $value);
-          if ($enclosed == '') {
-            $schema_insert .= $value;
-          }
-          else {
-            if ((substr($value, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR) &&
-              (substr($value, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
-            ) {
+          if ((substr($value, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR) &&
+            (substr($value, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
+          ) {
 
-              $strArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+            $strArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
 
-              foreach ($strArray as $key => $val) {
-                if (trim($val) == '') {
-                  unset($strArray[$key]);
-                }
+            foreach ($strArray as $key => $val) {
+              if (trim($val) == '') {
+                unset($strArray[$key]);
               }
-
-              $str = implode($seperator, $strArray);
-              $value = &$str;
             }
 
-            $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, $value) . $enclosed;
+            $str = implode($seperator, $strArray);
+            $value = &$str;
           }
+
+          $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, $value) . $enclosed;
         }
         else {
           $schema_insert .= '';
