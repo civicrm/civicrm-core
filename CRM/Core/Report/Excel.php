@@ -185,13 +185,11 @@ class CRM_Core_Report_Excel {
    *   If set this will be the title in the CSV.
    * @param bool $outputHeader
    *   Should we output the header row.
-   * @param bool $saveFile
-   *   -.
    *
    * @return void
    */
-  public static function writeCSVFile($fileName, $header, $rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {
-    if ($outputHeader && !$saveFile) {
+  public static function writeCSVFile($fileName, $header, $rows, $titleHeader = NULL, $outputHeader = TRUE) {
+    if ($outputHeader) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
         'text/x-csv',
         CRM_Core_DAO::$_nullObject,
@@ -201,11 +199,7 @@ class CRM_Core_Report_Excel {
     }
 
     if (!empty($rows)) {
-      $print = TRUE;
-      if ($saveFile) {
-        $print = FALSE;
-      }
-      return self::makeCSVTable($header, $rows, $titleHeader, $print, $outputHeader);
+      return self::makeCSVTable($header, $rows, $titleHeader, TRUE, $outputHeader);
     }
   }
 
