@@ -323,7 +323,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'participant_status_id',
       'contribution_trxn_id',
       'activity_type_id',
-      'status_id',
       'priority_id',
       'contribution_product_id',
       'payment_instrument_id',
@@ -332,7 +331,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'preferred_communication_method',
     ];
     $changeNames = [
-      'status_id' => 'activity_status_id',
       'priority_id' => 'activity_priority_id',
     ];
     CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);

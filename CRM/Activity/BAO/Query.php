@@ -443,11 +443,12 @@ class CRM_Activity_BAO_Query {
   /**
    * Get the metadata for fields to be included on the activity search form.
    *
+   * @throws \CiviCRM_API3_Exception
    * @todo ideally this would be a trait included on the activity search & advanced search
    * rather than a static function.
    */
   public static function getSearchFieldMetadata() {
-    $fields = ['activity_type_id', 'activity_date_time', 'priority_id', 'activity_location'];
+    $fields = ['activity_type_id', 'activity_date_time', 'priority_id', 'activity_location', 'activity_status_id'];
     $metadata = civicrm_api3('Activity', 'getfields', [])['values'];
     $metadata = array_intersect_key($metadata, array_flip($fields));
     $metadata['activity_text'] = [
@@ -462,6 +463,9 @@ class CRM_Activity_BAO_Query {
    * Add all the elements shared between case activity search and advanced search.
    *
    * @param CRM_Core_Form_Search $form
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Activity' => self::getSearchFieldMetadata()]);
@@ -484,21 +488,13 @@ class CRM_Activity_BAO_Query {
       'flip' => 1,
       'labelColumn' => 'name',
     ]);
-    $form->addSelect('status_id',
-      [
-        'entity' => 'activity',
-        'multiple' => 'multiple',
-        'option_url' => NULL,
-        'placeholder' => ts('- any -'),
-      ]
-    );
     $ssID = $form->get('ssID');
     $status = [$activityStatus['Completed'], $activityStatus['Scheduled']];
     //If status is saved in smart group.
     if (!empty($ssID) && !empty($form->_formValues['activity_status_id'])) {
       $status = $form->_formValues['activity_status_id'];
     }
-    $form->setDefaults(['status_id' => $status]);
+    $form->setDefaults(['activity_status_id' => $status]);
 
     $form->addElement('text', 'activity_text', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 

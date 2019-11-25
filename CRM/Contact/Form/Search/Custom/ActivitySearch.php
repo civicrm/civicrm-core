@@ -24,6 +24,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
    * Class constructor.
    *
    * @param array $formValues
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct(&$formValues) {
     $this->_formValues = self::formatSavedSearchFields($formValues);
@@ -138,6 +140,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
    * @param bool $justIDs
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
@@ -180,7 +183,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity');
 
     foreach ($groupTree as $key) {
-      if (!empty($key['extends']) && $key['extends'] == 'Activity') {
+      if (!empty($key['extends']) && $key['extends'] === 'Activity') {
         $select .= ", " . $key['table_name'] . ".*";
         $from .= " LEFT JOIN " . $key['table_name'] . " ON " . $key['table_name'] . ".entity_id = activity.id";
       }
@@ -338,6 +341,8 @@ ORDER BY contact_a.sort_name';
 
   /**
    * @inheritDoc
+   *
+   * @throws \CRM_Core_Exception
    */
   public function count() {
     $sql = $this->all();

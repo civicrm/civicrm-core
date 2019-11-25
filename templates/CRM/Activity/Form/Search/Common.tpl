@@ -80,8 +80,8 @@
     {$form.activity_option.html}<br/>
   </td>
   <td colspan="2">
-    {$form.status_id.label}<br/>
-    {$form.status_id.html}
+    {$form.activity_status_id.label}<br/>
+    {$form.activity_status_id.html}
   </td>
 </tr>
 <tr>
