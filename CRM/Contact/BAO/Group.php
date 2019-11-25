@@ -1081,19 +1081,17 @@ WHERE  id IN $groupIdString
         $parent = self::filterActiveGroups($parentArray);
         $tree[$parent][] = [
           'id' => $dao->id,
-          'title' => $dao->title,
+          'title' => empty($dao->saved_search_id) ? $dao->title : '* ' . $dao->title,
           'visibility' => $dao->visibility,
           'description' => $dao->description,
-          'icon' => empty($dao->saved_search_id) ? NULL : 'fa-lightbulb-o',
         ];
       }
       else {
         $roots[] = [
           'id' => $dao->id,
-          'title' => $dao->title,
+          'title' => empty($dao->saved_search_id) ? $dao->title : '* ' . $dao->title,
           'visibility' => $dao->visibility,
           'description' => $dao->description,
-          'icon' => empty($dao->saved_search_id) ? NULL : 'fa-lightbulb-o',
         ];
       }
     }
@@ -1122,8 +1120,7 @@ WHERE  id IN $groupIdString
     $spaces = str_repeat($spacer, $level);
 
     if ($titleOnly) {
-      $icon = $group['icon'] ? '* ' : '';
-      $hierarchy[$group['id']] = $icon . $spaces . $group['title'];
+      $hierarchy[$group['id']] = $spaces . $group['title'];
     }
     else {
       $hierarchy[] = array(
@@ -1131,7 +1128,6 @@ WHERE  id IN $groupIdString
         'text' => $spaces . $group['title'],
         'description' => $group['description'],
         'visibility' => $group['visibility'],
-        'icon' => $group['icon'],
       );
     }
 
