@@ -65,6 +65,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     ) {
       $dsnArray = DB::parseDSN($config->dsn);
       $tableNames = CRM_Core_DAO::getTableNames();
+      asort($tableNames);
       $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= array(';
       if ($config->userFramework === 'Backdrop') {
         $tablePrefixes = '$database_prefix = array(';
