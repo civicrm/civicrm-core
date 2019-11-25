@@ -96,12 +96,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = FALSE;
 
-    $this->loadStandardSearchOptionsFromUrl();
-    $this->loadFormValues();
-
-    if ($this->_force) {
-      $this->handleForcedSearch();
-    }
+    parent::preProcess();
 
     $sortID = NULL;
     if ($this->get(CRM_Utils_Sort::SORT_ID)) {
@@ -231,7 +226,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
