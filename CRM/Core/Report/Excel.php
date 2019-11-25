@@ -42,18 +42,8 @@ class CRM_Core_Report_Excel {
     $seperator = $config->fieldSeparator;
     $add_character = "\015\012";
 
-    $schema_insert = '';
-    foreach ($header as $field) {
-      $schema_insert .= '"' . str_replace('"', '""', stripslashes($field)) . '"';
-      $schema_insert .= $seperator;
-    }
-    // end while
-
     if ($outputHeader) {
-      // need to add PMA_exportOutputHandler functionality out here, rather than
-      // doing it the moronic way of assembling a buffer
-      $out = trim(substr($schema_insert, 0, -1)) . $add_character;
-      echo $out;
+      self::outputHeaderRow($header);
     }
 
     $fields_cnt = count($header);
@@ -99,6 +89,26 @@ class CRM_Core_Report_Excel {
       $out = $schema_insert . $add_character;
       echo $out;
     }
+  }
+
+  /**
+   * Output the header row for a csv file.
+   *
+   * @param array $header
+   *   Array of field names.
+   */
+  public static function outputHeaderRow($header) {
+    $schema_insert = '';
+    $separator = Civi::settings()->get('fieldSeparator');
+    foreach ($header as $field) {
+      $schema_insert .= '"' . str_replace('"', '""', stripslashes($field)) . '"';
+      $schema_insert .= $separator;
+    }
+    // end while
+    // need to add PMA_exportOutputHandler functionality out here, rather than
+    // doing it the moronic way of assembling a buffer
+    // We append a hex newline at the end.
+    echo trim(substr($schema_insert, 0, -1)) . "\015\012";
   }
 
   /**
