@@ -558,12 +558,17 @@ FROM civicrm_action_schedule cas
 
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
-    CRM_Activity_BAO_Activity::sendSMSMessage($tokenRow->context['contactId'],
-      $sms_body_text,
-      $smsParams,
-      $activity->id,
-      $userID
-    );
+    try {
+      CRM_Activity_BAO_Activity::sendSMSMessage($tokenRow->context['contactId'],
+        $sms_body_text,
+        $smsParams,
+        $activity->id,
+        $userID
+      );
+    }
+    catch (CRM_Core_Exception $e) {
+      return ["sms_send_error" => $e->getMessage()];
+    }
 
     return [];
   }

@@ -1178,7 +1178,7 @@ $text
     $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
     $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
     $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0], "Expected error doesn't match");
     $this->assertEquals(0, $success, "Expected success to be 0");
   }
 
@@ -1193,7 +1193,7 @@ $text
     $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
     $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
     $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0], "Expected error doesn't match");
     $this->assertEquals(0, $success, "Expected success to be 0");
   }
 
@@ -1229,7 +1229,7 @@ $text
   public function testSendSMSMobileInToProviderParamWithDoNotSMS() {
     list($sent, $activityId, $success) = $this->createSendSmsTest(2, TRUE, ['do_not_sms' => 1]);
     foreach ($sent as $error) {
-      $this->assertEquals('Contact Does not accept SMS', $error->getMessage());
+      $this->assertEquals('Contact Does not accept SMS', $error);
     }
     $this->assertEquals(1, count($sent), "Expected sent should a PEAR Error");
     $this->assertEquals(0, $success, "Expected success to be 0");

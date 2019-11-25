@@ -134,7 +134,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     $params['mailing_id'] = $ids['mailing_id'] = $this->_mailingID;
 
     if (empty($params['mailing_id'])) {
-      CRM_Core_Error::fatal(ts('Could not find a mailing id'));
+      CRM_Core_Error::statusBounce(ts('Could not find a mailing id'));
     }
 
     $params['send_option'] = $this->controller->exportValue($this->_name, 'send_option');
