@@ -27,20 +27,16 @@ class CRM_Core_Report_Excel {
    * @param array $rows
    *   result set rows.
    * @param string $titleHeader
-   * @param bool $print
-   *   Should the output be printed.
    * @param bool $outputHeader
    *
    * @return mixed
    *   empty if output is printed, else output
    *
    */
-  public static function makeCSVTable($header, $rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {
+  public static function makeCSVTable($header, $rows, $titleHeader = NULL, $outputHeader = TRUE) {
     if ($titleHeader) {
       echo $titleHeader;
     }
-
-    $result = '';
 
     $config = CRM_Core_Config::singleton();
     $seperator = $config->fieldSeparator;
@@ -59,12 +55,7 @@ class CRM_Core_Report_Excel {
       // need to add PMA_exportOutputHandler functionality out here, rather than
       // doing it the moronic way of assembling a buffer
       $out = trim(substr($schema_insert, 0, -1)) . $add_character;
-      if ($print) {
-        echo $out;
-      }
-      else {
-        $result .= $out;
-      }
+      echo $out;
     }
 
     $fields_cnt = count($header);
@@ -110,19 +101,7 @@ class CRM_Core_Report_Excel {
       // end for
 
       $out = $schema_insert . $add_character;
-      if ($print) {
-        echo $out;
-      }
-      else {
-        $result .= $out;
-      }
-    }
-
-    if ($print) {
-      return;
-    }
-    else {
-      return $result;
+      echo $out;
     }
   }
 
@@ -189,7 +168,7 @@ class CRM_Core_Report_Excel {
     }
 
     if (!empty($rows)) {
-      return self::makeCSVTable($header, $rows, $titleHeader, TRUE, $outputHeader);
+      return self::makeCSVTable($header, $rows, $titleHeader, $outputHeader);
     }
   }
 
