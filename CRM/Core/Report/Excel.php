@@ -26,17 +26,13 @@ class CRM_Core_Report_Excel {
    *   column headers.
    * @param array $rows
    *   result set rows.
-   * @param string $titleHeader
    * @param bool $outputHeader
    *
    * @return mixed
    *   empty if output is printed, else output
    *
    */
-  public static function makeCSVTable($header, $rows, $titleHeader = NULL, $outputHeader = TRUE) {
-    if ($titleHeader) {
-      echo $titleHeader;
-    }
+  public static function makeCSVTable($header, $rows, $outputHeader = TRUE) {
 
     $config = CRM_Core_Config::singleton();
     $seperator = $config->fieldSeparator;
@@ -156,14 +152,12 @@ class CRM_Core_Report_Excel {
    *   An array of the headers.
    * @param array $rows
    *   An array of arrays of the table contents.
-   * @param string $titleHeader
-   *   If set this will be the title in the CSV.
    * @param bool $outputHeader
    *   Should we output the header row.
    *
    * @return void
    */
-  public static function writeCSVFile($fileName, $header, $rows, $titleHeader = NULL, $outputHeader = TRUE) {
+  public static function writeCSVFile($fileName, $header, $rows, $outputHeader = TRUE) {
     if ($outputHeader) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
         'text/x-csv',
@@ -174,7 +168,7 @@ class CRM_Core_Report_Excel {
     }
 
     if (!empty($rows)) {
-      return self::makeCSVTable($header, $rows, $titleHeader, $outputHeader);
+      return self::makeCSVTable($header, $rows, $outputHeader);
     }
   }
 
