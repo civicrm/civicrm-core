@@ -374,7 +374,9 @@
           } else if (classes[0] === 'af-text' || classes[0] === 'af-button') {
             newBlock['#children'] = [{'#text': ts('Enter text')}];
           }
-          $scope.node['#children'].push(newBlock);
+          // Add new block to the top, underneath the fieldset legend if present
+          var pos = $scope.node['#children'].length && $scope.node['#children'][0]['#tag'] === 'legend' ? 1 : 0;
+          $scope.node['#children'].splice(pos, 0, newBlock);
         };
 
         this.removeBlock = function(node) {
