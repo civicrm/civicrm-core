@@ -1000,6 +1000,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param string $cacheKey
    * @param int $start
    * @param int $end
+   *
+   * @throws \CRM_Core_Exception
    */
   public function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE) {
     $coreSearch = TRUE;
@@ -1025,7 +1027,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $selectSQL = CRM_Core_DAO::composeQuery("SELECT DISTINCT %1, contact_a.id, contact_a.sort_name", [1 => [$cacheKey, 'String']]);
 
-    $sql = str_ireplace(["SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"], $selectSQL, $sql);
+    $sql = str_ireplace(['SELECT contact_a.id as contact_id', 'SELECT contact_a.id as id'], $selectSQL, $sql);
+    $sql = str_ireplace('ORDER BY `contact_id`', 'ORDER BY `id`', $sql, $sql);
+
     try {
       Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
     }
