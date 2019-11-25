@@ -14,21 +14,23 @@
 
 {strip}
 <table class="selector row-highlight">
-   <tr class="sticky">
-     {if !$single and $context eq 'Search' }
-        <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
-     {/if}
-     {foreach from=$columnHeaders item=header}
-        <th scope="col">
-        {if $header.sort}
-          {assign var='key' value=$header.sort}
-          {$sort->_response.$key.link}
-        {else}
-          {$header.name}
-        {/if}
-        </th>
-     {/foreach}
-   </tr>
+   <thead>
+     <tr class="sticky">
+       {if !$single and $context eq 'Search' }
+          <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+       {/if}
+       {foreach from=$columnHeaders item=header}
+          <th scope="col">
+          {if $header.sort}
+            {assign var='key' value=$header.sort}
+            {$sort->_response.$key.link}
+          {else}
+            {$header.name}
+          {/if}
+          </th>
+       {/foreach}
+     </tr>
+   </thead>
 
 
   {counter start=0 skip=1 print=false}
