@@ -471,7 +471,7 @@
   }
 
   function attr(el, item) {
-    var ret = [], attr = _.cloneDeep(item.attr || {}), a = ['rel', 'accesskey'];
+    var ret = [], attr = _.cloneDeep(item.attr || {}), a = ['rel', 'accesskey', 'target'];
     if (el === 'a') {
       attr = _.pick(attr, a);
       attr.href = item.url || "#";
