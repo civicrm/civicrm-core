@@ -94,12 +94,13 @@
             return item.text;
           }
           var option = convertValueToObj(item.id);
-          var icon = (option.entity_type === 'civicrm_mailing') ? 'fa-envelope' : item.is_smart ? 'fa-lightbulb-o' : 'fa-users';
+          var icon = (option.entity_type === 'civicrm_mailing') ? 'fa-envelope' : 'fa-users';
+          var smartGroupMarker = item.is_smart ? '* ' : '';
           var spanClass = (option.mode == 'exclude') ? 'crmMailing-exclude' : 'crmMailing-include';
           if (option.entity_type != 'civicrm_mailing' && isMandatory(option.entity_id)) {
             spanClass = 'crmMailing-mandatory';
           }
-          return '<i class="crm-i '+icon+'" aria-hidden="true"></i> <span class="' + spanClass + '">' + item.text + '</span>';
+          return '<i class="crm-i '+icon+'"></i> <span class="' + spanClass + '">' + smartGroupMarker + item.text + '</span>';
         }
 
         function validate() {
@@ -233,13 +234,16 @@
               if('civicrm_mailing' === rcpAjaxState.entity) {
                 params["api.MailingRecipients.getcount"] = {};
               }
+              else if ('civicrm_group' === rcpAjaxState.entity) {
+                params.extra = ["saved_search_id"];
+              }
 
               return params;
             },
             transport: function(params) {
               switch(rcpAjaxState.entity) {
               case 'civicrm_group':
-                CRM.api3('Group', 'get', params.data).then(params.success, params.error);
+                CRM.api3('Group', 'getlist', params.data).then(params.success, params.error);
                 break;
 
               case 'civicrm_mailing':
@@ -255,8 +259,9 @@
                     return obj["api.MailingRecipients.getcount"] > 0 ? {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
                                text: obj.label } : '';
                   }
-                  else if (obj.is_hidden == 0) {
-                    return { id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type, text: obj.title, is_smart: (!_.isEmpty(obj.saved_search_id)) };
+                  else {
+                    return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type, text: obj.label,
+                              is_smart: (!_.isEmpty(obj.extra.saved_search_id)) };
                   }
                 })
               };

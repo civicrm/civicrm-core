@@ -869,8 +869,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['preferred_communication_method'] = 'null';
     }
 
-    $group = $params['group'] ?? NULL;
-    if (!empty($group) && is_array($group)) {
+    $group = CRM_Utils_Array::value('group', $params);
+    if (!empty($group)) {
+      $group = is_array($group) ? $group : explode(',', $group);
       unset($params['group']);
       foreach ($group as $key => $value) {
         $params['group'][$value] = 1;
