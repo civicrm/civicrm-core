@@ -3255,6 +3255,65 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that getquick returns contacts with different cases of phone substring.
+   */
+  public function testGetQuickPhone() {
+    $this->getQuickSearchSampleData();
+    $criterias = [
+      [
+        'criteria' => [
+          'name' => '87-6',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 2,
+        'sort_names' => [
+          'I Bobby, Bobby',
+          'J Bobby, Bobby',
+        ],
+      ],
+      [
+        'criteria' => [
+          'name' => '876-1',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 1,
+        'sort_names' => [
+          'I Bobby, Bobby',
+        ],
+      ],
+      [
+        'criteria' => [
+          'name' => '87623',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 1,
+        'sort_names' => [
+          'J Bobby, Bobby',
+        ],
+      ],
+      [
+        'criteria' => [
+          'name' => '8a7abc6',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 2,
+        'sort_names' => [
+          'I Bobby, Bobby',
+          'J Bobby, Bobby',
+        ],
+      ],
+    ];
+
+    foreach ($criterias as $criteria) {
+      $result = $this->callAPISuccess('contact', 'getquick', $criteria['criteria']);
+      $this->assertEquals($result['count'], $criteria['count']);
+      foreach ($criteria['sort_names'] as $key => $sortName) {
+        $this->assertEquals($sortName, $result['values'][$key]['sort_name']);
+      }
+    }
+  }
+
+  /**
    * Test that getquick returns contacts with an exact first name match first.
    *
    * Depending on the setting the sort name sort might click in next or not - test!
@@ -3404,8 +3463,28 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ['first_name' => 'Bobby', 'last_name' => 'F Bobby', 'external_identifier' => 'klm'],
       ['first_name' => 'Bobby', 'last_name' => 'G Bobby', 'external_identifier' => 'nop'],
       ['first_name' => 'Bobby', 'last_name' => 'H Bobby', 'external_identifier' => 'qrs', 'email' => 'bob@h.com'],
-      ['first_name' => 'Bobby', 'last_name' => 'I Bobby'],
-      ['first_name' => 'Bobby', 'last_name' => 'J Bobby'],
+      [
+        'first_name' => 'Bobby',
+        'last_name' => 'I Bobby',
+        'api.phone.create' => [
+          'phone' => '876-123',
+          'phone_ext' => '444',
+          "phone_type_id" => "Phone",
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
+      [
+        'first_name' => 'Bobby',
+        'last_name' => 'J Bobby',
+        'api.phone.create' => [
+          'phone' => '87-6-234',
+          'phone_ext' => '134',
+          "phone_type_id" => "Phone",
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
       ['first_name' => 'Bob', 'last_name' => 'K Bobby', 'external_identifier' => 'bcdef'],
       ['first_name' => 'Bob', 'last_name' => 'Aadvark'],
     ];
