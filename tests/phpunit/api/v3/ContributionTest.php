@@ -2823,6 +2823,48 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test to ensure that completetransaction respects the is_email_receipt
+   * setting in the contribution recur record.
+   *
+   * We test this by:
+   *
+   * 1. Not using a Contribution Page (since this also includes an is_email_receipt setting)
+   * 2. Not passing is_email_receipt into the calls.
+   * 3. Setting is_email_receipt to 0 on the contribution recur record.
+   */
+  public function testCompleteTransactionForRecurringWithoutEmailReceipt() {
+    $contribution = $this->setUpRecurringContribution([], ['is_email_receipt' => 0]);
+    // Check that a receipt was NOT sent.
+    $receipt_date = $this->callAPISuccess('Contribution', 'getvalue', ['id' => $contribution['id'], 'return' => 'receipt_date']);
+    $this->assertEquals('', $receipt_date);
+  }
+
+  /**
+   * Test to ensure that completetransaction respects the is_email_receipt
+   * setting in the contribution recur record.
+   *
+   * We test this by:
+   *
+   * 1. Not using a Contribution Page (since this also includes an is_email_receipt setting)
+   * 2. Not passing is_email_receipt into the calls.
+   * 3. Setting is_email_receipt to 1 on the contribution recur record.
+   */
+  public function testCompleteTransactionForRecurringWithEmailReceipt() {
+    $mut = new CiviMailUtils($this, TRUE);
+
+    $contribution = $this->setUpRecurringContribution([], ['is_email_receipt' => 1]);
+
+    // Check that a receipt WAS sent.
+    $mut->checkMailLog([
+      'Contribution Information',
+    ]);
+    $mut->stop();
+
+    $receipt_date = $this->callAPISuccess('Contribution', 'getvalue', ['id' => $contribution['id'], 'return' => 'receipt_date']);
+    $this->assertEquals('', $receipt_date);
+  }
+
+  /**
    * CRM-19710 - Test to ensure that completetransaction respects the input for is_email_receipt setting.
    *
    * If passed in it will override the default from contribution page.
