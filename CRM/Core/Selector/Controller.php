@@ -308,6 +308,7 @@ class CRM_Core_Selector_Controller {
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       if ($this->_output == self::EXPORT) {
         // export the rows.
+        CRM_Core_Error::deprecatedFunctionWarning('This code is believed to be unreachable & to be later removed. Please log how you reached it in gitlab');
         CRM_Core_Report_Excel::writeCSVFile($this->_object->getExportFileName(),
           $columnHeaders,
           $rows
