@@ -33,25 +33,18 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
      */
     $this->_columns = [
       ts('Name') => 'sort_name',
-      ts('Status') => 'activity_status',
-      ts('Activity Type') => 'activity_type',
+      ts('Status') => 'activity_status_id',
+      ts('Activity Type') => 'activity_type_id',
       ts('Activity Subject') => 'activity_subject',
       ts('Scheduled By') => 'source_contact',
       ts('Scheduled Date') => 'activity_date',
       ' ' => 'activity_id',
-      '  ' => 'activity_type_id',
       '   ' => 'case_id',
       ts('Location') => 'location',
       ts('Duration') => 'duration',
       ts('Details') => 'details',
       ts('Assignee') => 'assignee',
     ];
-
-    $this->_groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
-      'activity_status',
-      'id',
-      'name'
-    );
 
     //Add custom fields to columns array for inclusion in export
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity');
@@ -163,10 +156,9 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
                 activity.id                 as activity_id,
                 activity.activity_type_id   as activity_type_id,
                 contact_b.sort_name         as source_contact,
-                ov1.label                   as activity_type,
                 activity.subject            as activity_subject,
                 activity.activity_date_time as activity_date,
-                ov2.label                   as activity_status,
+                activity.status_id          as activity_status_id,
                 cca.case_id                 as case_id,
                 activity.location           as location,
                 activity.duration           as duration,
@@ -235,6 +227,8 @@ ORDER BY contact_a.sort_name';
    */
   public function alterRow(&$row) {
     $row['activity_date'] = CRM_Utils_Date::customFormat($row['activity_date'], '%B %E%f, %Y %l:%M %P');
+    $row['activity_type_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_type_id', $row['activity_type_id']);
+    $row['activity_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_status_id', $row['activity_status_id']);
   }
 
   /**
@@ -254,10 +248,6 @@ ORDER BY contact_a.sort_name';
                  ON activity.id = target.activity_id AND target.record_type_id = {$targetID}
             JOIN civicrm_contact contact_a
                  ON contact_a.id = target.contact_id
-            JOIN civicrm_option_value ov1
-                 ON activity.activity_type_id = ov1.value AND ov1.option_group_id = 2
-            JOIN civicrm_option_value ov2
-                 ON activity.status_id = ov2.value AND ov2.option_group_id = {$this->_groupId}
             LEFT JOIN civicrm_activity_contact sourceContact
                  ON activity.id = sourceContact.activity_id AND sourceContact.record_type_id = {$sourceID}
             JOIN civicrm_contact contact_b
