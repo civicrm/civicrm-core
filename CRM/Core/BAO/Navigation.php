@@ -310,50 +310,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * Recursively check child menus.
-   *
-   * @param array $value
-   * @param string $navigationString
-   * @param array $skipMenuItems
-   *
-   * @return string
-   */
-  public static function recurseNavigation(&$value, &$navigationString, $skipMenuItems) {
-    if (!empty($value['child'])) {
-      $navigationString .= '<ul>';
-    }
-    else {
-      $navigationString .= '</li>';
-      //locate separator after
-      if (isset($value['attributes']['separator']) && $value['attributes']['separator'] == 1) {
-        $navigationString .= '<li class="menu-separator"></li>';
-      }
-    }
-
-    if (!empty($value['child'])) {
-      foreach ($value['child'] as $val) {
-        $name = self::getMenuName($val, $skipMenuItems);
-        if ($name) {
-          //locate separator before
-          if (isset($val['attributes']['separator']) && $val['attributes']['separator'] == 2) {
-            $navigationString .= '<li class="menu-separator"></li>';
-          }
-          $removeCharacters = ['/', '!', '&', '*', ' ', '(', ')', '.'];
-          $navigationString .= '<li class="crm-' . str_replace($removeCharacters, '_', $val['attributes']['label']) . '">' . $name;
-          self::recurseNavigation($val, $navigationString, $skipMenuItems);
-        }
-      }
-    }
-    if (!empty($value['child'])) {
-      $navigationString .= '</ul></li>';
-      if (isset($value['attributes']['separator']) && $value['attributes']['separator'] == 1) {
-        $navigationString .= '<li class="menu-separator"></li>';
-      }
-    }
-    return $navigationString;
-  }
-
-  /**
    * Given a navigation menu, generate navIDs for any items which are
    * missing them.
    *
@@ -399,55 +355,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         self::_fixNavigationMenu($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
       }
     }
-  }
-
-  /**
-   * Check permissions and format menu item as html.
-   *
-   * @param $value
-   * @param array $skipMenuItems
-   *
-   * @return bool|string
-   */
-  public static function getMenuName(&$value, &$skipMenuItems) {
-    // we need to localise the menu labels (CRM-5456) and don’t
-    // want to use ts() as it would throw the ts-extractor off
-    $i18n = CRM_Core_I18n::singleton();
-
-    $name = $i18n->crm_translate($value['attributes']['label'], ['context' => 'menu']);
-    $url = CRM_Utils_Array::value('url', $value['attributes']);
-    $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
-    $navID = CRM_Utils_Array::value('navID', $value['attributes']);
-    $active = CRM_Utils_Array::value('active', $value['attributes']);
-    $target = CRM_Utils_Array::value('target', $value['attributes']);
-
-    if (in_array($parentID, $skipMenuItems) || !$active || !self::checkPermission($value['attributes'])) {
-      $skipMenuItems[] = $navID;
-      return FALSE;
-    }
-
-    $makeLink = FALSE;
-    if (!empty($url)) {
-      $url = self::makeFullyFormedUrl($url);
-      $makeLink = TRUE;
-    }
-
-    if (!empty($value['attributes']['icon'])) {
-      $menuIcon = sprintf('<i class="%s"></i>', $value['attributes']['icon']);
-      $name = $menuIcon . $name;
-    }
-
-    if ($makeLink) {
-      $url = CRM_Utils_System::evalUrl($url);
-      if ($target) {
-        $name = "<a href=\"{$url}\" target=\"{$target}\">{$name}</a>";
-      }
-      else {
-        $name = "<a href=\"{$url}\">{$name}</a>";
-      }
-    }
-
-    return $name;
   }
 
   /**
