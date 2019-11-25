@@ -2360,15 +2360,15 @@ LIMIT $offset, $limit
   }
 
   /**
+   * Write rows to the csv.
+   *
    * @param array $headerRows
-   * @param array $componentDetails
+   * @param array $rows
    */
-  protected function writeRows(array $headerRows, array $componentDetails) {
-    CRM_Core_Report_Excel::writeCSVFile($this->getExportFileName(),
-      $headerRows,
-      $componentDetails,
-      FALSE
-    );
+  protected function writeRows(array $headerRows, array $rows) {
+    if (!empty($rows)) {
+      CRM_Core_Report_Excel::makeCSVTable($headerRows, $rows, FALSE);
+    }
   }
 
   /**
