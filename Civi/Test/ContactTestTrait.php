@@ -31,6 +31,7 @@ trait ContactTestTrait {
       'domain_id' => \CRM_Core_Config::domainID(),
     ];
     $contactID = $this->individualCreate($params);
+    $this->callAPISuccess('UFMatch', 'get', ['uf_id' => 6, 'api.UFMatch.delete' => []]);
     $this->callAPISuccess('UFMatch', 'create', [
       'contact_id' => $contactID,
       'uf_name' => 'superman',
