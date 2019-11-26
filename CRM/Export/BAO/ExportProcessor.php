@@ -2387,7 +2387,7 @@ LIMIT $offset, $limit
       'csv',
       FALSE
     );
-    CRM_Core_Report_Excel::makeCSVTable($headerRows, [], NULL, TRUE, TRUE);
+    CRM_Core_Report_Excel::makeCSVTable($headerRows, [], NULL, TRUE);
   }
 
   /**
