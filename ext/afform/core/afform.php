@@ -4,10 +4,6 @@ require_once 'afform.civix.php';
 use CRM_Afform_ExtensionUtil as E;
 use Civi\Api4\Action\Afform\Submit;
 
-function _afform_fields() {
-  return ['name', 'title', 'description', 'requires', 'layout', 'server_route', 'is_public'];
-}
-
 /**
  * Filter the content of $params to only have supported afform fields.
  *
@@ -16,15 +12,16 @@ function _afform_fields() {
  */
 function _afform_fields_filter($params) {
   $result = [];
-  foreach (_afform_fields() as $field) {
-    if (isset($params[$field])) {
-      $result[$field] = $params[$field];
+  $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->execute()->indexBy('name');
+  foreach ($fields as $fieldName => $field) {
+    if (isset($params[$fieldName])) {
+      $result[$fieldName] = $params[$fieldName];
     }
 
-    if (isset($result[$field])) {
-      switch ($field) {
+    if (isset($result[$fieldName])) {
+      switch ($fieldName) {
         case 'is_public':
-          $result[$field] = CRM_Utils_String::strtobool($result[$field]);
+          $result[$fieldName] = CRM_Utils_String::strtobool($result[$fieldName]);
           break;
 
       }

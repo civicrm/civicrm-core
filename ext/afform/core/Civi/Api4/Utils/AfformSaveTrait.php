@@ -25,31 +25,34 @@ trait AfformSaveTrait {
         $suffix++;
       }
       $item['name'] .= $suffix;
+      $orig = NULL;
     }
     elseif (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $item['name'])) {
       throw new \API_Exception("Afform.{$this->getActionName()}: name should use alphanumerics and dashes.");
     }
+    else {
+      // Fetch existing metadata
+      $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->addSelect('name')->execute()->column('name');
+      unset($fields[array_search('layout', $fields)]);
+      unset($fields[array_search('name', $fields)]);
+      $orig = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->setSelect($fields)->execute()->first();
+    }
 
     // FIXME validate all field data.
-    $updates = _afform_fields_filter($item);
+    $item = _afform_fields_filter($item);
 
     // Create or update aff.html.
-    if (isset($updates['layout'])) {
+    if (isset($item['layout'])) {
       $layoutPath = $scanner->createSiteLocalPath($item['name'], 'aff.html');
       \CRM_Utils_File::createDir(dirname($layoutPath));
-      file_put_contents($layoutPath, $this->convertInputToHtml($updates['layout']));
+      file_put_contents($layoutPath, $this->convertInputToHtml($item['layout']));
       // FIXME check for writability then success. Report errors.
     }
 
-    $orig = NULL;
-    $meta = $updates;
-    unset($meta['layout']);
-    unset($meta['name']);
+    $meta = $item + (array) $orig;
+    unset($meta['layout'], $meta['name']);
     if (!empty($meta)) {
       $metaPath = $scanner->createSiteLocalPath($item['name'], \CRM_Afform_AfformScanner::METADATA_FILE);
-      if (file_exists($metaPath)) {
-        $orig = $scanner->getMeta($item['name']);
-      }
       \CRM_Utils_File::createDir(dirname($metaPath));
       file_put_contents($metaPath, json_encode($meta, JSON_PRETTY_PRINT));
       // FIXME check for writability then success. Report errors.
@@ -58,13 +61,13 @@ trait AfformSaveTrait {
     // We may have changed list of files covered by the cache.
     _afform_clear();
 
-    if (($updates['server_route'] ?? NULL) !== ($orig['server_route'] ?? NULL)) {
+    if (($item['server_route'] ?? NULL) !== ($orig['server_route'] ?? NULL)) {
       \CRM_Core_Menu::store();
       \CRM_Core_BAO_Navigation::resetNavigation();
     }
     // FIXME if asset-caching is enabled, then flush the asset cache.
 
-    return $updates;
+    return $meta + $item;
   }
 
 }

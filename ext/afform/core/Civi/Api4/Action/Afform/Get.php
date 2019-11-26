@@ -19,7 +19,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $values = [];
     foreach ($names as $name) {
       $record = $scanner->getMeta($name);
-      $layout = $scanner->getLayout($name);
+      $layout = $this->_isFieldSelected('layout') ? $scanner->getLayout($name) : NULL;
       if ($layout !== NULL) {
         // FIXME check for validity?
         $record['layout'] = $this->convertHtmlToOutput($layout);
