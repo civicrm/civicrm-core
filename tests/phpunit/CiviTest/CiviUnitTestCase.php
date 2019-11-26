@@ -3335,6 +3335,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $stream = fopen('php://memory', 'r+');
     fwrite($stream, $output);
     rewind($stream);
+    $this->assertEquals("\xEF\xBB\xBF", substr($output, 0, 3));
     $csv = Reader::createFromString($output);
     if ($isFirstRowHeaders) {
       $csv->setHeaderOffset(0);
