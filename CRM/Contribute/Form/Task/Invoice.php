@@ -245,26 +245,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
-      $addressParams = ['contact_id' => $contribution->contact_id];
-      $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
-
-      // to get billing address if present
+      // Fetch the billing address. getValues should prioritize the billing
+      // address, otherwise will return the primary address.
       $billingAddress = [];
-      foreach ($addressDetails as $address) {
-        if (($address['is_billing'] == 1) && ($address['is_primary'] == 1) && ($address['contact_id'] == $contribution->contact_id)) {
-          $billingAddress[$address['contact_id']] = $address;
-          break;
-        }
-        elseif (($address['is_billing'] == 0 && $address['is_primary'] == 1) || ($address['is_billing'] == 1) && ($address['contact_id'] == $contribution->contact_id)) {
-          $billingAddress[$address['contact_id']] = $address;
-        }
-      }
 
-      if (!empty($billingAddress[$contribution->contact_id]['state_province_id'])) {
-        $stateProvinceAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($billingAddress[$contribution->contact_id]['state_province_id']);
-      }
-      else {
-        $stateProvinceAbbreviation = '';
+      $addressDetails = CRM_Core_BAO_Address::getValues([
+        'contact_id' => $contribution->contact_id,
+        'is_billing' => 1,
+      ]);
+
+      if (!empty($addressDetails)) {
+        $billingAddress = array_shift($addressDetails);
       }
 
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
@@ -405,13 +396,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'contribution_status_id' => $contribution->contribution_status_id,
         'contributionStatusName' => CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id),
         'subTotal' => $subTotal,
-        'street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
-        'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
-        'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
-        'supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
-        'city' => CRM_Utils_Array::value('city', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
-        'stateProvinceAbbreviation' => $stateProvinceAbbreviation,
-        'postal_code' => CRM_Utils_Array::value('postal_code', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
+        'street_address' => CRM_Utils_Array::value('street_address', $billingAddress),
+        'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', $billingAddress),
+        'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', $billingAddress),
+        'supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3', $billingAddress),
+        'city' => CRM_Utils_Array::value('city', $billingAddress),
+        'postal_code' => CRM_Utils_Array::value('postal_code', $billingAddress),
+        'state_province' => CRM_Utils_Array::value('state_province', $billingAddress),
+        'state_province_abbreviation' => CRM_Utils_Array::value('state_province_abbreviation', $billingAddress),
+        // Kept for backwards compatibility
+        'stateProvinceAbbreviation' => CRM_Utils_Array::value('state_province_abbreviation', $billingAddress),
+        'country' => CRM_Utils_Array::value('country', $billingAddress),
         'is_pay_later' => $contribution->is_pay_later,
         'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
         'domain_organization' => $domain->name,
