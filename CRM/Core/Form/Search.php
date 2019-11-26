@@ -86,6 +86,13 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Should we be adding all the metadata for contact search fields or just for the sort name.
+   *
+   * @var bool
+   */
+  protected $sortNameOnly = FALSE;
+
+  /**
    * Metadata for fields on the search form.
    *
    * Instantiate with empty array for contact to prevent e-notices.
@@ -424,6 +431,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       return;
     }
     $this->addSortNameField();
+    if ($this->sortNameOnly) {
+      return;
+    }
 
     $this->_group = CRM_Core_PseudoConstant::nestedGroup();
     if ($this->_group) {
@@ -449,7 +459,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     }
     $this->searchFieldMetadata['Contact']['contact_tags'] = ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'html' => ['type' => 'Select']];
     $this->addField('contact_type', ['entity' => 'Contact']);
-    $this->searchFieldMetadata['contact']['contact_type'] = CRM_Contact_DAO_Contact::fields()['contact_type'];
+    $this->searchFieldMetadata['Contact']['contact_type'] = CRM_Contact_DAO_Contact::fields()['contact_type'];
 
     if (CRM_Core_Permission::check('access deleted contacts') && Civi::settings()->get('contact_undelete')) {
       $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
