@@ -1237,6 +1237,23 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Processors may need to inspect, validate, cast and copy data that is
+   * specific to this Payment Processor from the input array to custom fields
+   * on the PropertyBag.
+   *
+   * @param Civi\Payment\PropertyBag $propertyBag
+   * @param array $params
+   * @param string $component
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function extractCustomPropertiesForDoPayment(PropertyBag $propertyBag, array $params, $component = 'contribute') {
+    // example
+    // (validation and casting goes first)
+    // $propertyBag->setCustomProperty('myprocessor_customPropertyName', $value);
+  }
+
+  /**
    * Process payment - this function wraps around both doTransferCheckout and doDirectPayment.
    * Any processor that still implements the deprecated doTransferCheckout() or doDirectPayment() should be updated to use doPayment().
    *
