@@ -120,7 +120,7 @@ class CRM_Afform_AfformScanner {
    * @param string $name
    *   Ex: 'view-individual'
    * @return array
-   *   An array with some mix of the following keys: name, title, description, client_route, server_route, requires.
+   *   An array with some mix of the following keys: name, title, description, server_route, requires, is_public.
    *   NOTE: This is only data available in *.aff.json. It does *NOT* include layout.
    *   Ex: [
    *     'name' => 'view-individual',

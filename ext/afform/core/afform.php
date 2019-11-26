@@ -5,7 +5,7 @@ use CRM_Afform_ExtensionUtil as E;
 use Civi\Api4\Action\Afform\Submit;
 
 function _afform_fields() {
-  return ['name', 'title', 'description', 'requires', 'layout', 'server_route', 'client_route', 'is_public'];
+  return ['name', 'title', 'description', 'requires', 'layout', 'server_route', 'is_public'];
 }
 
 /**
