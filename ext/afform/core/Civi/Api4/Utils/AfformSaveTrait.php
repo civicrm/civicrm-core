@@ -14,20 +14,19 @@ trait AfformSaveTrait {
     /** @var \CRM_Afform_AfformScanner $scanner */
     $scanner = \Civi::service('afform_scanner');
 
-    $name = $item['name'] ?? NULL;
     // If no name given, create a unique name based on the title
-    if (!$name) {
-      $name = \CRM_Utils_String::munge($item['title'], '-');
+    if (empty($item['name'])) {
+      $item['name'] = _afform_angular_module_name(\CRM_Utils_String::munge($item['title'], '-'));
       $suffix = '';
       while (
-        file_exists($scanner->createSiteLocalPath($name . $suffix, \CRM_Afform_AfformScanner::METADATA_FILE))
-        || file_exists($scanner->createSiteLocalPath($name . $suffix, 'aff.html'))
+        file_exists($scanner->createSiteLocalPath($item['name'] . $suffix, \CRM_Afform_AfformScanner::METADATA_FILE))
+        || file_exists($scanner->createSiteLocalPath($item['name'] . $suffix, 'aff.html'))
       ) {
         $suffix++;
       }
-      $name .= $suffix;
+      $item['name'] .= $suffix;
     }
-    elseif (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $name)) {
+    elseif (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $item['name'])) {
       throw new \API_Exception("Afform.{$this->getActionName()}: name should use alphanumerics and dashes.");
     }
 
@@ -36,7 +35,7 @@ trait AfformSaveTrait {
 
     // Create or update aff.html.
     if (isset($updates['layout'])) {
-      $layoutPath = $scanner->createSiteLocalPath($name, 'aff.html');
+      $layoutPath = $scanner->createSiteLocalPath($item['name'], 'aff.html');
       \CRM_Utils_File::createDir(dirname($layoutPath));
       file_put_contents($layoutPath, $this->convertInputToHtml($updates['layout']));
       // FIXME check for writability then success. Report errors.
@@ -47,9 +46,9 @@ trait AfformSaveTrait {
     unset($meta['layout']);
     unset($meta['name']);
     if (!empty($meta)) {
-      $metaPath = $scanner->createSiteLocalPath($name, \CRM_Afform_AfformScanner::METADATA_FILE);
+      $metaPath = $scanner->createSiteLocalPath($item['name'], \CRM_Afform_AfformScanner::METADATA_FILE);
       if (file_exists($metaPath)) {
-        $orig = $scanner->getMeta($name);
+        $orig = $scanner->getMeta($item['name']);
       }
       \CRM_Utils_File::createDir(dirname($metaPath));
       file_put_contents($metaPath, json_encode($meta, JSON_PRETTY_PRINT));

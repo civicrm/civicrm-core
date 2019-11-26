@@ -4,7 +4,7 @@
 
   var editingIcon;
 
-  angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4, $parse, $timeout) {
+  angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4, $parse, $timeout, $location) {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/main.html',
@@ -152,13 +152,13 @@
         };
 
         $scope.save = function() {
-          $scope.saving = true;
-          CRM.api4('Afform', 'save', {records: [JSON.parse(angular.toJson($scope.afform))]})
-            .then(function () {
-              $scope.$apply(function () {
-                $scope.saving = false;
-                $scope.changesSaved = true;
-              });
+          $scope.saving = $scope.changesSaved = true;
+          crmApi4('Afform', 'save', {records: [JSON.parse(angular.toJson($scope.afform))]})
+            .then(function (data) {
+              $scope.saving = false;
+              $scope.afform.name = data[0].name;
+              // FIXME: This causes an unnecessary reload when saving a new form
+              $location.search('name', data[0].name);
             });
         };
 

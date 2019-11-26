@@ -4,7 +4,7 @@
       <div class="btn-group btn-group-md pull-right">
         <button class="btn" ng-class="{'btn-primary': !changesSaved && !saving, 'btn-warning': saving, 'btn-success': changesSaved}" ng-disabled="changesSaved || saving" ng-click="save()">
           <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}"></i>
-          <span ng-if="changesSaved">{{ ts('Saved') }}</span>
+          <span ng-if="changesSaved && !saving">{{ ts('Saved') }}</span>
           <span ng-if="!changesSaved && !saving">{{ ts('Save') }}</span>
           <span ng-if="saving">{{ ts('Saving...') }}</span>
         </button>
