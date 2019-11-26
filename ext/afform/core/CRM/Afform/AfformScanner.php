@@ -194,7 +194,7 @@ class CRM_Afform_AfformScanner {
 
     foreach ($files as $file) {
       $fileBase = preg_replace(self::FILE_REGEXP, '', $file);
-      $name = _afform_angular_module_name(basename($fileBase));
+      $name = basename($fileBase);
       $formPaths[$name][$priority] = $fileBase;
       ksort($formPaths[$name]);
     }
