@@ -446,6 +446,34 @@ class CRM_Contact_BAO_Query {
   public $_groupUniqueKey;
   public $_groupKeys = [];
 
+  public $gcTable = NULL;
+  public $tagTable = NULL;
+  public $entityTagTable = NULL;
+
+  public function setGroupTable($table) {
+    $this->gcTable = $table;
+  }
+
+  public function getGroupTable() {
+    return $this->gcTable;
+  }
+
+  public function setTagTable($table) {
+    $this->tagTable = $table;
+  }
+
+  public function getTagTable() {
+    return $this->tagTable;
+  }
+
+  public function setEntityTagTable($table) {
+    $this->entityTagTable = $table;
+  }
+
+  public function getEntityTagTable() {
+    return $this->entityTagTable;
+  }
+
   /**
    * Class constructor which also does all the work.
    *
@@ -3067,7 +3095,11 @@ class CRM_Contact_BAO_Query {
         }
       }
 
-      $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
+      $gcTable = $this->getGroupTable();
+      if (!$gcTable) {
+        $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
+        $this->setGroupTable($gcTable);
+      }
       $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
 
       // @todo consider just casting != to NOT IN & handling both together.
@@ -3251,9 +3283,14 @@ WHERE  $smartGroupClause
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
     $tagTypesText = $this->getWhereValues('tag_types_text', $grouping);
 
-    $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
-    $tTable = "`civicrm_tag-" . uniqid() . "`";
-
+    $etTable = $this->getEntityTagTable();
+    $tTable = $this->getTagTable();
+    if (!$etTable) {
+      $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
+      $tTable = "`civicrm_tag-" . uniqid() . "`";
+      $this->setEntityTagTable($etTable);
+      $this->setTagTable($tTable);
+    }
     if ($useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
         = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id)
@@ -3288,8 +3325,14 @@ WHERE  $smartGroupClause
       $this->_qill[$grouping][] = ts('Tag %1 %2', [1 => $tagTypesText[2], 2 => $op]) . ' ' . $value;
     }
     else {
-      $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
-      $tTable = "`civicrm_tag-" . uniqid() . "`";
+      $etTable = $this->getEntityTagTable();
+      $tTable = $this->getTagTable();
+      if (!$etTable) {
+        $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
+        $tTable = "`civicrm_tag-" . uniqid() . "`";
+        $this->setEntityTagTable($etTable);
+        $this->setTagTable($tTable);
+      }
       $this->_tables[$etTable] = $this->_whereTables[$etTable] = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id  AND
       {$etTable}.entity_table = 'civicrm_contact' )
                 LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  ) ";
@@ -3333,7 +3376,11 @@ WHERE  $smartGroupClause
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
     $tagTypesText = $this->getWhereValues('tag_types_text', $grouping);
 
-    $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
+    $etTable = $this->getEntityTagTable();
+    if (!$etTable) {
+      $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
+      $this->setEntityTagTable($etTable);
+    }
 
     if ($useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
