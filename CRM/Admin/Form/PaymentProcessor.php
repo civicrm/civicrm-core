@@ -424,7 +424,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Process the form submission.
    *
    * @throws \CiviCRM_API3_Exception
-	 * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
 
