@@ -270,6 +270,7 @@ class CRM_GCD {
 
   private $groupMembershipStatus = array('Added', 'Removed', 'Pending');
   private $subscriptionHistoryMethod = array('Admin', 'Email');
+  private $deceasedContactIds = array();
 
   /*********************************
    * private methods
@@ -649,7 +650,13 @@ class CRM_GCD {
       }
 
       // Deceased probability based on age
-      if ($age > 40) {
+      if ($contact->gender_id && $contact->gender_id == 2) {
+        $checkAge = 64;
+      }
+      else {
+        $checkAge = 68;
+      }
+      if ($age > $checkAge && count($this->deceasedContactIds) < 4) {
         $contact->is_deceased = $this->probability(($age - 30) / 100);
         if ($contact->is_deceased && $this->probability(.7)) {
           $contact->deceased_date = $this->randomDate();
@@ -686,6 +693,9 @@ class CRM_GCD {
       $contact->hash = crc32($contact->sort_name);
       $contact->id = $cid;
       $this->_update($contact);
+      if ($contact->is_deceased) {
+        $this->deceasedContactIds[] = $cid;
+      }
     }
   }
 
