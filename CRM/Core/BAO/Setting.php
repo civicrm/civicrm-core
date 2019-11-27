@@ -125,8 +125,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Store an item in the setting table.
    *
-   * _setItem() is the common logic shared by setItem() and setItems().
-   *
    * @param $value
    *   (required) The value that will be serialized and stored.
    * @param string $group
@@ -140,6 +138,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   An optional ID to assign the creator to. If not set, retrieved from session.
    *
    * @param int $domainID
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated - refer docs https://docs.civicrm.org/dev/en/latest/framework/setting/
    */
   public static function setItem(
     $value,
@@ -150,6 +152,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $createdID = NULL,
     $domainID = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('refer docs for correct methods https://docs.civicrm.org/dev/en/latest/framework/setting/');
+
     /** @var \Civi\Core\SettingsManager $manager */
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
@@ -162,8 +166,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *  'name' setting's name
    *  'config_key' = the config key is different to the settings key - e.g. debug where there was a conflict
    *  'legacy_key' = rename from config or setting with this name
-   *
-   * _setItem() is the common logic shared by setItem() and setItems().
    *
    * @param array $params
    *   (required) An api formatted array of keys and values.
@@ -421,6 +423,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param bool $system
    * @param int $userID
    * @param string $keyField
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function setValueOption(
     $group,
@@ -430,6 +436,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $userID = NULL,
     $keyField = 'name'
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('refer docs for correct methods https://docs.civicrm.org/dev/en/latest/framework/setting/');
     if (empty($value)) {
       $optionValue = NULL;
     }
