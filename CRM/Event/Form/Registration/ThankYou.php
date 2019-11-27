@@ -39,7 +39,6 @@
  *
  */
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
-  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * Set variables up before form is built.

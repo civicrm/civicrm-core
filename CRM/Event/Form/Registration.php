@@ -34,6 +34,7 @@
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration extends CRM_Core_Form {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * How many locationBlocks should we display?
@@ -307,6 +308,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $this->_values['event']['participant_role'] = $participant_role["{$this->_values['event']['default_role_id']}"];
       }
       $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
+      $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
       //check for various combinations for paylater, payment
       //process with paid event.
       if ($isMonetary && (!$isPayLater || !empty($this->_values['event']['payment_processor']))) {
@@ -314,7 +316,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $this->_values['event']
         ));
         $this->assignPaymentProcessor($isPayLater);
-
       }
       //init event fee.
       self::initEventFee($this, $this->_eventId);
@@ -505,7 +506,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
     $this->assign('is_pay_later', $params['is_pay_later']);
     if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->_values['event']['pay_later_text']);
+      $this->assign('pay_later_text', $this->getPayLaterLabel());
       $this->assign('pay_later_receipt', $this->_values['event']['pay_later_receipt']);
     }
 

@@ -35,6 +35,7 @@
  * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -345,6 +346,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $isPayLater = FALSE;
           $this->_values['is_pay_later'] = FALSE;
         }
+      }
+      if ($isPayLater) {
+        $this->setPayLaterLabel($this->_values['pay_later_text']);
       }
 
       if ($isMonetary) {
