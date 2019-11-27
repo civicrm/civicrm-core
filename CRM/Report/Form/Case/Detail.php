@@ -44,12 +44,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->rel_types[$relid] = $v['label_b_a'];
     }
 
-    $this->deleted_labels = [
-      '' => ts('- select -'),
-      0 => ts('No'),
-      1 => ts('Yes'),
-    ];
-
     $this->caseActivityTypes = [];
     foreach (CRM_Case_PseudoConstant::caseActivityType() as $typeDetail) {
       $this->caseActivityTypes[$typeDetail['id']] = $typeDetail['label'];
@@ -81,7 +75,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'is_deleted' => [
             'title' => ts('Deleted?'),
             'default' => FALSE,
-            'type' => CRM_Utils_Type::T_INT,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
           ],
         ],
         'filters' => [
@@ -109,9 +103,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           ],
           'is_deleted' => [
             'title' => ts('Deleted?'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => $this->deleted_labels,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
             'default' => 0,
           ],
         ],
@@ -173,8 +165,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'is_active' => [
             'title' => ts('Active Role?'),
             'type' => CRM_Utils_Type::T_BOOLEAN,
-            'default' => TRUE,
-            'options' => CRM_Core_SelectValues::boolean(),
           ],
         ],
       ],
@@ -672,12 +662,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           }
           $rows[$rowNum]['case_activity_all_dates'] = implode('; ', $activityDates);
         }
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_case_is_deleted', $row)) {
-        $value = $row['civicrm_case_is_deleted'];
-        $rows[$rowNum]['civicrm_case_is_deleted'] = $this->deleted_labels[$value];
         $entryFound = TRUE;
       }
 
