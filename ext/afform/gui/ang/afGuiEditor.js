@@ -43,7 +43,7 @@
         };
         if ($scope.afGuiEditor.name && $scope.afGuiEditor.name != '0') {
           // Todo - show error msg if form is not found
-          crmApi4('Afform', 'get', {where: [['name', '=', $scope.afGuiEditor.name]], layoutFormat: 'shallow'}, 0)
+          crmApi4('Afform', 'get', {where: [['name', '=', $scope.afGuiEditor.name]], layoutFormat: 'shallow', formatWhitespace: true}, 0)
             .then(initialize);
         }
         else {
@@ -67,10 +67,6 @@
         function initialize(afform) {
           $scope.afform = afform;
           $scope.changesSaved = 1;
-          // Remove empty text nodes, they just create clutter
-          removeRecursive($scope.afform.layout, function(item) {
-            return ('#text' in item) && _.trim(item['#text']).length === 0;
-          });
           $scope.layout = findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
           evaluate($scope.layout['#children']);
           $scope.entities = findRecursive($scope.layout['#children'], {'#tag': 'af-entity'}, 'name');
@@ -153,7 +149,7 @@
 
         $scope.save = function() {
           $scope.saving = $scope.changesSaved = true;
-          crmApi4('Afform', 'save', {records: [JSON.parse(angular.toJson($scope.afform))]})
+          crmApi4('Afform', 'save', {formatWhitespace: true, records: [JSON.parse(angular.toJson($scope.afform))]})
             .then(function (data) {
               $scope.saving = false;
               $scope.afform.name = data[0].name;

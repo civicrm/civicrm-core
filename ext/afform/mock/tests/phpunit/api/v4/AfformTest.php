@@ -68,20 +68,19 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
   }
 
   public function getFormatExamples() {
-    $es = [];
-
-    foreach (['empty', 'string', 'comments', 'self-closing', 'apple', 'banana', 'cherry'] as $exampleName) {
-      $exampleFile = '/formatExamples/' . $exampleName . '.php';
-      $example = require __DIR__ . $exampleFile;
-      $formats = ['html', 'shallow', 'deep'];
-      foreach ($formats as $updateFormat) {
-        foreach ($formats as $readFormat) {
-          $es[] = ['mockBareFile', $updateFormat, $example[$updateFormat], $readFormat, $example[$readFormat], $exampleFile];
+    $ex = [];
+    $formats = ['html', 'shallow', 'deep'];
+    foreach (glob(__DIR__ . '/formatExamples/*.php') as $exampleFile) {
+      $example = require $exampleFile;
+      if (isset($example['deep'])) {
+        foreach ($formats as $updateFormat) {
+          foreach ($formats as $readFormat) {
+            $ex[] = ['mockBareFile', $updateFormat, $example[$updateFormat], $readFormat, $example[$readFormat], $exampleFile];
+          }
         }
       }
     }
-
-    return $es;
+    return $ex;
   }
 
   /**
@@ -121,6 +120,53 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($readLayout, $result[0]['layout'], "Based on \"$exampleName\", writing content as \"$updateFormat\" and reading back as \"$readFormat\".");
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
+  }
+
+  public function getWhitespaceExamples() {
+    $ex = [];
+    foreach (glob(__DIR__ . '/formatExamples/*.php') as $exampleFile) {
+      $example = require $exampleFile;
+      if (isset($example['pretty'])) {
+        $ex[] = ['mockBareFile', $example, $exampleFile];
+      }
+    }
+    return $ex;
+  }
+
+  /**
+   * This tests that a non-pretty html string will have its whitespace stripped & reformatted
+   * when using the "formatWhitespace" option.
+   *
+   * @dataProvider getWhitespaceExamples
+   */
+  public function testWhitespaceFormat($directiveName, $example, $exampleName) {
+    Civi\Api4\Afform::save()
+      ->addRecord(['name' => $directiveName, 'layout' => $example['html']])
+      ->setLayoutFormat('html')
+      ->execute();
+
+    $result = Civi\Api4\Afform::get()
+      ->addWhere('name', '=', $directiveName)
+      ->setLayoutFormat('shallow')
+      ->setFormatWhitespace(TRUE)
+      ->execute()
+      ->first();
+
+    $this->assertEquals($example['stripped'] ?? $example['shallow'], $result['layout']);
+
+    Civi\Api4\Afform::save()
+      ->addRecord(['name' => $directiveName, 'layout' => $result['layout']])
+      ->setLayoutFormat('shallow')
+      ->setFormatWhitespace(TRUE)
+      ->execute();
+
+    $result = Civi\Api4\Afform::get()
+      ->addWhere('name', '=', $directiveName)
+      ->setLayoutFormat('html')
+      ->execute()
+      ->first();
+
+    $this->assertEquals($example['pretty'], $result['layout']);
   }
 
   public function testAutoRequires() {
