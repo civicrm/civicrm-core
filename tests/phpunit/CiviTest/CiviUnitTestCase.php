@@ -3426,6 +3426,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   protected function validatePayments($payments) {
     foreach ($payments as $payment) {
+      $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($payment['contribution_id']);
+      if ($balance < 0 && $balance + $payment['total_amount'] === 0.0) {
+        // This is an overpayment situation. there are no financial items to allocate the overpayment.
+        // This is a pretty rough way at guessing which payment is the overpayment - but
+        // for the test suite it should be enough.
+        continue;
+      }
       $items = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
         'financial_trxn_id' => $payment['id'],
         'entity_table' => 'civicrm_financial_item',
