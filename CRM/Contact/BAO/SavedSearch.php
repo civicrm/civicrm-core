@@ -174,7 +174,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         }
       }
       if (substr($element, 0, 7) == 'custom_' &&
-        (substr($element, -5, 5) == '_from' || substr($element, -3, 3) == '_to')
+        (substr($element, -5, 5) == '_from' || substr($element, -3, 3) == '_to') && !empty($value)
       ) {
         // Ensure the _relative field is set if from or to are set to ensure custom date
         // fields with 'from' or 'to' values are displayed when the are set in the smart group
