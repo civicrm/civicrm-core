@@ -1146,6 +1146,44 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test contact subtype filter on summary report.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContactSubtypeIn() {
+    $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $this->individualCreate();
+
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contact/summary',
+      'contact_sub_type_op' => 'in',
+      'contact_sub_type_value' => ['Student'],
+      'contact_type_op' => 'in',
+      'contact_type_value' => 'Individual',
+    ]);
+    $this->assertEquals(1, $rows['count']);
+  }
+
+  /**
+   * Test contact subtype filter on summary report.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContactSubtypeNotIn() {
+    $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $this->individualCreate();
+
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contact/summary',
+      'contact_sub_type_op' => 'notin',
+      'contact_sub_type_value' => ['Student'],
+      'contact_type_op' => 'in',
+      'contact_type_value' => 'Individual',
+    ]);
+    $this->assertEquals(1, $rows['count']);
+  }
+
+  /**
    * Test PCP report to ensure total donors and total committed is accurate.
    */
   public function testPcpReportTotals() {

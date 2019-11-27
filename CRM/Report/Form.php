@@ -2114,32 +2114,34 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function whereSubtypeClause($field, $value, $op) {
     // Get the correct SQL operator.
+    $orNull = FALSE;
     switch ($op) {
       case 'notin':
         $op = 'nhas';
-        $clauseSeparator = 'AND';
+        $clauseSeparator = ' AND ';
+        $orNull = TRUE;
         break;
 
       case 'in':
         $op = 'has';
-        $clauseSeparator = 'OR';
+        $clauseSeparator = ' OR ';
         break;
     }
     $sqlOp = $this->getSQLOperator($op);
-    $clause = '( ';
-    $subtypeFilters = count($value);
     if ($sqlOp == 'IS NULL' || $sqlOp == 'IS NOT NULL') {
-      $clause .= "{$field['dbAlias']} $sqlOp";
+      $clause = "{$field['dbAlias']} $sqlOp";
     }
     else {
-      for ($i = 0; $i < $subtypeFilters; $i++) {
-        $clause .= "{$field['dbAlias']} $sqlOp '%$value[$i]%'";
-        if ($i !== ($subtypeFilters - 1)) {
-          $clause .= " $clauseSeparator ";
-        }
+      $subclauses = [];
+      foreach ($value as $item) {
+        $subclauses[] = "( {$field['dbAlias']} $sqlOp '%" . CRM_Core_DAO::VALUE_SEPARATOR . $item . CRM_Core_DAO::VALUE_SEPARATOR . "%' )";
       }
+      $clause = implode($clauseSeparator, $subclauses);
     }
-    $clause .= ' )';
+    $clause = "( $clause )";
+    if ($orNull) {
+      $clause = "( ( {$field['dbAlias']} IS NULL ) OR $clause )";
+    }
     return $clause;
   }
 
