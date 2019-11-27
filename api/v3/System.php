@@ -385,6 +385,38 @@ function civicrm_api3_system_updatelogtables($params) {
 }
 
 /**
+ * Update log table structures.
+ *
+ * This updates the engine type if defined in the hook and changes the field type
+ * for log_conn_id to reflect CRM-18193.
+ *
+ * @param array $params
+ *
+ * @return array
+ *
+ * @throws \API_Exception
+ */
+function civicrm_api3_system_utf8conversion($params) {
+  if (CRM_Core_BAO_SchemaHandler::migrateUtf8mb4($params['is_revert'])) {
+    return civicrm_api3_create_success(1);
+  }
+  throw new API_Exception('Conversion failed');
+}
+
+/**
+ * Metadata for conversion function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_system_utf8conversion_spec(&$params) {
+  $params['is_revert'] = [
+    'title' => ts('Revert back from UTF8MB4 to UTF8?'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => FALSE,
+  ];
+}
+
+/**
  * Adjust Metadata for Flush action.
  *
  * The metadata is used for setting defaults, documentation & validation.
