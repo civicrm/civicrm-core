@@ -14,23 +14,28 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page']],
       ['mockBareFile', ['title' => '', 'description' => '']],
       ['mockFoo', ['title' => '', 'description' => '']],
+      ['mock-weird-name', ['title' => 'Weird Name', 'description' => '']],
     ];
   }
 
   /**
    * This takes the bundled `example-page` and performs some API calls on it.
+   *
+   * @param string $formName
+   *   The symbolic name of the form.
+   * @param array $originalMetadata
    * @dataProvider getBasicDirectives
    */
-  public function testGetUpdateRevert($directiveName, $originalMetadata) {
+  public function testGetUpdateRevert($formName, $originalMetadata) {
     $get = function($arr, $key) {
       return isset($arr[$key]) ? $arr[$key] : NULL;
     };
 
-    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
 
     $message = 'The initial Afform.get should return default data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->execute();
-    $this->assertEquals($directiveName, $result[0]['name'], $message);
+    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->execute();
+    $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
@@ -38,24 +43,24 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
     $message = 'After updating with Afform.create, the revised data should be returned';
     $result = Civi\Api4\Afform::update()
-      ->addWhere('name', '=', $directiveName)
+      ->addWhere('name', '=', $formName)
       ->addValue('description', 'The temporary description')
       ->execute();
-    $this->assertEquals($directiveName, $result[0]['name'], $message);
+    $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals('The temporary description', $result[0]['description'], $message);
 
     $message = 'After updating, the Afform.get API should return blended data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->execute();
-    $this->assertEquals($directiveName, $result[0]['name'], $message);
+    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->execute();
+    $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals('The temporary description', $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
 
-    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
     $message = 'After reverting, the final Afform.get should return default data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->execute();
-    $this->assertEquals($directiveName, $result[0]['name'], $message);
+    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->execute();
+    $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
@@ -83,7 +88,8 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
    * In this test, we update the layout and in one format and then read it back
    * in another format.
    *
-   * @param string $directiveName
+   * @param string $formName
+   *   The symbolic name of the form.
    * @param string $updateFormat
    *   The format with which to write the data.
    *   'html' or 'array'
@@ -98,63 +104,63 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
    *   (For debug messages) A symbolic name of the example data-set being tested.
    * @dataProvider getFormatExamples
    */
-  public function testUpdateAndGetFormat($directiveName, $updateFormat, $updateLayout, $readFormat, $readLayout, $exampleName) {
-    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+  public function testUpdateAndGetFormat($formName, $updateFormat, $updateLayout, $readFormat, $readLayout, $exampleName) {
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
 
     Civi\Api4\Afform::update()
-      ->addWhere('name', '=', $directiveName)
+      ->addWhere('name', '=', $formName)
       ->setLayoutFormat($updateFormat)
       ->setValues(['layout' => $updateLayout])
       ->execute();
 
     $result = Civi\Api4\Afform::get()
-      ->addWhere('name', '=', $directiveName)
+      ->addWhere('name', '=', $formName)
       ->setLayoutFormat($readFormat)
       ->execute();
 
     $this->assertEquals($readLayout, $result[0]['layout'], "Based on \"$exampleName\", writing content as \"$updateFormat\" and reading back as \"$readFormat\".");
 
-    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
   }
 
   public function testAutoRequires() {
-    $directiveName = 'mockPage';
+    $formName = 'mockPage';
     $this->createLoggedInUser();
 
     // The default mockPage has 1 explicit requirement + 2 automatic requirements.
-    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
-    $angModule = Civi::service('angular')->getModule($directiveName);
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
+    $angModule = Civi::service('angular')->getModule($formName);
     $this->assertEquals(['afCore', 'extraMock', 'mockBareFile', 'mockFoo'], $angModule['requires']);
-    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->addSelect('requires')->execute();
+    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
     $this->assertEquals(['extraMock'], $storedRequires[0]['requires']);
 
     // Knock down to 1 explicit + 1 automatic.
     Civi\Api4\Afform::update()
-      ->addWhere('name', '=', $directiveName)
+      ->addWhere('name', '=', $formName)
       ->setLayoutFormat('html')
       ->setValues(['layout' => '<div>The bare file says "<span mock-bare-file/>"</div>'])
       ->execute();
-    $angModule = Civi::service('angular')->getModule($directiveName);
+    $angModule = Civi::service('angular')->getModule($formName);
     $this->assertEquals(['afCore', 'extraMock', 'mockBareFile'], $angModule['requires']);
-    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->addSelect('requires')->execute();
+    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
     $this->assertEquals(['extraMock'], $storedRequires[0]['requires']);
 
     // Remove the last explict and implicit requirements.
     Civi\Api4\Afform::update()
-      ->addWhere('name', '=', $directiveName)
+      ->addWhere('name', '=', $formName)
       ->setLayoutFormat('html')
       ->setValues([
         'layout' => '<div>The file has nothing! <strong>NOTHING!</strong> <em>JUST RANTING!</em></div>',
         'requires' => [],
       ])
       ->execute();
-    $angModule = Civi::service('angular')->getModule($directiveName);
+    $angModule = Civi::service('angular')->getModule($formName);
     $this->assertEquals(['afCore'], $angModule['requires']);
-    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->addSelect('requires')->execute();
+    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
     $this->assertEquals([], $storedRequires[0]['requires']);
 
-    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
-    $angModule = Civi::service('angular')->getModule($directiveName);
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
+    $angModule = Civi::service('angular')->getModule($formName);
     $this->assertEquals(['afCore', 'extraMock', 'mockBareFile', 'mockFoo'], $angModule['requires']);
   }
 
