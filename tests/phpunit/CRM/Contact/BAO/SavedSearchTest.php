@@ -17,6 +17,8 @@
  */
 class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   /**
    * Sets up the fixture, for example, opens a network connection.
    *
@@ -32,11 +34,20 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   protected function tearDown() {
+    if (!empty($this->ids['CustomField'])) {
+      foreach ($this->ids['CustomField'] as $type => $id) {
+        $field = civicrm_api3('CustomField', 'getsingle', ['id' => $id]);
+        $group = civicrm_api3('CustomGroup', 'getsingle', ['id' => $field['custom_group_id']]);
+        CRM_Core_DAO::executeQuery("DROP TABLE IF Exists {$group['table_name']}");
+      }
+    }
     $this->quickCleanup([
       'civicrm_mapping_field',
       'civicrm_mapping',
       'civicrm_group',
       'civicrm_saved_search',
+      'civicrm_custom_field',
+      'civicrm_custom_group',
     ]);
   }
 
@@ -46,6 +57,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testDefaultValues() {
+    $this->createCustomGroupWithFieldOfType([], 'int');
     $sg = new CRM_Contact_Form_Search_Advanced();
     $sg->controller = new CRM_Core_Controller();
     $formValues = [
@@ -55,6 +67,8 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       'privacy_toggle' => 2,
       'operator' => 'AND',
       'component_mode' => 1,
+      'custom_' . $this->ids['CustomField']['int'] . '_from' => 0,
+      'custom_' . $this->ids['CustomField']['int'] . '_to' => '',
     ];
     CRM_Core_DAO::executeQuery(
       "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($formValues) . "')"
@@ -66,6 +80,35 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     $defaults = $sg->setDefaultValues();
 
     $this->checkArrayEquals($defaults, $formValues);
+  }
+
+  /**
+   * Test setDefaults for privacy radio buttons.
+   *
+   * @throws \Exception
+   */
+  public function testGetFormValuesWithCustomFields() {
+    $this->createCustomGroupWithFieldsOfAllTypes();
+    $sg = new CRM_Contact_Form_Search_Advanced();
+    $sg->controller = new CRM_Core_Controller();
+    $formValues = [
+      'group_search_selected' => 'group',
+      'privacy_options' => ['do_not_email'],
+      'privacy_operator' => 'OR',
+      'privacy_toggle' => 2,
+      'operator' => 'AND',
+      'component_mode' => 1,
+      'custom_' . $this->ids['CustomField']['int'] . '_from' => 0,
+      'custom_' . $this->ids['CustomField']['int'] . '_to' => '',
+      'custom_' . $this->ids['CustomField']['select_date'] . '_high' => '2019-06-30',
+      'custom_' . $this->ids['CustomField']['select_date'] . '_low' => '2019-06-30',
+    ];
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($formValues) . "')"
+    );
+    $returnedFormValues = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $checkFormValues = $formValues + ['custom_' . $this->ids['CustomField']['select_date'] . '_relative' => 0];
+    $this->checkArrayEquals($returnedFormValues, $checkFormValues);
   }
 
   /**
