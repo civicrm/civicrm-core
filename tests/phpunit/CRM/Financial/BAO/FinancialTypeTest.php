@@ -110,7 +110,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Set ACLs for Financial Types()
    */
   public function setACL() {
-    CRM_Core_BAO_Setting::setItem(['acl_financial_type' => 1], NULL, 'contribution_invoice_settings');
+    Civi::settings()->set('acl_financial_type', 1);
   }
 
   /**
@@ -293,17 +293,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     ]);
     $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
     $this->assertEquals($perm, TRUE, 'Verify that lineitems now have permission.');
-  }
-
-  /**
-   * Check method testisACLFinancialTypeStatus()
-   */
-  public function testisACLFinancialTypeStatus() {
-    $isACL = CRM_Core_BAO_Setting::getItem(NULL, 'contribution_invoice_settings');
-    $this->assertEquals(array_search('acl_financial_type', $isACL), NULL);
-    $this->setACL();
-    $isACL = CRM_Core_BAO_Setting::getItem(NULL, 'contribution_invoice_settings');
-    $this->assertEquals($isACL, ['acl_financial_type' => 1]);
   }
 
   /**
