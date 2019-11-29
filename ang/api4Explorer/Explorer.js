@@ -469,10 +469,10 @@
     $scope.execute = function() {
       $scope.status = 'warning';
       $scope.loading = true;
-      $http.get(CRM.url('civicrm/ajax/api4/' + $scope.entity + '/' + $scope.action, {
+      $http.post(CRM.url('civicrm/ajax/api4/' + $scope.entity + '/' + $scope.action, {
         params: angular.toJson(getParams()),
         index: $scope.index
-      }), {
+      }), null, {
         headers: {
           'X-Requested-With': 'XMLHttpRequest'
         }
