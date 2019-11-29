@@ -82,13 +82,10 @@ class CRM_Activity_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['activity_status'])) {
-      $query->_select['activity_status'] = 'activity_status.label as activity_status,
-      civicrm_activity.status_id as status_id';
+      $query->_select['activity_status_id'] = 1;
       $query->_element['activity_status'] = 1;
       $query->_tables['civicrm_activity'] = 1;
-      $query->_tables['activity_status'] = 1;
       $query->_whereTables['civicrm_activity'] = 1;
-      $query->_whereTables['activity_status'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_duration'])) {
@@ -189,15 +186,24 @@ class CRM_Activity_BAO_Query {
    *
    * @param array $values
    * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping) = $values;
 
     $fields = CRM_Activity_BAO_Activity::exportableFields();
+    $fieldSpec = $query->getFieldSpec($name);
     $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
       $query->_skipDeleteClause = TRUE;
     }
+    // @todo we want to do this in a more metadata driven way, and also in contribute.
+    // But for the rc...
+    $namesToConvert = [
+      'activity_status' => 'activity_status_id',
+    ];
+    $name = $namesToConvert[$name] ?? $name;
 
     switch ($name) {
       case 'activity_type_id':
@@ -215,7 +221,6 @@ class CRM_Activity_BAO_Query {
           $name = $qillName = str_replace('activity_', '', $name);
         }
         if (in_array($name, [
-          'activity_status_id',
           'activity_subject',
           'activity_priority_id',
         ])) {
@@ -228,7 +233,11 @@ class CRM_Activity_BAO_Query {
 
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
 
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.$name", $op, $value, $dataType);
+        $where = $fieldSpec['where'];
+        if (!$where) {
+          $where = 'civicrm_activity.' . $name;
+        }
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($where, $op, $value, $dataType);
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [
           1 => $fields[$qillName]['title'],
@@ -242,7 +251,6 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_type':
-      case 'activity_status':
       case 'activity_priority':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
@@ -411,12 +419,6 @@ class CRM_Activity_BAO_Query {
         // Do not show deleted contact's activity
         $from .= " INNER JOIN civicrm_contact
                       ON ( civicrm_activity_contact.contact_id = civicrm_contact.id and civicrm_contact.is_deleted != 1 )";
-        break;
-
-      case 'activity_status':
-        $from .= " $side JOIN civicrm_option_group option_group_activity_status ON (option_group_activity_status.name = 'activity_status')";
-        $from .= " $side JOIN civicrm_option_value activity_status ON (civicrm_activity.status_id = activity_status.value
-                               AND option_group_activity_status.id = activity_status.option_group_id ) ";
         break;
 
       case 'activity_type':
