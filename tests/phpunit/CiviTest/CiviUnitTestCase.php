@@ -1765,7 +1765,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($dropCustomValueTables) {
       $optionGroupResult = CRM_Core_DAO::executeQuery('SELECT option_group_id FROM civicrm_custom_field');
       while ($optionGroupResult->fetch()) {
-        if (!empty($optionGroupResult->option_group_id)) {
+        // We have a test that sets the option_group_id for a custom group to that of 'activity_type'.
+        // Then test tearDown deletes it. This is all mildly terrifying but for the context here we can be pretty
+        // sure the low-numbered (50 is arbitrary) option groups are not ones to 'just delete' in a
+        // generic cleanup routine.
+        if (!empty($optionGroupResult->option_group_id) && $optionGroupResult->option_group_id > 50) {
           CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $optionGroupResult->option_group_id);
         }
       }

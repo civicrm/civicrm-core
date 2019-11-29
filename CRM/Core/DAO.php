@@ -2467,7 +2467,7 @@ SELECT contact_id
    * @param array $fields
    */
   public static function appendPseudoConstantsToFields(&$fields) {
-    foreach ($fields as $field) {
+    foreach ($fields as $fieldUniqueName => $field) {
       if (!empty($field['pseudoconstant'])) {
         $pseudoConstant = $field['pseudoconstant'];
         if (!empty($pseudoConstant['optionGroupName'])) {
@@ -2475,7 +2475,7 @@ SELECT contact_id
             'title' => CRM_Core_BAO_OptionGroup::getTitleByName($pseudoConstant['optionGroupName']),
             'name' => $pseudoConstant['optionGroupName'],
             'data_type' => CRM_Utils_Type::T_STRING,
-            'is_pseudofield_for' => $field['name'],
+            'is_pseudofield_for' => $fieldUniqueName,
           ];
         }
         // We restrict to id + name + FK as we are extending this a bit, but cautiously.

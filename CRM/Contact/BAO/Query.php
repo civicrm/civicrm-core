@@ -6914,7 +6914,7 @@ AND   displayRelType.is_active = 1
    *
    * @return array
    */
-  protected function getMetadataForRealField($fieldName) {
+  public function getMetadataForRealField($fieldName) {
     $field = $this->getMetadataForField($fieldName);
     if (!empty($field['is_pseudofield_for'])) {
       $field = $this->getMetadataForField($field['is_pseudofield_for']);
@@ -7011,7 +7011,11 @@ AND   displayRelType.is_active = 1
    */
   public function getFieldSpec($fieldName) {
     if (isset($this->_fields[$fieldName])) {
-      return $this->_fields[$fieldName];
+      $fieldSpec = $this->_fields[$fieldName];
+      if (!empty($fieldSpec['is_pseudofield_for'])) {
+        $fieldSpec = array_merge($this->_fields[$fieldSpec['is_pseudofield_for']], $this->_fields[$fieldName]);
+      }
+      return $fieldSpec;
     }
     $lowFieldName = str_replace('_low', '', $fieldName);
     if (isset($this->_fields[$lowFieldName])) {
