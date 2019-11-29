@@ -127,7 +127,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * _setItem() is the common logic shared by setItem() and setItems().
    *
-   * @param object $value
+   * @param $value
    *   (required) The value that will be serialized and stored.
    * @param string $group
    *   The group name of the item (deprecated).
