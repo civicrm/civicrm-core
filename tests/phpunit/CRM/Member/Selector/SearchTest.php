@@ -53,6 +53,12 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
       'auto_renew' => 1,
     ], $rows[0]);
     $this->assertCount(1, $rows);
+
+    //Verify if NULL search on source returns the row correctly.
+    $params = [['membership_source', 'IS NOT NULL', '', 1, 0]];
+    $selector = new CRM_Member_Selector_Search($params);
+    $rows = $selector->getRows(CRM_Core_Permission::VIEW, 0, 25, NULL);
+    $this->assertCount(1, $rows);
   }
 
 }
