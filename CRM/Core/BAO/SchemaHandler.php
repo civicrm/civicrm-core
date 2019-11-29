@@ -875,4 +875,22 @@ MODIFY      {$columnName} varchar( $length )
     return TRUE;
   }
 
+  /**
+   * Get the database collation.
+   *
+   * @return string
+   */
+  public static function getDBCollation() {
+    return CRM_Core_DAO::singleValueQuery('SELECT @@collation_database');
+  }
+
+  /**
+   * Get the database collation.
+   *
+   * @return string
+   */
+  public static function getDBCharset() {
+    return CRM_Core_DAO::singleValueQuery('SELECT @@character_set_database');
+  }
+
 }
