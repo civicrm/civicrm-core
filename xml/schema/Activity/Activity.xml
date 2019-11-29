@@ -262,6 +262,8 @@
     <name>priority_id</name>
     <type>int unsigned</type>
     <title>Priority</title>
+    <export>true</export>
+    <import>true</import>
     <comment>ID of the priority given to this activity. Foreign key to civicrm_option_value.</comment>
     <add>2.0</add>
     <pseudoconstant>
