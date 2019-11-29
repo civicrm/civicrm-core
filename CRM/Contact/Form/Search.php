@@ -914,12 +914,22 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
       $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
     }
-    $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);
-    $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);
-    $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
-    $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
-    $this->addSearchFieldMetadata(['Grant' => CRM_Grant_BAO_Query::getSearchFieldMetadata()]);
-    $this->addSearchFieldMetadata(['Case' => CRM_Case_BAO_Query::getSearchFieldMetadata()]);
+    if (self::checkComponentAccess('CiviPledge')) {
+      $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviEvent')) {
+      $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviMember')) {
+      $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviGrant')) {
+      $this->addSearchFieldMetadata(['Grant' => CRM_Grant_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviCase')) {
+      $this->addSearchFieldMetadata(['Case' => CRM_Case_BAO_Query::getSearchFieldMetadata()]);
+    }
   }
 
 }
