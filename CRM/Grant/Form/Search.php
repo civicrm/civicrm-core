@@ -39,13 +39,14 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    *
    * @var int
    */
-  protected $_limit = NULL;
+  protected $_limit;
 
   /**
    * Prefix for the controller.
+   *
    * @var string
    */
-  protected $_prefix = "grant_";
+  protected $_prefix = 'grant_';
 
   /**
    * Metadata of all fields to include on the form.
@@ -64,7 +65,8 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
   /**
    * Processing needed for buildForm and later.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     /**
@@ -86,7 +88,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
       $this->_context
     );
     $prefix = NULL;
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -109,6 +111,9 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -139,9 +144,8 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
    *
-   * @param
-   *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     if ($this->_done) {
@@ -165,7 +169,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->_actionButtonName) {
+    if ($buttonName === $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
 
       // hack, make sure we reset the task values
@@ -185,7 +189,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     $selector->setKey($this->controller->_key);
 
     $prefix = NULL;
-    if ($this->_context == 'basic' || $this->_context == 'user') {
+    if ($this->_context === 'basic' || $this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -200,12 +204,17 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     $controller->setEmbedded(TRUE);
 
     $query = &$selector->getQuery();
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $query->setSkipPermission(TRUE);
     }
     $controller->run();
   }
 
+  /**
+   * Hack form values :-(.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
@@ -247,6 +256,8 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    * Get metadata for fields being assigned by metadata.
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function getEntityMetadata() {
     return CRM_Grant_BAO_Query::getSearchFieldMetadata();
