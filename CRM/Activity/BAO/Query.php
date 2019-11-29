@@ -151,11 +151,13 @@ class CRM_Activity_BAO_Query {
   /**
    * Given a list of conditions in query generate the required where clause.
    *
-   * @param $query
+   * @param \CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function where(&$query) {
     foreach (array_keys($query->_params) as $id) {
-      if (substr($query->_params[$id][0], 0, 9) == 'activity_') {
+      if (substr($query->_params[$id][0], 0, 9) === 'activity_') {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
@@ -457,6 +459,9 @@ class CRM_Activity_BAO_Query {
       'title' => ts('Activity Text'),
       'type' => CRM_Utils_Type::T_STRING,
       'is_pseudofield' => TRUE,
+      'html' => [
+        'type' => 'Text',
+      ],
     ];
     return $metadata;
   }
