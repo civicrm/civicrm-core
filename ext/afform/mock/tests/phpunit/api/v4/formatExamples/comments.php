@@ -5,13 +5,7 @@ return [
   'shallow' => [
     [
       '#tag' => 'div',
-      '#children' => [
-        ['#text' => 'One'],
-        ['#comment' => ' uno '],
-        ['#text' => ' Two '],
-        ['#comment' => 'dos & so on '],
-        ['#text' => ' Three'],
-      ],
+      '#markup' => 'One<!-- uno --> Two <!--dos & so on --> Three',
     ],
     ['#comment' => 'tres-a--b---c'],
   ],

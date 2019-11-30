@@ -1,20 +1,21 @@
 <?php
 
 return [
-  'html' => '<span>First</span> <span>Second</span>',
-  'pretty' => "<span>First</span>\n<span>Second</span>\n",
-  'shallow' => [
-    ['#tag' => 'span', '#children' => [['#text' => 'First']]],
-    ['#text' => ' '],
-    ['#tag' => 'span', '#children' => [['#text' => 'Second']]],
-  ],
+  'html' => '<span>First</span>   <span>Second</span>',
+  'pretty' => "<span>First</span>
+<span>Second</span>\n",
   'stripped' => [
-    ['#tag' => 'span', '#children' => [['#text' => 'First']]],
-    ['#tag' => 'span', '#children' => [['#text' => 'Second']]],
+    ['#tag' => 'span', '#markup' => 'First'],
+    ['#tag' => 'span', '#markup' => 'Second'],
+  ],
+  'shallow' => [
+    ['#tag' => 'span', '#markup' => 'First'],
+    ['#text' => '   '],
+    ['#tag' => 'span', '#markup' => 'Second'],
   ],
   'deep' => [
     ['#tag' => 'span', '#children' => [['#text' => 'First']]],
-    ['#text' => ' '],
+    ['#text' => '   '],
     ['#tag' => 'span', '#children' => [['#text' => 'Second']]],
   ],
 ];

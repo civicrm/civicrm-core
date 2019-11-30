@@ -9,6 +9,25 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
   use \Civi\Test\Api3TestTrait;
   use \Civi\Test\ContactTestTrait;
 
+  /**
+   * DOMDocument outputs some tags a little different than they were input.
+   * It's not really a problem but can trip up tests.
+   *
+   * @param array|string $markup
+   * @return array|string
+   */
+  private function fudgeMarkup($markup) {
+    if (is_array($markup)) {
+      foreach ($markup as $idx => $item) {
+        $markup[$idx] = $this->fudgeMarkup($item);
+      }
+      return $markup;
+    }
+    else {
+      return str_replace([' />', '/>'], ['/>', ' />'], $markup);
+    }
+  }
+
   public function getBasicDirectives() {
     return [
       ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page']],
@@ -117,7 +136,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->setLayoutFormat($readFormat)
       ->execute();
 
-    $this->assertEquals($readLayout, $result[0]['layout'], "Based on \"$exampleName\", writing content as \"$updateFormat\" and reading back as \"$readFormat\".");
+    $this->assertEquals($readLayout, $this->fudgeMarkup($result[0]['layout']), "Based on \"$exampleName\", writing content as \"$updateFormat\" and reading back as \"$readFormat\".");
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
   }
@@ -152,7 +171,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals($example['stripped'] ?? $example['shallow'], $result['layout']);
+    $this->assertEquals($example['stripped'] ?? $example['shallow'], $this->fudgeMarkup($result['layout']));
 
     Civi\Api4\Afform::save()
       ->addRecord(['name' => $directiveName, 'layout' => $result['layout']])
@@ -166,7 +185,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals($example['pretty'], $result['layout']);
+    $this->assertEquals($example['pretty'], $this->fudgeMarkup($result['layout']));
   }
 
   public function testAutoRequires() {

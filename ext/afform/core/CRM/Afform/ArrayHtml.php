@@ -125,7 +125,7 @@ class CRM_Afform_ArrayHtml {
       }
     }
 
-    if (isset($array['#markup']) && !$this->formatWhitespace) {
+    if (isset($array['#markup']) && (!$this->formatWhitespace || strpos($array['#markup'], '<') === FALSE)) {
       $buf .= '>' . $array['#markup'] . '</' . $tag . '>';
     }
     elseif (isset($array['#markup'])) {
@@ -179,6 +179,7 @@ class CRM_Afform_ArrayHtml {
     }
 
     $doc = new DOMDocument();
+    $doc->preserveWhiteSpace = !$this->formatWhitespace;
     @$doc->loadHTML("<html><body>$html</body></html>");
 
     // FIXME: Validate expected number of child nodes
@@ -205,8 +206,8 @@ class CRM_Afform_ArrayHtml {
         $arr[$attribute->name] = $this->decodeAttrValue($type, $txt);
       }
       if ($node->childNodes->length > 0) {
-        // In shallow mode, return "af-markup" containers as-is
-        if (!$this->deepCoding && !empty($arr['class']) && strpos($arr['class'], 'af-markup') !== FALSE) {
+        // In shallow mode, return markup as-is if node isn't supported by the gui editor
+        if (!$this->deepCoding && !$this->isNodeEditable($arr)) {
           $arr['#markup'] = '';
           foreach ($node->childNodes as $child) {
             $arr['#markup'] .= $child->ownerDocument->saveXML($child);
@@ -333,6 +334,21 @@ class CRM_Afform_ArrayHtml {
       $attrValue = $txtAttrValue;
       return $attrValue;
     }
+  }
+
+  /**
+   * Determine if a node is recognized by the gui editor.
+   *
+   * @param array $item
+   * @return bool
+   */
+  public function isNodeEditable(array $item) {
+    if ($item['#tag'] === 'af-field' || $item['#tag'] === 'af-form' || isset($item['af-fieldset'])) {
+      return TRUE;
+    }
+    $editableClasses = ['af-block', 'af-text', 'af-button'];
+    $classes = explode(' ', $item['class'] ?? '');
+    return (bool) array_intersect($editableClasses, $classes);
   }
 
 }
