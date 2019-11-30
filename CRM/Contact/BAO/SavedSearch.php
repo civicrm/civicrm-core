@@ -173,14 +173,11 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
           }
         }
       }
-      if (substr($element, 0, 7) == 'custom_' &&
-        (substr($element, -5, 5) == '_from' || substr($element, -3, 3) == '_to')
-      ) {
-        // Ensure the _relative field is set if from or to are set to ensure custom date
-        // fields with 'from' or 'to' values are displayed when the are set in the smart group
-        // being loaded. (CRM-17116)
-        if (!isset($result[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'])) {
-          $result[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'] = 0;
+      // We should only set the relative key for custom date fields if it is not already set in the array.
+      $realField = str_replace(['_relative', '_low', '_high', '_to', '_high'], '', $element);
+      if (substr($element, 0, 7) == 'custom_' && CRM_Contact_BAO_Query::isCustomDateField($realField)) {
+        if (!isset($result[$realField . '_relative'])) {
+          $result[$realField . '_relative'] = 0;
         }
       }
       // check to see if we need to convert the old privacy array
