@@ -265,28 +265,32 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  /**
+   * Enable street address parsing.
+   *
+   * @param string $status
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setStreetAddressParsing($status) {
-    $address_options = CRM_Core_BAO_Setting::valueOptions(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'address_options',
-      TRUE, NULL, TRUE
-    );
-    if ($status) {
-      $value = 1;
+    $options = $this->callAPISuccess('Setting', 'getoptions', ['field' => 'address_options'])['values'];
+    $address_options = reset($this->callAPISuccess('Setting', 'get', ['return' => 'address_options'])['values'])['address_options'];
+    $parsingOption = array_search('Street Address Parsing', $options, TRUE);
+    $optionKey = array_search($parsingOption, $address_options, FALSE);
+    if ($status && !$optionKey) {
+      $address_options[] = $parsingOption;
     }
-    else {
-      $value = 0;
+    if (!$status && $optionKey) {
+      unset($address_options[$optionKey]);
     }
-    $address_options['street_address_parsing'] = $value;
-    CRM_Core_BAO_Setting::setValueOption(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'address_options',
-      $address_options
-    );
+    $this->callAPISuccess('Setting', 'create', ['address_options' => $address_options]);
   }
 
   /**
    * ParseStreetAddress if enabled, otherwise, don't.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testParseStreetAddressIfEnabled() {
     // Turn off address standardization. Parsing should work without it.
@@ -296,7 +300,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->setStreetAddressParsing(TRUE);
 
     $contactId = $this->individualCreate();
-    $street_address = "54 Excelsior Ave.";
+    $street_address = '54 Excelsior Ave.';
     $params = [
       'contact_id' => $contactId,
       'street_address' => $street_address,
@@ -331,7 +335,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // Out-of-range street number to be parsed.
-    $street_address = "505050505050 Main St";
+    $street_address = '505050505050 Main St';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address);
     $this->assertEquals($parsedStreetAddress['street_name'], '');
     $this->assertEquals($parsedStreetAddress['street_unit'], '');
