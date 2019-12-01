@@ -381,7 +381,9 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    *
    * @param array $params
    *   List of parameters to send to Mailing.create API.
+   *
    * @return array<ezcMail>
+   * @throws \CRM_Core_Exception
    */
   protected function runMailingSuccess($params) {
     $mailingParams = array_merge($this->defaultParams, $params);

@@ -2170,15 +2170,17 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['title'], 2 => $qillop, 3 => $qillVal]);
     }
     elseif (!empty($field['pseudoconstant'])) {
+      // For the hacked fields we want to undo the hack to type to avoid missing the index by adding quotes.
+      $dataType = !empty($this->legacyHackedFields[$name]) ? CRM_Utils_Type::T_INT : $field['type'];
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
         'CRM_Contact_DAO_Contact',
         $field,
         $field['title'],
-        'String',
+        CRM_Utils_Type::typeToString($dataType),
         TRUE
       );
-      if ($name == 'gender_id') {
+      if ($name === 'gender_id') {
         self::$_openedPanes[ts('Demographics')] = TRUE;
       }
     }
@@ -5892,10 +5894,6 @@ AND   displayRelType.is_active = 1
       'email_greeting',
       'postal_greeting',
       'addressee',
-      'gender_id',
-      'prefix_id',
-      'suffix_id',
-      'communication_style_id',
     ];
 
     if ($useIDsOnly) {
@@ -5907,8 +5905,8 @@ AND   displayRelType.is_active = 1
         // Special handling for on_hold, so that we actually use the 'where'
         // property in order to limit the query by the on_hold status of the email,
         // instead of using email.id which would be nonsensical.
-        if ($field['name'] == 'on_hold') {
-          $wc = "{$field['where']}";
+        if ($field['name'] === 'on_hold') {
+          $wc = $field['where'];
         }
         else {
           $wc = "$tableName.id";
@@ -5920,9 +5918,7 @@ AND   displayRelType.is_active = 1
       $wc = "{$field['where']}";
     }
     if (in_array($name, $pseudoFields)) {
-      if (!in_array($name, ['gender_id', 'prefix_id', 'suffix_id', 'communication_style_id'])) {
-        $wc = "contact_a.{$name}_id";
-      }
+      $wc = "contact_a.{$name}_id";
       $dataType = 'Positive';
       $value = (!$value) ? 0 : $value;
     }

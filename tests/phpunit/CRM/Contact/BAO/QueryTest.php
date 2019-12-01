@@ -1129,4 +1129,50 @@ civicrm_relationship.is_active = 1 AND
     $this->assertEquals(['=', 'Normal'], $qill);
   }
 
+  /**
+   * Test tests that a value on 'any entity' with the right metadata will be handled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGenericWhereHandling() {
+    $query = new CRM_Contact_BAO_Query([['suffix_id', '=', 2, 0]]);
+    $this->assertEquals("contact_a.suffix_id = 2", $query->_where[0][0]);
+    $this->assertEquals('Individual Suffix = Sr.', $query->_qill[0][0]);
+    $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
+
+    $query = new CRM_Contact_BAO_Query([['prefix_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.prefix_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Individual Prefix = Ms.', $query->_qill[0][0]);
+    $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
+
+    $query = new CRM_Contact_BAO_Query([['gender_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.gender_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Gender = Male', $query->_qill[0][0]);
+    $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
+
+    $query = new CRM_Contact_BAO_Query([['communication_style_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.communication_style_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Communication Style = Familiar', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['communication_style_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.communication_style_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Communication Style = Familiar', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['contact_type', '=', 'Household', 0]]);
+    $this->assertEquals("contact_a.contact_type = 'Household'", $query->_where[0][0]);
+    $this->assertEquals('Contact Type = Household', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['on_hold', '=', 0, 0]]);
+    $this->assertEquals('civicrm_email.on_hold = 0', $query->_where[0][0]);
+    $this->assertEquals('On Hold = 0', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['on_hold', '=', 1, 0]]);
+    $this->assertEquals('civicrm_email.on_hold = 1', $query->_where[0][0]);
+    $this->assertEquals('On Hold = 1', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['world_region', '=', 3, 0]]);
+    $this->assertEquals('civicrm_worldregion.id = 3', $query->_where[0][0]);
+    $this->assertEquals('World Region = Middle East and North Africa', $query->_qill[0][0]);
+  }
+
 }
