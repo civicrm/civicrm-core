@@ -1118,4 +1118,15 @@ civicrm_relationship.is_active = 1 AND
     ]);
   }
 
+  /**
+   * Test the options are handled for the qill.
+   */
+  public function testQillOptions() {
+    $qill = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_BAO_Activity', 'activity_type_id', 2, '=');
+    $this->assertEquals(['=', 'Phone Call'], $qill);
+
+    $qill = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_BAO_Activity', 'priority_id', 2, '=');
+    $this->assertEquals(['=', 'Normal'], $qill);
+  }
+
 }

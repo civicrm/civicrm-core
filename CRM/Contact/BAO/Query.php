@@ -6189,10 +6189,9 @@ AND   displayRelType.is_active = 1
       return [CRM_Utils_Array::value($op, $qillOperators, $op), ''];
     }
 
-    if ($fieldName == 'activity_type_id') {
-      $pseudoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
-    }
-    elseif ($fieldName == 'country_id') {
+    // @todo - if the right BAO is passed in special handling for the below
+    // fields should not be required. testQillOptions.
+    if ($fieldName == 'country_id') {
       $pseudoOptions = CRM_Core_PseudoConstant::country();
     }
     elseif ($fieldName == 'county_id') {
