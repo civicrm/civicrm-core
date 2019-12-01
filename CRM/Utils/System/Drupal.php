@@ -480,7 +480,7 @@ AND    u.status = 1
     // explicitly setting error reporting, since we cannot handle drupal related notices
     // @todo 1 = E_ERROR, but more to the point setting error reporting deep in code
     // causes grief with debugging scripts
-    error_reporting(1);
+    //error_reporting(1);
     if (!function_exists('module_exists')) {
       if ($throwError) {
         throw new Exception('Sorry, could not load drupal bootstrap.');
