@@ -26,6 +26,13 @@ Released December 4, 2019
 - **[Credits](release-notes/5.20.0.md#credits)**
 - **[Feedback](release-notes/5.20.0.md#feedback)**
 
+## CiviCRM 5.19.4
+
+Released December 4, 2019
+
+- **[Bugs resolved](release-notes/5.19.4.md#bugs)**
+- **[Security advisories](release-notes/5.19.4.md#security)**
+
 ## CiviCRM 5.19.3
 
 Released November 25, 2019
