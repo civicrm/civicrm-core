@@ -93,7 +93,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
       $params['id'] = $ids['optionGroup'];
     }
     $optionGroup = new CRM_Core_DAO_OptionGroup();
-    $optionGroup->copyValues($params);;
+    $optionGroup->copyValues($params);
     $optionGroup->save();
     return $optionGroup;
   }

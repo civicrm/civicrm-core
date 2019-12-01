@@ -105,7 +105,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     }
     // set financial type used for price set to set default for new option
     if (!$this->_oid) {
-      $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'financial_type_id', 'id');;
+      $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'financial_type_id', 'id');
     }
     if (!isset($defaults['weight']) || !$defaults['weight']) {
       $fieldValues = ['price_field_id' => $this->_fid];

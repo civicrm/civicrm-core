@@ -135,7 +135,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = [];
       }
     }
-    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);;
+    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
   }
 
   /**

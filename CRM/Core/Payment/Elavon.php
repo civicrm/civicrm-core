@@ -77,7 +77,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     $requestFields['ssl_ship_to_last_name'] = $params['last_name'];
     $requestFields['ssl_card_number'] = $params['credit_card_number'];
     $requestFields['ssl_amount'] = trim($params['amount']);
-    $requestFields['ssl_exp_date'] = sprintf('%02d', (int) $params['month']) . substr($params['year'], 2, 2);;
+    $requestFields['ssl_exp_date'] = sprintf('%02d', (int) $params['month']) . substr($params['year'], 2, 2);
     $requestFields['ssl_cvv2cvc2'] = $params['cvv2'];
     // CVV field passed to processor
     $requestFields['ssl_cvv2cvc2_indicator'] = "1";

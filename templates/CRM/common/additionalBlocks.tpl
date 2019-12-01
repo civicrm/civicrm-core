@@ -56,7 +56,7 @@ function buildAdditionalBlocks( blockName, className ) {
         cj("#" + blockName + '-Primary-html').show( );
     }
 
-    var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&block=' + blockName + '&count=' + currentInstance;;
+    var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&block=' + blockName + '&count=' + currentInstance;
 
     if ( className == 'CRM_Event_Form_ManageEvent_Location' ) {
         dataUrl = ( currentInstance <= 2 ) ? dataUrl + '&subPage=Location' : '';

@@ -195,7 +195,7 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("civicrm_contribution e")->param($defaultParams);;
+    $query = \CRM_Utils_SQL_Select::from("civicrm_contribution e")->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_contribution e';
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';

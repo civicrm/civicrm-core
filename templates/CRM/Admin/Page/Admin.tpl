@@ -46,7 +46,7 @@
     <table class="form-layout">
     <tr>
         <td width="20%" class="font-size11pt" style="vertical-align: top;">{$group.show} {$group.title}</td>
-        <td width="80%" style="white-space: nowrap;;">
+        <td width="80%" style="white-space: nowrap;">
 
             <table class="form-layout" width="100%">
             <tr>
