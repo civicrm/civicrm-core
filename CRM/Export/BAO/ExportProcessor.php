@@ -207,6 +207,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $exportedHouseholds = [];
 
   /**
+   * Contacts to be merged by virtue of their shared address.
+   *
+   * @var array
+   */
+  protected $contactsToMerge = [];
+
+  /**
    * Households to skip during export as they will be exported via their relationships anyway.
    *
    * @var array
@@ -1919,14 +1926,12 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * Build array for merging same addresses.
    *
-   * @param $sql
+   * @param string $sql
    * @param bool $sharedAddress
-   *
-   * @return array
    */
   public function buildMasterCopyArray($sql, $sharedAddress = FALSE) {
 
-    $merge = $parents = [];
+    $parents = [];
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
@@ -1936,7 +1941,7 @@ class CRM_Export_BAO_ExportProcessor {
       $this->cacheContactGreetings((int) $dao->master_contact_id);
       $this->cacheContactGreetings((int) $dao->copy_contact_id);
 
-      if (!isset($merge[$masterID])) {
+      if (!isset($this->contactsToMerge[$masterID])) {
         // check if this is an intermediate child
         // this happens if there are 3 or more matches a,b, c
         // the above query will return a, b / a, c / b, c
@@ -1946,33 +1951,34 @@ class CRM_Export_BAO_ExportProcessor {
           $masterID = $parents[$masterID];
         }
         else {
-          $merge[$masterID] = [
+          $this->contactsToMerge[$masterID] = [
             'addressee' => $this->getContactGreeting((int) $dao->master_contact_id, 'addressee', $dao->master_addressee),
             'copy' => [],
             'postalGreeting' => $this->getContactGreeting((int) $dao->master_contact_id, 'postal_greeting', $dao->master_postal_greeting),
           ];
-          $merge[$masterID]['emailGreeting'] = &$merge[$masterID]['postalGreeting'];
+          $this->contactsToMerge[$masterID]['emailGreeting'] = &$this->contactsToMerge[$masterID]['postalGreeting'];
         }
       }
       $parents[$copyID] = $masterID;
 
-      if (!$sharedAddress && !array_key_exists($copyID, $merge[$masterID]['copy'])) {
+      if (!$sharedAddress && !array_key_exists($copyID, $this->contactsToMerge[$masterID]['copy'])) {
         $copyPostalGreeting = $this->getContactPortionOfGreeting((int) $dao->copy_contact_id, (int) $dao->copy_postal_greeting_id, 'postal_greeting', $dao->copy_postal_greeting);
         if ($copyPostalGreeting) {
-          $merge[$masterID]['postalGreeting'] = "{$merge[$masterID]['postalGreeting']}, {$copyPostalGreeting}";
+          $this->contactsToMerge[$masterID]['postalGreeting'] = "{$this->contactsToMerge[$masterID]['postalGreeting']}, {$copyPostalGreeting}";
           // if there happens to be a duplicate, remove it
-          $merge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $merge[$masterID]['postalGreeting']);
+          $this->contactsToMerge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $this->contactsToMerge[$masterID]['postalGreeting']);
         }
 
         $copyAddressee = $this->getContactPortionOfGreeting((int) $dao->copy_contact_id, (int) $dao->copy_addressee_id, 'addressee', $dao->copy_addressee);
         if ($copyAddressee) {
-          $merge[$masterID]['addressee'] = "{$merge[$masterID]['addressee']}, " . trim($copyAddressee);
+          $this->contactsToMerge[$masterID]['addressee'] = "{$this->contactsToMerge[$masterID]['addressee']}, " . trim($copyAddressee);
         }
       }
-      $merge[$masterID]['copy'][$copyID] = $copyAddressee ?? $dao->copy_addressee;
+      if (!isset($this->contactsToMerge[$masterID]['copy'][$copyID])) {
+        // If it was set in the first run through - share routine, don't subsequently clobber.
+        $this->contactsToMerge[$masterID]['copy'][$copyID] = $copyAddressee ?? $dao->copy_addressee;
+      }
     }
-
-    return $merge;
   }
 
   /**
@@ -2000,7 +2006,7 @@ FROM      $tableName r1
 INNER JOIN civicrm_address adr ON r1.master_id   = adr.id
 INNER JOIN $tableName      r2  ON adr.contact_id = r2.civicrm_primary_id
 ORDER BY  r1.id";
-    $linkedMerge = $this->buildMasterCopyArray($sql, TRUE);
+    $this->buildMasterCopyArray($sql, TRUE);
 
     // find all the records that have the same street address BUT not in a household
     // require match on city and state as well
@@ -2027,28 +2033,9 @@ AND       ( r1.street_address != '' )
 AND       r2.id > r1.id
 ORDER BY  r1.id
 ";
-    $merge = $this->buildMasterCopyArray($sql);
+    $this->buildMasterCopyArray($sql);
 
-    // unset ids from $merge already present in $linkedMerge
-    foreach ($linkedMerge as $masterID => $values) {
-      $keys = [$masterID];
-      $keys = array_merge($keys, array_keys($values['copy']));
-      foreach ($merge as $mid => $vals) {
-        if (in_array($mid, $keys)) {
-          unset($merge[$mid]);
-        }
-        else {
-          foreach ($values['copy'] as $copyId) {
-            if (in_array($copyId, $keys)) {
-              unset($merge[$mid]['copy'][$copyId]);
-            }
-          }
-        }
-      }
-    }
-    $merge = $merge + $linkedMerge;
-
-    foreach ($merge as $masterID => $values) {
+    foreach ($this->contactsToMerge as $masterID => $values) {
       $sql = "
 UPDATE $tableName
 SET    addressee = %1, postal_greeting = %2, email_greeting = %3
