@@ -83,6 +83,8 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentMembershipRecurSuccess() {
     $durationUnit = 'year';
