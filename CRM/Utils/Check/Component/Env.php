@@ -898,8 +898,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     else {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Future versions of CiviCRM may require MySQL utf8mb4 support. It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true'),
-        ts('MySQL utf8mb4 Support'),
+        ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the <a href='%1' title='System Administrator Guide'>System Administrator Guide</a>", [1 => CRM_Utils_System::docURL2("sysadmin/requirements/#mysql-configuration", TRUE)]),
+        ts('MySQL Emoji Support (utf8mb4)'),
         \Psr\Log\LogLevel::WARNING,
         'fa-database'
       );
