@@ -211,7 +211,11 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     $ruleBao->find();
     $ruleFields = [];
     while ($ruleBao->fetch()) {
-      $ruleFields[] = $ruleBao->rule_field;
+      $field_name = $ruleBao->rule_field;
+      if ($field_name == 'phone_numeric') {
+        $field_name = 'phone';
+      }
+      $ruleFields[] = $field_name;
     }
     return $ruleFields;
   }
