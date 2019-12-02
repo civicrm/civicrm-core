@@ -97,8 +97,9 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
 
     $this->checkArrayEquals($defaults, $formValues);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['int']]);
+    unset($this->ids['CustomField']['int']);
     $defaults = $sg->setDefaultValues();
-    print_r($defaults);
+    $this->checkArrayEquals($defaults, $formValues);
   }
 
   /**
