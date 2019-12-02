@@ -179,7 +179,6 @@
       {if $action eq 4}
         {include file="CRM/Custom/Page/CustomDataView.tpl"}
       {else}
-        <div id="customData"></div>
         {include file="CRM/common/customDataBlock.tpl"}
       {/if}
     </td>
