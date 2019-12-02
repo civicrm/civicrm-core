@@ -545,35 +545,57 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   local file system path to CMS root, or NULL if it cannot be determined
    */
   public function cmsRootPath() {
+
+    // Return early if the path is already set.
     global $civicrm_paths;
     if (!empty($civicrm_paths['cms.root']['path'])) {
       return $civicrm_paths['cms.root']['path'];
     }
 
-    $cmsRoot = $valid = NULL;
+    // Return early if constant has been defined.
     if (defined('CIVICRM_CMSDIR')) {
       if ($this->validInstallDir(CIVICRM_CMSDIR)) {
-        $cmsRoot = CIVICRM_CMSDIR;
-        $valid = TRUE;
+        return CIVICRM_CMSDIR;
       }
     }
-    else {
-      $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
 
-      //might be windows installation.
-      $firstVar = array_shift($pathVars);
-      if ($firstVar) {
-        $cmsRoot = $firstVar;
+    // Return early if path to wp-load.php can be retrieved from settings.
+    $setting = Civi::settings()->get('wpLoadPhp');
+    if (!empty($setting)) {
+      $path = str_replace('wp-load.php', '', $setting);
+      $cmsRoot = rtrim($path, '/\\');
+      if ($this->validInstallDir($cmsRoot)) {
+        return $cmsRoot;
       }
+    }
 
-      //start w/ csm dir search.
-      foreach ($pathVars as $var) {
-        $cmsRoot .= "/$var";
-        if ($this->validInstallDir($cmsRoot)) {
-          //stop as we found bootstrap.
-          $valid = TRUE;
-          break;
-        }
+    /*
+     * Keep previous logic as fallback of last resort.
+     *
+     * At some point, it would be good to remove this because there are serious
+     * problems in correctly locating WordPress in this manner. In summary, it
+     * is impossible to do so reliably.
+     *
+     * @see https://github.com/civicrm/civicrm-wordpress/pull/63#issuecomment-61792328
+     * @see https://github.com/civicrm/civicrm-core/pull/11086#issuecomment-335454992
+     */
+    $cmsRoot = $valid = NULL;
+
+    $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
+
+    // Might be Windows installation.
+    $firstVar = array_shift($pathVars);
+    if ($firstVar) {
+      $cmsRoot = $firstVar;
+    }
+
+    // Start with CMS dir search.
+    foreach ($pathVars as $var) {
+      $cmsRoot .= "/$var";
+      if ($this->validInstallDir($cmsRoot)) {
+        // Stop as we found bootstrap.
+        $valid = TRUE;
+        break;
       }
     }
 

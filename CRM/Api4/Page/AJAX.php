@@ -39,6 +39,45 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
    * Handler for api4 ajax requests
    */
   public function run() {
+    $config = CRM_Core_Config::singleton();
+    if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
+        $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
+      )
+    ) {
+      $response = [
+        'error_code' => 401,
+        'error_message' => "SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api4().",
+      ];
+      Civi::log()->debug("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api4().",
+        [
+          'IP' => $_SERVER['REMOTE_ADDR'],
+          'level' => 'security',
+          'referer' => $_SERVER['HTTP_REFERER'],
+          'reason' => 'CSRF suspected',
+        ]
+      );
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+      echo json_encode($response);
+      CRM_Utils_System::civiExit();
+    }
+    if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
+      strtolower(substr($this->urlPath[4], 0, 3)) != 'get') {
+      $response = [
+        'error_code' => 400,
+        'error_message' => "SECURITY: All requests that modify the database must be http POST, not GET.",
+      ];
+      Civi::log()->debug("SECURITY: All requests that modify the database must be http POST, not GET.",
+        [
+          'IP' => $_SERVER['REMOTE_ADDR'],
+          'level' => 'security',
+          'referer' => $_SERVER['HTTP_REFERER'],
+          'reason' => 'Destructive HTTP GET',
+        ]
+      );
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+      echo json_encode($response);
+      CRM_Utils_System::civiExit();
+    }
     try {
       // Call multiple
       if (empty($this->urlPath[3])) {
