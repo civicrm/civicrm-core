@@ -134,7 +134,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     // 5. Record the additional amount which $40 ($50-$10)
     // Expected : Check the amount of new Financial Item created is $40
     $this->createParticipantRecordsFromTwoFieldPriceSet();
-    $priceSetBlock = CRM_Price_BAO_PriceSet::getSetDetail($this->_ids['price_set'], TRUE, FALSE)[$this->_ids['price_set']]['fields'];;
+    $priceSetBlock = CRM_Price_BAO_PriceSet::getSetDetail($this->_ids['price_set'], TRUE, FALSE)[$this->_ids['price_set']]['fields'];
 
     $priceSetParams = [
       'priceSetId' => $this->_ids['price_set'],

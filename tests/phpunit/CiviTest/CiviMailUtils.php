@@ -355,7 +355,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
       $this->_ut->assertContains($string, $mail, "$string .  not found in  $mail  $prefix");
     }
     foreach ($absentStrings as $string) {
-      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");;
+      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");
     }
     return $mail;
   }

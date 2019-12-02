@@ -591,7 +591,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
 
         case 'participant_status':
           $status = CRM_Event_PseudoConstant::participantStatus();
-          $values['participant_status_id'] = CRM_Utils_Array::key($value, $status);;
+          $values['participant_status_id'] = CRM_Utils_Array::key($value, $status);
           break;
 
         case 'participant_role_id':

@@ -1549,7 +1549,7 @@ class CRM_Utils_Date {
 
           case 'greater':
             $from['d'] = 1;
-            $from['M'] = $now['mon'];;
+            $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
             unset($to);
             break;
@@ -1591,7 +1591,7 @@ class CRM_Utils_Date {
 
           case 'current':
             $from['d'] = 1;
-            $from['M'] = $now['mon'];;
+            $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
@@ -1827,7 +1827,7 @@ class CRM_Utils_Date {
 
           case 'greater':
             $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];;
+            $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
             unset($to);
             break;

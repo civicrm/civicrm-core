@@ -187,7 +187,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     else {
       $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
     }
-    $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);;
+    $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);
 
     if (!empty($params['id'])) {
       $ufField->whereAdd("id <> " . $params['id']);

@@ -107,7 +107,7 @@ class CRM_Upgrade_Incremental_SmartGroups {
             $hasRelative = TRUE;
           }
           if ($formValue[0] === $relativeFieldName && empty($formValue[2])) {
-            unset($formValues[$index]);;
+            unset($formValues[$index]);
           }
           elseif (in_array($formValue[0], $fieldPossibilities)) {
             if ($isRelative) {

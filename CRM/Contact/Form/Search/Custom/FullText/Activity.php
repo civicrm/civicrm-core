@@ -105,7 +105,7 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
     ];
 
     $this->fillCustomInfo($tables, "( 'Activity' )");
-    return $tables;;
+    return $tables;
   }
 
   /**
