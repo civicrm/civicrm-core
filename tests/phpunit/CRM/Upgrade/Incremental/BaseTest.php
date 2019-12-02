@@ -467,4 +467,27 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $this->assertEquals(1, Civi::settings()->get('deferred_revenue_enabled'));
   }
 
+  /**
+   * dev/core#1405 Test fixing option groups with spaces in the name
+   */
+  public function testFixOptionGroupName() {
+    $name = 'This is a test Name';
+    $fixedName = CRM_Utils_String::titleToVar(strtolower($name));
+    $optionGroup = $this->callAPISuccess('OptionGroup', 'create', [
+      'title' => 'Test Option Group',
+      'name' => $name,
+    ]);
+    // API is hardened to strip the spaces to lets re-add in now
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET name = %1 WHERE id = %2", [
+      1 => [$name, 'String'],
+      2 => [$optionGroup['id'], 'Positive'],
+    ]);
+    $preUpgrade = $this->callAPISuccess('OptionGroup', 'getsingle', ['id' => $optionGroup['id']]);
+    $this->assertEquals($name, $preUpgrade['name']);
+    CRM_Upgrade_Incremental_php_FiveTwentyOne::fixOptionGroupName();
+    $postUpgrade = $this->callAPISuccess('OptionGroup', 'getsingle', ['id' => $optionGroup['id']]);
+    $this->assertEquals($fixedName, $postUpgrade['name'], 'Ensure that the spaces have been removed from OptionGroup name');
+    $this->assertEquals($postUpgrade['name'], $optionGroup['values'][$optionGroup['id']]['name'], 'Ensure that the fixed name matches what the API would produce');
+  }
+
 }

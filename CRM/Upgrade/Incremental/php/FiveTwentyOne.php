@@ -65,8 +65,33 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
   //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
   //  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_21_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('dev/core#1405 Fix option group names that contain spaces', 'fixOptionGroupName');
+  }
+
+  public static function fixOptionGroupName() {
+    $optionGroups = \Civi\Api4\OptionGroup::get()
+      ->setCheckPermissions(FALSE)
+      ->execute();
+    foreach ($optionGroups as $optionGroup) {
+      $name = trim($optionGroup['name']);
+      if (strpos($name, ' ') !== FALSE) {
+        $fixedName = CRM_Utils_String::titleToVar(strtolower($name));
+        \Civi::log()->debug('5.21 Upgrade Option Group name ' . $name . ' converted to ' . $fixedName);
+        \Civi\Api4\OptionGroup::update()
+          ->addWhere('id', '=', $optionGroup['id'])
+          ->addValue('name', $fixedName)
+          ->setCheckPermissions(FALSE)
+          ->execute();
+      }
+    }
+    return TRUE;
+  }
 
 }
