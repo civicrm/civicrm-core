@@ -421,34 +421,23 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $contactIDs = array_merge($this->contactIDs, [$householdID]);
     $params = ['contact_id' => $contactIDs];
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
-      FALSE,
-      $contactIDs,
-      CRM_Contact_BAO_Query::convertFormValues($params),
-      NULL,
-      NULL,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      NULL,
-      NULL,
-      TRUE,
-      FALSE,
-      array(
-        'suppress_csv_for_testing' => TRUE,
-      )
-    );
-    $exportedRows = CRM_Utils_SQL_Select::from($tableName)->execute()->fetchAll();
-    $this->assertEquals(1, count($exportedRows));
+
+    $this->doExportTest([
+      'selectAll' => FALSE,
+      'ids' => $contactIDs,
+      'mergeSameAddress' => TRUE,
+    ]);
+    $this->assertEquals(1, $this->csv->count());
+
+    $exportedRows = $this->csv->fetchOne();
+
     $expectedValues = [
-      'civicrm_primary_id' => $householdID,
-      'contact_type' => 'Household',
+      'Contact ID' => $householdID,
+      'Contact Type' => 'Household',
     ];
     foreach ($expectedValues as $columnName => $expectedValue) {
-      $this->assertEquals($expectedValue, $exportedRows[0][$columnName]);
+      $this->assertEquals($expectedValue, $exportedRows[$columnName]);
     }
-    // delete the export temp table and component table
-    $sql = "DROP TABLE IF EXISTS {$tableName}";
-    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
