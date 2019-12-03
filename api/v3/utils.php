@@ -2416,10 +2416,14 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create'
  * @param string $entity
  * @param array $result
  *
- * @return string|array|null
+ * @return string|array|false
  */
 function _civicrm_api3_deprecation_check($entity, $result = []) {
-  if ($entity) {
+  if (!$entity) {
+    return FALSE;
+  }
+  $cacheKey = 'deprecation_check_entity_' . $entity;
+  if (!Civi::cache('metadata')->has($cacheKey)) {
     $apiFile = "api/v3/$entity.php";
     if (CRM_Utils_File::isIncludable($apiFile)) {
       require_once $apiFile;
@@ -2427,9 +2431,13 @@ function _civicrm_api3_deprecation_check($entity, $result = []) {
     $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
     $fnName = "_civicrm_api3_{$lowercase_entity}_deprecation";
     if (function_exists($fnName)) {
-      return $fnName($result);
+      Civi::cache('metadata')->set($cacheKey, $fnName($result));
+    }
+    else {
+      Civi::cache('metadata')->set($cacheKey, FALSE);
     }
   }
+  return Civi::cache('metadata')->get($cacheKey);
 }
 
 /**
