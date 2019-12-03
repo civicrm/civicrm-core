@@ -1,12 +1,12 @@
 <?php
 
 return [
-  'html' => '<strong>New text!</strong>',
-  'pretty' => "<strong>New text!</strong>\n",
+  'html' => '<strong>New &nbsp; text!</strong>',
+  'pretty' => "<strong>New &nbsp; text!</strong>\n",
   'shallow' => [
-    ['#tag' => 'strong', '#markup' => 'New text!'],
+    ['#tag' => 'strong', '#markup' => 'New &nbsp; text!'],
   ],
   'deep' => [
-    ['#tag' => 'strong', '#children' => [['#text' => 'New text!']]],
+    ['#tag' => 'strong', '#children' => [['#text' => 'New &nbsp; text!']]],
   ],
 ];

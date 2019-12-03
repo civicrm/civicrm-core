@@ -150,6 +150,12 @@ class CRM_Afform_ArrayHtml {
     return $buf . $end;
   }
 
+  /**
+   * Converts a subset of items into html markup
+   *
+   * @param array $children
+   * @return string html
+   */
   public function convertArraysToHtml($children) {
     $buf = '';
     $this->indent++;
@@ -168,6 +174,17 @@ class CRM_Afform_ArrayHtml {
   }
 
   /**
+   * Converts a full array of items into html markup
+   *
+   * @param array $tree
+   * @return string html
+   */
+  public function convertTreeToHtml($tree) {
+    $this->indent = -1;
+    return $this->replaceUnicodeChars($this->convertArraysToHtml($tree));
+  }
+
+  /**
    * @param string $html
    *   Ex: '<div class="greeting">Hello world</div>'
    * @return array
@@ -180,7 +197,7 @@ class CRM_Afform_ArrayHtml {
 
     $doc = new DOMDocument();
     $doc->preserveWhiteSpace = !$this->formatWhitespace;
-    @$doc->loadHTML("<html><body>$html</body></html>");
+    @$doc->loadHTML("<?xml encoding=\"utf-8\" ?><html><body>$html</body></html>");
 
     // FIXME: Validate expected number of child nodes
 
@@ -210,7 +227,7 @@ class CRM_Afform_ArrayHtml {
         if (!$this->deepCoding && !$this->isNodeEditable($arr)) {
           $arr['#markup'] = '';
           foreach ($node->childNodes as $child) {
-            $arr['#markup'] .= $child->ownerDocument->saveXML($child);
+            $arr['#markup'] .= $this->replaceUnicodeChars($child->ownerDocument->saveXML($child));
           }
         }
         else {
@@ -220,7 +237,7 @@ class CRM_Afform_ArrayHtml {
       return $arr;
     }
     elseif ($node instanceof DOMText) {
-      return ['#text' => $node->textContent];
+      return ['#text' => $this->replaceUnicodeChars($node->textContent)];
     }
     elseif ($node instanceof DOMComment) {
       return ['#comment' => $node->nodeValue];
@@ -334,6 +351,25 @@ class CRM_Afform_ArrayHtml {
       $attrValue = $txtAttrValue;
       return $attrValue;
     }
+  }
+
+  /**
+   * Convert non-breaking space character to html notation.
+   *
+   * Makes html files easier to read.
+   *
+   * Note: This function does NOT convert all html entities (< to &lt;, etc.)
+   * as the input string is assumed to already be valid markup.
+   *
+   * @param string $markup - some html
+   * @return string
+   */
+  public function replaceUnicodeChars($markup) {
+    // TODO: Potentially replace other unicode characters that can be represented as html entities
+    $replace = [
+      ["\xc2\xa0", '&nbsp;'],
+    ];
+    return str_replace(array_column($replace, 0), array_column($replace, 1), $markup);
   }
 
   /**

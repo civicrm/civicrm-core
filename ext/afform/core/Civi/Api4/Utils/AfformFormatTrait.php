@@ -58,7 +58,7 @@ trait AfformFormatTrait {
       return $mixed;
     }
     $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat !== 'shallow', $this->formatWhitespace);
-    return $converter->convertArraysToHtml($mixed);
+    return $converter->convertTreeToHtml($mixed);
   }
 
 }
