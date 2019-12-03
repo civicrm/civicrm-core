@@ -407,19 +407,41 @@ class CRM_Utils_File {
    *
    * @param string $name
    *   Name of file.
+   * @param bool $useCache
+   *   Should the metadata cache be used. This should be true
+   *   if the file would be included by include_once rather than require_once
+   *   but may need to be false otherwise to prevent errors on upgrade.
+   *   Php level caching (but not backed by Redis etc) is still used if useCache is false.
    *
    * @return bool
    *   whether the file can be include()d or require()d
    */
-  public static function isIncludable($name) {
+  public static function isIncludable($name, $useCache = FALSE) {
+    $cacheKey = 'includable_file_' . md5($name);
+    // Don't use cache in dev mode because ... sore brains.
+    if ($useCache && !CRM_Utils_System::isDevelopment()) {
+      if (Civi::cache('metadata')->has($cacheKey)) {
+        return Civi::cache('metadata')->get($cacheKey);
+      }
+    }
+    elseif (isset(Civi::$statics[$cacheKey])) {
+      return Civi::$statics[$cacheKey];
+    }
     $x = @fopen($name, 'r', TRUE);
     if ($x) {
       fclose($x);
-      return TRUE;
+      $result = TRUE;
     }
     else {
-      return FALSE;
+      $result = FALSE;
     }
+    if ($useCache) {
+      Civi::cache('metadata')->set($cacheKey, $result);
+    }
+    else {
+      Civi::$statics[$cacheKey] = $result;
+    }
+    return $result;
   }
 
   /**

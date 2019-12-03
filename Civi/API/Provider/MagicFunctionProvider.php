@@ -199,8 +199,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       'api/v' . $apiRequest['version'] . '/' . $camelName . '/' . $actionCamelName . '.php',
     ];
     foreach ($stdFiles as $stdFile) {
-      if (\CRM_Utils_File::isIncludable($stdFile)) {
-        require_once $stdFile;
+      if (\CRM_Utils_File::isIncludable($stdFile, TRUE)) {
+        include_once $stdFile;
         if (function_exists($stdFunction)) {
           $this->cache[$cachekey] = ['function' => $stdFunction, 'is_generic' => FALSE];
           return $this->cache[$cachekey];
@@ -219,8 +219,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       'api/v' . $apiRequest['version'] . '/Generic/' . $actionCamelName . '.php',
     ];
     foreach ($genericFiles as $genericFile) {
-      if (\CRM_Utils_File::isIncludable($genericFile)) {
-        require_once $genericFile;
+      if (\CRM_Utils_File::isIncludable($genericFile, TRUE)) {
+        include_once $genericFile;
         if (function_exists($genericFunction)) {
           $this->cache[$cachekey] = ['function' => $genericFunction, 'is_generic' => TRUE];
           return $this->cache[$cachekey];
