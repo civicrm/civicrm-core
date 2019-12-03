@@ -86,16 +86,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     parent::preProcess();
 
-    //membership ID
-    $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
-    if (isset($memberShipId)) {
-      $this->_formValues['contribution_membership_id'] = $memberShipId;
-    }
-    $participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
-    if (isset($participantId)) {
-      $this->_formValues['contribution_participant_id'] = $participantId;
-    }
-
     $sortID = NULL;
     if ($this->get(CRM_Utils_Sort::SORT_ID)) {
       $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
@@ -163,6 +153,18 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'Completed'
       );
     }
+
+    // The membership or contribution id could be set on the form if viewing
+    // an embedded block on ParticipantView or MembershipView.
+    $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
+    if (isset($memberShipId)) {
+      $this->_defaults['contribution_membership_id'] = $memberShipId;
+    }
+    $participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
+    if (isset($participantId)) {
+      $this->_defaults['contribution_participant_id'] = $participantId;
+    }
+
     return $this->_defaults;
   }
 
