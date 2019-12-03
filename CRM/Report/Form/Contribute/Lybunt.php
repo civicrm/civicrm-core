@@ -190,6 +190,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_MONEY,
             'statistics' => ['sum' => ts('Lifetime total')],
+            'required' => TRUE,
           ],
         ],
         'filters' => [
@@ -630,9 +631,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $interval['life_time'] = 'Life Time';
 
     foreach ($rows as $key => $row) {
-      $display['life_time'] = CRM_Utils_Array::value('life_time', $display) +
-        $row['civicrm_life_time_total'];
-      $display[$previous_year] = CRM_Utils_Array::value($previous_year, $display) + $row[$previous_year];
+      // The final row contains the totals so we don't need to include it here.
+      if (!empty($row['civicrm_contribution_contact_id'])) {
+        $display['life_time'] = CRM_Utils_Array::value('life_time', $display) +
+          $row['civicrm_contribution_civicrm_life_time_total'];
+        $display[$previous_year] = CRM_Utils_Array::value($previous_year, $display) + $row['civicrm_contribution_last_year_total_amount'];
+      }
     }
 
     $config = CRM_Core_Config::Singleton();
