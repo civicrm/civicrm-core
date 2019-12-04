@@ -70,7 +70,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     parent::preProcess();
 
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
       $this->_action,
@@ -125,9 +124,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     // The membership or contribution id could be set on the form if viewing
     // an embedded block on ParticipantView or MembershipView.
-    $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
-    if (isset($memberShipId)) {
-      $this->_defaults['contribution_membership_id'] = $memberShipId;
+    $membershipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
+    if (isset($membershipId)) {
+      $this->_defaults['contribution_membership_id'] = $membershipId;
     }
     $participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
     if (isset($participantId)) {
