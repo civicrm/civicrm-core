@@ -19,8 +19,11 @@ Other resources for identifying changes are:
 
 Released December 4, 2019
 
-- **[Bugs resolved](release-notes/5.19.4.md#bugs)**
+- **[Synopsis](release-notes/5.19.4.md#synopsis)**
 - **[Security advisories](release-notes/5.19.4.md#security)**
+- **[Bugs resolved](release-notes/5.19.4.md#bugs)**
+- **[Credits](release-notes/5.19.4.md#credits)**
+- **[Feedback](release-notes/5.19.4.md#feedback)**
 
 ## CiviCRM 5.19.3
 
