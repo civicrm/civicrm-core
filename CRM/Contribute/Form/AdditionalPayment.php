@@ -86,11 +86,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_contributionId = $this->_id;
     }
 
-    $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
     $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_id);
 
-    $this->_amtPaid = $paymentDetails['paid'];
-    $this->_amtTotal = $paymentDetails['total'];
+    $this->_amtTotal = $this->getOrderTotal();
+    $this->_amtPaid = $this->_amtTotal - $paymentAmt;
 
     if ($paymentAmt < 0) {
       $this->_refund = $paymentAmt;
@@ -469,11 +468,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
-      $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
-
       $paymentAmount = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
-      $this->_amtPaid = $paymentDetails['paid'];
-      $this->_amtTotal = $paymentDetails['total'];
+      $this->_amtTotal = $this->getOrderTotal();
+      $this->_amtPaid = $this->_amtTotal - $paymentAmount;
 
       if ($paymentAmount < 0) {
         $this->_refund = $paymentAmount;
@@ -497,6 +494,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->set('cid', $this->_contactId);
     parent::preProcess();
     $this->submit($params);
+  }
+
+  /**
+   * Get the total amount for the order.
+   *
+   * @return float
+   */
+  protected function getOrderTotal() {
+    return CRM_Price_BAO_LineItem::getLineTotal($this->_contributionId);
   }
 
 }
