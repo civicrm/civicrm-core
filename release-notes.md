@@ -15,7 +15,7 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
-# CiviCRM 5.20.0
+## CiviCRM 5.20.0
 
 Released December 4, 2019
 
