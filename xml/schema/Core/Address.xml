@@ -101,6 +101,11 @@
       <type>Text</type>
     </html>
   </field>
+  <index>
+    <name>index_street_address</name>
+    <fieldName>street_address</fieldName>
+    <add>5.21</add>
+  </index>
   <field>
     <name>street_number</name>
     <title>Street Number</title>
