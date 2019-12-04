@@ -173,6 +173,14 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
             ],
           ],
         ],
+        'filters' => [
+          'contribution_status_id' => [
+            'title' => ts('Contribution Status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'default' => [1],
+          ],
+        ],
         'grouping' => 'pcp-fields',
       ],
       'civicrm_financial_trxn' => [
