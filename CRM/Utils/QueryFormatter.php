@@ -89,7 +89,9 @@ class CRM_Utils_QueryFormatter {
   const MODE_WILDWORDS_SUFFIX = 'wildwords-suffix';
 
   /**
-   * @var \CRM_Utils_QueryFormatter|NULL
+   * Singleton object.
+   *
+   * @var \CRM_Utils_QueryFormatter|null
    */
   static protected $singleton;
 

@@ -66,6 +66,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   protected $groupFilterNotOptimised = FALSE;
 
   /**
+   * Indicate that report is not fully FGB compliant.
+   *
+   * @var bool
+   */
+  public $optimisedForOnlyFullGroupBy;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -133,6 +140,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
+          'contribution_page_id' => array(
+            'title' => ts('Contribution Page'),
+          ),
           'total_amount' => array(
             'title' => ts('Contribution Amount Stats'),
             'default' => TRUE,
@@ -153,8 +163,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
             'default' => array(1),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'contribution_page_id' => array(
+            'title' => ts('Contribution Page'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionPage(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'currency' => array(
@@ -211,8 +227,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
             'default' => array(1),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'contribution_page_id' => array(
+            'title' => ts('Contribution Page'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionPage(),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -569,12 +591,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
     }
     else {
-      $groupBy = "{$this->_aliases['civicrm_contact']}.id";
       $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id";
     }
     $this->_groupBy .= $this->_rollup;
-    // append select with ANY_VALUE() keyword
-    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBy);
   }
 
   /**
@@ -631,7 +650,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     $contriSQL = "SELECT {$contriQuery} {$group} {$this->_having}";
     $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
-
+    $this->addToDeveloperTab($contriSQL);
     $totalAmount = $average = $mode = $median = $softTotalAmount = $softAverage = array();
     $count = $softCount = 0;
     while ($contriDAO->fetch()) {
@@ -655,6 +674,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     if ($softCredit) {
       $softDAO = CRM_Core_DAO::executeQuery($softSQL);
+      $this->addToDeveloperTab($softSQL);
       while ($softDAO->fetch()) {
         $softTotalAmount[]
           = CRM_Utils_Money::format($softDAO->civicrm_contribution_soft_soft_amount_sum, $softDAO->currency) .
@@ -715,71 +735,6 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
   public function postProcess() {
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::postProcess();
-  }
-
-  /**
-   * Build table rows for output.
-   *
-   * @param string $sql
-   * @param array $rows
-   */
-  public function buildRows($sql, &$rows) {
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    if (!is_array($rows)) {
-      $rows = array();
-    }
-
-    // use this method to modify $this->_columnHeaders
-    $this->modifyColumnHeaders();
-    $contriRows = array();
-    $unselectedSectionColumns = $this->unselectedSectionColumns();
-
-    //CRM-16338 if both soft-credit and contribution are enabled then process the contribution's
-    //total amount's average, count and sum separately and add it to the respective result list
-    $softCredit = (!empty($this->_params['fields']['soft_amount']) && !empty($this->_params['fields']['total_amount'])) ? TRUE : FALSE;
-    if ($softCredit) {
-      $this->from('contribution');
-      $this->customDataFrom();
-      $contriSQL = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
-      $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
-      $contriFields = array(
-        'civicrm_contribution_total_amount_sum',
-        'civicrm_contribution_total_amount_avg',
-        'civicrm_contribution_total_amount_count',
-      );
-      $contriRows = array();
-      while ($contriDAO->fetch()) {
-        $contriRow = array();
-        foreach ($contriFields as $column) {
-          $contriRow[$column] = $contriDAO->$column;
-        }
-        $contriRows[] = $contriRow;
-      }
-    }
-
-    $count = 0;
-    while ($dao->fetch()) {
-      $row = array();
-      foreach ($this->_columnHeaders as $key => $value) {
-        if ($softCredit && array_key_exists($key, $contriRows[$count])) {
-          $row[$key] = $contriRows[$count][$key];
-        }
-        elseif (property_exists($dao, $key)) {
-          $row[$key] = $dao->$key;
-        }
-      }
-
-      // section headers not selected for display need to be added to row
-      foreach ($unselectedSectionColumns as $key => $values) {
-        if (property_exists($dao, $key)) {
-          $row[$key] = $dao->$key;
-        }
-      }
-
-      $count++;
-      $rows[] = $row;
-    }
-
   }
 
   /**
@@ -846,8 +801,32 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
+    $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
+    //CRM-16338 if both soft-credit and contribution are enabled then process the contribution's
+    //total amount's average, count and sum separately and add it to the respective result list
+    $softCredit = (!empty($this->_params['fields']['soft_amount']) && !empty($this->_params['fields']['total_amount'])) ? TRUE : FALSE;
+    if ($softCredit) {
+      $this->from('contribution');
+      $this->customDataFrom();
+      $contriSQL = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+      CRM_Core_DAO::disableFullGroupByMode();
+      $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
+      CRM_Core_DAO::reenableFullGroupByMode();
+      $this->addToDeveloperTab($contriSQL);
+      $contriFields = array(
+        'civicrm_contribution_total_amount_sum',
+        'civicrm_contribution_total_amount_avg',
+        'civicrm_contribution_total_amount_count',
+      );
+      $count = 0;
+      while ($contriDAO->fetch()) {
+        foreach ($contriFields as $column) {
+          $rows[$count][$column] = $contriDAO->$column;
+        }
+        $count++;
+      }
+    }
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
       if (!empty($this->_params['group_bys']['receive_date']) &&
@@ -933,6 +912,11 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
+        $entryFound = TRUE;
+      }
+
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_page_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];
         $entryFound = TRUE;
       }
 

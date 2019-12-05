@@ -62,7 +62,7 @@ class AngularLoader {
   protected $modules;
 
   /**
-   * @var array|NULL
+   * @var array|null
    */
   protected $crmApp = NULL;
 

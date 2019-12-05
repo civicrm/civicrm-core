@@ -173,6 +173,10 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
         // 4.3 legacy handling.
         $values[$key]['contribution_type_id'] = $item['financial_type_id'];
       }
+      if (!empty($item['contribution_cancel_date'])) {
+        // 5.16 legacy handling.
+        $values[$key]['cancel_date'] = $item['contribution_cancel_date'];
+      }
       if (!empty($item['next_sched_contribution_date'])) {
         // 4.4 legacy handling
         $values[$key]['next_sched_contribution'] = $item['next_sched_contribution_date'];
@@ -380,6 +384,14 @@ function _civicrm_api3_get_BAO($name) {
     // Order basically maps to contribution at the top level but
     // has enhanced access to other entities.
     $name = 'Contribution';
+  }
+  if ($name === 'Dedupe') {
+    // Dedupe is a pseudoentity for PrevNextCache - but accessing dedupe related info
+    // not the other cache info like search results (which could in fact be in Redis or another cache engine)
+    $name = 'PrevNextCache';
+  }
+  if ($name === 'Payment') {
+    $name = 'FinancialTrxn';
   }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {
@@ -774,7 +786,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  * @return array
  *   options extracted from params
  */
-function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
+function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $entity = '', $action = '') {
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   $is_count = FALSE;
   $sort = CRM_Utils_Array::value('sort', $params, 0);
@@ -2153,7 +2165,8 @@ function _civicrm_api3_resolve_country_id($params) {
  * @param string $contactIdExpr
  *   E.g. "user_contact_id" or "@user:username".
  *
- * @return int|NULL|'unknown-user'
+ * @return int|null|'unknown-user'
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_resolve_contactID($contactIdExpr) {
   // If value = 'user_contact_id' replace value with logged in user id.
@@ -2335,6 +2348,11 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
   // If option is a key, no need to translate
   // or if no options are avaiable for pseudoconstant 'table' property
   if (array_key_exists($value, $options) || !$options) {
+    return;
+  }
+
+  // Hack for Profile formatting fields
+  if ($fieldName === 'field_name' && (strpos($value, 'formatting') === 0)) {
     return;
   }
 

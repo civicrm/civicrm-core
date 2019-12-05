@@ -210,7 +210,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     //add buttons
     $js = NULL;
     if ($this->isLastParticipant(TRUE) && empty($this->_values['event']['is_monetary'])) {
-      $js = ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"];
+      $this->submitOnce = TRUE;
     }
 
     //handle case where user might sart with waiting by group
@@ -361,7 +361,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-          'js' => $js,
         ],
       ]);
       if ($includeSkipButton) {
@@ -553,7 +552,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'], $fields, $lineItem);
       if ($fields['amount'] > 0) {
         $validatePayement = TRUE;
-        // $self->_forcePayement = true;
         // return false;
       }
     }

@@ -120,13 +120,14 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param bool $namesOnly
    *   Return simple list of names.
    *
-   * @param \Civi\ActionSchedule\Mapping|NULL $filterMapping
+   * @param \Civi\ActionSchedule\Mapping|null $filterMapping
    *   Filter by the schedule's mapping type.
    * @param int $filterValue
    *   Filter by the schedule's entity_value.
    *
    * @return array
    *   (reference)   reminder list
+   * @throws \CRM_Core_Exception
    */
   public static function &getList($namesOnly = FALSE, $filterMapping = NULL, $filterValue = NULL) {
     $query = "
@@ -331,7 +332,6 @@ FROM civicrm_action_schedule cas
         CRM_Core_BAO_ActionLog::create($logParams);
       }
 
-      $dao->free();
     }
   }
 
@@ -458,7 +458,7 @@ FROM civicrm_action_schedule cas
    * @param Civi\ActionSchedule\Mapping $mapping
    * @param int $contactID
    * @param int $entityID
-   * @param int|NULL $caseID
+   * @param int|null $caseID
    * @throws CRM_Core_Exception
    */
   protected static function createMailingActivity($tokenRow, $mapping, $contactID, $entityID, $caseID) {
@@ -549,7 +549,7 @@ FROM civicrm_action_schedule cas
     // dev/core#369 If an SMS provider is deleted then the relevant row in the action_schedule_table is set to NULL
     // So we need to exclude them.
     if (CRM_Utils_System::isNull($schedule->sms_provider_id)) {
-      return ["sms_provider_missing" => "SMS Provider is NULL in database cannot send reminder"];
+      return ["sms_provider_missing" => "SMS reminder cannot be sent because the SMS provider has been deleted."];
     }
 
     $messageSubject = $tokenRow->render('subject');

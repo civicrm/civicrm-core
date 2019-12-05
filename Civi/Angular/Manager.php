@@ -14,7 +14,9 @@ class Manager {
   protected $res = NULL;
 
   /**
-   * @var array|NULL
+   * Modules.
+   *
+   * @var array|null
    *   Each item has some combination of these keys:
    *   - ext: string
    *     The Civi extension which defines the Angular module.
@@ -48,7 +50,7 @@ class Manager {
    */
   public function __construct($res, \CRM_Utils_Cache_Interface $cache = NULL) {
     $this->res = $res;
-    $this->cache = $cache ? $cache : new \CRM_Utils_Cache_Arraycache([]);
+    $this->cache = $cache ? $cache : new \CRM_Utils_Cache_ArrayCache([]);
   }
 
   /**
@@ -78,6 +80,7 @@ class Manager {
 
       $angularModules = [];
       $angularModules['angularFileUpload'] = include "$civicrm_root/ang/angularFileUpload.ang.php";
+      $angularModules['checklist-model'] = include "$civicrm_root/ang/checklist-model.ang.php";
       $angularModules['crmApp'] = include "$civicrm_root/ang/crmApp.ang.php";
       $angularModules['crmAttachment'] = include "$civicrm_root/ang/crmAttachment.ang.php";
       $angularModules['crmAutosave'] = include "$civicrm_root/ang/crmAutosave.ang.php";
@@ -95,6 +98,8 @@ class Manager {
       $angularModules['ui.sortable'] = include "$civicrm_root/ang/ui.sortable.ang.php";
       $angularModules['unsavedChanges'] = include "$civicrm_root/ang/unsavedChanges.ang.php";
       $angularModules['statuspage'] = include "$civicrm_root/ang/crmStatusPage.ang.php";
+      $angularModules['api4Explorer'] = include "$civicrm_root/ang/api4Explorer.ang.php";
+      $angularModules['api4'] = include "$civicrm_root/ang/api4.ang.php";
 
       foreach (\CRM_Core_Component::getEnabledComponents() as $component) {
         $angularModules = array_merge($angularModules, $component->getAngularModules());

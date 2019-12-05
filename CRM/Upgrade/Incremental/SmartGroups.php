@@ -39,7 +39,14 @@ class CRM_Upgrade_Incremental_SmartGroups {
    */
   public function updateGroups($actions) {
     foreach ($actions as $func => $fields) {
-      $this->{$func}($fields);
+      if ($func == 'renameField') {
+        foreach ($fields as $fieldConversion) {
+          $this->{$func}($fieldConversion['old'], $fieldConversion['new']);
+        }
+      }
+      else {
+        $this->{$func}($fields);
+      }
     }
   }
 
@@ -49,15 +56,26 @@ class CRM_Upgrade_Incremental_SmartGroups {
    */
   public function datePickerConversion($fields) {
     $fieldPossibilities = $relativeFieldNames = [];
-    foreach ($fields as $field) {
-      $fieldPossibilities[] = $field;
-      $fieldPossibilities[] = $field . '_high';
-      $fieldPossibilities[] = $field . '_low';
-    }
-    $relativeDateMappings = ['activity_date_time' => 'activity'];
+    $relativeDateMappings = [
+      'activity_date_time' => 'activity',
+      'participant_register_date' => 'participant',
+      'receive_date' => 'contribution',
+      'contribution_cancel_date' => 'contribution_cancel',
+      'membership_join_date' => 'member_join',
+      'membership_start_date' => 'member_start',
+      'membership_end_date' => 'member_end',
+      'pledge_payment_scheduled_date' => 'pledge_payment',
+      'pledge_create_date' => 'pledge_create',
+      'pledge_end_date' => 'pledge_end',
+      'pledge_start_date' => 'pledge_start',
+    ];
 
     foreach ($fields as $field) {
       foreach ($this->getSearchesWithField($field) as $savedSearch) {
+        // Only populate field possibilities as we go to convert each field
+        $fieldPossibilities[] = $field;
+        $fieldPossibilities[] = $field . '_high';
+        $fieldPossibilities[] = $field . '_low';
         $formValues = $savedSearch['form_values'];
         $isRelative = $hasRelative = FALSE;
         $relativeFieldName = $field . '_relative';
@@ -74,7 +92,10 @@ class CRM_Upgrade_Incremental_SmartGroups {
             // Any actual criteria will have this key set but skip any weird lines
             continue;
           }
-          if (in_array($formValue[0], $fieldPossibilities)) {
+          if ($formValue[0] === $relativeFieldName && empty($formValue[2])) {
+            unset($formValues[$index]);;
+          }
+          elseif (in_array($formValue[0], $fieldPossibilities)) {
             if ($isRelative) {
               unset($formValues[$index]);
             }

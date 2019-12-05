@@ -97,7 +97,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assignToTemplate();
 
     $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
-    $getTaxDetails = FALSE;
     $taxAmount = 0;
 
     $lineItemForTemplate = [];
@@ -109,7 +108,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
             foreach ($value as $v) {
               if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
                 $taxAmount += $v['tax_amount'];
-                $getTaxDetails = TRUE;
               }
             }
           }
@@ -121,13 +119,11 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config') &&
       !empty($lineItemForTemplate)
     ) {
-      $this->assign('lineItem', $lineItemForTemplate);
+      $this->assignLineItemsToTemplate($lineItemForTemplate);
     }
 
     if ($invoicing) {
-      $this->assign('getTaxDetails', $getTaxDetails);
       $this->assign('totalTaxAmount', $taxAmount);
-      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
     }
     $this->assign('totalAmount', $this->_totalAmount);
 

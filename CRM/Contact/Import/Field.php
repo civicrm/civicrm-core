@@ -55,7 +55,7 @@ class CRM_Contact_Import_Field {
 
   /**
    * Is this field required
-   * @var boolean
+   * @var bool
    */
   public $_required;
 

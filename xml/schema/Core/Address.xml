@@ -95,8 +95,7 @@
     <dataPattern>/^(\d{1,5}( [0-9A-Za-z]+)+)$|^(P\.?O\.\? Box \d{1,5})$/i</dataPattern>
     <comment>Concatenation of all routable street address components (prefix, street number, street name, suffix, unit
       number OR P.O. Box). Apps should be able to determine physical location with this data (for mapping, mail
-      delivery, etc.).
-    </comment>
+      delivery, etc.).</comment>
     <add>1.1</add>
     <html>
       <type>Text</type>
@@ -119,8 +118,7 @@
     <type>varchar</type>
     <length>8</length>
     <export>true</export>
-    <comment>Non-numeric portion of address number on the street, e.g. For 112A Main St, the street_number_suffix = A
-    </comment>
+    <comment>Non-numeric portion of address number on the street, e.g. For 112A Main St, the street_number_suffix = A</comment>
     <add>1.1</add>
     <html>
       <type>Text</type>
@@ -350,6 +348,7 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
       <nameColumn>iso_code</nameColumn>
+      <abbrColumn>iso_code</abbrColumn>
     </pseudoconstant>
     <localize_context>country</localize_context>
     <html>
@@ -393,9 +392,14 @@
       <size>9</size>
     </html>
   </field>
+  <index>
+    <name>index_geo_code_1_geo_code_2</name>
+    <fieldName>geo_code_1</fieldName>
+    <fieldName>geo_code_2</fieldName>
+  </index>
   <field>
     <name>manual_geo_code</name>
-    <title>Is manually geocoded</title>
+    <title>Is Manually Geocoded</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this a manually entered geo code</comment>
@@ -403,6 +407,7 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <export>true</export>
   </field>
   <field>
     <name>timezone</name>

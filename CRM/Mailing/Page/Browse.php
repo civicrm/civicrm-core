@@ -67,7 +67,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   /**
    * Scheduled mailing.
    *
-   * @var boolean
+   * @var bool
    */
   public $_scheduled;
 

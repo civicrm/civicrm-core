@@ -55,6 +55,14 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
 
+    if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
+      if (!isset($params['total_amount'])) {
+        $trxn->fetch();
+        $params['total_amount'] = $trxn->total_amount;
+      }
+      $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
+    }
+
     if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
       $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
@@ -119,7 +127,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults = []) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
     $financialItem->copyValues($params);
     if ($financialItem->find(TRUE)) {
@@ -429,7 +437,7 @@ WHERE ceft.entity_id = %1";
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
         'description' => 'Fee',
-        'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],
@@ -735,6 +743,25 @@ WHERE ceft.entity_id = %1";
     self::createDeferredTrxn(CRM_Utils_Array::value('line_item', $inputParams), $currentContribution, TRUE, 'changePaymentInstrument');
 
     return TRUE;
+  }
+
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * Always set is_payment to 1 as this is used for Payment api as  well as FinancialTrxn.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName === 'is_payment') {
+      $this->is_payment = 1;
+    }
+    else {
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
+    }
   }
 
 }

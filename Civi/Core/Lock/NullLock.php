@@ -49,7 +49,7 @@ class NullLock implements LockInterface {
   /**
    * Acquire lock.
    *
-   * @param int|NULL $timeout
+   * @param int|null $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.
    *

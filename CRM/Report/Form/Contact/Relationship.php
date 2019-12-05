@@ -696,7 +696,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           $rowLabels = [];
           foreach ($rowValues as $rowValue) {
             if ($rowValue) {
-              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
+              $rowLabels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
             }
           }
           $rows[$rowNum]['civicrm_contact_contact_sub_type_a'] = implode(', ', $rowLabels);
@@ -712,7 +712,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           $rowLabels = [];
           foreach ($rowValues as $rowValue) {
             if ($rowValue) {
-              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
+              $rowLabels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
             }
           }
           $rows[$rowNum]['civicrm_contact_b_contact_sub_type_b'] = implode(', ', $rowLabels);

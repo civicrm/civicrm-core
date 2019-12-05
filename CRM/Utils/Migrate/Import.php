@@ -358,42 +358,44 @@ AND        v.name = %1
     foreach ($xml->CustomFields as $customFieldsXML) {
       $total = count($customFieldsXML->CustomField);
       foreach ($customFieldsXML->CustomField as $customFieldXML) {
+        if (empty($customFieldXML->option_group_id) && isset($customFieldXML->option_group_name)) {
+          $customFieldXML->option_group_id = $this->getOptionGroupIDFromName((string) $customFieldXML->option_group_name, $idMap);
+        }
+
         $id = $idMap['custom_group'][(string ) $customFieldXML->custom_group_name];
         $fields_indexed_by_group_id[$id][] = $customFieldXML;
       }
     }
+
     foreach ($fields_indexed_by_group_id as $group_id => $fields) {
-      $total = count($fields);
-      $count = 0;
-      foreach ($fields as $customFieldXML) {
-        $count++;
-        $customField = new CRM_Core_DAO_CustomField();
-        $customField->custom_group_id = $group_id;
-        $skipStore = FALSE;
-        if (!$this->copyData($customField, $customFieldXML, FALSE, 'label')) {
-          $skipStore = TRUE;
-        }
-
-        if (empty($customField->option_group_id) &&
-          isset($customFieldXML->option_group_name)
-        ) {
-          $customField->option_group_id = $idMap['option_group'][(string ) $customFieldXML->option_group_name];
-        }
-        if ($skipStore) {
-          continue;
-        }
-        $customField->save();
-
-        // Only rebuild the table's trigger on the last field added to avoid un-necessary
-        // and slow rebuilds when adding many fields at the same time.
-        $triggerRebuild = FALSE;
-        if ($count == $total) {
-          $triggerRebuild = TRUE;
-        }
-        $indexExist = FALSE;
-        CRM_Core_BAO_CustomField::createField($customField, 'add', $indexExist, $triggerRebuild);
-      }
+      \Civi\Api4\CustomField::save()
+        ->setCheckPermissions(FALSE)
+        ->setDefaults(['custom_group_id' => $group_id])
+        ->setRecords(json_decode(json_encode($fields), TRUE))
+        ->execute();
     }
+  }
+
+  /**
+   * Get Option Group ID.
+   *
+   * Returns an option group's ID, given its name.
+   *
+   * @param $groupName
+   * @param $idMap
+   *
+   * @return int|null
+   */
+  private function getOptionGroupIDFromName($groupName, &$idMap) {
+    if (empty($groupName)) {
+      return NULL;
+    }
+
+    if (!isset($idMap['option_group'][$groupName])) {
+      $idMap['option_group'][$groupName] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $groupName, 'id', 'name');
+    }
+
+    return $idMap['option_group'][$groupName];
   }
 
   /**

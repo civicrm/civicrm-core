@@ -24,14 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 <div class="help">
-    {ts}CiviCRM includes several optional components which give you more tools to connect with and engage your constituents.{/ts}{help id="components"}
+  {ts}CiviCRM includes several optional components which give you more tools to connect with and engage your constituents.{/ts}{help id="components"}
 </div>
 <div class="crm-block crm-form-block crm-component-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-{$form.enableComponents.html}
-<p class="description">
-    {ts}Enabled components are listed in the right-hand box. Disabled components are listed in the left-hand box. Highlight a component and click the Enable or Disable button to move it from one box to the other. Then click <strong>Save</strong>.{/ts}
-</p>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {include file='CRM/Admin/Form/Setting/SettingForm.tpl'}
 </div>
 <div class="spacer"></div>

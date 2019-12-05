@@ -70,7 +70,7 @@ class SettingsBag {
    * The result of combining default values, mandatory
    * values, and user values.
    *
-   * @var array|NULL
+   * @var array|null
    *   Array(string $settingName => mixed $value).
    */
   protected $combined;
@@ -83,7 +83,7 @@ class SettingsBag {
   /**
    * @param int $domainId
    *   The domain for which we want settings.
-   * @param int|NULL $contactId
+   * @param int|null $contactId
    *   The contact for which we want settings. Use NULL for domain settings.
    */
   public function __construct($domainId, $contactId) {
@@ -150,7 +150,7 @@ class SettingsBag {
     if (!$isUpgradeMode || \CRM_Core_DAO::checkTableExists('civicrm_setting')) {
       $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
       while ($dao->fetch()) {
-        $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
+        $this->values[$dao->name] = ($dao->value !== NULL) ? \CRM_Utils_String::unserialize($dao->value) : NULL;
       }
     }
 
@@ -355,7 +355,7 @@ class SettingsBag {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
-          unserialize($dao->value),
+          \CRM_Utils_String::unserialize($dao->value),
           $value,
           $metadata,
           $this->domainId
@@ -392,7 +392,6 @@ class SettingsBag {
       // to save the field `group_name`, which is required in older schema.
       \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
     }
-    $dao->free();
   }
 
 }

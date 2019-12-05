@@ -110,8 +110,7 @@
     <title>Contact Subtype A</title>
     <type>varchar</type>
     <length>64</length>
-    <comment>If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.
-    </comment>
+    <comment>If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.</comment>
     <add>3.1</add>
     <html>
       <type>Select</type>
@@ -128,8 +127,7 @@
     <title>Contact Subtype B</title>
     <type>varchar</type>
     <length>64</length>
-    <comment>If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.
-    </comment>
+    <comment>If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.</comment>
     <add>3.1</add>
     <html>
       <type>Select</type>
@@ -156,8 +154,7 @@
     <title>Relationship Type is Active</title>
     <type>boolean</type>
     <default>1</default>
-    <comment>Is this relationship type currently active (i.e. can be used when creating or editing relationships)?
-    </comment>
+    <comment>Is this relationship type currently active (i.e. can be used when creating or editing relationships)?</comment>
     <html>
       <type>CheckBox</type>
     </html>

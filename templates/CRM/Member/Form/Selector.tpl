@@ -62,7 +62,7 @@
         {$row.membership_type}{if $row.is_test} ({ts}test{/ts}){/if}
         {if $row.owner_membership_id}<br />({ts}by relationship{/ts}){/if}
     </td>
-    <td class="crm-membership-join_date">{$row.join_date|truncate:10:''|crmDate}</td>
+    <td class="crm-membership-join_date">{$row.membership_join_date|truncate:10:''|crmDate}</td>
     <td class="crm-membership-start_date">{$row.membership_start_date|truncate:10:''|crmDate}</td>
     <td class="crm-membership-end_date">{$row.membership_end_date|truncate:10:''|crmDate}</td>
     <td class="crm-membership-source">{$row.membership_source}</td>

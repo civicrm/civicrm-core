@@ -79,6 +79,9 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @return bool
    */
   public function isTransactional($apiProvider, $apiRequest) {
+    if ($apiRequest['version'] == 4) {
+      return FALSE;
+    }
     if ($this->isForceRollback($apiProvider, $apiRequest)) {
       return TRUE;
     }
@@ -98,6 +101,9 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @return bool
    */
   public function isForceRollback($apiProvider, $apiRequest) {
+    if ($apiRequest['version'] == 4) {
+      return FALSE;
+    }
     // FIXME: When APIv3 uses better parsing, only one check will be needed.
     if (isset($apiRequest['params']['options']['force_rollback'])) {
       return \CRM_Utils_String::strtobool($apiRequest['params']['options']['force_rollback']);

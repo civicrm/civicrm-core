@@ -118,17 +118,3 @@ function civicrm_api3_pledge_payment_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
-/**
- * Gets field for civicrm_pledge_payment functions.
- *
- * @param array $params
- *   Modifiable list of fields allowed for the PledgePayment.get action.
- */
-function civicrm_api3_pledge_payment_get_spec(&$params) {
-  $params['option.create_new'] = [
-    'title' => "Create New",
-    'description' => "Create new field rather than update an unpaid payment",
-    'type' => CRM_Utils_Type::T_BOOLEAN,
-  ];
-}

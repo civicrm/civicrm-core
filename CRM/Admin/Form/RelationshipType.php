@@ -208,8 +208,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
       if (empty($params['id'])) {
         // Set name on created but don't update on update as the machine name is not exposed.
-        $params['name_b_a'] = CRM_Utils_String::munge($params['label_b_a']);
-        $params['name_a_b'] = CRM_Utils_String::munge($params['label_a_b']);
+        $params['name_b_a'] = $params['label_b_a'];
+        $params['name_a_b'] = $params['label_a_b'];
       }
 
       $result = civicrm_api3('RelationshipType', 'create', $params);

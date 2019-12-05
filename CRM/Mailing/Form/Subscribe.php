@@ -147,10 +147,7 @@ ORDER BY title";
     }
 
     if ($addCaptcha) {
-      // add captcha
-      $captcha = CRM_Utils_ReCAPTCHA::singleton();
-      $captcha->add($this);
-      $this->assign('isCaptcha', TRUE);
+      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
 
     $this->addButtons([

@@ -479,7 +479,7 @@ CREATE TABLE `civicrm_component` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Component ID',
      `name` varchar(64) NOT NULL   COMMENT 'Name of the component.',
-     `namespace` varchar(128)    COMMENT 'Path to components main directory in a form of a class\n      namespace.\n    ' 
+     `namespace` varchar(128)    COMMENT 'Path to components main directory in a form of a class namespace.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -523,14 +523,14 @@ CREATE TABLE `civicrm_prevnext_cache` (
      `entity_table` varchar(64)    COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event',
      `entity_id1` int unsigned NOT NULL   COMMENT 'FK to entity table specified in entity_table column.',
      `entity_id2` int unsigned NULL   COMMENT 'FK to entity table specified in entity_table column.',
-     `cacheKey` varchar(255)    COMMENT 'Unique path name for cache element of the searched item',
+     `cachekey` varchar(255)    COMMENT 'Unique path name for cache element of the searched item',
      `data` longtext    COMMENT 'cached snapshot of the serialized data',
      `is_selected` tinyint   DEFAULT 0  
 ,
         PRIMARY KEY (`id`)
  
     ,     INDEX `index_all`(
-        cacheKey
+        cachekey
       , entity_id1
       , entity_id2
       , entity_table
@@ -665,7 +665,7 @@ CREATE TABLE `civicrm_contact` (
      `do_not_sms` tinyint   DEFAULT 0 ,
      `do_not_trade` tinyint   DEFAULT 0 ,
      `is_opt_out` tinyint NOT NULL  DEFAULT 0 COMMENT 'Has the contact opted out from receiving all bulk email from the organization or site domain?',
-     `legal_identifier` varchar(32)    COMMENT 'May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.\n    ',
+     `legal_identifier` varchar(32)    COMMENT 'May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.',
      `external_identifier` varchar(64)    COMMENT 'Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.',
      `sort_name` varchar(128)    COMMENT 'Name used for sorting different contact types',
      `display_name` varchar(128)    COMMENT 'Formatted name representing preferred format for display/print/other output.',
@@ -764,6 +764,12 @@ CREATE TABLE `civicrm_contact` (
       , sort_name
       , id
   )
+  ,     INDEX `index_created_date`(
+        created_date
+  )
+  ,     INDEX `index_modified_date`(
+        modified_date
+  )
   
 ,          CONSTRAINT FK_civicrm_contact_primary_contact_id FOREIGN KEY (`primary_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_contact_employer_id FOREIGN KEY (`employer_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
@@ -812,10 +818,10 @@ CREATE TABLE `civicrm_relationship_type` (
      `description` varchar(255)    COMMENT 'Optional verbose description of the relationship type.',
      `contact_type_a` varchar(12)    COMMENT 'If defined, contact_a in a relationship of this type must be a specific contact_type.',
      `contact_type_b` varchar(12)    COMMENT 'If defined, contact_b in a relationship of this type must be a specific contact_type.',
-     `contact_sub_type_a` varchar(64)    COMMENT 'If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.\n    ',
-     `contact_sub_type_b` varchar(64)    COMMENT 'If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.\n    ',
+     `contact_sub_type_a` varchar(64)    COMMENT 'If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.',
+     `contact_sub_type_b` varchar(64)    COMMENT 'If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.',
      `is_reserved` tinyint    COMMENT 'Is this relationship type a predefined system type (can not be changed or de-activated)?',
-     `is_active` tinyint   DEFAULT 1 COMMENT 'Is this relationship type currently active (i.e. can be used when creating or editing relationships)?\n    ' 
+     `is_active` tinyint   DEFAULT 1 COMMENT 'Is this relationship type currently active (i.e. can be used when creating or editing relationships)?' 
 ,
         PRIMARY KEY (`id`)
  
@@ -1732,7 +1738,7 @@ CREATE TABLE `civicrm_cxn` (
 CREATE TABLE `civicrm_cache` (
 
 
-     `id` int unsigned NOT NULL AUTO_INCREMENT  ,
+     `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique table ID',
      `group_name` varchar(32) NOT NULL   COMMENT 'group name for cache element, useful in cleaning cache elements',
      `path` varchar(255)    COMMENT 'Unique path name for cache element',
      `data` longtext    COMMENT 'data associated with this path',
@@ -1860,8 +1866,8 @@ CREATE TABLE `civicrm_custom_field` (
      `end_date_years` int    COMMENT 'Date may be up to end_date_years years after the current date.',
      `date_format` varchar(64)    COMMENT 'date format for custom date',
      `time_format` int unsigned    COMMENT 'time format for custom date',
-     `note_columns` int unsigned    COMMENT ' Number of columns in Note Field ',
-     `note_rows` int unsigned    COMMENT ' Number of rows in Note Field ',
+     `note_columns` int unsigned    COMMENT 'Number of columns in Note Field',
+     `note_rows` int unsigned    COMMENT 'Number of rows in Note Field',
      `column_name` varchar(255)    COMMENT 'Name of the column that holds the values for this field.',
      `option_group_id` int unsigned    COMMENT 'For elements with options, the option group id that is used',
      `filter` varchar(255)    COMMENT 'Stores Contact Get API params contact reference custom fields. May be used for other filters in the future.',
@@ -2144,7 +2150,7 @@ CREATE TABLE `civicrm_mapping_field` (
      `website_type_id` int unsigned    COMMENT 'Which type of website does this site belong',
      `relationship_type_id` int unsigned    COMMENT 'Relationship type, if required',
      `relationship_direction` varchar(6)    ,
-     `grouping` int unsigned   DEFAULT 1 COMMENT 'Used to group mapping_field records into related sets (e.g. for criteria sets in search builder\n      mappings).\n    ',
+     `grouping` int unsigned   DEFAULT 1 COMMENT 'Used to group mapping_field records into related sets (e.g. for criteria sets in search builder\n      mappings).',
      `operator` varchar(16)    COMMENT 'SQL WHERE operator for search-builder mapping fields (search criteria).',
      `value` varchar(255)    COMMENT 'SQL WHERE value for search-builder mapping fields.' 
 ,
@@ -2602,7 +2608,8 @@ CREATE TABLE `civicrm_status_pref` (
      `hush_until` date   DEFAULT NULL COMMENT 'expires ignore_severity.  NULL never hushes.',
      `ignore_severity` int unsigned   DEFAULT 1 COMMENT 'Hush messages up to and including this severity.',
      `prefs` varchar(255)    COMMENT 'These settings are per-check, and can\'t be compared across checks.',
-     `check_info` varchar(255)    COMMENT 'These values are per-check, and can\'t be compared across checks.' 
+     `check_info` varchar(255)    COMMENT 'These values are per-check, and can\'t be compared across checks.',
+     `is_active` tinyint   DEFAULT 1 COMMENT 'Is this status check active?' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3381,7 +3388,7 @@ CREATE TABLE `civicrm_dashboard` (
         PRIMARY KEY (`id`)
  
  
-,          CONSTRAINT FK_civicrm_dashboard_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)   
+,          CONSTRAINT FK_civicrm_dashboard_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`) ON DELETE CASCADE  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -3661,7 +3668,7 @@ CREATE TABLE `civicrm_action_log` (
      `is_error` tinyint   DEFAULT 0 COMMENT 'Was there any error sending the reminder?',
      `message` text    COMMENT 'Description / text in case there was an error encountered.',
      `repetition_number` int unsigned    COMMENT 'Keeps track of the sequence number of this repetition.',
-     `reference_date` date   DEFAULT NULL COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)' 
+     `reference_date` datetime   DEFAULT NULL COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4467,9 +4474,9 @@ CREATE TABLE `civicrm_address` (
      `location_type_id` int unsigned    COMMENT 'Which Location does this address belong to.',
      `is_primary` tinyint   DEFAULT 0 COMMENT 'Is this the primary address.',
      `is_billing` tinyint   DEFAULT 0 COMMENT 'Is this the billing address.',
-     `street_address` varchar(96)    COMMENT 'Concatenation of all routable street address components (prefix, street number, street name, suffix, unit\n      number OR P.O. Box). Apps should be able to determine physical location with this data (for mapping, mail\n      delivery, etc.).\n    ',
+     `street_address` varchar(96)    COMMENT 'Concatenation of all routable street address components (prefix, street number, street name, suffix, unit\n      number OR P.O. Box). Apps should be able to determine physical location with this data (for mapping, mail\n      delivery, etc.).',
      `street_number` int    COMMENT 'Numeric portion of address number on the street, e.g. For 112A Main St, the street_number = 112.',
-     `street_number_suffix` varchar(8)    COMMENT 'Non-numeric portion of address number on the street, e.g. For 112A Main St, the street_number_suffix = A\n    ',
+     `street_number_suffix` varchar(8)    COMMENT 'Non-numeric portion of address number on the street, e.g. For 112A Main St, the street_number_suffix = A',
      `street_number_predirectional` varchar(8)    COMMENT 'Directional prefix, e.g. SE Main St, SE is the prefix.',
      `street_name` varchar(64)    COMMENT 'Actual street name, excluding St, Dr, Rd, Ave, e.g. For 112 Main St, the street_name = Main.',
      `street_type` varchar(8)    COMMENT 'St, Rd, Dr, etc.',
@@ -4508,6 +4515,10 @@ CREATE TABLE `civicrm_address` (
   )
   ,     INDEX `index_city`(
         city
+  )
+  ,     INDEX `index_geo_code_1_geo_code_2`(
+        geo_code_1
+      , geo_code_2
   )
   
 ,          CONSTRAINT FK_civicrm_address_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_address_county_id FOREIGN KEY (`county_id`) REFERENCES `civicrm_county`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_address_state_province_id FOREIGN KEY (`state_province_id`) REFERENCES `civicrm_state_province`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_address_country_id FOREIGN KEY (`country_id`) REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_address_master_id FOREIGN KEY (`master_id`) REFERENCES `civicrm_address`(`id`) ON DELETE SET NULL  
@@ -4850,7 +4861,7 @@ CREATE TABLE `civicrm_participant` (
      `role_id` varchar(128)   DEFAULT NULL COMMENT 'Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.',
      `register_date` datetime    COMMENT 'When did contact register for event?',
      `source` varchar(128)    COMMENT 'Source of this event registration.',
-     `fee_level` text    COMMENT 'Populate with the label (text) associated with a fee level for paid events with multiple levels. Note that\n      we store the label value and not the key\n    ',
+     `fee_level` text    COMMENT 'Populate with the label (text) associated with a fee level for paid events with multiple levels. Note that\n      we store the label value and not the key',
      `is_test` tinyint   DEFAULT 0 ,
      `is_pay_later` tinyint   DEFAULT 0 ,
      `fee_amount` decimal(20,2)    COMMENT 'actual processor fee if known - may be 0.',

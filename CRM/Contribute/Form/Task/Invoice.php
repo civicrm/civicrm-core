@@ -43,7 +43,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * Are we operating in "single mode", i.e. updating the task of only
    * one specific contribution?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 
@@ -94,9 +94,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       parent::preProcess();
     }
 
-    // check that all the contribution ids have status Completed, Pending, Refunded.
+    // check that all the contribution ids have status Completed, Pending, Refunded, or Partially Paid.
     $this->_contributionStatusId = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $status = ['Completed', 'Pending', 'Refunded'];
+    $status = ['Completed', 'Pending', 'Refunded', 'Partially paid'];
     $statusId = [];
     foreach ($this->_contributionStatusId as $key => $value) {
       if (in_array($value, $status)) {
@@ -107,7 +107,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $query = "SELECT count(*) FROM civicrm_contribution WHERE contribution_status_id NOT IN ($Id) AND {$this->_componentClause}";
     $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count != 0) {
-      CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Refunded status.'));
+      CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Refunded, or Partially Paid status.'));
     }
 
     // we have all the contribution ids, so now we get the contact ids
@@ -301,13 +301,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $invoiceDate = date("F j, Y");
       $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $prefixValue['due_date'] . "" . $prefixValue['due_date_period']));
 
-      if ($input['component'] == 'contribute') {
-        $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribID);
-      }
-      else {
-        $eid = $contribution->_relatedObjects['participant']->id;
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, 'participant', NULL, TRUE, FALSE, TRUE);
-      }
+      $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribID);
 
       $resultPayments = civicrm_api3('Payment', 'get', [
         'sequential' => 1,

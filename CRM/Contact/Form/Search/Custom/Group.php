@@ -153,11 +153,12 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param NULL $sort
+   * @param string $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *
    * @return string
+   * @throws \Exception
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
@@ -587,10 +588,11 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param NULL $sort
+   * @param string $sort
    * @param bool $returnSQL
    *
    * @return string
+   * @throws \Exception
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);

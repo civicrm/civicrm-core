@@ -84,7 +84,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
       // when we come from a form which displays all the location elements (like the edit form or the inline block
       // elements, we can skip the below check. The below check adds quite a feq queries to an already overloaded
       // form
-      if (!CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE)) {
+      if (empty($params['updateBlankLocInfo'])) {
         // make sure contact should have only one primary block, CRM-5051
         self::checkPrimaryBlocks(CRM_Utils_Array::value('contact_id', $params));
       }
@@ -211,7 +211,6 @@ WHERE e.id = %1";
         $dao->id = $id;
         $dao->find(TRUE);
         $dao->delete();
-        $dao->free();
       }
     }
   }
@@ -314,6 +313,7 @@ WHERE e.id = %1";
    *   newly created/updated location block id.
    */
   public static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function which will be removed');
     //get the location info.
     $defaults = $updateValues = [];
     $locBlock = ['id' => $locBlockId];
@@ -345,7 +345,7 @@ WHERE e.id = %1";
       }
     }
 
-    $copyLocation = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_LocBlock',
+    $copyLocation = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_LocBlock',
       ['id' => $locBlock['id']],
       $copyLocationParams
     );

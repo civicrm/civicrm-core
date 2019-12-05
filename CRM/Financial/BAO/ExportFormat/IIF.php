@@ -286,7 +286,6 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
               'currency' => $this->format($itemDAO->currency),
             ];
           } // end items loop
-          $itemDAO->free();
         }
         else {
           // In this case, split record just uses the FROM account from the trxn, and there's only one record here

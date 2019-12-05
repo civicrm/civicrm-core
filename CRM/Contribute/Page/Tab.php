@@ -33,14 +33,22 @@
 class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen.
+   * The permission we have on this contact
    *
-   * @var array
+   * @var string
    */
-  public static $_links = NULL;
-  public static $_recurLinks = NULL;
   public $_permission = NULL;
+
+  /**
+   * The contact ID for the contributions we are acting on
+   * @var int
+   */
   public $_contactId = NULL;
+
+  /**
+   * The recurring contribution ID (if any)
+   * @var int
+   */
   public $_crid = NULL;
 
   /**
@@ -55,59 +63,56 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    *
    * @return array
    */
-  public static function &recurLinks($recurID = FALSE, $context = 'contribution') {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::VIEW => [
-          'name' => ts('View'),
-          'title' => ts('View Recurring Payment'),
-          'url' => 'civicrm/contact/view/contributionrecur',
-          'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
-        ],
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'title' => ts('Edit Recurring Payment'),
-          'url' => 'civicrm/contribute/updaterecur',
-          'qs' => "reset=1&action=update&crid=%%crid%%&cid=%%cid%%&context={$context}",
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Cancel'),
-          'title' => ts('Cancel'),
-          'ref' => 'crm-enable-disable',
-        ],
-      ];
-    }
+  public static function recurLinks($recurID = FALSE, $context = 'contribution') {
+    $links = [
+      CRM_Core_Action::VIEW => [
+        'name' => ts('View'),
+        'title' => ts('View Recurring Payment'),
+        'url' => 'civicrm/contact/view/contributionrecur',
+        'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
+      ],
+      CRM_Core_Action::UPDATE => [
+        'name' => ts('Edit'),
+        'title' => ts('Edit Recurring Payment'),
+        'url' => 'civicrm/contribute/updaterecur',
+        'qs' => "reset=1&action=update&crid=%%crid%%&cid=%%cid%%&context={$context}",
+      ],
+      CRM_Core_Action::DISABLE => [
+        'name' => ts('Cancel'),
+        'title' => ts('Cancel'),
+        'ref' => 'crm-enable-disable',
+      ],
+    ];
 
     if ($recurID) {
-      $links = self::$_links;
       $paymentProcessorObj = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorObject($recurID);
-      if (!$paymentProcessorObj) {
+      if ($paymentProcessorObj) {
+        if ($paymentProcessorObj->supports('cancelRecurring')) {
+          unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
+          $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
+          $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
+        }
+
+        if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
+          $links[CRM_Core_Action::RENEW] = [
+            'name' => ts('Change Billing Details'),
+            'title' => ts('Change Billing Details'),
+            'url' => 'civicrm/contribute/updatebilling',
+            'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
+          ];
+        }
+
+        if (!$paymentProcessorObj->supports('ChangeSubscriptionAmount') && !$paymentProcessorObj->supports('EditRecurringContribution')) {
+          unset($links[CRM_Core_Action::UPDATE]);
+        }
+      }
+      else {
         unset($links[CRM_Core_Action::DISABLE]);
         unset($links[CRM_Core_Action::UPDATE]);
-        return $links;
       }
-      if ($paymentProcessorObj->supports('cancelRecurring')) {
-        unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
-        $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
-        $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
-      }
-
-      if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
-        $links[CRM_Core_Action::RENEW] = [
-          'name' => ts('Change Billing Details'),
-          'title' => ts('Change Billing Details'),
-          'url' => 'civicrm/contribute/updatebilling',
-          'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
-        ];
-      }
-
-      if (!$paymentProcessorObj->supports('ChangeSubscriptionAmount') && !$paymentProcessorObj->supports('EditRecurringContribution')) {
-        unset($links[CRM_Core_Action::UPDATE]);
-      }
-      return $links;
     }
 
-    return self::$_links;
+    return $links;
   }
 
   /**
@@ -196,7 +201,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * Loads active recurring contributions for the current contact and formats
    * them to be used on the form.
    *
-   * @return array;
+   * @return array
    */
   private function getActiveRecurringContributions() {
     try {
@@ -218,7 +223,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * Loads inactive recurring contributions for the current contact and formats
    * them to be used on the form.
    *
-   * @return array;
+   * @return array
    */
   private function getInactiveRecurringContributions() {
     try {
@@ -239,7 +244,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   /**
    * @param $recurContributions
    *
-   * @return mixed
+   * @return array
    */
   private function buildRecurringContributionsArray($recurContributions) {
     $liveRecurringContributionCount = 0;
@@ -327,6 +332,10 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function preProcess() {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
@@ -361,7 +370,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
    *
-   * @return null
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function run() {
     $this->preProcess();
@@ -381,9 +391,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $this->browse();
     }
 
-    return parent::run();
+    parent::run();
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setContext() {
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric',

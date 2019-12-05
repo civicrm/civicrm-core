@@ -3,7 +3,7 @@
  * @package php-svg-lib
  * @link    http://github.com/PhenX/php-svg-lib
  * @author  Fabien M�nager <fabien.menager@gmail.com>
- * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
  */
 
 namespace Svg;
@@ -302,7 +302,7 @@ class Style
 
             if ($percent) {
                 if ($triplet[$c][strlen($triplet[$c]) - 1] === "%") {
-                    $triplet[$c] = $triplet[$c] / 100;
+                    $triplet[$c] = floatval($triplet[$c]) / 100;
                 }
                 else {
                     $triplet[$c] = $triplet[$c] / 255;
@@ -310,7 +310,7 @@ class Style
             }
             else {
                 if ($triplet[$c][strlen($triplet[$c]) - 1] === "%") {
-                    $triplet[$c] = round($triplet[$c] * 2.55);
+                    $triplet[$c] = round(floatval($triplet[$c]) * 2.55);
                 }
             }
         }

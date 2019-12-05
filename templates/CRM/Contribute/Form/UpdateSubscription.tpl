@@ -52,7 +52,9 @@
     {/if}
   </table>
 
-  {include file="CRM/common/customDataBlock.tpl"}
+  {if !$self_service}
+    {include file="CRM/common/customDataBlock.tpl"}
+  {/if}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

@@ -22,7 +22,7 @@ class CiviEnvBuilder {
   private $steps = [];
 
   /**
-   * @var string|NULL
+   * @var string|null
    *   A digest of the values in $steps.
    */
   private $targetSignature = NULL;

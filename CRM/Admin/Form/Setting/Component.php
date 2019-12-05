@@ -37,26 +37,15 @@
 class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   protected $_components;
 
+  protected $_settings = [
+    'enable_components' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+  ];
+
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Settings - Enable Components'));
-    $components = $this->_getComponentSelectValues();
-    $include = &$this->addElement('advmultiselect', 'enableComponents',
-      ts('Components') . ' ', $components,
-      [
-        'size' => 5,
-        'style' => 'width:150px',
-        'class' => 'advmultiselect',
-      ]
-    );
-
-    $include->setButtonAttributes('add', ['value' => ts('Enable >>')]);
-    $include->setButtonAttributes('remove', ['value' => ts('<< Disable')]);
-
     $this->addFormRule(['CRM_Admin_Form_Setting_Component', 'formRule'], $this);
-
     parent::buildQuickForm();
   }
 
@@ -76,98 +65,20 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   public static function formRule($fields, $files, $options) {
     $errors = [];
 
-    if (array_key_exists('enableComponents', $fields) && is_array($fields['enableComponents'])) {
-      if (in_array('CiviPledge', $fields['enableComponents']) &&
-        !in_array('CiviContribute', $fields['enableComponents'])
+    if (array_key_exists('enable_components', $fields) && is_array($fields['enable_components'])) {
+      if (!empty($fields['enable_components']['CiviPledge']) &&
+        empty($fields['enable_components']['CiviContribute'])
       ) {
-        $errors['enableComponents'] = ts('You need to enable CiviContribute before enabling CiviPledge.');
+        $errors['enable_components'] = ts('You need to enable CiviContribute before enabling CiviPledge.');
       }
-      if (in_array('CiviCase', $fields['enableComponents']) &&
+      if (!empty($fields['enable_components']['CiviCase']) &&
         !CRM_Core_DAO::checkTriggerViewPermission(TRUE, FALSE)
       ) {
-        $errors['enableComponents'] = ts('CiviCase requires CREATE VIEW and DROP VIEW permissions for the database.');
+        $errors['enable_components'] = ts('CiviCase requires CREATE VIEW and DROP VIEW permissions for the database.');
       }
     }
 
     return $errors;
-  }
-
-  /**
-   * @return array
-   */
-  private function _getComponentSelectValues() {
-    $ret = [];
-    $this->_components = CRM_Core_Component::getComponents();
-    foreach ($this->_components as $name => $object) {
-      $ret[$name] = $object->info['translatedName'];
-    }
-
-    return $ret;
-  }
-
-  public function postProcess() {
-    $params = $this->controller->exportValues($this->_name);
-
-    parent::commonProcess($params);
-
-    // reset navigation when components are enabled / disabled
-    CRM_Core_BAO_Navigation::resetNavigation();
-  }
-
-  /**
-   * Load case sample data.
-   *
-   * @param string $fileName
-   * @param bool $lineMode
-   */
-  public static function loadCaseSampleData($fileName, $lineMode = FALSE) {
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $multiLingual = (bool) $domain->locales;
-    $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('multilingual', $multiLingual);
-    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
-
-    if (!$lineMode) {
-
-      $string = $smarty->fetch($fileName);
-      // change \r\n to fix windows issues
-      $string = str_replace("\r\n", "\n", $string);
-
-      //get rid of comments starting with # and --
-
-      $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
-      $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
-
-      $queries = preg_split('/;$/m', $string);
-      foreach ($queries as $query) {
-        $query = trim($query);
-        if (!empty($query)) {
-          $res = &$db->query($query);
-          if (PEAR::isError($res)) {
-            die("Cannot execute $query: " . $res->getMessage());
-          }
-        }
-      }
-    }
-    else {
-      $fd = fopen($fileName, "r");
-      while ($string = fgets($fd)) {
-        $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
-        $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
-
-        $string = trim($string);
-        if (!empty($string)) {
-          $res = &$db->query($string);
-          if (PEAR::isError($res)) {
-            die("Cannot execute $string: " . $res->getMessage());
-          }
-        }
-      }
-    }
   }
 
 }

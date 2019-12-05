@@ -38,40 +38,46 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   private $isBuilt = FALSE;
 
   /**
-   * @var array(string)
+   * All Modules.
+   *
+   * @var string[]
    */
   private $allModules = NULL;
 
   /**
-   * @var array(string)
+   * CiviCRM Modules.
+   *
+   * @var string[]
    */
   private $civiModules = NULL;
 
   /**
-   * @var array(string)
+   * Drupal modules.
+   *
+   * @var string[]
    */
   private $drupalModules = NULL;
 
   /**
-   * @see CRM_Utils_Hook::invoke()
-   *
    * @param int $numParams
    *   Number of parameters to pass to the hook.
-   * @param unknown $arg1
+   * @param mixed $arg1
    *   Parameter to be passed to the hook.
-   * @param unknown $arg2
+   * @param mixed $arg2
    *   Parameter to be passed to the hook.
-   * @param unknown $arg3
+   * @param mixed $arg3
    *   Parameter to be passed to the hook.
-   * @param unknown $arg4
+   * @param mixed $arg4
    *   Parameter to be passed to the hook.
-   * @param unknown $arg5
+   * @param mixed $arg5
    *   Parameter to be passed to the hook.
    * @param mixed $arg6
    * @param string $fnSuffix
    *   Function suffix, this is effectively the hook name.
    *
    * @return array|bool
+   * @throws \Exception
+   * @see CRM_Utils_Hook::invoke()
    */
   public function invokeViaUF(
     $numParams,

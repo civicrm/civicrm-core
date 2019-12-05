@@ -73,14 +73,14 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -341,8 +341,10 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
+
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = [
+      $isMultiLingual = CRM_Core_I18n::isMultiLingual();
+      $headers = [
         ['desc' => ts('Contact Type')],
         [
           'name' => ts('Name'),
@@ -359,11 +361,17 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
           'sort' => 'mailing_name',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
-        [
+      ];
+
+      // Check to see if languages column should be displayed.
+      if ($isMultiLingual) {
+        $headers[] = [
           'name' => ts('Language'),
           'sort' => 'language',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ],
+        ];
+      }
+      self::$_columnHeaders = array_merge($headers, [
         [
           'name' => ts('Mailing Subject'),
           'sort' => 'mailing_subject',
@@ -380,7 +388,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         ['desc' => ts('Actions')],
-      ];
+      ]);
     }
     return self::$_columnHeaders;
   }

@@ -43,12 +43,14 @@ class CRM_Case_XMLRepository {
   protected $xml = [];
 
   /**
-   * @var array|NULL
+   * @var array|null
    */
   protected $hookCache = NULL;
 
   /**
-   * @var array|NULL symbolic names of case-types
+   * Symbolic names of case-types.
+   *
+   * @var array|null
    */
   protected $allCaseTypes = NULL;
 
@@ -256,6 +258,8 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Relationships are straight from XML, described from perspective of non-client
+   *
    * @return array<string> symbolic-names of relationship-types
    */
   public function getAllDeclaredRelationshipTypes() {

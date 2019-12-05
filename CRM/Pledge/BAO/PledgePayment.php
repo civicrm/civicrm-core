@@ -306,7 +306,6 @@ WHERE     pledge_id = %1
       $pledgeStatusID = self::calculatePledgeStatus($pledgeID);
       CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_Pledge', $pledgeID, 'status_id', $pledgeStatusID);
 
-      $payment->free();
     }
 
     $transaction->commit();

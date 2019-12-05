@@ -73,6 +73,9 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
+    CRM_Financial_Form_Payment::addCreditCardJs($form->getPaymentProcessorID());
+    $form->assign('paymentProcessorID', $form->getPaymentProcessorID());
+
     $form->assign('currency', $form->getCurrency());
 
     // also set cancel subscription url

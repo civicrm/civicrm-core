@@ -40,7 +40,7 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
    * Are we operating in "single mode", i.e. sending sms to one
    * specific contact?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 

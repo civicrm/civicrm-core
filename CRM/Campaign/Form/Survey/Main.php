@@ -104,7 +104,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       if (!empty($defaults['result_id']) && !empty($defaults['recontact_interval'])) {
 
         $resultId = $defaults['result_id'];
-        $recontactInterval = unserialize($defaults['recontact_interval']);
+        $recontactInterval = CRM_Utils_String::unserialize($defaults['recontact_interval']);
 
         unset($defaults['recontact_interval']);
         $defaults['option_group_id'] = $resultId;

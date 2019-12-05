@@ -270,8 +270,9 @@ class Table extends AbstractFrameReflower
                     $columns[$i]["percent"] *= $scale;
                     $w = min($columns[$i]["percent"] * $remaining_width / 100, $slack);
 
-                    if ($w < $columns[$i]["min-width"])
+                    if ($w < $columns[$i]["min-width"]) {
                         $w = $columns[$i]["min-width"];
+                    }
 
                     $columns[$i]["used-width"] = $w;
                     $used_width += $w;
@@ -446,7 +447,7 @@ class Table extends AbstractFrameReflower
             $style->margin_right = sprintf("%Fpt", $right);;
         } else {
             if ($left === "auto") {
-                $left = (float)$style->length_in_pt($cb["w"] - $right - $width, $cb["w"]);
+                $left = (float)$style->length_in_pt($cb["w"], $cb["w"]) - (float)$style->length_in_pt($right, $cb["w"]) - (float)$style->length_in_pt($width, $cb["w"]);
             }
             if ($right === "auto") {
                 $left = (float)$style->length_in_pt($left, $cb["w"]);

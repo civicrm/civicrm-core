@@ -137,9 +137,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     // set all other defaults to false.
     if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_membership_status SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query,
-        CRM_Core_DAO::$_nullArray
-      );
+      CRM_Core_DAO::executeQuery($query);
     }
 
     // action is taken depending upon the mode

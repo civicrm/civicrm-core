@@ -105,7 +105,6 @@ abstract class SelectQuery {
     $this->apiFieldSpec = $this->getFields();
 
     $this->query = \CRM_Utils_SQL_Select::from($bao->tableName() . ' ' . self::MAIN_TABLE_ALIAS);
-    $bao->free();
 
     // Add ACLs first to avoid redundant subclauses
     $this->checkPermissions = $checkPermissions;
@@ -145,7 +144,6 @@ abstract class SelectQuery {
 
     while ($result_dao->fetch()) {
       if (in_array('count_rows', $this->select)) {
-        $result_dao->free();
         return (int) $result_dao->c;
       }
       $result_entities[$result_dao->id] = [];
@@ -166,7 +164,6 @@ abstract class SelectQuery {
         }
       };
     }
-    $result_dao->free();
     return $result_entities;
   }
 
@@ -236,6 +233,12 @@ abstract class SelectQuery {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
+
+      // Skip if we don't have permission to access this field
+      if ($this->checkPermissions && !empty($fieldInfo['permission']) && !\CRM_Core_Permission::check($fieldInfo['permission'])) {
+        return NULL;
+      }
+
       $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
       $tableAlias = implode('_to_', $subStack) . "_to_$fkTable";
 

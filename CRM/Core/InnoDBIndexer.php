@@ -101,9 +101,13 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * @var array (string $table => array $indices)
+   * Indices.
+   *
+   * (string $table => array $indices)
    *
    * ex: $indices['civicrm_contact'][0] = array('first_name', 'last_name');
+   *
+   * @var array
    */
   protected $indices;
 
@@ -115,8 +119,8 @@ class CRM_Core_InnoDBIndexer {
   /**
    * Class constructor.
    *
-   * @param $isActive
-   * @param $indices
+   * @param bool $isActive
+   * @param array $indices
    */
   public function __construct($isActive, $indices) {
     $this->isActive = $isActive;

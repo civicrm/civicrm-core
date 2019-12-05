@@ -49,6 +49,12 @@
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
         CRM.utils.copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled', 'aria-label']);
         $dateField.addClass('crm-form-' + type);
+        if (!settings.minDate && !_.isUndefined(settings.start_date_years)) {
+          settings.minDate = '' + (new Date().getFullYear() - settings.start_date_years) + '-01-01';
+        }
+        if (!settings.maxDate && !_.isUndefined(settings.end_date_years)) {
+          settings.maxDate = '' + (new Date().getFullYear() + settings.end_date_years) + '-12-31';
+        }
         if (hasDatepicker) {
           settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
           settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;

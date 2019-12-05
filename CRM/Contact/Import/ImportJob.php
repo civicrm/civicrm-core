@@ -416,7 +416,7 @@ class CRM_Contact_Import_ImportJob {
     $result = CRM_Core_DAO::executeQuery($query, array($database));
     $incompleteImportTables = array();
     while ($importTable = $result->fetch()) {
-      if (!$this->isComplete($importTable)) {
+      if (!self::isComplete($importTable)) {
         $incompleteImportTables[] = $importTable;
       }
     }

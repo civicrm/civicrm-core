@@ -33,7 +33,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
   /**
    * Exported parameters from the form.
    *
-   * @var array.
+   * @var array
    */
   protected $params;
 
@@ -80,7 +80,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
     $this->assign('searchCount', $searchCount);
     $this->assign('searchDone', $this->get('searchDone'));
-    $this->assign('contact_type_display', ts($contactType));
+    $this->assign('contact_type_display', $contactType);
     $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), ['class' => 'crm-form-submit']);
     $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), ['class' => 'crm-form-submit']);
     $this->addButtons([

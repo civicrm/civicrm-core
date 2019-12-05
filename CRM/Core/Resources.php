@@ -64,37 +64,55 @@ class CRM_Core_Resources {
   private $strings = NULL;
 
   /**
-   * @var array free-form data tree
+   * Settings in free-form data tree.
+   *
+   * @var array
    */
   protected $settings = [];
   protected $addedSettings = FALSE;
 
   /**
-   * @var array of callables
+   * Setting factories.
+   *
+   * @var callable[]
    */
   protected $settingsFactories = [];
 
   /**
-   * @var array ($regionName => bool)
+   * Added core resources.
+   *
+   * Format is ($regionName => bool).
+   *
+   * @var array
    */
   protected $addedCoreResources = [];
 
   /**
-   * @var array ($regionName => bool)
+   * Added core styles.
+   *
+   * Format is ($regionName => bool).
+   *
+   * @var array
    */
   protected $addedCoreStyles = [];
 
   /**
-   * @var string a value to append to JS/CSS URLs to coerce cache resets
+   * A value to append to JS/CSS URLs to coerce cache resets.
+   *
+   * @var string
    */
   protected $cacheCode = NULL;
 
   /**
-   * @var string the name of a setting which persistently stores the cacheCode
+   * The name of a setting which persistently stores the cacheCode.
+   *
+   * @var string
    */
   protected $cacheCodeKey = NULL;
 
   /**
+   * Are ajax popup screens enabled.
+   *
    * @var bool
    */
   public $ajaxPopupsEnabled;
@@ -109,6 +127,7 @@ class CRM_Core_Resources {
    *
    * @param CRM_Core_Resources $instance
    *   New copy of the manager.
+   *
    * @return CRM_Core_Resources
    */
   public static function singleton(CRM_Core_Resources $instance = NULL) {
@@ -185,14 +204,15 @@ class CRM_Core_Resources {
    *   - string: Load translated strings. Use a specific domain.
    *
    * @return CRM_Core_Resources
+   * @throws \Exception
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
       $domain = ($translate === TRUE) ? $ext : $translate;
       $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
     }
-    $this->resolveFileName($file, $ext);
-    return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
+    $url = $this->getUrl($ext, $this->filterMinify($ext, $file), TRUE);
+    return $this->addScriptUrl($url, $weight, $region);
   }
 
   /**
@@ -371,7 +391,7 @@ class CRM_Core_Resources {
    * And from javascript access it at CRM.myNamespace.myString
    *
    * @param string|array $text
-   * @param string|NULL $domain
+   * @param string|null $domain
    * @return CRM_Core_Resources
    */
   public function addString($text, $domain = 'civicrm') {
@@ -407,8 +427,12 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    $this->resolveFileName($file, $ext);
-    return $this->addStyleUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
+    /** @var Civi\Core\Themes $theme */
+    $theme = Civi::service('themes');
+    foreach ($theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file) as $url) {
+      $this->addStyleUrl($url, $weight, $region);
+    }
+    return $this;
   }
 
   /**
@@ -459,7 +483,7 @@ class CRM_Core_Resources {
    *
    * @param string $ext
    *   extension name; use 'civicrm' for core.
-   * @param string|NULL $file
+   * @param string|null $file
    *   file path -- relative to the extension base dir.
    *
    * @return bool|string
@@ -765,9 +789,13 @@ class CRM_Core_Resources {
       $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
       $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
       $items[] = 'js/crm.menubar.js';
+      // @see CRM_Core_Resources::renderMenubarStylesheet
       $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css', [
-        'color' => Civi::settings()->get('menubar_color'),
+        'menubarColor' => Civi::settings()->get('menubar_color'),
+        'height' => 40,
+        'breakpoint' => 768,
       ]);
+      // Variables for crm.menubar.js
       $items[] = [
         'menubar' => [
           'position' => $position,
@@ -821,8 +849,8 @@ class CRM_Core_Resources {
     ) {
       return TRUE;
     }
-    $url = CRM_Utils_System::getUrlPath();
-    return (strpos($url, 'civicrm/ajax') === 0) || (strpos($url, 'civicrm/angular') === 0);
+    list($arg0, $arg1) = array_pad(explode('/', CRM_Utils_System::getUrlPath()), 2, '');
+    return ($arg0 === 'civicrm' && in_array($arg1, ['ajax', 'angularprofiles', 'asset']));
   }
 
   /**
@@ -834,7 +862,7 @@ class CRM_Core_Resources {
       return;
     }
     $e->mimeType = 'text/css';
-    $e->content = '';
+    $content = '';
     $config = CRM_Core_Config::singleton();
     $cms = strtolower($config->userFramework);
     $cms = $cms === 'drupal' ? 'drupal7' : $cms;
@@ -844,23 +872,23 @@ class CRM_Core_Resources {
       "css/menubar-$cms.css",
     ];
     foreach ($items as $item) {
-      $e->content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
+      $content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
     }
-    $color = $e->params['color'];
-    if (!CRM_Utils_Rule::color($color)) {
-      $color = Civi::settings()->getDefault('menubar_color');
-    }
+    $params = $e->params;
+    // "color" is deprecated in favor of the more specific "menubarColor"
+    $menubarColor = $params['color'] ?? $params['menubarColor'];
     $vars = [
-      'resourceBase' => rtrim($config->resourceBase, '/'),
-      'menubarColor' => $color,
-      'semiTransparentMenuColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ', .85)',
-      'highlightColor' => CRM_Utils_Color::getHighlight($color),
-      'textColor' => CRM_Utils_Color::getContrast($color, '#333', '#ddd'),
+      '$resourceBase' => rtrim($config->resourceBase, '/'),
+      '$menubarHeight' => $params['height'] . 'px',
+      '$breakMin' => $params['breakpoint'] . 'px',
+      '$breakMax' => ($params['breakpoint'] - 1) . 'px',
+      '$menubarColor' => $menubarColor,
+      '$menuItemColor' => $params['menuItemColor'] ?? 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($menubarColor)) . ", .9)",
+      '$highlightColor' => $params['highlightColor'] ?? CRM_Utils_Color::getHighlight($menubarColor),
+      '$textColor' => $params['textColor'] ?? CRM_Utils_Color::getContrast($menubarColor, '#333', '#ddd'),
     ];
-    $vars['highlightTextColor'] = CRM_Utils_Color::getContrast($vars['highlightColor'], '#333', '#ddd');
-    foreach ($vars as $var => $val) {
-      $e->content = str_replace('$' . $var, $val, $e->content);
-    }
+    $vars['$highlightTextColor'] = $params['highlightTextColor'] ?? CRM_Utils_Color::getContrast($vars['$highlightColor'], '#333', '#ddd');
+    $e->content = str_replace(array_keys($vars), array_values($vars), $content);
   }
 
   /**
@@ -905,24 +933,28 @@ class CRM_Core_Resources {
       }
     }
 
-    CRM_Utils_Hook::entityRefFilters($data['filters']);
+    CRM_Utils_Hook::entityRefFilters($data['filters'], $data['links']);
 
     return $data;
   }
 
   /**
-   * In debug mode, look for a non-minified version of this file
+   * Determine the minified file name.
    *
-   * @param string $fileName
-   * @param string $extName
+   * @param string $ext
+   * @param string $file
+   * @return string
+   *   An updated $fileName. If a minified version exists and is supported by
+   *   system policy, the minified version will be returned. Otherwise, the original.
    */
-  private function resolveFileName(&$fileName, $extName) {
-    if (CRM_Core_Config::singleton()->debug && strpos($fileName, '.min.') !== FALSE) {
-      $nonMiniFile = str_replace('.min.', '.', $fileName);
-      if ($this->getPath($extName, $nonMiniFile)) {
-        $fileName = $nonMiniFile;
+  public function filterMinify($ext, $file) {
+    if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.') !== FALSE) {
+      $nonMiniFile = str_replace('.min.', '.', $file);
+      if ($this->getPath($ext, $nonMiniFile)) {
+        $file = $nonMiniFile;
       }
     }
+    return $file;
   }
 
   /**

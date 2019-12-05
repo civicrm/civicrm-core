@@ -56,7 +56,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     if (!$q) {
       return NULL;
     }
-    $q->free();
 
     $delivered = new CRM_Mailing_Event_BAO_Delivered();
     $delivered->time_stamp = date('YmdHis');
@@ -164,7 +163,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = 0
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $delivered = self::getTableName();
     $bounce = CRM_Mailing_Event_BAO_Bounce::getTableName();
@@ -281,7 +280,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Consider mailings that were completed not more than $maxDays ago.
    */
   public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $query = "
 CREATE TEMPORARY TABLE civicrm_email_temp_values (

@@ -200,7 +200,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    *   The API action (e.g. "create").
    * @param string $entityTable
    *   The target entity table (e.g. "civicrm_mailing").
-   * @param int|NULL $entityId
+   * @param int|null $entityId
    *   The target entity ID.
    * @param array $apiRequest
    *   The full API request.

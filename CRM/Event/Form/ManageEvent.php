@@ -45,14 +45,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * Is this the first page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_first = FALSE;
 
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single;
 
@@ -60,13 +60,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
    * Are we actually managing an event template?
-   * @var boolean
+   * @var bool
    */
   protected $_isTemplate = FALSE;
 
   /**
-   * Pre-populate fields based on this template event_id
-   * @var integer
+   * Pre-populate fields based on this template event_id.
+   *
+   * @var int
    */
   protected $_templateId;
 
@@ -97,6 +98,21 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    */
   public function getDefaultContext() {
     return 'create';
+  }
+
+  /**
+   * Set the active tab
+   *
+   * @param string $default
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function setSelectedChild($default = NULL) {
+    $selectedChild = CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, $default);
+    if (!empty($selectedChild)) {
+      $this->set('selectedChild', $selectedChild);
+      $this->assign('selectedChild', $selectedChild);
+    }
   }
 
   /**
@@ -155,33 +171,21 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->assign('isTemplate', $this->_isTemplate);
 
+    // Set "Manage Event" Title
+    $title = NULL;
     if ($this->_id) {
       if ($this->_isTemplate) {
-        $title = CRM_Utils_Array::value('template_title', $eventInfo);
-        CRM_Utils_System::setTitle(ts('Edit Event Template') . " - $title");
+        $title = ts('Edit Event Template') . ' - ' . CRM_Utils_Array::value('template_title', $eventInfo);
       }
       else {
-        $configureText = ts('Configure Event');
-        $title = CRM_Utils_Array::value('title', $eventInfo);
-        //If it is a repeating event change title
-        if ($this->_isRepeatingEvent) {
-          $configureText = 'Configure Repeating Event';
-        }
-        CRM_Utils_System::setTitle($configureText . " - $title");
+        $configureText = $this->_isRepeatingEvent ? ts('Configure Repeating Event') : ts('Configure Event');
+        $title = $configureText . ' - ' . CRM_Utils_Array::value('title', $eventInfo);
       }
-      $this->assign('title', $title);
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
-      if ($this->_isTemplate) {
-        $title = ts('New Event Template');
-        CRM_Utils_System::setTitle($title);
-      }
-      else {
-        $title = ts('New Event');
-        CRM_Utils_System::setTitle($title);
-      }
-      $this->assign('title', $title);
+      $title = $this->_isTemplate ? ts('New Event Template') : ts('New Event');
     }
+    $this->setTitle($title);
 
     if (CRM_Core_Permission::check('view event participants') &&
       CRM_Core_Permission::check('view all contacts')
@@ -270,6 +274,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $defaults['is_template'] = $this->_isTemplate;
       $defaults['template_id'] = $defaults['id'];
       unset($defaults['id']);
+      unset($defaults['start_date']);
+      unset($defaults['end_date']);
     }
     else {
       $defaults['is_active'] = 1;
@@ -377,7 +383,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
         [1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className)]
-      ), ts('Saved'), 'success');
+      ), $this->getTitle(), 'success');
 
       $config = CRM_Core_Config::singleton();
       if (in_array('CiviCampaign', $config->enableComponents)) {

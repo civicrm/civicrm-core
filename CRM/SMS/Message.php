@@ -28,39 +28,45 @@
 class CRM_SMS_Message {
 
   /**
-   * @var String
    * What address is this SMS message coming from.
+   *
+   * @var string
    */
   public $from = '';
 
 
   /**
-   * @var String
    * What address is this SMS message going to.
+   *
+   * @var string
    */
   public $to = '';
 
   /**
-   * @var Integer
-   * Contact ID that is matched to the From address
+   * Contact ID that is matched to the From address.
+   *
+   * @var int
    */
   public $fromContactID = NULL;
 
   /**
-   * @var Integer
-   * Contact ID that is matched to the To address
+   * Contact ID that is matched to the To address.
+   *
+   * @var int
    */
   public $toContactID = NULL;
 
   /**
-   * @var String
-   * Body content of the message
+   * Body content of the message.
+   *
+   * @var string
    */
   public $body = '';
 
   /**
-   * @var Integer
-   * Trackable ID in the system to match to
+   * Trackable ID in the system to match to.
+   *
+   * @var int
    */
   public $trackID = NULL;
 

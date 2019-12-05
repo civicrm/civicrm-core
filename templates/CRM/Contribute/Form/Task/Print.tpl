@@ -53,8 +53,8 @@
         <td class="crm-contribution-thankyou_date">{$row.thankyou_date|truncate:10:''|crmDate}</td>
         <td class="crm-contribution-status crm-contribution-status_{$row.contribution_status_id}">
             {$row.contribution_status_id}<br />
-            {if $row.cancel_date}
-                {$row.cancel_date|truncate:10:''|crmDate}
+            {if $row.contribution_cancel_date}
+                {$row.contribution_cancel_date|truncate:10:''|crmDate}
             {/if}
         </td>
         <td class="crm-contribution-product_name">{$row.product_name}</td>

@@ -73,7 +73,7 @@ class LockManager {
    *
    *   Categories: worker|data|cache|...
    *   Component: core|mailing|member|contribute|...
-   * @param int|NULL $timeout
+   * @param int|null $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.
    * @return LockInterface

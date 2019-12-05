@@ -233,19 +233,22 @@ class CRM_Utils_Type {
    *
    * @return mixed
    *   The data, escaped if necessary.
+   * @throws \Exception
    */
   public static function escape($data, $type, $abort = TRUE) {
     switch ($type) {
       case 'Integer':
       case 'Int':
-        if (CRM_Utils_Rule::integer($data)) {
-          return (int) $data;
-        }
-        break;
-
       case 'Positive':
-        if (CRM_Utils_Rule::positiveInteger($data)) {
-          return (int) $data;
+      case 'Float':
+      case 'Money':
+      case 'Date':
+      case 'Timestamp':
+      case 'ContactReference':
+      case 'MysqlOrderByDirection':
+        $validatedData = self::validate($data, $type, $abort);
+        if (isset($validatedData)) {
+          return $validatedData;
         }
         break;
 
@@ -287,43 +290,10 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'Float':
-      case 'Money':
-        if (CRM_Utils_Rule::numeric($data)) {
-          return $data;
-        }
-        break;
-
       case 'String':
       case 'Memo':
       case 'Text':
-        return CRM_Core_DAO::escapeString($data);
-
-      case 'Date':
-      case 'Timestamp':
-        // a null date or timestamp is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if ((preg_match('/^\d{8}$/', $data) ||
-            preg_match('/^\d{14}$/', $data)
-          ) &&
-          CRM_Utils_Rule::mysqlDate($data)
-        ) {
-          return $data;
-        }
-        break;
-
-      case 'ContactReference':
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if (CRM_Utils_Rule::validContact($data)) {
-          return (int) $data;
-        }
-        break;
+        return CRM_Core_DAO::escapeString(self::validate($data, $type, $abort));
 
       case 'MysqlColumnNameOrAlias':
         if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
@@ -332,12 +302,6 @@ class CRM_Utils_Type {
           $data = '`' . implode('`.`', $parts) . '`';
 
           return $data;
-        }
-        break;
-
-      case 'MysqlOrderByDirection':
-        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
-          return strtolower($data);
         }
         break;
 
@@ -387,6 +351,7 @@ class CRM_Utils_Type {
     // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
+
       CRM_Core_Error::fatal("$data is not of the type $type");
     }
     return NULL;
@@ -456,18 +421,6 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'CommaSeparatedIntegers':
-        if (CRM_Utils_Rule::commaSeparatedIntegers($data)) {
-          return $data;
-        }
-        break;
-
-      case 'Boolean':
-        if (CRM_Utils_Rule::boolean($data)) {
-          return $data;
-        }
-        break;
-
       case 'Float':
       case 'Money':
         if (CRM_Utils_Rule::numeric($data)) {
@@ -482,18 +435,6 @@ class CRM_Utils_Type {
         return $data;
 
       case 'Date':
-        // a null date is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if (preg_match('/^\d{8}$/', $data) &&
-          CRM_Utils_Rule::mysqlDate($data)
-        ) {
-          return $data;
-        }
-        break;
-
       case 'Timestamp':
         // a null timestamp is valid
         if (strlen(trim($data)) == 0) {
@@ -516,13 +457,7 @@ class CRM_Utils_Type {
         }
 
         if (CRM_Utils_Rule::validContact($data)) {
-          return $data;
-        }
-        break;
-
-      case 'MysqlColumnNameOrAlias':
-        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
@@ -532,35 +467,17 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlOrderBy':
-        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
-          return $data;
-        }
-        break;
-
       case 'ExtensionKey':
         if (CRM_Utils_Rule::checkExtensionKeyIsValid($data)) {
           return $data;
         }
         break;
 
-      case 'Json':
-        if (CRM_Utils_Rule::json($data)) {
+      default:
+        $check = lcfirst($type);
+        if (CRM_Utils_Rule::$check($data)) {
           return $data;
         }
-        break;
-
-      case 'Alphanumeric':
-        if (CRM_Utils_Rule::alphanumeric($data)) {
-          return $data;
-        }
-        break;
-
-      case 'Color':
-        if (CRM_Utils_Rule::color($data)) {
-          return $data;
-        }
-        break;
     }
 
     if ($abort) {

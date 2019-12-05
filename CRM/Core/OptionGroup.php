@@ -334,7 +334,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * @deprecated - use CRM_Core_Pseudoconstant::getLabel
+   * @deprecated - use CRM_Core_PseudoConstant::getLabel
    *
    * @param string $groupName
    * @param $value
@@ -416,10 +416,8 @@ WHERE  v.option_group_id = g.id
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
     if ($dao->fetch()) {
-      $dao->free();
       return $dao->value;
     }
-    $dao->free();
     return NULL;
   }
 

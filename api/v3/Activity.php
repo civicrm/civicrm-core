@@ -354,10 +354,11 @@ function civicrm_api3_activity_get($params) {
  */
 function _civicrm_activity_get_handleSourceContactNameOrderBy(&$params, &$options, $sql) {
   $sourceContactID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
-  if (!empty($options['sort']) && in_array($options['sort'], [
+  if (!empty($options['sort'])
+    && in_array($options['sort'], [
       'source_contact_name',
       'source_contact_name desc',
-      'source_contact_name asc'
+      'source_contact_name asc',
     ])) {
     $order = substr($options['sort'], -4) === 'desc' ? 'desc' : 'asc';
     $sql->join(
@@ -805,7 +806,7 @@ function _civicrm_api3_activity_getlist_output($result, $request) {
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']] ? $row[$request['label_field']] : ts('(no subject)'),
         'description' => [
-          CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $row['activity_type_id']),
+          CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $row['activity_type_id']),
         ],
       ];
       if (!empty($row['activity_date_time'])) {

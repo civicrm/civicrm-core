@@ -97,8 +97,8 @@ class WrapperAdapter implements EventSubscriberInterface {
    * @return array<\API_Wrapper>
    */
   public function getWrappers($apiRequest) {
-    if (!isset($apiRequest['wrappers'])) {
-      $apiRequest['wrappers'] = $this->defaults;
+    if (!isset($apiRequest['wrappers']) || is_null($apiRequest['wrappers'])) {
+      $apiRequest['wrappers'] = $apiRequest['version'] < 4 ? $this->defaults : [];
       \CRM_Utils_Hook::apiWrappers($apiRequest['wrappers'], $apiRequest);
     }
     return $apiRequest['wrappers'];

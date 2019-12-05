@@ -33,13 +33,6 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
-   * Array with statuses that mark a recurring contribution as inactive.
-   *
-   * @var array
-   */
-  private static $inactiveStatuses = ['Cancelled', 'Chargeback', 'Refunded', 'Completed'];
-
-  /**
    * Create recurring contribution.
    *
    * @param array $params
@@ -276,15 +269,14 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       'details' => CRM_Utils_Array::value('processor_message', $params),
     ];
 
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $canceledId = array_search('Cancelled', $contributionStatus);
+    $cancelledId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled');
     $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->id = $recurId;
-    $recur->whereAdd("contribution_status_id != $canceledId");
+    $recur->whereAdd("contribution_status_id != $cancelledId");
 
     if ($recur->find(TRUE)) {
       $transaction = new CRM_Core_Transaction();
-      $recur->contribution_status_id = $canceledId;
+      $recur->contribution_status_id = $cancelledId;
       $recur->start_date = CRM_Utils_Date::isoToMysql($recur->start_date);
       $recur->create_date = CRM_Utils_Date::isoToMysql($recur->create_date);
       $recur->modified_date = CRM_Utils_Date::isoToMysql($recur->modified_date);
@@ -292,6 +284,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $recur->cancel_date = date('YmdHis');
       $recur->save();
 
+      // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
       $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);
       if ($dao && $dao->recur_id) {
         $details = CRM_Utils_Array::value('details', $activityParams);
@@ -333,51 +326,13 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     else {
       // if already cancelled, return true
       $recur->whereAdd();
-      $recur->whereAdd("contribution_status_id = $canceledId");
+      $recur->whereAdd("contribution_status_id = $cancelledId");
       if ($recur->find(TRUE)) {
         return TRUE;
       }
     }
 
     return FALSE;
-  }
-
-  /**
-   * @deprecated Get list of recurring contribution of contact Ids.
-   *
-   * @param int $contactId
-   *   Contact ID.
-   *
-   * @return array
-   *   list of recurring contribution fields
-   *
-   */
-  public static function getRecurContributions($contactId) {
-    CRM_Core_Error::deprecatedFunctionWarning('ContributionRecur.get API instead');
-    $params = [];
-    $recurDAO = new CRM_Contribute_DAO_ContributionRecur();
-    $recurDAO->contact_id = $contactId;
-    $recurDAO->find();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-
-    while ($recurDAO->fetch()) {
-      $params[$recurDAO->id]['id'] = $recurDAO->id;
-      $params[$recurDAO->id]['contactId'] = $recurDAO->contact_id;
-      $params[$recurDAO->id]['start_date'] = $recurDAO->start_date;
-      $params[$recurDAO->id]['end_date'] = $recurDAO->end_date;
-      $params[$recurDAO->id]['next_sched_contribution_date'] = $recurDAO->next_sched_contribution_date;
-      $params[$recurDAO->id]['amount'] = $recurDAO->amount;
-      $params[$recurDAO->id]['currency'] = $recurDAO->currency;
-      $params[$recurDAO->id]['frequency_unit'] = $recurDAO->frequency_unit;
-      $params[$recurDAO->id]['frequency_interval'] = $recurDAO->frequency_interval;
-      $params[$recurDAO->id]['installments'] = $recurDAO->installments;
-      $params[$recurDAO->id]['contribution_status_id'] = $recurDAO->contribution_status_id;
-      $params[$recurDAO->id]['contribution_status'] = CRM_Utils_Array::value($recurDAO->contribution_status_id, $contributionStatus);
-      $params[$recurDAO->id]['is_test'] = $recurDAO->is_test;
-      $params[$recurDAO->id]['payment_processor_id'] = $recurDAO->payment_processor_id;
-    }
-
-    return $params;
   }
 
   /**
@@ -771,14 +726,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   public static function recurringContribution(&$form) {
     // Recurring contribution fields
-    foreach (self::getRecurringFields() as $key => $label) {
+    foreach (self::getRecurringFields() as $key) {
       if ($key == 'contribution_recur_payment_made' && !empty($form->_formValues) &&
         !CRM_Utils_System::isNull(CRM_Utils_Array::value($key, $form->_formValues))
       ) {
         $form->assign('contribution_recur_pane_open', TRUE);
         break;
       }
-      CRM_Core_Form_Date::buildDateRange($form, $key, 1, '_low', '_high');
       // If data has been entered for a recurring field, tell the tpl layer to open the pane
       if (!empty($form->_formValues) && !empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
         $form->assign('contribution_recur_pane_open', TRUE);
@@ -800,16 +754,10 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       2 => ts('Recurring contributions with at least one payment'),
     ];
     $form->addRadio('contribution_recur_payment_made', NULL, $recurringPaymentOptions, ['allowClear' => TRUE]);
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_start_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_end_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_modified_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_next_sched_contribution_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_failure_retry_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_cancel_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
 
     // Add field for contribution status
     $form->addSelect('contribution_recur_contribution_status_id',
-      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => CRM_Contribute_PseudoConstant::contributionStatus()]
+      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label')]
     );
 
     $form->addElement('text', 'contribution_recur_processor_id', ts('Processor ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'processor_id'));
@@ -823,20 +771,39 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * Get the metadata for fields to be included on the search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getContributionRecurSearchFieldMetadata() {
+    $fields = [
+      'contribution_recur_start_date',
+      'contribution_recur_next_sched_contribution_date',
+      'contribution_recur_cancel_date',
+      'contribution_recur_end_date',
+      'contribution_recur_create_date',
+      'contribution_recur_modified_date',
+      'contribution_recur_failure_retry_date',
+    ];
+    $metadata = civicrm_api3('ContributionRecur', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * Get fields for recurring contributions.
    *
    * @return array
    */
   public static function getRecurringFields() {
     return [
-      'contribution_recur_payment_made' => ts(''),
-      'contribution_recur_start_date' => ts('Recurring Contribution Start Date'),
-      'contribution_recur_next_sched_contribution_date' => ts('Next Scheduled Recurring Contribution'),
-      'contribution_recur_cancel_date' => ts('Recurring Contribution Cancel Date'),
-      'contribution_recur_end_date' => ts('Recurring Contribution End Date'),
-      'contribution_recur_create_date' => ('Recurring Contribution Create Date'),
-      'contribution_recur_modified_date' => ('Recurring Contribution Modified Date'),
-      'contribution_recur_failure_retry_date' => ts('Failed Recurring Contribution Retry Date'),
+      'contribution_recur_payment_made',
+      'contribution_recur_start_date',
+      'contribution_recur_next_sched_contribution_date',
+      'contribution_recur_cancel_date',
+      'contribution_recur_end_date',
+      'contribution_recur_create_date',
+      'contribution_recur_modified_date',
+      'contribution_recur_failure_retry_date',
     ];
   }
 
@@ -971,13 +938,12 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
-   * Returns array with statuses that are considered to make a recurring
-   * contribution inactive.
+   * Returns array with statuses that are considered to make a recurring contribution inactive.
    *
    * @return array
    */
   public static function getInactiveStatuses() {
-    return self::$inactiveStatuses;
+    return ['Cancelled', 'Failed', 'Completed'];
   }
 
   /**

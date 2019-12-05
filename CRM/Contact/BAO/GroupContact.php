@@ -165,7 +165,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param string $method
    * @param string $status
-   * @param NULL $tracking
+   * @param string $tracking
    *
    * @return array
    *   (total, removed, notRemoved) count of contacts removed to group
@@ -180,7 +180,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     if (!is_array($contactIds)) {
       return [0, 0, 0];
     }
-
     if ($status == 'Removed' || $status == 'Deleted') {
       $op = 'delete';
     }
@@ -200,8 +199,11 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     foreach ($contactIds as $contactId) {
       if ($status == 'Deleted') {
-        $query = "DELETE FROM civicrm_group_contact WHERE contact_id=$contactId AND group_id=$groupId";
-        $dao = CRM_Core_DAO::executeQuery($query);
+        $query = "DELETE FROM civicrm_group_contact WHERE contact_id = %1 AND group_id = %2";
+        $dao = CRM_Core_DAO::executeQuery($query, [
+          1 => [$contactId, 'Positive'],
+          2 => [$groupId, 'Positive'],
+        ]);
         $historyParams = [
           'group_id' => $groupId,
           'contact_id' => $contactId,
@@ -211,6 +213,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
           'tracking' => $tracking,
         ];
         CRM_Contact_BAO_SubscriptionHistory::create($historyParams);
+        // Removing a row from civicrm_group_contact for a smart group may mean a contact
+        // Is now back in a group based on criteria so we will invalidate the cache if it is there
+        // So that accurate group cache is created next time it is needed.
+        CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupId);
       }
       else {
         $groupContact = new CRM_Contact_DAO_GroupContact();
@@ -239,6 +245,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
         CRM_Contact_BAO_SubscriptionHistory::create($historyParams);
         $groupContact->status = $status;
         $groupContact->save();
+        // Remove any rows from the group contact cache so it disappears straight away from smart groups.
+        CRM_Contact_BAO_GroupContactCache::removeContact($contactId, $groupId);
       }
     }
 
@@ -698,7 +706,7 @@ AND       group_id IN ( $groupIDString )
    *   The id of the group.
    * @param string $method
    * @param string $status
-   * @param NULL $tracking
+   * @param string $tracking
    *
    * @return array
    *   (total, added, notAdded) count of contacts added to group

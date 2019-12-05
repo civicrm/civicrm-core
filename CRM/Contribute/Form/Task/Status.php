@@ -40,7 +40,7 @@ class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
    * Are we operating in "single mode", i.e. updating the task of only
    * one specific contribution?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 
@@ -70,9 +70,7 @@ SELECT count(*)
 FROM   civicrm_contribution
 WHERE  contribution_status_id != 2
 AND    {$this->_componentClause}";
-    $count = CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count != 0) {
       CRM_Core_Error::statusBounce(ts('Please select only online contributions with Pending status.'));
     }
@@ -86,7 +84,7 @@ AND    {$this->_componentClause}";
    * Build the form object.
    */
   public function buildQuickForm() {
-    $status = CRM_Contribute_PseudoConstant::contributionStatus();
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     unset($status[2]);
     unset($status[5]);
     unset($status[6]);
@@ -110,9 +108,7 @@ FROM   civicrm_contact c,
        civicrm_contribution co
 WHERE  co.contact_id = c.id
 AND    co.id IN ( $contribIDs )";
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     // build a row for each contribution id
     $this->_rows = [];
@@ -323,9 +319,7 @@ LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
 WHERE     c.id IN ( $contributionIDs )";
 
     $rows = [];
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
       $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';

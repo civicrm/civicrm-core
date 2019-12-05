@@ -154,7 +154,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
 
     if ($useTable) {
-      $tempTable = CRM_Utils_SQL_TempTable::build()->setCategory('tskact')->setDurable()->setId($qfKey)->setUtf8();
+      $tempTable = CRM_Utils_SQL_TempTable::build()->setCategory('tskact')->setDurable()->setId($qfKey);
       $form->_componentTable = $tempTable->getName();
       $tempTable->drop();
       $tempTable->createWithColumns('contact_id int primary key');
@@ -453,7 +453,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
           $this->_contactIds[] = $householdsDAO->household_id;
         }
       }
-      $householdsDAO->free();
     }
 
     // If contact list has changed, households will probably be at the end of
@@ -544,7 +543,10 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         'group_type' => ['2' => 1],
         // queryParams have been preprocessed esp WRT any entity reference fields - see +
         // https://github.com/civicrm/civicrm-core/pull/13250
-        'form_values' => $this->get('queryParams'),
+        // Advanced search sets queryParams, for builder you need formValues.
+        // This is kinda fragile but ....  see CRM_Mailing_Form_Task_AdhocMailingTest for test effort.
+        // Moral never touch anything ever again and the house of cards will stand tall, unless there is a breeze
+        'form_values' => $this->get('isSearchBuilder') ? $this->get('formValues') : $this->get('queryParams'),
         'saved_search_id' => $ssId,
         'search_custom_id' => $this->get('customSearchID'),
         'search_context' => $this->get('context'),

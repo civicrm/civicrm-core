@@ -444,17 +444,21 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $validLinks[CRM_Core_Action::BROWSE] = [
             'name' => ts('Public View'),
             'url' => 'civicrm/mailing/view',
-            'qs' => 'id=%%mid%%&reset=1',
+            'qs' => 'id=%%hashOrMid%%&reset=1',
             'title' => ts('Public View'),
             'fe' => TRUE,
           ];
           $actionMask |= CRM_Core_Action::BROWSE;
         }
 
+        $hash = CRM_Mailing_BAO_Mailing::getMailingHash($row['id']);
         $rows[$key]['action'] = CRM_Core_Action::formLink(
           $validLinks,
           $actionMask,
-          ['mid' => $row['id']],
+          [
+            'mid' => $row['id'],
+            'hashOrMid' => $hash ? $hash : $row['id'],
+          ],
           "more",
           FALSE,
           $opString,
@@ -518,7 +522,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     }
 
     $dateClause1 = $dateClause2 = [];
-    $from = $this->_parent->get('mailing_from');
+    $from = $this->_parent->get('mailing_low');
     if (!CRM_Utils_System::isNull($from)) {
       if ($this->_parent->get('unscheduled')) {
         $dateClause1[] = 'civicrm_mailing.created_date >= %2';
@@ -530,7 +534,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[2] = [$from, 'String'];
     }
 
-    $to = $this->_parent->get('mailing_to');
+    $to = $this->_parent->get('mailing_high');
     if (!CRM_Utils_System::isNull($to)) {
       if ($this->_parent->get('unscheduled')) {
         $dateClause1[] = ' civicrm_mailing.created_date <= %3 ';

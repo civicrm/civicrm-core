@@ -62,21 +62,3 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
 
   return isset($perm[$action]) ? $perm[$action] : $perm['default'];
 }
-
-# FIXME: not sure how to permission the following API 3 calls:
-# contribution_transact (make online contributions)
-# entity_tag_display
-# group_contact_pending
-# group_contact_update_status
-# mailing_event_bounce
-# mailing_event_click
-# mailing_event_confirm
-# mailing_event_forward
-# mailing_event_open
-# mailing_event_reply
-# mailing_group_event_domain_unsubscribe
-# mailing_group_event_resubscribe
-# mailing_group_event_subscribe
-# mailing_group_event_unsubscribe
-# membership_status_calc
-# survey_respondant_count

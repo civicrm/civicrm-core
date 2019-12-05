@@ -95,10 +95,10 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         if ($id != 0) {
           $paymentProcessor[$id] = $processor['name'];
         }
-        if (CRM_Utils_Array::value('is_recur', $processor)) {
+        if (!empty($processor['is_recur'])) {
           $recurringPaymentProcessor[] = $id;
         }
-        if (CRM_Utils_Array::value('object', $processor) && $processor['object']->supports('FutureRecurStartDate')) {
+        if (!empty($processor['object']) && $processor['object']->supports('FutureRecurStartDate')) {
           $futurePaymentProcessor[] = $id;
         }
       }
@@ -152,12 +152,13 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     else {
       $this->assign('price', TRUE);
     }
-    $this->add('select', 'price_set_id', ts('Price Set'),
-      [
-        '' => ts('- none -'),
-      ] + $price,
-      NULL, ['onchange' => "showHideAmountBlock( this.value, 'price_set_id' );"]
-    );
+
+    $this->addField('price_set_id', [
+      'entity' => 'PriceSet',
+      'options' => $price,
+      'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
+    ]);
+
     //CiviPledge fields.
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviPledge', $config->enableComponents)) {
@@ -179,7 +180,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         $this->addElement('checkbox', 'adjust_recur_start_date', ts('Adjust Recurring Start Date'), NULL,
           ['onclick' => "showHideByValue('adjust_recur_start_date',true,'recurDefaults','table-row','radio',false);"]
         );
-        $this->addDate('pledge_calendar_date', ts('Specific Calendar Date'));
+        $this->add('datepicker', 'pledge_calendar_date', ts('Specific Calendar Date'), [], FALSE, ['time' => FALSE]);
         $month = CRM_Utils_Date::getCalendarDayOfMonth();
         $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
         $pledgeDefaults = [
@@ -332,7 +333,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       }
 
       //CRM-16165, Don't allow reccuring contribution if membership block contain any renewable membership option
-      $membershipTypes = unserialize($membershipBlock->membership_types);
+      $membershipTypes = CRM_Utils_String::unserialize($membershipBlock->membership_types);
       if (!empty($fields['is_recur']) && !empty($membershipTypes)) {
         if (!$membershipBlock->is_separate_payment) {
           $errors['is_recur'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution.');
@@ -344,7 +345,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     // CRM-18854 Check if recurring start date is in the future.
-    if (CRM_Utils_Array::value('pledge_calendar_date', $fields)) {
+    if (!empty($fields['pledge_calendar_date'])) {
       if (date('Ymd') > date('Ymd', strtotime($fields['pledge_calendar_date']))) {
         $errors['pledge_calendar_date'] = ts('The recurring start date cannot be prior to the current date.');
       }
@@ -505,18 +506,18 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['is_recur_installments'] = CRM_Utils_Array::value('is_recur_installments', $params, FALSE);
     }
 
-    if (CRM_Utils_Array::value('adjust_recur_start_date', $params)) {
+    if (!empty($params['adjust_recur_start_date'])) {
       $fieldValue = '';
       $pledgeDateFields = [
         'calendar_date' => 'pledge_calendar_date',
         'calendar_month' => 'pledge_calendar_month',
       ];
       if ($params['pledge_default_toggle'] == 'contribution_date') {
-        $fieldValue = json_encode(['contribution_date' => date('m/d/Y')]);
+        $fieldValue = json_encode(['contribution_date' => date('Y-m-d')]);
       }
       else {
         foreach ($pledgeDateFields as $key => $pledgeDateField) {
-          if (CRM_Utils_Array::value($pledgeDateField, $params) && $params['pledge_default_toggle'] == $key) {
+          if (!empty($params[$pledgeDateField]) && $params['pledge_default_toggle'] == $key) {
             $fieldValue = json_encode([$key => $params[$pledgeDateField]]);
             break;
           }
@@ -530,10 +531,10 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['is_pledge_start_date_visible'] = 0;
       $params['is_pledge_start_date_editable'] = 0;
     }
-    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $params)) {
+    if (empty($params['is_pledge_start_date_visible'])) {
       $params['is_pledge_start_date_visible'] = 0;
     }
-    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $params)) {
+    if (empty($params['is_pledge_start_date_editable'])) {
       $params['is_pledge_start_date_editable'] = 0;
     }
 

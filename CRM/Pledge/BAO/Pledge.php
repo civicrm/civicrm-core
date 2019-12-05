@@ -1106,7 +1106,7 @@ SELECT  pledge.contact_id              as contact_id,
    *   Array of int (civicrm_pledge_payment.id)
    */
   public static function findCancelablePayments($pledgeID) {
-    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());
+    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'));
 
     $paymentDAO = new CRM_Pledge_DAO_PledgePayment();
     $paymentDAO->pledge_id = $pledgeID;
@@ -1145,7 +1145,7 @@ SELECT  pledge.contact_id              as contact_id,
 
     return civicrm_api3('pledge_payment', 'getcount', array(
       'pledge_id' => $pledgeID,
-      'contribution_id' => array('NOT NULL' => TRUE),
+      'contribution_id' => array('IS NOT NULL' => TRUE),
     ));
   }
 
@@ -1200,7 +1200,7 @@ SELECT  pledge.contact_id              as contact_id,
   public static function getPledgeStartDate($date, $pledgeBlock) {
     $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
     foreach ($startDate as $field => $value) {
-      if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+      if (!empty($date) && empty($pledgeBlock['is_pledge_start_date_editable'])) {
         return $date;
       }
       if (empty($date)) {

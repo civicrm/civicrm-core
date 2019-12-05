@@ -98,8 +98,7 @@ class CRM_Utils_OpenFlashChart {
     $ySteps = $yMax / 5;
 
     $bars = [];
-    $config = CRM_Core_Config::singleton();
-    $symbol = $config->defaultCurrencySymbol;
+    $symbol = CRM_Core_BAO_Country::defaultCurrencySymbol();
     foreach ($values as $barCount => $barVal) {
       $bars[$barCount] = new bar_glass();
 
@@ -214,8 +213,7 @@ class CRM_Utils_OpenFlashChart {
     $graphTitle = !empty($params['legend']) ? $params['legend'] : ts('Pie Chart');
 
     // get the currency.
-    $config = CRM_Core_Config::singleton();
-    $symbol = $config->defaultCurrencySymbol;
+    $symbol = CRM_Core_BAO_Country::defaultCurrencySymbol();
 
     $pie = new pie();
     $pie->radius(100);
@@ -296,8 +294,7 @@ class CRM_Utils_OpenFlashChart {
     }
 
     // get the currency.
-    $config = CRM_Core_Config::singleton();
-    $symbol = $config->defaultCurrencySymbol;
+    $symbol = CRM_Core_BAO_Country::defaultCurrencySymbol();
 
     // set the tooltip.
     $tooltip = CRM_Utils_Array::value('tip', $params, "$symbol #val#");

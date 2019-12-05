@@ -35,6 +35,7 @@
     <table>civicrm_domain</table>
     <key>id</key>
     <add>3.1</add>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
     <name>name</name>

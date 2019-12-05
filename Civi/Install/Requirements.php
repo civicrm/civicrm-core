@@ -624,7 +624,7 @@ class Requirements {
     mysqli_query($conn, 'DROP TABLE civicrm_utf8mb4_test');
 
     // Ensure that the MySQL driver supports utf8mb4 encoding.
-    $version = mysqli_get_client_info($conn);
+    $version = mysqli_get_client_info();
     if (strpos($version, 'mysqlnd') !== FALSE) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);

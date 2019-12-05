@@ -73,7 +73,11 @@ class CRM_Core_Smarty extends Smarty {
   static private $_singleton = NULL;
 
   /**
-   * @var array (string $name => mixed $value) a list of variables ot save temporarily
+   * Backup frames.
+   *
+   * A list of variables ot save temporarily in format (string $name => mixed $value).
+   *
+   * @var array
    */
   private $backupFrames = [];
 
@@ -139,6 +143,8 @@ class CRM_Core_Smarty extends Smarty {
     else {
       $this->plugins_dir = [$smartyDir . 'plugins', $pluginsDir];
     }
+
+    $this->compile_check = $this->isCheckSmartyIsCompiled();
 
     // add the session and the config here
     $session = CRM_Core_Session::singleton();
@@ -334,6 +340,16 @@ class CRM_Core_Smarty extends Smarty {
     }
 
     return 'en_US';
+  }
+
+  /**
+   * Get the compile_check value.
+   *
+   * @return bool
+   */
+  private function isCheckSmartyIsCompiled() {
+    // check for define in civicrm.settings.php as FALSE, otherwise returns TRUE
+    return CRM_Utils_Constant::value('CIVICRM_TEMPLATE_COMPILE_CHECK', TRUE);
   }
 
 }

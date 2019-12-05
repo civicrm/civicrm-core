@@ -178,7 +178,9 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'field' => 'is_online_registration',
         ];
 
-      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
+      // @fixme I don't understand the event permissions check here - can we just get rid of it?
+      $permissions = CRM_Event_BAO_Event::getAllPermissions();
+      if (CRM_Core_Permission::check('administer CiviCRM') || !empty($permissions[CRM_Core_Permission::EDIT])) {
         self::$_tabLinks[$cacheKey]['reminder']
           = [
             'title' => ts('Schedule Reminders'),
@@ -314,7 +316,10 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     $this->_searchResult = CRM_Utils_Request::retrieve('searchResult', 'Boolean', $this);
 
     $whereClause = $this->whereClause($params, FALSE, $this->_force);
-    $this->pagerAToZ($whereClause, $params);
+
+    if (CRM_Core_Config::singleton()->includeAlphabeticalPager) {
+      $this->pagerAToZ($whereClause, $params);
+    }
 
     $params = [];
     $whereClause = $this->whereClause($params, TRUE, $this->_force);

@@ -42,7 +42,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    * Are we operating in "single mode", i.e. mapping address to one
    * specific contact?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 

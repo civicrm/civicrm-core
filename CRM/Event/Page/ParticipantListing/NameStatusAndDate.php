@@ -100,12 +100,9 @@ LIMIT    $offset, $rowCount";
 
     $rows = [];
     $object = CRM_Core_DAO::executeQuery($query, $params);
-    $statusLookup = CRM_Event_PseudoConstant::participantStatus();
+    $statusLookup = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     while ($object->fetch()) {
       $status = CRM_Utils_Array::value($object->status_id, $statusLookup);
-      if ($status) {
-        $status = ts($status);
-      }
       $row = [
         'id' => $object->contact_id,
         'participantID' => $object->participant_id,

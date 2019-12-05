@@ -207,7 +207,7 @@ class CRM_Core_Payment_Form {
    * @return string
    */
   public static function getPaymentTypeLabel($paymentProcessor) {
-    return ts('%1 Information', [$paymentProcessor->getPaymentTypeLabel()]);
+    return $paymentProcessor->getPaymentTypeLabel();
   }
 
   /**
@@ -319,7 +319,7 @@ class CRM_Core_Payment_Form {
       if (!empty($values['credit_card_type'])) {
         $processorCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($processorID);
         if (!empty($processorCards) && !in_array($values['credit_card_type'], $processorCards)) {
-          $errors['credit_card_type'] = ts('This procesor does not support credit card type ' . $values['credit_card_type']);
+          $errors['credit_card_type'] = ts('This processor does not support credit card type %1', [1 => $values['credit_card_type']]);
         }
       }
       if (!empty($values['credit_card_number']) &&

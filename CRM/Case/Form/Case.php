@@ -91,6 +91,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    */
   public $_caseTypeId = NULL;
 
+  public $submitOnce = TRUE;
+
   /**
    * Explicitly declare the entity api name.
    */

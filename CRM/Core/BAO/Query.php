@@ -59,6 +59,27 @@ class CRM_Core_BAO_Query {
   }
 
   /**
+   * Get legacy fields which we still maybe support.
+   *
+   * These are contribution specific but I think it's ok to have one list of legacy supported
+   * params in a central place.
+   *
+   * @return array
+   */
+  protected static function getLegacySupportedFields(): array {
+    // @todo enotices when these are hit so we can start to elimnate them.
+    $fieldAliases = [
+      'financial_type' => 'financial_type_id',
+      'contribution_page' => 'contribution_page_id',
+      'payment_instrument' => 'payment_instrument_id',
+      // or payment_instrument_id?
+      'contribution_payment_instrument' => 'contribution_payment_instrument_id',
+      'contribution_status' => 'contribution_status_id',
+    ];
+    return $fieldAliases;
+  }
+
+  /**
    * Getter for the qill object.
    *
    * @return string
@@ -79,5 +100,23 @@ class CRM_Core_BAO_Query {
    * @param $tables
    */
   public static function tableNames(&$tables) {}
+
+  /**
+   * Get the name of the field.
+   *
+   * @param array $values
+   *
+   * @return string
+   */
+  protected static function getFieldName($values) {
+    $name = $values[0];
+    $fieldAliases = self::getLegacySupportedFields();
+    if (isset($fieldAliases[$name])) {
+      CRM_Core_Error::deprecatedFunctionWarning('These parameters should be standardised before we get here');
+      return $fieldAliases[$name];
+    }
+
+    return str_replace(['_high', '_low'], '', $name);
+  }
 
 }

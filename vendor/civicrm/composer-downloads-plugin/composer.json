@@ -1,0 +1,40 @@
+{
+    "name": "civicrm/composer-downloads-plugin",
+    "description": "Composer plugin for downloading additional files within any composer package.",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rob Bayliss",
+            "email": "rob@lastcallmedia.com"
+        },
+        {
+            "name": "Tim Otten",
+            "email": "totten@civicrm.org"
+        }
+    ],
+    "require": {
+        "composer-plugin-api": "^1.1",
+        "php": ">=5.6",
+        "togos/gitignore": "~1.1.1"
+    },
+    "require-dev": {
+        "composer/composer": "~1.0",
+        "phpunit/phpunit": "^5.7",
+        "friendsofphp/php-cs-fixer": "^2.3",
+        "totten/process-helper": "^1.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "LastCall\\DownloadsPlugin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LastCall\\DownloadsPlugin\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "class": "LastCall\\DownloadsPlugin\\Plugin"
+    }
+}

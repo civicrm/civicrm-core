@@ -7,8 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Validate' => array($vendorDir . '/pear/validate_finance_creditcard'),
+    'TOGoS_GitIgnore_' => array($vendorDir . '/togos/gitignore/src/main/php'),
     'System' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
-    'Svg\\' => array($vendorDir . '/phenx/php-svg-lib/src'),
     'Sabberworm\\CSS' => array($vendorDir . '/sabberworm/php-css-parser/lib'),
     'PHPUnit_' => array($baseDir . '/packages'),
     'PEAR' => array($vendorDir . '/pear/pear_exception'),
@@ -16,7 +16,6 @@ return array(
     'Math' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Mail' => array($vendorDir . '/pear/mail'),
     'Log' => array($vendorDir . '/pear/log'),
-    'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
     'File' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Crypt' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Console' => array($vendorDir . '/pear/console_getopt'),

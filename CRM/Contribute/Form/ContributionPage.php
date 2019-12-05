@@ -53,21 +53,21 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single;
 
   /**
    * Is this the first page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_first = FALSE;
 
   /**
    * Is this the last page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_last = FALSE;
 
@@ -85,6 +85,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    */
   public function getDefaultEntity() {
     return 'Contribution';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
   }
 
   /**
@@ -120,13 +127,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     CRM_Contribute_Form_ContributionPage_TabHeader::build($this);
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      CRM_Utils_System::setTitle(ts('Configure Page - %1', [1 => $title]));
+      $this->setTitle(ts('Configure Page - %1', [1 => $title]));
     }
     elseif ($this->_action == CRM_Core_Action::VIEW) {
-      CRM_Utils_System::setTitle(ts('Preview Page - %1', [1 => $title]));
+      $this->setTitle(ts('Preview Page - %1', [1 => $title]));
     }
     elseif ($this->_action == CRM_Core_Action::DELETE) {
-      CRM_Utils_System::setTitle(ts('Delete Page - %1', [1 => $title]));
+      $this->setTitle(ts('Delete Page - %1', [1 => $title]));
     }
 
     //cache values.
@@ -299,7 +306,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       ];
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
-        if ($key == 'pledge_start_date' && CRM_Utils_Array::value($key, $pledgeBlockDefaults)) {
+        if ($key == 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
           $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
           $pledgeDateFields = [
             'pledge_calendar_date' => 'calendar_date',
@@ -339,7 +346,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       // @todo look to change to $defaults['start_date'] = date('Ymd His');
       // main settings form overrides this to implement above but this is left here
       // 'in case' another extending form uses start_date - for now
-      list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
+      $defaults['start_date'] = date('Y-m-d H:i:s');
     }
 
     if (!empty($defaults['recur_frequency_unit'])) {
@@ -420,7 +427,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
         [1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className)]
-      ), ts('Saved'), 'success');
+      ), $this->getTitle(), 'success');
 
       $this->postProcessHook();
 

@@ -93,6 +93,13 @@ function _civicrm_api3_mailing_a_b_submit_spec(&$spec) {
   $spec['approval_date'] = $mailingFields['approval_date'];
   $spec['approval_status_id'] = $mailingFields['approval_status_id'];
   $spec['approval_note'] = $mailingFields['approval_note'];
+  $spec['winner_id'] = [
+    'name' => 'winner_id',
+    'type' => 1,
+    'title' => 'Winner ID',
+    'description' => 'The experimental mailing with the best results. If specified, values are copied to the final mailing.',
+    'localizable' => 0,
+  ];
   // Note: we'll pass through approval_* fields to the underlying mailing, but they may be ignored
   // if the user doesn't have suitable permission. If separate approvals are required, they must be provided
   // outside the A/B Test UI.
@@ -149,6 +156,9 @@ function civicrm_api3_mailing_a_b_submit($params) {
       if ($dao->status != 'Testing') {
         throw new API_Exception("Cannot transition to state 'Final'");
       }
+      if (!empty($params['winner_id'])) {
+        _civicrm_api3_mailing_a_b_fill_winner($params['winner_id'], $dao->mailing_id_c);
+      }
       civicrm_api3('Mailing', 'submit', $submitParams + [
         'id' => $dao->mailing_id_c,
         '_skip_evil_bao_auto_recipients_' => 1,
@@ -166,6 +176,56 @@ function civicrm_api3_mailing_a_b_submit($params) {
       'reload' => 1,
     ],
   ]);
+}
+
+/**
+ * @param int $winner_id
+ *   The experimental mailing chosen as the "winner".
+ * @param int $final_id
+ *   The final mailing which should imitate the "winner".
+ * @throws \API_Exception
+ */
+function _civicrm_api3_mailing_a_b_fill_winner($winner_id, $final_id) {
+  $copyFields = [
+    // 'id',
+    // 'name',
+    'campaign_id',
+    'from_name',
+    'from_email',
+    'replyto_email',
+    'subject',
+    'dedupe_email',
+    // 'recipients',
+    'body_html',
+    'body_text',
+    'footer_id',
+    'header_id',
+    'visibility',
+    'url_tracking',
+    'dedupe_email',
+    'forward_replies',
+    'auto_responder',
+    'open_tracking',
+    'override_verp',
+    'optout_id',
+    'reply_id',
+    'resubscribe_id',
+    'unsubscribe_id'
+  ];
+  $f = CRM_Utils_SQL_Select::from('civicrm_mailing')
+    ->where('id = #id', ['id' => $winner_id])
+    ->select($copyFields)
+    ->execute()
+    ->fetchAll();
+  if (count($f) !== 1) {
+    throw new API_Exception('Invalid winner_id');
+  }
+  foreach ($f as $winner) {
+    civicrm_api3('Mailing', 'create', $winner + [
+      'id' => $final_id,
+      '_skip_evil_bao_auto_recipients_' => 1,
+    ]);
+  }
 }
 
 /**

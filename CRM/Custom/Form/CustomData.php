@@ -49,10 +49,11 @@ class CRM_Custom_Form_CustomData {
    *   e.g Student for contact type
    * @param null|string $subName value in civicrm_custom_group.extends_entity_column_id
    * @param null|int $groupCount number of entities that could have custom data
+   * @param null|int $contact_id contact ID associated with the custom data.
    *
    * @throws \CRM_Core_Exception
    */
-  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1) {
+  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1, $contact_id = NULL) {
     $entityName = $form->getDefaultEntity();
     $entityID = $form->getEntityId();
     // FIXME: If the form has been converted to use entityFormTrait then getEntitySubTypeId() will exist.
@@ -80,6 +81,7 @@ class CRM_Custom_Form_CustomData {
     $form->assign('customDataType', $entityName);
     $form->assign('customDataSubType', $entitySubType);
     $form->assign('entityID', $entityID);
+    $form->assign('cid', $contact_id);
   }
 
   /**
@@ -188,15 +190,18 @@ class CRM_Custom_Form_CustomData {
   }
 
   /**
-   * @param $form
-   * @param $subType
-   * @param $gid
-   * @param $onlySubType
-   * @param $getCachedTree
+   * Add the group data as a formatted array to the form.
+   *
+   * @param CRM_Core_Form $form
+   * @param string $subType
+   * @param int $gid
+   * @param bool $onlySubType
+   * @param bool $getCachedTree
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
+  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = TRUE) {
     $singleRecord = NULL;
     if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = $form->_groupCount;

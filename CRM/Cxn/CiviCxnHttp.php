@@ -17,8 +17,12 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
   protected $cache;
 
   /**
+   * Singleton object.
+   *
    * @param bool $fresh
+   *
    * @return CRM_Cxn_CiviCxnHttp
+   * @throws \CRM_Core_Exception
    */
   public static function singleton($fresh = FALSE) {
     if (self::$singleton === NULL || $fresh) {
@@ -34,14 +38,17 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
   }
 
   /**
-   * @param CRM_Utils_Cache_Interface|NULL $cache
-   *   The cache data store.
+   * The cache data store.
+   *
+   * @param CRM_Utils_Cache_Interface|null $cache
    */
   public function __construct($cache) {
     $this->cache = $cache;
   }
 
   /**
+   * Send.
+   *
    * @param string $verb
    * @param string $url
    * @param string $blob
@@ -107,6 +114,8 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
   }
 
   /**
+   * Get cache.
+   *
    * @return \CRM_Utils_Cache_Interface|null
    */
   public function getCache() {

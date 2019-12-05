@@ -30,20 +30,18 @@
 
 {if $action eq 8}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
-        {ts}WARNING: Deleting this Payment Processor may result in some transaction pages being rendered inactive.{/ts} {ts}Do you want to continue?{/ts}
+    <div class="icon inform-icon"></div>
+    {$deleteMessage|escape}
   </div>
 {else}
   <table class="form-layout-compressed">
-    <tr class="crm-paymentProcessor-form-block-payment_processor_type">
-        <td class="label">{$form.payment_processor_type_id.label}</td><td>{$form.payment_processor_type_id.html} {help id='proc-type'}</td>
-    </tr>
-    <tr class="crm-paymentProcessor-form-block-name">
-        <td class="label">{$form.name.label}</td><td>{$form.name.html}</td>
-    </tr>
-    <tr class="crm-paymentProcessor-form-block-description">
-        <td class="label">{$form.description.label}</td><td>{$form.description.html}</td>
-    </tr>
+    {* This works for the fields managed from the EntityFields trait - see RelationshipType.tpl for end goal in this tpl *}
+    {foreach from=$entityFields item=fieldSpec}
+      {assign var=fieldName value=$fieldSpec.name}
+      <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
+        {include file="CRM/Core/Form/Field.tpl"}
+      </tr>
+    {/foreach}
 
     <tr class="crm-paymentProcessor-form-block-financial_account">
       <td class="label">{$form.financial_account_id.label}</td>

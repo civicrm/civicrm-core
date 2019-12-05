@@ -428,7 +428,7 @@ AND    u.status = 1
    * Determine the native ID of the CMS user.
    *
    * @param string $username
-   * @return int|NULL
+   * @return int|null
    */
   public function getUfId($username) {
     $user = user_load_by_name($username);
@@ -835,9 +835,6 @@ AND    u.status = 1
       }
       else {
         $contactMatching++;
-      }
-      if (is_object($match)) {
-        $match->free();
       }
     }
 

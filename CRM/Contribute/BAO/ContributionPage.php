@@ -328,8 +328,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
-          //@todo - following line should not refer to undefined $postProfileTypes? figure out way to test
-          if (in_array('Individual', $preProfileTypes) || in_array('Contact', $postProfileTypes)) {
+          if (in_array('Individual', $preProfileTypes) || in_array('Contact', $preProfileTypes)) {
             //Take Individual contact ID
             $userID = CRM_Utils_Array::value('related_contact', $values);
           }
@@ -357,7 +356,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         );
       }
 
-      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_PseudoConstant::contributionPage($values['contribution_page_id']);
+      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
 
       // Set email variables explicitly to avoid leaky smarty variables.
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
@@ -672,33 +671,33 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => ts('Copy of') . ' ',
       ],
     ];
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', [
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', [
       'id' => $id,
     ], NULL, $fieldsFix);
 
     //copying all the blocks pertaining to the contribution page
-    $copyPledgeBlock = &CRM_Core_DAO::copyGeneric('CRM_Pledge_DAO_PledgeBlock', [
+    $copyPledgeBlock = CRM_Core_DAO::copyGeneric('CRM_Pledge_DAO_PledgeBlock', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyMembershipBlock = &CRM_Core_DAO::copyGeneric('CRM_Member_DAO_MembershipBlock', [
+    $copyMembershipBlock = CRM_Core_DAO::copyGeneric('CRM_Member_DAO_MembershipBlock', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyUFJoin = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin', [
+    $copyUFJoin = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyWidget = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Widget', [
+    $copyWidget = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Widget', [
       'contribution_page_id' => $id,
     ], [
       'contribution_page_id' => $copy->id,
@@ -707,14 +706,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     //copy price sets
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
 
-    $copyTellFriend = &CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', [
+    $copyTellFriend = CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyPersonalCampaignPages = &CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', [
+    $copyPersonalCampaignPages = CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
@@ -722,7 +721,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'target_entity_id' => $copy->id,
     ]);
 
-    $copyPremium = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', [
+    $copyPremium = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
@@ -734,7 +733,7 @@ FROM civicrm_premiums
 WHERE entity_table = 'civicrm_contribution_page'
       AND entity_id ={$id}";
 
-    $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
+    $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
         CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', [

@@ -38,7 +38,7 @@ class SqlTriggers {
   /**
    * The name of the output file.
    *
-   * @var string|NULL
+   * @var string|null
    */
   private $file = NULL;
 

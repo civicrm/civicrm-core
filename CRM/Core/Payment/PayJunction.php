@@ -19,7 +19,7 @@ require_once 'PayJunction/pjClasses.php';
  * Class CRM_Core_Payment_PayJunction.
  */
 class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
-  # (not used, implicit in the API, might need to convert?)
+  // (not used, implicit in the API, might need to convert?)
   const CHARSET = 'UFT-8';
 
   /**

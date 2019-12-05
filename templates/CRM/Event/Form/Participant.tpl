@@ -184,6 +184,16 @@
     {assign var=registerMode value="LIVE"}
   {/if}
   <div class="crm-block crm-form-block crm-participant-form-block">
+    {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
+      <div class="action-link css_right crm-link-credit-card-mode">
+        {if $contactId}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+        {else}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
+        {/if}
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card event registration{/ts}</a>
+      </div>
+    {/if}
     <div class="view-content">
       {if $participantMode}
         <div class="help">
@@ -384,6 +394,9 @@
 
           {if $urlPathVar}
           dataUrl += '&' + '{$urlPathVar}';
+          {/if}
+          {if $isBackOffice}
+            dataUrl += '&' + 'is_backoffice=1';
           {/if}
 
           {literal}

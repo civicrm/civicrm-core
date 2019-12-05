@@ -32,7 +32,7 @@ class CRM_Core_CodeGen_Specification {
 
     $this->classNames = [];
 
-    # TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
+    // TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
     if ($verbose) {
       echo "Extracting table information\n";
     }
@@ -318,7 +318,7 @@ class CRM_Core_CodeGen_Specification {
         // need this case since some versions of mysql do not have boolean as a valid column type and hence it
         // is changed to tinyint. hopefully after 2 yrs this case can be removed.
         $field['sqlType'] = 'tinyint';
-        $field['phpType'] = $type;
+        $field['phpType'] = 'bool';
         $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
         break;
 
@@ -327,7 +327,7 @@ class CRM_Core_CodeGen_Specification {
         $field['sqlType'] = 'decimal(' . $length . ')';
         $field['phpType'] = 'float';
         $field['crmType'] = 'CRM_Utils_Type::T_MONEY';
-        $field['precision'] = $length;
+        $field['precision'] = $length . ',';
         break;
 
       case 'float':
@@ -340,6 +340,7 @@ class CRM_Core_CodeGen_Specification {
         $field['phpType'] = $this->value('phpType', $fieldXML, $type);
         $field['sqlType'] = $type;
         if ($type == 'int unsigned') {
+          $field['phpType'] = 'int';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
@@ -367,8 +368,16 @@ class CRM_Core_CodeGen_Specification {
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
+    $field['uniqueTitle'] = $this->value('uniqueTitle', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
+    if (isset($fieldXML->permission)) {
+      $field['permission'] = trim($this->value('permission', $fieldXML));
+      $field['permission'] = $field['permission'] ? array_filter(array_map('trim', explode(',', $field['permission']))) : [];
+      if (isset($fieldXML->permission->or)) {
+        $field['permission'][] = array_filter(array_map('trim', explode(',', $fieldXML->permission->or)));
+      }
+    }
     if (!empty($field['html'])) {
       $validOptions = [
         'type',
@@ -421,6 +430,8 @@ class CRM_Core_CodeGen_Specification {
         'labelColumn',
         // Non-translated machine name for programmatic lookup. Defaults to 'name' if that column exists
         'nameColumn',
+        // Column to fetch in "abbreviate" context
+        'abbrColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
         // callback function incase of static arrays

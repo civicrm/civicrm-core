@@ -32,7 +32,9 @@
  */
 class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
   /**
-   * @var int Time to live (seconds).
+   * Time to live (seconds).
+   *
+   * @var int
    *
    * 12 hours: 12 * 60 * 60 = 43200
    */

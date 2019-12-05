@@ -863,14 +863,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $this->header = new CRM_Mailing_BAO_MailingComponent();
       $this->header->id = $this->header_id;
       $this->header->find(TRUE);
-      $this->header->free();
     }
 
     if (!$this->footer and $this->footer_id) {
       $this->footer = new CRM_Mailing_BAO_MailingComponent();
       $this->footer->id = $this->footer_id;
       $this->footer->find(TRUE);
-      $this->footer->free();
     }
   }
 
@@ -1363,6 +1361,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $numSlices = count($embed_data);
       $url = '';
       for ($i = 0; $i < $numSlices; $i++) {
+        $embed_url_data = parse_url($embed_data[$i]);
+        if (!empty($embed_url_data['scheme'])) {
+          $token_a['embed_parts'][$i] = preg_replace("/href=\"(https*:\/\/)/", "href=\"", $token_a['embed_parts'][$i]);
+        }
         $url .= "{$token_a['embed_parts'][$i]}{$embed_data[$i]}";
       }
       if (isset($token_a['embed_parts'][$numSlices])) {
@@ -1447,7 +1449,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     while ($mg->fetch()) {
       $groups[] = $mg->name;
     }
-    $mg->free();
     return $groups;
   }
 
@@ -2027,6 +2028,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['event_totals']['optout'] += $row['optout'];
 
       foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
+        // Get the field name from the MailingJob fields as that will not have any prefixing.
+        // dev/mailing#56
+        $field = CRM_Mailing_BAO_MailingJob::fields()[$field]['name'];
         $row[$field] = $mailing->$field;
       }
 
@@ -3063,6 +3067,13 @@ ORDER BY civicrm_mailing.name";
       'id' => $id,
       'return' => 'visibility',
     ])) === 'Public Pages') {
+
+      // if hash setting is on then we change the public url into a hash
+      $hash = CRM_Mailing_BAO_Mailing::getMailingHash($id);
+      if (!empty($hash)) {
+        $id = $hash;
+      }
+
       return CRM_Utils_System::url('civicrm/mailing/view', ['id' => $id], $absolute, NULL, TRUE, TRUE);
     }
   }

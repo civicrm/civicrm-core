@@ -245,7 +245,10 @@ function civicrm_api3_extension_download($params) {
     throw new API_Exception('Cannot resolve download url for extension. Try adding parameter "url"');
   }
 
-  foreach (CRM_Extension_System::singleton()->getDownloader()->checkRequirements() as $requirement) {
+  if (!isset($info)) {
+    $info = NULL;
+  }
+  foreach (CRM_Extension_System::singleton()->getDownloader()->checkRequirements($info) as $requirement) {
     return civicrm_api3_create_error($requirement['message']);
   }
 

@@ -54,7 +54,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
   /**
    * The flag to tell if there are soft credits included.
    *
-   * @var boolean
+   * @var bool
    */
   public $_includesSoftCredits = FALSE;
 
@@ -137,7 +137,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
           $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
         }
       }
-      $result->free();
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
 

@@ -83,7 +83,7 @@ abstract class AbstractFrameDecorator extends Frame
     private $_positionned_parent;
 
     /**
-     * Cache for the get_parent wehile loop results
+     * Cache for the get_parent while loop results
      *
      * @var Frame
      */
@@ -438,6 +438,7 @@ abstract class AbstractFrameDecorator extends Frame
     }
 
     /**
+     * @param bool $use_cache
      * @return AbstractFrameDecorator
      */
     function get_parent($use_cache = true)
@@ -695,6 +696,7 @@ abstract class AbstractFrameDecorator extends Frame
         $split->reset();
         $split->get_original_style()->text_indent = 0;
         $split->_splitted = true;
+        $split->_already_pushed = true;
 
         // The body's properties must be kept
         if ($node->nodeName !== "body") {

@@ -36,8 +36,11 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
         continue;
       }
       foreach ($table['fields'] as $field) {
+        $required = $field['required'] ? ' NOT NULL' : '';
+        $default = $field['default'] ? ' DEFAULT ' . $field['default'] : '';
+        $comment = $field['comment'] ? " COMMENT '" . $field['comment'] . "'" : '';
         if ($field['localizable']) {
-          $columns[$table['name']][$field['name']] = $field['sqlType'];
+          $columns[$table['name']][$field['name']] = $field['sqlType'] . $required . $default . $comment;
           $widgets[$table['name']][$field['name']] = $field['widget'];
         }
       }

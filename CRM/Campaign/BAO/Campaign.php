@@ -49,18 +49,18 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       return NULL;
     }
 
-    if (!(CRM_Utils_Array::value('id', $params))) {
+    if (empty($params['id'])) {
 
-      if (!(CRM_Utils_Array::value('created_id', $params))) {
+      if (empty($params['created_id'])) {
         $session = CRM_Core_Session::singleton();
         $params['created_id'] = $session->get('userID');
       }
 
-      if (!(CRM_Utils_Array::value('created_date', $params))) {
+      if (empty($params['created_date'])) {
         $params['created_date'] = date('YmdHis');
       }
 
-      if (!(CRM_Utils_Array::value('name', $params))) {
+      if (empty($params['name'])) {
         $params['name'] = CRM_Utils_String::titleToVar($params['title'], 64);
       }
 

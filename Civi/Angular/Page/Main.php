@@ -37,7 +37,7 @@ class Main extends \CRM_Core_Page {
   /**
    * The region of the page into which JavaScript will be loaded.
    *
-   * @var String
+   * @var string
    * @deprecated
    */
   public $region;

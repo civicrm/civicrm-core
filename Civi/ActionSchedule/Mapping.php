@@ -149,14 +149,14 @@ abstract class Mapping implements MappingInterface {
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_start_date'
    */
   private $entity_date_start;
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_end_date'.
    */
   private $entity_date_end;
@@ -340,5 +340,17 @@ abstract class Mapping implements MappingInterface {
    * @return \CRM_Utils_SQL_Select
    */
   abstract public function createQuery($schedule, $phase, $defaultParams);
+
+  /**
+   * Determine whether a schedule based on this mapping should
+   * reset the reminder state if the trigger date changes.
+   *
+   * @return bool
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   */
+  public function resetOnTriggerDateChange($schedule) {
+    return FALSE;
+  }
 
 }

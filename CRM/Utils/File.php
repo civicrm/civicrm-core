@@ -526,8 +526,16 @@ class CRM_Utils_File {
     if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
-  Order allow,deny
-  Deny from all
+# Apache 2.2
+  <IfModule !authz_core_module>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+
+# Apache 2.4+
+  <IfModule authz_core_module>
+    Require all denied
+  </IfModule>
 </Files>
 
 HTACCESS;
@@ -569,8 +577,19 @@ HTACCESS;
   }
 
   /**
-   * Create the base file path from which all our internal directories are
-   * offset. This is derived from the template compile directory set
+   * (Deprecated) Create the file-path from which all other internal paths are
+   * computed. This implementation determines it as `dirname(CIVICRM_TEMPLATE_COMPILEDIR)`.
+   *
+   * This approach is problematic - e.g. it prevents one from authentically
+   * splitting the CIVICRM_TEMPLATE_COMPILEDIR away from other dirs. The implementation
+   * is preserved for backwards compatibility (and should only be called by
+   * CMS-adapters and by Civi\Core\Paths).
+   *
+   * Do not use it for new path construction logic. Instead, use Civi::paths().
+   *
+   * @deprecated
+   * @see \Civi::paths()
+   * @see \Civi\Core\Paths
    */
   public static function baseFilePath() {
     static $_path = NULL;
@@ -621,6 +640,10 @@ HTACCESS;
    * @param $directory
    *
    * @return string
+   * @deprecated
+   *   Computation of a relative path requires some base.
+   *   This implementation is problematic because it relies on an
+   *   implicit base which was constructed problematically.
    */
   public static function relativeDirectory($directory) {
     // Do nothing on windows
@@ -647,12 +670,12 @@ HTACCESS;
 
   /**
    * @param $directory
-   * @param string|NULL $basePath
+   * @param string $basePath
    *   The base path when evaluating relative paths. Should include trailing slash.
    *
    * @return string
    */
-  public static function absoluteDirectory($directory, $basePath = NULL) {
+  public static function absoluteDirectory($directory, $basePath) {
     // check if directory is already absolute, if so return immediately
     // Note: Windows PHP accepts any mix of "/" or "\", so "C:\htdocs" or "C:/htdocs" would be a valid absolute path
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && preg_match(';^[a-zA-Z]:[/\\\\];', $directory)) {
@@ -664,8 +687,12 @@ HTACCESS;
       return $directory;
     }
 
-    // make everything absolute from the baseFilePath
-    $basePath = ($basePath === NULL) ? self::baseFilePath() : $basePath;
+    if ($basePath === NULL) {
+      // Previous versions interpreted `NULL` to mean "default to `self::baseFilePath()`".
+      // However, no code in the known `universe` relies on this interpretation, and
+      // the `baseFilePath()` function is problematic/deprecated.
+      throw new \RuntimeException("absoluteDirectory() requires specifying a basePath");
+    }
 
     // ensure that $basePath has a trailing slash
     $basePath = self::addTrailingSlash($basePath);

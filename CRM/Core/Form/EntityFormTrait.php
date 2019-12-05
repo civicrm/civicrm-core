@@ -65,12 +65,35 @@ trait CRM_Core_Form_EntityFormTrait {
   }
 
   /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+  }
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+  }
+
+  /**
    * Get the entity id being edited.
    *
    * @return int|null
    */
   public function getEntityId() {
     return $this->_id;
+  }
+
+  /**
+   * Should custom data be suppressed on this form.
+   *
+   * @return bool
+   */
+  protected function isSuppressCustomData() {
+    return FALSE;
   }
 
   /**
@@ -91,6 +114,9 @@ trait CRM_Core_Form_EntityFormTrait {
    * If the custom data is in the submitted data (eg. added via ajax loaded form) add to form.
    */
   public function addCustomDataToForm() {
+    if ($this->isSuppressCustomData()) {
+      return TRUE;
+    }
     $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
     if (isset($customisableEntities[$this->getDefaultEntity()])) {
       CRM_Custom_Form_CustomData::addToForm($this);

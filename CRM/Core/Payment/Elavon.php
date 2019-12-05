@@ -231,7 +231,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       if ($this->_mode == 'test') {
         $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
         $p = [];
-        $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+        $trxn_id = strval(CRM_Core_DAO::singleValueQuery($query, $p));
         $trxn_id = str_replace('test', '', $trxn_id);
         $trxn_id = intval($trxn_id) + 1;
         $params['trxn_id'] = sprintf('test%08d', $trxn_id);
@@ -343,7 +343,13 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
     $xml = '<txn>';
     foreach ($requestFields as $key => $value) {
-      $xml .= '<' . $key . '>' . self::tidyStringforXML($value, $xmlFieldLength[$key]) . '</' . $key . '>';
+      //dev/core/966 Don't send email through the urlencode.
+      if ($key == 'ssl_email') {
+        $xml .= '<' . $key . '>' . substr($value, 0, $xmlFieldLength[$key]) . '</' . $key . '>';
+      }
+      else {
+        $xml .= '<' . $key . '>' . self::tidyStringforXML($value, $xmlFieldLength[$key]) . '</' . $key . '>';
+      }
     }
     $xml .= '</txn>';
     return $xml;

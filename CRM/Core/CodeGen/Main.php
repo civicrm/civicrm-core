@@ -37,13 +37,18 @@ class CRM_Core_CodeGen_Main {
   public $database;
 
   /**
-   * @var string|NULL path in which to store a marker that indicates the last execution of
-   * GenCode. If a matching marker already exists, GenCode doesn't run.
+   * Path in which to store a marker that indicates the last execution of GenCode.
+   *
+   * If a matching marker already exists, GenCode doesn't run.
+   *
+   * @var string|null
    */
   public $digestPath;
 
   /**
-   * @var string|NULL a digest of the inputs to the code-generator (eg the properties and source files)
+   * Digest of the inputs to the code-generator (eg the properties and source files).
+   *
+   * @var string|null
    */
   public $sourceDigest;
 
@@ -150,7 +155,6 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     if (!$this->database || !$this->tables) {
       $specification = new CRM_Core_CodeGen_Specification();
       $specification->parse($this->schemaPath, $this->buildVersion);
-      # cheese:
       $this->database = $specification->database;
       $this->tables = $specification->tables;
     }

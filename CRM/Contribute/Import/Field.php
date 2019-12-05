@@ -56,8 +56,9 @@ class CRM_Contribute_Import_Field {
   public $_type;
 
   /**
-   * Is this field required
-   * @var boolean
+   * Is this field required.
+   *
+   * @var bool
    */
   public $_required;
 

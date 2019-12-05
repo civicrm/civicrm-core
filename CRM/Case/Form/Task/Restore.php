@@ -40,7 +40,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    * Are we operating in "single mode", i.e. deleting one
    * specific case?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 

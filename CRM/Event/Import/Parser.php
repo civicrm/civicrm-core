@@ -37,24 +37,22 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
   protected $_fileName;
 
   /**
-   * #@+
-   * @var integer
-   */
-
-  /**
-   * Imported file size
+   * Imported file size.
+   *
    * @var int
    */
   protected $_fileSize;
 
   /**
-   * Seperator being used
+   * Separator being used.
+   *
    * @var string
    */
   protected $_seperator;
 
   /**
-   * Total number of lines in file
+   * Total number of lines in file.
+   *
    * @var int
    */
   protected $_lineCount;
@@ -62,7 +60,7 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
   /**
    * Whether the file has a column header or not
    *
-   * @var boolean
+   * @var bool
    */
   protected $_haveColumnHeader;
 

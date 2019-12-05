@@ -115,4 +115,8 @@ class Request {
     return strtolower(\CRM_Utils_String::munge($action));
   }
 
+  public static function getNextId() {
+    return self::$nextId++;
+  }
+
 }

@@ -7,7 +7,7 @@
      <page_callback>CRM_Activity_Form_Activity</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <page_arguments>attachUpload=1</page_arguments>
-     <path_arguments>action=add,context=standalone</path_arguments>
+     <path_arguments>action=add&amp;context=standalone</path_arguments>
   </item>
   <item>
      <path>civicrm/activity/view</path>

@@ -51,7 +51,7 @@ class CRM_Extension_System {
   /**
    * The URL of the remote extensions repository.
    *
-   * @var string|FALSE
+   * @var string|false
    */
   private $_repoUrl = NULL;
 
@@ -89,6 +89,8 @@ class CRM_Extension_System {
   }
 
   /**
+   * Class constructor.
+   *
    * @param array $parameters
    *   List of configuration values required by the extension system.
    *   Missing values will be guessed based on $config.
@@ -150,6 +152,12 @@ class CRM_Extension_System {
             $this->getCache(),
             'cmsvendor'
           );
+        }
+      }
+
+      if (!defined('CIVICRM_TEST')) {
+        foreach ($containers as $container) {
+          $container->addFilter([__CLASS__, 'isNotTestExtension']);
         }
       }
 
@@ -256,7 +264,7 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      $cacheGroup = md5(serialize(['ext', $this->parameters]));
+      $cacheGroup = md5(serialize(['ext', $this->parameters, CRM_Utils_System::version()]));
       // Extension system starts before container. Manage our own cache.
       $this->cache = CRM_Utils_Cache::create([
         'name' => $cacheGroup,
@@ -298,6 +306,10 @@ class CRM_Extension_System {
       Civi::$statics[__CLASS__]['compatibility'] = json_decode(file_get_contents(Civi::paths()->getPath('[civicrm.root]/extension-compatibility.json')), TRUE);
     }
     return Civi::$statics[__CLASS__]['compatibility'];
+  }
+
+  public static function isNotTestExtension(CRM_Extension_Info $info) {
+    return (bool) !preg_match('/^test\./', $info->key);
   }
 
   /**
@@ -349,6 +361,9 @@ class CRM_Extension_System {
 
       default:
         $extensionRow['statusLabel'] = '(' . $extensionRow['status'] . ')';
+    }
+    if ($manager->isIncompatible($obj->key)) {
+      $extensionRow['statusLabel'] = ts('Obsolete') . ($extensionRow['statusLabel'] ? (' - ' . $extensionRow['statusLabel']) : '');
     }
     return $extensionRow;
   }

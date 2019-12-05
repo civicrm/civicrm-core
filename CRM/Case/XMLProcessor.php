@@ -36,27 +36,11 @@ class CRM_Case_XMLProcessor {
    * FIXME: This does *NOT* belong in a static property, but we're too late in
    * the 4.5-cycle to do the necessary cleanup.
    *
-   * @var array|null array(int $id => string $relTypeCname)
+   * Format is [int $id => string $relTypeCname].
+   *
+   * @var array|null
    */
   public static $activityTypes = NULL;
-
-  /**
-   * FIXME: This does *NOT* belong in a static property, but we're too late in
-   * the 4.5-cycle to do the necessary cleanup.
-   *
-   * @var array|null array(int $id => string $relTypeCname)
-   */
-  public static $relationshipTypes = NULL;
-
-  /**
-   * Relationship-types have four name fields (name_a_b, name_b_a, label_a_b,
-   * label_b_a), but CiviCase XML refers to reltypes by a single name.
-   * REL_TYPE_CNAME identifies the canonical name field as used by CiviCase XML.
-   *
-   * This appears to be "label_b_a", but IMHO "name_b_a" would be more
-   * sensible.
-   */
-  const REL_TYPE_CNAME = 'label_b_a';
 
   /**
    * @param $caseType
@@ -107,19 +91,33 @@ class CRM_Case_XMLProcessor {
   }
 
   /**
+   * Get all relationship type labels
+   *
+   * TODO: These should probably be names, but under legacy behavior this has
+   * been labels.
+   *
+   * @param bool $fromXML
+   *   Is this to be used for lookup of values from XML?
+   *   Relationships are recorded in XML from the perspective of the non-client
+   *   while relationships in the UI and everywhere else are from the
+   *   perspective of the client.  Since the XML can't be expected to be
+   *   switched, the direction needs to be translated.
    * @return array
    */
-  public function &allRelationshipTypes() {
-    if (self::$relationshipTypes === NULL) {
+  public function &allRelationshipTypes($fromXML = FALSE) {
+    if (!isset(Civi::$statics[__CLASS__]['reltypes'][$fromXML])) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
 
-      self::$relationshipTypes = [];
+      Civi::$statics[__CLASS__]['reltypes'][$fromXML] = [];
       foreach ($relationshipInfo as $id => $info) {
-        self::$relationshipTypes[$id] = $info[CRM_Case_XMLProcessor::REL_TYPE_CNAME];
+        Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_b_a'] = ($fromXML) ? $info['label_a_b'] : $info['label_b_a'];
+        if ($info['label_b_a'] !== $info['label_a_b']) {
+          Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_a_b'] = ($fromXML) ? $info['label_b_a'] : $info['label_a_b'];
+        }
       }
     }
 
-    return self::$relationshipTypes;
+    return Civi::$statics[__CLASS__]['reltypes'][$fromXML];
   }
 
   /**
@@ -127,7 +125,7 @@ class CRM_Case_XMLProcessor {
    */
   public static function flushStaticCaches() {
     self::$activityTypes = NULL;
-    self::$relationshipTypes = NULL;
+    unset(Civi::$statics[__CLASS__]['reltypes']);
   }
 
 }

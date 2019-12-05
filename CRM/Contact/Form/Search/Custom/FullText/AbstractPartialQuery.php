@@ -85,9 +85,9 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *   A temporary table into which we can write a list of all matching IDs.
    * @param string $detailTable
    *   A table into which we can write details about a page worth of matches.
-   * @param array|NULL $queryLimit overall limit (applied when building $entityIDTableName)
+   * @param array|null $queryLimit overall limit (applied when building $entityIDTableName)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
-   * @param array|NULL $detailLimit final limit (applied when building $detailTable)
+   * @param array|null $detailLimit final limit (applied when building $detailTable)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @return array
    *   keys: match-descriptor

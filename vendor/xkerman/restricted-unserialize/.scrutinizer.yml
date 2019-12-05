@@ -1,0 +1,26 @@
+checks:
+  php: true
+filter:
+  excluded_paths:
+    - bin/*
+    - generated/*
+    - test/*
+build:
+  environment:
+    php:
+      version: 7.3
+  nodes:
+    analysis: # https://scrutinizer-ci.com/docs/tools/php/php-scrutinizer/#security-analysis
+      project_setup:
+        override: true
+      tests:
+        override:
+          - php-scrutinizer-run --enable-security-analysis
+    coverage:    # https://scrutinizer-ci.com/docs/build/code_coverage
+      tests:
+        override:
+          -
+            command: composer test
+            coverage:
+              file: report/coverage/clover.xml
+              format: php-clover

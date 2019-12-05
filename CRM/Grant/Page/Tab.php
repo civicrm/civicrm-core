@@ -177,7 +177,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
         break;
 
       case 'edit':
-        $url = CRM_utils_System::url('civicrm/contact/view/grant', 'reset=1&id=' . $this->_id . '&cid=' . $this->_contactId . '&action=view&context=grant&selectedChild=grant');
+        $url = CRM_Utils_System::url('civicrm/contact/view/grant', 'reset=1&id=' . $this->_id . '&cid=' . $this->_contactId . '&action=view&context=grant&selectedChild=grant');
         break;
 
       case 'grant':

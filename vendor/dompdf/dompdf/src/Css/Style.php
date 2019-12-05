@@ -544,7 +544,7 @@ class Style
             }
 
             if ($l === "normal") {
-                $ret += $ref_size;
+                $ret += (float)$ref_size;
                 continue;
             }
 
@@ -576,12 +576,17 @@ class Style
             }
 
             if (($i = mb_strpos($l, "%")) !== false) {
-                $ret += (float)mb_substr($l, 0, $i) / 100 * $ref_size;
+                $ret += (float)mb_substr($l, 0, $i) / 100 * (float)$ref_size;
                 continue;
             }
 
             if (($i = mb_strpos($l, "rem")) !== false) {
-                $ret += (float)mb_substr($l, 0, $i) * $this->_stylesheet->get_dompdf()->getTree()->get_root()->get_style()->font_size;
+                if ($this->_stylesheet->get_dompdf()->getTree()->get_root()->get_style() === null) {
+                    // Interpreting it as "em", see https://github.com/dompdf/dompdf/issues/1406
+                    $ret += (float)mb_substr($l, 0, $i) * $this->__get("font_size");
+                } else {
+                    $ret += (float)mb_substr($l, 0, $i) * $this->_stylesheet->get_dompdf()->getTree()->get_root()->get_style()->font_size;
+                }
                 continue;
             }
 
@@ -684,19 +689,33 @@ class Style
      */
     function merge(Style $style)
     {
+        $shorthand_properties = array("background", "border", "border_bottom", "border_color", "border_left", "border_radius", "border_right", "border_style", "border_top", "border_width", "flex", "font", "list_style", "margin", "padding", "transform");
         //treat the !important attribute
         //if old rule has !important attribute, override with new rule only if
         //the new rule is also !important
         foreach ($style->_props as $prop => $val) {
+            $can_merge = false;
             if (isset($style->_important_props[$prop])) {
                 $this->_important_props[$prop] = true;
-                //see __set and __get, on all assignments clear cache!
-                $this->_prop_cache[$prop] = null;
-                $this->_props[$prop] = $val;
+                $can_merge = true;
             } else if (!isset($this->_important_props[$prop])) {
+                $can_merge = true;
+            }
+
+            if ($can_merge) {
                 //see __set and __get, on all assignments clear cache!
                 $this->_prop_cache[$prop] = null;
                 $this->_props[$prop] = $val;
+
+                // Clear out "inherit" shorthand properties if specific properties have been set
+                $shorthands = array_filter($shorthand_properties, function($el) use ($prop) {
+                    return ( strpos($prop, $el."_") !== false );
+                });
+                foreach ($shorthands as $shorthand) {
+                    if (array_key_exists($shorthand, $this->_props) && $this->_props[$shorthand] === "inherit") {
+                        unset($this->_props[$shorthand]);
+                    }
+                } 
             }
         }
 
@@ -757,7 +776,7 @@ class Style
      * For easier finding all assignments, attempted to allowing only explicite assignment:
      * Very many uses, e.g. AbstractFrameReflower.php -> for now leave as it is
      * function __set($prop, $val) {
-     *   throw new Exception("Implicite replacement of assignment by __set.  Not good.");
+     *   throw new Exception("Implicit replacement of assignment by __set.  Not good.");
      * }
      * function props_set($prop, $val) { ... }
      *
@@ -955,7 +974,9 @@ class Style
             $font = $this->getFontMetrics()->getFont($family, $subtype);
 
             if ($font) {
-                if ($DEBUGCSS) print '(' . $font . ")get_font_family]\n</pre>";
+                if ($DEBUGCSS) {
+                    print '(' . $font . ")get_font_family]\n</pre>";
+                }
                 return $this->_font_family = $font;
             }
         }
@@ -967,7 +988,9 @@ class Style
         $font = $this->getFontMetrics()->getFont($family, $subtype);
 
         if ($font) {
-            if ($DEBUGCSS) print '(' . $font . ")get_font_family]\n</pre>";
+            if ($DEBUGCSS) {
+                print '(' . $font . ")get_font_family]\n</pre>";
+            }
             return $this->_font_family = $font;
         }
 
@@ -1070,8 +1093,7 @@ class Style
      */
     function get_line_height()
     {
-        if (array_key_exists("line_height", $this->_props) === false)
-        {
+        if (array_key_exists("line_height", $this->_props) === false) {
             $this->_props["line_height"] = self::$_defaults["line_height"];
         }
         $line_height = $this->_props["line_height"];
@@ -1155,7 +1177,6 @@ class Style
         }
 
         if (isset($tmp[1])) {
-
             switch ($tmp[1]) {
                 case "left":
                     $x = "0%";
@@ -1185,7 +1206,6 @@ class Style
                     $y = $tmp[1];
                     break;
             }
-
         } else {
             $y = "50%";
         }
@@ -1570,7 +1590,7 @@ class Style
      Only for combined attributes extra treatment needed. See below.
 
      div { border: 1px red; }
-     div { border: solid; } // Not combined! Only one occurence of same style per context
+     div { border: solid; } // Not combined! Only one occurrence of same style per context
      //
      div { border: 1px red; }
      div a { border: solid; } // Adding to border style ok by inheritance
@@ -1588,13 +1608,13 @@ class Style
      At individual property like border-top-width need to check whether overriding value is also !important.
      Also store the !important condition for later overrides.
      Since not known who is initiating the override, need to get passed !important as parameter.
-     !important Paramter taken as in the original style in the css file.
+     !important Parameter taken as in the original style in the css file.
      When property border !important given, do not mark subsets like border_style as important. Only
      individual properties.
 
      Note:
      Setting individual property directly from css with e.g. set_border_top_style() is not needed, because
-     missing set funcions handled by a generic handler __set(), including the !important.
+     missing set functions handled by a generic handler __set(), including the !important.
      Setting individual property of as sub-property is handled below.
 
      Implementation see at _set_style_side_type()
@@ -1949,7 +1969,7 @@ class Style
      *
      * Other than with border and list, existing partial attributes should
      * reset when starting here, even when not mentioned.
-     * If individual attribute is !important and explicite or implicite replacement is not,
+     * If individual attribute is !important and explicit or implicit replacement is not,
      * keep individual attribute
      *
      * require whitespace as delimiters for single value attributes
@@ -1958,7 +1978,7 @@ class Style
      * font-style, font-variant, font-weight, font-size, line-height, font-family
      *
      * missing font-size and font-family might be not allowed, but accept it here and
-     * use default (medium size, enpty font name)
+     * use default (medium size, empty font name)
      *
      * @link http://www.w3.org/TR/CSS21/generate.html#propdef-list-style
      * @param $val
@@ -2152,7 +2172,7 @@ class Style
 
         // FIXME: handle partial values
 
-        //For consistency of individal and combined properties, and with ie8 and firefox3
+        //For consistency of individual and combined properties, and with ie8 and firefox3
         //reset all attributes, even if only partially given
         $this->_set_style_side_type('border', $side, '_style', self::$_defaults['border_' . $side . '_style'], $important);
         $this->_set_style_side_type('border', $side, '_width', self::$_defaults['border_' . $side . '_width'], $important);
@@ -2524,7 +2544,7 @@ class Style
 
             //On setting or merging or inheriting list_style_image as well as list_style_type,
             //and url exists, then url has precedence, otherwise fall back to list_style_type
-            //Firefox is wrong here (list_style_image gets overwritten on explicite list_style_type)
+            //Firefox is wrong here (list_style_image gets overwritten on explicit list_style_type)
             //Internet Explorer 7/8 and dompdf is right.
 
             if (mb_substr($value, 0, 3) === "url") {
@@ -2662,10 +2682,10 @@ class Style
 
                         // <translation-value> units
                         case "translate":
-                            $values[0] = $this->length_in_pt($values[0], $this->width);
+                            $values[0] = $this->length_in_pt($values[0], (float)$this->length_in_pt($this->width));
 
                             if (isset($values[1])) {
-                                $values[1] = $this->length_in_pt($values[1], $this->height);
+                                $values[1] = $this->length_in_pt($values[1], (float)$this->length_in_pt($this->height));
                             } else {
                                 $values[1] = 0;
                             }
@@ -2673,12 +2693,12 @@ class Style
 
                         case "translateX":
                             $name = "translate";
-                            $values = array($this->length_in_pt($values[0], $this->width), 0);
+                            $values = array($this->length_in_pt($values[0], (float)$this->length_in_pt($this->width)), 0);
                             break;
 
                         case "translateY":
                             $name = "translate";
-                            $values = array(0, $this->length_in_pt($values[0], $this->height));
+                            $values = array(0, $this->length_in_pt($values[0], (float)$this->length_in_pt($this->height)));
                             break;
 
                         // <number> units

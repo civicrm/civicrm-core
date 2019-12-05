@@ -44,16 +44,23 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   protected $_queryParams;
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Pledge';
+  }
+
+  /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -91,6 +98,10 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     }
 
     if ($this->_force) {
+      // pledge related dates
+      $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
+      $this->addFormFieldsFromMetadata();
       $this->postProcess();
       $this->set('force', 0);
     }
@@ -223,7 +234,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = TRUE;
 
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
 
     $this->fixFormValues();
 
@@ -314,19 +325,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     $this->addFormRule(['CRM_Pledge_Form_Search', 'formRule']);
   }
 
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function setDefaultValues() {
-    $defaults = [];
-    $defaults = $this->_formValues;
-    return $defaults;
-  }
-
   public function fixFormValues() {
     if (!$this->_force) {
       return;
@@ -396,13 +394,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
         $this->_single = TRUE;
       }
     }
-  }
-
-  /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
   }
 
   /**

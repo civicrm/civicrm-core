@@ -126,4 +126,183 @@ class CRM_Utils_JS {
     return preg_replace(":^\\s*//[^\n]+$:m", "", $script);
   }
 
+  /**
+   * Decodes a js variable (not necessarily strict json but valid js) into a php variable.
+   *
+   * This is similar to using json_decode($js, TRUE) but more forgiving about syntax.
+   *
+   * ex. {a: 'Apple', 'b': "Banana", c: [1, 2, 3]}
+   * Returns: [
+   *   'a' => 'Apple',
+   *   'b' => 'Banana',
+   *   'c' => [1, 2, 3],
+   * ]
+   *
+   * @param string $js
+   * @return mixed
+   */
+  public static function decode($js) {
+    $js = trim($js);
+    $first = substr($js, 0, 1);
+    $last = substr($js, -1);
+    if ($last === $first && ($first === "'" || $first === '"')) {
+      // Use a temp placeholder for escaped backslashes
+      $backslash = chr(0) . 'backslash' . chr(0);
+      return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', $backslash], [$backslash, "'", '"', '&', '/', '\\'], substr($js, 1, -1));
+    }
+    if (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
+      $obj = self::getRawProps($js);
+      foreach ($obj as $idx => $item) {
+        $obj[$idx] = self::decode($item);
+      }
+      return $obj;
+    }
+    return json_decode($js);
+  }
+
+  /**
+   * Encodes a variable to js notation (not strict json) suitable for e.g. an angular attribute.
+   *
+   * Like json_encode() but the output looks more like native javascript,
+   * with single quotes around strings and no unnecessary quotes around object keys.
+   *
+   * Ex input: [
+   *   'a' => 'Apple',
+   *   'b' => 'Banana',
+   *   'c' => [1, 2, 3],
+   * ]
+   * Ex output: {a: 'Apple', b: 'Banana', c: [1, 2, 3]}
+   *
+   * @param mixed $value
+   * @return string
+   */
+  public static function encode($value) {
+    if (is_array($value)) {
+      return self::writeObject($value, TRUE);
+    }
+    $result = json_encode($value, JSON_UNESCAPED_SLASHES);
+    // Convert double-quotes around string to single quotes
+    if (is_string($value) && substr($result, 0, 1) === '"' && substr($result, -1) === '"') {
+      $backslash = chr(0) . 'backslash' . chr(0);
+      return "'" . str_replace(['\\\\', '\\"', "'", $backslash], [$backslash, '"', "\\'", '\\\\'], substr($result, 1, -1)) . "'";
+    }
+    return $result;
+  }
+
+  /**
+   * Gets the properties of a javascript object/array WITHOUT decoding them.
+   *
+   * Useful when the object might contain js functions, expressions, etc. which cannot be decoded.
+   * Returns an array with keys as property names and values as raw strings of js.
+   *
+   * Ex Input: {foo: getFoo(arg), 'bar': function() {return "bar";}}
+   * Returns: [
+   *   'foo' => 'getFoo(arg)',
+   *   'bar' => 'function() {return "bar";}',
+   * ]
+   *
+   * @param $js
+   * @return array
+   * @throws \Exception
+   */
+  public static function getRawProps($js) {
+    $js = trim($js);
+    if (!is_string($js) || $js === '' || !($js[0] === '{' || $js[0] === '[')) {
+      throw new Exception("Invalid js object string passed to CRM_Utils_JS::getRawProps");
+    }
+    $chars = str_split(substr($js, 1));
+    $isEscaped = $quote = NULL;
+    $type = $js[0] === '{' ? 'object' : 'array';
+    $key = $type == 'array' ? 0 : NULL;
+    $item = '';
+    $end = strlen($js) - 2;
+    $quotes = ['"', "'", '/'];
+    $brackets = [
+      '}' => '{',
+      ')' => '(',
+      ']' => '[',
+      ':' => '?',
+    ];
+    $enclosures = array_fill_keys($brackets, 0);
+    $result = [];
+    foreach ($chars as $index => $char) {
+      if (!$isEscaped && in_array($char, $quotes, TRUE)) {
+        // Open quotes, taking care not to mistake the division symbol for opening a regex
+        if (!$quote && !($char == '/' && preg_match('{[\w)]\s*$}', $item))) {
+          $quote = $char;
+        }
+        // Close quotes
+        elseif ($char === $quote) {
+          $quote = NULL;
+        }
+      }
+      if (!$quote) {
+        // Delineates property key
+        if ($char == ':' && !array_filter($enclosures) && !$key) {
+          $key = $item;
+          $item = '';
+          continue;
+        }
+        // Delineates property value
+        if (($char == ',' || $index == $end) && !array_filter($enclosures) && isset($key) && trim($item) !== '') {
+          // Trim, unquote, and unescape characters in key
+          if ($type == 'object') {
+            $key = trim($key);
+            $key = in_array($key[0], $quotes) ? self::decode($key) : $key;
+          }
+          $result[$key] = trim($item);
+          $key = $type == 'array' ? $key + 1 : NULL;
+          $item = '';
+          continue;
+        }
+        // Open brackets - we'll ignore delineators inside
+        if (isset($enclosures[$char])) {
+          $enclosures[$char]++;
+        }
+        // Close brackets
+        if (isset($brackets[$char]) && $enclosures[$brackets[$char]]) {
+          $enclosures[$brackets[$char]]--;
+        }
+      }
+      $item .= $char;
+      // We are escaping the next char if this is a backslash not preceded by an odd number of backslashes
+      $isEscaped = $char === '\\' && ((strlen($item) - strlen(rtrim($item, '\\'))) % 2);
+    }
+    return $result;
+  }
+
+  /**
+   * Converts a php array to javascript object/array notation (not strict JSON).
+   *
+   * Does not encode keys unless they contain special characters.
+   * Does not encode values by default, so either specify $encodeValues = TRUE,
+   * or pass strings of valid js/json as values (per output from getRawProps).
+   * @see CRM_Utils_JS::getRawProps
+   *
+   * @param array $obj
+   * @param bool $encodeValues
+   * @return string
+   */
+  public static function writeObject($obj, $encodeValues = FALSE) {
+    $js = [];
+    $brackets = isset($obj[0]) && array_keys($obj) === range(0, count($obj) - 1) ? ['[', ']'] : ['{', '}'];
+    foreach ($obj as $key => $val) {
+      if ($encodeValues) {
+        $val = self::encode($val);
+      }
+      if ($brackets[0] == '{') {
+        // Enclose the key in quotes unless it is purely alphanumeric
+        if (preg_match('/\W/', $key)) {
+          // Prefer single quotes
+          $key = preg_match('/^[\w "]+$/', $key) ? "'" . $key . "'" : json_encode($key, JSON_UNESCAPED_SLASHES);
+        }
+        $js[] = "$key: $val";
+      }
+      else {
+        $js[] = $val;
+      }
+    }
+    return $brackets[0] . implode(', ', $js) . $brackets[1];
+  }
+
 }

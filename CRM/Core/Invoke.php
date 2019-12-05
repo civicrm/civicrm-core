@@ -80,7 +80,6 @@ class CRM_Core_Invoke {
       // may exit
       self::hackMenuRebuild($args);
       self::init($args);
-      self::hackStandalone($args);
       $item = self::getItem($args);
       return self::runItem($item);
     }
@@ -138,26 +137,6 @@ class CRM_Core_Invoke {
     // also initialize the i18n framework
     require_once 'CRM/Core/I18n.php';
     $i18n = CRM_Core_I18n::singleton();
-  }
-
-  /**
-   * Hackish support for /standalone/*
-   *
-   * @param array $args
-   *   List of path parts.
-   * @void
-   */
-  public static function hackStandalone($args) {
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework == 'Standalone') {
-      $session = CRM_Core_Session::singleton();
-      if ($session->get('new_install') !== TRUE) {
-        CRM_Core_Standalone::sidebarLeft();
-      }
-      elseif ($args[1] == 'standalone' && $args[2] == 'register') {
-        CRM_Core_Menu::store();
-      }
-    }
   }
 
   /**

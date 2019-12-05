@@ -142,6 +142,7 @@ class CRM_Core_Component {
 
   public static function flushEnabledComponents() {
     unset(Civi::$statics[__CLASS__]);
+    CRM_Core_BAO_Navigation::resetNavigation();
   }
 
   /**

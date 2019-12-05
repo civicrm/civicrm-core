@@ -37,34 +37,46 @@
 class CRM_Extension_Container_Collection implements CRM_Extension_Container_Interface {
 
   /**
-   * @var array ($name => CRM_Extension_Container_Interface)
+   * Containers.
+   *
+   * Format is [$name => CRM_Extension_Container_Interface]
+   *
+   * @var array
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $containers;
 
   /**
-   * @var CRM_Utils_Cache_Interface|NULL
+   * @var CRM_Utils_Cache_Interface|null
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $cache;
 
   /**
-   * @var string the cache key used for any data stored by this container
+   * The cache key used for any data stored by this container.
+   *
+   * @var string
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $cacheKey;
 
   /**
-   * @var array ($key => $containerName)
+   * K2C ....
+   *
+   * Format is ($key => $containerName).
+   *
+   * @var array
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $k2c;
 
   /**
+   * Class constructor.
+   *
    * @param array $containers
    *   Array($name => CRM_Extension_Container_Interface) in order from highest
    *   priority (winners) to lowest priority (losers).
@@ -95,7 +107,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   /**
    * @inheritDoc
    *
-   * @return array_keys
+   * @return array
    */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
@@ -106,6 +118,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @inheritDoc
    *
    * @param string $key
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getPath($key) {
     return $this->getContainer($key)->getPath($key);
@@ -115,6 +129,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @inheritDoc
    *
    * @param string $key
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getResUrl($key) {
     return $this->getContainer($key)->getResUrl($key);

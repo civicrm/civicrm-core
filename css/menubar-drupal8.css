@@ -24,21 +24,24 @@ nav#civicrm-menu-nav .crm-menubar-toggle-btn-icon {
   left: 44px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
-  body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar-administration  {
+  body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar-administration {
     display: none;
   }
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
-    padding-top: 40px !important;
+    padding-top: $menubarHeight !important;
   }
-  body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped,
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
+    padding-top: calc($menubarHeight * 2) !important;
+  }
+  /* The Drupal menu is 40px tall so we add that to our menubar height */
   body.crm-menubar-visible.crm-menubar-below-cms-menu {
-    padding-top: 80px !important;
+    padding-top: calc($menubarHeight + 40px) !important;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped {
-    padding-top: 120px !important;
+    padding-top: calc($menubarHeight * 2 + 40px) !important;
   }
 
   body.crm-menubar-below-cms-menu > #civicrm-menu-nav ul#civicrm-menu {

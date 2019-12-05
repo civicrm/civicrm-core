@@ -230,6 +230,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $ids
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public function getInput(&$input, &$ids) {
     $input['amount'] = $this->retrieve('x_amount', 'String');
@@ -241,7 +242,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $input['subscription_paynum'] = $this->retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
     $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
     $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
-    $input['receive_date'] = $this->retrieve('receive_date', 'String', FALSE, 'now');
+    $input['receive_date'] = $this->retrieve('receive_date', 'String', FALSE, date('YmdHis', strtotime('now')));
 
     if ($input['trxn_id']) {
       $input['is_test'] = 0;

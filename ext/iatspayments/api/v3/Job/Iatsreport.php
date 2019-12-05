@@ -71,7 +71,6 @@ function civicrm_api3_job_iatsreport($params) {
   foreach (array('quick', 'recur', 'series') as $setting) {
     $import[$setting] = empty($iats_settings['import_' . $setting]) ? 0 : 1;
   }
-  require_once "CRM/iATS/iATSService.php";
   // an array of types => methods => payment status of the records retrieved
   $process_methods = array(
     1 => array('cc_journal_csv' => 1, 'cc_payment_box_journal_csv' => 1, 'cc_payment_box_reject_csv' => 4),
@@ -92,7 +91,7 @@ function civicrm_api3_job_iatsreport($params) {
       $process_methods_per_type = $process_methods[$type];
       $iats_service_params = array('type' => 'report', 'iats_domain' => parse_url($payment_processor['url_site'], PHP_URL_HOST)); // + $iats_service_params;
       /* the is_test below should always be 0, but I'm leaving it in, in case eventually we want to be verifying tests */
-      $credentials = iATS_Service_Request::credentials($payment_processor['id'], $payment_processor['is_test']);
+      $credentials = CRM_Iats_iATSServiceRequest::credentials($payment_processor['id'], $payment_processor['is_test']);
 
       foreach ($process_methods_per_type as $method => $payment_status_id) {
         // initialize my counts
@@ -101,7 +100,7 @@ function civicrm_api3_job_iatsreport($params) {
         /* get approvals from yesterday, approvals from previous days, and then rejections for this payment processor */
         /* we're going to assume that all the payment_processors_per_type are using the same server */
         $iats_service_params['method'] = $method;
-        $iats = new iATS_Service_Request($iats_service_params);
+        $iats = new CRM_Iats_iATSServiceRequest($iats_service_params);
         // For some methods, I only want to check once per day.
         $skip_method = FALSE;
         $journal_setting_key = 'last_update_' . $method;

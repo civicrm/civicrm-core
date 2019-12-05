@@ -282,6 +282,7 @@
       });
 
       $(".crm-dedupe-flip-selections").on('click', function(e) {
+        e.preventDefault();
         var ids = [];
         $('.crm-row-selected').each(function() {
           var ele = CRM.$('input.crm-dedupe-select', this);
@@ -289,7 +290,8 @@
         });
         if (ids.length > 0) {
           var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
-          CRM.$.post(dataUrl, {pnid: ids}, function (response) {
+          var request = $.post(dataUrl, {pnid: ids});
+          request.done(function(dt) {
             var mapper = {1:3, 2:4, 5:6, 7:8, 9:10}
             $('.crm-row-selected').each(function() {
               var idx = $('table#dupePairs').DataTable().row(this).index();
@@ -302,7 +304,7 @@
               // keep the checkbox checked if needed
               $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
             });
-          }, 'json');
+          });
         }
       });
     });

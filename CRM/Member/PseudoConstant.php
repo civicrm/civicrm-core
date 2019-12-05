@@ -132,6 +132,9 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
     if (isset(self::$$name)) {
       self::$$name = NULL;
     }
+    // The preferred source of membership pseudoconstants is in fact the Core class.
+    // which buildOptions accesses - better flush that too.
+    CRM_Core_PseudoConstant::flush();
   }
 
 }

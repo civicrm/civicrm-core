@@ -1,5 +1,126 @@
 [
     {
+        "name": "cache/integration-tests",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-cache/integration-tests.git",
+            "reference": "b97328797ab199f0ac933e39842a86ab732f21f9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-cache/integration-tests/zipball/b97328797ab199f0ac933e39842a86ab732f21f9",
+            "reference": "b97328797ab199f0ac933e39842a86ab732f21f9",
+            "shasum": ""
+        },
+        "require": {
+            "cache/tag-interop": "^1.0",
+            "php": "^5.4|^7",
+            "psr/cache": "~1.0"
+        },
+        "conflict": {
+            "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
+        },
+        "require-dev": {
+            "cache/cache": "^1.0",
+            "illuminate/cache": "^5.4|^5.5|^5.6",
+            "mockery/mockery": "^1.0",
+            "phpunit/phpunit": "^4.8.35|^5.4.3",
+            "symfony/cache": "^3.1|^4.0|^5.0",
+            "tedivm/stash": "^0.14"
+        },
+        "time": "2019-05-28T15:23:38+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Cache\\IntegrationTests\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Aaron Scherer",
+                "email": "aequasi@gmail.com",
+                "homepage": "https://github.com/aequasi"
+            },
+            {
+                "name": "Tobias Nyholm",
+                "email": "tobias.nyholm@gmail.com",
+                "homepage": "https://github.com/nyholm"
+            }
+        ],
+        "description": "Integration tests for PSR-6 and PSR-16 cache implementations",
+        "homepage": "https://github.com/php-cache/integration-tests",
+        "keywords": [
+            "cache",
+            "psr16",
+            "psr6",
+            "test"
+        ]
+    },
+    {
+        "name": "cache/tag-interop",
+        "version": "1.0.0",
+        "version_normalized": "1.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-cache/tag-interop.git",
+            "reference": "c7496dd81530f538af27b4f2713cde97bc292832"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-cache/tag-interop/zipball/c7496dd81530f538af27b4f2713cde97bc292832",
+            "reference": "c7496dd81530f538af27b4f2713cde97bc292832",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^5.5 || ^7.0",
+            "psr/cache": "^1.0"
+        },
+        "time": "2017-03-13T09:14:27+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Cache\\TagInterop\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Tobias Nyholm",
+                "email": "tobias.nyholm@gmail.com",
+                "homepage": "https://github.com/Nyholm"
+            },
+            {
+                "name": "Nicolas Grekas",
+                "email": "p@tchwork.com",
+                "homepage": "https://github.com/nicolas-grekas"
+            }
+        ],
+        "description": "Framework interoperable interfaces for tags",
+        "homepage": "http://www.php-cache.com/en/latest/",
+        "keywords": [
+            "cache",
+            "psr",
+            "psr6",
+            "tag"
+        ]
+    },
+    {
         "name": "civicrm/civicrm-cxn-rpc",
         "version": "v0.19.01.08",
         "version_normalized": "0.19.01.08",
@@ -78,6 +199,59 @@
         "description": "CiviCRM installation library"
     },
     {
+        "name": "civicrm/composer-downloads-plugin",
+        "version": "v2.0.0",
+        "version_normalized": "2.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/civicrm/composer-downloads-plugin.git",
+            "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
+            "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
+            "shasum": ""
+        },
+        "require": {
+            "composer-plugin-api": "^1.1",
+            "php": ">=5.6",
+            "togos/gitignore": "~1.1.1"
+        },
+        "require-dev": {
+            "composer/composer": "~1.0",
+            "friendsofphp/php-cs-fixer": "^2.3",
+            "phpunit/phpunit": "^5.7",
+            "totten/process-helper": "^1.0.1"
+        },
+        "time": "2019-08-22T10:56:51+00:00",
+        "type": "composer-plugin",
+        "extra": {
+            "class": "LastCall\\DownloadsPlugin\\Plugin"
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "LastCall\\DownloadsPlugin\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Rob Bayliss",
+                "email": "rob@lastcallmedia.com"
+            },
+            {
+                "name": "Tim Otten",
+                "email": "totten@civicrm.org"
+            }
+        ],
+        "description": "Composer plugin for downloading additional files within any composer package."
+    },
+    {
         "name": "cweagans/composer-patches",
         "version": "1.6.5",
         "version_normalized": "1.6.5.0",
@@ -125,32 +299,36 @@
     },
     {
         "name": "dompdf/dompdf",
-        "version": "v0.8.0",
-        "version_normalized": "0.8.0.0",
+        "version": "v0.8.3",
+        "version_normalized": "0.8.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/dompdf/dompdf.git",
-            "reference": "0f418c6b58fdeafc2a0e80eb1fa5e644e185089c"
+            "reference": "75f13c700009be21a1965dc2c5b68a8708c22ba2"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/dompdf/dompdf/zipball/0f418c6b58fdeafc2a0e80eb1fa5e644e185089c",
-            "reference": "0f418c6b58fdeafc2a0e80eb1fa5e644e185089c",
+            "url": "https://api.github.com/repos/dompdf/dompdf/zipball/75f13c700009be21a1965dc2c5b68a8708c22ba2",
+            "reference": "75f13c700009be21a1965dc2c5b68a8708c22ba2",
             "shasum": ""
         },
         "require": {
             "ext-dom": "*",
-            "ext-gd": "*",
             "ext-mbstring": "*",
             "phenx/php-font-lib": "0.5.*",
-            "phenx/php-svg-lib": "0.2.*",
-            "php": ">=5.3.0"
+            "phenx/php-svg-lib": "0.3.*",
+            "php": ">=5.4.0"
         },
         "require-dev": {
-            "phpunit/phpunit": "4.8.*",
+            "phpunit/phpunit": "^4.8|^5.5|^6.5",
             "squizlabs/php_codesniffer": "2.*"
         },
-        "time": "2017-02-16T02:40:40+00:00",
+        "suggest": {
+            "ext-gd": "Needed to process images",
+            "ext-gmagick": "Improves image processing performance",
+            "ext-imagick": "Improves image processing performance"
+        },
+        "time": "2018-12-14T02:40:31+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -228,55 +406,6 @@
         ],
         "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
         "homepage": "http://code.google.com/p/phpquery/"
-    },
-    {
-        "name": "ezyang/htmlpurifier",
-        "version": "v4.10.0",
-        "version_normalized": "4.10.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/ezyang/htmlpurifier.git",
-            "reference": "d85d39da4576a6934b72480be6978fb10c860021"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d85d39da4576a6934b72480be6978fb10c860021",
-            "reference": "d85d39da4576a6934b72480be6978fb10c860021",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2"
-        },
-        "require-dev": {
-            "simpletest/simpletest": "^1.1"
-        },
-        "time": "2018-02-23T01:58:20+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "HTMLPurifier": "library/"
-            },
-            "files": [
-                "library/HTMLPurifier.composer.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL"
-        ],
-        "authors": [
-            {
-                "name": "Edward Z. Yang",
-                "email": "admin@htmlpurifier.org",
-                "homepage": "http://ezyang.com"
-            }
-        ],
-        "description": "Standards compliant HTML filter written in PHP",
-        "homepage": "http://htmlpurifier.org/",
-        "keywords": [
-            "html"
-        ]
     },
     {
         "name": "guzzlehttp/guzzle",
@@ -509,6 +638,75 @@
         "keywords": [
             "mimetype",
             "php"
+        ]
+    },
+    {
+        "name": "league/csv",
+        "version": "9.2.1",
+        "version_normalized": "9.2.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/thephpleague/csv.git",
+            "reference": "b574a7d8b28f1528e011d8652fb7d2e83410d4c9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/thephpleague/csv/zipball/b574a7d8b28f1528e011d8652fb7d2e83410d4c9",
+            "reference": "b574a7d8b28f1528e011d8652fb7d2e83410d4c9",
+            "shasum": ""
+        },
+        "require": {
+            "ext-mbstring": "*",
+            "php": ">=7.0.10"
+        },
+        "require-dev": {
+            "ext-curl": "*",
+            "friendsofphp/php-cs-fixer": "^2.12",
+            "phpstan/phpstan": "^0.9.2",
+            "phpstan/phpstan-phpunit": "^0.9.4",
+            "phpstan/phpstan-strict-rules": "^0.9.0",
+            "phpunit/phpunit": "^6.0"
+        },
+        "suggest": {
+            "ext-iconv": "Needed to ease transcoding CSV using iconv stream filters"
+        },
+        "time": "2019-06-07T06:24:33+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "9.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "League\\Csv\\": "src"
+            },
+            "files": [
+                "src/functions_include.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Ignace Nyamagana Butera",
+                "email": "nyamsprod@gmail.com",
+                "homepage": "https://github.com/nyamsprod/",
+                "role": "Developer"
+            }
+        ],
+        "description": "Csv data manipulation made easy in PHP",
+        "homepage": "http://csv.thephpleague.com",
+        "keywords": [
+            "csv",
+            "export",
+            "filter",
+            "import",
+            "read",
+            "write"
         ]
     },
     {
@@ -1125,28 +1323,31 @@
     },
     {
         "name": "phenx/php-svg-lib",
-        "version": "v0.2",
-        "version_normalized": "0.2.0.0",
+        "version": "v0.3.3",
+        "version_normalized": "0.3.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/PhenX/php-svg-lib.git",
-            "reference": "de291bec8449b89acfe85691b5c71434797959dc"
+            "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/de291bec8449b89acfe85691b5c71434797959dc",
-            "reference": "de291bec8449b89acfe85691b5c71434797959dc",
+            "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
+            "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
             "shasum": ""
         },
         "require": {
-            "sabberworm/php-css-parser": "6.0.*"
+            "sabberworm/php-css-parser": "^8.3"
         },
-        "time": "2016-12-13T20:25:45+00:00",
+        "require-dev": {
+            "phpunit/phpunit": "^5.5|^6.5"
+        },
+        "time": "2019-09-11T20:02:13+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
-            "psr-0": {
-                "Svg\\": "src/"
+            "psr-4": {
+                "Svg\\": "src/Svg"
             }
         },
         "notification-url": "https://packagist.org/downloads/",
@@ -1440,6 +1641,54 @@
         ]
     },
     {
+        "name": "psr/cache",
+        "version": "1.0.1",
+        "version_normalized": "1.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-fig/cache.git",
+            "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-fig/cache/zipball/d11b50ad223250cf17b86e38383413f5a6764bf8",
+            "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-08-06T20:24:11+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Psr\\Cache\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PHP-FIG",
+                "homepage": "http://www.php-fig.org/"
+            }
+        ],
+        "description": "Common interface for caching libraries",
+        "keywords": [
+            "cache",
+            "psr",
+            "psr-6"
+        ]
+    },
+    {
         "name": "psr/http-message",
         "version": "1.0.1",
         "version_normalized": "1.0.1.0",
@@ -1592,23 +1841,27 @@
     },
     {
         "name": "sabberworm/php-css-parser",
-        "version": "6.0.1",
-        "version_normalized": "6.0.1.0",
+        "version": "8.3.0",
+        "version_normalized": "8.3.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/sabberworm/PHP-CSS-Parser.git",
-            "reference": "9ea4b00c569b19f731d0c2e0e802055877ff40c2"
+            "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/9ea4b00c569b19f731d0c2e0e802055877ff40c2",
-            "reference": "9ea4b00c569b19f731d0c2e0e802055877ff40c2",
+            "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
+            "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.2"
         },
-        "time": "2015-08-24T08:48:52+00:00",
+        "require-dev": {
+            "codacy/coverage": "^1.4",
+            "phpunit/phpunit": "~4.8"
+        },
+        "time": "2019-02-22T07:42:52+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1635,17 +1888,17 @@
     },
     {
         "name": "symfony/config",
-        "version": "v2.8.44",
-        "version_normalized": "2.8.44.0",
+        "version": "v2.8.50",
+        "version_normalized": "2.8.50.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/config.git",
-            "reference": "06c0be4cdd8363f3ec8d592c9a4d1b981d5052af"
+            "reference": "7dd5f5040dc04c118d057fb5886563963eb70011"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/config/zipball/06c0be4cdd8363f3ec8d592c9a4d1b981d5052af",
-            "reference": "06c0be4cdd8363f3ec8d592c9a4d1b981d5052af",
+            "url": "https://api.github.com/repos/symfony/config/zipball/7dd5f5040dc04c118d057fb5886563963eb70011",
+            "reference": "7dd5f5040dc04c118d057fb5886563963eb70011",
             "shasum": ""
         },
         "require": {
@@ -1659,7 +1912,7 @@
         "suggest": {
             "symfony/yaml": "To use the yaml reference dumper"
         },
-        "time": "2018-07-26T11:13:39+00:00",
+        "time": "2018-11-26T09:38:12+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1694,17 +1947,17 @@
     },
     {
         "name": "symfony/dependency-injection",
-        "version": "v2.8.44",
-        "version_normalized": "2.8.44.0",
+        "version": "v2.8.50",
+        "version_normalized": "2.8.50.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/dependency-injection.git",
-            "reference": "ad2446d39d11c3daaa7f147d957941a187e47357"
+            "reference": "c306198fee8f872a8f5f031e6e4f6f83086992d8"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/ad2446d39d11c3daaa7f147d957941a187e47357",
-            "reference": "ad2446d39d11c3daaa7f147d957941a187e47357",
+            "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/c306198fee8f872a8f5f031e6e4f6f83086992d8",
+            "reference": "c306198fee8f872a8f5f031e6e4f6f83086992d8",
             "shasum": ""
         },
         "require": {
@@ -1724,7 +1977,7 @@
             "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
             "symfony/yaml": ""
         },
-        "time": "2018-07-26T11:13:39+00:00",
+        "time": "2019-04-16T11:33:46+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1759,17 +2012,17 @@
     },
     {
         "name": "symfony/event-dispatcher",
-        "version": "v2.8.44",
-        "version_normalized": "2.8.44.0",
+        "version": "v2.8.50",
+        "version_normalized": "2.8.50.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/event-dispatcher.git",
-            "reference": "84ae343f39947aa084426ed1138bb96bf94d1f12"
+            "reference": "a77e974a5fecb4398833b0709210e3d5e334ffb0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/84ae343f39947aa084426ed1138bb96bf94d1f12",
-            "reference": "84ae343f39947aa084426ed1138bb96bf94d1f12",
+            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/a77e974a5fecb4398833b0709210e3d5e334ffb0",
+            "reference": "a77e974a5fecb4398833b0709210e3d5e334ffb0",
             "shasum": ""
         },
         "require": {
@@ -1786,7 +2039,7 @@
             "symfony/dependency-injection": "",
             "symfony/http-kernel": ""
         },
-        "time": "2018-07-26T09:03:18+00:00",
+        "time": "2018-11-21T14:20:20+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1821,24 +2074,24 @@
     },
     {
         "name": "symfony/filesystem",
-        "version": "v2.8.44",
-        "version_normalized": "2.8.44.0",
+        "version": "v2.8.50",
+        "version_normalized": "2.8.50.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/filesystem.git",
-            "reference": "2d6a4deccdfa2e4e9f113138b93457b2d0886c15"
+            "reference": "7ae46872dad09dffb7fe1e93a0937097339d0080"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/filesystem/zipball/2d6a4deccdfa2e4e9f113138b93457b2d0886c15",
-            "reference": "2d6a4deccdfa2e4e9f113138b93457b2d0886c15",
+            "url": "https://api.github.com/repos/symfony/filesystem/zipball/7ae46872dad09dffb7fe1e93a0937097339d0080",
+            "reference": "7ae46872dad09dffb7fe1e93a0937097339d0080",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.9",
             "symfony/polyfill-ctype": "~1.8"
         },
-        "time": "2018-07-26T11:13:39+00:00",
+        "time": "2018-11-11T11:18:13+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1873,23 +2126,23 @@
     },
     {
         "name": "symfony/finder",
-        "version": "v2.8.44",
-        "version_normalized": "2.8.44.0",
+        "version": "v2.8.50",
+        "version_normalized": "2.8.50.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/finder.git",
-            "reference": "f0de0b51913eb2caab7dfed6413b87e14fca780e"
+            "reference": "1444eac52273e345d9b95129bf914639305a9ba4"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/finder/zipball/f0de0b51913eb2caab7dfed6413b87e14fca780e",
-            "reference": "f0de0b51913eb2caab7dfed6413b87e14fca780e",
+            "url": "https://api.github.com/repos/symfony/finder/zipball/1444eac52273e345d9b95129bf914639305a9ba4",
+            "reference": "1444eac52273e345d9b95129bf914639305a9ba4",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.9"
         },
-        "time": "2018-07-26T11:13:39+00:00",
+        "time": "2018-11-11T11:18:13+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1924,27 +2177,30 @@
     },
     {
         "name": "symfony/polyfill-ctype",
-        "version": "v1.8.0",
-        "version_normalized": "1.8.0.0",
+        "version": "v1.12.0",
+        "version_normalized": "1.12.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/polyfill-ctype.git",
-            "reference": "7cc359f1b7b80fc25ed7796be7d96adc9b354bae"
+            "reference": "550ebaac289296ce228a706d0867afc34687e3f4"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/7cc359f1b7b80fc25ed7796be7d96adc9b354bae",
-            "reference": "7cc359f1b7b80fc25ed7796be7d96adc9b354bae",
+            "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/550ebaac289296ce228a706d0867afc34687e3f4",
+            "reference": "550ebaac289296ce228a706d0867afc34687e3f4",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2018-04-30T19:57:29+00:00",
+        "suggest": {
+            "ext-ctype": "For best performance"
+        },
+        "time": "2019-08-06T08:03:45+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.8-dev"
+                "dev-master": "1.12-dev"
             }
         },
         "installation-source": "dist",
@@ -1962,12 +2218,12 @@
         ],
         "authors": [
             {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            },
-            {
                 "name": "Gert de Pagter",
                 "email": "BackEndTea@gmail.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
             }
         ],
         "description": "Symfony polyfill for ctype functions",
@@ -1981,17 +2237,17 @@
     },
     {
         "name": "symfony/polyfill-iconv",
-        "version": "v1.9.0",
-        "version_normalized": "1.9.0.0",
+        "version": "v1.12.0",
+        "version_normalized": "1.12.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/polyfill-iconv.git",
-            "reference": "bcc0cd69185b8a5d8b4a5400c489ed3333bf9bb2"
+            "reference": "685968b11e61a347c18bf25db32effa478be610f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-iconv/zipball/bcc0cd69185b8a5d8b4a5400c489ed3333bf9bb2",
-            "reference": "bcc0cd69185b8a5d8b4a5400c489ed3333bf9bb2",
+            "url": "https://api.github.com/repos/symfony/polyfill-iconv/zipball/685968b11e61a347c18bf25db32effa478be610f",
+            "reference": "685968b11e61a347c18bf25db32effa478be610f",
             "shasum": ""
         },
         "require": {
@@ -2000,11 +2256,11 @@
         "suggest": {
             "ext-iconv": "For best performance"
         },
-        "time": "2018-08-06T14:22:27+00:00",
+        "time": "2019-08-06T08:03:45+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.9-dev"
+                "dev-master": "1.12-dev"
             }
         },
         "installation-source": "dist",
@@ -2042,23 +2298,23 @@
     },
     {
         "name": "symfony/process",
-        "version": "v2.8.44",
-        "version_normalized": "2.8.44.0",
+        "version": "v2.8.50",
+        "version_normalized": "2.8.50.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/process.git",
-            "reference": "cc83afdb5ac99147806b3bb65a3ff1227664f596"
+            "reference": "c3591a09c78639822b0b290d44edb69bf9f05dc8"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/process/zipball/cc83afdb5ac99147806b3bb65a3ff1227664f596",
-            "reference": "cc83afdb5ac99147806b3bb65a3ff1227664f596",
+            "url": "https://api.github.com/repos/symfony/process/zipball/c3591a09c78639822b0b290d44edb69bf9f05dc8",
+            "reference": "c3591a09c78639822b0b290d44edb69bf9f05dc8",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.9"
         },
-        "time": "2018-07-26T11:13:39+00:00",
+        "time": "2018-11-11T11:18:13+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -2156,6 +2412,41 @@
         ]
     },
     {
+        "name": "togos/gitignore",
+        "version": "1.1.1",
+        "version_normalized": "1.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/TOGoS/PHPGitIgnore.git",
+            "reference": "32bc0830e4123f670adcbf5ddda5bef362f4f4d4"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/TOGoS/PHPGitIgnore/zipball/32bc0830e4123f670adcbf5ddda5bef362f4f4d4",
+            "reference": "32bc0830e4123f670adcbf5ddda5bef362f4f4d4",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "require-dev": {
+            "togos/simpler-test": "1.1.1"
+        },
+        "time": "2019-04-19T19:16:58+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "TOGoS_GitIgnore_": "src/main/php/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Parser for .gitignore (and sparse-checkout, and anything else using the same format) files"
+    },
+    {
         "name": "totten/ca-config",
         "version": "v17.05.0",
         "version_normalized": "17.05.0.0",
@@ -2193,6 +2484,59 @@
         ],
         "description": "Default configuration for certificate authorities",
         "homepage": "https://github.com/totten/ca_config"
+    },
+    {
+        "name": "xkerman/restricted-unserialize",
+        "version": "1.1.12",
+        "version_normalized": "1.1.12.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/xKerman/restricted-unserialize.git",
+            "reference": "4c6cadbb176c04d3e19b9bb8b40df12998460489"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/xKerman/restricted-unserialize/zipball/4c6cadbb176c04d3e19b9bb8b40df12998460489",
+            "reference": "4c6cadbb176c04d3e19b9bb8b40df12998460489",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "require-dev": {
+            "nikic/php-parser": "^1.4|^3.0|^4.2",
+            "phpmd/phpmd": "^2.6",
+            "phpunit/phpunit": "^4.8|^5.7|^6.5|^7.4|^8.2",
+            "sebastian/phpcpd": "^2.0|^3.0|^4.1",
+            "squizlabs/php_codesniffer": "^2.9|^3.4"
+        },
+        "time": "2019-08-11T00:04:39+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "src/function.php"
+            ],
+            "psr-4": {
+                "xKerman\\Restricted\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "xKerman",
+                "email": "xKhorasan@gmail.com"
+            }
+        ],
+        "description": "provide PHP Object Injection safe unserialize function",
+        "keywords": [
+            "PHP Object Injection",
+            "deserialize",
+            "unserialize"
+        ]
     },
     {
         "name": "zendframework/zend-escaper",

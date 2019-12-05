@@ -109,7 +109,7 @@ function _civicrm_api3_setting_getfields_spec(&$params) {
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
  */
-function civicrm_api3_setting_getdefaults(&$params) {
+function civicrm_api3_setting_getdefaults($params) {
   $settings = civicrm_api3('Setting', 'getfields', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $defaults = [];
@@ -148,33 +148,14 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
  * @throws \API_Exception
  */
 function civicrm_api3_setting_getoptions($params) {
-  $specs = CRM_Core_BAO_Setting::getSettingSpecification();
+  $domainId = CRM_Utils_Array::value('domain_id', $params);
+  $specs = \Civi\Core\SettingsMetadata::getMetadata(['name' => $params['field']], $domainId, TRUE);
 
-  if (empty($specs[$params['field']]) || empty($specs[$params['field']]['pseudoconstant'])) {
+  if (empty($specs[$params['field']]) || !is_array(CRM_Utils_Array::value('options', $specs[$params['field']]))) {
     throw new API_Exception("The field '" . $params['field'] . "' has no associated option list.");
   }
 
-  $pseudoconstant = $specs[$params['field']]['pseudoconstant'];
-
-  // It would be nice if we could leverage CRM_Core_PseudoConstant::get() somehow,
-  // but it's tightly coupled to DAO/field. However, if you really need to support
-  // more pseudoconstant types, then probably best to refactor it. For now, KISS.
-  if (!empty($pseudoconstant['callback'])) {
-    $values = Civi\Core\Resolver::singleton()->call($pseudoconstant['callback'], []);
-    return civicrm_api3_create_success($values, $params, 'Setting', 'getoptions');
-  }
-  elseif (!empty($pseudoconstant['optionGroupName'])) {
-    $keyColumn = 'value';
-    if (!empty($pseudoconstant['keyColumn'])) {
-      $keyColumn = $pseudoconstant['keyColumn'];
-    }
-    return civicrm_api3_create_success(
-      CRM_Core_OptionGroup::values($pseudoconstant['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn),
-      $params, 'Setting', 'getoptions'
-    );
-  }
-
-  throw new API_Exception("The field '" . $params['field'] . "' uses an unsupported option list.");
+  return civicrm_api3_create_success($specs[$params['field']]['options'], $params, 'Setting', 'getoptions');
 }
 
 /**
@@ -185,7 +166,7 @@ function civicrm_api3_setting_getoptions($params) {
  * @return array
  * @throws \Exception
  */
-function civicrm_api3_setting_revert(&$params) {
+function civicrm_api3_setting_revert($params) {
   $defaults = civicrm_api('Setting', 'getdefaults', $params);
   $fields = civicrm_api('Setting', 'getfields', $params);
   $fields = $fields['values'];
@@ -235,7 +216,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
  */
-function civicrm_api3_setting_fill(&$params) {
+function civicrm_api3_setting_fill($params) {
   $defaults = civicrm_api3('Setting', 'getdefaults', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = [];

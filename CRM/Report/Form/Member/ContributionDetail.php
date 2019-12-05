@@ -221,7 +221,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
             'default' => [1],
           ],
           'total_amount' => ['title' => ts('Contribution Amount')],
@@ -311,11 +311,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           'source' => ['title' => ts('Membership Source')],
         ],
         'filters' => [
-          'join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'membership_join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'membership_start_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'membership_end_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'owner_membership_id' => [
-            'title' => ts('Membership Owner ID'),
+            'title' => ts('Primary Membership'),
             'operatorType' => CRM_Report_Form::OP_INT,
           ],
           'tid' => [
@@ -612,6 +612,25 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     return $statistics;
   }
 
+  public function getOperationPair($type = "string", $fieldName = NULL) {
+    //re-name IS NULL/IS NOT NULL for clarity
+    if ($fieldName == 'owner_membership_id') {
+      $result = [];
+      $result['nll'] = ts('Primary members only');
+      $result['nnll'] = ts('Non-primary members only');
+      $options = parent::getOperationPair($type, $fieldName);
+      foreach ($options as $key => $label) {
+        if (!array_key_exists($key, $result)) {
+          $result[$key] = $label;
+        }
+      }
+    }
+    else {
+      $result = parent::getOperationPair($type, $fieldName);
+    }
+    return $result;
+  }
+
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
@@ -627,7 +646,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     $entryFound = FALSE;
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $batches = CRM_Batch_BAO_Batch::getBatches();
 

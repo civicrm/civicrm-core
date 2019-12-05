@@ -40,7 +40,7 @@ class CRM_Core_I18n {
   const NONE = 'none', AUTO = 'auto';
 
   /**
-   * @var callable|NULL
+   * @var callable|null
    *   A callback function which handles SQL string encoding.
    *   Set NULL to use the default, CRM_Core_DAO::escapeString().
    *   This is used by `ts(..., [escape=>sql])`.
@@ -230,11 +230,11 @@ class CRM_Core_I18n {
     }
 
     if ($enabled === NULL) {
-      $config = CRM_Core_Config::singleton();
+      $languageLimit = Civi::settings()->get('languageLimit');
       $enabled = [];
-      if (isset($config->languageLimit) and $config->languageLimit) {
+      if ($languageLimit) {
         foreach ($all as $code => $name) {
-          if (in_array($code, array_keys($config->languageLimit))) {
+          if (array_key_exists($code, $languageLimit)) {
             $enabled[$code] = $name;
           }
         }
@@ -419,8 +419,8 @@ class CRM_Core_I18n {
    * Lookup the raw translation of a string (without any extra escaping or interpolation).
    *
    * @param string $text
-   * @param string|NULL $domain
-   * @param int|NULL $count
+   * @param string|null $domain
+   * @param int|null $count
    * @param string $plural
    * @param string $context
    *

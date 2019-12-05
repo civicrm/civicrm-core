@@ -82,6 +82,12 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }
 
+    if (!empty($query->_returnProperties['pledge_end_date'])) {
+      $query->_select['pledge_end_date'] = 'civicrm_pledge.end_date as pledge_end_date';
+      $query->_element['pledge_end_date'] = 1;
+      $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+    }
+
     if (!empty($query->_returnProperties['pledge_start_date'])) {
       $query->_select['pledge_start_date'] = 'civicrm_pledge.start_date as pledge_start_date';
       $query->_element['pledge_start_date'] = 1;
@@ -229,7 +235,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 7) == 'pledge_') {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $grouping = $query->_params[$id][3];
@@ -239,43 +245,24 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * @param $values
-   * @param $query
+   * Get where clause for field.
+   *
+   * @todo most of this could be replaced by using metadata.
+   *
+   * @param array $values
+   * @param \CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
+    if ($query->buildDateRangeQuery($values)) {
+      // @todo - move this to Contact_Query in or near the call to
+      // $this->buildRelativeDateQuery($values);
+      return;
+    }
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     switch ($name) {
-      case 'pledge_create_date_low':
-      case 'pledge_create_date_high':
-        // process to / from date
-        $query->dateQueryBuilder($values,
-          'civicrm_pledge', 'pledge_create_date', 'create_date', 'Pledge Made'
-        );
-      case 'pledge_start_date_low':
-      case 'pledge_start_date_high':
-        // process to / from date
-        $query->dateQueryBuilder($values,
-          'civicrm_pledge', 'pledge_start_date', 'start_date', 'Pledge Start Date'
-        );
-        return;
-
-      case 'pledge_end_date_low':
-      case 'pledge_end_date_high':
-        // process to / from date
-        $query->dateQueryBuilder($values,
-          'civicrm_pledge', 'pledge_end_date', 'end_date', 'Pledge End Date'
-        );
-        return;
-
-      case 'pledge_payment_date_low':
-      case 'pledge_payment_date_high':
-        // process to / from date
-        $query->dateQueryBuilder($values,
-          'civicrm_pledge_payment', 'pledge_payment_date', 'scheduled_date', 'Payment Scheduled'
-        );
-        return;
-
       case 'pledge_amount':
       case 'pledge_amount_low':
       case 'pledge_amount_high':
@@ -524,16 +511,47 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'pledge_status_id',
+      'pledge_start_date',
+      'pledge_end_date',
+      'pledge_create_date',
+    ];
+    $metadata = civicrm_api3('Pledge', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
+   * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getPledgePaymentSearchFieldMetadata() {
+    $fields = [
+      'pledge_payment_scheduled_date',
+    ];
+    $metadata = civicrm_api3('PledgePayment', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
+   * Build the search for for pledges.
+   *
+   * @param CRM_Pledge_Form_Search|\CRM_Contact_Form_Search_Advanced $form
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
     // pledge related dates
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_start_date', 1, '_low', '_high', ts('From'), FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_end_date', 1, '_low', '_high', ts('From'), FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_create_date', 1, '_low', '_high', ts('From'), FALSE);
-
-    // pledge payment related dates
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_payment_date', 1, '_low', '_high', ts('From'), FALSE);
+    $form->addSearchFieldMetadata(['Pledge' => self::getSearchFieldMetadata()]);
+    $form->addSearchFieldMetadata(['PledgePayment' => self::getPledgePaymentSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
 
     $form->addYesNo('pledge_test', ts('Pledge is a Test?'), TRUE);
     $form->add('text', 'pledge_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);
@@ -541,11 +559,6 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->add('text', 'pledge_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
     $form->addRule('pledge_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
-
-    $form->add('select', 'pledge_status_id',
-      ts('Pledge Status'), CRM_Pledge_BAO_Pledge::buildOptions('status_id'),
-      FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']
-    );
 
     $form->addYesNo('pledge_acknowledge_date_is_not_null', ts('Acknowledgement sent?'), TRUE);
 

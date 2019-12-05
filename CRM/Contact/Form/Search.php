@@ -120,7 +120,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * The profile group id used for display.
    *
-   * @var integer
+   * @var int
    */
   protected $_ufGroupID;
 
@@ -132,13 +132,16 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public static $csv = ['contact_type', 'group', 'tag'];
 
   /**
-   * @var string how to display the results. Should we display as
-   *             contributons, members, cases etc
+   * How to display the results. Should we display as contributons, members, cases etc.
+   *
+   * @var string
    */
   protected $_componentMode;
 
   /**
-   * @var string what operator should we use, AND or OR
+   * What operator should we use, AND or OR.
+   *
+   * @var string
    */
   protected $_operator;
 
@@ -728,7 +731,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $controller->setDynamicAction($setDynamic);
 
     if ($this->_force) {
-
+      $this->loadMetadata();
       $this->postProcess();
 
       /*
@@ -755,13 +758,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return array
-   */
-  public function &getFormValues() {
-    return $this->_formValues;
-  }
-
-  /**
    * Common post processing.
    */
   public function postProcess() {
@@ -777,14 +773,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
-
-    if (array_key_exists($this->_searchButtonName, $_POST) ||
-      ($this->_force && !$crmPID)
-    ) {
-      //reset the cache table for new search
-      $cacheKey = "civicrm search {$this->controller->_key}";
-      Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
-    }
 
     //get the button name
     $buttonName = $this->controller->getButtonName();
@@ -823,6 +811,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       return;
     }
     else {
+      if (array_key_exists($this->_searchButtonName, $_POST) ||
+        ($this->_force && !$crmPID)
+      ) {
+        //reset the cache table for new search
+        $cacheKey = "civicrm search {$this->controller->_key}";
+        Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
+      }
       $output = CRM_Core_Selector_Controller::SESSION;
 
       // create the selector, controller and run - store results in session
@@ -905,6 +900,18 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Search');
+  }
+
+  /**
+   * Load metadata for fields on the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function loadMetadata() {
+    // @todo - check what happens if the person does not have 'access civicontribute' - make sure they
+    // can't by pass acls by passing search criteria in the url.
+    $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
   }
 
 }

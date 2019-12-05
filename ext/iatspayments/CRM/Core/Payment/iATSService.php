@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public
  * License with this program; if not, see http://www.gnu.org/licenses/
  *
- * This code provides glue between CiviCRM payment model and the iATS Payment model encapsulated in the iATS_Service_Request object
+ * This code provides glue between CiviCRM payment model and the iATS Payment model encapsulated in the CRM_Iats_iATSServiceRequest object
  */
 
 /**
@@ -132,11 +132,10 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
       return self::error('Unexpected error, missing profile');
     }
     // Use the iATSService object for interacting with iATS. Recurring contributions go through a more complex process.
-    require_once "CRM/iATS/iATSService.php";
     $isRecur = CRM_Utils_Array::value('is_recur', $params) && $params['contributionRecurID'];
     $methodType = $isRecur ? 'customer' : 'process';
     $method = $isRecur ? 'create_credit_card_customer' : 'cc';
-    $iats = new iATS_Service_Request(array('type' => $methodType, 'method' => $method, 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
+    $iats = new CRM_Iats_iATSServiceRequest(array('type' => $methodType, 'method' => $method, 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
     $request = $this->convertParams($params, $method);
     $request['customerIPAddress'] = (function_exists('ip_address') ? ip_address() : $_SERVER['REMOTE_ADDR']);
     $credentials = array(
@@ -153,8 +152,6 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
       $result = $iats->result($response);
       if ($result['status']) {
         // Success.
-        $params['contribution_status_id'] = 1;
-        // For versions >= 4.6.6, the proper key.
         $params['payment_status_id'] = 1;
         $params['trxn_id'] = trim($result['remote_id']) . ':' . time();
         $params['gross_amount'] = $params['amount'];
@@ -165,13 +162,13 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
       }
     }
     else {
-      // Save the client info in my custom table, then (maybe) run the transaction.
+      // Save the customer info in the payment_token table, then (maybe) run the transaction.
       $customer = $iats->result($response, FALSE);
       // print_r($customer);
       if ($customer['status']) {
         $processresult = $response->PROCESSRESULT;
         $customer_code = (string) $processresult->CUSTOMERCODE;
-        $exp = sprintf('%02d%02d', ($params['year'] % 100), $params['month']);
+        $expiry_date = sprintf('%04d-%02d-01', $params['year'], $params['month']);
         $email = '';
         if (isset($params['email'])) {
           $email = $params['email'];
@@ -182,28 +179,60 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
         elseif (isset($params['email-Primary'])) {
           $email = $params['email-Primary'];
         }
-        $query_params = array(
-          1 => array($customer_code, 'String'),
-          2 => array($request['customerIPAddress'], 'String'),
-          3 => array($exp, 'String'),
-          4 => array($params['contactID'], 'Integer'),
-          5 => array($email, 'String'),
-          6 => array($params['contributionRecurID'], 'Integer'),
-        );
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_iats_customer_codes
-          (customer_code, ip, expiry, cid, email, recur_id) VALUES (%1, %2, %3, %4, %5, %6)", $query_params);
+        $payment_token_params = [
+          'token' => $customer_code,
+          'ip_address' => $request['customerIPAddress'],
+          'expiry_date' => $expiry_date,
+          'contact_id' => $params['contactID'],
+          'email' => $email,
+          'payment_processor_id' => $this->_paymentProcessor['id'],
+        ];
+        $token_result = civicrm_api3('PaymentToken', 'create', $payment_token_params);
+        // Upon success, save the token table's id back in the recurring record.
+        if (!empty($token_result['id'])) {
+          civicrm_api3('ContributionRecur', 'create', [
+            'id' => $params['contributionRecurID'],
+            'payment_token_id' => $token_result['id'],
+          ]);
+        }
         // Test for admin setting that limits allowable transaction days
         $allow_days = $this->getSettings('days');
-        // Also test for a specific recieve date request that is not today.
-        $receive_date_request = CRM_Utils_Array::value('receive_date', $params);
-        $today = date('Ymd');
-        // If the receive_date is set to sometime today, unset it.
-        if (!empty($receive_date_request) && 0 === strpos($receive_date_request, $today)) {
-          unset($receive_date_request);
+        // Test for a specific receive date request and convert to a timestamp, default now
+        $receive_date = CRM_Utils_Array::value('receive_date', $params);
+        // my front-end addition to will get stripped out of the params, do a
+        // work-around
+        if (empty($receive_date)) {
+          $receive_date = CRM_Utils_Array::value('receive_date', $_POST);
         }
-        // Normally, run the (first) transaction immediately, unless the admin setting is in force or a specific request is being made.
-        if (max($allow_days) <= 0 && empty($receive_date_request)) {
-          $iats = new iATS_Service_Request(array('type' => 'process', 'method' => 'cc_with_customer_code', 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
+        $receive_ts = empty($receive_date) ? time() : strtotime($receive_date);
+        // If the admin setting is in force, ensure it's compatible.
+        if (max($allow_days) > 0) {
+          $receive_ts = CRM_Iats_Transaction::contributionrecur_next($receive_ts, $allow_days);
+        }
+        // convert to a reliable format
+        $receive_date = date('Ymd', $receive_ts);
+        $today = date('Ymd');
+        // If the receive_date is NOT today, then
+        // create a pending contribution and adjust the next scheduled date.
+        CRM_Core_Error::debug_var('receive_date', $receieve_date);
+        if ($receive_date !== $today) {
+          // I've got a schedule to adhere to!
+          // set the receieve time to 3:00 am for a better admin experience
+          $update = array(
+            'payment_status_id' => 2,
+            'receive_date' => date('Ymd', $receive_ts) . '030000',
+          );
+          // update the recurring and contribution records with the receive date,
+          // i.e. make up for what core doesn't do
+          $this->updateRecurring($params, $update);
+          $this->updateContribution($params, $update);
+          // and now return the updates to core via the params
+          $params = array_merge($params, $update);
+          return $params;
+        }
+        else {
+          // run the (first) transaction immediately
+          $iats = new CRM_Iats_iATSServiceRequest(array('type' => 'process', 'method' => 'cc_with_customer_code', 'iats_domain' => $this->_profile['iats_domain'], 'currencyID' => $params['currencyID']));
           $request = array('invoiceNum' => $params['invoiceID']);
           $request['total'] = sprintf('%01.2f', CRM_Utils_Rule::cleanMoney($params['amount']));
           $request['customerCode'] = $customer_code;
@@ -211,32 +240,21 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
           $response = $iats->request($credentials, $request);
           $result = $iats->result($response);
           if ($result['status']) {
-            // Add a time string to iATS short authentication string to ensure uniqueness and provide helpful referencing.
+            // Add a time string to iATS short authentication string to ensure 
+            // uniqueness and provide helpful referencing.
             $update = array(
               'trxn_id' => trim($result['remote_id']) . ':' . time(),
               'gross_amount' => $params['amount'],
-              'payment_status_id' => '1',
+              'payment_status_id' => 1,
             );
-            // Setting the next_sched_contribution_date param doesn't do anything, commented out, work around in setRecurReturnParams
-            $params = $this->setRecurReturnParams($params, $update);
+            // do some cleanups to the recurring record in updateRecurring
+            $this->updateRecurring($params, $update);
+            $params = array_merge($params, $update);
             return $params;
           }
           else {
             return self::error($result['reasonMessage']);
           }
-        }
-        // I've got a schedule to adhere to!
-        else {
-          // Note that the admin general setting restricting allowable days will overwrite any specific request.
-          $next_sched_contribution_timestamp = (max($allow_days) > 0) ? _iats_contributionrecur_next(time(), $allow_days) 
-            : strtotime($params['receive_date']);
-          // set the receieve time to 3:00 am for a better admin experience
-          $update = array(
-            'payment_status_id' => 'Pending',
-            'receive_date' => date('Ymd', $next_sched_contribution_timestamp) . '030000',
-          );
-          $params = $this->setRecurReturnParams($params, $update);
-          return $params;
         }
         return self::error('Unexpected error');
       }
@@ -407,44 +425,96 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
    * This functionality will apply to back-end and front-end,
    * so it's only enabled when configured as on via the iATS admin settings.
    * The default isSupported method is overridden above to achieve this.
+   *
+   * Return TRUE on success or an error.
    */
   public function updateSubscriptionBillingInfo(&$message = '', $params = array()) {
-    require_once('CRM/iATS/Form/IATSCustomerUpdateBillingInfo.php');
 
-    $fakeForm = new IATSCustomerUpdateBillingInfo();
-    $fakeForm->updatedBillingInfo = $params;
+    // Fix billing form update bug https://github.com/iATSPayments/com.iatspayments.civicrm/issues/252 by getting crid from _POST
+    if (empty($params['crid'])) {
+      $params['crid'] = !empty($_POST['crid']) ? (int) $_POST['crid'] : (!empty($_GET['crid']) ? (int) $_GET['crid'] : 0);
+      if (empty($params['crid']) && !empty($params['entryURL'])) {
+        $components = parse_url($params['entryURL']); 
+        parse_str(html_entity_decode($components['query']), $entryURLquery); 
+        $params['crid'] = $entryURLquery['crid'];
+      }
+    }
+    // updatedBillingInfo array changed sometime after 4.7.27
+    $crid = !empty($params['crid']) ? $params['crid'] : $params['recur_id'];
+    if (empty($crid)) {
+      $alert = ts('This system is unable to perform self-service updates to credit cards. Please contact the administrator of this site.');
+      throw new Exception($alert);
+    } 
+    $mop = array(
+      'Visa' => 'VISA',
+      'MasterCard' => 'MC',
+      'Amex' => 'AMX',
+      'Discover' => 'DSC',
+    );
+    $contribution_recur = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $crid]);
+    $payment_token = $result = civicrm_api3('PaymentToken', 'getsingle', ['id' => $contribution_recur['payment_token_id']]);
+    // construct the array of data that I'll submit to the iATS Payments server.
+    $state_province = civicrm_api3('StateProvince', 'getsingle', ['return' => ["abbreviation"], 'id' => $params['state_province_id']]);
+    $submit_values = array(
+      'cid' => $contribution_recur['contact_id'],
+      'customerCode' => $payment_token['token'],
+      'creditCardCustomerName' => "{$params['first_name']} " . (!empty($params['middle_name']) ? "{$params['middle_name']} " : '') . $params['last_name'],
+      'address' => $params['street_address'],
+      'city' => $params['city'],
+      'state' => $state_province['abbreviation'],
+      'zipCode' => $params['postal_code'],
+      'creditCardNum' => $params['credit_card_number'],
+      'creditCardExpiry' => sprintf('%02d/%02d', $params['month'], $params['year'] % 100),
+      'mop' => $mop[$params['credit_card_type']],
+    );
+
+    $credentials = CRM_Iats_iATSServiceRequest::credentials($contribution_recur['payment_processor_id'], 0);
+    $iats_service_params = array('type' => 'customer', 'iats_domain' => $credentials['domain'], 'method' => 'update_credit_card_customer');
+    $iats = new CRM_Iats_iATSServiceRequest($iats_service_params);
+    $submit_values['customerIPAddress'] = (function_exists('ip_address') ? ip_address() : $_SERVER['REMOTE_ADDR']);
+    // Make the soap request.
     try {
-      $fakeForm->postProcess();
+      $response = $iats->request($credentials, $submit_values);
+      // note: don't log this to the iats_response table.
+      $iats_result = $iats->result($response, TRUE);
+      // CRM_Core_Error::debug_var('iats result', $iats_result);
+      if ('OK' == $iats_result['AUTHORIZATIONRESULT']) {
+        // Update my copy of the expiry date.
+        $result = civicrm_api3('PaymentToken', 'get', [
+          'return' => ['id'],
+          'token' => $values['customerCode'],
+        ]);
+        if (count($result['values'])) {
+          list($month, $year) = explode('/', $values['creditCardExpiry']);
+          $expiry_date = sprintf('20%02d-%02d-01', $year, $month);
+          foreach(array_keys($result['values']) as $id) {
+            civicrm_api3('PaymentToken', 'create', [
+              'id' => $id,
+              'expiry_date' => $expiry_date,
+            ]);
+          }
+        }
+        return TRUE;
+      }
+      return $this->error('9002','Authorization failed');
     }
     catch (Exception $error) { // what could go wrong? 
       $message = $error->getMessage();
-      CRM_Core_Session::setStatus($message, ts('Warning'), 'alert');
-      $e = CRM_Core_Error::singleton();
-      return $e; 
+      return $this->error('9002', $message);
     }
-    if ('OK' == $fakeForm->getAuthorizationResult()) {
-      return TRUE;
-    }
-    $message = $fakeForm->getResultMessage();
-    CRM_Core_Session::setStatus($message, ts('Warning'), 'alert');
-    $e = CRM_Core_Error::singleton();
-    return $e;
   }
   
   /*
-   * Set the return params for recurring contributions.
+   * Update the recurring contribution record.
    *
-   * Implemented as a function so I can do some cleanup and implement
+   * Do some cleanup and implement
    * the ability to set a future start date for recurring contributions.
    * This functionality will apply to back-end and front-end,
    * As enabled when configured via the iATS admin settings.
    *
-   * This function will alter the recurring schedule as an intended side effect.
-   * and return the modified the params.
+   * Returns result of api request if a change is made, usually ignored.
    */
-  protected function setRecurReturnParams($params, $update) {
-    // Merge in the updates
-    $params = array_merge($params, $update);
+  protected function updateRecurring($params, $update) {
     // If the recurring record already exists, let's fix the next contribution and start dates,
     // in case core isn't paying attention.
     // We also set the schedule to 'in-progress' (even for ACH/EFT when the first one hasn't been verified), 
@@ -470,6 +540,7 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
       }
       try {
         $result = civicrm_api3('ContributionRecur', 'create', $recur_update);
+        return $result;
       }
       catch (CiviCRM_API3_Exception $e) {
         // Not a critical error, just log and continue.
@@ -480,7 +551,33 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
     else {
       Civi::log()->info('Unexpectedly unable to update the next scheduled contribution date, missing id.');
     }
-    return $params;
+    return FALSE;
   }
-  
+
+  /*
+   * Update the contribution record.
+   *
+   * This function will alter the civi contribution record.
+   * Implemented only to update the receive date.
+   */
+  protected function updateContribution($params, $update = array()) {
+    if (!empty($params['contributionID'])  && !empty($update['receive_date'])) {
+      $contribution_id = $params['contributionID'];
+      $update = array(
+        'id' => $contribution_id,
+        'receive_date' => $update['receive_date']
+      );
+      try {
+        $result = civicrm_api3('Contribution', 'create', $update);
+        return $result;
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        // Not a critical error, just log and continue.
+        $error = $e->getMessage();
+        Civi::log()->info('Unexpected error updating the contribution date for id {id}: {error}', array('id' => $contribution_id, 'error' => $error));
+      }
+    }
+    return false;
+  }
+
 }

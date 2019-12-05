@@ -127,10 +127,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *   domain
    */
   public static function edit(&$params, &$id) {
+    CRM_Utils_Hook::pre('edit', 'Domain', CRM_Utils_Array::value('id', $params), $params);
     $domain = new CRM_Core_DAO_Domain();
     $domain->id = $id;
     $domain->copyValues($params);
     $domain->save();
+    CRM_Utils_Hook::post('edit', 'Domain', $domain->id, $domain);
     return $domain;
   }
 
@@ -143,9 +145,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *   domain
    */
   public static function create($params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'Domain', CRM_Utils_Array::value('id', $params), $params);
     $domain = new CRM_Core_DAO_Domain();
     $domain->copyValues($params, TRUE);
     $domain->save();
+    CRM_Utils_Hook::post($hook, 'Domain', $domain->id, $domain);
     return $domain;
   }
 

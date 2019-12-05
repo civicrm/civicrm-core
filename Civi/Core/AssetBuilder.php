@@ -125,6 +125,8 @@ class AssetBuilder {
    *   Ex: 'http://example.org/files/civicrm/dyn/angular.abcd1234abcd1234.json'.
    */
   public function getUrl($name, $params = []) {
+    \CRM_Utils_Hook::getAssetUrl($name, $params);
+
     if (!$this->isValidName($name)) {
       throw new \RuntimeException("Invalid dynamic asset name");
     }
@@ -340,17 +342,7 @@ class AssetBuilder {
   public static function pageRun() {
     // Beg your pardon, sir. Please may I have an HTTP response class instead?
     $asset = self::pageRender($_GET);
-    if (function_exists('http_response_code')) {
-      // PHP 5.4+
-      http_response_code($asset['statusCode']);
-    }
-    else {
-      header('X-PHP-Response-Code: ' . $asset['statusCode'], TRUE, $asset['statusCode']);
-    }
-
-    header('Content-Type: ' . $asset['mimeType']);
-    echo $asset['content'];
-    \CRM_Utils_System::civiExit();
+    \CRM_Utils_System::sendResponse(new \GuzzleHttp\Psr7\Response($asset['statusCode'], ['Content-Type' => $asset['mimeType']], $asset['content']));
   }
 
   /**

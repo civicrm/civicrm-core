@@ -42,7 +42,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    * Are we operating in "single mode", i.e. deleting one
    * specific contribution?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
