@@ -99,12 +99,12 @@
 
   {literal}
   <script type="text/javascript">
-    {/literal}{if $freezeMailignList}{literal}
-    cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal}]"]').prop('disabled',true);
+    {/literal}{if $freezeMailingList}{literal}
+    cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailingList}{literal}]"]').prop('disabled',true);
     {/literal}{/if}{literal}
-    {/literal}{if $hideMailignList}{literal}
-    cj('input[type=checkbox][name="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
-    cj('label[for="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
+    {/literal}{if $hideMailingList}{literal}
+    cj('input[type=checkbox][name="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
+    cj('label[for="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     {/literal}{/if}{literal}
   </script>
   {/literal}

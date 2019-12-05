@@ -208,10 +208,10 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     ) {
       $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
       if ($defaults['group_type'][$groupTypes['Mailing List']] == 1) {
-        $this->assign('freezeMailignList', $groupTypes['Mailing List']);
+        $this->assign('freezeMailingList', $groupTypes['Mailing List']);
       }
       else {
-        $this->assign('hideMailignList', $groupTypes['Mailing List']);
+        $this->assign('hideMailingList', $groupTypes['Mailing List']);
       }
     }
 
