@@ -40,10 +40,20 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
+    if ($rev == '5.21.alpha1') {
+      // Find any option groups that were not converted during the upgrade.
+      $notConverted = [];
+      $optionGroups = \Civi\Api4\OptionGroup::get()->setCheckPermissions(FALSE)->execute();
+      foreach ($optionGroups as $optionGroup) {
+        $trimmedName = trim($optionGroup['name']);
+        if (strpos($trimmedName, ' ') !== FALSE) {
+          $notConverted[] = $optionGroup['title'];
+        }
+      }
+      if (count($notConverted)) {
+        $postUpgradeMessage .= '<br /><br />' . ts("The Following option Groups have not been converted due to there being already another option group with the same name in the database") . "<ul><li>" . implode('</li><li>', $notConverted) . "</li></ul>";
+      }
+    }
   }
 
   /*
@@ -83,12 +93,19 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
       $name = trim($optionGroup['name']);
       if (strpos($name, ' ') !== FALSE) {
         $fixedName = CRM_Utils_String::titleToVar(strtolower($name));
-        \Civi::log()->debug('5.21 Upgrade Option Group name ' . $name . ' converted to ' . $fixedName);
-        \Civi\Api4\OptionGroup::update()
-          ->addWhere('id', '=', $optionGroup['id'])
-          ->addValue('name', $fixedName)
+        $check = \Civi\Api4\OptionGroup::get()
+          ->addWhere('name', '=', $fixedName)
           ->setCheckPermissions(FALSE)
           ->execute();
+        // Fix hard fail in upgrade due to name already in database dev/core#1447
+        if (!count($check)) {
+          \Civi::log()->debug('5.21 Upgrade Option Group name ' . $name . ' converted to ' . $fixedName);
+          \Civi\Api4\OptionGroup::update()
+            ->addWhere('id', '=', $optionGroup['id'])
+            ->addValue('name', $fixedName)
+            ->setCheckPermissions(FALSE)
+            ->execute();
+        }
       }
     }
     return TRUE;
