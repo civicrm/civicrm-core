@@ -2427,6 +2427,9 @@ SELECT count(*)
     AND is_current_member = 1";
     $result = CRM_Core_DAO::singleValueQuery($query);
     if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
+      $values = [];
+      _civicrm_api3_custom_format_params($membershipValues, $values, 'Membership');
+      $membershipValues = array_merge($membershipValues, $values);
       CRM_Member_BAO_Membership::create($membershipValues);
     }
     return $membershipValues;
