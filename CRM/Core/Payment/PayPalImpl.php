@@ -697,7 +697,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $message
    * @param array $params
    *
-   * @return array|bool|object
+   * @return bool
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function cancelSubscription(&$message = '', $params = []) {
@@ -711,7 +711,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
       $result = $this->invokeAPI($args);
       if (is_a($result, 'CRM_Core_Error')) {
-        return $result;
+        throw new PaymentProcessorException(CRM_Core_Error::getMessages($result, "\n"));
       }
       $message = "{$result['ack']}: profileid={$result['profileid']}";
       return TRUE;
@@ -805,7 +805,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $message
    * @param array $params
    *
-   * @return array|bool|object
+   * @return bool
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function changeSubscriptionAmount(&$message = '', $params = []) {
@@ -822,7 +822,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $result = $this->invokeAPI($args);
       CRM_Core_Error::debug_var('$result', $result);
       if (is_a($result, 'CRM_Core_Error')) {
-        return $result;
+        throw new PaymentProcessorException(CRM_Core_Error::getMessages($result, "\n"));
       }
       $message = "{$result['ack']}: profileid={$result['profileid']}";
       return TRUE;

@@ -203,8 +203,15 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     }
 
     if (CRM_Utils_Array::value('send_cancel_request', $params) == 1) {
+      // Note the 'subscriptionId' here is the value stored in
+      // civicrm_contribution_recur.processor_id
       $cancelParams = ['subscriptionId' => $this->_subscriptionDetails->subscription_id];
-      $cancelSubscription = $this->_paymentProcessorObj->cancelSubscription($message, $cancelParams);
+      try {
+        $cancelSubscription = $this->_paymentProcessorObj->cancelSubscription($message, $cancelParams);
+      }
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        CRM_Core_Error::statusBounce($e->getMessage());
+      }
     }
 
     if (is_a($cancelSubscription, 'CRM_Core_Error')) {
