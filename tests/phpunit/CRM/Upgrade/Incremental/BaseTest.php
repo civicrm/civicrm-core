@@ -488,6 +488,35 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $postUpgrade = $this->callAPISuccess('OptionGroup', 'getsingle', ['id' => $optionGroup['id']]);
     $this->assertEquals($fixedName, $postUpgrade['name'], 'Ensure that the spaces have been removed from OptionGroup name');
     $this->assertEquals($postUpgrade['name'], $optionGroup['values'][$optionGroup['id']]['name'], 'Ensure that the fixed name matches what the API would produce');
+    $this->callAPISuccess('OptionGroup', 'delete', ['id' => $optionGroup['id']]);
+  }
+
+  /**
+   * Test that if there is an option group name as the same as the proposed fix name that doesn't cause a hard fail in the upgrade
+   */
+  public function testFixOptionGroupNameWithFixedNameInDatabase() {
+    $name = 'This is a test Name';
+    $fixedName = CRM_Utils_String::titleToVar(strtolower($name));
+    $optionGroup = $this->callAPISuccess('OptionGroup', 'create', [
+      'title' => 'Test Option Group',
+      'name' => $name,
+    ]);
+    // API is hardened to strip the spaces to lets re-add in now
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET name = %1 WHERE id = %2", [
+      1 => [$name, 'String'],
+      2 => [$optionGroup['id'], 'Positive'],
+    ]);
+    $optionGroup2 = $this->callAPISuccess('OptionGroup', 'create', [
+      'title' => 'Test Option Group 2',
+      'name' => $name,
+    ]);
+    $preUpgrade = $this->callAPISuccess('OptionGroup', 'getsingle', ['id' => $optionGroup['id']]);
+    $this->assertEquals($name, $preUpgrade['name']);
+    $preUpgrade = $this->callAPISuccess('OptionGroup', 'getsingle', ['id' => $optionGroup2['id']]);
+    $this->assertEquals($fixedName, $preUpgrade['name']);
+    CRM_Upgrade_Incremental_php_FiveTwentyOne::fixOptionGroupName();
+    $this->callAPISuccess('OptionGroup', 'delete', ['id' => $optionGroup['id']]);
+    $this->callAPISuccess('OptionGroup', 'delete', ['id' => $optionGroup2['id']]);
   }
 
 }
