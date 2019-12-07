@@ -50,7 +50,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * This is used for composing messages because they have dependency on the
    * contribution_page or event page - although over time we may eliminate that
    *
-   * @var "contribution"\"event"
+   * @var contribution\event
    */
   public $_component = NULL;
 
@@ -813,6 +813,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
 
       $financialAccount = CRM_Financial_DAO_FinancialAccount::export();
+      $paymentProcessor = CRM_Financial_DAO_PaymentProcessor::export();
+      $paymentProcessorType = CRM_Financial_DAO_PaymentProcessorType::export();
 
       $contributionPage = [
         'contribution_page' => [
@@ -880,7 +882,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       ];
 
       $fields = array_merge($fields, $contributionPage,
-        $contributionNote, $extraFields, $softCreditFields, $financialAccount, $campaignTitle,
+        $contributionNote, $extraFields, $softCreditFields, $financialAccount, $campaignTitle, $paymentProcessor, $paymentProcessorType,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution', FALSE, FALSE, FALSE, $checkPermission)
       );
 

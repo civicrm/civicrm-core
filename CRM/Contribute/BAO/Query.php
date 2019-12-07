@@ -620,6 +620,17 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $from .= " $side JOIN civicrm_financial_trxn ON (
           civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id )";
         break;
+
+      case 'civicrm_payment_processor':
+        $from .= " $side JOIN civicrm_payment_processor ON (
+          civicrm_financial_trxn.payment_processor_id = civicrm_payment_processor.id )";
+        break;
+
+      case 'civicrm_payment_processor_type':
+        $from .= " $side JOIN civicrm_payment_processor_type ON (
+          civicrm_payment_processor.payment_processor_type_id = civicrm_payment_processor_type.id ) ";
+        break;
+
     }
     return $from;
   }
@@ -1041,6 +1052,19 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
     if (!empty($tables['civicrm_contribution_product']) && empty($tables['civicrm_product'])) {
       $tables['civicrm_product'] = 1;
+    }
+
+    if (!empty($tables['civicrm_payment_processor_type'])) {
+      if (empty($tables['civicrm_payment_processor'])) {
+        $tables['civicrm_payment_processor'] = 1;
+      }
+      if (empty($tables['civicrm_financial_trxn'])) {
+        $tables['civicrm_financial_trxn'] = 1;
+      }
+    }
+
+    if (!empty($tables['civicrm_payment_processor']) && empty($tables['civicrm_financial_trxn'])) {
+      $tables['civicrm_financial_trxn'] = 1;
     }
   }
 

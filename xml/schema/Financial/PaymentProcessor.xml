@@ -42,15 +42,18 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Payment Processor Name.</comment>
+    <export>true</export>
     <add>1.8</add>
     <html>
       <type>Text</type>
     </html>
+    <uniqueName>payment_procesor_name</uniqueName>
   </field>
   <field>
     <name>title</name>
     <title>Payment Processor Title</title>
     <type>varchar</type>
+    <export>true</export>
     <length>127</length>
     <localizable>true</localizable>
     <html>
@@ -58,6 +61,7 @@
     </html>
     <comment>Payment Processor Descriptive Name.</comment>
     <add>5.13</add>
+    <uniqueName>payment_procesor_title</uniqueName>
   </field>
   <field>
     <name>description</name>

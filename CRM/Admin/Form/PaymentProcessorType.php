@@ -28,12 +28,12 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
 
     $this->_fields = [
       [
-        'name' => 'name',
+        'name' => 'payment_processor_type_name',
         'label' => ts('Name'),
         'required' => TRUE,
       ],
       [
-        'name' => 'title',
+        'name' => 'payment_processor_type_title',
         'label' => ts('Title'),
         'required' => TRUE,
       ],
@@ -143,7 +143,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
     foreach ($this->_fields as $field) {
       $required = CRM_Utils_Array::value('required', $field, FALSE);
       $this->add('text', $field['name'],
-        $field['label'], $attributes['name'], $required
+        $field['label'], $attributes[$field['name']], $required
       );
       if (!empty($field['rule'])) {
         $this->addRule($field['name'], $field['msg'], $field['rule']);

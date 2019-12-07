@@ -44,7 +44,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPIFailure('payment_processor_type', 'create', $payProcParams);
     $this->assertEquals($result['error_message'],
-      'Mandatory key(s) missing from params array: name, title, class_name, billing_mode'
+      'Mandatory key(s) missing from params array: class_name, billing_mode, name, title'
     );
   }
 
@@ -131,7 +131,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   public function testPaymentProcessorTypeUpdateEmpty() {
     $params = [];
     $result = $this->callAPIFailure('payment_processor_type', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: name, title, class_name, billing_mode');
+    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: class_name, billing_mode, name, title');
   }
 
   /**
