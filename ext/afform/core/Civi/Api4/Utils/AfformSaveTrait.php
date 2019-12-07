@@ -54,7 +54,7 @@ trait AfformSaveTrait {
     if (!empty($meta)) {
       $metaPath = $scanner->createSiteLocalPath($item['name'], \CRM_Afform_AfformScanner::METADATA_FILE);
       \CRM_Utils_File::createDir(dirname($metaPath));
-      file_put_contents($metaPath, json_encode($meta, JSON_PRETTY_PRINT));
+      file_put_contents($metaPath, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
       // FIXME check for writability then success. Report errors.
     }
 
