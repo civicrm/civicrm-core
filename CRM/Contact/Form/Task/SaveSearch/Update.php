@@ -47,6 +47,15 @@ class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_Save
     $params = ['saved_search_id' => $this->_id];
     CRM_Contact_BAO_Group::retrieve($params, $defaults);
 
+    if (!empty($defaults['group_type'])) {
+      $types = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+        substr($defaults['group_type'], 1, -1)
+      );
+      $defaults['group_type'] = array();
+      foreach ($types as $type) {
+        $defaults['group_type'][$type] = 1;
+      }
+    }
     return $defaults;
   }
 
