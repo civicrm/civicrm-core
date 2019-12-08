@@ -468,14 +468,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $contactID;
       if ($contact->find(TRUE)) {
-        CRM_Core_BAO_Setting::setItem(
-          $newKey,
-          CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-          'navigation',
-          NULL,
-          $contactID,
-          $contactID
-        );
+        Civi::contactSettings($contactID)->set('navigation', $newKey);
       }
     }
 
