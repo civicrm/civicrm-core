@@ -175,6 +175,7 @@ abstract class CRM_Utils_Hook {
     // quantities of low-importance data or the table not having an id field, which could cause a fatal error.
     // Instead of not calling any hooks we only call those we know to be frequently important - if a particular extension wanted
     // to avoid this they could do an early return on CRM_Core_Config::singleton()->isUpgradeMode
+    // Futther discussion is happening at https://lab.civicrm.org/dev/core/issues/1460
     $upgradeFriendlyHooks = ['civicrm_alterSettingsFolders', 'civicrm_alterSettingsMetaData', 'civicrm_triggerInfo', 'civicrm_alterLogTables', 'civicrm_container'];
     if (CRM_Core_Config::singleton()->isUpgradeMode() && !in_array($fnSuffix, $upgradeFriendlyHooks)) {
       return;
@@ -371,6 +372,11 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function pre($op, $objectName, $id, &$params) {
+    // Dev/core#1449 DO not dispatch hook_civicrm_pre if we are in an upgrade as this cases the upgrade to fail
+    // Futher discussion is happening at https://lab.civicrm.org/dev/core/issues/1460
+    if (CRM_Core_Config::singleton()->isUpgradeMode()) {
+      return;
+    }
     $event = new \Civi\Core\Event\PreEvent($op, $objectName, $id, $params);
     \Civi::dispatcher()->dispatch('hook_civicrm_pre', $event);
     return $event->getReturnValues();
@@ -393,6 +399,11 @@ abstract class CRM_Utils_Hook {
    *                           an error message which aborts the operation
    */
   public static function post($op, $objectName, $objectId, &$objectRef = NULL) {
+    // Dev/core#1449 DO not dispatch hook_civicrm_post if we are in an upgrade as this cases the upgrade to fail
+    // Futher discussion is happening at https://lab.civicrm.org/dev/core/issues/1460
+    if (CRM_Core_Config::singleton()->isUpgradeMode()) {
+      return;
+    }
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
     \Civi::dispatcher()->dispatch('hook_civicrm_post', $event);
     return $event->getReturnValues();
