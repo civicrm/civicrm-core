@@ -242,7 +242,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $domain = defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1;
     }
 
-    return $domain;
+    return (int) $domain;
   }
 
   /**

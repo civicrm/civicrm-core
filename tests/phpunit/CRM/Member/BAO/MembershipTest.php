@@ -770,8 +770,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test the buildMembershipTypeValues function.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function testBuildMembershipTypeValues() {
+    $this->restoreMembershipTypes();
     $form = new CRM_Core_Form();
     $values = CRM_Member_BAO_Membership::buildMembershipTypeValues($form);
     $this->assertEquals([
@@ -783,11 +786,15 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'financial_type_id' => '2',
       'auto_renew' => '0',
       'member_of_contact_id' => $values[1]['member_of_contact_id'],
-      'relationship_type_id' => 7,
-      'relationship_direction' => 'b_a',
+      'relationship_type_id' => [7],
+      'relationship_direction' => ['b_a'],
       'max_related' => NULL,
       'duration_unit' => 'year',
       'duration_interval' => '2',
+      'domain_id' => '1',
+      'period_type' => 'rolling',
+      'visibility' => 'Public',
+      'weight' => '1',
     ], $values[1]);
   }
 

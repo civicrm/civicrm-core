@@ -1537,55 +1537,19 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *   behaviour unchanged).
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function buildMembershipTypeValues(&$form, $membershipTypeID = [], $activeOnly = FALSE) {
-    $whereClause = " WHERE domain_id = " . CRM_Core_Config::domainID();
+  public static function buildMembershipTypeValues($form, $membershipTypeID = [], $activeOnly = FALSE) {
     $membershipTypeIDS = (array) $membershipTypeID;
+    $membershipTypeValues = CRM_Member_BAO_MembershipType::getPermissionedMembershipTypes();
 
-    if ($activeOnly) {
-      $whereClause .= " AND is_active = 1 ";
-    }
-    if (!empty($membershipTypeIDS)) {
-      $allIDs = implode(',', $membershipTypeIDS);
-      $whereClause .= " AND id IN ( $allIDs )";
-    }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-
-    if ($financialTypes) {
-      $whereClause .= " AND financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
-    }
-    else {
-      $whereClause .= " AND financial_type_id IN (0)";
-    }
-
-    $query = "
-SELECT *
-FROM   civicrm_membership_type
-       $whereClause;
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    $membershipTypeValues = [];
-    $membershipTypeFields = [
-      'id',
-      'minimum_fee',
-      'name',
-      'is_active',
-      'description',
-      'financial_type_id',
-      'auto_renew',
-      'member_of_contact_id',
-      'relationship_type_id',
-      'relationship_direction',
-      'max_related',
-      'duration_unit',
-      'duration_interval',
-    ];
-
-    while ($dao->fetch()) {
-      $membershipTypeValues[$dao->id] = [];
-      foreach ($membershipTypeFields as $mtField) {
-        $membershipTypeValues[$dao->id][$mtField] = $dao->$mtField;
+    // MembershipTypes are already filtered by domain, filter as appropriate by is_active & a passed in list of ids.
+    foreach ($membershipTypeValues as $id => $type) {
+      if (($activeOnly && empty($type['is_active']))
+        || (!empty($membershipTypeIDS) && !in_array($id, $membershipTypeIDS, FALSE))
+      ) {
+        unset($membershipTypeValues[$id]);
       }
     }
 
@@ -1594,11 +1558,10 @@ FROM   civicrm_membership_type
     if (is_numeric($membershipTypeID) &&
       $membershipTypeID > 0
     ) {
+      CRM_Core_Error::deprecatedFunctionWarning('Non arrays deprecated');
       return $membershipTypeValues[$membershipTypeID];
     }
-    else {
-      return $membershipTypeValues;
-    }
+    return $membershipTypeValues;
   }
 
   /**
