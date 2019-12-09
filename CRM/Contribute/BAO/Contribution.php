@@ -92,6 +92,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
     $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
+    $action = $contributionID ? 'edit' : 'create';
     $duplicates = [];
     if (self::checkDuplicate($params, $duplicates, $contributionID)) {
       $message = ts("Duplicate error - existing contribution record(s) have a matching Transaction ID or Invoice ID. Contribution record ID(s) are: %1", [1 => implode(', ', $duplicates)]);
@@ -196,12 +197,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
     }
 
-    if ($contributionID) {
-      CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Contribution', NULL, $params);
-    }
+    CRM_Utils_Hook::pre($action, 'Contribution', $contributionID, $params);
+
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->copyValues($params);
 
@@ -241,15 +238,17 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       );
     }
 
+    $params['contribution_id'] = $contribution->id;
+
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id, $action);
+    }
+
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    if ($contributionID) {
-      CRM_Utils_Hook::post('edit', 'Contribution', $contribution->id, $contribution);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Contribution', $contribution->id, $contribution);
-    }
-
+    CRM_Utils_Hook::post($action, 'Contribution', $contribution->id, $contribution);
     return $result;
   }
 
@@ -484,10 +483,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function create(&$params, $ids = []) {
-    $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
-    $action = $contributionID ? 'edit' : 'create';
 
     $dateFields = [
       'receive_date',
@@ -513,13 +513,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     $params['contribution_id'] = $contribution->id;
-
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id, $action);
-    }
-
     $session = CRM_Core_Session::singleton();
 
     if (!empty($params['note'])) {
