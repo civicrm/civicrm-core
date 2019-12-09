@@ -60,10 +60,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_contributorDisplayName = NULL;
 
   /**
-   * email of the person paying for the membership (used for receipts)
+   * Email of the person paying for the membership (used for receipts).
+   *
    * @var string
    */
-  protected $_contributorEmail = NULL;
+  protected $_contributorEmail;
 
   /**
    * email of the person paying for the membership (used for receipts)
@@ -114,9 +115,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public function setDeleteMessage() {
     $this->deleteMessage = '<span class="font-red bold">'
-      . ts("WARNING: Deleting this membership will also delete any related payment (contribution) records." . ts("This action cannot be undone.")
+      . ts('WARNING: Deleting this membership will also delete any related payment (contribution) records.' . ts('This action cannot be undone.')
         . '</span><p>'
-        . ts("Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.")
+        . ts('Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.')
           . '</p><p>'
         . ts("Click 'Delete' if you want to continue.") . '</p>');
   }
@@ -142,6 +143,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param array $params
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getSelectedMemberships($priceSet, $params) {
     $memTypeSelected = [];
@@ -190,6 +192,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * Form preProcess function.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -324,7 +328,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     //set Soft Credit Type to Gift by default
-    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $scTypes = CRM_Core_OptionGroup::values('soft_credit_type');
     $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
 
     //CRM-13420
@@ -382,6 +386,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
 
@@ -462,7 +468,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $contactField = $this->addEntityRef('contact_id', ts('Member'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
-    if ($this->_context != 'standalone') {
+    if ($this->_context !== 'standalone') {
       $contactField->freeze();
     }
 
@@ -766,14 +772,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
         $membershipDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
 
-        if ($startDate && CRM_Utils_Array::value('period_type', $membershipDetails) == 'rolling') {
+        if ($startDate && CRM_Utils_Array::value('period_type', $membershipDetails) === 'rolling') {
           if ($startDate < $joinDate) {
             $errors['start_date'] = ts('Start date must be the same or later than Member since.');
           }
         }
 
         if ($endDate) {
-          if ($membershipDetails['duration_unit'] == 'lifetime') {
+          if ($membershipDetails['duration_unit'] === 'lifetime') {
             // Check if status is NOT cancelled or similar. For lifetime memberships, there is no automated
             // process to update status based on end-date. The user must change the status now.
             $result = civicrm_api3('MembershipStatus', 'get', [
@@ -1054,9 +1060,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Submit function.
    *
    * This is also accessed by unit tests.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function submit() {
-    $isTest = ($this->_mode == 'test') ? 1 : 0;
+    $isTest = ($this->_mode === 'test') ? 1 : 0;
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $joinDate = $startDate = $endDate = NULL;
@@ -1448,7 +1457,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       );
       $params['source'] = $formValues['source'] ? $formValues['source'] : $params['contribution_source'];
       $params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
-      $params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
+      $params['is_test'] = ($this->_mode === 'live') ? 0 : 1;
       if (!empty($formValues['send_receipt'])) {
         $params['receipt_date'] = $now;
       }

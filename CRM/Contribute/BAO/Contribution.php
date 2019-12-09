@@ -1999,7 +1999,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @param bool $processContributionObject
    *
    * @return array
-   * @throws \Exception
+   *
+   * @throws CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @deprecated
    *
    * Use api contribute.completetransaction
