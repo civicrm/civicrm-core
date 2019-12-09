@@ -510,8 +510,8 @@
     {/literal}
 
     {if $membershipMode or $action eq 2}
-
-    buildAutoRenew( null, null, '{$membershipMode}');
+      buildAutoRenew( null, null, '{$membershipMode}');
+    {/if}
     {literal}
     function buildAutoRenew( membershipType, processorId, mode ) {
       var action = {/literal}'{$action}'{literal};
@@ -574,10 +574,6 @@
       }
       showEmailOptions();
     }
-    {/literal}
-    {/if}
-
-    {literal}
 
     var customDataType = {/literal}{$customDataType|@json_encode}{literal};
 
