@@ -1,6 +1,5 @@
 (function(angular, $, _) {
-  // "afFieldset" is a basic skeletal directive.
-  // Example usage: <af-form>... <div af-fieldset="myModel">...</div> ...</af-form>
+  // Example usage: <af-form><af-entity name="Person" type="Contact" /> ... <fieldset af-fieldset="Person> ... </fieldset></af-form>
   angular.module('af').directive('afFieldset', function() {
     return {
       restrict: 'A',
@@ -12,7 +11,7 @@
         $scope.afFormCtrl = afFormCtrl;
         // This is faster than waiting for each field directive to register itself
         $('af-field', $el).each(function() {
-          afFormCtrl.registerField($scope.modelName, $(this).attr('name'))
+          afFormCtrl.registerField($scope.modelName, $(this).attr('name'));
         });
       },
       controller: function($scope){
@@ -25,7 +24,7 @@
         };
         this.getName = function() {
           return $scope.modelName;
-        }
+        };
       }
     };
   });

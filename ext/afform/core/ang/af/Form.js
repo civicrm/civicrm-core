@@ -1,11 +1,9 @@
 (function(angular, $, _) {
-  // "afForm" is a basic skeletal directive.
-  // Example usage: <af-form ctrl="myCtrl">
+  // Example usage: <af-form ctrl="modelListCtrl">
   angular.module('af').directive('afForm', function() {
     return {
-      restrict: 'AE',
+      restrict: 'E',
       scope: {
-        // afForm: '=',
         ctrl: '@'
       },
       link: {

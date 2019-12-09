@@ -18,6 +18,6 @@ return [
   'settings' => [],
   'basePages' => [],
   'exports' => [
-    'af-field' => 'AE',
+    'af-field' => 'E',
   ],
 ];
