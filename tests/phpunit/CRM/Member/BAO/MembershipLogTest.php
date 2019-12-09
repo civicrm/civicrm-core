@@ -91,20 +91,23 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     ];
-    $ids = [];
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+    $membershipType = CRM_Member_BAO_MembershipType::add($params);
     $this->membershipTypeID = $membershipType->id;
     $this->membershipStatusID = $this->membershipStatusCreate('test status');
   }
 
   /**
    * Tears down the fixture.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->relationshipTypeDelete($this->relationshipTypeID);
-    $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
     $this->membershipStatusDelete($this->membershipStatusID);
+    $this->quickCleanUpFinancialEntities();
+    $this->restoreMembershipTypes();
     $this->contactDelete($this->organizationContactID);
+    parent::tearDown();
   }
 
   /**

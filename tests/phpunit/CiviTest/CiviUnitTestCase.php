@@ -1805,6 +1805,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Clean up financial entities after financial tests (so we remember to get all the tables :-))
+   *
+   * @throws \CRM_Core_Exception
    */
   public function quickCleanUpFinancialEntities() {
     $tablesToTruncate = [
@@ -1847,11 +1849,28 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';
   }
 
+  /**
+   * Reset the price set config so results exist.
+   */
   public function restoreDefaultPriceSetConfig() {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_price_set WHERE name NOT IN('default_contribution_amount', 'default_membership_type_amount')");
     CRM_Core_DAO::executeQuery("UPDATE civicrm_price_set SET id = 1 WHERE name ='default_contribution_amount'");
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `non_deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
+  }
+
+  /**
+   * Recreate default membership types.
+   */
+  public function restoreMembershipTypes() {
+    CRM_Core_DAO::executeQuery(
+      "REPLACE INTO civicrm_membership_type
+    (id, domain_id, name, description, member_of_contact_id, financial_type_id, minimum_fee, duration_unit, duration_interval, period_type, fixed_period_start_day, fixed_period_rollover_day, relationship_type_id, relationship_direction, visibility, weight, is_active)
+VALUES
+    (1, 1, 'General', 'Regular annual membership.', 1, 2, 100.00, 'year', 2, 'rolling', NULL, NULL, 7, 'b_a', 'Public', 1, 1),
+    (2, 1, 'Student', 'Discount membership for full-time students.', 1, 2, 50.00, 'year', 1, 'rolling', NULL, NULL, NULL, NULL, 'Public', 2, 1),
+    (3, 1, 'Lifetime', 'Lifetime membership.', 1, 2, 1200.00, 'lifetime', 1, 'rolling', NULL, NULL, 7, 'b_a', 'Admin', 3, 1);
+    ");
   }
 
   /*
