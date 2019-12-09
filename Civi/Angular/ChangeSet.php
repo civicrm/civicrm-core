@@ -13,11 +13,9 @@ class ChangeSet implements ChangeSetInterface {
    * @param array $resources
    *   The list of resources.
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public static function applyResourceFilters($changeSets, $resourceType, $resources) {
-    if ($resourceType === 'partials') {
-      return self::applyHtmlFilters($changeSets, $resources);
-    }
     foreach ($changeSets as $changeSet) {
       /** @var ChangeSet $changeSet */
       foreach ($changeSet->resFilters as $filter) {
@@ -25,6 +23,9 @@ class ChangeSet implements ChangeSetInterface {
           $resources = call_user_func($filter['callback'], $resources);
         }
       }
+    }
+    if ($resourceType === 'partials') {
+      self::applyHtmlFilters($changeSets, $resources);
     }
     return $resources;
   }
@@ -35,12 +36,10 @@ class ChangeSet implements ChangeSetInterface {
    * @param array $changeSets
    *   Array(ChangeSet).
    * @param array $strings
-   *   Array(string $path => string $html).
-   * @return array
-   *   Updated list of $strings.
+   *   [string $path => string $html]
    * @throws \CRM_Core_Exception
    */
-  private static function applyHtmlFilters($changeSets, $strings) {
+  private static function applyHtmlFilters($changeSets, &$strings) {
     $coder = new Coder();
 
     foreach ($strings as $path => $html) {
@@ -65,7 +64,6 @@ class ChangeSet implements ChangeSetInterface {
         $strings[$path] = $coder->encode($doc);
       }
     }
-    return $strings;
   }
 
   /**
