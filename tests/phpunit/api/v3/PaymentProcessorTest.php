@@ -16,9 +16,13 @@
  */
 class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_paymentProcessorType;
-  protected $_apiversion = 3;
   protected $_params;
 
+  /**
+   * Set up class.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -42,17 +46,16 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with no name.
+   * Check create with no name specified.
    */
   public function testPaymentProcessorCreateWithoutName() {
-    $payProcParams = [
-      'is_active' => 1,
-    ];
-    $this->callAPIFailure('payment_processor', 'create', $payProcParams);
+    $this->callAPIFailure('payment_processor', 'create', ['is_active' => 1]);
   }
 
   /**
    * Create payment processor.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorCreate() {
     $params = $this->_params;
@@ -72,6 +75,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Update payment processor.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorUpdate() {
     $params = $this->_params;
@@ -115,6 +120,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Check payment processor delete.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorDelete() {
     $result = $this->callAPISuccess('payment_processor', 'create', $this->_params);
@@ -127,6 +134,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Check with valid params array.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorsGet() {
     $params = $this->_params;

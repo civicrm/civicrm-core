@@ -1268,7 +1268,7 @@ abstract class CRM_Core_Payment {
    *  For the current status see: https://lab.civicrm.org/dev/financial/issues/53
    * If we DO have a contribution ID, then the payment processor can (and should) update parameters on the contribution record as necessary.
    *
-   * @param array $params
+   * @param array|PropertyBag $params
    *
    * @param string $component
    *
@@ -1664,25 +1664,19 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    * @return string
    */
   protected function getPaymentDescription($params = [], $length = 24) {
+    $propertyBag = PropertyBag::cast($params);
     $parts = [
-      'contactID',
-      'contributionID',
-      'description',
-      'billing_first_name',
-      'billing_last_name',
+      $propertyBag->getter('contactID', TRUE),
+      $propertyBag->getter('contributionID', TRUE),
+      $propertyBag->getter('description', TRUE) ?: ($propertyBag->getter('isRecur', TRUE) ? ts('Recurring payment') : NULL),
+      $propertyBag->getter('billing_first_name', TRUE),
+      $propertyBag->getter('billing_last_name', TRUE),
     ];
-    $validParts = [];
-    $params['description'] = $this->getDescription();
-    foreach ($parts as $part) {
-      if ((!empty($params[$part]))) {
-        $validParts[] = $params[$part];
-      }
-    }
-    return substr(implode('-', $validParts), 0, $length);
+    return substr(implode('-', array_filter($parts)), 0, $length);
   }
 
   /**
-   * Checks if backoffice recurring edit is allowed
+   * Checks if back-office recurring edit is allowed
    *
    * @return bool
    */
