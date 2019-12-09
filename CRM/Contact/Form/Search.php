@@ -727,15 +727,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
        * values that potentially change the controller behavior. i.e. things
        * like totalCount etc
        */
-      $sortID = NULL;
-      if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-        $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-          $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-        );
-      }
       $controller = new CRM_Contact_Selector_Controller($selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
-        $sortID,
+        $this->getSortID(),
         CRM_Core_Action::VIEW, $this, CRM_Core_Selector_Controller::TRANSFER
       );
       $controller->setEmbedded(TRUE);
@@ -855,15 +849,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-      $sortID = NULL;
-      if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-        $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-          $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-        );
-      }
       $controller = new CRM_Contact_Selector_Controller($selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
-        $sortID,
+        $this->getSortID(),
         CRM_Core_Action::VIEW,
         $this,
         $output
