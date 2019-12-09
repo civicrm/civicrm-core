@@ -24,32 +24,47 @@ class PropertyBag implements \ArrayAccess {
   protected $props = ['default' => []];
 
   protected static $propMap = [
-    'contactID'              => TRUE,
-    'contact_id'             => 'contactID',
-    'contributionID'         => TRUE,
-    'contribution_id'        => 'contributionID',
-    'contributionRecurID'    => TRUE,
-    'contribution_recur_id'  => 'contributionRecurID',
-    'currency'               => TRUE,
-    'currencyID'             => 'currency',
-    'description'            => TRUE,
-    'feeAmount'              => TRUE,
-    'fee_amount'             => 'feeAmount',
-    'invoiceID'              => TRUE,
-    'invoice_id'             => 'invoiceID',
-    'isBackOffice'           => TRUE,
-    'is_back_office'         => 'isBackOffice',
-    'isRecur'                => TRUE,
-    'is_recur'               => 'isRecur',
-    'paymentToken'           => TRUE,
-    'payment_token'          => 'paymentToken',
-    'recurFrequencyInterval' => TRUE,
-    'frequency_interval' => 'recurFrequencyInterval',
-    'recurFrequencyUnit'     => TRUE,
-    'frequency_unit' => 'recurFrequencyUnit',
-    'transactionID'          => TRUE,
-    'transaction_id'         => 'transactionID',
-    'trxnResultCode'         => TRUE,
+    'billingStreetAddress'        => TRUE,
+    'billingSupplementalAddress1' => TRUE,
+    'billingSupplementalAddress2' => TRUE,
+    'billingSupplementalAddress3' => TRUE,
+    'billingCity'                 => TRUE,
+    'billingPostalCode'           => TRUE,
+    'billingCounty'               => TRUE,
+    'billingCountry'              => TRUE,
+    'contactID'                   => TRUE,
+    'contact_id'                  => 'contactID',
+    'contributionID'              => TRUE,
+    'contribution_id'             => 'contributionID',
+    'contributionRecurID'         => TRUE,
+    'contribution_recur_id'       => 'contributionRecurID',
+    'currency'                    => TRUE,
+    'currencyID'                  => 'currency',
+    'description'                 => TRUE,
+    'email'                       => TRUE,
+    'feeAmount'                   => TRUE,
+    'fee_amount'                  => 'feeAmount',
+    'first_name'                  => 'firstName',
+    'firstName'                   => TRUE,
+    'invoiceID'                   => TRUE,
+    'invoice_id'                  => 'invoiceID',
+    'isBackOffice'                => TRUE,
+    'is_back_office'              => 'isBackOffice',
+    'isRecur'                     => TRUE,
+    'is_recur'                    => 'isRecur',
+    'last_name'                   => 'lastName',
+    'lastName'                    => TRUE,
+    'paymentToken'                => TRUE,
+    'payment_token'               => 'paymentToken',
+    'phone'                       => TRUE,
+    'recurFrequencyInterval'      => TRUE,
+    'frequency_interval'          => 'recurFrequencyInterval',
+    'recurFrequencyUnit'          => TRUE,
+    'frequency_unit'              => 'recurFrequencyUnit',
+    'recurProcessorID'            => TRUE,
+    'transactionID'               => TRUE,
+    'transaction_id'              => 'transactionID',
+    'trxnResultCode'              => TRUE,
   ];
 
   /**
@@ -265,6 +280,168 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
+   * BillingStreetAddress getter.
+   *
+   * @return string
+   */
+  public function getBillingStreetAddress($label = 'default') {
+    return $this->get('billingStreetAddress', $label);
+  }
+
+  /**
+   * BillingStreetAddress setter.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingStreetAddress($input, $label = 'default') {
+    return $this->set('billingStreetAddress', $label, (string) $input);
+  }
+
+  /**
+   * BillingSupplementalAddress1 getter.
+   *
+   * @return string
+   */
+  public function getBillingSupplementalAddress1($label = 'default') {
+    return $this->get('billingSupplementalAddress1', $label);
+  }
+
+  /**
+   * BillingSupplementalAddress1 setter.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingSupplementalAddress1($input, $label = 'default') {
+    return $this->set('billingSupplementalAddress1', $label, (string) $input);
+  }
+
+  /**
+   * BillingSupplementalAddress2 getter.
+   *
+   * @return string
+   */
+  public function getBillingSupplementalAddress2($label = 'default') {
+    return $this->get('billingSupplementalAddress2', $label);
+  }
+
+  /**
+   * BillingSupplementalAddress2 setter.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingSupplementalAddress2($input, $label = 'default') {
+    return $this->set('billingSupplementalAddress2', $label, (string) $input);
+  }
+
+  /**
+   * BillingSupplementalAddress3 getter.
+   *
+   * @return string
+   */
+  public function getBillingSupplementalAddress3($label = 'default') {
+    return $this->get('billingSupplementalAddress3', $label);
+  }
+
+  /**
+   * BillingSupplementalAddress3 setter.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingSupplementalAddress3($input, $label = 'default') {
+    return $this->set('billingSupplementalAddress3', $label, (string) $input);
+  }
+
+  /**
+   * BillingCity getter.
+   *
+   * @return string
+   */
+  public function getBillingCity($label = 'default') {
+    return $this->get('billingCity', $label);
+  }
+
+  /**
+   * BillingCity setter.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingCity($input, $label = 'default') {
+    return $this->set('billingCity', $label, (string) $input);
+  }
+
+  /**
+   * BillingPostalCode getter.
+   *
+   * @return string
+   */
+  public function getBillingPostalCode($label = 'default') {
+    return $this->get('billingPostalCode', $label);
+  }
+
+  /**
+   * BillingPostalCode setter.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingPostalCode($input, $label = 'default') {
+    return $this->set('billingPostalCode', $label, (string) $input);
+  }
+
+  /**
+   * BillingCounty getter.
+   *
+   * @return string
+   */
+  public function getBillingCounty($label = 'default') {
+    return $this->get('billingCounty', $label);
+  }
+
+  /**
+   * BillingCounty setter.
+   *
+   * Nb. we can't validate this unless we have the country ID too, so we don't.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingCounty($input, $label = 'default') {
+    return $this->set('billingCounty', $label, (string) $input);
+  }
+
+  /**
+   * BillingCountry getter.
+   *
+   * @return string
+   */
+  public function getBillingCountry($label = 'default') {
+    return $this->get('billingCountry', $label);
+  }
+
+  /**
+   * BillingCountry setter.
+   *
+   * Nb. We require and we store a 2 character country code.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingCountry($input, $label = 'default') {
+    if (!is_string($input) || strlen($input) !== 2) {
+      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+    }
+    if (!CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', $input)) {
+      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+    }
+    return $this->set('billingCountry', $label, (string) $input);
+  }
+
+  /**
    * @return int
    */
   public function getContactID($label = 'default'): int {
@@ -379,6 +556,25 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
+   * Email getter.
+   *
+   * @return string
+   */
+  public function getEmail($label = 'default') {
+    return $this->get('email', $label);
+  }
+
+  /**
+   * Email setter.
+   *
+   * @param string $email
+   * @param string $label e.g. 'default'
+   */
+  public function setEmail($email, $label = 'default') {
+    return $this->set('email', $label, (string) $email);
+  }
+
+  /**
    * Amount of money charged in fees by the payment processor.
    *
    * This is notified by (some) payment processers.
@@ -400,6 +596,25 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("feeAmount must be a number.");
     }
     return $this->set('feeAmount', $label, (float) $feeAmount);
+  }
+
+  /**
+   * First name
+   *
+   * @return string
+   */
+  public function getFirstName($label = 'default') {
+    return $this->get('firstName', $label);
+  }
+
+  /**
+   * First name setter.
+   *
+   * @param string $firstName
+   * @param string $label e.g. 'default'
+   */
+  public function setFirstName($firstName, $label = 'default') {
+    return $this->set('firstName', $label, (string) $firstName);
   }
 
   /**
@@ -467,6 +682,25 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
+   * Last name
+   *
+   * @return string
+   */
+  public function getLastName($label = 'default') {
+    return $this->get('lastName', $label);
+  }
+
+  /**
+   * Last name setter.
+   *
+   * @param string $lastName
+   * @param string $label e.g. 'default'
+   */
+  public function setLastName($lastName, $label = 'default') {
+    return $this->set('lastName', $label, (string) $lastName);
+  }
+
+  /**
    * Getter for payment processor generated string for charging.
    *
    * A payment token could be a single use token (e.g generated by
@@ -505,6 +739,25 @@ class PropertyBag implements \ArrayAccess {
    */
   public function setPaymentToken($paymentToken, $label = 'default') {
     return $this->set('paymentToken', $label, $paymentToken);
+  }
+
+  /**
+   * Phone getter.
+   *
+   * @return string
+   */
+  public function getPhone($label = 'default') {
+    return $this->get('phone', $label);
+  }
+
+  /**
+   * Phone setter.
+   *
+   * @param string $phone
+   * @param string $label e.g. 'default'
+   */
+  public function setPhone($phone, $label = 'default') {
+    return $this->set('phone', $label, (string) $phone);
   }
 
   /**
@@ -553,6 +806,32 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("recurFrequencyUnit must be day|week|month|year");
     }
     return $this->set('recurFrequencyUnit', $label, $recurFrequencyUnit);
+  }
+
+  /**
+   * Set the unique payment processor service provided ID for a particular subscription.
+   *
+   * Nb. this is stored in civicrm_contribution_recur.processor_id and is NOT
+   * in any way related to the payment processor ID.
+   *
+   * @return string
+   */
+  public function getRecurProcessorID($label = 'default') {
+    return $this->get('recurProcessorID', $label);
+  }
+
+  /**
+   * Set the unique payment processor service provided ID for a particular
+   * subscription.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setRecurProcessorID($input, $label = 'default') {
+    if (empty($input) || strlen($input) > 255) {
+      throw new \InvalidArgumentException("processorID field has max length of 255");
+    }
+    return $this->set('recurProcessorID', $label, $input);
   }
 
   /**
