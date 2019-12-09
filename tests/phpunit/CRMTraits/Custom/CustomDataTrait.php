@@ -116,8 +116,10 @@ trait CRMTraits_Custom_CustomDataTrait {
     $customField = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
     $ids['text'] = $customField['id'];
 
-    $customField = $this->createSelectCustomField(['custom_group_id' => $customGroupID]);
-    $ids['select_string'] = $customField['id'];
+    if ((!empty($this->entity) && $this->entity !== 'Contribution') || empty($this->entity)) {
+      $customField = $this->createSelectCustomField(['custom_group_id' => $customGroupID]);
+      $ids['select_string'] = $customField['id'];
+    }
 
     $customField = $this->createDateCustomField(['custom_group_id' => $customGroupID]);
     $ids['select_date'] = $customField['id'];
