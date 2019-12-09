@@ -123,18 +123,18 @@
   padding: 0 3px 3px;
 }
 
-#afGuiEditor .af-gui-block {
+#afGuiEditor .af-gui-container {
   border: 2px dashed transparent;
   position: relative;
   padding: 22px 3px 3px;
   min-height: 40px;
 }
 
-#afGuiEditor .af-gui-block-type-fieldset {
+#afGuiEditor .af-gui-container-type-fieldset {
   box-shadow: 0 0 5px #bbbbbb;
 }
 
-#afGuiEditor .af-gui-block:hover {
+#afGuiEditor .af-gui-container:hover {
   border: 2px dashed #757575;
 }
 
@@ -213,16 +213,16 @@
   padding-top: 2px;
   padding-bottom: 2px;
 }
-#afGuiEditor .af-gui-add-block-button span {
+#afGuiEditor .af-gui-add-element-button span {
   display: inline-block;
   width: 18px;
   height: 18px;
   border: 2px dashed #0071bd;
   color: #0071bd;
 }
-#afGuiEditor .af-gui-add-block-button span i {
+#afGuiEditor .af-gui-add-element-button span i {
   position: relative;
-  top: -3px;
+  top: -2px;
 }
 
 #afGuiEditor .af-gui-layout-icon {
@@ -399,7 +399,7 @@
 .af-gui-editing-content #afGuiEditor-palette .panel-body > * {
   opacity: .5;
 }
-#afGuiEditor.af-gui-editing-content .af-gui-block {
+#afGuiEditor.af-gui-editing-content .af-gui-container {
   border: 2px solid transparent;
 }
 #afGuiEditor.af-gui-editing-content .af-gui-bar {

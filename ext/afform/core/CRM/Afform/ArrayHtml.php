@@ -382,7 +382,7 @@ class CRM_Afform_ArrayHtml {
     if ($item['#tag'] === 'af-field' || $item['#tag'] === 'af-form' || isset($item['af-fieldset'])) {
       return TRUE;
     }
-    $editableClasses = ['af-block', 'af-text', 'af-button'];
+    $editableClasses = ['af-container', 'af-text', 'af-button'];
     $classes = explode(' ', $item['class'] ?? '');
     return (bool) array_intersect($editableClasses, $classes);
   }

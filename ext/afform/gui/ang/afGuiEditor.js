@@ -316,12 +316,12 @@
     };
   });
 
-  angular.module('afGuiEditor').directive('afGuiBlock', function() {
+  angular.module('afGuiEditor').directive('afGuiContainer', function() {
     return {
       restrict: 'A',
-      templateUrl: '~/afGuiEditor/block.html',
+      templateUrl: '~/afGuiEditor/container.html',
       scope: {
-        node: '=afGuiBlock',
+        node: '=afGuiContainer',
         entityName: '='
       },
       require: '^^afGuiEditor',
@@ -329,7 +329,7 @@
         $scope.editor = editor;
       },
       controller: function($scope) {
-        var block = $scope.block = this;
+        var container = $scope.container = this;
         var ts = $scope.ts = CRM.ts();
         this.node = $scope.node;
 
@@ -343,40 +343,30 @@
           if (node['af-fieldset']) {
             return 'fieldset';
           }
-          var classes = splitClass(node['class']);
-          if (_.contains(classes, 'af-block')) {
-            return 'block';
-          }
-          if (_.contains(classes, 'af-text')) {
-            return 'text';
-          }
-          if (_.contains(classes, 'af-button')) {
-            return 'button';
-          }
-          if (_.contains(classes, 'af-markup')) {
-            return 'markup';
-          }
-          return null;
+          var classes = splitClass(node['class']),
+            types = ['af-container', 'af-text', 'af-button', 'af-markup'],
+            type = _.intersection(types, classes);
+          return type.length ? type[0].replace('af-', '') : null;
         };
 
-        $scope.addBlock = function(type, props) {
+        $scope.addElement = function(type, props) {
           var classes = type.split('.');
-          var newBlock = _.defaults({
+          var element = _.defaults({
             '#tag': classes.shift(),
             'class': classes.join(' '),
           }, props);
-          if (classes[0] === 'af-block') {
-            newBlock['#children'] = [];
-          } else if (classes[0] === 'af-text' || classes[0] === 'af-button') {
-            newBlock['#children'] = [{'#text': ts('Enter text')}];
+          if (_.includes(classes, 'af-container')) {
+            element['#children'] = [];
+          } else if (_.intersection(classes, ['af-text', 'af-button']).length) {
+            element['#children'] = [{'#text': ts('Enter text')}];
           }
-          // Add new block to the top, underneath the fieldset legend if present
+          // Add it to the top, underneath the fieldset legend if present
           var pos = $scope.node['#children'].length && $scope.node['#children'][0]['#tag'] === 'legend' ? 1 : 0;
-          $scope.node['#children'].splice(pos, 0, newBlock);
+          $scope.node['#children'].splice(pos, 0, element);
         };
 
-        this.removeBlock = function(node) {
-          removeRecursive($scope.editor.scope.layout['#children'], {$$hashKey: node.$$hashKey});
+        this.removeElement = function(element) {
+          removeRecursive($scope.editor.scope.layout['#children'], {$$hashKey: element.$$hashKey});
         };
 
         $scope.isSelectedFieldset = function(entityName) {
@@ -412,7 +402,7 @@
         };
 
         $scope.tags = {
-          div: ts('Block'),
+          div: ts('Container'),
           fieldset: ts('Fieldset')
         };
 
@@ -430,7 +420,7 @@
         };
 
         $scope.setLayout = function(val) {
-          var classes = ['af-block'];
+          var classes = ['af-container'];
           if (val !== 'af-layout-rows') {
             classes.push(val);
           }
@@ -449,10 +439,10 @@
         node: '=afGuiField',
         entityName: '='
       },
-      require: ['^^afGuiEditor', '^^afGuiBlock'],
+      require: ['^^afGuiEditor', '^^afGuiContainer'],
       link: function($scope, element, attrs, ctrls) {
         $scope.editor = ctrls[0];
-        $scope.block = ctrls[1];
+        $scope.container = ctrls[1];
       },
       controller: function($scope) {
         var ts = $scope.ts = CRM.ts();
@@ -603,7 +593,7 @@
           $scope.deletedOptions.splice($index, 1);
           $scope.options.push(option);
         };
-        
+
         $scope.save = function() {
           $scope.field.getSet('options', JSON.parse(angular.toJson($scope.options)));
           $scope.close();
@@ -624,9 +614,9 @@
       scope: {
         node: '=afGuiText'
       },
-      require: '^^afGuiBlock',
-      link: function($scope, element, attrs, block) {
-        $scope.block = block;
+      require: '^^afGuiContainer',
+      link: function($scope, element, attrs, container) {
+        $scope.container = container;
       },
       controller: function($scope) {
         var ts = $scope.ts = CRM.ts();
@@ -681,13 +671,13 @@
       scope: {
         node: '=afGuiMarkup'
       },
-      require: '^^afGuiBlock',
-      link: function($scope, element, attrs, block) {
-        $scope.block = block;
+      require: '^^afGuiContainer',
+      link: function($scope, element, attrs, container) {
+        $scope.container = container;
         // CRM.wysiwyg doesn't work without a dom id
         $scope.id = 'af-markup-editor-' + richtextId++;
 
-        // When creating a new markup block, go straight to edit mode
+        // When creating a new markup container, go straight to edit mode
         $timeout(function() {
           if ($scope.node['#markup'] === false) {
             $scope.edit();
@@ -716,9 +706,9 @@
         $scope.close = function() {
           CRM.wysiwyg.destroy('#' + $scope.id);
           $('#afGuiEditor').removeClass('af-gui-editing-content');
-          // If a newly-added block was canceled, just remove it
+          // If a newly-added wysiwyg was canceled, just remove it
           if ($scope.node['#markup'] === false) {
-            $scope.block.removeBlock($scope.node);
+            $scope.container.removeElement($scope.node);
           } else {
             $scope.editingMarkup = false;
           }
@@ -735,9 +725,9 @@
       scope: {
         node: '=afGuiButton'
       },
-      require: '^^afGuiBlock',
-      link: function($scope, element, attrs, block) {
-        $scope.block = block;
+      require: '^^afGuiContainer',
+      link: function($scope, element, attrs, container) {
+        $scope.container = container;
       },
       controller: function($scope) {
         var ts = $scope.ts = CRM.ts();
