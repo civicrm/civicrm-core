@@ -660,12 +660,9 @@ WHERE  id = %1";
    *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
    * @param $lineItem
    *   Line item array to be altered.
-   * @param string $component
-   *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
-   *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    * @param int $priceSetID
    */
-  public static function processAmount($fields, &$params, &$lineItem, $component = '', $priceSetID = NULL) {
+  public static function processAmount($fields, &$params, &$lineItem, $priceSetID = NULL) {
     // using price set
     $totalPrice = $totalTax = 0;
     // CRM-18701 Sometimes the amount in the price set is overridden by the amount on the form.
@@ -675,10 +672,6 @@ WHERE  id = %1";
     // set up (which allows a free form field).
     $amount_override = NULL;
 
-    if ($component) {
-      $autoRenew = [];
-      $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
-    }
     if ($priceSetID) {
       $priceFields = self::filterPriceFieldsFromParams($priceSetID, $params);
       if (count($priceFields) == 1) {
@@ -730,15 +723,6 @@ WHERE  id = %1";
             }
           }
           $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
-          if (
-            $component &&
-            // auto_renew exists and is empty in some workflows, which php treat as a 0
-            // and hence we explicitly check to see if auto_renew is numeric
-            isset($lineItem[$optionValueId]['auto_renew']) &&
-            is_numeric($lineItem[$optionValueId]['auto_renew'])
-          ) {
-            $autoRenew[$lineItem[$optionValueId]['auto_renew']] += $lineItem[$optionValueId]['line_total'];
-          }
           break;
 
         case 'Select':
@@ -750,13 +734,6 @@ WHERE  id = %1";
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
-          if (
-            $component &&
-            isset($lineItem[$optionValueId]['auto_renew']) &&
-            is_numeric($lineItem[$optionValueId]['auto_renew'])
-          ) {
-            $autoRenew[$lineItem[$optionValueId]['auto_renew']] += $lineItem[$optionValueId]['line_total'];
-          }
           break;
 
         case 'CheckBox':
@@ -767,13 +744,6 @@ WHERE  id = %1";
               $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);
             }
             $totalPrice += $lineItem[$optionId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionId]);
-            if (
-              $component &&
-              isset($lineItem[$optionId]['auto_renew']) &&
-              is_numeric($lineItem[$optionId]['auto_renew'])
-            ) {
-              $autoRenew[$lineItem[$optionId]['auto_renew']] += $lineItem[$optionId]['line_total'];
-            }
           }
           break;
       }
@@ -819,16 +789,6 @@ WHERE  id = %1";
 
     $params['amount'] = $totalPrice;
     $params['tax_amount'] = $totalTax;
-    if ($component) {
-      foreach ($autoRenew as $dontCare => $eachAmount) {
-        if (!$eachAmount) {
-          unset($autoRenew[$dontCare]);
-        }
-      }
-      if (count($autoRenew) > 1) {
-        $params['autoRenew'] = $autoRenew;
-      }
-    }
   }
 
   /**
