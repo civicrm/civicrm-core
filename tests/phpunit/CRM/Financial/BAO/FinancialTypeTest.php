@@ -215,8 +215,11 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testcheckPermissionedLineItems()
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testcheckPermissionedLineItems() {
+  public function testCheckPermissionedLineItems() {
     $contactId = $this->individualCreate();
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
@@ -282,10 +285,10 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
     try {
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
-      $this->fail("Missed expected exception");
+      $this->fail('Missed expected exception');
     }
     catch (Exception $e) {
-      $this->assertEquals("A fatal error was triggered: You do not have permission to access this page.", $e->getMessage());
+      $this->assertEquals('A fatal error was triggered: You do not have permission to access this page.', $e->getMessage());
     }
 
     $this->setPermissions([

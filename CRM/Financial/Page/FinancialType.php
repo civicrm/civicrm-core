@@ -88,7 +88,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
     ) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     // get all financial types sorted by weight
     $financialType = [];

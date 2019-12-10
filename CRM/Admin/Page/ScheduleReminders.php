@@ -113,12 +113,14 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    * Browse all Scheduled Reminders settings.
    *
    * @param null $action
+   *
+   * @throws \CRM_Core_Exception
    */
   public function browse($action = NULL) {
     //CRM-16777: Do not permit access to user, for page 'Administer->Communication->Schedule Reminder',
     //when do not have 'administer CiviCRM' permission.
     if (!CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     // Get list of configured reminders

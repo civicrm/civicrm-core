@@ -127,7 +127,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public function preProcess() {
     // Check for edit permission.
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     if (!CRM_Member_BAO_Membership::statusAvailabilty()) {
       // all possible statuses are disabled - redirect back to contact form
