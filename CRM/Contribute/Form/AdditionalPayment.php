@@ -92,18 +92,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       CRM_Utils_System::setTitle($title);
       return;
     }
-    $entityType = 'contribution';
     if ($this->_component == 'event') {
-      $entityType = 'participant';
       $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
-      $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
     }
     else {
       $this->_contributionId = $this->_id;
     }
 
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
-    $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_id);
+    $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
 
     $this->_amtPaid = $paymentDetails['paid'];
     $this->_amtTotal = $paymentDetails['total'];
@@ -288,7 +285,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    if ($self->_paymentType == 'owed' && $fields['total_amount'] > $self->_owed) {
+    if ($self->_paymentType == 'owed' && (int) $fields['total_amount'] > (int) $self->_owed) {
       $errors['total_amount'] = ts('Payment amount cannot be greater than owed amount');
     }
     if ($self->_paymentType == 'refund' && $fields['total_amount'] != abs($self->_refund)) {
