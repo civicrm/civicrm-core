@@ -86,7 +86,7 @@ class Afform extends AbstractEntity {
 
   public static function getFields() {
     return new BasicGetFieldsAction('Afform', __FUNCTION__, function($self) {
-      return [
+      $fields = [
         [
           'name' => 'name',
         ],
@@ -111,6 +111,17 @@ class Afform extends AbstractEntity {
           'name' => 'layout',
         ],
       ];
+
+      if ($self->getAction() === 'get') {
+        $fields[] = [
+          'name' => 'has_local',
+        ];
+        $fields[] = [
+          'name' => 'has_packaged',
+        ];
+      }
+
+      return $fields;
     });
   }
 

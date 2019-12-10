@@ -152,6 +152,21 @@ class CRM_Afform_AfformScanner {
     }
   }
 
+  public function getComputedFields($name) {
+    // Ex: $allPaths['viewIndividual'][0] == '/var/www/foo/afform/view-individual'].
+    $allPaths = $this->findFilePaths()[$name];
+    // $activeLayoutPath = $this->findFilePath($name, self::LAYOUT_FILE);
+    // $activeMetaPath = $this->findFilePath($name, self::METADATA_FILE);
+    $localLayoutPath = $this->createSiteLocalPath($name, self::LAYOUT_FILE);
+    $localMetaPath = $this->createSiteLocalPath($name, self::METADATA_FILE);
+
+    $fields = [];
+    $fields['has_local'] = file_exists($localLayoutPath) || file_exists($localMetaPath);
+    $fields['has_packaged'] = ($fields['has_local'] && count($allPaths) > 1)
+      || (!$fields['has_local'] && count($allPaths) > 0);
+    return $fields;
+  }
+
   /**
    * @param string $formName
    *   Ex: 'view-individual'

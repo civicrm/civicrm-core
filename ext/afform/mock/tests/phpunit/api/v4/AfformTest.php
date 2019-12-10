@@ -59,6 +59,8 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
+    $this->assertEquals(TRUE, $get($result[0], 'has_packaged'), $message);
+    $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
 
     $message = 'After updating with Afform.create, the revised data should be returned';
     $result = Civi\Api4\Afform::update()
@@ -75,6 +77,8 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals('The temporary description', $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
+    $this->assertEquals(TRUE, $get($result[0], 'has_packaged'), $message);
+    $this->assertEquals(TRUE, $get($result[0], 'has_local'), $message);
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
     $message = 'After reverting, the final Afform.get should return default data';
@@ -84,6 +88,8 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
+    $this->assertEquals(TRUE, $get($result[0], 'has_packaged'), $message);
+    $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
   }
 
   public function getFormatExamples() {
