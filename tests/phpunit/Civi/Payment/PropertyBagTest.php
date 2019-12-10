@@ -132,8 +132,18 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     foreach ($valid_values as $_) {
       list($given, $expect) = $_;
       $propertyBag = new PropertyBag();
-      $propertyBag->$setter($given);
-      $this->assertEquals($expect, $propertyBag->$getter());
+      try {
+        $propertyBag->$setter($given);
+      }
+      catch (\Exception $e) {
+        $this->fail("Expected to be able to set '$prop' to '$given' but got " . get_class($e) . ": " . $e->getMessage());
+      }
+      try {
+        $this->assertEquals($expect, $propertyBag->$getter());
+      }
+      catch (\Exception $e) {
+        $this->fail("Expected to be able to call $getter, having called $setter with '$given' but got " . get_class($e) . ": " . $e->getMessage());
+      }
     }
     // Using the setter and getter, check we get an error for invalid data.
     foreach ($invalid_values as $given) {
@@ -189,19 +199,31 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   public function otherParamsDataProvider() {
     $valid_bools = [['0' , FALSE], ['', FALSE], [0, FALSE], [FALSE, FALSE], [TRUE, TRUE], [1, TRUE], ['1', TRUE]];
     $valid_strings = [['foo' , 'foo'], ['', '']];
+    $valid_strings_inc_null = [['foo' , 'foo'], ['', ''], [NULL, '']];
     $valid_ints = [[123, 123], ['123', 123]];
     $invalid_ints = [-1, 0, NULL, ''];
     return [
+      ['billingStreetAddress', [], $valid_strings_inc_null, []],
+      ['billingSupplementalAddress1', [], $valid_strings_inc_null, []],
+      ['billingSupplementalAddress2', [], $valid_strings_inc_null, []],
+      ['billingSupplementalAddress3', [], $valid_strings_inc_null, []],
+      ['billingCity', [], $valid_strings_inc_null, []],
+      ['billingPostalCode', [], $valid_strings_inc_null, []],
+      ['billingCounty', [], $valid_strings_inc_null, []],
+      ['billingCountry', [], [['GB', 'GB'], ['NZ', 'NZ']], ['XX', '', NULL, 0]],
       ['contributionID', ['contribution_id'], $valid_ints, $invalid_ints],
       ['contributionRecurID', ['contribution_recur_id'], $valid_ints, $invalid_ints],
       ['description', [], [['foo' , 'foo'], ['', '']], []],
       ['feeAmount', ['fee_amount'], [[1.23, 1.23], ['4.56', 4.56]], [NULL]],
+      ['firstName', [], $valid_strings_inc_null, []],
       ['invoiceID', ['invoice_id'], $valid_strings, []],
       ['isBackOffice', ['is_back_office'], $valid_bools, [NULL]],
       ['isRecur', ['is_recur'], $valid_bools, [NULL]],
+      ['lastName', [], $valid_strings_inc_null, []],
       ['paymentToken', [], $valid_strings, []],
       ['recurFrequencyInterval', ['frequency_interval'], $valid_ints, $invalid_ints],
       ['recurFrequencyUnit', [], [['month', 'month'], ['day', 'day'], ['year', 'year']], ['', NULL, 0]],
+      ['recurProcessorID', [], [['foo', 'foo']], [str_repeat('x', 256), NULL, '', 0]],
       ['transactionID', ['transaction_id'], $valid_strings, []],
       ['trxnResultCode', [], $valid_strings, []],
     ];
