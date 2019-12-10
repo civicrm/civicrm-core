@@ -32,6 +32,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected $_formDataModel;
 
+  /**
+   * @param \Civi\Api4\Generic\Result $result
+   * @throws \API_Exception
+   */
   public function _run(Result $result) {
     // This will throw an exception if the form doesn't exist
     $this->_afform = (array) civicrm_api4('Afform', 'get', ['checkPermissions' => FALSE, 'where' => [['name', '=', $this->name]]], 0);

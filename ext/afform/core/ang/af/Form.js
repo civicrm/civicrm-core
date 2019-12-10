@@ -47,7 +47,8 @@
             crmApi4('Afform', 'prefill', {name: this.getFormMeta().name, args: $routeParams})
               .then(function(result) {
                 _.each(result, function(item) {
-                  data[item.name] = _.extend(item.values, schema[item.name].data || {});
+                  data[item.name] = data[item.name] || {};
+                  _.extend(data[item.name], item.values, schema[item.name].data || {});
                 });
               });
           }

@@ -1,6 +1,6 @@
 <div class="af-gui-columns">
   <fieldset class="af-gui-entity-values">
-    <legend>{{ ts('Values') }}</legend>
+    <legend>{{ ts('Values:') }}</legend>
     <div class="form-inline" ng-if="entity.data" ng-repeat="(fieldName, value) in entity.data">
       <label>{{ editor.getField(entity.type, fieldName).title }}:</label><br />
       <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
@@ -14,17 +14,35 @@
     </div>
   </fieldset>
 
-  <fieldset class="af-gui-entity-fields">
-    <legend>{{ ts('Fields') }}</legend>
-    <div class="af-gui-field-search form-inline">
+  <fieldset class="af-gui-entity-palette">
+    <legend class="form-inline">
+      {{ ts('Add:') }}
       <input ng-model="controls.fieldSearch" class="form-control" type="search" placeholder="&#xf002" title="{{ ts('Search fields') }}" />
-      <a href ng-click="clearSearch()" ng-show="!!controls.fieldSearch" title="{{ ts('Clear search') }}">
-        <i class="crm-i fa-times"></i>
-      </a>
-    </div>
-    <div class="af-gui-field-select-list" ui-sortable="{update: rebuildFieldList, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] [ui-sortable]'}" ng-model="fieldList">
-      <div ng-repeat="field in fieldList" ng-class="{disabled: fieldInUse(field.name)}">
-        {{ editor.getField(entity.type, field.name).title }}
+    </legend>
+    <div class="af-gui-entity-palette-select-list">
+      <div ng-if="blockList.length">
+        <label>{{ ts('Blocks') }}</label>
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] &gt; [ui-sortable]'}" ng-model="blockList">
+          <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block['af-block'])}">
+            {{ editor.meta.blocks[block['#children'][0]['#tag']].title }}
+          </div>
+        </div>
+      </div>
+      <div ng-if="elementList.length">
+        <label>{{ ts('Elements') }}</label>
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]'}" ng-model="elementList">
+          <div ng-repeat="element in elementList" >
+            {{ elementTitles[$index] }}
+          </div>
+        </div>
+      </div>
+      <div ng-if="fieldList.length">
+        <label>{{ ts('Fields') }}</label>
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] &gt; [ui-sortable]'}" ng-model="fieldList">
+          <div ng-repeat="field in fieldList" ng-class="{disabled: fieldInUse(field.name)}">
+            {{ editor.getField(entity.type, field.name).title }}
+          </div>
+        </div>
       </div>
     </div>
   </fieldset>

@@ -18,7 +18,7 @@ class FormDataModel {
   protected $entities;
 
   /**
-   * Gets entity metadata and all fields from the form
+   * Gets entity metadata and all blocks & fields from the form
    *
    * @param array $layout
    *   The root element of the layout, in shallow/deep format.
@@ -29,9 +29,9 @@ class FormDataModel {
     $root = AHQ::makeRoot($layout);
     $entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
     foreach (array_keys($entities) as $entity) {
-      $entities[$entity]['fields'] = [];
+      $entities[$entity]['fields'] = $entities[$entity]['blocks'] = [];
     }
-    self::parseFields($root, $entities);
+    self::parseFields($layout, $entities);
 
     $self = new static();
     $self->entities = $entities;
@@ -39,26 +39,29 @@ class FormDataModel {
   }
 
   /**
-   * @param array $element
-   *   The root element of the layout, in shallow/deep format.
+   * @param array $nodes
    * @param array $entities
-   *   A list of entities, keyed by named.
-   *   This will be updated to include 'fields'.
-   *   Ex: $entities['spouse']['type'] = 'Contact';
+   *   A list of entities, keyed by name.
+   *     This will be updated to populate 'fields' and 'blocks'.
+   *     Ex: $entities['spouse']['type'] = 'Contact';
+   * @param string $entity
    */
-  protected static function parseFields($element, &$entities) {
-    if (!isset($element['#children'])) {
-      return;
-    }
-    foreach ($element['#children'] as $child) {
-      if (is_string($child) || isset($child['#text'])) {
+  protected static function parseFields($nodes, &$entities, $entity = NULL) {
+    foreach ($nodes as $node) {
+      if (!is_array($node) || !isset($node['#tag'])) {
         //nothing
       }
-      elseif (!empty($child['af-fieldset']) && !empty($child['#children'])) {
-        $entities[$child['af-fieldset']]['fields'] = array_merge($entities[$child['af-fieldset']]['fields'] ?? [], AHQ::getTags($child, 'af-field'));
+      elseif (!empty($node['af-fieldset'])) {
+        self::parseFields($node['#children'], $entities, $node['af-fieldset']);
       }
-      else {
-        self::parseFields($child, $entities);
+      elseif ($entity && $node['#tag'] === 'af-field') {
+        $entities[$entity]['fields'][$node['name']] = AHQ::getProps($node);
+      }
+      elseif ($entity && !empty($node['af-block'])) {
+        $entities[$entity]['blocks'][$node['af-block']] = AHQ::getProps($node);
+      }
+      elseif (!empty($node['#children'])) {
+        self::parseFields($node['#children'], $entities, $entity);
       }
     }
   }

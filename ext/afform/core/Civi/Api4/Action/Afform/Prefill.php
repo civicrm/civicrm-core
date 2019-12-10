@@ -29,7 +29,7 @@ class Prefill extends AbstractProcessor {
   }
 
   /**
-   * Fetch all fields needed to display a given entity on this form
+   * Fetch all data needed to display a given entity on this form
    *
    * @param $entity
    * @param $id
@@ -46,11 +46,20 @@ class Prefill extends AbstractProcessor {
     }
     $result = civicrm_api4($entity['type'], 'get', [
       'where' => [['id', '=', $id]],
-      'select' => array_column($entity['fields'], 'name'),
+      'select' => array_keys($entity['fields']),
       'checkPermissions' => $checkPermissions,
     ]);
-    if ($result->first()) {
-      $this->_data[$entity['name']] = $result->first();
+    $data = $result->first();
+    if ($data) {
+      $data['blocks'] = [];
+      foreach ($entity['blocks'] ?? [] as $blockEntity => $block) {
+        $data['blocks'][$blockEntity] = (array) civicrm_api4($blockEntity, 'get', [
+          'where' => [['contact_id', '=', $data['id']]],
+          'limit' => $block['max'] ?? 0,
+          'checkPermissions' => $checkPermissions,
+        ]);
+      }
+      $this->_data[$entity['name']] = $data;
     }
   }
 

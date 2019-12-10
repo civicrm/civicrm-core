@@ -45,9 +45,10 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'type' => 'Foo',
           'name' => 'foobar',
           'fields' => [
-            ['name' => 'propA'],
-            ['name' => 'propB', 'defn' => ['title' => 'Whiz']],
+            'propA' => ['name' => 'propA'],
+            'propB' => ['name' => 'propB', 'defn' => ['title' => 'Whiz']],
           ],
+          'blocks' => [],
         ],
       ],
     ];
@@ -59,11 +60,13 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'type' => 'Foo',
           'name' => 'foobar',
           'fields' => [],
+          'blocks' => [],
         ],
         'whiz_bang' => [
           'type' => 'Whiz',
           'name' => 'whiz_bang',
           'fields' => [],
+          'blocks' => [],
         ],
       ],
     ];

@@ -15,4 +15,15 @@ a.af-api4-action-idle {
 .af-container.af-layout-inline > * {
     display: inline-block;
     margin-right: .5em;
+    vertical-align: bottom;
+}
+
+[af-block-item] {
+  position: relative;
+}
+#bootstrap-theme [af-block-item] .af-block-remove-btn {
+  min-width: 30px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }

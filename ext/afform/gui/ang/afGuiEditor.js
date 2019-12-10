@@ -2,8 +2,6 @@
   "use strict";
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'));
 
-  var editingIcon;
-
   angular.module('afGuiEditor').directive('afGuiEditor', function(crmApi4, $parse, $timeout, $location) {
     return {
       restrict: 'A',
@@ -17,7 +15,7 @@
           $('#af-gui-icon-picker').crmIconPicker().change(function() {
             if (editingIcon) {
               $scope.$apply(function() {
-                editingIcon['crm-icon'] = $('#af-gui-icon-picker').val();
+                editingIcon[editingIconProp] = $('#af-gui-icon-picker').val();
                 editingIcon = null;
                 $('#af-gui-icon-picker').val('').change();
               });
@@ -31,6 +29,9 @@
         $scope.saving = false;
         $scope.selectedEntityName = null;
         $scope.meta = this.meta = CRM.afformAdminData;
+        _.each($scope.meta.blocks, function(block) {
+          evaluate(block.layout);
+        });
         this.scope = $scope;
         var editor = $scope.editor = this;
         var newForm = {
@@ -238,6 +239,9 @@
         var ts = $scope.ts = CRM.ts();
         $scope.controls = {};
         $scope.fieldList = [];
+        $scope.blockList = [];
+        $scope.elementList = [];
+        $scope.elementTitles = [];
 
         $scope.valuesFields = function() {
           var fields = $scope.editor ? _.transform($scope.editor.meta.fields[$scope.entity.type], function(fields, field) {
@@ -250,57 +254,100 @@
           delete entity.data[fieldName];
         };
 
-        $scope.buildFieldList = function() {
-          $scope.fieldList.length = 0;
+        function buildPaletteLists() {
           var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
+          buildFieldList(search);
+          buildBlockList(search);
+          buildElementList(search);
+        }
+
+        function buildFieldList(search) {
+          $scope.fieldList.length = 0;
           _.each($scope.editor.meta.fields[$scope.entity.type], function(field) {
             if (!search || _.contains(field.name, search) || _.contains(field.title.toLowerCase(), search)) {
               $scope.fieldList.push({
                 "#tag": "af-field",
-                name: field.name,
-                defn: {}
+                name: field.name
               });
             }
           });
-        };
+        }
+
+        function buildBlockList(search) {
+          $scope.blockList.length = 0;
+          _.each($scope.editor.meta.blocks, function(block, directive) {
+            if (!search || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) {
+              $scope.blockList.push({
+                "#tag": "div",
+                "af-block": block.block,
+                "add-label": ts('Add'),
+                min: '1',
+                "#children": [
+                  {"#tag": directive}
+                ]
+              });
+            }
+          });
+        }
+
+        function buildElementList(search) {
+          $scope.elementList.length = 0;
+          $scope.elementTitles.length = 0;
+          _.each($scope.editor.meta.elements, function(element, name) {
+            if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
+              $scope.elementList.push(_.cloneDeep(element.element));
+              $scope.elementTitles.push(element.title);
+            }
+          });
+        }
 
         $scope.clearSearch = function() {
           $scope.controls.fieldSearch = '';
         };
 
-        $scope.rebuildFieldList = function() {
+        // This gets called from jquery-ui so we have to manually apply changes to scope
+        $scope.buildPaletteLists = function() {
           $timeout(function() {
             $scope.$apply(function() {
-              $scope.buildFieldList();
+              buildPaletteLists();
             });
           });
         };
 
         // Checks if a field is on the form or set as a value
         $scope.fieldInUse = function(fieldName) {
-          var data = $scope.entity.data || {},
-            found = false;
+          var data = $scope.entity.data || {};
           if (fieldName in data) {
             return true;
           }
-          return check($scope.editor.scope.layout['#children']);
-          function check(group) {
-            _.each(group, function(item) {
-              if (found) {
-                return false;
-              }
-              if (_.isPlainObject(item)) {
-                if ((!item['af-fieldset'] || (item['af-fieldset'] === $scope.entity.name)) && item['#children']) {
-                  check(item['#children']);
-                }
-                if (item['#tag'] === 'af-field' && item.name === fieldName) {
-                  found = true;
-                }
-              }
-            });
-            return found;
-          }
+          return check($scope.editor.scope.layout['#children'], {'#tag': 'af-field', name: fieldName});
         };
+
+        $scope.blockInUse = function(blockType) {
+          return check($scope.editor.scope.layout['#children'], {'af-block': blockType});
+        };
+
+        // Recursively check for a matching object in a multi-level collection
+        function check(group, criteria, found) {
+          if (!found) {
+            found = {};
+          }
+          if (_.find(group, criteria)) {
+            found.match = true;
+            return true;
+          }
+          _.each(group, function(item) {
+            if (found.match) {
+              return false;
+            }
+            if (_.isPlainObject(item)) {
+              if ((!item['af-fieldset'] || (item['af-fieldset'] === $scope.entity.name)) && item['#children']) {
+                check(item['#children'], criteria, found);
+              }
+            }
+          });
+          return found.match;
+        }
 
         $scope.$watch('controls.addValue', function(fieldName) {
           if (fieldName) {
@@ -312,7 +359,7 @@
           }
         });
 
-        $scope.$watch('controls.fieldSearch', $scope.buildFieldList);
+        $scope.$watch('controls.fieldSearch', buildPaletteLists);
       }
     };
   });
@@ -323,11 +370,13 @@
       templateUrl: '~/afGuiEditor/container.html',
       scope: {
         node: '=afGuiContainer',
+        block: '=',
         entityName: '='
       },
-      require: '^^afGuiEditor',
-      link: function($scope, element, attrs, editor) {
-        $scope.editor = editor;
+      require: ['^^afGuiEditor', '?^^afGuiContainer'],
+      link: function($scope, element, attrs, ctrls) {
+        $scope.editor = ctrls[0];
+        $scope.parentContainer = ctrls[1];
       },
       controller: function($scope) {
         var container = $scope.container = this;
@@ -343,6 +392,9 @@
           }
           if (node['af-fieldset']) {
             return 'fieldset';
+          }
+          if (node['af-block']) {
+            return 'block';
           }
           var classes = splitClass(node['class']),
             types = ['af-container', 'af-text', 'af-button', 'af-markup'],
@@ -361,13 +413,31 @@
           } else if (_.intersection(classes, ['af-text', 'af-button']).length) {
             element['#children'] = [{'#text': ts('Enter text')}];
           }
-          // Add it to the top, underneath the fieldset legend if present
-          var pos = $scope.node['#children'].length && $scope.node['#children'][0]['#tag'] === 'legend' ? 1 : 0;
-          $scope.node['#children'].splice(pos, 0, element);
+          var children = $scope.getSetChildren();
+          if (children) {
+            // Add it to the top, underneath the fieldset legend if present
+            var pos = children.length && children[0]['#tag'] === 'legend' ? 1 : 0;
+            children.splice(pos, 0, element);
+          }
         };
 
         this.removeElement = function(element) {
-          removeRecursive($scope.editor.scope.layout['#children'], {$$hashKey: element.$$hashKey});
+          removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
+        };
+
+        this.getEntityName = function() {
+          return $scope.entityName.split('-block-')[0];
+        };
+
+        // Returns the primary entity type for this container e.g. "Contact"
+        this.getMainEntityType = function() {
+          return $scope.editor && $scope.editor.getEntity(container.getEntityName()).type;
+        };
+
+        // Returns the entity type for fields within this conainer (block entity type if this is a block, else the primary entity type)
+        this.getFieldEntityType = function() {
+          var blockType = $scope.entityName.split('-block-');
+          return blockType[1] || ($scope.editor && $scope.editor.getEntity(blockType[0]).type);
         };
 
         $scope.isSelectedFieldset = function(entityName) {
@@ -389,6 +459,10 @@
             var $source = $(sort.source[0]),
               $target = $(sort.droptarget[0]),
               $item = $(ui.item[0]);
+            // Dropping onto palette is ok; works like a trash can
+            if ($target.closest('#afGuiEditor-palette-config').length) {
+              return;
+            }
             // Fields cannot be dropped outside their own entity
             if ($item.is('[af-gui-field]') || $item.has('[af-gui-field]').length) {
               if ($source.closest('[data-entity]').attr('data-entity') !== $target.closest('[data-entity]').attr('data-entity')) {
@@ -396,7 +470,7 @@
               }
             }
             // Entity-fieldsets cannot be dropped into other entity-fieldsets
-            if (($item.is('[data-entity]') || $item.has('[data-entity]').length) && $target.closest('[data-entity]').length) {
+            if (($item.hasClass('af-gui-fieldset') || $item.has('.af-gui-fieldset').length) && $target.closest('.af-gui-fieldset').length) {
               return sort.cancel();
             }
           }
@@ -407,27 +481,146 @@
           fieldset: ts('Fieldset')
         };
 
-        $scope.layouts = {
-          'af-layout-rows': ts('Contents display as rows'),
-          'af-layout-cols': ts('Contents are evenly-spaced columns'),
-          'af-layout-inline': ts('Contents are arranged inline')
+        // Block settings
+        var selectedBlock = $scope.selectedBlock = {
+          name: null,
+          layout: null,
+          override: false,
+          options: [],
         };
 
-        $scope.getLayout = function() {
-          if (!$scope.node) {
-            return '';
-          }
-          return _.intersection(splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
+        $scope.getSetChildren = function(val) {
+          var collection = selectedBlock.layout || ($scope.node && $scope.node['#children']);
+          return arguments.length ? (collection = val) : collection;
         };
 
-        $scope.setLayout = function(val) {
-          var classes = ['af-container'];
-          if (val !== 'af-layout-rows') {
-            classes.push(val);
-          }
-          modifyClasses($scope.node, _.keys($scope.layouts), classes);
-        };
+        function getBlockOptions() {
+          var blockOptions = [];
+          _.each($scope.editor.meta.blocks, function(block, id) {
+            if (block.block === $scope.container.getFieldEntityType()) {
+              blockOptions.push({
+                id: id,
+                text: block.title + (selectedBlock.name === id && selectedBlock.override ? ' ' + ts('(overridden)') : ''),
+              });
+            }
+          });
+          return blockOptions;
+        }
 
+        if ($scope.block) {
+
+          $scope.isRepeatable = function() {
+            return "fixme";
+          };
+
+          $scope.toggleRepeat = function() {
+            if ($scope.node.min === '1' && $scope.node.max === '1') {
+              delete $scope.node.max;
+              delete $scope.node.min;
+              $scope.node['add-label'] = ts('Add');
+            } else {
+              $scope.node.min = $scope.node.max = '1';
+              delete $scope.node['add-label'];
+            }
+          };
+
+          $scope.getSetMin = function(val) {
+            if (arguments.length) {
+              if ($scope.node.max && val >= parseInt($scope.node.max, 10)) {
+                $scope.node.max = '' + (1 + val);
+              }
+              if (!val) {
+                delete $scope.node.min;
+              }
+              else {
+                $scope.node.min = '' + val;
+              }
+            }
+            return $scope.node.min ? parseInt($scope.node.min, 10) : null;
+          };
+
+          $scope.getSetMax = function(val) {
+            if (arguments.length) {
+              if (!$scope.node.max && $scope.node.min === '1' && val === 1) {
+                val++;
+              }
+              if ($scope.node.min && val && val <= parseInt($scope.node.min, 10)) {
+                $scope.node.min = '' + (val - 1);
+              }
+              if (typeof val !== 'number') {
+                delete $scope.node.max;
+              }
+              else {
+                $scope.node.max = '' + val;
+              }
+            }
+            return $scope.node.max ? parseInt($scope.node.max, 10) : null;
+          };
+
+          $scope.pickAddIcon = function() {
+            openIconPicker($scope.node, 'add-icon');
+          };
+
+          $scope.$watch('selectedBlock.name', function (name, oldVal) {
+            if (name && name !== oldVal) {
+              selectedBlock.layout = _.cloneDeep($scope.editor.meta.blocks[name].layout);
+              $scope.node['#children'] = [{'#tag': name}];
+              selectedBlock.override = false;
+              selectedBlock.options = getBlockOptions();
+            }
+            else if (!name && oldVal) {
+              if (selectedBlock.layout) {
+                $scope.node['#children'] = selectedBlock.layout;
+              }
+              selectedBlock.override = false;
+              selectedBlock.layout = null;
+              selectedBlock.options = getBlockOptions();
+            }
+          });
+
+          $scope.$watch('selectedBlock.layout', function (layout, oldVal) {
+            if (selectedBlock.name && !selectedBlock.override && layout && layout !== oldVal && !angular.equals(layout, $scope.editor.meta.blocks[selectedBlock.name].layout)) {
+              $scope.node['#children'] = selectedBlock.layout;
+              selectedBlock.override = true;
+              selectedBlock.layout = null;
+              selectedBlock.options = getBlockOptions();
+            }
+          }, true);
+
+          $scope.$watch("node['#children']", function (children) {
+            if (!selectedBlock.name && children && children.length === 1 && children[0]['#tag'] in $scope.editor.meta.blocks) {
+              selectedBlock.name = children[0]['#tag'];
+              selectedBlock.override = false;
+            } else if (selectedBlock.name && selectedBlock.override && !selectedBlock.layout && children && angular.equals(children, $scope.editor.meta.blocks[selectedBlock.name].layout)) {
+              selectedBlock.layout = _.cloneDeep($scope.editor.meta.blocks[selectedBlock.name].layout);
+              $scope.node['#children'] = [{'#tag': selectedBlock.name}];
+              selectedBlock.override = false;
+            }
+            selectedBlock.options = getBlockOptions();
+          }, true);
+        }
+        else {
+          $scope.layouts = {
+            'af-layout-rows': ts('Contents display as rows'),
+            'af-layout-cols': ts('Contents are evenly-spaced columns'),
+            'af-layout-inline': ts('Contents are arranged inline')
+          };
+
+          $scope.getLayout = function() {
+            if (!$scope.node) {
+              return '';
+            }
+            return _.intersection(splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
+          };
+
+          $scope.setLayout = function(val) {
+            var classes = ['af-container'];
+            if (val !== 'af-layout-rows') {
+              classes.push(val);
+            }
+            modifyClasses($scope.node, _.keys($scope.layouts), classes);
+          };
+        }
       }
     };
   });
@@ -437,8 +630,7 @@
       restrict: 'A',
       templateUrl: '~/afGuiEditor/field.html',
       scope: {
-        node: '=afGuiField',
-        entityName: '='
+        node: '=afGuiField'
       },
       require: ['^^afGuiEditor', '^^afGuiContainer'],
       link: function($scope, element, attrs, ctrls) {
@@ -454,11 +646,11 @@
         ];
 
         $scope.getEntity = function() {
-          return $scope.editor ? $scope.editor.getEntity($scope.entityName) : {};
+          return $scope.editor ? $scope.editor.getEntity($scope.container.getEntityName()) : {};
         };
 
         $scope.getDefn = this.getDefn = function() {
-          return $scope.editor ? $scope.editor.getField($scope.getEntity().type, $scope.node.name) : {};
+          return $scope.editor ? $scope.editor.getField($scope.container.getFieldEntityType(), $scope.node.name) : {};
         };
 
         $scope.hasOptions = function() {
@@ -546,10 +738,11 @@
               localDefn = drillDown($scope.node, ['defn'].concat(path)),
               fieldDefn = drillDown($scope.getDefn(), path);
             // Set the value if different than the field defn, otherwise unset it
-            if (typeof val !== 'undefined' && val !== fieldDefn[item]) {
+            if (typeof val !== 'undefined' && (val !== fieldDefn[item] && !(!val && !fieldDefn[item]))) {
               localDefn[item] = val;
             } else {
               delete localDefn[item];
+              clearOut($scope.node, ['defn'].concat(path));
             }
             return val;
           }
@@ -569,6 +762,15 @@
             container = container[level];
           });
           return container;
+        }
+
+        // Recursively clears out empty arrays and objects
+        function clearOut(parent, path) {
+          var item;
+          while (path.length && _.every(drillDown(parent, path), _.isEmpty)) {
+            item = path.pop();
+            delete drillDown(parent, path)[item];
+          }
         }
       }
     };
@@ -760,8 +962,7 @@
         };
 
         $scope.pickIcon = function() {
-          editingIcon = $scope.node;
-          $('#af-gui-icon-picker ~ .crm-icon-picker-button').click();
+          openIconPicker($scope.node, 'crm-icon');
         };
 
       }
@@ -1023,6 +1224,13 @@
       classes = _.unique(classes.concat(splitClass(toAdd)));
     }
     node['class'] = classes.join(' ');
+  }
+
+  var editingIcon, editingIconProp;
+  function openIconPicker(node, propName) {
+    editingIcon = node;
+    editingIconProp = propName;
+    $('#af-gui-icon-picker ~ .crm-icon-picker-button').click();
   }
 
 })(angular, CRM.$, CRM._);

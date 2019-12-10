@@ -1,0 +1,6 @@
+{
+  "title": "Email Block (default)",
+  "block": "Email",
+  "extends": "Contact",
+  "repeatable": true
+}

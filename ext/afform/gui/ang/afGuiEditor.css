@@ -76,6 +76,16 @@
   min-width: 110px;
 }
 
+#afGuiEditor-palette-config .af-gui-entity-palette [type=search] {
+  width: 120px;
+  padding: 3px 3px 3px 5px;
+  height: 22px;
+  font-weight: normal;
+  position: relative;
+  top: -3px;
+  font-size: 12px;
+}
+
 #afGuiEditor input[type=search]::placeholder {
   font-family: FontAwesome;
   text-align: right;
@@ -177,25 +187,25 @@
   min-height: 25px;
 }
 
-#afGuiEditor .af-gui-field-select-list {
-  max-height: 280px;
+#afGuiEditor .af-gui-entity-palette-select-list {
+  max-height: 400px;
   overflow-y: auto;
 }
 
-#afGuiEditor .af-gui-field-select-list > div {
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div {
   cursor: move;
-  padding-left:15px;
+  padding-left: 10px;
   position: relative;
 }
-#afGuiEditor .af-gui-field-select-list > div.disabled {
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div.disabled {
   cursor: auto;
 }
-#afGuiEditor .af-gui-field-select-list > div:not(.disabled):hover {
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover {
   background-color: #efefef;
 }
 /* grip handle */
 #afGuiEditor [ui-sortable] .af-gui-bar:before,
-#afGuiEditor .af-gui-field-select-list > div:not(.disabled):hover:before,
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
 #afGuiEditor [af-gui-edit-options] [ui-sortable] li:before {
   background-size: cover;
   background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
@@ -300,6 +310,7 @@
 
 #afGuiEditor .dropdown-menu li > * > label {
   font-weight: normal;
+  cursor: pointer;
 }
 
 #afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {
@@ -311,6 +322,11 @@
 #afGuiEditor li .af-gui-field-select-in-dropdown input[type=color] {
   width: 30px;
   padding: 2px 4px;
+}
+
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
+  width: 50px;
+  padding-right: 0;
 }
 
 /* For editing field placeholder text */
@@ -430,6 +446,11 @@
   top: 0;
   left: 0;
   padding-left: 15px;
+}
+#afGuiEditor .af-gui-edit-options-bar .btn-group-sm {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 #afGuiEditor [af-gui-edit-options] ul[ui-sortable] {
   padding: 5px 20px 0;

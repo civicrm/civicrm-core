@@ -1,0 +1,6 @@
+{
+  "title": "IM Block (default)",
+  "block": "IM",
+  "extends": "Contact",
+  "repeatable": true
+}

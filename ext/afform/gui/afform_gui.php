@@ -154,6 +154,8 @@ function afform_gui_civicrm_pageRun(&$page) {
  * Implements hook_civicrm_buildAsset().
  *
  * Loads metadata to send to the gui editor.
+ *
+ * FIXME: This is a prototype and should get broken out into separate callbacks with hooks, events, etc.
  */
 function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   if ($asset !== 'af-gui-vars.js') {
@@ -172,23 +174,81 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     $data['defaults'][$entity] = trim(CRM_Utils_JS::stripComments(file_get_contents($file)));
   }
 
+  // Load main entities
   $data['entities'] = (array) Civi\Api4\Entity::get()
     ->setCheckPermissions(FALSE)
     ->setSelect(['name', 'description'])
     ->addWhere('name', 'IN', $entityWhitelist)
     ->execute();
 
-  foreach ($entityWhitelist as $entityName) {
-    $api = 'Civi\\Api4\\' . $entityName;
-    $data['fields'][$entityName] = (array) $api::getFields()
-      ->setCheckPermissions(FALSE)
-      ->setIncludeCustom(TRUE)
-      ->setLoadOptions(TRUE)
-      ->setAction('create')
-      ->setSelect(['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'])
-      ->addWhere('input_type', 'IS NOT NULL')
-      ->execute()
-      ->indexBy('name');
+  // Load blocks
+  $data['blocks'] = [];
+  $blockData = \Civi\Api4\Afform::get()
+    ->setCheckPermissions(FALSE)
+    ->addWhere('block', 'IS NOT NULL')
+    ->setSelect(['name', 'title', 'block', 'extends', 'layout', 'repeatable'])
+    ->setFormatWhitespace(TRUE)
+    ->setLayoutFormat('shallow')
+    ->execute();
+  foreach ($blockData as $block) {
+    $entityWhitelist[] = $block['block'];
+    $data['blocks'][_afform_angular_module_name($block['name'], 'dash')] = $block;
+  }
+
+  // Todo: scan for other elements
+  $data['elements'] = [
+    'container' => [
+      'title' => ts('Container'),
+      'element' => [
+        '#tag' => 'div',
+        'class' => 'af-container',
+        '#children' => [],
+      ],
+    ],
+    'text' => [
+      'title' => ts('Text box'),
+      'element' => [
+        '#tag' => 'p',
+        'class' => 'af-text',
+        '#children' => [
+          ['#text' => ts('Enter text')],
+        ],
+      ],
+    ],
+    'markup' => [
+      'title' => ts('Rich content'),
+      'element' => [
+        '#tag' => 'div',
+        'class' => 'af-markup',
+        '#markup' => FALSE,
+      ],
+    ],
+    'button' => [
+      'title' => ts('Button'),
+      'element' => [
+        '#tag' => 'button',
+        'class' => 'af-button btn-primary',
+        'crm-icon' => 'fa-check',
+        'ng-click' => 'afform.submit()',
+        '#children' => [
+          ['#text' => ts('Enter text')],
+        ],
+      ],
+    ],
+  ];
+
+  $getFieldParams = [
+    'checkPermissions' => FALSE,
+    'includeCustom' => TRUE,
+    'loadOptions' => TRUE,
+    'action' => 'create',
+    'select' => ['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
+    'where' => [['input_type', 'IS NOT NULL']],
+  ];
+
+  // Get fields for main entities + block entities
+  foreach (array_unique($entityWhitelist) as $entityName) {
+    $data['fields'][$entityName] = (array) civicrm_api4($entityName, 'getFields', $getFieldParams, 'name');
 
     // TODO: Teach the api to return options in this format
     foreach ($data['fields'][$entityName] as $name => $field) {

@@ -1,0 +1,6 @@
+{
+  "title": "Website Block (default)",
+  "block": "Website",
+  "extends": "Contact",
+  "repeatable": true
+}

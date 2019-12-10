@@ -18,6 +18,8 @@ return [
     'af-entity' => 'E',
     'af-fieldset' => 'A',
     'af-form' => 'E',
+    'af-block' => 'A',
+    'af-block-item' => 'A',
     'af-field' => 'E',
   ],
 ];

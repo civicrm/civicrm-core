@@ -7,7 +7,7 @@ namespace Civi\Api4\Utils;
  *
  * @method $this setLayoutFormat(string $layoutFormat)
  * @method string getLayoutFormat()
- * @method $this setFormatWhitespace(string $layoutFormat)
+ * @method $this setFormatWhitespace(string $formatWhitespace)
  * @method string getFormatWhitespace()
  */
 trait AfformFormatTrait {

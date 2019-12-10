@@ -54,7 +54,7 @@ function afform_civicrm_config(&$config) {
   }
   Civi::$statics[__FUNCTION__] = 1;
 
-  // Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], -500);
+  Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], 500);
   Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], -1000);
   Civi::dispatcher()->addListener('hook_civicrm_angularModules', '_afform_civicrm_angularModules_autoReq', -1000);
 }
@@ -150,12 +150,7 @@ function afform_civicrm_caseTypes(&$caseTypes) {
 /**
  * Implements hook_civicrm_angularModules().
  *
- * Generate a list of Angular modules.
- *
- * Note: This hook only runs in CiviCRM 4.5+. It may
- * use features only available in v4.6+.
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
+ * Generate a list of Afform Angular modules.
  */
 function afform_civicrm_angularModules(&$angularModules) {
   _afform_civix_civicrm_angularModules($angularModules);
@@ -325,54 +320,72 @@ function _afform_reverse_deps_find($formName, $html, $revMap) {
 function afform_civicrm_alterAngular($angular) {
   $fieldMetadata = \Civi\Angular\ChangeSet::create('fieldMetadata')
     ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
-      $entities = _afform_getMetadata($doc);
+      /** @var \CRM_Afform_AfformScanner $scanner */
+      $scanner = Civi::service('afform_scanner');
+      $meta = $scanner->getMeta(basename($path, '.aff.html'));
+      $blockEntity = $meta['block'] ?? NULL;
+      if (!$blockEntity) {
+        $entities = _afform_getMetadata($doc);
+      }
 
       foreach (pq('af-field', $doc) as $afField) {
         /** @var DOMElement $afField */
-        $fieldName = $afField->getAttribute('name');
         $entityName = pq($afField)->parents('[af-fieldset]')->attr('af-fieldset');
-        if (!preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
+        $blockName = pq($afField)->parents('[af-block]')->attr('af-block');
+        if (!$blockEntity && !preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
           throw new \CRM_Core_Exception("Cannot process $path: malformed entity name ($entityName)");
         }
-        $entityType = $entities[$entityName]['type'];
-        $getFields = civicrm_api4($entityType, 'getFields', [
-          'action' => 'create',
-          'where' => [['name', '=', $fieldName]],
-          'select' => ['title', 'input_type', 'input_attrs', 'options'],
-          'loadOptions' => TRUE,
-        ]);
-        // Merge field definition data with whatever's already in the markup
-        $deep = ['input_attrs'];
-        foreach ($getFields as $fieldInfo) {
-          $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
-          if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
-            // If it's not an object, don't mess with it.
-            continue;
-          }
-          // TODO: Teach the api to return options in this format
-          if (!empty($fieldInfo['options'])) {
-            $fieldInfo['options'] = CRM_Utils_Array::makeNonAssociative($fieldInfo['options'], 'key', 'label');
-          }
-          // Default placeholder for select inputs
-          if ($fieldInfo['input_type'] === 'Select') {
-            $fieldInfo['input_attrs'] = ($fieldInfo['input_attrs'] ?? []) + ['placeholder' => ts('Select')];
-          }
-
-          $fieldDefn = $existingFieldDefn ? CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
-          foreach ($fieldInfo as $name => $prop) {
-            // Merge array props 1 level deep
-            if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
-              $fieldDefn[$name] = CRM_Utils_JS::writeObject(CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['CRM_Utils_JS', 'encode'], $prop));
-            }
-            elseif (!isset($fieldDefn[$name])) {
-              $fieldDefn[$name] = CRM_Utils_JS::encode($prop);
-            }
-          }
-          pq($afField)->attr('defn', htmlspecialchars(CRM_Utils_JS::writeObject($fieldDefn)));
-        }
+        $entityType = $blockEntity ?? $entities[$entityName]['type'];
+        _af_fill_field_metadata($blockName ? $blockName : $entityType, $afField);
       }
     });
   $angular->add($fieldMetadata);
+}
+
+/**
+ * Merge field definition metadata into an afform field's definition
+ *
+ * @param $entityType
+ * @param DOMElement $afField
+ * @throws API_Exception
+ */
+function _af_fill_field_metadata($entityType, DOMElement $afField) {
+  $fieldName = $afField->getAttribute('name');
+  $getFields = civicrm_api4($entityType, 'getFields', [
+    'action' => 'create',
+    'where' => [['name', '=', $fieldName]],
+    'select' => ['title', 'input_type', 'input_attrs', 'options'],
+    'loadOptions' => TRUE,
+  ]);
+  // Merge field definition data with whatever's already in the markup
+  $deep = ['input_attrs'];
+  foreach ($getFields as $fieldInfo) {
+    $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
+    if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
+      // If it's not an object, don't mess with it.
+      continue;
+    }
+    // TODO: Teach the api to return options in this format
+    if (!empty($fieldInfo['options'])) {
+      $fieldInfo['options'] = CRM_Utils_Array::makeNonAssociative($fieldInfo['options'], 'key', 'label');
+    }
+    // Default placeholder for select inputs
+    if ($fieldInfo['input_type'] === 'Select') {
+      $fieldInfo['input_attrs'] = ($fieldInfo['input_attrs'] ?? []) + ['placeholder' => ts('Select')];
+    }
+
+    $fieldDefn = $existingFieldDefn ? CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
+    foreach ($fieldInfo as $name => $prop) {
+      // Merge array props 1 level deep
+      if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
+        $fieldDefn[$name] = CRM_Utils_JS::writeObject(CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['CRM_Utils_JS', 'encode'], $prop));
+      }
+      elseif (!isset($fieldDefn[$name])) {
+        $fieldDefn[$name] = CRM_Utils_JS::encode($prop);
+      }
+    }
+    pq($afField)->attr('defn', htmlspecialchars(CRM_Utils_JS::writeObject($fieldDefn)));
+  }
 }
 
 function _afform_getMetadata(phpQueryObject $doc) {
@@ -411,8 +424,6 @@ function afform_civicrm_entityTypes(&$entityTypes) {
 function afform_civicrm_themes(&$themes) {
   _afform_civix_civicrm_themes($themes);
 }
-
-// --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
  * Implements hook_civicrm_buildAsset().

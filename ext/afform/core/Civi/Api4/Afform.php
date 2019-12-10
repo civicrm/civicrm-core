@@ -94,6 +94,12 @@ class Afform extends AbstractEntity {
           'name' => 'requires',
         ],
         [
+          'name' => 'block',
+        ],
+        [
+          'name' => 'extends',
+        ],
+        [
           'name' => 'title',
           'required' => $self->getAction() === 'create',
         ],
@@ -102,6 +108,10 @@ class Afform extends AbstractEntity {
         ],
         [
           'name' => 'is_public',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'repeatable',
           'data_type' => 'Boolean',
         ],
         [
