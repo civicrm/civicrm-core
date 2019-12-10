@@ -11,11 +11,13 @@
 
 /**
  * Class api_v3_EmailTest
+ *
  * @group headless
  */
 class api_v3_EmailTest extends CiviUnitTestCase {
   protected $_contactID;
   protected $_locationType;
+  protected $locationType2;
   protected $_entity;
   protected $_params;
 
@@ -26,7 +28,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
 
     $this->_contactID = $this->organizationCreate(NULL);
     $this->_locationType = $this->locationTypeCreate(NULL);
-    $this->_locationType2 = $this->locationTypeCreate([
+    $this->locationType2 = $this->locationTypeCreate([
       'name' => 'New Location Type 2',
       'vcard_name' => 'New Location Type 2',
       'description' => 'Another Location Type',
@@ -43,8 +45,12 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create email.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateEmail($version) {
     $this->_apiversion = $version;
@@ -53,13 +59,13 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'location_type_id' => $this->_locationType->id,
     ]);
-    $this->assertEquals(0, $get['count'], 'Contact not successfully deleted In line ' . __LINE__);
+    $this->assertEquals(0, $get['count'], 'Contact not successfully deleted.');
 
     $result = $this->callAPIAndDocument('email', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['id']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $delresult = $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
+    $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
   }
 
   /**
@@ -67,7 +73,9 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    * the LocationType default
    *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateEmailDefaultLocation($version) {
     $this->_apiversion = $version;
@@ -82,8 +90,11 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    * If a new email is set to is_primary the prev should no longer be.
    *
    * If is_primary is not set then it should become is_primary is no others exist
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateEmailPrimaryHandlingChangeToPrimary($version) {
     $this->_apiversion = $version;
@@ -92,7 +103,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $email1 = $this->callAPISuccess('email', 'create', $params);
     //now we check & make sure it has been set to primary
     $expected = 1;
-    $check = $this->callAPISuccess('email', 'getcount', [
+    $this->callAPISuccess('email', 'getcount', [
       'is_primary' => 1,
       'id' => $email1['id'],
     ],
@@ -102,12 +113,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateEmailPrimaryHandlingChangeExisting($version) {
     $this->_apiversion = $version;
-    $email1 = $this->callAPISuccess('email', 'create', $this->_params);
-    $email2 = $this->callAPISuccess('email', 'create', $this->_params);
+    $this->callAPISuccess('email', 'create', $this->_params);
+    $this->callAPISuccess('email', 'create', $this->_params);
     $check = $this->callAPISuccess('email', 'getcount', [
       'is_primary' => 1,
       'contact_id' => $this->_contactID,
@@ -128,7 +141,9 @@ class api_v3_EmailTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetEmail($version) {
     $this->_apiversion = $version;
@@ -139,12 +154,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals($get['count'], 1);
     $get = $this->callAPISuccess('email', 'create', $this->_params + ['debug' => 1, 'action' => 'get']);
     $this->assertEquals($get['count'], 1);
-    $delresult = $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
+    $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testDeleteEmail($version) {
     $this->_apiversion = $version;
@@ -160,7 +177,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'location_type_id' => $this->_locationType->id,
     ]);
-    $this->assertEquals(0, $get['count'], 'email already exists ' . __LINE__);
+    $this->assertEquals(0, $get['count'], 'email already exists');
 
     //create one
     $create = $this->callAPISuccess('email', 'create', $params);
@@ -170,12 +187,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'location_type_id' => $this->_locationType->id,
     ]);
-    $this->assertEquals(0, $get['count'], 'Contact not successfully deleted In line ' . __LINE__);
+    $this->assertEquals(0, $get['count'], 'Contact not successfully deleted');
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testReplaceEmail($version) {
     $this->_apiversion = $version;
@@ -183,7 +202,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(0, $get['count'], 'email already exists ' . __LINE__);
+    $this->assertEquals(0, $get['count'], 'email already exists');
 
     // initialize email list with three emails at loc #1 and two emails at loc #2
     $replace1Params = [
@@ -205,12 +224,12 @@ class api_v3_EmailTest extends CiviUnitTestCase {
           'is_primary' => 0,
         ],
         [
-          'location_type_id' => $this->_locationType2->id,
+          'location_type_id' => $this->locationType2->id,
           'email' => '2-1@example.com',
           'is_primary' => 0,
         ],
         [
-          'location_type_id' => $this->_locationType2->id,
+          'location_type_id' => $this->locationType2->id,
           'email' => '2-2@example.com',
           'is_primary' => 0,
         ],
@@ -223,7 +242,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(5, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertEquals(5, $get['count'], 'Incorrect email count');
 
     // replace the subset of emails in location #1, but preserve location #2
     $replace2Params = [
@@ -244,15 +263,15 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->_locationType->id,
     ]);
-    $this->assertEquals(1, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertEquals(1, $get['count'], 'Incorrect email count');
 
     // check emails at location #2 -- preserve the original two
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
-      'location_type_id' => $this->_locationType2->id,
+      'location_type_id' => $this->locationType2->id,
     ]);
 
-    $this->assertEquals(2, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertEquals(2, $get['count'], 'Incorrect email count');
 
     // replace the set of emails with an empty set
     $replace3Params = [
@@ -268,12 +287,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ]);
     $this->assertAPISuccess($get);
-    $this->assertEquals(0, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertEquals(0, $get['count'], 'Incorrect email count');
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testReplaceEmailsInChain($version) {
     $this->_apiversion = $version;
@@ -283,9 +304,9 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ]);
     $this->assertAPISuccess($get);
-    $this->assertEquals(0, $get['count'], 'email already exists ' . __LINE__);
-    $description = "Demonstrates use of Replace in a nested API call.";
-    $subfile = "NestedReplaceEmail";
+    $this->assertEquals(0, $get['count'], 'email already exists');
+    $description = 'Demonstrates use of Replace in a nested API call.';
+    $subfile = 'NestedReplaceEmail';
     // initialize email list with three emails at loc #1 and two emails at loc #2
     $getReplace1Params = [
 
@@ -308,12 +329,12 @@ class api_v3_EmailTest extends CiviUnitTestCase {
             'is_primary' => 0,
           ],
           [
-            'location_type_id' => $this->_locationType2->id,
+            'location_type_id' => $this->locationType2->id,
             'email' => '2-1@example.com',
             'is_primary' => 0,
           ],
           [
-            'location_type_id' => $this->_locationType2->id,
+            'location_type_id' => $this->locationType2->id,
             'email' => '2-2@example.com',
             'is_primary' => 0,
           ],
@@ -327,7 +348,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(5, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertEquals(5, $get['count'], 'Incorrect email count');
 
     // replace the subset of emails in location #1, but preserve location #2
     $getReplace2Params = [
@@ -352,19 +373,21 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'location_type_id' => $this->_locationType->id,
     ]);
 
-    $this->assertEquals(1, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertEquals(1, $get['count'], 'Incorrect email count');
 
     // check emails at location #2 -- preserve the original two
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
-      'location_type_id' => $this->_locationType2->id,
+      'location_type_id' => $this->locationType2->id,
     ]);
-    $this->assertEquals(2, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertEquals(2, $get['count'], 'Incorrect email count');
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testReplaceEmailWithId($version) {
     $this->_apiversion = $version;
@@ -417,9 +440,12 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals('1-2@example.com', $get['values'][$emailID]['email']);
   }
 
+  /**
+   * Test updates affecting on hold emails.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testEmailOnHold() {
-    $params = [];
-    $params_change = [];
     $params = [
       'contact_id' => $this->_contactID,
       'email' => 'api@a-team.com',
@@ -448,7 +474,25 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d H:i'), date('Y-m-d H:i', strtotime($result_change['values'][$result_change['id']]['reset_date'])));
     $this->assertEmpty($result_change['values'][$result_change['id']]['hold_date']);
 
-    $delresult = $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
+    $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
+  }
+
+  /**
+   * Test setting a bulk email unsets others on the contact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSetBulkEmail() {
+    $individualID = $this->individualCreate([]);
+    $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
+    $this->assertEquals(0, $email['is_bulkmail']);
+    $this->callAPISuccess('Email', 'create', ['id' => $email['id'], 'is_bulkmail' => 1]);
+    $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
+    $this->assertEquals(1, $email['is_bulkmail']);
+    $email2 = $this->callAPISuccess('Email', 'create', ['contact_id' => $individualID, 'email' => 'mail@Example.com', 'is_bulkmail' => 1]);
+    $emails = $this->callAPISuccess('Email', 'get', ['contact_id' => $individualID])['values'];
+    $this->assertEquals(0, $emails[$email['id']]['is_bulkmail']);
+    $this->assertEquals(1, $emails[$email2['id']]['is_bulkmail']);
   }
 
 }
