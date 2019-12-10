@@ -10,10 +10,30 @@ class CRM_AfformGui_Upgrader extends CRM_AfformGui_Upgrader_Base {
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
 
   /**
-   * Example: Run an external SQL script when the module is installed.
-   *
+   * Setup navigation item on new installs
+   */
   public function install() {
-    $this->executeSqlFile('sql/myinstall.sql');
+    // $this->executeSqlFile('sql/myinstall.sql');
+    try {
+      $existing = civicrm_api3('Navigation', 'getcount', [
+        'name' => 'afform_gui',
+        'domain_id' => CRM_Core_Config::domainID(),
+      ]);
+      if (!$existing) {
+        civicrm_api3('Navigation', 'create', [
+          'parent_id' => 'Customize Data and Screens',
+          'label' => ts('Afforms'),
+          'weight' => 1,
+          'name' => 'afform_gui',
+          'permission' => 'administer CiviCRM',
+          'url' => 'civicrm/admin/afform',
+          'is_active' => 1,
+        ]);
+      }
+    }
+    catch (Exception $e) {
+      // Couldn't create menu item.
+    }
   }
 
   /**
@@ -35,10 +55,15 @@ class CRM_AfformGui_Upgrader extends CRM_AfformGui_Upgrader_Base {
   }
 
   /**
-   * Example: Run an external SQL script when the module is uninstalled.
-   *
+   * Cleanup navigtaion upon removal
+   */
   public function uninstall() {
-   $this->executeSqlFile('sql/myuninstall.sql');
+   // $this->executeSqlFile('sql/myuninstall.sql');
+    civicrm_api3('Navigation', 'get', [
+      'name' => 'afform_gui',
+      'return' => ['id'],
+      'api.Navigation.delete' => [],
+    ]);
   }
 
   /**
