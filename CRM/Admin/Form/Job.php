@@ -55,6 +55,22 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       return;
     }
 
+    if ($this->_action & CRM_Core_Action::VIEW) { 
+      $this->addButtons([
+        [
+          'type' => 'submit',
+          'name' => ts('Execute'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+      return;
+    }
+        
+
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Job');
 
     $this->add('text', 'name', ts('Name'),
@@ -169,6 +185,15 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_Job::del($this->_id);
       CRM_Core_Session::setStatus("", ts('Scheduled Job Deleted.'), "success");
+      return;
+    }
+
+    // using View action for Execute. Doh.
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $jm = new CRM_Core_JobManager();
+      $jm->executeJobById($this->_id);
+      CRM_Core_Session::setStatus(ts('Selected Scheduled Job has been executed. See the log for details.'), ts("Executed"), "success");
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
       return;
     }
 
