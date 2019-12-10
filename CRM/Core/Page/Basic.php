@@ -170,7 +170,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
     if ($id) {
       if (!$this->checkPermission($id, NULL)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to make changes to the record'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to make changes to the record'));
       }
     }
 

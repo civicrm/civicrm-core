@@ -171,7 +171,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       CRM_Core_Error::fatal('Petition doesn\'t exist.');
     }
     if ($this->petition['is_active'] == 0) {
-      CRM_Core_Error::fatal('Petition is no longer active.');
+      CRM_Core_Error::statusBounce('Petition is no longer active.');
     }
 
     //get userID from session

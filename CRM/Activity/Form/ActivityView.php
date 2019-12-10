@@ -33,7 +33,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     if ($activityId &&
       !CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::VIEW)
     ) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $session = CRM_Core_Session::singleton();

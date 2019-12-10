@@ -97,7 +97,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
       );
 
       if (empty($values['is_tellfriend_enabled'])) {
-        CRM_Core_Error::fatal(ts('Tell Friend is disable for this Personal Campaign Page'));
+        CRM_Core_Error::statusBounce(ts('Tell Friend is disable for this Personal Campaign Page'));
       }
 
       $this->_mailLimit = $values['tellfriend_limit'];
@@ -118,7 +118,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
       $this->assign('pcpTitle', $this->_title);
     }
     else {
-      CRM_Core_Error::fatal(ts('page argument missing or invalid'));
+      CRM_Core_Error::statusBounce(ts('page argument missing or invalid'));
     }
     $this->assign('context', $pcomponent);
 

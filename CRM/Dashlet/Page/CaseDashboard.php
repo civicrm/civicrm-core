@@ -31,7 +31,7 @@ class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
   public function run() {
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
     }
 
     $summary = CRM_Case_BAO_Case::getCasesSummary(TRUE);

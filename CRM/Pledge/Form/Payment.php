@@ -43,11 +43,13 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     // check for edit permission
     if (!CRM_Core_Permission::check('edit pledges')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $this->_id = CRM_Utils_Request::retrieve('ppId', 'Positive', $this);
