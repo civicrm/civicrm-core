@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+
 /**
  * This class generates form components generic to recurring contributions.
  *
@@ -208,7 +209,12 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $params['subscriptionId'] = $this->_subscriptionDetails->subscription_id;
     $updateSubscription = TRUE;
     if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
-      $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+      try {
+        $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+      }
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        CRM_Core_Error::statusBounce($e->getMessage());
+      }
     }
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
