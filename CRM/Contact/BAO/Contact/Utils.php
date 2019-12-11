@@ -364,7 +364,7 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
 SET contact_a.organization_name=contact_b.organization_name
 WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query);
   }
 
   /**
