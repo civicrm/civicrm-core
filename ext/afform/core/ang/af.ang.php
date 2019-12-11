@@ -10,7 +10,7 @@ return [
     'ang/af/*/*.js',
   ],
   // 'css' => ['ang/af.css'],
-  // 'partials' => ['ang/af'],
+  'partials' => ['ang/af'],
   'requires' => ['crmUtil'],
   'settings' => [],
   'basePages' => [],
@@ -18,5 +18,6 @@ return [
     'af-entity' => 'E',
     'af-fieldset' => 'A',
     'af-form' => 'E',
+    'af-field' => 'E',
   ],
 ];

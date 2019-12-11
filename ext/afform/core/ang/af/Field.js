@@ -1,12 +1,12 @@
 (function(angular, $, _) {
   // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
-  angular.module('afField').directive('afField', function() {
+  angular.module('af').directive('afField', function() {
     return {
       restrict: 'E',
       require: ['^afFieldset', '^afForm'],
-      templateUrl: '~/afField/afField.html',
+      templateUrl: '~/af/afField.html',
       scope: {
-        fieldName: '@name', // TEST ME
+        fieldName: '@name',
         defn: '='
       },
       link: function($scope, $el, $attr, ctrls) {
