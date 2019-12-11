@@ -572,7 +572,7 @@
 - name        : Heather Oliver
   organization: Red Hot Irons
   github      : HROliver
-  
+
 - name        : Heather Oliver
   organization: GMCVO Databases
   jira        : heather oliver
@@ -641,6 +641,9 @@
   name        : Jamie Novick
   organization: CompuCorp
   jira        : jamienovick
+
+- github      : jamie-tillman
+  name        : Jamie Tillman
 
 - github      : javiya-rupal
   name        : Rupal Javiya
@@ -872,6 +875,7 @@
   jira        : loganbear
 
 - name        : Lola Slade
+  github      : lolaslade
   organization: Freeform Solutions
   jira        : lola_slade
 
@@ -1220,6 +1224,10 @@
 - github      : reneolivo
   name        : René Olivo
   organization: CompuCorp
+
+- github      : revati90
+  name        : Revati Gawas
+  organization: OSSeed Technologies LLP
 
 - name        : Robyn Perry
   organization: Progressive Technology Project
