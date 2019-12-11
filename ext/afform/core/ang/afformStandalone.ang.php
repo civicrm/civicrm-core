@@ -6,13 +6,8 @@
 return [
   'js' => [
     'ang/afformStandalone.js',
-    'ang/afformStandalone/*.js',
-    'ang/afformStandalone/*/*.js',
   ],
   'css' => [],
-  'partials' => [
-    'ang/afformStandalone',
-  ],
   'settings' => [],
   'requires' => ['ngRoute'],
 ];
