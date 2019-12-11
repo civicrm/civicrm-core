@@ -262,6 +262,53 @@ class PropertyBag implements \ArrayAccess {
   // Public getters, setters.
 
   /**
+   * Get a property by its name (but still using its getter).
+   *
+   * @param string $prop valid property name, like contactID
+   * @param bool $allowUnset If TRUE, return the default value if the property is
+   *               not set - normal behaviour would be to throw an exception.
+   * @param mixed $default
+   * @param string $label e.g. 'default' or 'old' or 'new'
+   *
+   * @return mixed
+   */
+  public function getter($prop, $allowUnset = FALSE, $default = NULL, $label = 'default') {
+
+    if ((static::$propMap[$prop] ?? NULL) === TRUE) {
+      // This is a standard property that will have a getter method.
+      $getter = 'get' . ucfirst($prop);
+      return (!$allowUnset || $this->has($prop, $label))
+        ? $this->$getter($label)
+        : $default;
+    }
+
+    // This is not a property name we know, but they could be requesting a
+    // custom property.
+    return (!$allowUnset || $this->has($prop, $label))
+      ? $this->getCustomProperty($prop, $label)
+      : $default;
+  }
+
+  /**
+   * Set a property by its name (but still using its setter).
+   *
+   * @param string $prop valid property name, like contactID
+   * @param mixed $value
+   * @param string $label e.g. 'default' or 'old' or 'new'
+   *
+   * @return mixed
+   */
+  public function setter($prop, $value = NULL, $label = 'default') {
+    if ((static::$propMap[$prop] ?? NULL) === TRUE) {
+      // This is a standard property.
+      $setter = 'set' . ucfirst($prop);
+      return $this->$setter($value, $label);
+    }
+    // We don't allow using the setter for custom properties.
+    throw new \BadMethodCallException("Cannot use generic setter with non-standard properties; you must use setCustomProperty for custom properties.");
+  }
+
+  /**
    * Get the monetary amount.
    */
   public function getAmount($label = 'default') {
