@@ -229,4 +229,60 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     ];
   }
 
+  /**
+   * Test generic getter, setter methods.
+   *
+   */
+  public function testGetterAndSetter() {
+    $propertyBag = new PropertyBag();
+
+    $propertyBag->setter('contactID', 123);
+    $this->assertEquals(123, $propertyBag->getContactID(), "Failed testing that a valid property was set correctly");
+
+    $result = $propertyBag->getter('contactID');
+    $this->assertEquals(123, $result, "Failed testing the getter on a set property");
+
+    $result = $propertyBag->getter('contactID', TRUE, 456);
+    $this->assertEquals(123, $result, "Failed testing the getter on a set property when providing a default");
+
+    $result = $propertyBag->getter('contributionRecurID', TRUE, 456);
+    $this->assertEquals(456, $result, "Failed testing the getter on an unset property when providing a default");
+
+    try {
+      $result = $propertyBag->getter('contributionRecurID', FALSE);
+      $this->fail("getter called with unset property should throw exception but none was thrown");
+    }
+    catch (\BadMethodCallException $e) {
+    }
+
+    $result = $propertyBag->getter('contribution_recur_id', TRUE, NULL);
+    $this->assertNull($result, "Failed testing the getter on an invalid property when providing a default");
+
+    try {
+      $result = $propertyBag->getter('contribution_recur_id');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals("Attempted to get 'contribution_recur_id' via getCustomProperty - must use using its getter.", $e->getMessage());
+    }
+
+    // Nb. hmmm. the custom property getter does not throw an exception if the property is unset, it just returns NULL.
+    $result = $propertyBag->getter('something_custom');
+    $this->assertNull($result, "Failed testing the getter on an unset custom property when not providing a default");
+
+    try {
+      $propertyBag->setter('some_custom_thing', 'foo');
+      $this->fail("Expected to get an exception when trying to use setter for a non-standard property.");
+    }
+    catch (\BadMethodCallException $e) {
+      $this->assertEquals("Cannot use generic setter with non-standard properties; you must use setCustomProperty for custom properties.", $e->getMessage());
+    }
+
+    // Test labels.
+    $propertyBag->setter('contactID', '100', 'original');
+    $this->assertEquals(123, $propertyBag->getContactID(), "Looks like the setter did not respect the label.");
+    $this->assertEquals(100, $propertyBag->getContactID('original'), "Failed to retrieve the labelled property");
+    $this->assertEquals(100, $propertyBag->getter('contactID', FALSE, NULL, 'original'), "Failed using the getter to retrieve the labelled property");
+
+  }
+
 }
