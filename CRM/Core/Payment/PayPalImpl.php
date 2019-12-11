@@ -1016,13 +1016,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param null $url
    *
    * @return array|object
-   * @throws \Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function invokeAPI($args, $url = NULL) {
 
     if ($url === NULL) {
       if (empty($this->_paymentProcessor['url_api'])) {
-        CRM_Core_Error::fatal(ts('Please set the API URL. Please refer to the documentation for more details'));
+        throw new PaymentProcessorException(ts('Please set the API URL. Please refer to the documentation for more details'));
       }
 
       $url = $this->_paymentProcessor['url_api'] . 'nvp';
@@ -1062,16 +1062,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = self::deformat($response);
 
     if (curl_errno($ch)) {
-      $e = CRM_Core_Error::singleton();
-      $e->push(curl_errno($ch),
-        0, NULL,
-        curl_error($ch)
-      );
-      return $e;
+      throw new PaymentProcessorException(ts('Network error') . ' ' . curl_error($ch) . curl_errno($ch), curl_errno($ch));
     }
-    else {
-      curl_close($ch);
-    }
+    curl_close($ch);
 
     $outcome = strtolower(CRM_Utils_Array::value('ack', $result));
 
