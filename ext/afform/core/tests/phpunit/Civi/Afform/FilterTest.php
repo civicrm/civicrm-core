@@ -20,10 +20,24 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     return \Civi\Test::headless()->installMe(__DIR__)->apply();
   }
 
+  /**
+   * Apply any filters to an HTML partial.
+   *
+   * @param string $fileName
+   * @param string $html
+   *   Original HTML.
+   * @return string
+   *   Modified HTML.
+   */
+  private function htmlFilter($fileName, $html) {
+    $htmls = \Civi\Angular\ChangeSet::applyResourceFilters(\Civi::service('angular')->getChangeSets(), 'partials', [$fileName => $html]);
+    return $htmls[$fileName];
+  }
+
   public function testDefnInjection() {
     $inputHtml = sprintf(self::PERSON_TPL,
       '<div af-fieldset="person"><af-field name="first_name" /></div>');
-    $filteredHtml = _afform_html_filter('~afform/MyForm.html', $inputHtml);
+    $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);
     $converter = new \CRM_Afform_ArrayHtml(TRUE);
     $parsed = $converter->convertHtmlToArray($filteredHtml);
 
@@ -35,7 +49,7 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
   public function testDefnInjectionNested() {
     $inputHtml = sprintf(self::PERSON_TPL,
       '<span><div af-fieldset="person"><foo><af-field name="first_name" /></foo></div></span>');
-    $filteredHtml = _afform_html_filter('~afform/MyForm.html', $inputHtml);
+    $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);
     $converter = new \CRM_Afform_ArrayHtml(TRUE);
     $parsed = $converter->convertHtmlToArray($filteredHtml);
 
@@ -47,7 +61,7 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
   public function testDefnOverrideTitle() {
     $inputHtml = sprintf(self::PERSON_TPL,
       '<div af-fieldset="person"><af-field name="first_name" defn="{title: \'Given name\'}" /></div>');
-    $filteredHtml = _afform_html_filter('~afform/MyForm.html', $inputHtml);
+    $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);
     $converter = new \CRM_Afform_ArrayHtml(TRUE);
     $parsed = $converter->convertHtmlToArray($filteredHtml);
 

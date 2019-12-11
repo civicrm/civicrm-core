@@ -172,7 +172,7 @@ function afform_civicrm_angularModules(&$angularModules) {
       'requires' => $meta['requires'],
       'basePages' => [],
       'snippets' => [
-        "~afform/$name.aff.html" => $layout,
+        "~/afform/$name.aff.html" => $layout,
       ],
       'exports' => [
         _afform_angular_module_name($name, 'dash') => 'AE',
@@ -300,7 +300,7 @@ function _afform_reverse_deps_find($formName, $html, $revMap) {
  */
 function afform_civicrm_alterAngular($angular) {
   $fieldMetadata = \Civi\Angular\ChangeSet::create('fieldMetadata')
-    ->alterHtml(';^~afform/;', function($doc, $path) {
+    ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
       $entities = _afform_getMetadata($doc);
 
       foreach (pq('af-field', $doc) as $afField) {
@@ -412,26 +412,10 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'camel' => _afform_angular_module_name($name, 'camel'),
     'meta' => $meta,
     'metaJson' => json_encode($meta),
-    'templateUrl' => "~afform/$name.aff.html",
+    'templateUrl' => "~/afform/$name.aff.html",
   ]);
   $mimeType = 'text/javascript';
   $content = $smarty->fetch('afform/AfformAngularModule.tpl');
-}
-
-/**
- * Apply any filters to an HTML partial.
- *
- * @param string $formName
- * @param string $html
- *   Original HTML.
- * @return string
- *   Modified HTML.
- */
-function _afform_html_filter($formName, $html) {
-  $fileName = '~afform/' . _afform_angular_module_name($formName, 'camel');
-  $htmls = [$fileName => $html];
-  $htmls = \Civi\Angular\ChangeSet::applyResourceFilters(Civi::service('angular')->getChangeSets(), 'partials', $htmls);
-  return $htmls[$fileName];
 }
 
 /**
