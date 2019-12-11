@@ -513,6 +513,15 @@
           return !(typeof val === 'undefined' || val === null);
         };
 
+        $scope.toggleLabel = function() {
+          $scope.node.defn = $scope.node.defn || {};
+          if ($scope.node.defn.title === false) {
+            delete $scope.node.defn.title;
+          } else {
+            $scope.node.defn.title = false;
+          }
+        };
+
         $scope.toggleRequired = function() {
           getSet('required', !getSet('required'));
           return false;

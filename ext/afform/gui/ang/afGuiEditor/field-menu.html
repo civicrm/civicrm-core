@@ -13,6 +13,12 @@
   </a>
 </li>
 <li>
+  <a href ng-click="toggleLabel(); $event.stopPropagation();" title="{{ ts('Show field label') }}">
+    <i class="crm-i" ng-class="{'fa-square-o': node.defn.title === false, 'fa-check-square-o': node.defn.title !== false}"></i>
+    {{ ts('Label') }}
+  </a>
+</li>
+<li>
   <a href ng-click="toggleHelp('pre'); $event.stopPropagation();" title="{{ ts('Show help text above this field') }}">
     <i class="crm-i" ng-class="{'fa-square-o': !propIsset('help_pre'), 'fa-check-square-o': propIsset('help_pre')}"></i>
     {{ ts('Pre help text') }}
