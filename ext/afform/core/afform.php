@@ -165,20 +165,19 @@ function afform_civicrm_angularModules(&$angularModules) {
   $names = array_keys($scanner->findFilePaths());
   foreach ($names as $name) {
     $meta = $scanner->getMeta($name);
+    $layout = $scanner->getLayout($name);
     $angularModules[_afform_angular_module_name($name, 'camel')] = [
       'ext' => E::LONG_NAME,
       'js' => ['assetBuilder://afform.js?name=' . urlencode($name)],
       'requires' => $meta['requires'],
       'basePages' => [],
+      'snippets' => [
+        "~afform/$name.aff.html" => $layout,
+      ],
       'exports' => [
         _afform_angular_module_name($name, 'dash') => 'AE',
       ],
     ];
-
-    // FIXME: The HTML layout template is embedded in the JS asset.
-    // This works at runtime for basic usage, but it bypasses
-    // the normal workflow for templates (e.g. translation).
-    // We should update core so that 'partials' can be specified more dynamically.
   }
 }
 
@@ -413,7 +412,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'camel' => _afform_angular_module_name($name, 'camel'),
     'meta' => $meta,
     'metaJson' => json_encode($meta),
-    'layout' => _afform_html_filter($name, $scanner->getLayout($name)),
+    'templateUrl' => "~afform/$name.aff.html",
   ]);
   $mimeType = 'text/javascript';
   $content = $smarty->fetch('afform/AfformAngularModule.tpl');
