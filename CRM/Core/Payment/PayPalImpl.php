@@ -256,10 +256,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $result = $this->invokeAPI($args);
 
-    if (is_a($result, 'CRM_Core_Error')) {
-      throw new PaymentProcessorException($result->message);
-    }
-
     /* Success */
 
     return $result['token'];
@@ -301,10 +297,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['method'] = 'GetExpressCheckoutDetails';
 
     $result = $this->invokeAPI($args);
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
-    }
 
     /* Success */
     $fieldMap = [
@@ -357,10 +349,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['BUTTONSOURCE'] = 'CiviCRM_SP';
 
     $result = $this->invokeAPI($args);
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
-    }
 
     /* Success */
     $params['trxn_id'] = $result['transactionid'];
@@ -424,10 +412,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['BUTTONSOURCE'] = 'CiviCRM_SP';
 
     $result = $this->invokeAPI($args);
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
-    }
 
     /* Success - result looks like"
      * array (
@@ -561,11 +545,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $args);
 
     $result = $this->invokeAPI($args);
-
-    // WAG
-    if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
-    }
 
     $params['recurr_profile_id'] = NULL;
 
@@ -711,9 +690,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['NOTE'] = CRM_Utils_Array::value('reason', $params);
 
       $result = $this->invokeAPI($args);
-      if (is_a($result, 'CRM_Core_Error')) {
-        throw new PaymentProcessorException(CRM_Core_Error::getMessages($result, "\n"));
-      }
+
       $message = "{$result['ack']}: profileid={$result['profileid']}";
       return TRUE;
     }
@@ -793,9 +770,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['ZIP'] = $params['country'];
 
       $result = $this->invokeAPI($args);
-      if (is_a($result, 'CRM_Core_Error')) {
-        return $result;
-      }
+
       $message = "{$result['ack']}: profileid={$result['profileid']}";
       return TRUE;
     }
@@ -822,9 +797,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
       $result = $this->invokeAPI($args);
       CRM_Core_Error::debug_var('$result', $result);
-      if (is_a($result, 'CRM_Core_Error')) {
-        throw new PaymentProcessorException(CRM_Core_Error::getMessages($result, "\n"));
-      }
+
       $message = "{$result['ack']}: profileid={$result['profileid']}";
       return TRUE;
     }
@@ -1013,20 +986,17 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * returns an associative array containing the response from the server.
    *
    * @param array $args
-   * @param null $url
    *
    * @return array|object
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function invokeAPI($args, $url = NULL) {
+  public function invokeAPI($args) {
 
-    if ($url === NULL) {
-      if (empty($this->_paymentProcessor['url_api'])) {
-        throw new PaymentProcessorException(ts('Please set the API URL. Please refer to the documentation for more details'));
-      }
-
-      $url = $this->_paymentProcessor['url_api'] . 'nvp';
+    if (empty($this->_paymentProcessor['url_api'])) {
+      throw new PaymentProcessorException(ts('Please set the API URL. Please refer to the documentation for more details'));
     }
+
+    $url = $this->_paymentProcessor['url_api'] . 'nvp';
 
     $p = [];
     foreach ($args as $n => $v) {
@@ -1037,7 +1007,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $nvpreq = implode('&', $p);
 
     if (!function_exists('curl_init')) {
-      CRM_Core_Error::fatal("curl functions NOT available.");
+      throw new PaymentProcessorException('curl functions NOT available.');
     }
 
     //setting the curl parameters.
