@@ -723,8 +723,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // CRM-10032
       $this->processFirstParticipant($participant->id);
     }
-    $this->_params['participantID'] = $participant->id;
-    $this->set('primaryParticipant', $this->_params);
+
+    if (!empty($this->_params['is_primary'])) {
+      $this->_params['participantID'] = $participant->id;
+      $this->set('primaryParticipant', $this->_params);
+    }
 
     CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
       'civicrm_participant',
