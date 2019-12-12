@@ -111,6 +111,13 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
+    $this->_id = CRM_Utils_Request::retrieve('id', 'String',
+      $this, FALSE, 0
+    );
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String',
+      $this, FALSE, 0
+    );
+
     if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
       try {
         $jobResult = civicrm_api3('Job', 'clone', array('id' => $this->_id));
@@ -153,7 +160,6 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
         $action -= CRM_Core_Action::ENABLE;
       }
       else {
-        $action -= CRM_Core_Action::VIEW;
         $action -= CRM_Core_Action::DISABLE;
       }
 
