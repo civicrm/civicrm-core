@@ -2436,14 +2436,9 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
 
     $activityParams['activity_type_id'] = self::filterActivityTypes($params);
     $enabledComponents = self::activityComponents();
-    // @todo - should we move this to activity get api.
-    foreach ([
-      'case_id' => 'CiviCase',
-      'campaign_id' => 'CiviCampaign',
-    ] as $attr => $component) {
-      if (!in_array($component, $enabledComponents)) {
-        $activityParams[$attr] = ['IS NULL' => 1];
-      }
+    // @todo - this appears to be duplicating the activity api.
+    if (!in_array('CiviCase', $enabledComponents)) {
+      $activityParams['case_id'] = ['IS NULL' => 1];
     }
     return $activityParams;
   }
