@@ -20,7 +20,7 @@
 {elseif $action eq 4}
   <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {ts}Are you sure you would like to execute this job?{/ts}
+        {ts 1=$jobName}Are you sure you would like to execute %1 job?{/ts}
   </div>
 {else}
   <table class="form-layout-compressed">
