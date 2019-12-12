@@ -37,7 +37,7 @@
           title: ts('Untitled Form'),
           layout: [{
             '#tag': 'af-form',
-            ctrl: 'modelListCtrl',
+            ctrl: 'afform',
             '#children': []
           }]
         };
@@ -54,7 +54,7 @@
               "#tag": "button",
               "class": 'af-button btn btn-primary',
               "crm-icon": 'fa-check',
-              "ng-click": "modelListCtrl.submit()",
+              "ng-click": "afform.submit()",
               "#children": [
                 {
                   "#text": "Submit"
@@ -743,7 +743,7 @@
 
         // TODO: Add action selector to UI
         // $scope.actions = {
-        //   "modelListCtrl.submit()": ts('Submit Form')
+        //   "afform.submit()": ts('Submit Form')
         // };
 
         $scope.styles = _.transform(CRM.afformAdminData.styles, function(styles, val, key) {
