@@ -165,20 +165,36 @@ function afform_civicrm_angularModules(&$angularModules) {
   $names = array_keys($scanner->findFilePaths());
   foreach ($names as $name) {
     $meta = $scanner->getMeta($name);
-    $layout = $scanner->getLayout($name);
     $angularModules[_afform_angular_module_name($name, 'camel')] = [
       'ext' => E::LONG_NAME,
       'js' => ['assetBuilder://afform.js?name=' . urlencode($name)],
       'requires' => $meta['requires'],
       'basePages' => [],
-      'snippets' => [
-        "~/afform/$name.aff.html" => $layout,
-      ],
+      'partialsCallback' => '_afform_get_partials',
+      '_afform' => $name,
       'exports' => [
         _afform_angular_module_name($name, 'dash') => 'AE',
       ],
     ];
   }
+}
+
+/**
+ * Construct a list of partials for a given afform/angular module.
+ *
+ * @param string $moduleName
+ *   The module name.
+ * @param array $module
+ *   The module definition.
+ * @return array
+ *   Array(string $filename => string $html).
+ */
+function _afform_get_partials($moduleName, $module) {
+  /** @var CRM_Afform_AfformScanner $scanner */
+  $scanner = Civi::service('afform_scanner');
+  return [
+    "~/$moduleName/$moduleName.aff.html" => $scanner->getLayout($module['_afform']),
+  ];
 }
 
 /**
@@ -406,13 +422,14 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   /** @var \CRM_Afform_AfformScanner $scanner */
   $scanner = Civi::service('afform_scanner');
   $meta = $scanner->getMeta($name);
+  $moduleName = _afform_angular_module_name($name, 'camel');
 
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
-    'camel' => _afform_angular_module_name($name, 'camel'),
+    'camel' => $moduleName,
     'meta' => $meta,
     'metaJson' => json_encode($meta),
-    'templateUrl' => "~/afform/$name.aff.html",
+    'templateUrl' => "~/$moduleName/$moduleName.aff.html",
   ]);
   $mimeType = 'text/javascript';
   $content = $smarty->fetch('afform/AfformAngularModule.tpl');
