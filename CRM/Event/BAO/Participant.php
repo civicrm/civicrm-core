@@ -570,7 +570,19 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
     }
 
     $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
+    $participantRoles = CRM_Event_PseudoConstant::participantRole(NULL, 'filter = 1');
     $statusIds = '(' . implode(',', array_keys($positiveStatuses)) . ')';
+
+    // Handle participant roles that aren't counted.
+    if (!empty($participantRoles)) {
+      $escapedRoles = [];
+      foreach (array_keys($participantRoles) as $participantRole) {
+        $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
+      }
+
+      $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', $escapedRoles) . "([[:cntrl:]]|$)";
+      $roleWhere = " participant.role_id REGEXP '{$regexp}'";
+    }
 
     $query = "
   SELECT  count(participant.id) as registered,
@@ -579,6 +591,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    WHERE  participant.event_id = {$eventId}
      AND  civicrm_event.id = participant.event_id
      AND  participant.status_id IN {$statusIds}
+     AND  {$roleWhere}
 GROUP BY  participant.event_id
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
