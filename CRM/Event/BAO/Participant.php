@@ -330,6 +330,12 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    *
    * @param bool $returnWaitingCount
    * @param bool $considerTestParticipant
+   *   When TRUE, include participant records where is_test = 1.
+   * @param bool $onlyPositiveStatuses
+   *   When FALSE, count all participant statuses where is_counted = 1.  This includes
+   *   both "Positive" participants (Registered, Attended, etc.) and waitlisted
+   *   (and some pending) participants.
+   *   When TRUE, count only participants with statuses of "Positive".
    *
    * @return bool|int|null|string
    *   1. false                 => If event having some empty spaces.
@@ -339,7 +345,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $returnEmptySeats = FALSE,
     $includeWaitingList = TRUE,
     $returnWaitingCount = FALSE,
-    $considerTestParticipant = FALSE
+    $considerTestParticipant = FALSE,
+    $onlyPositiveStatuses = FALSE
   ) {
     $result = NULL;
     if (!$eventId) {
@@ -354,18 +361,16 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     $participantRoles = CRM_Event_PseudoConstant::participantRole(NULL, 'filter = 1');
     $countedStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
+    $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
     $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
     $onWaitlistStatusId = array_search('On waitlist', $waitingStatuses);
-
-    //when we do require only waiting count don't consider counted.
-    if (!$returnWaitingCount && !empty($countedStatuses)) {
-      $allStatusIds = array_keys($countedStatuses);
-    }
 
     $where = [' event.id = %1 '];
     if (!$considerTestParticipant) {
       $where[] = ' ( participant.is_test = 0 OR participant.is_test IS NULL ) ';
     }
+
+    // Only count Participant Roles with the "Counted?" flag.
     if (!empty($participantRoles)) {
       $escapedRoles = [];
       foreach (array_keys($participantRoles) as $participantRole) {
@@ -406,8 +411,13 @@ INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
       }
     }
 
-    //consider only counted participants.
-    $where[] = ' participant.status_id IN ( ' . implode(', ', array_keys($countedStatuses)) . ' ) ';
+    //Consider only counted participants, or alternatively only registered (not on waitlist) participants.
+    if ($onlyPositiveStatuses) {
+      $where[] = ' participant.status_id IN ( ' . implode(', ', array_keys($positiveStatuses)) . ' ) ';
+    }
+    else {
+      $where[] = ' participant.status_id IN ( ' . implode(', ', array_keys($countedStatuses)) . ' ) ';
+    }
     $whereClause = ' WHERE ' . implode(' AND ', $where);
     $eventSeatsWhere = implode(' AND ', $where);
 
@@ -557,6 +567,8 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    * Get the empty spaces for event those we can allocate
    * to pending participant to become confirm.
    *
+   * @deprecated
+   *
    * @param int $eventId
    *   Event id.
    *
@@ -564,42 +576,8 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    *   $spaces  Number of Empty Seats/null.
    */
   public static function pendingToConfirmSpaces($eventId) {
-    $emptySeats = 0;
-    if (!$eventId) {
-      return $emptySeats;
-    }
-
-    $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
-    $statusIds = '(' . implode(',', array_keys($positiveStatuses)) . ')';
-
-    $query = "
-  SELECT  count(participant.id) as registered,
-          civicrm_event.max_participants
-    FROM  civicrm_participant participant, civicrm_event
-   WHERE  participant.event_id = {$eventId}
-     AND  civicrm_event.id = participant.event_id
-     AND  participant.status_id IN {$statusIds}
-GROUP BY  participant.event_id
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    if ($dao->fetch()) {
-
-      //unlimited space.
-      if ($dao->max_participants == NULL || $dao->max_participants <= 0) {
-        return NULL;
-      }
-
-      //no space.
-      if ($dao->registered >= $dao->max_participants) {
-        return $emptySeats;
-      }
-
-      //difference.
-      return $dao->max_participants - $dao->registered;
-    }
-
-    //space in case no registeration yet.
-    return CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'max_participants');
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Event_BAO_Participant::eventFull');
+    return CRM_Event_BAO_Participant::eventFull($eventId, TRUE, FALSE, TRUE, FALSE, TRUE);
   }
 
   /**
