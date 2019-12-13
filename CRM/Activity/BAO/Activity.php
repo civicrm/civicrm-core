@@ -979,12 +979,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param string $additionalDetails
    * @param int $campaignID
    * @param array $attachments
+   * @param int $caseID
    *
    * @return int
    *   The created activity ID
    * @throws \CRM_Core_Exception
    */
-  public static function createEmailActivity($userID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments) {
+  public static function createEmailActivity($userID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments, $caseID) {
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
 
     // CRM-6265: save both text and HTML parts in details (if present)
@@ -1006,6 +1007,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
       'campaign_id' => $campaignID,
     ];
+    if (!empty($caseID)) {
+      $activityParams['case_id'] = $caseID;
+    }
 
     // CRM-5916: strip [case #…] before saving the activity (if present in subject)
     $activityParams['subject'] = preg_replace('/\[case #([0-9a-h]{7})\] /', '', $activityParams['subject']);
@@ -1016,9 +1020,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activityParams = array_merge($activityParams, $attachments);
     }
 
-    $activity = self::create($activityParams);
-
-    return $activity->id;
+    $activity = civicrm_api3('Activity', 'create', $activityParams);
+    return $activity['id'];
   }
 
   /**
@@ -1099,7 +1102,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     //create the meta level record first ( email activity )
-    $activityID = self::createEmailActivity($userID, $subject, $html, $text, $additionalDetails, $campaignId, $attachments);
+    $activityID = self::createEmailActivity($userID, $subject, $html, $text, $additionalDetails, $campaignId, $attachments, $caseId);
 
     $returnProperties = [];
     if (isset($messageToken['contact'])) {
