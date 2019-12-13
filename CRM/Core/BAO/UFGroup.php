@@ -989,11 +989,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       }
     }
     $query->convertToPseudoNames($details);
-    $config = CRM_Core_Config::singleton();
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id', 'validate');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
+    $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
 
     $multipleFields = ['url'];
 
