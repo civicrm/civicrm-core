@@ -135,16 +135,14 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    */
   public static function formRule($fields, $files, $options) {
     $errors = [];
-    $count = count(CRM_Utils_Array::value('extends', $fields));
+    $count = count(CRM_Utils_Array::value('extends', $fields, []));
     //price sets configured for membership
-    if ($count && array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $fields['extends'])) {
-      if ($count > 1) {
-        $errors['extends'] = ts('If you plan on using this price set for membership signup and renewal, you can not also use it for Events or Contributions. However, a membership price set may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription).');
-      }
+    if ($count > 1 && array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $fields['extends'])) {
+      $errors['extends'] = ts('If you plan on using this price set for membership signup and renewal, you can not also use it for Events or Contributions. However, a membership price set may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription).');
     }
     // Checks the given price set does not start with a digit
     if (strlen($fields['title']) && is_numeric($fields['title'][0])) {
-      $errors['title'] = ts("Name cannot not start with a digit");
+      $errors['title'] = ts('Name cannot not start with a digit');
     }
     return empty($errors) ? TRUE : $errors;
   }
