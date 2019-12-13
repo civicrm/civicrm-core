@@ -2244,6 +2244,10 @@ abstract class CRM_Utils_Hook {
    *    - js: array, list of JS files or globs.
    *    - css: array, list of CSS files or globs.
    *    - partials: array, list of base-dirs containing HTML.
+   *    - partialsCallback: mixed, a callback function which generates a list of HTML
+   *        function(string $moduleName, array $moduleDefn) => array(string $file => string $html)
+   *        For future-proofing, use a serializable callback (e.g. string/array).
+   *        See also: Civi\Core\Resolver.
    *    - requires: array, list of required Angular modules.
    *    - basePages: array, uncondtionally load this module onto the given Angular pages. [v4.7.21+]
    *      If omitted, default to "array('civicrm/a')" for backward compat.
