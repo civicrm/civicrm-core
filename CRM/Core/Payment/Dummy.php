@@ -128,6 +128,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     // Add a fee_amount so we can make sure fees are handled properly in underlying classes.
     $params['fee_amount'] = 1.50;
     $params['net_amount'] = $params['gross_amount'] - $params['fee_amount'];
+    $params['description'] = $this->getPaymentDescription($params);
 
     return $params;
   }

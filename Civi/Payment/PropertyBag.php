@@ -68,6 +68,25 @@ class PropertyBag implements \ArrayAccess {
   ];
 
   /**
+   * Get the property bag.
+   *
+   * This allows us to swap a 'might be an array might be a property bag'
+   * variable for a known PropertyBag.
+   *
+   * @param \Civi\Payment\PropertyBag|array $params
+   *
+   * @return \Civi\Payment\PropertyBag
+   */
+  public static function cast($params) {
+    if ($params instanceof self) {
+      return $params;
+    }
+    $propertyBag = new self();
+    $propertyBag->mergeLegacyInputParams($params);
+    return $propertyBag;
+  }
+
+  /**
    * @var string Just for unit testing.
    */
   public $lastWarning;
