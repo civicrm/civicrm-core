@@ -92,6 +92,72 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test advanced search results by uf_group_id.
+   */
+  public function testSearchByProfile() {
+    //Create search profile for contacts.
+    $ufGroup = $this->callAPISuccess('uf_group', 'create', [
+      'group_type' => 'Contact',
+      'name' => 'test_search_profile',
+      'title' => 'Test Search Profile',
+      'api.uf_field.create' => [
+        [
+          'field_name' => 'email',
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'label' => 'Email',
+          'in_selector' => 1,
+        ],
+      ],
+    ]);
+    $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
+    //Put the email on hold.
+    $email = $this->callAPISuccess('Email', 'get', [
+      'sequential' => 1,
+      'contact_id' => $contactID,
+    ]);
+    $this->callAPISuccess('Email', 'create', [
+      'id' => $email['id'],
+      'on_hold' => 1,
+    ]);
+
+    $dataSet = [
+      'description' => 'Normal default behaviour',
+      'class' => 'CRM_Contact_Selector',
+      'settings' => [],
+      'form_values' => ['email' => 'mickey@mouseville.com', 'uf_group_id' => $ufGroup['id']],
+      'params' => [],
+      'return_properties' => NULL,
+      'context' => 'advanced',
+      'action' => CRM_Core_Action::ADVANCED,
+      'includeContactIds' => NULL,
+      'searchDescendentGroups' => FALSE,
+    ];
+    $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
+    // create CRM_Contact_Selector instance and set desired query params
+    $selector = new CRM_Contact_Selector(
+      $dataSet['class'],
+      $dataSet['form_values'],
+      $params,
+      $dataSet['return_properties'],
+      $dataSet['action'],
+      $dataSet['includeContactIds'],
+      $dataSet['searchDescendentGroups'],
+      $dataSet['context']
+    );
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+    $this->assertEquals(1, count($rows));
+    $this->assertEquals($contactID, key($rows));
+
+    //Check if email column contains (On Hold) string.
+    foreach ($rows[$contactID] as $key => $value) {
+      if (strpos($key, 'email') !== FALSE) {
+        $this->assertContains("(On Hold)", (string) $value);
+      }
+    }
+  }
+
+  /**
    * Test the civicrm_prevnext_cache entry if it correctly stores the search query result
    */
   public function testPrevNextCache() {
