@@ -74,7 +74,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       $this->freeze('is_reserved');
 
       if (!empty($this->_values['is_reserved'])) {
-        $this->freeze(['name', 'is_active', 'data_type']);
+        $this->freeze(['is_active', 'data_type']);
       }
     }
 
