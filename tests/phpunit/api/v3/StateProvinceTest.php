@@ -17,11 +17,9 @@
  * @group headless
  */
 class api_v3_StateProvinceTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $_params;
 
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = [
@@ -31,6 +29,9 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * @dataProvider versionThreeAndFour
+   */
   public function testCreateStateProvince() {
     $result = $this->callAPIAndDocument('StateProvince', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -38,6 +39,9 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
     $this->callAPISuccess('StateProvince', 'delete', ['id' => $result['id']]);
   }
 
+  /**
+   * @dataProvider versionThreeAndFour
+   */
   public function testDeleteStateProvince() {
     // Create
     $create = $this->callAPISuccess('StateProvince', 'create', $this->_params);
@@ -53,6 +57,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
 
   /**
    * Test with empty params
+   * @dataProvider versionThreeAndFour
    */
   public function testGetEmptyParams() {
     $result = $this->callAPISuccess('StateProvince', 'Get', []);
@@ -60,6 +65,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
 
   /**
    * Test with wrong params
+   * @dataProvider versionThreeAndFour
    */
   public function testGetWrongParams() {
     $this->callAPIFailure('StateProvince', 'Get', ['id' => 'abc']);
@@ -67,6 +73,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
 
   /**
    * Test get
+   * @dataProvider versionThreeAndFour
    */
   public function testGet() {
     $province = $this->callAPISuccess('StateProvince', 'create', $this->_params);
@@ -80,6 +87,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
 
   /**
    * There cannot be two state/provinces with the same name in the same country.
+   * @dataProvider versionThreeAndFour
    */
   public function testCreateDuplicateFail() {
     $params = $this->_params;

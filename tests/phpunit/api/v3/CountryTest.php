@@ -17,11 +17,9 @@
  * @group headless
  */
 class api_v3_CountryTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $_params;
 
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = [
@@ -31,6 +29,9 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * @dataProvider versionThreeAndFour
+   */
   public function testCreateCountry() {
 
     $result = $this->callAPIAndDocument('country', 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -40,6 +41,9 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $this->callAPISuccess('country', 'delete', ['id' => $result['id']]);
   }
 
+  /**
+   * @dataProvider versionThreeAndFour
+   */
   public function testDeleteCountry() {
     //create one
     $create = $this->callAPISuccess('country', 'create', $this->_params);
@@ -54,6 +58,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_phone_get with empty params.
+   * @dataProvider versionThreeAndFour
    */
   public function testGetEmptyParams() {
     $result = $this->callAPISuccess('Country', 'Get', []);
@@ -61,6 +66,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_phone_get with wrong params.
+   * @dataProvider versionThreeAndFour
    */
   public function testGetWrongParams() {
     $this->callAPIFailure('Country', 'Get', ['id' => 'abc']);
@@ -68,6 +74,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_phone_get - success expected.
+   * @dataProvider versionThreeAndFour
    */
   public function testGet() {
     $country = $this->callAPISuccess('Country', 'create', $this->_params);
@@ -84,6 +91,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   /**
    * If a new country is created and it is created again it should not create a second one.
    * We check on the iso code (there should be only one iso code
+   * @dataProvider versionThreeAndFour
    */
   public function testCreateDuplicateFail() {
     $params = $this->_params;
