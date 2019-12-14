@@ -14,12 +14,13 @@
  */
 class CRM_Utils_Weight {
   /**
-   * @var array, list of GET fields which must be validated
+   * List of GET fields which must be validated
    *
    * To reduce the size of this patch, we only sign the exploitable fields
    * which make up "$baseURL" in addOrder() (eg 'filter' or 'dao').
    * Less-exploitable fields (eg 'dir') are left unsigned.
    * 'id','src','dst','dir'
+   * @var array
    */
   public static $SIGNABLE_FIELDS = ['reset', 'dao', 'idName', 'url', 'filter'];
 
@@ -418,13 +419,17 @@ class CRM_Utils_Weight {
     }
   }
 
+  /**
+   *
+   * @throws CRM_Core_Exception
+   */
   public static function fixOrder() {
     $signature = CRM_Utils_Request::retrieve('_sgn', 'String');
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
 
     // Validate $_GET values b/c subsequent code reads $_GET (via CRM_Utils_Request::retrieve)
     if (!$signer->validate($signature, $_GET)) {
-      CRM_Core_Error::fatal('Request signature is invalid');
+      throw new CRM_Core_Exception('Request signature is invalid');
     }
 
     // Note: Ensure this list matches self::$SIGNABLE_FIELDS

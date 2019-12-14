@@ -75,6 +75,10 @@ class CRM_Utils_Mail_EmailProcessor {
 
   /**
    * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce).
+   *
+   * @return bool
+   *
+   * @throws CRM_Core_Exception.
    */
   public static function processActivities() {
     $dao = new CRM_Core_DAO_MailSettings();
@@ -87,7 +91,7 @@ class CRM_Utils_Mail_EmailProcessor {
       self::_process(FALSE, $dao, TRUE);
     }
     if (!$found) {
-      CRM_Core_Error::fatal(ts('No mailboxes have been configured for Email to Activity Processing'));
+      throw new CRM_Core_Exception(ts('No mailboxes have been configured for Email to Activity Processing'));
     }
     return $found;
   }
@@ -114,6 +118,7 @@ class CRM_Utils_Mail_EmailProcessor {
    *   Create activities.
    *
    * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function _process($civiMail, $dao, $is_create_activities) {
     // 0 = activities; 1 = bounce;
@@ -125,7 +130,7 @@ class CRM_Utils_Mail_EmailProcessor {
       : CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
 
     if (!$emailActivityTypeId) {
-      CRM_Core_Error::fatal(ts('Could not find a valid Activity Type ID for Inbound Email'));
+      throw new CRM_Core_Exception(ts('Could not find a valid Activity Type ID for Inbound Email'));
     }
 
     $config = CRM_Core_Config::singleton();
@@ -156,7 +161,7 @@ class CRM_Utils_Mail_EmailProcessor {
       $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server . '<p>';
       $message .= ts('Error message: ');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
-      CRM_Core_Error::fatal($message);
+      throw new CRM_Core_Exception($message);
     }
 
     // process fifty at a time, CRM-4002

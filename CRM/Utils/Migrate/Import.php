@@ -398,7 +398,7 @@ AND        v.name = %1
    * @param $xml
    * @param $idMap
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function profileFields(&$xml, &$idMap) {
     foreach ($xml->ProfileFields as $profileFieldsXML) {
@@ -423,7 +423,7 @@ AND        f.column_name = %2
           ];
           $cfID = CRM_Core_DAO::singleValueQuery($sql, $params);
           if (!$cfID) {
-            CRM_Core_Error::fatal(ts("Could not find custom field for %1, %2, %3",
+            throw new CRM_Core_Exception(ts("Could not find custom field for %1, %2, %3",
                 [
                   1 => $profileField->field_name,
                   2 => $tableName,

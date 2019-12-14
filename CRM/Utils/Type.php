@@ -213,7 +213,7 @@ class CRM_Utils_Type {
    * @param string $type
    *   The type to verify against.
    * @param bool $abort
-   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
+   *   If TRUE, the operation will throw an CRM_Core_Exception on invalid data.
    *
    * @return mixed
    *   The data, escaped if necessary.
@@ -326,17 +326,16 @@ class CRM_Utils_Type {
         break;
 
       default:
-        CRM_Core_Error::fatal(
+        throw new CRM_Core_Exception(
           $type . " is not a recognised (camel cased) data type."
         );
-        break;
     }
 
     // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
 
-      CRM_Core_Error::fatal("$data is not of the type $type");
+      throw new CRM_Core_Exception("$data is not of the type $type");
     }
     return NULL;
   }
