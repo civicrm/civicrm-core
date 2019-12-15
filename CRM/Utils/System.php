@@ -980,6 +980,8 @@ class CRM_Utils_System {
    *   Returns TRUE if the requirement is met, FALSE if the requirement is not
    *   met and we're not aborting due to the failed requirement. If $abort is
    *   TRUE and the requirement fails, this function does not return.
+   *
+   * @throws CRM_Core_Exception
    */
   public static function checkPHPVersion($ver = 5, $abort = TRUE) {
     $phpVersion = substr(PHP_VERSION, 0, 1);
@@ -988,7 +990,7 @@ class CRM_Utils_System {
     }
 
     if ($abort) {
-      CRM_Core_Error::fatal(ts('This feature requires PHP Version %1 or greater',
+      throw new CRM_Core_Exception(ts('This feature requires PHP Version %1 or greater',
         [1 => $ver]
       ));
     }
@@ -1059,6 +1061,8 @@ class CRM_Utils_System {
    *
    * @return string
    *   civicrm version
+   *
+   * @throws CRM_Core_Exception
    */
   public static function version() {
     static $version;
@@ -1075,7 +1079,7 @@ class CRM_Utils_System {
 
       // pattern check
       if (!CRM_Utils_System::isVersionFormatValid($version)) {
-        CRM_Core_Error::fatal('Unknown codebase version.');
+        throw new CRM_Core_Exception('Unknown codebase version.');
       }
     }
 
@@ -1161,7 +1165,7 @@ class CRM_Utils_System {
    *
    * @param bool|FALSE $abort
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -1177,7 +1181,7 @@ class CRM_Utils_System {
       Civi::log()->warning('CiviCRM thinks site is not SSL, redirecting to {url}', ['url' => $url]);
       if (!self::checkURL($url, TRUE)) {
         if ($abort) {
-          CRM_Core_Error::fatal('HTTPS is not set up on this machine');
+          throw new CRM_Core_Exception('HTTPS is not set up on this machine');
         }
         else {
           CRM_Core_Session::setStatus(ts('HTTPS is not set up on this machine'), ts('Warning'), 'alert');

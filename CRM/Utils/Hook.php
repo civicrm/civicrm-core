@@ -57,7 +57,7 @@ abstract class CRM_Utils_Hook {
   private $commonIncluded = FALSE;
 
   /**
-   * @var array(string)
+   * @var array|string
    */
   private $commonCiviModules = [];
 
@@ -249,7 +249,7 @@ abstract class CRM_Utils_Hook {
    * @param mixed $arg6
    *
    * @return array|bool
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function runHooks(
     $civiModules, $fnSuffix, $numParams,
@@ -307,8 +307,7 @@ abstract class CRM_Utils_Hook {
           break;
 
         default:
-          CRM_Core_Error::fatal(ts('Invalid hook invocation'));
-          break;
+          throw new CRM_Core_Exception(ts('Invalid hook invocation'));
       }
 
       if (!empty($fResult) &&

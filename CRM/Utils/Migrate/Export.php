@@ -19,7 +19,8 @@ class CRM_Utils_Migrate_Export {
   const XML_VALUE_SEPARATOR = ":;:;:;";
 
   /**
-   * @var array description of export field mapping
+   * @var array
+   * Description of export field mapping
    *
    * @code
    * 'exampleEntityMappingName' => array(
@@ -343,6 +344,7 @@ class CRM_Utils_Migrate_Export {
    *
    * @return string
    *   XML
+   * @throws CRM_Core_Exception
    */
   public function toXML() {
     $buffer = '<?xml version="1.0" encoding="iso-8859-1" ?>';
@@ -356,7 +358,7 @@ class CRM_Utils_Migrate_Export {
         $buffer .= "  </{$this->_xml[$key]['scope']}>\n";
       }
       elseif ($this->_xml[$key]['required']) {
-        CRM_Core_Error::fatal("No records in DB for $key");
+        throw new CRM_Core_Exception("No records in DB for $key");
       }
     }
     $buffer .= "</CustomData>\n";

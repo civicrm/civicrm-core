@@ -71,6 +71,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return array
    *   Array of event summary values
+   *
+   * @throws CRM_Core_Exception
    */
   public static function getGrantStatusOptGroup() {
 
@@ -81,7 +83,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 
     $og = CRM_Core_BAO_OptionGroup::retrieve($params, $defaults);
     if (!$og) {
-      CRM_Core_Error::fatal('No option group for grant statuses - database discrepancy! Make sure you loaded civicrm_data.mysql');
+      throw new CRM_Core_Exception('No option group for grant statuses - database discrepancy! Make sure you loaded civicrm_data.mysql');
     }
 
     return $og;

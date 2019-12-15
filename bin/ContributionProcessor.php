@@ -204,7 +204,7 @@ class CiviContributeProcessor {
 
     $handle = fopen($csvFile, "r");
     if (!$handle) {
-      CRM_Core_Error::fatal("Can't locate csv file.");
+      throw new CRM_Core_Exception("Can't locate csv file.");
     }
 
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
@@ -231,7 +231,7 @@ class CiviContributeProcessor {
         CRM_Core_Error::debug_log_message("Considering first row ( line $row ) as HEADER ..<p>", TRUE);
 
         if (empty($header)) {
-          CRM_Core_Error::fatal("Header is empty.");
+          throw new CRM_Core_Exception("Header is empty.");
         }
       }
       $row++;
@@ -254,7 +254,7 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 0, 'REQUEST'
         );
         if ($start < $end) {
-          CRM_Core_Error::fatal("Start offset can't be less than End offset.");
+          throw new CRM_Core_Exception("Start offset can't be less than End offset.");
         }
 
         $start = date('Y-m-d', time() - $start * 24 * 60 * 60) . 'T00:00:00.00Z';
