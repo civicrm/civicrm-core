@@ -610,10 +610,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * Process the form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
+    $params['price'] = CRM_Utils_Rule::cleanMoney($params['price']);
 
     $params['is_display_amounts'] = CRM_Utils_Array::value('is_display_amounts', $params, FALSE);
     $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
