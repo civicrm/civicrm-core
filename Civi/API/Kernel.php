@@ -167,7 +167,6 @@ class Kernel {
       throw new \API_Exception('Input variable `params` is not an array', 2000);
     }
     switch ($apiRequest['version']) {
-      case 2:
       case 3:
         require_once 'api/v3/utils.php';
         _civicrm_api3_initialize();
