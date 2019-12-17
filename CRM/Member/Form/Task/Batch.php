@@ -217,6 +217,14 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
 
         //Get the membership status
         $value['status_id'] = (CRM_Utils_Array::value('membership_status', $value)) ? $value['membership_status'] : CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'status_id');
+        // dev/membership#23 If we are setting a status to be one which is an administrator only status, also set the status_override field
+        $is_admin = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $value['status_id'], 'is_admin');
+        if ($is_admin) {
+          $value['is_override'] = 1;
+        }
+        else {
+          $value['is_override'] = 0;
+        }
         unset($value['membership_status']);
         foreach ($dates as $val) {
           if (isset($value[$val])) {
