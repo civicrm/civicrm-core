@@ -195,6 +195,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $this->_returnProperties['contact_type'] = 1;
       $this->_returnProperties['contact_sub_type'] = 1;
       $this->_returnProperties['sort_name'] = 1;
+      if (!empty($this->_returnProperties['location']) && is_array($this->_returnProperties['location'])) {
+        foreach ($this->_returnProperties['location'] as $key => $property) {
+          if (!empty($property['email'])) {
+            $this->_returnProperties['location'][$key]['on_hold'] = 1;
+          }
+        }
+      }
     }
 
     $displayRelationshipType = CRM_Utils_Array::value('display_relationship_type', $this->_formValues);
@@ -707,6 +714,15 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             $websiteUrl = "<a href=\"{$websiteValue}\">{$websiteValue}  ({$websiteType})</a>";
           }
           $row[$property] = $websiteUrl;
+        }
+        elseif (strpos($property, '-email') !== FALSE) {
+          list($locType) = explode("-email", $property);
+          $onholdProperty = "{$locType}-on_hold";
+
+          $row[$property] = isset($result->$property) ? $result->$property : NULL;
+          if (!empty($row[$property]) && !empty($result->$onholdProperty)) {
+            $row[$property] .= " (On Hold)";
+          }
         }
         else {
           $row[$property] = isset($result->$property) ? $result->$property : NULL;
