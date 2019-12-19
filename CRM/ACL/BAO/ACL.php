@@ -78,8 +78,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
-   * @deprecated
-   *
    * @param array $tables
    *   Any tables that may be needed in the FROM.
    * @param string $operation
@@ -95,6 +93,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return string
    *   The WHERE clause, or 0 on failure
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
+   *
    */
   public static function permissionClause(
     &$tables, $operation,
@@ -318,6 +320,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @return string|null
    *   WHERE-style clause to filter results,
    *   or null if $table or $id is null
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getClause($table, $id, &$tables) {
     $table = CRM_Utils_Type::escape($table, 'String');
@@ -379,8 +383,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function &getACLs($contact_id = NULL, $group_id = NULL, $aclRoles = FALSE) {
+  public static function getACLs($contact_id = NULL, $group_id = NULL, $aclRoles = FALSE) {
     $results = [];
 
     if (empty($contact_id)) {
@@ -444,8 +450,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function &getACLRoles($contact_id = NULL, $group_id = NULL) {
+  public static function getACLRoles($contact_id = NULL, $group_id = NULL) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
     if ($group_id) {
       $group_id = CRM_Utils_Type::escape($group_id, 'Integer');
@@ -510,8 +518,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return array
    *   Assoc array of ACL rules
+   * @throws \CRM_Core_Exception
    */
-  public static function &getGroupACLs($contact_id, $aclRoles = FALSE) {
+  public static function getGroupACLs($contact_id, $aclRoles = FALSE) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
 
     $rule = new CRM_ACL_BAO_ACL();
@@ -554,8 +563,9 @@ SELECT      $acl.*
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
+   * @throws \CRM_Core_Exception
    */
-  public static function &getGroupACLRoles($contact_id) {
+  public static function getGroupACLRoles($contact_id) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
 
     $rule = new CRM_ACL_BAO_ACL();
@@ -626,8 +636,10 @@ SELECT $acl.*
    *
    * @return array
    *   Assoc array of ACL rules
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function &getAllByContact($contact_id) {
+  public static function getAllByContact($contact_id) {
     $result = [];
 
     /* First, the contact-specific ACLs, including ACL Roles */
@@ -644,7 +656,7 @@ SELECT $acl.*
    *
    * @return CRM_ACL_DAO_ACL
    */
-  public static function create(&$params) {
+  public static function create($params) {
     $dao = new CRM_ACL_DAO_ACL();
     $dao->copyValues($params);
     $dao->save();
@@ -653,7 +665,7 @@ SELECT $acl.*
 
   /**
    * @param array $params
-   * @param $defaults
+   * @param array $defaults
    */
   public static function retrieve(&$params, &$defaults) {
     CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_ACL', $params, $defaults);
