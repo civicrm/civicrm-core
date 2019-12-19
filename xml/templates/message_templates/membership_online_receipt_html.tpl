@@ -405,7 +405,7 @@
           {$email}
         </td>
       </tr>
-    {elseif $email}}
+    {elseif $email}
       <tr>
         <th {$headerStyle}>
           {ts}Registered Email{/ts}
