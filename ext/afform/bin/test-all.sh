@@ -18,7 +18,13 @@ pushd "$AFF_CORE" >> /dev/null
 popd >> /dev/null
 
 pushd "$AFF_MOCK" >> /dev/null
-  if ! phpunit6 "$@" ; then
+  if ! phpunit6 --group e2e "$@" ; then
+    EXIT=1
+  fi
+popd >> /dev/null
+
+pushd "$AFF_MOCK" >> /dev/null
+  if ! phpunit6 --group headless "$@" ; then
     EXIT=1
   fi
 popd >> /dev/null

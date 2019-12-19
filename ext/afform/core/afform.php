@@ -452,10 +452,31 @@ function afform_civicrm_alterMenu(&$items) {
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'title' => $meta['title'] ?? '',
-        'access_arguments' => [['access CiviCRM'], 'and'], // FIXME
+        'access_arguments' => [["@afform:$name"], 'and'],
         'is_public' => $meta['is_public'],
       ];
     }
+  }
+}
+
+/**
+ * Implements hook_civicrm_permission_check().
+ *
+ * @see CRM_Utils_Hook::permission_check()
+ */
+function afform_civicrm_permission_check($permission, &$granted, $contactId) {
+  if ($permission{0} !== '@') {
+    // Micro-optimization - this function may get hit a lot.
+    return;
+  }
+
+  if (preg_match('/^@afform:(.*)/', $permission, $m)) {
+    $name = $m[1];
+
+    /** @var CRM_Afform_AfformScanner $scanner */
+    $scanner = \Civi::container()->get('afform_scanner');
+    $meta = $scanner->getMeta($name);
+    $granted = CRM_Core_Permission::check($meta['permission'], $contactId);
   }
 }
 
