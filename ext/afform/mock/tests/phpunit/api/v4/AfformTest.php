@@ -205,9 +205,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     // The default mockPage has 1 explicit requirement + 2 automatic requirements.
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
     $angModule = Civi::service('angular')->getModule($formName);
-    $this->assertEquals(['afCore', 'extraMock', 'mockBareFile', 'mockFoo'], $angModule['requires']);
+    $this->assertEquals(['afCore', 'mockBespoke', 'mockBareFile', 'mockFoo'], $angModule['requires']);
     $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
-    $this->assertEquals(['extraMock'], $storedRequires[0]['requires']);
+    $this->assertEquals(['mockBespoke'], $storedRequires[0]['requires']);
 
     // Knock down to 1 explicit + 1 automatic.
     Civi\Api4\Afform::update()
@@ -216,9 +216,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->setValues(['layout' => '<div>The bare file says "<span mock-bare-file/>"</div>'])
       ->execute();
     $angModule = Civi::service('angular')->getModule($formName);
-    $this->assertEquals(['afCore', 'extraMock', 'mockBareFile'], $angModule['requires']);
+    $this->assertEquals(['afCore', 'mockBespoke', 'mockBareFile'], $angModule['requires']);
     $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
-    $this->assertEquals(['extraMock'], $storedRequires[0]['requires']);
+    $this->assertEquals(['mockBespoke'], $storedRequires[0]['requires']);
 
     // Remove the last explict and implicit requirements.
     Civi\Api4\Afform::update()
@@ -236,7 +236,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
     $angModule = Civi::service('angular')->getModule($formName);
-    $this->assertEquals(['afCore', 'extraMock', 'mockBareFile', 'mockFoo'], $angModule['requires']);
+    $this->assertEquals(['afCore', 'mockBespoke', 'mockBareFile', 'mockFoo'], $angModule['requires']);
   }
 
 }
