@@ -1,1 +1,1 @@
-{"server_route": "civicrm/mock-page", "requires":["extraMock"]}
+{"server_route": "civicrm/mock-page", "requires":["extraMock"], "permission": "access Foobar" }

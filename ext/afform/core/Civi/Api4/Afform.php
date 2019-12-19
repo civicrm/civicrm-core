@@ -108,6 +108,9 @@ class Afform extends AbstractEntity {
           'name' => 'server_route',
         ],
         [
+          'name' => 'permission',
+        ],
+        [
           'name' => 'layout',
         ],
       ];

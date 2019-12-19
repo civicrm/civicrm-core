@@ -138,6 +138,7 @@ class CRM_Afform_AfformScanner {
       'title' => '',
       'description' => '',
       'is_public' => FALSE,
+      'permission' => 'access CiviCRM',
     ];
 
     $metaFile = $this->findFilePath($name, self::METADATA_FILE);
