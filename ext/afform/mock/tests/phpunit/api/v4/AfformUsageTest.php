@@ -71,6 +71,42 @@ EOHTML;
     $this->assertEquals('Lasty', $contact['last_name']);
   }
 
+  public function testAboutMeForbidden() {
+    $this->useValues([
+      'layout' => self::$layouts['aboutMe'],
+      'permission' => CRM_Core_Permission::ALWAYS_DENY_PERMISSION,
+    ]);
+
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
+
+    try {
+      Civi\Api4\Afform::prefill()
+        ->setName($this->formName)
+        ->setArgs([])
+        ->execute()
+        ->indexBy('name');
+      $this->fail('Expected authorization exception from Afform.prefill');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertRegExp(';Authorization failed: Cannot process form mock\d+;', $e->getMessage());
+    }
+
+    try {
+      Civi\Api4\Afform::submit()
+        ->setName($this->formName)
+        ->setArgs([])
+        ->setValues([
+          'does.n' => 'tmatter',
+        ])
+        ->execute();
+      $this->fail('Expected authorization exception from Afform.submit');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertRegExp(';Authorization failed: Cannot process form mock\d+;', $e->getMessage());
+    }
+  }
+
   protected function useValues($values) {
     $defaults = [
       'title' => 'My form',
