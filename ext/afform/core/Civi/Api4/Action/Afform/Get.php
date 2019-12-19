@@ -19,7 +19,9 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $values = [];
     foreach ($names as $name) {
       $record = $scanner->getMeta($name);
-      $record = array_merge($record, $scanner->getComputedFields($name));
+      if ($record) {
+        $record = array_merge($record, $scanner->getComputedFields($name));
+      }
       $layout = $this->_isFieldSelected('layout') ? $scanner->getLayout($name) : NULL;
       if ($layout !== NULL) {
         // FIXME check for validity?
