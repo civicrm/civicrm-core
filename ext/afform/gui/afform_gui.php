@@ -222,6 +222,15 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'danger' => ts('Danger'),
   ];
 
+  $data['permissions'] = [];
+  foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $name => $perm) {
+    $data['permissions'][] = [
+      'id' => $name,
+      'text' => $perm[0],
+      'description' => $perm[1] ?? NULL,
+    ];
+  }
+
   $mimeType = 'text/javascript';
   $content = "CRM.afformAdminData=" . json_encode($data, JSON_UNESCAPED_SLASHES) . ';';
 }
