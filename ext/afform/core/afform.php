@@ -462,6 +462,13 @@ function afform_civicrm_alterMenu(&$items) {
 /**
  * Implements hook_civicrm_permission_check().
  *
+ * This extends the list of permissions available in `CRM_Core_Permission:check()`
+ * by introducing virtual-permissions named `@afform:myForm`. The evaluation
+ * of these virtual-permissions is dependent on the settings for `myForm`.
+ * `myForm` may be exposed/integrated through multiple subsystems (routing,
+ * nav-menu, API, etc), and the use of virtual-permissions makes easy to enforce
+ * consistent permissions across any relevant subsystems.
+ *
  * @see CRM_Utils_Hook::permission_check()
  */
 function afform_civicrm_permission_check($permission, &$granted, $contactId) {
