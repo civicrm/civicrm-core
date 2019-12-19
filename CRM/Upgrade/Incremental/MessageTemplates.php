@@ -192,6 +192,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'test_preview', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.21.beta1',
+        'upgrade_descriptor' => ts('Fix Membership Receipt'),
+        'templates' => [
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
+        ],
+      ],
 
     ];
   }
