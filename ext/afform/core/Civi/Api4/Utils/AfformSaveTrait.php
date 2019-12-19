@@ -63,7 +63,11 @@ trait AfformSaveTrait {
     // We may have changed list of files covered by the cache.
     _afform_clear();
 
-    if (($item['server_route'] ?? NULL) !== ($orig['server_route'] ?? NULL)) {
+    $isChanged = function($field) use ($item, $orig) {
+      return ($item[$field] ?? NULL) !== ($orig[$field] ?? NULL);
+    };
+    // Right now, permission-checks are completely on-demand.
+    if ($isChanged('server_route') /* || $isChanged('permission') */) {
       \CRM_Core_Menu::store();
       \CRM_Core_BAO_Navigation::resetNavigation();
     }
