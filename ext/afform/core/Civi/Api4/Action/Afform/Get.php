@@ -19,7 +19,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $values = [];
     foreach ($names as $name) {
       $record = $scanner->getMeta($name);
-      if ($record) {
+      if ($record && ($this->_isFieldSelected('has_local') || $this->_isFieldSelected('has_base'))) {
         $record = array_merge($record, $scanner->getComputedFields($name));
       }
       $layout = $this->_isFieldSelected('layout') ? $scanner->getLayout($name) : NULL;

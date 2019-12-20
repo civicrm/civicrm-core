@@ -160,27 +160,30 @@ function afform_civicrm_caseTypes(&$caseTypes) {
 function afform_civicrm_angularModules(&$angularModules) {
   _afform_civix_civicrm_angularModules($angularModules);
 
-  /** @var CRM_Afform_AfformScanner $scanner */
-  $scanner = Civi::service('afform_scanner');
-  $names = array_keys($scanner->findFilePaths());
-  foreach ($names as $name) {
-    $meta = $scanner->getMeta($name);
-    $angularModules[_afform_angular_module_name($name, 'camel')] = [
+  $afforms = \Civi\Api4\Afform::get()
+    ->setCheckPermissions(FALSE)
+    ->setSelect(['name', 'requires'])
+    ->execute();
+
+  foreach ($afforms as $afform) {
+    $angularModules[_afform_angular_module_name($afform['name'], 'camel')] = [
       'ext' => E::LONG_NAME,
-      'js' => ['assetBuilder://afform.js?name=' . urlencode($name)],
-      'requires' => $meta['requires'],
+      'js' => ['assetBuilder://afform.js?name=' . urlencode($afform['name'])],
+      'requires' => $afform['requires'],
       'basePages' => [],
       'partialsCallback' => '_afform_get_partials',
-      '_afform' => $name,
+      '_afform' => $afform['name'],
       'exports' => [
-        _afform_angular_module_name($name, 'dash') => 'AE',
+        _afform_angular_module_name($afform['name'], 'dash') => 'AE',
       ],
     ];
   }
 }
 
 /**
- * Construct a list of partials for a given afform/angular module.
+ * Callback to retrieve partials for a given afform/angular module.
+ *
+ * @see afform_civicrm_angularModules
  *
  * @param string $moduleName
  *   The module name.
@@ -188,12 +191,17 @@ function afform_civicrm_angularModules(&$angularModules) {
  *   The module definition.
  * @return array
  *   Array(string $filename => string $html).
+ * @throws API_Exception
  */
 function _afform_get_partials($moduleName, $module) {
-  /** @var CRM_Afform_AfformScanner $scanner */
-  $scanner = Civi::service('afform_scanner');
+  $afform = civicrm_api4('Afform', 'get', [
+    'where' => [['name', '=', $module['_afform']]],
+    'select' => ['layout'],
+    'layoutFormat' => 'html',
+    'checkPermissions' => FALSE,
+  ], 0);
   return [
-    "~/$moduleName/$moduleName.aff.html" => $scanner->getLayout($module['_afform']),
+    "~/$moduleName/$moduleName.aff.html" => $afform['layout'],
   ];
 }
 
@@ -418,17 +426,11 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     throw new RuntimeException("Missing required parameter: afform.js?name=NAME");
   }
 
-  $name = $params['name'];
-  /** @var \CRM_Afform_AfformScanner $scanner */
-  $scanner = Civi::service('afform_scanner');
-  $meta = $scanner->getMeta($name);
-  $moduleName = _afform_angular_module_name($name, 'camel');
-
+  $moduleName = _afform_angular_module_name($params['name'], 'camel');
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => $moduleName,
-    'meta' => $meta,
-    'metaJson' => json_encode($meta),
+    'meta' => ['name' => $params['name']],
     'templateUrl' => "~/$moduleName/$moduleName.aff.html",
   ]);
   $mimeType = 'text/javascript';
@@ -480,10 +482,15 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
   if (preg_match('/^@afform:(.*)/', $permission, $m)) {
     $name = $m[1];
 
-    /** @var CRM_Afform_AfformScanner $scanner */
-    $scanner = \Civi::container()->get('afform_scanner');
-    $meta = $scanner->getMeta($name);
-    $granted = CRM_Core_Permission::check($meta['permission'], $contactId);
+    $afform = \Civi\Api4\Afform::get()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('name', '=', $name)
+      ->setSelect(['permission'])
+      ->execute()
+      ->first();
+    if ($afform) {
+      $granted = CRM_Core_Permission::check($afform['permission'], $contactId);
+    }
   }
 }
 

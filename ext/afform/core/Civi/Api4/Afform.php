@@ -120,7 +120,7 @@ class Afform extends AbstractEntity {
           'name' => 'has_local',
         ];
         $fields[] = [
-          'name' => 'has_packaged',
+          'name' => 'has_base',
         ];
       }
 

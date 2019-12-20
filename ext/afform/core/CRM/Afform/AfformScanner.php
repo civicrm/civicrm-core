@@ -163,7 +163,7 @@ class CRM_Afform_AfformScanner {
 
     $fields = [];
     $fields['has_local'] = file_exists($localLayoutPath) || file_exists($localMetaPath);
-    $fields['has_packaged'] = ($fields['has_local'] && count($allPaths) > 1)
+    $fields['has_base'] = ($fields['has_local'] && count($allPaths) > 1)
       || (!$fields['has_local'] && count($allPaths) > 0);
     return $fields;
   }

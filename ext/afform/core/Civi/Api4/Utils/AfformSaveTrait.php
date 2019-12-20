@@ -36,7 +36,7 @@ trait AfformSaveTrait {
       unset($fields[array_search('layout', $fields)]);
       unset($fields[array_search('name', $fields)]);
       unset($fields[array_search('has_local', $fields)]);
-      unset($fields[array_search('has_packaged', $fields)]);
+      unset($fields[array_search('has_base', $fields)]);
       $orig = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->setSelect($fields)->execute()->first();
     }
 
