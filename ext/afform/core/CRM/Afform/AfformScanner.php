@@ -27,15 +27,7 @@ class CRM_Afform_AfformScanner {
    * CRM_Afform_AfformScanner constructor.
    */
   public function __construct() {
-    // TODO Manage this is a service, and inject the cache service.
-    $this->cache = new CRM_Utils_Cache_SqlGroup([
-      // Note: If there are edge-case bugs with multisite, consider changing
-      // the group key - but tread carefully to ensure that (eg) CLI+web workers
-      // see the same cache.
-      'group' => 'afform_scanner',
-      'prefetch' => FALSE,
-    ]);
-    // $this->cache = new CRM_Utils_Cache_Arraycache([]);
+    $this->cache = Civi::cache('long');
   }
 
   /**
@@ -47,7 +39,7 @@ class CRM_Afform_AfformScanner {
   public function findFilePaths() {
     if (!CRM_Core_Config::singleton()->debug) {
       // FIXME: Use a separate setting. Maybe use the asset-builder cache setting?
-      $paths = $this->cache->get('allPaths');
+      $paths = $this->cache->get('afformAllPaths');
       if ($paths !== NULL) {
         return $paths;
       }
@@ -70,7 +62,7 @@ class CRM_Afform_AfformScanner {
 
     $this->appendFilePaths($paths, $this->getSiteLocalPath(), 10);
 
-    $this->cache->set('allPaths', $paths);
+    $this->cache->set('afformAllPaths', $paths);
     return $paths;
   }
 
@@ -114,7 +106,7 @@ class CRM_Afform_AfformScanner {
   }
 
   public function clear() {
-    $this->cache->flush();
+    $this->cache->delete('afformAllPaths');
   }
 
   /**
