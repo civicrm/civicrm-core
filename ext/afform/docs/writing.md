@@ -8,7 +8,7 @@ creates a scope with these variables:
 
 * `routeParams`: This is a reference to the [$routeParams](https://docs.angularjs.org/api/ngRoute/service/$routeParams)
   service. In the example, we used `routeParams` to get a reference to a `name` from the URL.
-* `meta`: The stored meta data (`*.aff.json`) for this form.
+* `meta`: Object which for now contains just the form name but could potentially have other metadata if needed.
 * `ts`: This is a utility function which translates strings, as in `{{ts('Hello world')}}`.
 
 Additionally, AngularJS allows *directives* -- these are extensions to HTML (custom tags and attributes) which create behavior. For example:

@@ -1,7 +1,7 @@
 {* This takes an $afform and generates an AngularJS module.
 
  @param string $afform.camel     The full camel-case name of the AngularJS module being created
- @param array  $afform.meta      The full metadata record of the form
+ @param array  $afform.meta      Relevant form metadata
  @param string $afform.layout    The template content (HTML)
  *}
 {literal}
