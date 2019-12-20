@@ -393,16 +393,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contact', $contact->id);
     }
 
-    // make a civicrm_subscription_history entry only on contact create (CRM-777)
-    if (empty($params['contact_id'])) {
-      $subscriptionParams = [
-        'contact_id' => $contact->id,
-        'status' => 'Added',
-        'method' => 'Admin',
-      ];
-      CRM_Contact_BAO_SubscriptionHistory::create($subscriptionParams);
-    }
-
     $transaction->commit();
 
     // CRM-6367: fetch the right label for contact type’s display
