@@ -479,12 +479,14 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
+   * Get the total sum of all payments (and optionally refunds) for a contribution record
+   *
    * @param int $contributionID
    * @param bool $includeRefund
    *
-   * @return string
+   * @return float
    */
-  public static function getTotalPayments($contributionID, $includeRefund = FALSE) {
+  public static function getTotalPayments($contributionID, $includeRefund = FALSE): float {
     $statusIDs = [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')];
 
     if ($includeRefund) {
@@ -495,7 +497,7 @@ WHERE ceft.entity_id = %1";
       INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution')
       WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id IN (%2) ";
 
-    return CRM_Core_DAO::singleValueQuery($sql, [
+    return (float) CRM_Core_DAO::singleValueQuery($sql, [
       1 => [$contributionID, 'Integer'],
       2 => [implode(',', $statusIDs), 'CommaSeparatedIntegers'],
     ]);
