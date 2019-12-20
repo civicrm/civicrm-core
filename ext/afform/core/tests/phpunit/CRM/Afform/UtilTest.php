@@ -38,6 +38,13 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
     $exs[] = ['abCd23', 'dash', 'ab-cd23'];
     $exs[] = ['AbCd23', 'dash', 'ab-cd23'];
 
+    $exs[] = ['Custom_fooBar', 'camel', 'customFooBar'];
+    $exs[] = ['Custom_Foo__Bar', 'camel', 'customFooBar'];
+    $exs[] = ['Custom Foo_ _Bar', 'camel', 'customFooBar'];
+    $exs[] = ['Custom_fooBar', 'dash', 'custom-foo-bar'];
+    $exs[] = ['Custom_Foo__Bar', 'dash', 'custom-foo-bar'];
+    $exs[] = ['Custom Foo_ _Bar', 'dash', 'custom-foo-bar'];
+
     return $exs;
   }
 

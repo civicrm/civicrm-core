@@ -320,9 +320,13 @@ function _afform_reverse_deps_find($formName, $html, $revMap) {
 function afform_civicrm_alterAngular($angular) {
   $fieldMetadata = \Civi\Angular\ChangeSet::create('fieldMetadata')
     ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
-      /** @var \CRM_Afform_AfformScanner $scanner */
-      $scanner = Civi::service('afform_scanner');
-      $meta = $scanner->getMeta(basename($path, '.aff.html'));
+      try {
+        $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
+        $meta = \Civi\Api4\Afform::get()->addWhere('name', '=', $module['_afform'])->addSelect('block')->setCheckPermissions(FALSE)->execute()->first();
+      }
+      catch (Exception $e) {
+      }
+
       $blockEntity = $meta['block'] ?? NULL;
       if (!$blockEntity) {
         $entities = _afform_getMetadata($doc);
@@ -530,13 +534,13 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
   switch ($format) {
     case 'camel':
       $camelCase = '';
-      foreach (explode('-', $fileBaseName) as $shortNamePart) {
+      foreach (preg_split('/[-_ ]/', $fileBaseName, NULL, PREG_SPLIT_NO_EMPTY) as $shortNamePart) {
         $camelCase .= ucfirst($shortNamePart);
       }
       return strtolower($camelCase{0}) . substr($camelCase, 1);
 
     case 'dash':
-      return strtolower(implode('-', array_filter(preg_split('/(?=[A-Z])/', $fileBaseName))));
+      return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $fileBaseName, NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
 
     default:
       throw new \Exception("Unrecognized format");

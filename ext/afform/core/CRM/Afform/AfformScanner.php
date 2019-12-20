@@ -148,7 +148,13 @@ class CRM_Afform_AfformScanner {
     }
   }
 
-  public function getComputedFields($name) {
+  /**
+   * Adds has_local & has_base to an afform metadata record
+   *
+   * @param array $record
+   */
+  public function addComputedFields(&$record) {
+    $name = $record['name'];
     // Ex: $allPaths['viewIndividual'][0] == '/var/www/foo/afform/view-individual'].
     $allPaths = $this->findFilePaths()[$name];
     // $activeLayoutPath = $this->findFilePath($name, self::LAYOUT_FILE);
@@ -156,11 +162,11 @@ class CRM_Afform_AfformScanner {
     $localLayoutPath = $this->createSiteLocalPath($name, self::LAYOUT_FILE);
     $localMetaPath = $this->createSiteLocalPath($name, self::METADATA_FILE);
 
-    $fields = [];
-    $fields['has_local'] = file_exists($localLayoutPath) || file_exists($localMetaPath);
-    $fields['has_base'] = ($fields['has_local'] && count($allPaths) > 1)
-      || (!$fields['has_local'] && count($allPaths) > 0);
-    return $fields;
+    $record['has_local'] = file_exists($localLayoutPath) || file_exists($localMetaPath);
+    if (!isset($record['has_base'])) {
+      $record['has_base'] = ($record['has_local'] && count($allPaths) > 1)
+        || (!$record['has_local'] && count($allPaths) > 0);
+    }
   }
 
   /**
