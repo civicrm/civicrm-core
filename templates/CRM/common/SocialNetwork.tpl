@@ -26,16 +26,12 @@
                 <img title="Facebook Like Button" src="{$config->userFrameworkResourceURL|replace:'https://':'http://'}/i/fblike.png" alt="Facebook Button" />
             </a>
         {else}
-            <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
             {*use advanced buttons for pages*}
             <div class="label">
                 <iframe allowtransparency="true" frameborder="0" scrolling="no"
                 src="https://platform.twitter.com/widgets/tweet_button.html?text={$title}&amp;url={$url|escape:'url'}"
                 style="width:100px; height:20px;">
                 </iframe>
-            </div>
-            <div class="label">
-                <g:plusone href={$url}></g:plusone>
             </div>
             <div class="label" style="width:300px;">
                 <iframe src="https://www.facebook.com/plugins/like.php?app_id=240719639306341&amp;href={$url|escape:'url'}&amp;send=false&amp;layout=standard&amp;show_faces=false&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:30px;" allowTransparency="true">
