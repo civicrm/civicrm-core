@@ -29,7 +29,10 @@ class CRM_Afform_AfformScanner {
   public function __construct() {
     // TODO Manage this is a service, and inject the cache service.
     $this->cache = new CRM_Utils_Cache_SqlGroup([
-      'group' => md5('afform_' . CRM_Core_Config_Runtime::getId() . $this->getSiteLocalPath()),
+      // Note: If there are edge-case bugs with multisite, consider changing
+      // the group key - but tread carefully to ensure that (eg) CLI+web workers
+      // see the same cache.
+      'group' => 'afform_scanner',
       'prefetch' => FALSE,
     ]);
     // $this->cache = new CRM_Utils_Cache_Arraycache([]);
