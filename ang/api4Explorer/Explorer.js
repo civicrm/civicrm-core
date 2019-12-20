@@ -400,7 +400,7 @@
           code.php += ', ' + phpFormat(index);
         }
         code.php += ");";
-        
+
         // Write oop code
         if (entity.substr(0, 7) !== 'Custom_') {
           code.oop = '$' + results + " = \\Civi\\Api4\\" + entity + '::' + action + '()';
@@ -445,7 +445,7 @@
         code.cli = 'cv api4 ' + entity + '.' + action + " '" + stringify(params) + "'";
       }
       _.each(code, function(val, type) {
-        $scope.code[type] = prettyPrintOne(val);
+        $scope.code[type] = prettyPrintOne(_.escape(val));
       });
     }
 
@@ -466,7 +466,7 @@
           ret += (ret.length ? ', ' : '') + key + ': ' + (_.isArray(val) ? '[' + val + ']' : val);
         }
       });
-      return prettyPrintOne(ret);
+      return prettyPrintOne(_.escape(ret));
     }
 
     $scope.execute = function() {
@@ -482,11 +482,11 @@
       }).then(function(resp) {
           $scope.loading = false;
           $scope.status = 'success';
-          $scope.result = [formatMeta(resp.data), prettyPrintOne(JSON.stringify(resp.data.values, null, 2), 'js', 1)];
+          $scope.result = [formatMeta(resp.data), prettyPrintOne(_.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)];
         }, function(resp) {
           $scope.loading = false;
           $scope.status = 'danger';
-          $scope.result = [formatMeta(resp), prettyPrintOne(JSON.stringify(resp.data, null, 2))];
+          $scope.result = [formatMeta(resp), prettyPrintOne(_.escape(JSON.stringify(resp.data, null, 2)))];
         });
     };
 
