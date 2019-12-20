@@ -45,6 +45,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    */
   protected $_membershipTypeID = NULL;
 
+  /**
+   * Set up for test.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp() {
     parent::setUp();
 
@@ -104,6 +110,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   /**
    *  Test Import.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImport() {
     $this->individualCreate();
@@ -119,33 +127,31 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $this->individualCreate($contact2Params);
     $year = date('Y') - 1;
-    $startDate2 = date('Y-m-d', mktime(0, 0, 0, 9, 10, $year));
+    $startDate2 = $year . '-10-09';
+    $joinDate2 = $year . '-10-10';
     $params = [
       [
         'anthony_anderson@civicrm.org',
         $this->_membershipTypeID,
+        date('Y-m-d'),
         date('Y-m-d'),
       ],
       [
         $contact2Params['email'],
         $this->_membershipTypeName,
         $startDate2,
+        $joinDate2,
       ],
     ];
-    $fieldMapper = [
-      'mapper[0][0]' => 'email',
-      'mapper[1][0]' => 'membership_type_id',
-      'mapper[2][0]' => 'membership_start_date',
-    ];
 
-    $importObject = new CRM_Member_Import_Parser_Membership($fieldMapper);
-    $importObject->init();
-    $importObject->_contactType = 'Individual';
+    $importObject = $this->createImportObject(['email', 'membership_type_id', 'membership_start_date', 'membership_join_date']);
     foreach ($params as $values) {
       $this->assertEquals(CRM_Import_Parser::VALID, $importObject->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), $values[0]);
     }
-    $result = $this->callAPISuccess('membership', 'get', []);
-    $this->assertEquals(2, $result['count']);
+    $result = $this->callAPISuccess('membership', 'get', ['sequential' => 1])['values'];
+    $this->assertCount(2, $result);
+    $this->assertEquals($startDate2, $result[1]['start_date']);
+    $this->assertEquals($joinDate2, $result[1]['join_date']);
   }
 
   /**
