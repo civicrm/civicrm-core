@@ -35,6 +35,7 @@
         var editor = $scope.editor = this;
         var newForm = {
           title: ts('Untitled Form'),
+          permission: 'access CiviCRM',
           layout: [{
             '#tag': 'af-form',
             ctrl: 'afform',
