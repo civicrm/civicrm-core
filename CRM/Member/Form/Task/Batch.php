@@ -203,7 +203,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     if (isset($params['field'])) {
       $customFields = [];
       foreach ($params['field'] as $key => $value) {
-        $ids['membership'] = $key;
+        $params['id'] = $key;
         if (!empty($value['membership_source'])) {
           $value['source'] = $value['membership_source'];
         }
@@ -244,7 +244,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
           $membershipTypeId
         );
 
-        $membership = CRM_Member_BAO_Membership::add($value, $ids);
+        $membership = CRM_Member_BAO_Membership::add($value);
 
         // add custom field values
         if (!empty($value['custom']) &&

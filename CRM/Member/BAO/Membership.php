@@ -51,7 +51,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    */
   public static function add(&$params, $ids = []) {
     $oldStatus = $oldType = NULL;
-    $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
     if ($params['id']) {
       CRM_Utils_Hook::pre('edit', 'Membership', $params['id'], $params);
     }
@@ -306,7 +305,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $transaction = new CRM_Core_Transaction();
 
-    // @todo remove $ids from here - $ids['contribution'] is not used or set by add. $ids['userId'] is used. $ids['membership'] is used if $params['id'] is not set
+    // @todo remove $ids from here $ids['userId'] is still used
+    $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
     $membership = self::add($params, $ids);
 
     if (is_a($membership, 'CRM_Core_Error')) {
