@@ -1903,6 +1903,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test we get an error is deceased status is disabled.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testProcessMembershipNoDeceasedStatus() {
     $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
@@ -1920,114 +1922,81 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test processing membership: check that status is updated when it should be
    * and left alone when it shouldn't.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessMembershipUpdateStatus() {
-    $membershipTypeId = $this->membershipTypeCreate();
+    $this->ids['MembershipType'] = $this->membershipTypeCreate();
 
     // Create admin-only membership status and get all statuses.
-    $result = $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1, 'sequential' => 1]);
-    $membershipStatusIdAdmin = $result['values'][0]['id'];
-    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+    $membershipStatusIdAdmin = $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1])['id'];
 
-    // Default params, which we'll expand on below.
-    $params = [
-      'membership_type_id' => $membershipTypeId,
-      // Don't calculate status.
-      'skipStatusCal' => 1,
-      'source' => 'Test',
-      'sequential' => 1,
+    // Create membership with incorrect statuses for the given dates and also some (pending, cancelled, admin override) which should not be updated.
+    $memberships = [
+      [
+        'start_date' => 'now',
+        'end_date' => '+ 1 year',
+        'initial_status' => 'Current',
+        'expected_processed_status' => 'New',
+      ],
+      [
+        'start_date' => '- 6 month',
+        'end_date' => '+ 6 month',
+        'initial_status' => 'New',
+        'expected_processed_status' => 'Current',
+      ],
+      [
+        'start_date' => '- 53 week',
+        'end_date' => '-1 week',
+        'initial_status' => 'Current',
+        'expected_processed_status' => 'Grace',
+      ],
+      [
+        'start_date' => '- 16 month',
+        'end_date' => '- 4 month',
+        'initial_status' => 'Grace',
+        'expected_processed_status' => 'Expired',
+      ],
+      [
+        'start_date' => 'now',
+        'end_date' => '+ 1 year',
+        'initial_status' => 'Pending',
+        'expected_processed_status' => 'Pending',
+      ],
+      [
+        'start_date' => '- 6 month',
+        'end_date' => '+ 6 month',
+        'initial_status' => 'Cancelled',
+        'expected_processed_status' => 'Cancelled',
+      ],
+      [
+        'start_date' => '- 16 month',
+        'end_date' => '- 4 month',
+        'initial_status' => 'Current',
+        'is_override' => TRUE,
+        'expected_processed_status' => 'Current',
+      ],
+      [
+        // @todo this looks like it's covering something up. If we pass isAdminOverride it is the same as the line above. Without it the test fails.
+        // this smells of something that should work (or someone thought should work & so put in a test) doesn't & test has been adjusted to cope.
+        'start_date' => '- 16 month',
+        'end_date' => '- 4 month',
+        'initial_status' => 'Admin',
+        'is_override' => TRUE,
+        'expected_processed_status' => 'Admin',
+      ],
     ];
-
-    /*
-     * We create various memberships with wrong status, then check that the
-     * process_membership job sets the correct status for each.
-     * Also some memberships that should not be updated.
-     */
-
-    // Create membership with incorrect status but dates implying status New.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d');
-    $params['start_date'] = date('Y-m-d');
-    $params['end_date'] = date('Y-m-d', strtotime('now + 1 year'));
-    // Intentionally incorrect status.
-    $params['status_id'] = 'Current';
-    $resultNew = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals(array_search('Current', $memStatus), $resultNew['values'][0]['status_id']);
-
-    // Create membership with incorrect status but dates implying status Current.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
-    $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
-    $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
-    // Intentionally incorrect status.
-    $params['status_id'] = 'New';
-    $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals(array_search('New', $memStatus), $resultCurrent['values'][0]['status_id']);
-
-    // Create membership with incorrect status but dates implying status Grace.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d', strtotime('now - 53 week'));
-    $params['start_date'] = date('Y-m-d', strtotime('now - 53 week'));
-    $params['end_date'] = date('Y-m-d', strtotime('now - 1 week'));
-    // Intentionally incorrect status.
-    $params['status_id'] = 'Current';
-    $resultGrace = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals(array_search('Current', $memStatus), $resultGrace['values'][0]['status_id']);
-
-    // Create membership with incorrect status but dates implying status Expired.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
-    $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
-    $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
-    // Intentionally incorrect status.
-    $params['status_id'] = 'Grace';
-    $resultExpired = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals(array_search('Grace', $memStatus), $resultExpired['values'][0]['status_id']);
-
-    // Create Pending membership with dates implying New: should not get updated.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d');
-    $params['start_date'] = date('Y-m-d');
-    $params['end_date'] = date('Y-m-d', strtotime('now + 1 year'));
-    $params['status_id'] = 'Pending';
-    $resultPending = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals(array_search('Pending', $memStatus), $resultPending['values'][0]['status_id']);
-
-    // Create Cancelled membership with dates implying Current: should not get updated.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
-    $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
-    $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
-    $params['status_id'] = 'Cancelled';
-    $resultCancelled = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals(array_search('Cancelled', $memStatus), $resultCancelled['values'][0]['status_id']);
-
-    // Create status-overridden membership with dates implying Expired: should not get updated.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
-    $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
-    $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
-    $params['status_id'] = 'Current';
-    $params['is_override'] = 1;
-    $resultOverride = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals(array_search('Current', $memStatus), $resultOverride['values'][0]['status_id']);
-
-    // Create membership with admin-only status but dates implying Expired: should not get updated.
-    $params['contact_id'] = $this->individualCreate();
-    $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
-    $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
-    $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
-    $params['status_id'] = $membershipStatusIdAdmin;
-    $params['is_override'] = 1;
-    $resultAdmin = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertEquals($membershipStatusIdAdmin, $resultAdmin['values'][0]['status_id']);
+    foreach ($memberships as $index => $membership) {
+      $memberships[$index]['id'] = $this->createMembershipNeedingStatusProcessing($membership['start_date'], $membership['end_date'], $membership['initial_status'], $membership['is_override'] ?? FALSE);
+    }
 
     /*
      * Create membership type with inheritence and check processing of secondary memberships.
      */
     $employerRelationshipId = $this->callAPISuccessGetValue('RelationshipType', [
-      'return' => "id",
-      'name_b_a' => "Employer Of",
+      'return' => 'id',
+      'name_b_a' => 'Employer Of',
     ]);
     // Create membership type: inherited through employment.
     $membershipOrgId = $this->organizationCreate();
@@ -2043,8 +2012,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'relationship_direction' => 'b_a',
       'is_active' => 1,
     ];
-    $result = $this->callAPISuccess('membership_type', 'create', $params);
-    $membershipTypeId = $result['id'];
+    $membershipTypeId = $this->callAPISuccess('membership_type', 'create', $params)['id'];
 
     // Create employer and first employee
     $employerId = $this->organizationCreate([], 1);
@@ -2066,59 +2034,28 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $organizationMembershipID = $this->contactMembershipCreate($params);
 
     // Check that the employee inherited the membership and status.
-    $params = [
+    $expiredInheritedRelationship = $this->callAPISuccessGetSingle('membership', [
       'contact_id' => $memberContactId,
       'membership_type_id' => $membershipTypeId,
-      'sequential' => 1,
-    ];
-    $resultInheritExpired = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $resultInheritExpired['count']);
-    $this->assertEquals($organizationMembershipID, $resultInheritExpired['values'][0]['owner_membership_id']);
-    $this->assertEquals(array_search('Grace', $memStatus), $resultInheritExpired['values'][0]['status_id']);
+    ]);
+    $this->assertEquals($organizationMembershipID, $expiredInheritedRelationship['owner_membership_id']);
+    $this->assertMembershipStatus('Grace', (int) $expiredInheritedRelationship['status_id']);
 
     // Reset static $relatedContactIds array in createRelatedMemberships(),
     // to avoid bug where inherited membership gets deleted.
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
-
     // Check that after running process_membership job, statuses are correct.
     $this->callAPISuccess('Job', 'process_membership', []);
 
-    // New - should get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultNew['values'][0]['id']]);
-    $this->assertEquals(array_search('New', $memStatus), $membership['status_id']);
-
-    // Current - should get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultCurrent['values'][0]['id']]);
-    $this->assertEquals(array_search('Current', $memStatus), $membership['status_id']);
-
-    // Grace - should get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultGrace['values'][0]['id']]);
-    $this->assertEquals(array_search('Grace', $memStatus), $membership['status_id']);
-
-    // Expired - should get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultExpired['values'][0]['id']]);
-    $this->assertEquals(array_search('Expired', $memStatus), $membership['status_id']);
-
-    // Pending - should not get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultPending['values'][0]['id']]);
-    $this->assertEquals(array_search('Pending', $memStatus), $membership['status_id']);
-
-    // Cancelled - should not get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultCancelled['values'][0]['id']]);
-    $this->assertEquals(array_search('Cancelled', $memStatus), $membership['status_id']);
-
-    // Override - should not get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultOverride['values'][0]['id']]);
-    $this->assertEquals(array_search('Current', $memStatus), $membership['status_id']);
-
-    // Admin - should not get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultAdmin['values'][0]['id']]);
-    $this->assertEquals($membershipStatusIdAdmin, $membership['status_id']);
+    foreach ($memberships as $expectation) {
+      $membership = $this->callAPISuccessGetSingle('membership', ['id' => $expectation['id']]);
+      $this->assertMembershipStatus($expectation['expected_processed_status'], (int) $membership['status_id']);
+    }
 
     // Inherit Expired - should get updated.
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultInheritExpired['values'][0]['id']]);
-    $this->assertEquals(array_search('Expired', $memStatus), $membership['status_id']);
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $expiredInheritedRelationship['id']]);
+    $this->assertMembershipStatus('Expired', $membership['status_id']);
   }
 
   /**
@@ -2157,6 +2094,49 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $jobResult = $this->callAPISuccess('Job', 'process_membership', []);
     $this->assertEquals('Processed 1 membership records. Updated 1 records.', $jobResult['values']);
     $this->assertEquals(array_search('Current', $memStatus), $this->callAPISuccess('Membership', 'get', ['id' => $resultCurrent['id']])['values'][$resultCurrent['id']]['status_id']);
+  }
+
+  /**
+   * @param string $expectedStatusName
+   * @param int $actualStatusID
+   */
+  protected function assertMembershipStatus(string $expectedStatusName, int $actualStatusID) {
+    $this->assertEquals($expectedStatusName, CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $actualStatusID));
+  }
+
+  /**
+   * @param string $startDate
+   *   Date in strtotime format - e.g 'now', '+1 day'
+   * @param string $endDate
+   *   Date in strtotime format - e.g 'now', '+1 day'
+   * @param string $status
+   *   Status override
+   * @param bool $isAdminOverride
+   *   Is administratively overridden (if so the status is fixed).
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createMembershipNeedingStatusProcessing(string $startDate, string $endDate, string $status, bool $isAdminOverride = FALSE): int {
+    $params = [
+      'membership_type_id' => $this->ids['MembershipType'],
+      // Don't calculate status.
+      'skipStatusCal' => 1,
+      'source' => 'Test',
+      'sequential' => 1,
+    ];
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime($startDate));
+    $params['start_date'] = date('Y-m-d', strtotime($startDate));
+    $params['end_date'] = date('Y-m-d', strtotime($endDate));
+    $params['sequential'] = TRUE;
+    $params['is_override'] = $isAdminOverride;
+    // Intentionally incorrect status.
+    $params['status_id'] = $status;
+    $resultNew = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertMembershipStatus($status, (int) $resultNew['values'][0]['status_id']);
+    return (int) $resultNew['id'];
   }
 
 }
