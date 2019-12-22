@@ -1124,14 +1124,16 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    *
    * @return array
    *   [select, from, where]
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function makeURLClause($contactId, $status, $numRelationship, $count, $relationshipId, $direction, $params = []) {
     $select = $from = $where = '';
 
     $select = '( ';
     if ($count) {
-      if ($direction == 'a_b') {
+      if ($direction === 'a_b') {
         $select .= ' SELECT count(DISTINCT civicrm_relationship.id) as cnt1, 0 as cnt2 ';
       }
       else {
@@ -1166,7 +1168,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
                               civicrm_relationship.is_permission_b_a as is_permission_b_a,
                               civicrm_relationship.case_id as case_id';
 
-      if ($direction == 'a_b') {
+      if ($direction === 'a_b') {
         $select .= ', civicrm_relationship_type.label_a_b as label_a_b,
                               civicrm_relationship_type.label_b_a as relation ';
       }
@@ -1176,11 +1178,11 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       }
     }
 
-    $from = "
+    $from = '
       FROM  civicrm_relationship
 INNER JOIN  civicrm_relationship_type ON ( civicrm_relationship.relationship_type_id = civicrm_relationship_type.id )
-INNER JOIN  civicrm_contact ";
-    if ($direction == 'a_b') {
+INNER JOIN  civicrm_contact ';
+    if ($direction === 'a_b') {
       $from .= 'ON ( civicrm_contact.id = civicrm_relationship.contact_id_a ) ';
     }
     else {
@@ -1188,18 +1190,18 @@ INNER JOIN  civicrm_contact ";
     }
 
     if (!$count) {
-      $from .= "
+      $from .= '
 LEFT JOIN  civicrm_address ON (civicrm_address.contact_id = civicrm_contact.id AND civicrm_address.is_primary = 1)
 LEFT JOIN  civicrm_phone   ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1)
 LEFT JOIN  civicrm_email   ON (civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1)
 LEFT JOIN  civicrm_state_province ON (civicrm_address.state_province_id = civicrm_state_province.id)
 LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
-";
+';
     }
 
     $where = 'WHERE ( 1 )';
     if ($contactId) {
-      if ($direction == 'a_b') {
+      if ($direction === 'a_b') {
         $where .= ' AND civicrm_relationship.contact_id_b = ' . CRM_Utils_Type::escape($contactId, 'Positive');
       }
       else {
@@ -1245,7 +1247,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $where .= ' AND relationship_type_id = ' . CRM_Utils_Type::escape($params['relationship_type_id'], 'Positive');
       }
     }
-    if ($direction == 'a_b') {
+    if ($direction === 'a_b') {
       $where .= ' ) UNION ';
     }
     else {
@@ -1279,7 +1281,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *
    * @return array|int
    *   relationship records
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getRelationship(
     $contactId = NULL,
