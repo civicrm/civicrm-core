@@ -418,6 +418,16 @@ function civicrm_api3_system_updateindexes() {
 }
 
 /**
+ * Get an array of indices that should be defined but are not.
+ *
+ * @return array
+ */
+function civicrm_api3_system_getmissingindices() {
+  $indices = CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE);
+  return civicrm_api3_create_success($indices);
+}
+
+/**
  * Creates missing log tables.
  *
  * CRM-20838 - This adds any missing log tables into the database.
