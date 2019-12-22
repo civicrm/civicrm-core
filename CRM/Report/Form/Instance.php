@@ -102,35 +102,30 @@ class CRM_Report_Form_Instance {
       $form->freeze('is_reserved');
     }
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework != 'Joomla' ||
-      $config->userFramework != 'WordPress'
-    ) {
-      $form->addElement('select',
-        'permission',
-        ts('Permission'),
-        ['0' => ts('Everyone (includes anonymous)')] + CRM_Core_Permission::basicPermissions()
-      );
+    $form->addElement('select',
+      'permission',
+      ts('Permission'),
+      ['0' => ts('Everyone (includes anonymous)')] + CRM_Core_Permission::basicPermissions()
+    );
 
-      // prepare user_roles to save as names not as ids
-      if (function_exists('user_roles')) {
-        $user_roles_array = user_roles();
-        foreach ($user_roles_array as $key => $value) {
-          $user_roles[$value] = $value;
-        }
-        $grouprole = &$form->addElement('advmultiselect',
-          'grouprole',
-          ts('ACL Group/Role'),
-          $user_roles,
-          [
-            'size' => 5,
-            'style' => 'width:240px',
-            'class' => 'advmultiselect',
-          ]
-        );
-        $grouprole->setButtonAttributes('add', ['value' => ts('Add >>')]);
-        $grouprole->setButtonAttributes('remove', ['value' => ts('<< Remove')]);
+    // prepare user_roles to save as names not as ids
+    if (function_exists('user_roles')) {
+      $user_roles_array = user_roles();
+      foreach ($user_roles_array as $key => $value) {
+        $user_roles[$value] = $value;
       }
+      $grouprole = $form->addElement('advmultiselect',
+        'grouprole',
+        ts('ACL Group/Role'),
+        $user_roles,
+        [
+          'size' => 5,
+          'style' => 'width:240px',
+          'class' => 'advmultiselect',
+        ]
+      );
+      $grouprole->setButtonAttributes('add', ['value' => ts('Add >>')]);
+      $grouprole->setButtonAttributes('remove', ['value' => ts('<< Remove')]);
     }
 
     // navigation field
