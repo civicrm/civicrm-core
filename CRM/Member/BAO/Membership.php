@@ -269,16 +269,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'today', $excludeIsAdmin, CRM_Utils_Array::value('membership_type_id', $params), $params
       );
       if (empty($calcStatus)) {
-        // Redirect the form in case of error
-        // @todo this redirect in the BAO layer is really bad & should be moved to the form layer
-        // however since we have no idea how (if) this is triggered we can't safely move / remove it
-        // NB I tried really hard to trigger this error from backoffice membership form in order to test it
-        // and am convinced form validation is complete on that form WRT this error.
-        $errorParams = [
-          'message_title' => ts('No valid membership status for given dates.'),
-          'legacy_redirect_path' => 'civicrm/contact/view',
-          'legacy_redirect_query' => "reset=1&force=1&cid={$params['contact_id']}&selectedChild=member",
-        ];
         throw new CRM_Core_Exception(ts(
           "The membership cannot be saved because the status cannot be calculated for start_date: $start_date end_date $end_date join_date $join_date as at " . date('Y-m-d H:i:s')),
           0,
