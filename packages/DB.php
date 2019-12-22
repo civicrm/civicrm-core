@@ -187,6 +187,15 @@ define('DB_ERROR_CONSTRAINT_NOT_NULL',-29);
  * Invalid view or no permissions
  */
 define('DB_ERROR_INVALID_VIEW', -100);
+
+/**
+ * Database lock timeout exceeded.
+ */
+define('DB_ERROR_LOCK_TIMEOUT', -30);
+/**
+ * Database deadlock encountered.
+ */
+define('DB_ERROR_DEADLOCK', -31);
 /**#@-*/
 
 
@@ -694,6 +703,8 @@ class DB
                 DB_ERROR_TRUNCATED          => 'truncated',
                 DB_ERROR_VALUE_COUNT_ON_ROW => 'value count on row',
                 DB_OK                       => 'no error',
+                DB_ERROR_DEADLOCK           => 'deadlock',
+                DB_ERROR_LOCK_TIMEOUT       => 'database lock timeout',
             );
         }
 
