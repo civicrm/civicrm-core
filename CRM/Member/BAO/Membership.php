@@ -447,6 +447,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @return array
    *   array of contact_id of all related contacts.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function checkMembershipRelationship($membershipTypeID, $contactId, $action = CRM_Core_Action::ADD) {
     $contacts = [];

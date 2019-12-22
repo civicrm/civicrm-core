@@ -58,6 +58,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp() {
     parent::setUp();
@@ -126,6 +128,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test Get.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetContribution() {
     $contributionSettings = $this->enableTaxAndInvoicing();
@@ -211,6 +215,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test that test contributions can be retrieved.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetTestContribution() {
     $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['is_test' => 1]));
