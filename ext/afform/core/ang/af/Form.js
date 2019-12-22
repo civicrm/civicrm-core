@@ -22,9 +22,6 @@
           schema[entity.modelName] = entity;
           data[entity.modelName] = entity.data || {};
         };
-        this.registerField = function(entityName, fieldName) {
-          schema[entityName].fields.push(fieldName);
-        };
         this.getEntity = function getEntity(name) {
           return schema[name];
         };

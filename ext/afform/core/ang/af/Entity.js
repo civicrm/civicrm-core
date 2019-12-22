@@ -18,7 +18,6 @@
         var ts = $scope.ts = CRM.ts('afform'),
           entity = _.pick($scope, _.keys(modelProps));
         entity.id = null;
-        entity.fields = [];
         afFormCtrl.registerEntity(entity);
         // $scope.$watch('afEntity', function(newValue){$scope.myOptions = newValue;});
       }
