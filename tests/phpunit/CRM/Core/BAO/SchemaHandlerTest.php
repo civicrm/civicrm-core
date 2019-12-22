@@ -277,6 +277,9 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $missingIndices);
     $missingIndices = $this->callAPISuccess('System', 'getmissingindices', ['tables' => ['civicrm_contact']])['values'];
     $this->assertEquals(['civicrm_contact' => $expected['civicrm_contact']], $missingIndices);
+    $this->callAPISuccess('System', 'updateindexes', ['tables' => 'civicrm_contribution']);
+    $missingIndices = $this->callAPISuccess('System', 'getmissingindices', [])['values'];
+    $this->assertEquals(['civicrm_contact' => $expected['civicrm_contact']], $missingIndices);
   }
 
   /**
