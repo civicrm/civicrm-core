@@ -1331,13 +1331,15 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
     // CRM-4213 check for loops, using static variable to record contacts already processed.
-    static $relatedContactIds = [];
+    if (!isset(\Civi::$statics[__CLASS__]['related_contacts'])) {
+      \Civi::$statics[__CLASS__]['related_contacts'] = [];
+    }
     if ($reset) {
-      // We need a way to reset this static variable from the test suite.
-      // @todo consider replacing with Civi::$statics but note reset now used elsewhere: CRM-17723.
-      $relatedContactIds = [];
+      // CRM-17723.
+      unset(\Civi::$statics[__CLASS__]['related_contacts']);
       return FALSE;
     }
+    $relatedContactIds = &\Civi::$statics[__CLASS__]['related_contacts'];
 
     $membership = new CRM_Member_DAO_Membership();
     $membership->id = $dao->id;
