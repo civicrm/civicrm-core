@@ -428,6 +428,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
   /**
    * CRM-20892 Add Tests of new timestamp checking function
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testTimeStampChecking() {
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing (id, modified_date) VALUES (25, '2016-06-30 12:52:52')");
@@ -435,6 +437,26 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->callAPISuccess('Mailing', 'create', ['id' => 25, 'subject' => 'Test Subject']);
     $this->assertFalse(_civicrm_api3_compare_timestamps('2017-02-15 16:00:00', 25, 'Mailing'));
     $this->callAPISuccess('Mailing', 'delete', ['id' => 25]);
+  }
+
+  /**
+   * Test that the foreign key constraint test correctly interprets pseudoconstants.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   */
+  public function testKeyConstraintCheck() {
+    $fieldInfo = $this->callAPISuccess('Contribution', 'getfields', [])['values']['financial_type_id'];
+    _civicrm_api3_validate_constraint(1, 'financial_type_id', $fieldInfo, 'Contribution');
+    _civicrm_api3_validate_constraint('Donation', 'financial_type_id', $fieldInfo, 'Contribution');
+    try {
+      _civicrm_api3_validate_constraint('Blah', 'financial_type_id', $fieldInfo, 'Contribution');
+    }
+    catch (API_Exception $e) {
+      $this->assertEquals("'Blah' is not a valid option for field financial_type_id", $e->getMessage());
+      return;
+    }
+    $this->fail('Last function call should have thrown an exception');
   }
 
 }
