@@ -14,9 +14,20 @@
  *
  * These tests create and drop indexes on the civicrm_uf_join table. The indexes
  * being added and dropped we assume will never exist.
+ *
  * @group headless
  */
 class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
+
+  /**
+   * Ensure any removed indices are put back.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function tearDown() {
+    parent::tearDown();
+    $this->callAPISuccess('System', 'updateindexes', []);
+  }
 
   /**
    * Test creating an index.
@@ -234,6 +245,38 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $this->callAPISuccess('System', 'updateindexes', []);
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertEmpty($missingIndices);
+  }
+
+  /**
+   * Check there are no missing indices
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMissingIndicesWithTableFilter() {
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contribution DROP INDEX index_total_amount_receive_date');
+    $missingIndices = $this->callAPISuccess('System', 'getmissingindices', [])['values'];
+    $expected = [
+      'civicrm_contact' => [
+        [
+          'name' => 'index_sort_name',
+          'field' => ['sort_name'],
+          'localizable' => FALSE,
+          'sig' => 'civicrm_contact::0::sort_name',
+        ],
+      ],
+      'civicrm_contribution' => [
+        [
+          'name' => 'index_total_amount_receive_date',
+          'field' => ['total_amount', 'receive_date'],
+          'localizable' => FALSE,
+          'sig' => 'civicrm_contribution::0::total_amount::receive_date',
+        ],
+      ],
+    ];
+    $this->assertEquals($expected, $missingIndices);
+    $missingIndices = $this->callAPISuccess('System', 'getmissingindices', ['tables' => ['civicrm_contact']])['values'];
+    $this->assertEquals(['civicrm_contact' => $expected['civicrm_contact']], $missingIndices);
   }
 
   /**

@@ -654,15 +654,20 @@ MODIFY      {$columnName} varchar( $length )
    * @param bool $dropFalseIndices
    *  If set - this function deletes false indices present in the DB which mismatches the expected
    *  values of xml file so that civi re-creates them with correct values using createMissingIndices() function.
+   * @param array|FALSE $tables
+   *   An optional array of tables - if provided the results will be restricted to these tables.
    *
    * @return array
    *   index specifications
    */
-  public static function getMissingIndices($dropFalseIndices = FALSE) {
+  public static function getMissingIndices($dropFalseIndices = FALSE, $tables = FALSE) {
     $requiredSigs = $existingSigs = [];
     // Get the indices defined (originally) in the xml files
     $requiredIndices = CRM_Core_DAO_AllCoreTables::indices();
     $reqSigs = [];
+    if ($tables !== FALSE) {
+      $requiredIndices = array_intersect_key($requiredIndices, array_fill_keys($tables, TRUE));
+    }
     foreach ($requiredIndices as $table => $indices) {
       $reqSigs[] = CRM_Utils_Array::collect('sig', $indices);
     }
