@@ -1038,14 +1038,12 @@ Expires: ',
     $this->createTwoMembershipsViaPriceSetInBackEnd($orgID);
 
     // Check the primary memberships on the organization.
-    $orgMembershipResult = $this->callAPISuccess('membership', 'get', [
-      'contact_id' => $orgID,
-    ]);
-    $this->assertEquals(2, $orgMembershipResult['count'], "2 primary memberships should have been created on the organization.");
+    $orgMembershipResult = $this->callAPISuccess('membership', 'get', ['contact_id' => $orgID])['values'];
+    $this->assertCount(2, $orgMembershipResult, '2 primary memberships should have been created on the organization.');
     $primaryMembershipIds = [];
-    foreach ($orgMembershipResult['values'] as $membership) {
+    foreach ($orgMembershipResult as $membership) {
       $primaryMembershipIds[] = $membership['id'];
-      $this->assertTrue(empty($membership['owner_membership_id']), "Membership on the organization has owner_membership_id so is inherited.");
+      $this->assertTrue(empty($membership['owner_membership_id']), 'Membership on the organization has owner_membership_id so is inherited.');
     }
 
     // CRM-20955: check that correct inherited memberships were created for the individual,
@@ -1053,42 +1051,43 @@ Expires: ',
     $individualMembershipResult = $this->callAPISuccess('membership', 'get', [
       'contact_id' => $this->_individualId,
     ]);
-    $this->assertEquals(2, $individualMembershipResult['count'], "2 inherited memberships should have been created on the individual.");
+    $this->assertEquals(2, $individualMembershipResult['count'], '2 inherited memberships should have been created on the individual.');
     foreach ($individualMembershipResult['values'] as $membership) {
-      $this->assertNotEmpty($membership['owner_membership_id'], "Membership on the individual lacks owner_membership_id so is not inherited.");
-      $this->assertNotContains($membership['id'], $primaryMembershipIds, "Inherited membership id should not be the id of a primary membership.");
-      $this->assertContains($membership['owner_membership_id'], $primaryMembershipIds, "Inherited membership owner_membership_id should be the id of a primary membership.");
+      $this->assertNotEmpty($membership['owner_membership_id'], 'Membership on the individual lacks owner_membership_id so is not inherited.');
+      $this->assertNotContains($membership['id'], $primaryMembershipIds, 'Inherited membership id should not be the id of a primary membership.');
+      $this->assertContains($membership['owner_membership_id'], $primaryMembershipIds, 'Inherited membership owner_membership_id should be the id of a primary membership.');
     }
 
     // CRM-20966: check that the correct membership contribution, line items
     // & membership_payment records were created for the organization.
-    $contributionResult = $this->callAPISuccess('contribution', 'get', [
+    $contributionResult = $this->callAPISuccessGetSingle('contribution', [
       'contact_id' => $orgID,
       'sequential' => 1,
       'api.line_item.get' => [],
       'api.membership_payment.get' => [],
     ]);
-    $this->assertEquals(1, $contributionResult['count'], "One contribution should have been created for the organization's memberships.");
 
-    $this->assertEquals(2, $contributionResult['values'][0]['api.line_item.get']['count'], "2 line items should have been created for the organization's memberships.");
-    foreach ($contributionResult['values'][0]['api.line_item.get']['values'] as $lineItem) {
+    $this->assertEquals(2, $contributionResult['api.line_item.get']['count'], "2 line items should have been created for the organization's memberships.");
+    foreach ($contributionResult['api.line_item.get']['values'] as $lineItem) {
       $this->assertEquals('civicrm_membership', $lineItem['entity_table'], "Membership line item's entity_table should be 'civicrm_membership'.");
       $this->assertContains($lineItem['entity_id'], $primaryMembershipIds, "Membership line item's entity_id should be the id of a primary membership.");
     }
 
-    $this->assertEquals(2, $contributionResult['values'][0]['api.membership_payment.get']['count'], "2 membership payment records should have been created for the organization's memberships.");
-    foreach ($contributionResult['values'][0]['api.membership_payment.get']['values'] as $membershipPayment) {
-      $this->assertEquals($contributionResult['values'][0]['id'], $membershipPayment['contribution_id'], "membership payment's contribution ID should be the ID of the organization's membership contribution.");
+    $this->assertEquals(2, $contributionResult['api.membership_payment.get']['count'], "2 membership payment records should have been created for the organization's memberships.");
+    foreach ($contributionResult['api.membership_payment.get']['values'] as $membershipPayment) {
+      $this->assertEquals($contributionResult['id'], $membershipPayment['contribution_id'], "membership payment's contribution ID should be the ID of the organization's membership contribution.");
       $this->assertContains($membershipPayment['membership_id'], $primaryMembershipIds, "membership payment's membership ID should be the ID of a primary membership.");
     }
 
+    $this->callAPISuccessGetCount('Membership', [], 4);
+    $this->callAPISuccess('Membership', 'create', ['id' => $primaryMembershipIds[0]]);
+    $this->callAPISuccessGetCount('Membership', [], 4);
+
     // CRM-20966: check that deleting relationship used for inheritance does not delete contribution.
-    $this->callAPISuccess('relationship', 'delete', [
-      'id' => $relationship['id'],
-    ]);
+    $this->callAPISuccess('relationship', 'delete', ['id' => $relationship['id']]);
 
     $contributionResultAfterRelationshipDelete = $this->callAPISuccess('contribution', 'get', [
-      'id' => $contributionResult['values'][0]['id'],
+      'id' => $contributionResult['id'],
       'contact_id' => $orgID,
     ]);
     $this->assertEquals(1, $contributionResultAfterRelationshipDelete['count'], "Contribution has been wrongly deleted.");

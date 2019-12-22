@@ -1325,25 +1325,14 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param CRM_Core_DAO $dao
    *   Membership object.
    *
-   * @param bool $reset
-   *
    * @return array|null
    *   Membership details, if created.
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
-    // CRM-4213 check for loops, using static variable to record contacts already processed.
-    if (!isset(\Civi::$statics[__CLASS__]['related_contacts'])) {
-      \Civi::$statics[__CLASS__]['related_contacts'] = [];
-    }
-    if ($reset) {
-      // CRM-17723.
-      unset(\Civi::$statics[__CLASS__]['related_contacts']);
-      return FALSE;
-    }
-    $relatedContactIds = &\Civi::$statics[__CLASS__]['related_contacts'];
+  public static function createRelatedMemberships(&$params, &$dao) {
+    $relatedContactIds = [];
 
     $membership = new CRM_Member_DAO_Membership();
     $membership->id = $dao->id;
@@ -1351,7 +1340,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     // required since create method doesn't return all the
     // parameters in the returned membership object
     if (!$membership->find(TRUE)) {
-      return;
+      return NULL;
     }
     $deceasedStatusId = array_search('Deceased', CRM_Member_PseudoConstant::membershipStatus());
     // FIXME : While updating/ renewing the
@@ -1402,6 +1391,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
 
     //lets cleanup related membership if any.
     if (empty($relatedContacts)) {
+      // This is deeply truely madly wrong - refer to function name....
       self::deleteRelatedMemberships($membership->id);
     }
     else {
