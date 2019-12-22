@@ -28,13 +28,13 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $tables = ['civicrm_uf_join' => ['weight']];
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
-    $dao = CRM_Core_DAO::executeQuery("SHOW INDEX FROM civicrm_uf_join");
+    $dao = CRM_Core_DAO::executeQuery('SHOW INDEX FROM civicrm_uf_join');
     $count = 0;
 
     while ($dao->fetch()) {
-      if ($dao->Column_name == 'weight') {
+      if ($dao->Column_name === 'weight') {
         $count++;
-        CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_uf_join DROP INDEX " . $dao->Key_name);
+        CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_uf_join DROP INDEX ' . $dao->Key_name);
       }
     }
     $this->assertEquals(1, $count);
@@ -60,24 +60,22 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 
     $tables = ['civicrm_uf_join' => [['weight', 'module']]];
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
-    $dao = CRM_Core_DAO::executeQuery("SHOW INDEX FROM civicrm_uf_join");
+    $dao = CRM_Core_DAO::executeQuery('SHOW INDEX FROM civicrm_uf_join');
     $weightCount = 0;
-    $combinedCount = 0;
     $indexes = [];
 
     while ($dao->fetch()) {
-      if ($dao->Column_name == 'weight') {
+      if ($dao->Column_name === 'weight') {
         $weightCount++;
         $indexes[$dao->Key_name] = $dao->Key_name;
       }
-      if ($dao->Column_name == 'module') {
-        $combinedCount++;
+      if ($dao->Column_name === 'module') {
         $this->assertArrayHasKey($dao->Key_name, $indexes);
       }
 
     }
     foreach (array_keys($indexes) as $index) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_uf_join DROP INDEX " . $index);
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_uf_join DROP INDEX ' . $index);
     }
     $this->assertEquals(2, $weightCount);
   }
@@ -132,7 +130,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    * @dataProvider columnTests
    */
   public function testCheckIfColumnExists($tableName, $columnName) {
-    if ($columnName == 'xxxx') {
+    if ($columnName === 'xxxx') {
       $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName));
     }
     else {
@@ -154,9 +152,12 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    * Test to see if we can drop foreign key
    *
    * @dataProvider foreignKeyTests
+   *
+   * @param string $tableName
+   * @param string $key
    */
   public function testSafeDropForeignKey($tableName, $key) {
-    if ($key == 'FK_civicrm_mailing_recipients_id') {
+    if ($key === 'FK_civicrm_mailing_recipients_id') {
       $this->assertFalse(CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', $key));
     }
     else {
@@ -309,7 +310,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     // drop col1
     CRM_Core_DAO::executeQuery(CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($alterParams, FALSE));
 
-    $create_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_drop_column");
+    $create_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_test_drop_column');
     while ($create_table->fetch()) {
       $this->assertNotContains('col1', $create_table->Create_Table);
       $this->assertContains('col2', $create_table->Create_Table);
@@ -319,7 +320,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $alterParams['name'] = 'col2';
     CRM_Core_DAO::executeQuery(CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($alterParams, FALSE));
 
-    $create_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_drop_column");
+    $create_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_test_drop_column');
     while ($create_table->fetch()) {
       $this->assertNotContains('col2', $create_table->Create_Table);
     }
@@ -336,8 +337,8 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       'type' => 'text',
     ];
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
-    $this->assertEquals("ALTER TABLE big_table
-        ADD COLUMN `big_bob` text", trim($sql));
+    $this->assertEquals('ALTER TABLE big_table
+        ADD COLUMN `big_bob` text', trim($sql));
 
     $params['operation'] = 'modify';
     $params['comment'] = 'super big';
