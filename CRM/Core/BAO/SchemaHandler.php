@@ -557,7 +557,7 @@ MODIFY      {$columnName} varchar( $length )
    * Check if the table has an index matching the name.
    *
    * @param string $tableName
-   * @param array $indexName
+   * @param string $indexName
    *
    * @return bool
    */
