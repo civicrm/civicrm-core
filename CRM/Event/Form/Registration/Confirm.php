@@ -86,17 +86,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('hookDiscount', $this->_params[0]['discount']);
     }
 
-    if (!$this->preProcessExpress()) {
-      //process only primary participant params.
-      $registerParams = $this->_params[0];
-      $registerParams = $this->prepareParamsForPaymentProcessor($registerParams);
-
-      if ($this->_values['event']['is_monetary']) {
-        $registerParams['currencyID'] = $this->_params[0]['currencyID'];
-      }
-      //assign back primary participant params.
-      $this->_params[0] = $registerParams;
-    }
+    $this->preProcessExpress();
 
     if ($this->_values['event']['is_monetary']) {
       $this->_params[0]['invoiceID'] = $this->get('invoiceID');
@@ -1310,7 +1300,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   private function processPayment($payment, $value) {
     try {
-      $result = $payment->doPayment($value, 'event');
+      $params = $this->prepareParamsForPaymentProcessor($value);
+      $result = $payment->doPayment($params, 'event');
       return [$result, $value];
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {

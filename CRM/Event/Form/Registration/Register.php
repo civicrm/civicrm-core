@@ -1085,9 +1085,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // assumptions we are working to remove.
       $this->set('contributeMode', 'direct');
 
-      // This code is duplicated multiple places and should be consolidated.
-      $params = $this->prepareParamsForPaymentProcessor($params);
-
       if ($this->_values['event']['is_monetary']) {
         $params['currencyID'] = $config->defaultCurrency;
         $params['invoiceID'] = $invoiceID;
@@ -1135,6 +1132,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['invoiceID'] = $invoiceID;
 
         $params['component'] = 'event';
+        // This code is duplicated multiple places and should be consolidated.
+        $params = $this->prepareParamsForPaymentProcessor($params);
         $this->handlePreApproval($params);
       }
       elseif ($this->_paymentProcessor &&
