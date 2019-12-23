@@ -1656,7 +1656,7 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
     if (!empty($fieldInfo['FKClassName'])) {
       if (!empty($params[$fieldName])) {
         foreach ((array) $params[$fieldName] as $fieldValue) {
-          _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo);
+          _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, $entity);
         }
       }
       elseif (!empty($fieldInfo['required'])) {
@@ -1748,16 +1748,21 @@ function _civicrm_api3_getValidDate($dateValue, $fieldName, $fieldType) {
  *
  * @param mixed $fieldValue
  * @param string $fieldName
- *   Uniquename of field being checked.
+ *   Unique name of field being checked.
  * @param array $fieldInfo
  *   Array of fields from getfields function.
+ * @param string $entity
  *
  * @throws \API_Exception
  */
-function _civicrm_api3_validate_constraint(&$fieldValue, &$fieldName, &$fieldInfo) {
+function _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, $entity) {
   $daoName = $fieldInfo['FKClassName'];
+  $fieldInfo = [$fieldName => $fieldInfo];
+  $params = [$fieldName => $fieldValue];
+  _civicrm_api3_validate_fields($entity, NULL, $params, $fieldInfo);
+  /* @var CRM_Core_DAO $dao*/
   $dao = new $daoName();
-  $dao->id = $fieldValue;
+  $dao->id = $params[$fieldName];
   $dao->selectAdd();
   $dao->selectAdd('id');
   if (!$dao->find()) {
