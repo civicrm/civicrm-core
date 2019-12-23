@@ -169,7 +169,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    */
   public function testGetMissingIndices() {
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
-    $this->assertTrue(empty($missingIndices));
+    $this->assertEmpty($missingIndices);
   }
 
   /**
@@ -211,10 +211,15 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 
   /**
    * Check there are no missing indices
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testReconcileMissingIndices() {
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    // Check the api also retrieves them.
+    $missingIndicesAPI = $this->callAPISuccess('System', 'getmissingindices', [])['values'];
+    $this->assertEquals($missingIndices, $missingIndicesAPI);
     $this->assertEquals([
       'civicrm_contact' => [
         [
@@ -227,7 +232,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     ], $missingIndices);
     $this->callAPISuccess('System', 'updateindexes', []);
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
-    $this->assertTrue(empty($missingIndices));
+    $this->assertEmpty($missingIndices);
   }
 
   /**

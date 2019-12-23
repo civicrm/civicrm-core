@@ -17,7 +17,10 @@
 class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
 
   /**
+   * Check defined indices exist.
+   *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   public function checkIndices() {
     $messages = [];
@@ -26,7 +29,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     // unreliable. Bypass this check until CRM-20817 and CRM-20533 are resolved.
     return $messages;
 
-    $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    $missingIndices = civicrm_api3('System', 'getmissingindices', [])['values'];
     if ($missingIndices) {
       $html = '';
       foreach ($missingIndices as $tableName => $indices) {
