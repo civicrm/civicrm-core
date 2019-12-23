@@ -794,6 +794,8 @@ SET    version = '$version'
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
+
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile(TRUE);
   }
 
   /**
