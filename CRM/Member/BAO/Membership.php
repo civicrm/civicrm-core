@@ -1362,14 +1362,11 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       $expiredStatusId = array_search('Expired', CRM_Member_PseudoConstant::membershipStatus());
     }
 
-    $allRelatedContacts = [];
     $relatedContacts = [];
-    if (!is_a($membership, 'CRM_Core_Error')) {
-      $allRelatedContacts = CRM_Member_BAO_Membership::checkMembershipRelationship($membership->membership_type_id,
-        $membership->contact_id,
-        CRM_Utils_Array::value('action', $params)
-      );
-    }
+    $allRelatedContacts = CRM_Member_BAO_Membership::checkMembershipRelationship($membership->membership_type_id,
+      $membership->contact_id,
+      CRM_Utils_Array::value('action', $params)
+    );
 
     // CRM-4213, CRM-19735 check for loops, using static variable to record contacts already processed.
     // Remove repeated related contacts, which already inherited membership of this type.
