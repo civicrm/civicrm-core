@@ -369,6 +369,34 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test getGlobalContacts
+   */
+  public function testGetGlobalContacts() {
+    //Add contact to case resource.
+    $caseResourceContactID = $this->individualCreate();
+    $this->callAPISuccess('GroupContact', 'create', [
+      'group_id' => "Case_Resources",
+      'contact_id' => $caseResourceContactID,
+    ]);
+
+    //No contact should be returned.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    $groupInfo = [];
+    $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
+    $this->assertEquals(count($groupContacts), 0);
+
+    //Verify if contact is returned correctly.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+    $groupInfo = [];
+    $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
+    $this->assertEquals(count($groupContacts), 1);
+    $this->assertEquals(key($groupContacts), $caseResourceContactID);
+  }
+
+  /**
    * Test max_instances
    */
   public function testMaxInstances() {
