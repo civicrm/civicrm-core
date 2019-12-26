@@ -524,7 +524,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $mailing = Civi::settings()->get('mailing_backend');
       if ($mailing) {
         Civi::settings()->set('mailing_backend', $mailing);
-      } else {
+      }
+      else {
         $mailing = Civi::settings()->get('mailing_backend_store');
         if ($mailing) {
           Civi::settings()->set('mailing_backend', $mailing);
