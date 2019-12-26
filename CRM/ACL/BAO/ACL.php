@@ -173,25 +173,25 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $c2g = CRM_Contact_BAO_GroupContact::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
 
-    $query = " SELECT      $acl.*
-                        FROM        $acl ";
+    $query = " SELECT acl.*
+     FROM $acl acl";
 
     if (!empty($group_id)) {
-      $query .= " INNER JOIN  $c2g
-                            ON      $acl.entity_id      = $c2g.group_id
-                        WHERE       $acl.entity_table   = '$group'
-                            AND     $acl.is_active      = 1
-                            AND     $c2g.group_id       = $group_id";
+      $query .= " INNER JOIN  $c2g group_contact
+                            ON      acl.entity_id      = group_contact.group_id
+                        WHERE       acl.entity_table   = '$group'
+                            AND     acl.is_active      = 1
+                            AND     group_contact.group_id       = $group_id";
 
       if (!empty($contact_id)) {
-        $query .= " AND     $c2g.contact_id     = $contact_id
-                            AND     $c2g.status         = 'Added'";
+        $query .= " AND group_contact.contact_id     = $contact_id
+                            AND group_contact.status         = 'Added'";
       }
     }
     else {
       if (!empty($contact_id)) {
-        $query .= " WHERE   $acl.entity_table   = '$contact'
-                            AND     $acl.entity_id      = $contact_id";
+        $query .= " WHERE   acl.entity_table   = '$contact'
+         AND acl.entity_id      = $contact_id";
       }
     }
 
@@ -236,32 +236,32 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $c2g = CRM_Contact_BAO_GroupContact::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
 
-    $query = "   SELECT          $acl.*
-                        FROM            $acl
+    $query = "   SELECT          acl.*
+                        FROM            $acl acl
                         INNER JOIN      civicrm_option_group og
                                 ON      og.name = 'acl_role'
                         INNER JOIN      civicrm_option_value ov
-                                ON      $acl.entity_table   = '$aclRole'
+                                ON      acl.entity_table   = '$aclRole'
                                 AND     ov.option_group_id  = og.id
-                                AND     $acl.entity_id      = ov.value";
+                                AND     acl.entity_id      = ov.value";
 
     if (!empty($group_id)) {
-      $query .= " INNER JOIN  $c2g
-                            ON      $acl.entity_id     = $c2g.group_id
-                        WHERE       $acl.entity_table  = '$group'
-                            AND     $acl.is_active     = 1
-                            AND     $c2g.group_id           = $group_id";
+      $query .= " INNER JOIN  $c2g group_contact
+                            ON      acl.entity_id     = group_contact.group_id
+                        WHERE       acl.entity_table  = '$group'
+                            AND     aacl.is_active     = 1
+                            AND     group_contact.group_id           = $group_id";
 
       if (!empty($contact_id)) {
-        $query .= " AND     $c2g.contact_id = $contact_id
-                            AND     $c2g.status = 'Added'";
+        $query .= " AND     group_contact.contact_id = $contact_id
+                            AND     group_contact.status = 'Added'";
       }
     }
     else {
       if (!empty($contact_id)) {
-        $query .= " WHERE   $acl.entity_table  = '$contact'
-                                AND $acl.is_active     = 1
-                                AND $acl.entity_id     = $contact_id";
+        $query .= " WHERE   acl.entity_table  = '$contact'
+                                AND acl.is_active     = 1
+                                AND acl.entity_id     = $contact_id";
       }
     }
 
@@ -300,13 +300,13 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     if ($contact_id) {
       $query = "
-SELECT      $acl.*
-  FROM      $acl
- INNER JOIN  $c2g
-        ON  $acl.entity_id      = $c2g.group_id
-     WHERE  $acl.entity_table   = '$group'
-       AND  $c2g.contact_id     = $contact_id
-       AND  $c2g.status         = 'Added'";
+SELECT      acl.*
+  FROM      $acl acl
+ INNER JOIN  $c2g group_contact
+        ON  acl.entity_id      = group_contact.group_id
+     WHERE  acl.entity_table   = '$group'
+       AND  group_contact.contact_id     = $contact_id
+       AND  group_contact.status         = 'Added'";
 
       $rule->query($query);
 
@@ -345,23 +345,23 @@ SELECT      $acl.*
     $c2g = CRM_Contact_BAO_GroupContact::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
 
-    $query = "   SELECT          $acl.*
-                        FROM            $acl
+    $query = "   SELECT          acl.*
+                        FROM            $acl acl
                         INNER JOIN      civicrm_option_group og
                                 ON      og.name = 'acl_role'
                         INNER JOIN      civicrm_option_value ov
-                                ON      $acl.entity_table   = '$aclRole'
+                                ON      acl.entity_table   = '$aclRole'
                                 AND     ov.option_group_id  = og.id
-                                AND     $acl.entity_id      = ov.value
+                                AND     acl.entity_id      = ov.value
                                 AND     ov.is_active        = 1
                         INNER JOIN      $aclER
-                                ON      $aclER.acl_role_id = $acl.entity_id
+                                ON      $aclER.acl_role_id = acl.entity_id
                                 AND     $aclER.is_active    = 1
                         INNER JOIN  $c2g
                                 ON      $aclER.entity_id      = $c2g.group_id
                                 AND     $aclER.entity_table   = 'civicrm_group'
-                        WHERE       $acl.entity_table       = '$aclRole'
-                            AND     $acl.is_active          = 1
+                        WHERE       acl.entity_table       = '$aclRole'
+                            AND     acl.is_active          = 1
                             AND     $c2g.contact_id         = $contact_id
                             AND     $c2g.status             = 'Added'";
 
@@ -382,10 +382,10 @@ SELECT      $acl.*
     }
 
     $query = "
-SELECT $acl.*
-  FROM $acl
- WHERE $acl.entity_id      IN ( $roles )
-   AND $acl.entity_table   = 'civicrm_acl_role'
+SELECT acl.*
+  FROM $acl acl
+ WHERE acl.entity_id      IN ( $roles )
+   AND acl.entity_table   = 'civicrm_acl_role'
 ";
 
     $rule->query($query);
