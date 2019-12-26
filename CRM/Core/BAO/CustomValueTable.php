@@ -573,6 +573,7 @@ SELECT cg.table_name  as table_name ,
        cg.extends     as extends,
        cf.column_name as column_name,
        cf.id          as cf_id      ,
+       cf.html_type   as html_type  ,
        cf.data_type   as data_type
 FROM   civicrm_custom_group cg,
        civicrm_custom_field cf
@@ -586,6 +587,10 @@ AND    cf.id IN ( $fieldIDList )
     while ($dao->fetch()) {
       $dataType = $dao->data_type == 'Date' ? 'Timestamp' : $dao->data_type;
       foreach ($fieldValues[$dao->cf_id] as $fieldValue) {
+        // Serialize array values
+        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($dao)) {
+          $fieldValue['value'] = CRM_Utils_Array::implodePadded($fieldValue['value']);
+        }
         // Format null values correctly
         if ($fieldValue['value'] === NULL || $fieldValue['value'] === '') {
           switch ($dataType) {
