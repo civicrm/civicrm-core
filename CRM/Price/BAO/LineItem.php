@@ -1172,7 +1172,7 @@ WHERE li.contribution_id = %1";
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
   protected function _recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
-    $paidAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
+    $paidAmount = (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
     $balanceAmt = $updatedAmount - $paidAmount;
 
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1181,26 +1181,21 @@ WHERE li.contribution_id = %1";
     $completedStatusId = array_search('Completed', $contributionStatuses);
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
-    $adjustedTrxn = $skip = FALSE;
+    $adjustedTrxn = FALSE;
     if ($balanceAmt) {
-      if ($balanceAmt > 0 && $paidAmount != 0) {
-        $contributionStatusVal = $partiallyPaidStatusId;
-      }
-      elseif ($balanceAmt < 0 && $paidAmount != 0) {
-        $contributionStatusVal = $pendingRefundStatusId;
-      }
-      elseif ($paidAmount == 0) {
+      if ($paidAmount === 0.0) {
         //skip updating the contribution status if no payment is made
-        $skip = TRUE;
         $updatedContributionDAO->cancel_date = 'null';
         $updatedContributionDAO->cancel_reason = NULL;
       }
+      else {
+        $updatedContributionDAO->contribution_status_id = $balanceAmt > 0 ? $partiallyPaidStatusId : $pendingRefundStatusId;
+      }
+
       // update contribution status and total amount without trigger financial code
       // as this is handled in current BAO function used for change selection
       $updatedContributionDAO->id = $contributionId;
-      if (!$skip) {
-        $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
-      }
+
       $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
       $updatedContributionDAO->fee_amount = 0;
       $updatedContributionDAO->tax_amount = $taxAmount;
