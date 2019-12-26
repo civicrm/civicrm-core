@@ -187,78 +187,86 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
   /**
    * Process the form after the input has been submitted and validated.
    *
-   *
-   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $params = $this->exportValues();
-    // @todo extract submit functions &
-    // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
-    // handling of custom data, specifically checkbox fields.
+    if (isset($params['field'])) {
+      $this->submit($params);
+      CRM_Core_Session::setStatus(ts('Your updates have been saved.'), ts('Saved'), 'success');
+    }
+    else {
+      CRM_Core_Session::setStatus(ts('No updates have been saved.'), ts('Not Saved'), 'alert');
+    }
+  }
+
+  /**
+   * @param array $params
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function submit(array $params) {
     $dates = [
       'membership_join_date',
       'membership_start_date',
       'membership_end_date',
     ];
-    if (isset($params['field'])) {
-      $customFields = [];
-      foreach ($params['field'] as $key => $value) {
-        $params['id'] = $key;
-        if (!empty($value['membership_source'])) {
-          $value['source'] = $value['membership_source'];
-        }
-
-        if (!empty($value['membership_type'])) {
-          $membershipTypeId = $value['membership_type_id'] = $value['membership_type'][1];
-        }
-
-        unset($value['membership_source']);
-        unset($value['membership_type']);
-
-        //Get the membership status
-        $value['status_id'] = (CRM_Utils_Array::value('membership_status', $value)) ? $value['membership_status'] : CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'status_id');
-        unset($value['membership_status']);
-        foreach ($dates as $val) {
-          if (isset($value[$val])) {
-            $value[$val] = CRM_Utils_Date::processDate($value[$val]);
-          }
-        }
-        if (empty($customFields)) {
-          if (empty($value['membership_type_id'])) {
-            $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'membership_type_id');
-          }
-
-          // membership type custom data
-          $customFields = CRM_Core_BAO_CustomField::getFields('Membership', FALSE, FALSE, $membershipTypeId);
-
-          $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-            CRM_Core_BAO_CustomField::getFields('Membership',
-              FALSE, FALSE, NULL, NULL, TRUE
-            )
-          );
-        }
-        //check for custom data
-        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
-          $key,
-          'Membership',
-          $membershipTypeId
-        );
-
-        $membership = CRM_Member_BAO_Membership::add($value);
-
-        // add custom field values
-        if (!empty($value['custom']) &&
-          is_array($value['custom'])
-        ) {
-          CRM_Core_BAO_CustomValueTable::store($value['custom'], 'civicrm_membership', $membership->id);
-        }
+    $customFields = [];
+    foreach ($params['field'] as $key => $value) {
+      $value['id'] = $key;
+      if (!empty($value['membership_source'])) {
+        $value['source'] = $value['membership_source'];
       }
 
-      CRM_Core_Session::setStatus(ts("Your updates have been saved."), ts('Saved'), 'success');
+      if (!empty($value['membership_type'])) {
+        $membershipTypeId = $value['membership_type_id'] = $value['membership_type'][1];
+      }
+
+      unset($value['membership_source']);
+      unset($value['membership_type']);
+
+      //Get the membership status
+      $value['status_id'] = (CRM_Utils_Array::value('membership_status', $value)) ? $value['membership_status'] : CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'status_id');
+      unset($value['membership_status']);
+      foreach ($dates as $val) {
+        if (isset($value[$val])) {
+          $value[$val] = CRM_Utils_Date::processDate($value[$val]);
+        }
+      }
+      if (empty($customFields)) {
+        if (empty($value['membership_type_id'])) {
+          $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'membership_type_id');
+        }
+
+        // membership type custom data
+        $customFields = CRM_Core_BAO_CustomField::getFields('Membership', FALSE, FALSE, $membershipTypeId);
+
+        $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
+          CRM_Core_BAO_CustomField::getFields('Membership',
+            FALSE, FALSE, NULL, NULL, TRUE
+          )
+        );
+      }
+      //check for custom data
+      $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
+        $key,
+        'Membership',
+        $membershipTypeId
+      );
+
+      $membership = CRM_Member_BAO_Membership::add($value);
+
+      // add custom field values
+      if (!empty($value['custom']) &&
+        is_array($value['custom'])
+      ) {
+        CRM_Core_BAO_CustomValueTable::store($value['custom'], 'civicrm_membership', $membership->id);
+      }
     }
-    else {
-      CRM_Core_Session::setStatus(ts("No updates have been saved."), ts('Not Saved'), 'alert');
-    }
+    return $value;
   }
 
 }
