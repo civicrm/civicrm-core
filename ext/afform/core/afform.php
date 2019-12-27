@@ -322,12 +322,12 @@ function afform_civicrm_alterAngular($angular) {
     ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
       try {
         $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
-        $meta = \Civi\Api4\Afform::get()->addWhere('name', '=', $module['_afform'])->addSelect('block')->setCheckPermissions(FALSE)->execute()->first();
+        $meta = \Civi\Api4\Afform::get()->addWhere('name', '=', $module['_afform'])->setSelect(['join', 'block'])->setCheckPermissions(FALSE)->execute()->first();
       }
       catch (Exception $e) {
       }
 
-      $blockEntity = $meta['block'] ?? NULL;
+      $blockEntity = $meta['join'] ?? $meta['block'] ?? NULL;
       if (!$blockEntity) {
         $entities = _afform_getMetadata($doc);
       }
@@ -335,12 +335,12 @@ function afform_civicrm_alterAngular($angular) {
       foreach (pq('af-field', $doc) as $afField) {
         /** @var DOMElement $afField */
         $entityName = pq($afField)->parents('[af-fieldset]')->attr('af-fieldset');
-        $blockName = pq($afField)->parents('[af-block]')->attr('af-block');
+        $joinName = pq($afField)->parents('[af-join]')->attr('af-join');
         if (!$blockEntity && !preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
           throw new \CRM_Core_Exception("Cannot process $path: malformed entity name ($entityName)");
         }
         $entityType = $blockEntity ?? $entities[$entityName]['type'];
-        _af_fill_field_metadata($blockName ? $blockName : $entityType, $afField);
+        _af_fill_field_metadata($joinName ? $joinName : $entityType, $afField);
       }
     });
   $angular->add($fieldMetadata);

@@ -240,6 +240,7 @@
         $scope.controls = {};
         $scope.fieldList = [];
         $scope.blockList = [];
+        $scope.blockTitles = [];
         $scope.elementList = [];
         $scope.elementTitles = [];
 
@@ -275,17 +276,23 @@
 
         function buildBlockList(search) {
           $scope.blockList.length = 0;
+          $scope.blockTitles.length = 0;
           _.each($scope.editor.meta.blocks, function(block, directive) {
-            if (!search || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) {
-              $scope.blockList.push({
-                "#tag": "div",
-                "af-block": block.block,
-                "add-label": ts('Add'),
-                min: '1',
-                "#children": [
-                  {"#tag": directive}
-                ]
-              });
+            if (!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) {
+              var item = {"#tag": block.join ? "div" : directive};
+              if (block.join) {
+                item['af-join'] = block.join;
+                item['#children'] = [{"#tag": directive}];
+              }
+              if (block.repeat) {
+                item['af-repeat'] = ts('Add');
+                item.min = '1';
+                if (typeof block.repeat === 'number') {
+                  item.max = '' + block.repeat;
+                }
+              }
+              $scope.blockList.push(item);
+              $scope.blockTitles.push(block.title);
             }
           });
         }
@@ -323,11 +330,18 @@
           return check($scope.editor.scope.layout['#children'], {'#tag': 'af-field', name: fieldName});
         };
 
-        $scope.blockInUse = function(blockType) {
-          return check($scope.editor.scope.layout['#children'], {'af-block': blockType});
+        $scope.blockInUse = function(block) {
+          if (block['af-join']) {
+            return check($scope.editor.scope.layout['#children'], {'af-join': block['af-join']});
+          }
+          var fieldsInBlock = _.pluck(findRecursive($scope.editor.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+          return check($scope.editor.scope.layout['#children'], function(item) {
+            return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
+          });
         };
 
-        // Recursively check for a matching object in a multi-level collection
+        // Check for a matching item for this entity
+        // Recursively checks the form layout, including block directives
         function check(group, criteria, found) {
           if (!found) {
             found = {};
@@ -341,8 +355,13 @@
               return false;
             }
             if (_.isPlainObject(item)) {
+              // Recurse through everything but skip fieldsets for other entities
               if ((!item['af-fieldset'] || (item['af-fieldset'] === $scope.entity.name)) && item['#children']) {
                 check(item['#children'], criteria, found);
+              }
+              // Recurse into block directives
+              else if (item['#tag'] && item['#tag'] in $scope.editor.meta.blocks) {
+                check($scope.editor.meta.blocks[item['#tag']].layout, criteria, found);
               }
             }
           });
@@ -370,37 +389,14 @@
       templateUrl: '~/afGuiEditor/container.html',
       scope: {
         node: '=afGuiContainer',
-        block: '=',
+        join: '=',
         entityName: '='
       },
       require: ['^^afGuiEditor', '?^^afGuiContainer'],
       link: function($scope, element, attrs, ctrls) {
+        var ts = $scope.ts = CRM.ts();
         $scope.editor = ctrls[0];
         $scope.parentContainer = ctrls[1];
-      },
-      controller: function($scope) {
-        var container = $scope.container = this;
-        var ts = $scope.ts = CRM.ts();
-        this.node = $scope.node;
-
-        this.getNodeType = function(node) {
-          if (!node) {
-            return null;
-          }
-          if (node['#tag'] === 'af-field') {
-            return 'field';
-          }
-          if (node['af-fieldset']) {
-            return 'fieldset';
-          }
-          if (node['af-block']) {
-            return 'block';
-          }
-          var classes = splitClass(node['class']),
-            types = ['af-container', 'af-text', 'af-button', 'af-markup'],
-            type = _.intersection(types, classes);
-          return type.length ? type[0].replace('af-', '') : null;
-        };
 
         $scope.addElement = function(type, props) {
           var classes = type.split('.');
@@ -419,25 +415,6 @@
             var pos = children.length && children[0]['#tag'] === 'legend' ? 1 : 0;
             children.splice(pos, 0, element);
           }
-        };
-
-        this.removeElement = function(element) {
-          removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
-        };
-
-        this.getEntityName = function() {
-          return $scope.entityName.split('-block-')[0];
-        };
-
-        // Returns the primary entity type for this container e.g. "Contact"
-        this.getMainEntityType = function() {
-          return $scope.editor && $scope.editor.getEntity(container.getEntityName()).type;
-        };
-
-        // Returns the entity type for fields within this conainer (block entity type if this is a block, else the primary entity type)
-        this.getFieldEntityType = function() {
-          var blockType = $scope.entityName.split('-block-');
-          return blockType[1] || ($scope.editor && $scope.editor.getEntity(blockType[0]).type);
         };
 
         $scope.isSelectedFieldset = function(entityName) {
@@ -482,145 +459,202 @@
         };
 
         // Block settings
-        var selectedBlock = $scope.selectedBlock = {
-          name: null,
-          layout: null,
-          override: false,
-          options: [],
-        };
+        var block = {};
+        $scope.block = null;
 
         $scope.getSetChildren = function(val) {
-          var collection = selectedBlock.layout || ($scope.node && $scope.node['#children']);
+          var collection = block.layout || ($scope.node && $scope.node['#children']);
           return arguments.length ? (collection = val) : collection;
         };
 
-        function getBlockOptions() {
-          var blockOptions = [];
-          _.each($scope.editor.meta.blocks, function(block, id) {
-            if (block.block === $scope.container.getFieldEntityType()) {
-              blockOptions.push({
-                id: id,
-                text: block.title + (selectedBlock.name === id && selectedBlock.override ? ' ' + ts('(overridden)') : ''),
+        $scope.isRepeatable = function() {
+          return $scope.node['af-fieldset'] || (block.directive && $scope.editor.meta.blocks[block.directive].repeat) || $scope.join;
+        };
+
+        $scope.toggleRepeat = function() {
+          if ('af-repeat' in $scope.node) {
+            delete $scope.node.max;
+            delete $scope.node.min;
+            delete $scope.node['af-repeat'];
+            delete $scope.node['add-icon'];
+          } else {
+            $scope.node.min = '1';
+            $scope.node['af-repeat'] = ts('Add');
+          }
+        };
+
+        $scope.getSetMin = function(val) {
+          if (arguments.length) {
+            if ($scope.node.max && val > parseInt($scope.node.max, 10)) {
+              $scope.node.max = '' + val;
+            }
+            if (!val) {
+              delete $scope.node.min;
+            }
+            else {
+              $scope.node.min = '' + val;
+            }
+          }
+          return $scope.node.min ? parseInt($scope.node.min, 10) : null;
+        };
+
+        $scope.getSetMax = function(val) {
+          if (arguments.length) {
+            if ($scope.node.min && val && val < parseInt($scope.node.min, 10)) {
+              $scope.node.min = '' + val;
+            }
+            if (typeof val !== 'number') {
+              delete $scope.node.max;
+            }
+            else {
+              $scope.node.max = '' + val;
+            }
+          }
+          return $scope.node.max ? parseInt($scope.node.max, 10) : null;
+        };
+
+        $scope.pickAddIcon = function() {
+          openIconPicker($scope.node, 'add-icon');
+        };
+
+        function getBlockNode() {
+          return !$scope.join ? $scope.node : ($scope.node['#children'] && $scope.node['#children'].length === 1 ? $scope.node['#children'][0] : null);
+        }
+
+        function setBlockDirective(directive) {
+          if ($scope.join) {
+            $scope.node['#children'] = [{'#tag': directive}];
+          } else {
+            delete $scope.node['#children'];
+            delete $scope.node['class'];
+            $scope.node['#tag'] = directive;
+          }
+        }
+
+        function overrideBlockContents(layout) {
+          $scope.node['#children'] = layout || [];
+          if (!$scope.join) {
+            $scope.node['#tag'] = 'div';
+            $scope.node['class'] = 'af-container';
+          }
+          block.override = true;
+          block.layout = null;
+        }
+
+        $scope.layouts = {
+          'af-layout-rows': ts('Contents display as rows'),
+          'af-layout-cols': ts('Contents are evenly-spaced columns'),
+          'af-layout-inline': ts('Contents are arranged inline')
+        };
+
+        $scope.getLayout = function() {
+          if (!$scope.node) {
+            return '';
+          }
+          return _.intersection(splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
+        };
+
+        $scope.setLayout = function(val) {
+          var classes = ['af-container'];
+          if (val !== 'af-layout-rows') {
+            classes.push(val);
+          }
+          modifyClasses($scope.node, _.keys($scope.layouts), classes);
+        };
+
+        if (($scope.node['#tag'] in $scope.editor.meta.blocks) || $scope.join) {
+
+          block = $scope.block = {
+            directive: null,
+            layout: null,
+            override: false,
+            options: [],
+          };
+
+          _.each($scope.editor.meta.blocks, function(blockInfo, directive) {
+            if (directive === $scope.node['#tag'] || blockInfo.join === $scope.container.getFieldEntityType()) {
+              block.options.push({
+                id: directive,
+                text: blockInfo.title
               });
             }
           });
-          return blockOptions;
-        }
 
-        if ($scope.block) {
-
-          $scope.isRepeatable = function() {
-            return "fixme";
-          };
-
-          $scope.toggleRepeat = function() {
-            if ($scope.node.min === '1' && $scope.node.max === '1') {
-              delete $scope.node.max;
-              delete $scope.node.min;
-              $scope.node['add-label'] = ts('Add');
-            } else {
-              $scope.node.min = $scope.node.max = '1';
-              delete $scope.node['add-label'];
+          $scope.$watch('block.directive', function (directive, oldVal) {
+            if (directive && directive !== oldVal) {
+              block.layout = _.cloneDeep($scope.editor.meta.blocks[directive].layout);
+              setBlockDirective(directive);
+              block.override = false;
             }
-          };
-
-          $scope.getSetMin = function(val) {
-            if (arguments.length) {
-              if ($scope.node.max && val >= parseInt($scope.node.max, 10)) {
-                $scope.node.max = '' + (1 + val);
-              }
-              if (!val) {
-                delete $scope.node.min;
-              }
-              else {
-                $scope.node.min = '' + val;
-              }
-            }
-            return $scope.node.min ? parseInt($scope.node.min, 10) : null;
-          };
-
-          $scope.getSetMax = function(val) {
-            if (arguments.length) {
-              if (!$scope.node.max && $scope.node.min === '1' && val === 1) {
-                val++;
-              }
-              if ($scope.node.min && val && val <= parseInt($scope.node.min, 10)) {
-                $scope.node.min = '' + (val - 1);
-              }
-              if (typeof val !== 'number') {
-                delete $scope.node.max;
-              }
-              else {
-                $scope.node.max = '' + val;
-              }
-            }
-            return $scope.node.max ? parseInt($scope.node.max, 10) : null;
-          };
-
-          $scope.pickAddIcon = function() {
-            openIconPicker($scope.node, 'add-icon');
-          };
-
-          $scope.$watch('selectedBlock.name', function (name, oldVal) {
-            if (name && name !== oldVal) {
-              selectedBlock.layout = _.cloneDeep($scope.editor.meta.blocks[name].layout);
-              $scope.node['#children'] = [{'#tag': name}];
-              selectedBlock.override = false;
-              selectedBlock.options = getBlockOptions();
-            }
-            else if (!name && oldVal) {
-              if (selectedBlock.layout) {
-                $scope.node['#children'] = selectedBlock.layout;
-              }
-              selectedBlock.override = false;
-              selectedBlock.layout = null;
-              selectedBlock.options = getBlockOptions();
+            else if (!directive && oldVal) {
+              overrideBlockContents(block.layout);
+              block.override = false;
             }
           });
 
-          $scope.$watch('selectedBlock.layout', function (layout, oldVal) {
-            if (selectedBlock.name && !selectedBlock.override && layout && layout !== oldVal && !angular.equals(layout, $scope.editor.meta.blocks[selectedBlock.name].layout)) {
-              $scope.node['#children'] = selectedBlock.layout;
-              selectedBlock.override = true;
-              selectedBlock.layout = null;
-              selectedBlock.options = getBlockOptions();
+          $scope.$watch('block.layout', function (layout, oldVal) {
+            if (block.directive && !block.override && layout && layout !== oldVal && !angular.equals(layout, $scope.editor.meta.blocks[block.directive].layout)) {
+              overrideBlockContents(block.layout);
             }
           }, true);
 
           $scope.$watch("node['#children']", function (children) {
-            if (!selectedBlock.name && children && children.length === 1 && children[0]['#tag'] in $scope.editor.meta.blocks) {
-              selectedBlock.name = children[0]['#tag'];
-              selectedBlock.override = false;
-            } else if (selectedBlock.name && selectedBlock.override && !selectedBlock.layout && children && angular.equals(children, $scope.editor.meta.blocks[selectedBlock.name].layout)) {
-              selectedBlock.layout = _.cloneDeep($scope.editor.meta.blocks[selectedBlock.name].layout);
-              $scope.node['#children'] = [{'#tag': selectedBlock.name}];
-              selectedBlock.override = false;
+            if (getBlockNode() && getBlockNode()['#tag'] in $scope.editor.meta.blocks) {
+              block.directive = getBlockNode()['#tag'];
+              block.override = false;
+            } else if (block.directive && block.override && !block.layout && children && angular.equals(children, $scope.editor.meta.blocks[block.directive].layout)) {
+              block.layout = _.cloneDeep($scope.editor.meta.blocks[block.directive].layout);
+              $scope.node['#children'] = [{'#tag': block.directive}];
+              block.override = false;
             }
-            selectedBlock.options = getBlockOptions();
           }, true);
         }
-        else {
-          $scope.layouts = {
-            'af-layout-rows': ts('Contents display as rows'),
-            'af-layout-cols': ts('Contents are evenly-spaced columns'),
-            'af-layout-inline': ts('Contents are arranged inline')
-          };
+      },
+      controller: function($scope) {
+        var container = $scope.container = this;
+        this.node = $scope.node;
 
-          $scope.getLayout = function() {
-            if (!$scope.node) {
-              return '';
-            }
-            return _.intersection(splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
-          };
+        this.getNodeType = function(node) {
+          if (!node) {
+            return null;
+          }
+          if (node['#tag'] === 'af-field') {
+            return 'field';
+          }
+          if (node['af-fieldset']) {
+            return 'fieldset';
+          }
+          if (node['af-join']) {
+            return 'join';
+          }
+          if (node['#tag'] && node['#tag'] in $scope.editor.meta.blocks) {
+            return 'container';
+          }
+          var classes = splitClass(node['class']),
+            types = ['af-container', 'af-text', 'af-button', 'af-markup'],
+            type = _.intersection(types, classes);
+          return type.length ? type[0].replace('af-', '') : null;
+        };
 
-          $scope.setLayout = function(val) {
-            var classes = ['af-container'];
-            if (val !== 'af-layout-rows') {
-              classes.push(val);
-            }
-            modifyClasses($scope.node, _.keys($scope.layouts), classes);
-          };
-        }
+        this.removeElement = function(element) {
+          removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
+        };
+
+        this.getEntityName = function() {
+          return $scope.entityName.split('-join-')[0];
+        };
+
+        // Returns the primary entity type for this container e.g. "Contact"
+        this.getMainEntityType = function() {
+          return $scope.editor && $scope.editor.getEntity(container.getEntityName()).type;
+        };
+
+        // Returns the entity type for fields within this conainer (join entity type if this is a join, else the primary entity type)
+        this.getFieldEntityType = function() {
+          var joinType = $scope.entityName.split('-join-');
+          return joinType[1] || ($scope.editor && $scope.editor.getEntity(joinType[0]).type);
+        };
+
       }
     };
   });

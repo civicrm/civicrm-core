@@ -1,6 +1,6 @@
 {
   "title": "Phone Block (default)",
-  "block": "Phone",
-  "extends": "Contact",
-  "repeatable": true
+  "block": "Contact",
+  "join": "Phone",
+  "repeat": true
 }

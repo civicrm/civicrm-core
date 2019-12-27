@@ -2,12 +2,13 @@
 
 namespace Civi\Afform;
 
+use Civi\Api4\Afform;
+
 /**
  * Class FormDataModel
  * @package Civi\Afform
  *
- * The FormDataModel examines a form and determines the list of entities/fields
- * which are used by the form.
+ * Examines a form and determines the entities, fields & joins in use.
  */
 class FormDataModel {
 
@@ -18,50 +19,58 @@ class FormDataModel {
   protected $entities;
 
   /**
-   * Gets entity metadata and all blocks & fields from the form
-   *
-   * @param array $layout
-   *   The root element of the layout, in shallow/deep format.
-   * @return static
-   *   Parsed summary of the entities used in a given form.
+   * @var array
    */
-  public static function create($layout) {
-    $root = AHQ::makeRoot($layout);
-    $entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
-    foreach (array_keys($entities) as $entity) {
-      $entities[$entity]['fields'] = $entities[$entity]['blocks'] = [];
-    }
-    self::parseFields($layout, $entities);
+  protected $blocks = [];
 
-    $self = new static();
-    $self->entities = $entities;
-    return $self;
+  public function __construct($layout) {
+    $root = AHQ::makeRoot($layout);
+    $this->entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
+    foreach (Afform::get()->setCheckPermissions(FALSE)->addSelect('name')->execute() as $block) {
+      $this->blocks[_afform_angular_module_name($block['name'], 'dash')] = $block;
+    }
+    foreach (array_keys($this->entities) as $entity) {
+      $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
+    }
+    $this->parseFields($layout);
   }
 
   /**
    * @param array $nodes
-   * @param array $entities
-   *   A list of entities, keyed by name.
-   *     This will be updated to populate 'fields' and 'blocks'.
-   *     Ex: $entities['spouse']['type'] = 'Contact';
    * @param string $entity
+   * @param string $join
    */
-  protected static function parseFields($nodes, &$entities, $entity = NULL) {
+  protected function parseFields($nodes, $entity = NULL, $join = NULL) {
     foreach ($nodes as $node) {
       if (!is_array($node) || !isset($node['#tag'])) {
-        //nothing
+        continue;
       }
-      elseif (!empty($node['af-fieldset'])) {
-        self::parseFields($node['#children'], $entities, $node['af-fieldset']);
+      elseif (!empty($node['af-fieldset']) && !empty($node['#children'])) {
+        $this->parseFields($node['#children'], $node['af-fieldset'], $join);
       }
       elseif ($entity && $node['#tag'] === 'af-field') {
-        $entities[$entity]['fields'][$node['name']] = AHQ::getProps($node);
+        if ($join) {
+          $this->entities[$entity]['joins'][$join]['fields'][$node['name']] = AHQ::getProps($node);
+        }
+        else {
+          $this->entities[$entity]['fields'][$node['name']] = AHQ::getProps($node);
+        }
       }
-      elseif ($entity && !empty($node['af-block'])) {
-        $entities[$entity]['blocks'][$node['af-block']] = AHQ::getProps($node);
+      elseif ($entity && !empty($node['af-join'])) {
+        $this->entities[$entity]['joins'][$node['af-join']] = AHQ::getProps($node);
+        $this->parseFields($node['#children'] ?? [], $entity, $node['af-join']);
       }
       elseif (!empty($node['#children'])) {
-        self::parseFields($node['#children'], $entities, $entity);
+        $this->parseFields($node['#children'], $entity, $join);
+      }
+      // Recurse into embedded blocks
+      if (isset($this->blocks[$node['#tag']])) {
+        if (!isset($this->blocks[$node['#tag']]['layout'])) {
+          $this->blocks[$node['#tag']] = Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
+        }
+        if (!empty($this->blocks[$node['#tag']]['layout'])) {
+          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join);
+        }
       }
     }
   }

@@ -23,8 +23,8 @@
       <div ng-if="blockList.length">
         <label>{{ ts('Blocks') }}</label>
         <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] &gt; [ui-sortable]'}" ng-model="blockList">
-          <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block['af-block'])}">
-            {{ editor.meta.blocks[block['#children'][0]['#tag']].title }}
+          <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
+            {{ blockTitles[$index] }}
           </div>
         </div>
       </div>

@@ -49,17 +49,17 @@ class Prefill extends AbstractProcessor {
       'select' => array_keys($entity['fields']),
       'checkPermissions' => $checkPermissions,
     ]);
-    $data = $result->first();
-    if ($data) {
-      $data['blocks'] = [];
-      foreach ($entity['blocks'] ?? [] as $blockEntity => $block) {
-        $data['blocks'][$blockEntity] = (array) civicrm_api4($blockEntity, 'get', [
-          'where' => [['contact_id', '=', $data['id']]],
-          'limit' => $block['max'] ?? 0,
+    foreach ($result as $item) {
+      $data = ['fields' => $item];
+      foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
+        $data['joins'][$joinEntity] = (array) civicrm_api4($joinEntity, 'get', [
+          'where' => $this->getJoinWhereClause($entity['type'], $joinEntity, $item['id']),
+          'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
+          'select' => array_keys($join['fields']),
           'checkPermissions' => $checkPermissions,
         ]);
       }
-      $this->_data[$entity['name']] = $data;
+      $this->_data[$entity['name']][] = $data;
     }
   }
 
@@ -68,6 +68,7 @@ class Prefill extends AbstractProcessor {
    *
    * @param $entity
    * @param $mode
+   * @throws \API_Exception
    */
   private function autoFillEntity($entity, $mode) {
     $id = NULL;

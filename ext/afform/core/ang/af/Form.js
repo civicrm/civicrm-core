@@ -20,7 +20,7 @@
 
         this.registerEntity = function registerEntity(entity) {
           schema[entity.modelName] = entity;
-          data[entity.modelName] = entity.data || {};
+          data[entity.modelName] = [];
         };
         this.getEntity = function getEntity(name) {
           return schema[name];

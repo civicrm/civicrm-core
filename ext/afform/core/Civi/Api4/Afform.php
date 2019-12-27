@@ -97,7 +97,7 @@ class Afform extends AbstractEntity {
           'name' => 'block',
         ],
         [
-          'name' => 'extends',
+          'name' => 'join',
         ],
         [
           'name' => 'title',
@@ -111,8 +111,8 @@ class Afform extends AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
-          'name' => 'repeatable',
-          'data_type' => 'Boolean',
+          'name' => 'repeat',
+          'data_type' => 'Mixed',
         ],
         [
           'name' => 'server_route',

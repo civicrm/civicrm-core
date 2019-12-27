@@ -18,8 +18,9 @@ return [
     'af-entity' => 'E',
     'af-fieldset' => 'A',
     'af-form' => 'E',
-    'af-block' => 'A',
-    'af-block-item' => 'A',
+    'af-join' => 'A',
+    'af-repeat' => 'A',
+    'af-repeat-item' => 'A',
     'af-field' => 'E',
   ],
 ];

@@ -96,9 +96,9 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'description' => '',
         'is_public' => FALSE,
         'permission' => 'access CiviCRM',
-        'block' => 'Custom_' . $custom['name'],
+        'join' => 'Custom_' . $custom['name'],
         'extends' => 'Contact',
-        'repeatable' => TRUE,
+        'repeat' => TRUE,
         'has_base' => TRUE,
       ];
       if ($getLayout) {

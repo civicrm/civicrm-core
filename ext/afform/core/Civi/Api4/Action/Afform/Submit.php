@@ -3,7 +3,6 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\Afform\Event\AfformSubmitEvent;
-use Civi\API\Exception\NotImplementedException;
 
 /**
  * Class Submit
@@ -23,8 +22,15 @@ class Submit extends AbstractProcessor {
   protected function processForm() {
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
-      // Predetermined values override submitted values
-      $entityValues[$entity['type']][$entityName] = ($entity['af-values'] ?? []) + ($this->values[$entityName] ?? []);
+      foreach ($this->values[$entityName] ?? [] as $values) {
+        $entityValues[$entity['type']][$entityName][] = $values + ['fields' => []];
+        // Predetermined values override submitted values
+        if (!empty($entity['af-values'])) {
+          foreach ($entityValues[$entity['type']][$entityName] as $index => $vals) {
+            $entityValues[$entity['type']][$entityName][$index]['fields'] = $entity['af-values'] + $vals['fields'];
+          }
+        }
+      }
     }
 
     $event = new AfformSubmitEvent($this->_formDataModel->getEntities(), $entityValues);
@@ -44,29 +50,11 @@ class Submit extends AbstractProcessor {
    * @throws \API_Exception
    * @see afform_civicrm_config
    */
-  public function processContacts(AfformSubmitEvent $event) {
-    foreach ($event->entityValues['Contact'] ?? [] as $entityName => $contact) {
-      $blocks = $contact['blocks'] ?? [];
-      unset($contact['blocks']);
-      $saved = civicrm_api4('Contact', 'save', ['records' => [$contact]])->first();
-      foreach ($blocks as $entity => $block) {
-        $values = self::filterEmptyBlocks($entity, $block);
-        // FIXME: Replace/delete should only be done to known contacts
-        if ($values) {
-          civicrm_api4($entity, 'replace', [
-            'where' => [['contact_id', '=', $saved['id']]],
-            'records' => $values,
-          ]);
-        }
-        else {
-          try {
-            civicrm_api4($entity, 'delete', [
-              'where' => [['contact_id', '=', $saved['id']]],
-            ]);
-          } catch (\API_Exception $e) {
-            // No records to delete
-          }
-        }
+  public static function processContacts(AfformSubmitEvent $event) {
+    foreach ($event->entityValues['Contact'] ?? [] as $entityName => $contacts) {
+      foreach ($contacts as $contact) {
+        $saved = civicrm_api4('Contact', 'save', ['records' => [$contact['fields']]])->first();
+        self::saveJoins('Contact', $saved['id'], $contact['joins'] ?? []);
       }
     }
     unset($event->entityValues['Contact']);
@@ -78,23 +66,50 @@ class Submit extends AbstractProcessor {
    * @see afform_civicrm_config
    */
   public static function processGenericEntity(AfformSubmitEvent $event) {
-    foreach ($event->entityValues as $entityType => $records) {
-      civicrm_api4($entityType, 'save', [
-        'records' => $records,
-      ]);
+    foreach ($event->entityValues as $entityType => $entities) {
+      // Each record is an array of one or more items (can be > 1 if af-repeat is used)
+      foreach ($entities as $entityName => $records) {
+        foreach ($records as $record) {
+          $saved = civicrm_api4($entityType, 'save', ['records' => [$record['fields']]])->first();
+          self::saveJoins($entityType, $saved['id'], $record['joins'] ?? []);
+        }
+      }
       unset($event->entityValues[$entityType]);
     }
   }
 
+  protected static function saveJoins($mainEntityName, $entityId, $joins) {
+    foreach ($joins as $joinEntityName => $join) {
+      $values = self::filterEmptyJoins($joinEntityName, $join);
+      // FIXME: Replace/delete should only be done to known contacts
+      if ($values) {
+        civicrm_api4($joinEntityName, 'replace', [
+          'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
+          'records' => $values,
+        ]);
+      }
+      else {
+        try {
+          civicrm_api4($joinEntityName, 'delete', [
+            'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
+          ]);
+        }
+        catch (\API_Exception $e) {
+          // No records to delete
+        }
+      }
+    }
+  }
+
   /**
-   * Filter out blocks that have been left blank on the form
+   * Filter out joins that have been left blank on the form
    *
    * @param $entity
-   * @param $block
+   * @param $join
    * @return array
    */
-  private static function filterEmptyBlocks($entity, $block) {
-    return array_filter($block, function($item) use($entity) {
+  private static function filterEmptyJoins($entity, $join) {
+    return array_filter($join, function($item) use($entity) {
       switch ($entity) {
         case 'Email':
           return !empty($item['email']);

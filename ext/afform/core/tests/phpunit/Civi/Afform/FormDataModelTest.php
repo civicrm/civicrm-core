@@ -48,7 +48,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
             'propA' => ['name' => 'propA'],
             'propB' => ['name' => 'propB', 'defn' => ['title' => 'Whiz']],
           ],
-          'blocks' => [],
+          'joins' => [],
         ],
       ],
     ];
@@ -60,13 +60,13 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'type' => 'Foo',
           'name' => 'foobar',
           'fields' => [],
-          'blocks' => [],
+          'joins' => [],
         ],
         'whiz_bang' => [
           'type' => 'Whiz',
           'name' => 'whiz_bang',
           'fields' => [],
-          'blocks' => [],
+          'joins' => [],
         ],
       ],
     ];
@@ -81,7 +81,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
    */
   public function testGetEntities($html, $expectEntities) {
     $parser = new \CRM_Afform_ArrayHtml();
-    $fdm = FormDataModel::create($parser->convertHtmlToArray($html));
+    $fdm = new FormDataModel($parser->convertHtmlToArray($html));
     $this->assertEquals($expectEntities, $fdm->getEntities());
   }
 

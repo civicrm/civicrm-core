@@ -1,11 +1,11 @@
 <div class="af-gui-bar" ng-if="node['#tag'] !== 'af-form'" ng-click="selectEntity()" >
   <div class="form-inline" af-gui-menu>
     <span ng-if="container.getNodeType(node) == 'fieldset'">{{ editor.getEntity(entityName).label }}</span>
-    <span ng-if="block">{{ ts('%1 block:', {1: block}) }}</span>
+    <span ng-if="block">{{ join ? ts(join) + ':' : ts('Block:') }}</span>
     <span ng-if="!block">{{ tags[node['#tag']].toLowerCase() }}</span>
-    <select ng-if="block" ng-model="selectedBlock.name">
+    <select ng-if="block" ng-model="block.directive">
       <option value="">{{ ts('Custom') }}</option>
-      <option value="{{ option.id }}" ng-repeat="option in selectedBlock.options track by option.id">{{ option.text }}</option>
+      <option value="{{ option.id }}" ng-repeat="option in block.options track by option.id">{{ option.text }}</option>
     </select>
     <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button pull-right" data-toggle="dropdown" title="{{ ts('Add Element') }}">
       <span><i class="crm-i fa-plus"></i></span>
@@ -26,7 +26,7 @@
     <div ng-switch="container.getNodeType(item)">
       <div ng-switch-when="fieldset" af-gui-container="item" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />
       <div ng-switch-when="container" af-gui-container="item" style="{{ item.style }}" class="af-gui-container af-gui-container-type-{{ item['#tag'] }}" entity-name="entityName" data-entity="{{ entityName }}" />
-      <div ng-switch-when="block" af-gui-container="item"  style="{{ item.style }}" class="af-gui-container af-gui-block" block="item['af-block']" entity-name="entityName + '-block-' + item['af-block']" data-entity="{{ entityName + '-block-' + item['af-block'] }}" />
+      <div ng-switch-when="join" af-gui-container="item"  style="{{ item.style }}" class="af-gui-container" join="item['af-join']" entity-name="entityName + '-join-' + item['af-join']" data-entity="{{ entityName + '-join-' + item['af-join'] }}" />
       <div ng-switch-when="field" af-gui-field="item" />
       <div ng-switch-when="text" af-gui-text="item" class="af-gui-element af-gui-text" />
       <div ng-switch-when="markup" af-gui-markup="item" class="af-gui-markup" />
@@ -34,11 +34,11 @@
     </div>
   </div>
 </div>
-<div ng-if="block && !(node.min === '1' && node.max === '1')" class="af-gui-button">
+<div ng-if="node['af-repeat'] || node['af-repeat'] === ''" class="af-gui-button">
   <button class="btn btn-xs btn-primary disabled">
     <span class="crm-editable-enabled" ng-click="pickAddIcon()" >
       <i class="crm-i {{ node['add-icon'] || 'fa-plus' }}"></i>
     </span>
-    <span af-gui-editable ng-model="node['add-label']">{{ node['add-label'] }}</span>
+    <span af-gui-editable ng-model="node['af-repeat']">{{ node['af-repeat'] }}</span>
   </button>
 </div>

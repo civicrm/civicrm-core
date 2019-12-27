@@ -186,12 +186,14 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   $blockData = \Civi\Api4\Afform::get()
     ->setCheckPermissions(FALSE)
     ->addWhere('block', 'IS NOT NULL')
-    ->setSelect(['name', 'title', 'block', 'extends', 'layout', 'repeatable'])
+    ->setSelect(['name', 'title', 'block', 'join', 'layout', 'repeat'])
     ->setFormatWhitespace(TRUE)
     ->setLayoutFormat('shallow')
     ->execute();
   foreach ($blockData as $block) {
-    $entityWhitelist[] = $block['block'];
+    if (!empty($block['join']) && !in_array($block['join'], $entityWhitelist)) {
+      $entityWhitelist[] = $block['join'];
+    }
     $data['blocks'][_afform_angular_module_name($block['name'], 'dash')] = $block;
   }
 
@@ -246,7 +248,7 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'where' => [['input_type', 'IS NOT NULL']],
   ];
 
-  // Get fields for main entities + block entities
+  // Get fields for main entities + joined entities
   foreach (array_unique($entityWhitelist) as $entityName) {
     $data['fields'][$entityName] = (array) civicrm_api4($entityName, 'getFields', $getFieldParams, 'name');
 

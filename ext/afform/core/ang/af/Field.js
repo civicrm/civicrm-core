@@ -1,9 +1,10 @@
 (function(angular, $, _) {
+  var id = 0;
   // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
   angular.module('af').directive('afField', function() {
     return {
       restrict: 'E',
-      require: ['^^afFieldset', '?^afBlockItem'],
+      require: ['^^afForm', '^^afFieldset', '?^^afJoin', '?^^afRepeatItem'],
       templateUrl: '~/af/afField.html',
       scope: {
         fieldName: '@name',
@@ -11,10 +12,10 @@
       },
       link: function($scope, $el, $attr, ctrls) {
         var ts = $scope.ts = CRM.ts('afform'),
-          afFieldset = ctrls[0],
-          blockItem = ctrls[1];
-        $scope.fieldId = afFieldset.getDefn().modelName + '-' + $scope.fieldName;
-        $scope.getData = blockItem ? blockItem.getData : afFieldset.getData;
+          closestController = $($el).closest('[af-fieldset],[af-join],[af-repeat-item]'),
+          afForm = ctrls[0];
+        $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrls[3] : ctrls[2] || ctrls[1];
+        $scope.fieldId = afForm.getFormMeta().name + '-' + $scope.fieldName + '-' + id++;
 
         $el.addClass('af-field-type-' + _.kebabCase($scope.defn.input_type));
 

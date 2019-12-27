@@ -3,23 +3,30 @@
   angular.module('af').directive('afFieldset', function() {
     return {
       restrict: 'A',
-      require: '^afForm',
-      scope: {
+      require: ['afFieldset', '^afForm'],
+      bindToController: {
         modelName: '@afFieldset'
       },
-      link: function($scope, $el, $attr, afFormCtrl) {
-        $scope.afFormCtrl = afFormCtrl;
+      link: function($scope, $el, $attr, ctrls) {
+        var self = ctrls[0];
+        self.afFormCtrl = ctrls[1];
       },
       controller: function($scope){
-        this.getDefn = function getDefn() {
-          return $scope.afFormCtrl.getEntity($scope.modelName);
-          // return $scope.modelDefn;
+        this.getDefn = function() {
+          return this.afFormCtrl.getEntity(this.modelName);
         };
-        this.getData = function getData() {
-          return $scope.afFormCtrl.getData($scope.modelName);
+        this.getData = function() {
+          return this.afFormCtrl.getData(this.modelName);
         };
         this.getName = function() {
-          return $scope.modelName;
+          return this.modelName;
+        };
+        this.getFieldData = function() {
+          var data = this.getData();
+          if (!data.length) {
+            data.push({fields: {}});
+          }
+          return data[0].fields;
         };
       }
     };

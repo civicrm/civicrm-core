@@ -53,12 +53,12 @@ EOHTML;
       ->setArgs([])
       ->execute()
       ->indexBy('name');
-    $this->assertEquals('Logged In', $prefill['me']['values']['first_name']);
-    $this->assertRegExp('/^User/', $prefill['me']['values']['last_name']);
+    $this->assertEquals('Logged In', $prefill['me']['values'][0]['fields']['first_name']);
+    $this->assertRegExp('/^User/', $prefill['me']['values'][0]['fields']['last_name']);
 
     $me = $prefill['me']['values'];
-    $me['first_name'] = 'Firsty';
-    $me['last_name'] = 'Lasty';
+    $me[0]['fields']['first_name'] = 'Firsty';
+    $me[0]['fields']['last_name'] = 'Lasty';
 
     Civi\Api4\Afform::submit()
       ->setName($this->formName)
