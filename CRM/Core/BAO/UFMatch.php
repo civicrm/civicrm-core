@@ -430,7 +430,7 @@ AND    domain_id    = %4
           'email' => $emailAddress,
           'is_primary' => 1,
         ]);
-        $emailID = $result->id;
+        $emailID = $result['id'];
       }
 
       CRM_Core_BAO_Log::register($contactId,
