@@ -234,6 +234,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
           $query = array_shift($tableQueries);
 
           if ($searchWithinDupes) {
+            // drop dedupe_copy table just in case if its already there.
+            $dedupeCopyTemporaryTableObject->drop();
             // get prepared to search within already found dupes if $searchWithinDupes flag is set
             $dedupeCopyTemporaryTableObject->createWithQuery("SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}");
 
