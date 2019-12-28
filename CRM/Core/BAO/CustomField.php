@@ -2595,15 +2595,15 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
   /**
    * Does this field store a serialized string?
    *
-   * @param array $field
+   * @param array|object $field
    *
    * @return bool
    */
   public static function isSerialized($field) {
     // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
-    $field = (array) $field;
+    $html_type = is_object($field) ? $field->html_type : $field['html_type'];
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
-    return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
+    return ($html_type === 'CheckBox' || strpos($html_type, 'Multi') !== FALSE);
   }
 
   /**
