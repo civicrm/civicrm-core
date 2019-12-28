@@ -43,7 +43,7 @@ abstract class BaseCustomValueTest extends UnitTestCase {
       ],
     ];
 
-    $this->dropByPrefix('civicrm_value_mycontact');
+    $this->dropByPrefix('civicrm_value_my');
     $this->cleanup($cleanup_params);
   }
 

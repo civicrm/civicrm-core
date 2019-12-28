@@ -30,6 +30,9 @@ use Civi\Api4\Utils\ActionUtil;
  * @method $this setLoadOptions(bool $value)
  * @method bool getLoadOptions()
  * @method $this setAction(string $value)
+ * @method $this addValue(string $value)
+ * @method $this setValues(array $values)
+ * @method array getValues()
  */
 class BasicGetFieldsAction extends BasicGetAction {
 
@@ -41,9 +44,18 @@ class BasicGetFieldsAction extends BasicGetAction {
   protected $loadOptions = FALSE;
 
   /**
+   * Fields will be returned appropriate to the specified action (get, create, delete, etc.)
+   *
    * @var string
    */
   protected $action = 'get';
+
+  /**
+   * Fields will be returned appropriate to the specified values (e.g. ['contact_type' => 'Individual'])
+   *
+   * @var array
+   */
+  protected $values = [];
 
   /**
    * To implement getFields for your own entity:

@@ -46,18 +46,19 @@ class SpecGatherer {
    *
    * @param string $entity
    * @param string $action
-   * @param $includeCustom
+   * @param bool $includeCustom
+   * @param array $values
    *
    * @return \Civi\Api4\Service\Spec\RequestSpec
    */
-  public function getSpec($entity, $action, $includeCustom) {
+  public function getSpec($entity, $action, $includeCustom, $values = []) {
     $specification = new RequestSpec($entity, $action);
 
     // Real entities
     if (strpos($entity, 'Custom_') !== 0) {
       $this->addDAOFields($entity, $action, $specification);
       if ($includeCustom && array_key_exists($entity, \CRM_Core_SelectValues::customGroupExtends())) {
-        $this->addCustomFields($entity, $specification);
+        $this->addCustomFields($entity, $specification, $values);
       }
     }
     // Custom pseudo-entities
@@ -114,12 +115,18 @@ class SpecGatherer {
   /**
    * @param string $entity
    * @param \Civi\Api4\Service\Spec\RequestSpec $specification
+   * @param array $values
+   * @throws \API_Exception
    */
-  private function addCustomFields($entity, RequestSpec $specification) {
-    $extends = ($entity == 'Contact') ? ['Contact', 'Individual', 'Organization', 'Household'] : [$entity];
+  private function addCustomFields($entity, RequestSpec $specification, $values = []) {
+    $extends = [$entity];
+    if ($entity === 'Contact') {
+      $extends = !empty($values['contact_type']) ? [$values['contact_type'], 'Contact'] : ['Contact', 'Individual', 'Organization', 'Household'];
+    }
     $customFields = CustomField::get()
       ->setCheckPermissions(FALSE)
       ->addWhere('custom_group.extends', 'IN', $extends)
+      ->addWhere('custom_group.is_multiple', '=', '0')
       ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value', 'date_format', 'time_format', 'start_date_years', 'end_date_years', 'help_pre', 'help_post'])
       ->execute();
 

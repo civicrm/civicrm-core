@@ -34,8 +34,8 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $customGroup = CustomGroup::create()
       ->setCheckPermissions(FALSE)
-      ->addValue('name', 'MyContactFields')
-      ->addValue('extends', 'Contact')
+      ->addValue('name', 'MyIndividualFields')
+      ->addValue('extends', 'Individual')
       ->execute()
       ->first();
 
@@ -47,39 +47,45 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
+    // Individual fields should show up when contact_type = null|Individual but not other contact types
+    $getFields = Contact::getFields()->setCheckPermissions(FALSE);
+    $this->assertContains('MyIndividualFields.FavColor', $getFields->execute()->column('name'));
+    $this->assertContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
+    $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Household'])->execute()->column('name'));
+
     $contactId = Contact::create()
       ->setCheckPermissions(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactFields.FavColor', 'Red')
+      ->addValue('MyIndividualFields.FavColor', 'Red')
       ->execute()
       ->first()['id'];
 
     $contact = Contact::get()
       ->setCheckPermissions(FALSE)
       ->addSelect('first_name')
-      ->addSelect('MyContactFields.FavColor')
+      ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
-      ->addWhere('MyContactFields.FavColor', '=', 'Red')
+      ->addWhere('MyIndividualFields.FavColor', '=', 'Red')
       ->execute()
       ->first();
 
-    $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Red', $contact['MyIndividualFields.FavColor']);
 
     Contact::update()
       ->addWhere('id', '=', $contactId)
-      ->addValue('MyContactFields.FavColor', 'Blue')
+      ->addValue('MyIndividualFields.FavColor', 'Blue')
       ->execute();
 
     $contact = Contact::get()
       ->setCheckPermissions(FALSE)
-      ->addSelect('MyContactFields.FavColor')
+      ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
       ->execute()
       ->first();
 
-    $this->assertEquals('Blue', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Blue', $contact['MyIndividualFields.FavColor']);
   }
 
   public function testWithTwoFields() {
