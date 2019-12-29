@@ -39,6 +39,7 @@
     </html>
     <add>1.1</add>
     <change>3.1</change>
+    <contactType>null</contactType>
   </field>
   <index>
     <name>index_contact_type</name>
@@ -385,6 +386,7 @@
     <fulltext/>
     <comment>First Name.</comment>
     <add>1.1</add>
+    <contactType>Individual</contactType>
   </field>
   <index>
     <name>index_first_name</name>
@@ -405,6 +407,7 @@
     <fulltext/>
     <comment>Middle Name.</comment>
     <add>1.1</add>
+    <contactType>Individual</contactType>
   </field>
   <field>
     <name>last_name</name>
@@ -420,6 +423,7 @@
     <comment>Last Name.</comment>
     <fulltext/>
     <add>1.1</add>
+    <contactType>Individual</contactType>
   </field>
   <index>
     <name>index_last_name</name>
@@ -441,6 +445,7 @@
     <dataPattern>/^(mr|ms|mrs|sir|dr)\.?$/i</dataPattern>
     <import>true</import>
     <add>1.2</add>
+    <contactType>Individual</contactType>
   </field>
   <index>
     <name>UI_prefix</name>
@@ -462,6 +467,7 @@
     <headerPattern>/^suffix$/i</headerPattern>
     <dataPattern>/^(sr|jr)\.?|i{2,}$/</dataPattern>
     <add>1.2</add>
+    <contactType>Individual</contactType>
   </field>
   <index>
     <name>UI_suffix</name>
@@ -479,6 +485,7 @@
     <headerPattern>/^title/i</headerPattern>
     <comment>Formal (academic or similar) title in front of name. (Prof., Dr. etc.)</comment>
     <add>4.5</add>
+    <contactType>Individual</contactType>
   </field>
   <field>
     <name>communication_style_id</name>
@@ -642,6 +649,7 @@
     <dataPattern>//</dataPattern>
     <comment>Job Title</comment>
     <add>1.1</add>
+    <contactType>Individual</contactType>
   </field>
   <field>
     <name>gender_id</name>
@@ -657,6 +665,7 @@
     <comment>FK to gender ID</comment>
     <import>true</import>
     <add>1.2</add>
+    <contactType>Individual</contactType>
   </field>
   <index>
     <name>UI_gender</name>
@@ -675,6 +684,7 @@
       <type>Select Date</type>
       <formatType>birth</formatType>
     </html>
+    <contactType>Individual</contactType>
   </field>
   <field>
     <name>is_deceased</name>
@@ -688,6 +698,7 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <contactType>Individual</contactType>
   </field>
   <index>
     <name>index_is_deceased</name>
@@ -706,6 +717,7 @@
       <type>Select Date</type>
       <formatType>birth</formatType>
     </html>
+    <contactType>Individual</contactType>
   </field>
   <field>
     <name>mail_to_household_id</name>
@@ -738,6 +750,7 @@
     <comment>Household Name.</comment>
     <fulltext/>
     <add>1.1</add>
+    <contactType>Household</contactType>
   </field>
   <index>
     <name>index_household_name</name>
@@ -750,6 +763,7 @@
     <title>Household Primary Contact ID</title>
     <comment>Optional FK to Primary Contact for this household.</comment>
     <add>1.1</add>
+    <contactType>Household</contactType>
   </field>
   <foreignKey>
     <name>primary_contact_id</name>
@@ -772,6 +786,7 @@
     <comment>Organization Name.</comment>
     <fulltext/>
     <add>1.1</add>
+    <contactType>Organization</contactType>
   </field>
   <index>
     <name>index_organization_name</name>
@@ -789,6 +804,7 @@
     <html>
       <type>Text</type>
     </html>
+    <contactType>Organization</contactType>
   </field>
   <field>
     <name>user_unique_id</name>
@@ -816,6 +832,7 @@
     <html>
       <type>EntityRef</type>
     </html>
+    <contactType>Individual</contactType>
   </field>
   <foreignKey>
     <name>employer_id</name>

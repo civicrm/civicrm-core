@@ -29,17 +29,26 @@ use Civi\Api4\Contact;
  */
 class GetExtraFieldsTest extends UnitTestCase {
 
-  public function testBAOFieldsWillBeReturned() {
-    $returnedFields = Contact::getFields()
-      ->execute()
-      ->getArrayCopy();
+  public function testGetFieldsByContactType() {
+    $getFields = Contact::getFields()->setCheckPermissions(FALSE)->addSelect('name')->setIncludeCustom(FALSE);
 
-    $baseFields = \CRM_Contact_BAO_Contact::fields();
-    $baseFieldNames = array_column($baseFields, 'name');
-    $returnedFieldNames = array_column($returnedFields, 'name');
-    $notReturned = array_diff($baseFieldNames, $returnedFieldNames);
+    $baseFields = array_column(\CRM_Contact_BAO_Contact::fields(), 'name');
+    $returnedFields = $getFields->execute()->column('name');
+    $notReturned = array_diff($baseFields, $returnedFields);
 
+    // With no contact_type specified, all fields should be returned
     $this->assertEmpty($notReturned);
+
+    $individualFields = $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name');
+    $this->assertNotContains('sic_code', $individualFields);
+    $this->assertNotContains('contact_type', $individualFields);
+    $this->assertContains('first_name', $individualFields);
+
+    $organizationFields = $getFields->setValues(['contact_type' => 'Organization'])->execute()->column('name');
+    $this->assertContains('sic_code', $organizationFields);
+    $this->assertNotContains('contact_type', $organizationFields);
+    $this->assertNotContains('first_name', $organizationFields);
+    $this->assertNotContains('household_name', $organizationFields);
   }
 
 }
