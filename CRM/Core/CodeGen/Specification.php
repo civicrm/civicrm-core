@@ -383,6 +383,7 @@ class CRM_Core_CodeGen_Specification {
         'type',
         'formatType',
         'label',
+        'controlField',
         /* Fixme: prior to CRM-13497 these were in a flat structure
         // CRM-13497 moved them to be nested within 'html' but there's no point
         // making that change in the DAOs right now since we are in the process of
