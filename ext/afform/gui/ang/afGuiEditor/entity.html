@@ -1,10 +1,10 @@
 <div class="af-gui-columns">
   <fieldset class="af-gui-entity-values">
     <legend>{{ ts('Values:') }}</legend>
-    <div class="form-inline" ng-if="entity.data" ng-repeat="(fieldName, value) in entity.data">
-      <label>{{ editor.getField(entity.type, fieldName).title }}:</label><br />
+    <div class="form-inline" ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in entity.data">
+      <label>{{ getMeta().fields[fieldName].title }}:</label><br />
       <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
-      <a href class="" ng-click="removeValue(entity, fieldName)" ng-if="!editor.getField(entity.type, fieldName).required_data">
+      <a href ng-click="removeValue(entity, fieldName)">
         <i class="crm-i fa-times"></i>
       </a>
     </div>
@@ -48,7 +48,7 @@
   </fieldset>
 </div>
 
-<a href ng-click="editor.removeEntity(entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: entity.type}) }}">
+<a href ng-click="editor.removeEntity(entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: getMeta().label}) }}">
   <i class="crm-i fa-trash"></i>
 </a>
 

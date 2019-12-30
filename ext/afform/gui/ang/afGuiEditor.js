@@ -51,7 +51,7 @@
         else {
           $timeout(function() {
             initialize(_.cloneDeep(newForm));
-            editor.addEntity('Contact');
+            editor.addEntity('Individual');
             $scope.layout['#children'].push({
               "#tag": "button",
               "class": 'af-button btn btn-primary',
@@ -79,38 +79,42 @@
           }, true);
         }
 
-        this.addEntity = function(entityType) {
-          var existingEntitiesofThisType = _.map(_.filter($scope.entities, {type: entityType}), 'name'),
-            num = existingEntitiesofThisType.length + 1;
+        this.addEntity = function(type) {
+          var meta = editor.meta.entities[type],
+            num = 1;
           // Give this new entity a unique name
-          while (_.contains(existingEntitiesofThisType, entityType + num)) {
+          while (!!$scope.entities[type + num]) {
             num++;
           }
-          $scope.entities[entityType + num] = _.assign($parse(this.meta.defaults[entityType])($scope), {
+          $scope.entities[type + num] = _.assign($parse(meta.defaults)($scope), {
             '#tag': 'af-entity',
-            type: entityType,
-            name: entityType + num,
-            label: entityType + ' ' + num
+            type: meta.entity,
+            name: type + num,
+            label: meta.label + ' ' + num
           });
           // Add this af-entity tag after the last existing one
           var pos = 1 + _.findLastIndex($scope.layout['#children'], {'#tag': 'af-entity'});
-          $scope.layout['#children'].splice(pos, 0, $scope.entities[entityType + num]);
+          $scope.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
           var fieldset = {
             '#tag': 'fieldset',
-            'af-fieldset': entityType + num,
+            'af-fieldset': type + num,
             '#children': [
               {
                 '#tag': 'legend',
                 'class': 'af-text',
                 '#children': [
                   {
-                    '#text': entityType + ' ' + num
+                    '#text': meta.label + ' ' + num
                   }
                 ]
               }
             ]
           };
+          // Add default contact name block
+          if (meta.entity === 'Contact') {
+            fieldset['#children'].push({'#tag': 'block-name-' + type.toLowerCase()});
+          }
           // Attempt to place the new af-fieldset after the last one on the form
           pos = 1 + _.findLastIndex($scope.layout['#children'], 'af-fieldset');
           if (pos) {
@@ -118,7 +122,7 @@
           } else {
             $scope.layout['#children'].push(fieldset);
           }
-          return entityType + num;
+          return type + num;
         };
 
         this.removeEntity = function(entityName) {
@@ -133,14 +137,14 @@
         };
 
         this.getField = function(entityType, fieldName) {
-          return $scope.meta.fields[entityType][fieldName];
+          return $scope.meta.entities[entityType].fields[fieldName];
         };
 
         this.getEntity = function(entityName) {
           return $scope.entities[entityName];
         };
 
-        this.getselectedEntityName = function() {
+        this.getSelectedEntityName = function() {
           return $scope.selectedEntityName;
         };
 
@@ -244,10 +248,15 @@
         $scope.elementList = [];
         $scope.elementTitles = [];
 
+        $scope.getMeta = function() {
+          var type = $scope.entity.type === 'Contact' ? $scope.entity.data.contact_type : $scope.entity.type;
+          return $scope.editor ? $scope.editor.meta.entities[type] : {};
+        };
+
         $scope.valuesFields = function() {
-          var fields = $scope.editor ? _.transform($scope.editor.meta.fields[$scope.entity.type], function(fields, field) {
+          var fields = _.transform($scope.getMeta().fields, function(fields, field) {
             fields.push({id: field.name, text: field.title, disabled: $scope.fieldInUse(field.name)});
-          }, []) : [];
+          }, []);
           return {results: fields};
         };
 
@@ -264,7 +273,7 @@
 
         function buildFieldList(search) {
           $scope.fieldList.length = 0;
-          _.each($scope.editor.meta.fields[$scope.entity.type], function(field) {
+          _.each($scope.getMeta().fields, function(field) {
             if (!search || _.contains(field.name, search) || _.contains(field.title.toLowerCase(), search)) {
               $scope.fieldList.push({
                 "#tag": "af-field",
@@ -278,7 +287,9 @@
           $scope.blockList.length = 0;
           $scope.blockTitles.length = 0;
           _.each($scope.editor.meta.blocks, function(block, directive) {
-            if (!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) {
+            if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
+              (block.block === '*' || block.block === $scope.entity.type || ($scope.entity.type === 'Contact' && block.block === $scope.entity.data.contact_type))
+            ) {
               var item = {"#tag": block.join ? "div" : directive};
               if (block.join) {
                 item['af-join'] = block.join;
@@ -418,7 +429,7 @@
         };
 
         $scope.isSelectedFieldset = function(entityName) {
-          return entityName === $scope.editor.getselectedEntityName();
+          return entityName === $scope.editor.getSelectedEntityName();
         };
 
         $scope.selectEntity = function() {

@@ -162,27 +162,51 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     return;
   }
 
-  $entityWhitelist = $data = [];
+  $getFieldParams = [
+    'checkPermissions' => FALSE,
+    'includeCustom' => TRUE,
+    'loadOptions' => TRUE,
+    'action' => 'create',
+    'select' => ['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
+    'where' => [['input_type', 'IS NOT NULL']],
+  ];
 
-  // First scan the entityDefaults directory for our list of supported entities
-  // FIXME: Need a way to load this from other extensions too
-  foreach (glob(__DIR__ . '/ang/afGuiEditor/entityDefaults/*.json') as $file) {
-    $matches = [];
-    preg_match('/([-a-z_A-Z0-9]*).json/', $file, $matches);
-    $entityWhitelist[] = $entity = $matches[1];
-    // No json_decode, the files are not strict json and will go through angular.$parse clientside
-    $data['defaults'][$entity] = trim(CRM_Utils_JS::stripComments(file_get_contents($file)));
+  $data = [
+    'entities' => [
+      'Contact' => [
+        'entity' => 'Contact',
+        'label' => ts('Contact'),
+        'fields' => (array) civicrm_api4('Contact', 'getFields', $getFieldParams, 'name'),
+      ],
+    ],
+    'blocks' => [],
+  ];
+
+  $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo();
+
+  // Scan all extensions for our list of supported entities
+  foreach (CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
+    $dir = CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . 'afformEntities';
+    if (is_dir($dir)) {
+      foreach (glob($dir . '/*.php') as $file) {
+        $entity = include $file;
+        // Skip disabled contact types
+        if (!empty($entity['contact_type']) && !isset($contactTypes[$entity['contact_type']])) {
+          continue;
+        }
+        if (!empty($entity['contact_type'])) {
+          $entity['label'] = $contactTypes[$entity['contact_type']]['label'];
+        }
+        // For Contact pseudo-entities (Individual, Organization, Household)
+        $values = array_intersect_key($entity, ['contact_type' => NULL]);
+        $afformEntity = $entity['contact_type'] ?? $entity['entity'];
+        $entity['fields'] = (array) civicrm_api4($entity['entity'], 'getFields', $getFieldParams + ['values' => $values], 'name');
+        $data['entities'][$afformEntity] = $entity;
+      }
+    }
   }
 
-  // Load main entities
-  $data['entities'] = (array) Civi\Api4\Entity::get()
-    ->setCheckPermissions(FALSE)
-    ->setSelect(['name', 'description'])
-    ->addWhere('name', 'IN', $entityWhitelist)
-    ->execute();
-
   // Load blocks
-  $data['blocks'] = [];
   $blockData = \Civi\Api4\Afform::get()
     ->setCheckPermissions(FALSE)
     ->addWhere('block', 'IS NOT NULL')
@@ -191,8 +215,11 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     ->setLayoutFormat('shallow')
     ->execute();
   foreach ($blockData as $block) {
-    if (!empty($block['join']) && !in_array($block['join'], $entityWhitelist)) {
-      $entityWhitelist[] = $block['join'];
+    if (!empty($block['join']) && !isset($data['entities'][$block['join']]['fields'])) {
+      $data['entities'][$block['join']]['entity'] = $block['join'];
+      // Normally you shouldn't pass variables to ts() but very common strings like "Email" should already exist
+      $data['entities'][$block['join']]['label'] = ts($block['join']);
+      $data['entities'][$block['join']]['fields'] = (array) civicrm_api4($block['join'], 'getFields', $getFieldParams, 'name');
     }
     $data['blocks'][_afform_angular_module_name($block['name'], 'dash')] = $block;
   }
@@ -239,33 +266,18 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     ],
   ];
 
-  $getFieldParams = [
-    'checkPermissions' => FALSE,
-    'includeCustom' => TRUE,
-    'loadOptions' => TRUE,
-    'action' => 'create',
-    'select' => ['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
-    'where' => [['input_type', 'IS NOT NULL']],
-  ];
-
-  // Get fields for main entities + joined entities
-  foreach (array_unique($entityWhitelist) as $entityName) {
-    $data['fields'][$entityName] = (array) civicrm_api4($entityName, 'getFields', $getFieldParams, 'name');
-
-    // TODO: Teach the api to return options in this format
-    foreach ($data['fields'][$entityName] as $name => $field) {
+  // Reformat options
+  // TODO: Teach the api to return options in this format
+  foreach ($data['entities'] as $entityName => $entity) {
+    foreach ($entity['fields'] as $name => $field) {
       if (!empty($field['options'])) {
-        $data['fields'][$entityName][$name]['options'] = CRM_Utils_Array::makeNonAssociative($field['options'], 'key', 'label');
+        $data['entities'][$entityName]['fields'][$name]['options'] = CRM_Utils_Array::makeNonAssociative($field['options'], 'key', 'label');
       }
       else {
-        unset($data['fields'][$entityName][$name]['options']);
+        unset($data['entities'][$entityName]['fields'][$name]['options']);
       }
     }
   }
-
-  // Now adjust the field metadata
-  // FIXME: This should probably be a callback event or something to allow extensions to tweak the metadata for their entities
-  $data['fields']['Contact']['contact_type']['required_data'] = TRUE;
 
   // Scan for input types
   // FIXME: Need a way to load this from other extensions too
