@@ -51,7 +51,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     if ($fields) {
       $this->includeCustom = strpos(implode('', $fields), '.') !== FALSE;
     }
-    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $this->includeCustom);
+    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $this->includeCustom, $this->values);
     return SpecFormatter::specToArray($spec->getFields($fields), $this->loadOptions);
   }
 
