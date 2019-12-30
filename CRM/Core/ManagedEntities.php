@@ -112,10 +112,15 @@ class CRM_Core_ManagedEntities {
   /**
    * Identify any enabled/disabled modules. Add new entities, update
    * existing entities, and remove orphaned (stale) entities.
+   * @param bool $ignoreUpgradeMode
    *
    * @throws Exception
    */
-  public function reconcile() {
+  public function reconcile($ignoreUpgradeMode = FALSE) {
+    // Do not reconcile whilst we are in upgrade mode
+    if (CRM_Core_Config::singleton()->isUpgradeMode() && !$ignoreUpgradeMode) {
+      return;
+    }
     if ($error = $this->validate($this->getDeclarations())) {
       throw new Exception($error);
     }
