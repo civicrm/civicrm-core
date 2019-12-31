@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   var id = 0;
   // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
-  angular.module('af').directive('afField', function() {
+  angular.module('af').directive('afField', function(crmApi4) {
     return {
       restrict: 'E',
       require: ['^^afForm', '^^afFieldset', '?^^afJoin', '?^^afRepeatItem'],
@@ -30,6 +30,28 @@
             }, [])
           };
         };
+
+        // ChainSelect - watch control field & reload options as needed
+        if ($scope.defn.input_type === 'ChainSelect') {
+          $scope.$watch('dataProvider.getFieldData()[defn.input_attrs.controlField]', function(val) {
+            if (val) {
+              var params = {
+                where: [['name', '=', $scope.fieldName]],
+                select: ['options'],
+                loadOptions: true,
+                values: {}
+              };
+              params.values[$scope.defn.input_attrs.controlField] = val;
+              crmApi4($scope.dataProvider.getEntityType(), 'getFields', params, 0)
+                .then(function(data) {
+                  $scope.defn.options.length = 0;
+                  _.transform(data.options, function(options, label, key) {
+                    options.push({key: key, label: label});
+                  }, $scope.defn.options);
+                });
+            }
+          });
+        }
       }
     };
   });

@@ -358,6 +358,7 @@
 #afGuiEditor .af-gui-field-input-type-select .input-group-btn {
   position: initial;
 }
+#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle,
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle {
   padding: 3px 11px;
 }

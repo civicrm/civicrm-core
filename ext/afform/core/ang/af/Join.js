@@ -15,6 +15,9 @@
         },
         controller: function($scope) {
           var self = this;
+          this.getEntityType = function() {
+            return this.entity;
+          };
           this.getData = function() {
             var data, fieldsetData;
             if (self.repeatItem) {

@@ -19,7 +19,7 @@
         },
         controller: function($scope) {
           this.getItems = $scope.getItems = function() {
-            var data = $scope.afJoin ? $scope.afJoin.getData() : $scope.afFieldset.getData();
+            var data = getEntityController().getData();
             while ($scope.min && data.length < $scope.min) {
               data.push(getRepeatType() === 'join' ? {} : {fields: {}, joins: {}});
             }
@@ -30,6 +30,11 @@
             return $scope.afJoin ? 'join' : 'fieldset';
           }
           this.getRepeatType = getRepeatType;
+
+          function getEntityController() {
+            return $scope.afJoin || $scope.afFieldset;
+          }
+          this.getEntityController = getEntityController;
 
           $scope.addItem = function() {
             $scope.getItems().push(getRepeatType() === 'join' ? {} : {fields: {}});
@@ -63,6 +68,10 @@
         controller: function($scope) {
           this.getFieldData = function() {
             return this.afRepeat.getRepeatType() === 'join' ? this.item : this.item.fields;
+          };
+
+          this.getEntityType = function() {
+            return this.afRepeat.getEntityController().getEntityType();
           };
         }
       };

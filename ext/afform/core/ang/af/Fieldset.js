@@ -21,6 +21,9 @@
         this.getName = function() {
           return this.modelName;
         };
+        this.getEntityType = function() {
+          return this.afFormCtrl.getEntity(this.modelName).type;
+        };
         this.getFieldData = function() {
           var data = this.getData();
           if (!data.length) {
