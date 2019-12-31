@@ -376,9 +376,10 @@ class FieldSpec {
   }
 
   /**
+   * @param array $values
    * @return array
    */
-  public function getOptions() {
+  public function getOptions($values = []) {
     if (!isset($this->options) || $this->options === TRUE) {
       $fieldName = $this->getName();
 
@@ -388,7 +389,7 @@ class FieldSpec {
       }
 
       $bao = CoreUtil::getBAOFromApiName($this->getEntity());
-      $options = $bao::buildOptions($fieldName);
+      $options = $bao::buildOptions($fieldName, NULL, $values);
 
       if (!is_array($options) || !$options) {
         $options = FALSE;
