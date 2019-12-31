@@ -115,7 +115,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id'          => $this->_membershipStatusID,
     ]);
 
-    $membership = $membership["values"][$membership["id"]];
+    $membership = $membership['values'][$membership["id"]];
 
     // Check count of related memberships. It should be one for individual contact.
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
@@ -135,28 +135,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   public function testCreate() {
 
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
 
     // Now call create() to modify an existing Membership
-
-    $params = [];
     $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
@@ -241,24 +222,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testRetrieve() {
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
     $params = ['id' => $membershipId];
     $values = [];
     CRM_Member_BAO_Membership::retrieve($params, $values);
@@ -329,24 +293,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testDeleteMembership() {
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
     CRM_Member_BAO_Membership::del($membershipId);
 
     $this->assertDBNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -356,24 +303,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testGetContactMembership() {
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
 
     $membership = CRM_Member_BAO_Membership::getContactMembership($contactId, $this->_membershipTypeID, FALSE);
 
@@ -388,24 +318,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * page id from the membership record
    */
   public function testgetContributionPageId() {
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
     $membership[$membershipId]['renewPageId'] = CRM_Member_BAO_Membership::getContributionPageId($membershipId);
 
     $this->membershipDelete($membershipId);
@@ -418,24 +331,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * type.
    */
   public function testgetMembershipStarts() {
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
     $yearStart = date('Y') . '0101';
     $currentDate = date('Ymd');
     CRM_Member_BAO_Membership::getMembershipStarts($this->_membershipTypeID, $yearStart, $currentDate);
@@ -449,24 +345,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * optionally for a specified date.
    */
   public function testGetMembershipCount() {
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
     $currentDate = date('Ymd');
     $test = 0;
     CRM_Member_BAO_Membership::getMembershipCount($this->_membershipTypeID, $currentDate, $test);
@@ -504,25 +383,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Delete related memberships.
    */
   public function testdeleteRelatedMemberships() {
-    $contactId = $this->individualCreate();
-
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $ids = [];
-
-    CRM_Member_BAO_Membership::create($params, $ids);
-
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    list($contactId, $membershipId) = $this->setupMembership();
 
     CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId);
 
@@ -932,6 +793,33 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('LineItem', [], 6);
     $this->membershipTypeDelete(['id' => $membershipTypeID1]);
     $this->membershipTypeDelete(['id' => $membershipTypeID2]);
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setupMembership(): array {
+    $contactId = $this->individualCreate();
+
+    $params = [
+      'contact_id' => $contactId,
+      'membership_type_id' => $this->_membershipTypeID,
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id' => $this->_membershipStatusID,
+    ];
+    $ids = [];
+    CRM_Member_BAO_Membership::create($params, $ids);
+
+    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
+      'contact_id', 'Database check for created membership.'
+    );
+    return [$contactId, $membershipId];
   }
 
 }
