@@ -96,8 +96,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     // be more complete.
     if (!empty($params['credit_card_exp_date']['Y']) && date('Y') >
       CRM_Core_Payment_Form::getCreditCardExpirationYear($params)) {
-      $error = new CRM_Core_Error(ts('transaction failed'));
-      return $error;
+      throw new PaymentProcessorException(ts('Invalid expiry date'));
     }
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {

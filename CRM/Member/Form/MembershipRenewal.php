@@ -477,6 +477,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * This function is also accessed by a unit test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function submit() {
     $this->storeContactFields($this->_params);
