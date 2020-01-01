@@ -1771,7 +1771,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *   A hierarchical property tree if appropriate
    */
   public static function &makeHierReturnProperties($fields, $contactId = NULL) {
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id', 'validate');
 
     $returnProperties = [];
 
