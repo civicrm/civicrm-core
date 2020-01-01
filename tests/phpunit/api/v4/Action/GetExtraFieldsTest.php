@@ -22,6 +22,7 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Address;
 use Civi\Api4\Contact;
 
 /**
@@ -40,6 +41,20 @@ class GetExtraFieldsTest extends UnitTestCase {
     $notReturned = array_diff($baseFieldNames, $returnedFieldNames);
 
     $this->assertEmpty($notReturned);
+  }
+
+  public function testGetOptionsAddress() {
+    $getFields = Address::getFields()->setCheckPermissions(FALSE)->addWhere('name', '=', 'state_province_id')->setLoadOptions(TRUE);
+
+    $usOptions = $getFields->setValues(['country_id' => 1228])->execute()->first();
+
+    $this->assertContains('Alabama', $usOptions['options']);
+    $this->assertNotContains('Alberta', $usOptions['options']);
+
+    $caOptions = $getFields->setValues(['country_id' => 1039])->execute()->first();
+
+    $this->assertNotContains('Alabama', $caOptions['options']);
+    $this->assertContains('Alberta', $caOptions['options']);
   }
 
 }

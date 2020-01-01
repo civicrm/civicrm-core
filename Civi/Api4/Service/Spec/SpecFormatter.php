@@ -29,15 +29,16 @@ class SpecFormatter {
   /**
    * @param FieldSpec[] $fields
    * @param bool $includeFieldOptions
+   * @param array $values
    *
    * @return array
    */
-  public static function specToArray($fields, $includeFieldOptions = FALSE) {
+  public static function specToArray($fields, $includeFieldOptions = FALSE, $values = []) {
     $fieldArray = [];
 
     foreach ($fields as $field) {
       if ($includeFieldOptions) {
-        $field->getOptions();
+        $field->getOptions($values);
       }
       $fieldArray[$field->getName()] = $field->toArray();
     }
