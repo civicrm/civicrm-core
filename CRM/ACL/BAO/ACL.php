@@ -230,43 +230,37 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $rule = new CRM_ACL_BAO_ACL();
 
     $acl = self::getTableName();
-    $aclRole = 'civicrm_acl_role';
-    $aclRoleJoin = CRM_ACL_DAO_EntityRole::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $c2g = CRM_Contact_BAO_GroupContact::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
 
-    $query = "   SELECT          acl.*
-                        FROM            $acl acl
+    $select = 'SELECT acl.*';
+    $from = "FROM $acl acl
                         INNER JOIN      civicrm_option_group og
                                 ON      og.name = 'acl_role'
                         INNER JOIN      civicrm_option_value ov
-                                ON      acl.entity_table   = '$aclRole'
+                                ON      acl.entity_table   = 'civicrm_acl_role'
                                 AND     ov.option_group_id  = og.id
                                 AND     acl.entity_id      = ov.value";
+    $where = [];
 
     if (!empty($group_id)) {
-      $query .= " INNER JOIN  $c2g group_contact
-                            ON      acl.entity_id     = group_contact.group_id
-                        WHERE       acl.entity_table  = '$group'
-                            AND     aacl.is_active     = 1
-                            AND     group_contact.group_id           = $group_id";
+      $from .= " INNER JOIN  $c2g group_contact ON acl.entity_id = group_contact.group_id";
+      $where[] = "(acl.entity_table  = '$group' AND aacl.is_active = 1 AND group_contact.group_id = $group_id )";
 
       if (!empty($contact_id)) {
-        $query .= " AND     group_contact.contact_id = $contact_id
-                            AND     group_contact.status = 'Added'";
+        $where[] = "(group_contact.contact_id = $contact_id AND group_contact.status = 'Added')";
       }
     }
     else {
       if (!empty($contact_id)) {
-        $query .= " WHERE   acl.entity_table  = '$contact'
-                                AND acl.is_active     = 1
-                                AND acl.entity_id     = $contact_id";
+        $where[] = "(acl.entity_table  = '$contact' AND acl.is_active = 1 AND acl.entity_id = $contact_id )";
       }
     }
 
     $results = [];
 
+    $query = $select . ' ' . $from . ' ' . ($where ? 'WHERE ' . implode('AND', $where) : '');
     $rule->query($query);
 
     while ($rule->fetch()) {
