@@ -124,7 +124,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'cvv2' => '123',
           'credit_card_exp_date' => [
             'M' => '1',
-            'Y' => '2019',
+            'Y' => date('Y') + 1,
           ],
           'credit_card_type' => 'Visa',
           'billing_first_name' => 'p',
@@ -207,7 +207,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], $entityFinancialTrxns[2], ['id', 'entity_id']);
     $mut->checkMailLog([
       'Event Information and Location', 'Registration Confirmation - Annual CiviCRM meet',
-      'Expires: January 2019',
+      'Expires: January ' . (date('Y') + 1),
       'Visa',
       '************1111',
       'This is a confirmation that your registration has been received and your status has been updated to <strong> Registered</strong>',

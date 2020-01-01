@@ -234,8 +234,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => '9',
-        // TODO: Future proof
-        'Y' => '2019',
+        'Y' => date('Y') + 1,
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -357,6 +356,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitRecurCompleteInstantWithMail($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -614,8 +616,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => '9',
-        // TODO: Future proof
-        'Y' => '2019',
+        'Y' => date('Y') + 1,
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
