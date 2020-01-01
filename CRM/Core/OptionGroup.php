@@ -121,7 +121,7 @@ class CRM_Core_OptionGroup {
     }
 
     $query = "
-SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.{$keyColumnName} as value, v.grouping as grouping
+SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.{$keyColumnName} as value, v.grouping as `grouping`
 FROM   civicrm_option_value v,
        civicrm_option_group g
 WHERE  v.option_group_id = g.id
@@ -225,7 +225,7 @@ WHERE  v.option_group_id = g.id
       }
     }
     $query = "
-SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.value as value, v.grouping as grouping
+SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.value as value, v.grouping as `grouping`
 FROM   civicrm_option_value v,
        civicrm_option_group g
 WHERE  v.option_group_id = g.id
