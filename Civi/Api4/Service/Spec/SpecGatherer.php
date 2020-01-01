@@ -56,7 +56,7 @@ class SpecGatherer {
 
     // Real entities
     if (strpos($entity, 'Custom_') !== 0) {
-      $this->addDAOFields($entity, $action, $specification);
+      $this->addDAOFields($entity, $action, $specification, $values);
       if ($includeCustom && array_key_exists($entity, \CRM_Core_SelectValues::customGroupExtends())) {
         $this->addCustomFields($entity, $specification, $values);
       }
@@ -93,12 +93,16 @@ class SpecGatherer {
    * @param string $entity
    * @param string $action
    * @param \Civi\Api4\Service\Spec\RequestSpec $specification
+   * @param array $values
    */
-  private function addDAOFields($entity, $action, RequestSpec $specification) {
+  private function addDAOFields($entity, $action, RequestSpec $specification, $values = []) {
     $DAOFields = $this->getDAOFields($entity);
 
     foreach ($DAOFields as $DAOField) {
       if ($DAOField['name'] == 'id' && $action == 'create') {
+        continue;
+      }
+      if (array_key_exists('contactType', $DAOField) && !empty($values['contact_type']) && $DAOField['contactType'] != $values['contact_type']) {
         continue;
       }
       if ($action !== 'create' || isset($DAOField['default'])) {
