@@ -43,13 +43,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   The array that holds all the db ids.
    *
    * @return CRM_Member_BAO_Membership
    * @throws \CiviCRM_API3_Exception
    */
-  public static function add(&$params, $ids = []) {
+  public static function add(&$params) {
     $oldStatus = $oldType = NULL;
     if ($params['id']) {
       CRM_Utils_Hook::pre('edit', 'Membership', $params['id'], $params);
@@ -112,10 +110,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     elseif (CRM_Core_Session::singleton()->get('userID')) {
       $membershipLog['modified_id'] = CRM_Core_Session::singleton()->get('userID');
     }
-    elseif (!empty($ids['userId'])) {
-      // @todo deprecated this - transform in create as a transitional measure.
-      $membershipLog['modified_id'] = $ids['userId'];
-    }
     else {
       $membershipLog['modified_id'] = $membership->contact_id;
     }
@@ -136,7 +130,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $targetContactID = $membership->contact_id;
     if (!empty($params['is_for_organization'])) {
-      $targetContactID = CRM_Utils_Array::value('userId', $ids);
+      // @todo - deprecate is_for_organization, require modified_id
+      $targetContactID = CRM_Utils_Array::value('modified_id', $params);
     }
     if ($id) {
       if ($membership->status_id != $oldStatus) {
@@ -300,7 +295,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     // @todo remove $ids from here $ids['userId'] is still used
     $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
-    $membership = self::add($params, $ids);
+    if (empty($params['modified_id']) && !empty($ids['userID'])) {
+      // @todo add deprecation notice here.
+      $params['modified_id'] = $ids['userID'];
+    }
+    $membership = self::add($params);
 
     if (is_a($membership, 'CRM_Core_Error')) {
       $transaction->rollback();
