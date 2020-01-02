@@ -190,19 +190,14 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @param int $contact_id
    *   ID of a contact to search for.
-   * @param int $group_id
-   *   ID of a group to search for.
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getACLRoles($contact_id = NULL, $group_id = NULL) {
+  public static function getACLRoles($contact_id = NULL) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
-    if ($group_id) {
-      $group_id = CRM_Utils_Type::escape($group_id, 'Integer');
-    }
 
     $rule = new CRM_ACL_BAO_ACL();
 
@@ -210,8 +205,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $aclRole = 'civicrm_acl_role';
     $aclRoleJoin = CRM_ACL_DAO_EntityRole::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
-    $c2g = CRM_Contact_BAO_GroupContact::getTableName();
-    $group = CRM_Contact_BAO_Group::getTableName();
 
     $query = "   SELECT          acl.*
                         FROM            $acl acl
@@ -222,24 +215,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
                                 AND     ov.option_group_id  = og.id
                                 AND     acl.entity_id      = ov.value";
 
-    if (!empty($group_id)) {
-      $query .= " INNER JOIN  $c2g group_contact
-                            ON      acl.entity_id     = group_contact.group_id
-                        WHERE       acl.entity_table  = '$group'
-                            AND     aacl.is_active     = 1
-                            AND     group_contact.group_id           = $group_id";
-
-      if (!empty($contact_id)) {
-        $query .= " AND     group_contact.contact_id = $contact_id
-                            AND     group_contact.status = 'Added'";
-      }
-    }
-    else {
-      if (!empty($contact_id)) {
-        $query .= " WHERE   acl.entity_table  = '$contact'
-                                AND acl.is_active     = 1
-                                AND acl.entity_id     = $contact_id";
-      }
+    if (!empty($contact_id)) {
+      $query .= " WHERE   acl.entity_table  = '$contact'
+                              AND acl.is_active     = 1
+                              AND acl.entity_id     = $contact_id";
     }
 
     $results = [];
