@@ -819,6 +819,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   public static function getAllMembershipTypes() {
     if (!Civi::cache('metadata')->has(__CLASS__ . __FUNCTION__)) {
       $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
+      $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related'];
       // In order to avoid down-stream e-notices we undo api v3 filtering of NULL values. This is covered
       // in Unit tests & ideally we might switch to apiv4 but I would argue we should build caching
@@ -832,6 +833,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         if (isset($type['contribution_type_id'])) {
           unset($types[$id]['contribution_type_id']);
         }
+        $types[$id]['tax_rate'] = (float) ($taxRates[$type['financial_type_id']] ?? 0.0);
+        $multiplier = 1;
+        if ($types[$id]['tax_rate'] !== 0.0) {
+          $multiplier += ($types[$id]['tax_rate'] / 100);
+        }
+        $types[$id]['minimum_fee_with_tax'] = (float) $types[$id]['minimum_fee'] * $multiplier;
       }
       Civi::cache('metadata')->set(__CLASS__ . __FUNCTION__, $types);
     }
