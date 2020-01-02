@@ -144,17 +144,13 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @param int $contact_id
    *   ID of a contact to search for.
-   * @param int $group_id
-   *   ID of a group to search for.
-   * @param bool $aclRoles
-   *   Should we include ACL Roles.
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getACLs($contact_id = NULL, $group_id = NULL, $aclRoles = FALSE) {
+  public static function getACLs($contact_id = NULL) {
     $results = [];
 
     if (empty($contact_id)) {
@@ -162,9 +158,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     }
 
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
-    if ($group_id) {
-      $group_id = CRM_Utils_Type::escape($group_id, 'Integer');
-    }
 
     $rule = new CRM_ACL_BAO_ACL();
 
@@ -176,23 +169,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $query = " SELECT acl.*
      FROM $acl acl";
 
-    if (!empty($group_id)) {
-      $query .= " INNER JOIN  $c2g group_contact
-                            ON      acl.entity_id      = group_contact.group_id
-                        WHERE       acl.entity_table   = '$group'
-                            AND     acl.is_active      = 1
-                            AND     group_contact.group_id       = $group_id";
-
-      if (!empty($contact_id)) {
-        $query .= " AND group_contact.contact_id     = $contact_id
-                            AND group_contact.status         = 'Added'";
-      }
-    }
-    else {
-      if (!empty($contact_id)) {
-        $query .= " WHERE   acl.entity_table   = '$contact'
-         AND acl.entity_id      = $contact_id";
-      }
+    if (!empty($contact_id)) {
+      $query .= " WHERE   acl.entity_table   = '$contact'
+       AND acl.entity_id      = $contact_id";
     }
 
     $rule->query($query);
@@ -201,9 +180,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
       $results[$rule->id] = $rule->toArray();
     }
 
-    if ($aclRoles) {
-      $results += self::getACLRoles($contact_id, $group_id);
-    }
+    $results += self::getACLRoles($contact_id);
 
     return $results;
   }
@@ -411,7 +388,7 @@ SELECT acl.*
     $result = [];
 
     /* First, the contact-specific ACLs, including ACL Roles */
-    $result += self::getACLs($contact_id, NULL, TRUE);
+    $result += self::getACLs($contact_id);
 
     /* Then, all ACLs granted through group membership */
     $result += self::getGroupACLs($contact_id, TRUE);
