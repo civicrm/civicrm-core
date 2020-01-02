@@ -87,7 +87,7 @@ class CRM_Member_Utils_RelationshipProcessor {
       'options' => ['limit' => 0],
     ])['values'];
     foreach ($memberships as $id => $membership) {
-      if (!isset($membership['inheriting_membership_ids'])) {
+      if (!isset($memberships[$id]['inheriting_membership_ids'])) {
         $memberships[$id]['inheriting_membership_ids'] = [];
         $memberships[$id]['inheriting_contact_ids'] = [];
       }

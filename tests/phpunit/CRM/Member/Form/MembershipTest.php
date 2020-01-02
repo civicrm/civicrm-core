@@ -1195,8 +1195,7 @@ Expires: ',
       'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => '9',
-        // TODO: Future proof
-        'Y' => '2019',
+        'Y' => date('Y') + 1,
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
