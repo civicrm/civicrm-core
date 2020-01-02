@@ -32,7 +32,7 @@
                 {assign var=cbName value=$row.checkbox}
                 <td class="crm-mailing-subscribe-form-block-{$cbName}">{$form.$cbName.html}</td>
                 <td class="crm-mailing-subscribe-form-block-title"><label for="{$cbName}"><strong>{$row.title}</strong></label></td>
-                <td class="crm-mailing-subscribe-form-block-description">&nbsp;&nbsp;{$row.description}&nbsp;</td>
+                <td class="crm-mailing-subscribe-form-block-description">{$row.description}</td>
             </tr>
             {/foreach}
             </table>
