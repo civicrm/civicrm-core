@@ -201,29 +201,18 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $rule = new CRM_ACL_BAO_ACL();
 
-    $acl = self::getTableName();
-    $aclRole = 'civicrm_acl_role';
-    $aclRoleJoin = CRM_ACL_DAO_EntityRole::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
 
-    $query = "   SELECT          acl.*
-                        FROM            $acl acl
-                        INNER JOIN      civicrm_option_group og
-                                ON      og.name = 'acl_role'
-                        INNER JOIN      civicrm_option_value ov
-                                ON      acl.entity_table   = '$aclRole'
-                                AND     ov.option_group_id  = og.id
-                                AND     acl.entity_id      = ov.value";
+    $query = 'SELECT acl.* FROM civicrm_acl acl';
+    $where = ['acl.entity_table = "civicrm_acl_role" AND acl.entity_id IN (' . implode(',', array_keys(CRM_Core_OptionGroup::values('acl_role'))) . ')'];
 
     if (!empty($contact_id)) {
-      $query .= " WHERE   acl.entity_table  = '$contact'
-                              AND acl.is_active     = 1
-                              AND acl.entity_id     = $contact_id";
+      $where[] = " acl.entity_table  = '$contact' AND acl.is_active = 1 AND acl.entity_id = $contact_id";
     }
 
     $results = [];
 
-    $rule->query($query);
+    $rule->query($query . ' WHERE ' . implode(' AND ', $where));
 
     while ($rule->fetch()) {
       $results[$rule->id] = $rule->toArray();
