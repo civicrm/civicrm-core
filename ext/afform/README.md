@@ -46,7 +46,7 @@ Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) 
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://github.com/totten/afform.git
+git clone https://lab.civicrm.org/extensions/afform.git
 cv en afform
 ```
 
