@@ -103,7 +103,6 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->relationshipTypeDelete($this->relationshipTypeID);
-    $this->membershipStatusDelete($this->membershipStatusID);
     $this->quickCleanUpFinancialEntities();
     $this->restoreMembershipTypes();
     $this->contactDelete($this->organizationContactID);
@@ -144,14 +143,28 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the value for modified_id can be set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateMembershipWithPassedInModifiedID() {
+    $modifier = $this->individualCreate();
+    $membershipID = $this->setupMembership($modifier)[1];
+    $this->assertEquals($modifier, $this->callAPISuccessGetValue('MembershipLog', ['membership_id' => $membershipID, 'return' => 'modified_id']));
+  }
+
+  /**
    * Set up membership.
+   *
+   * @param int|null $modifiedID
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  private function setupMembership(): array {
+  private function setupMembership($modifiedID = NULL): array {
     $contactID = $this->individualCreate();
+    $modifiedID = $modifiedID ?? $contactID;
 
     $params = [
       'contact_id' => $contactID,
@@ -162,10 +175,11 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->membershipStatusID,
+      'modified_id' => $modifiedID,
     ];
 
     $membershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
-    $this->assertEquals($contactID, CRM_Core_DAO::singleValueQuery(
+    $this->assertEquals($modifiedID, CRM_Core_DAO::singleValueQuery(
       'SELECT modified_id FROM civicrm_membership_log WHERE membership_id = %1',
       [1 => [$membershipID, 'Integer']]
     ));

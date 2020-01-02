@@ -105,12 +105,15 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       'max_related' => $membership->max_related,
     ];
 
-    $session = CRM_Core_Session::singleton();
+    if (!empty($params['modified_id'])) {
+      $membershipLog['modified_id'] = $params['modified_id'];
+    }
     // If we have an authenticated session, set modified_id to that user's contact_id, else set to membership.contact_id
-    if ($session->get('userID')) {
-      $membershipLog['modified_id'] = $session->get('userID');
+    elseif (CRM_Core_Session::singleton()->get('userID')) {
+      $membershipLog['modified_id'] = CRM_Core_Session::singleton()->get('userID');
     }
     elseif (!empty($ids['userId'])) {
+      // @todo deprecated this - transform in create as a transitional measure.
       $membershipLog['modified_id'] = $ids['userId'];
     }
     else {
