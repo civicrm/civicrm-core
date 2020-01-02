@@ -12,7 +12,7 @@ Alexy Mikhailichenko
 Andrei Mondoc
 Andrew Thompson
 Armadillo Sec Ltd - Daniel Compton
-Australian Greens - Andrew Cormick-Dockery, Seamus Lee
+Australian Greens - Andrew Cormick-Dockery
 Bastien Ho
 Blackfly Solutions - Alan Dixon
 Business & Code - Alain Benbassat
@@ -51,7 +51,7 @@ Guillaume Rischard
 iXiam - César Ramos, Luciano Spiegel, Vangelis Pantazis
 Jamie Tillman
 Jens Schuppe
-JMA Consulting - Edsel Lopez, Joe Murray, Monish Deb
+JMA Consulting - Edsel Lopez, Joe Murray, Monish Deb, Seamus Lee
 Johan Vervloet
 John Kingsnorth
 John Kyle Cronan
