@@ -1231,7 +1231,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
 
           // Provide a select drop-down for the location's type/provider
-          // eg websites: Google+, Facebook...
+          // eg websites: Facebook...
 
           if ($blockInfo['hasType']) {
 
