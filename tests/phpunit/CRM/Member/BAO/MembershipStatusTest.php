@@ -114,33 +114,37 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals(empty($result), TRUE, 'Verify membership status record deletion.');
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function testExpiredDisabled() {
-    $result = civicrm_api3('MembershipStatus', 'get', [
-      'name' => "Expired",
+    $this->callAPISuccess('MembershipStatus', 'get', [
+      'name' => 'Expired',
       'api.MembershipStatus.create' => ['label' => 'Expiiiired'],
     ]);
 
     // Calling it 'Expiiiired' is OK.
-    $result = $this->callAPISuccess('job', 'process_membership', []);
+    $this->callAPISuccess('job', 'process_membership', []);
 
-    $result = civicrm_api3('MembershipStatus', 'get', [
-      'name' => "Expired",
+    $this->callAPISuccess('MembershipStatus', 'get', [
+      'name' => 'Expired',
       'api.MembershipStatus.create' => ['is_active' => 0],
     ]);
 
     // Disabling 'Expired' is OK.
-    $result = $this->callAPISuccess('job', 'process_membership', []);
+    $this->callAPISuccess('job', 'process_membership', []);
 
-    $result = civicrm_api3('MembershipStatus', 'get', [
-      'name' => "Expired",
+    $this->callAPISuccess('MembershipStatus', 'get', [
+      'name' => 'Expired',
       'api.MembershipStatus.delete' => [],
     ]);
 
     // Deleting 'Expired' is OK.
-    $result = $this->callAPISuccess('job', 'process_membership', []);
+    $this->callAPISuccess('job', 'process_membership', []);
 
     // Put things back like normal
-    $result = civicrm_api3('MembershipStatus', 'create', [
+    $this->callAPISuccess('MembershipStatus', 'create', [
       'name' => 'Expired',
       'label' => 'Expired',
       'start_event' => 'end_date',
