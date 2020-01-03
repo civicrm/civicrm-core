@@ -1104,7 +1104,7 @@ FROM   civicrm_domain
    *
    * @return array
    */
-  public function fetchAll() {
+  public function fetchAll($k = FALSE, $v = FALSE, $method = FALSE) {
     $result = [];
     while ($this->fetch()) {
       $result[] = $this->toArray();
