@@ -324,8 +324,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    */
   public function testgetMembershipStarts() {
     list($contactId, $membershipId) = $this->setupMembership();
-    $yearStart = date('Y') . '0101';
-    $currentDate = date('Ymd');
+    $yearStart = date('Y') . '-01-01';
+    $currentDate = date('Y-m-d');
     CRM_Member_BAO_Membership::getMembershipStarts($this->_membershipTypeID, $yearStart, $currentDate);
 
     $this->membershipDelete($membershipId);
