@@ -411,20 +411,54 @@ function _civicrm_api3_system_updatelogtables_spec(&$params) {
  * Update indexes.
  *
  * This adds any indexes that exist in the schema but not the database.
+ *
+ * @param array $params
+ *
+ * @return array
  */
-function civicrm_api3_system_updateindexes() {
-  CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(TRUE));
+function civicrm_api3_system_updateindexes(array $params):array {
+  $tables = empty($params['tables']) ? FALSE : (array) $params['tables'];
+  CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(TRUE, $tables));
   return civicrm_api3_create_success(1);
+}
+
+/**
+ * Declare metadata for api System.getmissingindices
+ *
+ * @param array $params
+ */
+function _civicrm_api3_system_updateindexes_spec(array &$params) {
+  $params['tables'] = [
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => FALSE,
+    'title' => ts('Optional tables filter'),
+  ];
 }
 
 /**
  * Get an array of indices that should be defined but are not.
  *
+ * @param array $params
+ *
  * @return array
  */
-function civicrm_api3_system_getmissingindices() {
-  $indices = CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE);
+function civicrm_api3_system_getmissingindices($params) {
+  $tables = empty($params['tables']) ? FALSE : (array) $params['tables'];
+  $indices = CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE, $tables);
   return civicrm_api3_create_success($indices);
+}
+
+/**
+ * Declare metadata for api System.getmissingindices
+ *
+ * @param array $params
+ */
+function _civicrm_api3_system_getmissingindices_spec(&$params) {
+  $params['tables'] = [
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => FALSE,
+    'title' => ts('Optional tables filter'),
+  ];
 }
 
 /**
