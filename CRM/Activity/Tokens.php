@@ -346,9 +346,9 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       foreach (\CRM_Core_SelectValues::contactTokens() as $label => $name) {
         $match = [];
         if (preg_match('/{contact\.(.*)}/', $label, $match)) {
-          $this->specialTokens['source_' . $match[1]] = "(Source) " . $name;
-          $this->specialTokens['target_N_' . $match[1]] = "(Target N) " . $name;
-          $this->specialTokens['assignee_N_' . $match[1]] = "(Assignee N) " . $name;
+          $this->specialTokens['source_' . $match[1]] = ts('%1 (Added By)', [1 => $name]);
+          $this->specialTokens['target_N_' . $match[1]] = ts('%1 (With Contact N)', [1 => $name]);
+          $this->specialTokens['assignee_N_' . $match[1]] = ts('%1 (Assignee N)', [1 => $name]);
         }
       }
     }
