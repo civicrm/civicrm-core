@@ -23,6 +23,10 @@
   margin-bottom: 5px !important;
 }
 
+#afGuiEditor-palette fieldset legend {
+  height: 30px;
+}
+
 #afGuiEditor hr {
   margin-top: 15px;
   margin-bottom: 10px;
@@ -79,7 +83,7 @@
 #afGuiEditor-palette-config .af-gui-entity-palette [type=search] {
   width: 120px;
   padding: 3px 3px 3px 5px;
-  height: 22px;
+  height: 25px;
   font-weight: normal;
   position: relative;
   top: -3px;

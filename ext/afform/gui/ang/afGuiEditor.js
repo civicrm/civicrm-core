@@ -249,9 +249,12 @@
         $scope.elementList = [];
         $scope.elementTitles = [];
 
+        function getEntityType() {
+          return $scope.entity.type === 'Contact' ? $scope.entity.data.contact_type : $scope.entity.type;
+        }
+
         $scope.getMeta = function() {
-          var type = $scope.entity.type === 'Contact' ? $scope.entity.data.contact_type : $scope.entity.type;
-          return $scope.editor ? $scope.editor.meta.entities[type] : {};
+          return $scope.editor ? $scope.editor.meta.entities[getEntityType()] : {};
         };
 
         $scope.valuesFields = function() {
@@ -274,14 +277,34 @@
 
         function buildFieldList(search) {
           $scope.fieldList.length = 0;
-          _.each($scope.getMeta().fields, function(field) {
-            if (!search || _.contains(field.name, search) || _.contains(field.title.toLowerCase(), search)) {
+          $scope.fieldList.push({
+            entityName: $scope.entity.name,
+            entityType: getEntityType(),
+            label: ts('%1 Fields', {1: $scope.getMeta().label}),
+            fields: filterFields($scope.getMeta().fields)
+          });
+
+          _.each($scope.editor.meta.entities, function(entity, entityName) {
+            if (check($scope.editor.scope.layout['#children'], {'af-join': entityName})) {
               $scope.fieldList.push({
-                "#tag": "af-field",
-                name: field.name
+                entityName: $scope.entity.name + '-join-' + entityName,
+                entityType: entityName,
+                label: ts('%1 Fields', {1: entity.label}),
+                fields: filterFields(entity.fields)
               });
             }
           });
+
+          function filterFields(fields) {
+            return _.transform(fields, function(fieldList, field) {
+              if (!search || _.contains(field.name, search) || _.contains(field.title.toLowerCase(), search)) {
+                fieldList.push({
+                  "#tag": "af-field",
+                  name: field.name
+                });
+              }
+            }, []);
+          }
         }
 
         function buildBlockList(search) {
