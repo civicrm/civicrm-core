@@ -65,8 +65,34 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
   //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
   //  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_23_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Remove Google + location option', 'removeGooglePlusOption');
+  }
+
+  /**
+   * Remove Google + option value option for website type
+   * only if there is no websites using it
+   */
+  public static function removeGooglePlusOption(CRM_Queue_TaskContext $ctx) {
+    $googlePlusValue = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'Google_');
+    if ($googlePlusValue) {
+      $values = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_website WHERE website_type_id = %1", [1 => [$googlePlusValue, 'Positive']])->fetchAll();
+      if (empty($values)) {
+        $optionGroup = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_option_group WHERE name = 'website_type'");
+        \Civi\Api4\OptionValue::delete()
+          ->addWhere('value', '=', $googlePlusValue)
+          ->addWhere('option_group_id', '=', $optionGroup)
+          ->setCheckPermissions(FALSE)
+          ->execute();
+      }
+    }
+    return TRUE;
+  }
 
 }
