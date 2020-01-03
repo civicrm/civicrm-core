@@ -66,6 +66,9 @@ function civicrm_api3_membership_delete($params) {
  *
  * @return array
  *   API result array.
+ *
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update
@@ -121,10 +124,6 @@ function civicrm_api3_membership_create($params) {
   $ids = [];
   if (empty($params['id'])) {
     $params['action'] = CRM_Core_Action::ADD;
-    // we need user id during add mode
-    if (!empty($params['contact_id'])) {
-      $ids['userId'] = $params['contact_id'];
-    }
   }
   else {
     // edit mode
@@ -134,7 +133,7 @@ function civicrm_api3_membership_create($params) {
   }
 
   // @todo stop passing $ids (membership and userId may be set above)
-  $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
+  $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids);
 
   if (array_key_exists('is_error', $membershipBAO)) {
     // In case of no valid status for given dates, $membershipBAO

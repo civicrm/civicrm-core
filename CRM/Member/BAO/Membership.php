@@ -303,7 +303,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // @todo remove $ids from here $ids['userId'] is still used
     $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
     if (empty($params['modified_id']) && !empty($ids['userID'])) {
-      // @todo add deprecation notice here.
+      CRM_Core_Error::deprecatedFunctionWarning('$ids["userID"] no longer supported - use $params["modified_id"]');
       $params['modified_id'] = $ids['userID'];
     }
     $membership = self::add($params);
@@ -2012,12 +2012,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
     //CRM-4027, create log w/ individual contact.
     if ($modifiedID) {
-      $ids['userId'] = $modifiedID;
+      // @todo this param is likely unused now.
       $memParams['is_for_organization'] = TRUE;
     }
-    else {
-      $ids['userId'] = $contactID;
-    }
+    $params['modified_id'] = $modifiedID ?? $contactID;
 
     //inherit campaign from contrib page.
     if (isset($campaignId)) {

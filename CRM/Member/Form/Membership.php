@@ -1082,7 +1082,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_id) {
       $ids['membership'] = $params['id'] = $this->_id;
     }
-    $ids['userId'] = CRM_Core_Session::singleton()->get('userID');
 
     // Set variables that we normally get from context.
     // In form mode these are set in preProcess.
@@ -1241,7 +1240,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $membershipType = implode(', ', $membershipTypes);
 
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
+    list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
 
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
