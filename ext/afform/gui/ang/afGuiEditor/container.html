@@ -3,10 +3,11 @@
     <span ng-if="container.getNodeType(node) == 'fieldset'">{{ editor.getEntity(entityName).label }}</span>
     <span ng-if="block">{{ join ? ts(join) + ':' : ts('Block:') }}</span>
     <span ng-if="!block">{{ tags[node['#tag']].toLowerCase() }}</span>
-    <select ng-if="block" ng-model="block.directive">
+    <select ng-if="block" ng-model="block.directive" ng-change="selectBlockDirective()">
       <option value="">{{ ts('Custom') }}</option>
-      <option value="{{ option.id }}" ng-repeat="option in block.options track by option.id">{{ option.text }}</option>
+      <option ng-value="option.id" ng-repeat="option in block.options track by option.id">{{ option.text }}</option>
     </select>
+    <button type="button" class="btn btn-default btn-xs" ng-if="block && !block.layout" ng-click="saveBlock()">{{ ts('Save...') }}</button>
     <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button pull-right" data-toggle="dropdown" title="{{ ts('Add Element') }}">
       <span><i class="crm-i fa-plus"></i></span>
     </button>

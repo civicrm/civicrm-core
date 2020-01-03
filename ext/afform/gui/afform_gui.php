@@ -206,22 +206,19 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     }
   }
 
-  // Load blocks
+  // Load fields from entity joins
   $blockData = \Civi\Api4\Afform::get()
     ->setCheckPermissions(FALSE)
-    ->addWhere('block', 'IS NOT NULL')
-    ->setSelect(['name', 'title', 'block', 'join', 'layout', 'repeat'])
-    ->setFormatWhitespace(TRUE)
-    ->setLayoutFormat('shallow')
+    ->addWhere('join', 'IS NOT NULL')
+    ->setSelect(['join'])
     ->execute();
   foreach ($blockData as $block) {
-    if (!empty($block['join']) && !isset($data['entities'][$block['join']]['fields'])) {
+    if (!isset($data['entities'][$block['join']]['fields'])) {
       $data['entities'][$block['join']]['entity'] = $block['join'];
       // Normally you shouldn't pass variables to ts() but very common strings like "Email" should already exist
       $data['entities'][$block['join']]['label'] = ts($block['join']);
       $data['entities'][$block['join']]['fields'] = (array) civicrm_api4($block['join'], 'getFields', $getFieldParams, 'name');
     }
-    $data['blocks'][_afform_angular_module_name($block['name'], 'dash')] = $block;
   }
 
   // Todo: scan for other elements
@@ -252,15 +249,15 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
         '#markup' => FALSE,
       ],
     ],
-    'button' => [
-      'title' => ts('Button'),
+    'submit' => [
+      'title' => ts('Submit Button'),
       'element' => [
         '#tag' => 'button',
         'class' => 'af-button btn-primary',
         'crm-icon' => 'fa-check',
         'ng-click' => 'afform.submit()',
         '#children' => [
-          ['#text' => ts('Enter text')],
+          ['#text' => ts('Submit')],
         ],
       ],
     ],

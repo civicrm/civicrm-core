@@ -43,35 +43,36 @@
             '#children': []
           }]
         };
-        if ($scope.afGuiEditor.name && $scope.afGuiEditor.name != '0') {
-          // Todo - show error msg if form is not found
-          crmApi4('Afform', 'get', {where: [['name', '=', $scope.afGuiEditor.name]], layoutFormat: 'shallow', formatWhitespace: true}, 0)
-            .then(initialize);
-        }
-        else {
-          $timeout(function() {
-            initialize(_.cloneDeep(newForm));
-            editor.addEntity('Individual');
-            $scope.layout['#children'].push({
-              "#tag": "button",
-              "class": 'af-button btn btn-primary',
-              "crm-icon": 'fa-check',
-              "ng-click": "afform.submit()",
-              "#children": [
-                {
-                  "#text": "Submit"
-                }
-              ]
-            });
-          });
-        }
+        // Fetch the current form plus all blocks
+        crmApi4('Afform', 'get', {where: [["OR", [["name", "=", $scope.afGuiEditor.name], ["block", "IS NOT NULL"]]]], layoutFormat: 'shallow', formatWhitespace: true})
+          .then(initialize);
 
-        function initialize(afform) {
-          $scope.afform = afform;
+        // Initialize the current form + list of blocks
+        function initialize(afforms) {
+          $scope.meta.blocks = {};
+          _.each(afforms, function(form) {
+            evaluate(form.layout);
+            if (form.block) {
+              $scope.meta.blocks[_.kebabCase(form.name)] = form;
+            }
+            if (form.name === $scope.afGuiEditor.name) {
+              $scope.afform = form;
+            }
+          });
+          if (!$scope.afform) {
+            $scope.afform = _.cloneDeep(newForm);
+            if ($scope.afGuiEditor.name != '0') {
+              alert('Error: could not find form ' + $scope.afGuiEditor.name);
+            }
+          }
           $scope.changesSaved = 1;
           $scope.layout = findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
-          evaluate($scope.layout['#children']);
           $scope.entities = findRecursive($scope.layout['#children'], {'#tag': 'af-entity'}, 'name');
+
+          if ($scope.afGuiEditor.name == '0') {
+            editor.addEntity('Individual');
+            $scope.layout['#children'].push($scope.meta.elements.submit.element);
+          }
 
           // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
           $scope.$watch('afform', function () {
@@ -394,7 +395,7 @@
     };
   });
 
-  angular.module('afGuiEditor').directive('afGuiContainer', function() {
+  angular.module('afGuiEditor').directive('afGuiContainer', function(crmApi4, dialogService) {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/container.html',
@@ -548,8 +549,7 @@
             $scope.node['#tag'] = 'div';
             $scope.node['class'] = 'af-container';
           }
-          block.override = true;
-          block.layout = null;
+          block.layout = block.directive = null;
         }
 
         $scope.layouts = {
@@ -573,13 +573,34 @@
           modifyClasses($scope.node, _.keys($scope.layouts), classes);
         };
 
+        $scope.selectBlockDirective = function() {
+          if (block.directive) {
+            block.layout = _.cloneDeep($scope.editor.meta.blocks[block.directive].layout);
+            block.original = block.directive;
+            setBlockDirective(block.directive);
+          }
+          else {
+            overrideBlockContents(block.layout);
+          }
+        };
+
         if (($scope.node['#tag'] in $scope.editor.meta.blocks) || $scope.join) {
+          initializeBlockContainer();
+        }
+
+        function initializeBlockContainer() {
+
+          // Cancel the below $watch expressions if already set
+          _.each(block.listeners, function(deregister) {
+            deregister();
+          });
 
           block = $scope.block = {
             directive: null,
             layout: null,
-            override: false,
+            original: null,
             options: [],
+            listeners: []
           };
 
           _.each($scope.editor.meta.blocks, function(blockInfo, directive) {
@@ -591,35 +612,49 @@
             }
           });
 
-          $scope.$watch('block.directive', function (directive, oldVal) {
-            if (directive && directive !== oldVal) {
-              block.layout = _.cloneDeep($scope.editor.meta.blocks[directive].layout);
-              setBlockDirective(directive);
-              block.override = false;
-            }
-            else if (!directive && oldVal) {
-              overrideBlockContents(block.layout);
-              block.override = false;
-            }
-          });
+          if (getBlockNode() && getBlockNode()['#tag'] in $scope.editor.meta.blocks) {
+            block.directive = block.original = getBlockNode()['#tag'];
+            block.layout = _.cloneDeep($scope.editor.meta.blocks[block.directive].layout);
+          }
 
-          $scope.$watch('block.layout', function (layout, oldVal) {
-            if (block.directive && !block.override && layout && layout !== oldVal && !angular.equals(layout, $scope.editor.meta.blocks[block.directive].layout)) {
+          block.listeners.push($scope.$watch('block.layout', function (layout, oldVal) {
+            if (block.directive && layout && layout !== oldVal && !angular.equals(layout, $scope.editor.meta.blocks[block.directive].layout)) {
               overrideBlockContents(block.layout);
             }
-          }, true);
-
-          $scope.$watch("node['#children']", function (children) {
-            if (getBlockNode() && getBlockNode()['#tag'] in $scope.editor.meta.blocks) {
-              block.directive = getBlockNode()['#tag'];
-              block.override = false;
-            } else if (block.directive && block.override && !block.layout && children && angular.equals(children, $scope.editor.meta.blocks[block.directive].layout)) {
-              block.layout = _.cloneDeep($scope.editor.meta.blocks[block.directive].layout);
-              $scope.node['#children'] = [{'#tag': block.directive}];
-              block.override = false;
-            }
-          }, true);
+          }, true));
         }
+
+        $scope.saveBlock = function() {
+          var options = CRM.utils.adjustDialogDefaults({
+            width: '500px',
+            height: '300px',
+            autoOpen: false,
+            title: ts('Save block')
+          });
+          var model = {
+            title: '',
+            name: null,
+            layout: $scope.node['#children']
+          };
+          if ($scope.join) {
+            model.join = $scope.join;
+          }
+          if ($scope.block && $scope.block.original) {
+            model.title = $scope.editor.meta.blocks[$scope.block.original].title;
+            model.name = $scope.editor.meta.blocks[$scope.block.original].name;
+            model.block = $scope.editor.meta.blocks[$scope.block.original].block;
+          }
+          else {
+            model.block = $scope.container.getFieldEntityType() || '*';
+          }
+          dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
+            .then(function(block) {
+              $scope.editor.meta.blocks[_.kebabCase(block.name)] = block;
+              setBlockDirective(_.kebabCase(block.name));
+              initializeBlockContainer();
+            });
+        };
+
       },
       controller: function($scope) {
         var container = $scope.container = this;
@@ -667,6 +702,35 @@
         };
 
       }
+    };
+  });
+
+  angular.module('afGuiEditor').controller('afGuiSaveBlock', function($scope, crmApi4, dialogService) {
+    var ts = $scope.ts = CRM.ts(),
+      model = $scope.model,
+      original = $scope.original = {
+        title: model.title,
+        name: model.name
+      };
+    if (model.name) {
+      $scope.$watch('model.name', function(val, oldVal) {
+        if (!val && model.title === original.title) {
+          model.title += ' ' + ts('(copy)');
+        }
+        else if (val === original.name && val !== oldVal) {
+          model.title = original.title;
+        }
+      });
+    }
+    $scope.cancel = function() {
+      dialogService.cancel('saveBlockDialog');
+    };
+    $scope.save = function() {
+      $('.ui-dialog:visible').block();
+      crmApi4('Afform', 'save', {formatWhitespace: true, records: [JSON.parse(angular.toJson(model))]})
+        .then(function(result) {
+          dialogService.close('saveBlockDialog', result[0]);
+        });
     };
   });
 
