@@ -487,17 +487,17 @@ class CRM_Core_I18n_Schema {
       if (!in_array($dao->Field, array_keys($columns[$table])) and
         !preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $dao->Field)
       ) {
-        $cols[] = $dao->Field;
+        $cols[] = '`' . $dao->Field . '`';
       }
       $tableCols[] = $dao->Field;
     }
     // view intrernationalized columns through an alias
     foreach ($columns[$table] as $column => $_) {
       if (!$isUpgradeMode) {
-        $cols[] = "{$column}_{$locale} {$column}";
+        $cols[] = "`{$column}_{$locale}` `{$column}`";
       }
       elseif (in_array("{$column}_{$locale}", $tableCols)) {
-        $cols[] = "{$column}_{$locale} {$column}";
+        $cols[] = "`{$column}_{$locale}` `{$column}`";
       }
     }
     return "CREATE OR REPLACE VIEW {$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM {$table}";
