@@ -133,6 +133,13 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       // @todo - deprecate is_for_organization, require modified_id
       $targetContactID = CRM_Utils_Array::value('modified_id', $params);
     }
+
+    // add custom field values
+    if (!empty($params['custom']) && is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_membership', $membership->id);
+    }
+
     if ($id) {
       if ($membership->status_id != $oldStatus) {
         CRM_Activity_BAO_Activity::addActivity($membership,
@@ -304,12 +311,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     if (is_a($membership, 'CRM_Core_Error')) {
       $transaction->rollback();
       return $membership;
-    }
-
-    // add custom field values
-    if (!empty($params['custom']) && is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_membership', $membership->id);
     }
 
     $params['membership_id'] = $membership->id;
