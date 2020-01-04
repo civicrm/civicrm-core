@@ -1431,7 +1431,7 @@ class CRM_Export_BAO_ExportProcessor {
     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
     // also for current_employer, CRM-16939
     if ($columnName == 'master_id' || $columnName == 'current_employer') {
-      return "$fieldName varchar(128)";
+      return "`$fieldName` varchar(128)";
     }
 
     $queryFields = $this->getQueryFields();
@@ -1446,23 +1446,23 @@ class CRM_Export_BAO_ExportProcessor {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
           if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
-            return "$fieldName varchar(255)";
+            return "`$fieldName` varchar(255)";
           }
-          return "$fieldName varchar(16)";
+          return "`$fieldName` varchar(16)";
 
         case CRM_Utils_Type::T_STRING:
           if (isset($queryFields[$columnName]['maxlength'])) {
-            return "$fieldName varchar({$queryFields[$columnName]['maxlength']})";
+            return "`$fieldName` varchar({$queryFields[$columnName]['maxlength']})";
           }
           else {
-            return "$fieldName varchar(255)";
+            return "`$fieldName` varchar(255)";
           }
 
         case CRM_Utils_Type::T_TEXT:
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_BLOB:
         case CRM_Utils_Type::T_MEDIUMBLOB:
-          return "$fieldName longtext";
+          return "`$fieldName` longtext";
 
         case CRM_Utils_Type::T_FLOAT:
         case CRM_Utils_Type::T_ENUM:
@@ -1474,15 +1474,15 @@ class CRM_Export_BAO_ExportProcessor {
         case CRM_Utils_Type::T_URL:
         case CRM_Utils_Type::T_CCNUM:
         default:
-          return "$fieldName varchar(32)";
+          return "`$fieldName` varchar(32)";
       }
     }
     else {
       if (substr($fieldName, -3, 3) == '_id') {
-        return "$fieldName varchar(255)";
+        return "`$fieldName` varchar(255)";
       }
       elseif (substr($fieldName, -5, 5) == '_note') {
-        return "$fieldName text";
+        return "`$fieldName` text";
       }
       else {
         $changeFields = [
@@ -1492,7 +1492,7 @@ class CRM_Export_BAO_ExportProcessor {
         ];
 
         if (in_array($fieldName, $changeFields)) {
-          return "$fieldName text";
+          return "`$fieldName` text";
         }
         else {
           // set the sql columns for custom data
@@ -1502,20 +1502,20 @@ class CRM_Export_BAO_ExportProcessor {
               case 'String':
                 // May be option labels, which could be up to 512 characters
                 $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
-                return "$fieldName varchar($length)";
+                return "`$fieldName` varchar($length)";
 
               case 'Link':
-                return "$fieldName varchar(255)";
+                return "`$fieldName` varchar(255)";
 
               case 'Memo':
-                return "$fieldName text";
+                return "`$fieldName` text";
 
               default:
-                return "$fieldName varchar(255)";
+                return "`$fieldName` varchar(255)";
             }
           }
           else {
-            return "$fieldName text";
+            return "`$fieldName` text";
           }
         }
       }

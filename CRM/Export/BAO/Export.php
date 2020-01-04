@@ -330,7 +330,7 @@ FROM   $tableName
       $sqlClause[] = '(' . implode(',', $valueString) . ')';
     }
     $sqlColumns = array_merge(['id' => 1], $processor->getSQLColumns());
-    $sqlColumnString = '(' . implode(',', array_keys($sqlColumns)) . ')';
+    $sqlColumnString = '(`' . implode('`, `', array_keys($sqlColumns)) . '`)';
 
     $sqlValueString = implode(",\n", $sqlClause);
 
