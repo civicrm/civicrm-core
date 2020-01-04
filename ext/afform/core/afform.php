@@ -354,13 +354,17 @@ function afform_civicrm_alterAngular($angular) {
  * @throws API_Exception
  */
 function _af_fill_field_metadata($entityType, DOMElement $afField) {
-  $fieldName = $afField->getAttribute('name');
-  $getFields = civicrm_api4($entityType, 'getFields', [
+  $params = [
     'action' => 'create',
-    'where' => [['name', '=', $fieldName]],
+    'where' => [['name', '=', $afField->getAttribute('name')]],
     'select' => ['title', 'input_type', 'input_attrs', 'options'],
     'loadOptions' => TRUE,
-  ]);
+  ];
+  if (in_array($entityType, CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
+    $params['values'] = ['contact_type' => $entityType];
+    $entityType = 'Contact';
+  }
+  $getFields = civicrm_api4($entityType, 'getFields', $params);
   // Merge field definition data with whatever's already in the markup
   $deep = ['input_attrs'];
   foreach ($getFields as $fieldInfo) {
