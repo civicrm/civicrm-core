@@ -325,8 +325,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'activity_date_time' => $now_date,
       'target_contact_id' => $client_id,
       'source_contact_id' => $loggedInUser,
-      // yeah this is extra weird, but without it you get the wrong subject
-      'subject' => 'null',
     ];
 
     $form->postProcess($actParams);

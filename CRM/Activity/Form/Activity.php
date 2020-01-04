@@ -1200,7 +1200,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * needed, after the activity has been added/updated
    *
    * @param array $params
-   * @param $activity
+   * @param object $activity
    */
   public function endPostProcess(&$params, &$activity) {
     if ($this->_activityTypeFile) {

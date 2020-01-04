@@ -495,30 +495,29 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       foreach ($this->_caseId as $key => $val) {
         $params['case_id'] = $val;
         // activity create/update
-        $activity = CRM_Activity_BAO_Activity::create($params);
-        $vvalue[] = ['case_id' => $val, 'actId' => $activity->id];
+        $activity = civicrm_api3('Activity', 'create', $params);
+        $vvalue[] = ['case_id' => $val, 'actId' => $activity['id']];
         // call end post process, after the activity has been created/updated.
-        $this->endPostProcess($params, $activity);
+        // @fixme: We switched from CRM_Activity_BAO_Activity::create to Activity.create API because that handles
+        //   activity revisions properly (and respects the civicaseActivityRevisions setting).
+        //   But endPostProcess still requires an object.
+        $activityObject = new CRM_Activity_BAO_Activity();
+        $activityObject->id = $activity['id'];
+        $activityObject->find();
+        // call end post process, after the activity has been created/updated.
+        $this->endPostProcess($params, $activityObject);
       }
     }
     else {
       // create a new version of activity if activity was found to
       // have been modified/created by user
 
-      // since the params we need to set are very few, and we don't want rest of the
-      // work done by bao create method , lets use dao object to make the changes
-      $params = ['id' => $this->_activityId];
-      $params['is_current_revision'] = 0;
-      $activity = new CRM_Activity_DAO_Activity();
-      $activity->copyValues($params);
-      $activity->save();
-
       // set proper original_id
       if (!empty($this->_defaults['original_id'])) {
         $newActParams['original_id'] = $this->_defaults['original_id'];
       }
       else {
-        $newActParams['original_id'] = $activity->id;
+        $newActParams['original_id'] = $this->_activityId;
       }
 
       //is_current_revision will be set to 1 by default.
@@ -532,16 +531,23 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $this->beginPostProcess($newActParams);
       foreach ($this->_caseId as $key => $val) {
         $newActParams['case_id'] = $val;
-        $activity = CRM_Activity_BAO_Activity::create($newActParams);
-        $vvalue[] = ['case_id' => $val, 'actId' => $activity->id];
+        //$activity = CRM_Activity_BAO_Activity::create($newActParams);
+        $activity = civicrm_api3('Activity', 'create', $newActParams);
+        $vvalue[] = ['case_id' => $val, 'actId' => $activity['id']];
         // call end post process, after the activity has been created/updated.
-        $this->endPostProcess($newActParams, $activity);
+        // @fixme: We switched from CRM_Activity_BAO_Activity::create to Activity.create API because that handles
+        //   activity revisions properly (and respects the civicaseActivityRevisions setting).
+        //   But endPostProcess still requires an object.
+        $activityObject = new CRM_Activity_BAO_Activity();
+        $activityObject->id = $activity['id'];
+        $activityObject->find();
+        $this->endPostProcess($newActParams, $activityObject);
       }
       // copy files attached to old activity if any, to new one,
       // as long as users have not selected the 'delete attachment' option.
-      if (empty($newActParams['is_delete_attachment']) && ($this->_activityId != $activity->id)) {
+      if (empty($newActParams['is_delete_attachment']) && ($this->_activityId != $activity['id'])) {
         CRM_Core_BAO_File::copyEntityFile('civicrm_activity', $this->_activityId,
-          'civicrm_activity', $activity->id
+          'civicrm_activity', $activity['id']
         );
       }
 
@@ -635,7 +641,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
 
       $extraParams = ['case_id' => $vval['case_id'], 'client_id' => $this->_currentlyViewedContactId];
-      $result = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts, $extraParams);
+      $result = CRM_Activity_BAO_Activity::sendToAssignee($activityObject, $mailToContacts, $extraParams);
       if (empty($result)) {
         $mailStatus = '';
       }
