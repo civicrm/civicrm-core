@@ -996,6 +996,13 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   start_date is between $startDate and $endDate
    */
   public static function getMembershipStarts($membershipTypeId, $startDate, $endDate, $isTest = 0, $isOwner = 0) {
+    // Ensure that the dates that are passed to the query are in the format of yyyy-mm-dd
+    $dates = ['startDate', 'endDate'];
+    foreach ($dates as $date) {
+      if (strlen($$date) === 8) {
+        $$date = date('Y-m-d', strtotime($$date));
+      }
+    }
 
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
