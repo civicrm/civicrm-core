@@ -197,6 +197,11 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     elseif (in_array($field, ['campaign'])) {
       $row->tokens($entity, $field, $this->campaigns[$activity->campaign_id]);
     }
+    elseif (in_array($field, ['case_id'])) {
+      // An activity can be linked to multiple cases so case_id is always an array.
+      // We just return the first case ID for the token.
+      $row->tokens($entity, $field, is_array($activity->case_id) ? reset($activity->case_id) : $activity->case_id);
+    }
     elseif (array_key_exists($field, $this->customFieldTokens)) {
       $row->tokens($entity, $field,
         isset($activity->$field)
