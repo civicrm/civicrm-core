@@ -190,6 +190,7 @@ function dm_install_wordpress() {
   ## Need --exclude=civicrm for self-building on WP site
 
   dm_preg_edit '/^Version: [0-9\.]+/m' "Version: $DM_VERSION" "$to/civicrm.php"
+  dm_preg_edit "/^define\( \'CIVICRM_PLUGIN_VERSION\',\W'[0-9\.]+/m" "define( 'CIVICRM_PLUGIN_VERSION', '$DM_VERSION" "$to/civicrm.php"
 }
 
 ## Generate the composer "vendor" folder
