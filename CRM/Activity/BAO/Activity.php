@@ -1918,33 +1918,23 @@ AND cl.modified_id  = c.id
    * Find the latest revision of a given activity.
    *
    * @param int $activityID
-   *   Prior activity id.
+   *   Prior (or current) activity id.
    *
    * @return int
-   *   current activity id.
+   *   latest activity id.
    */
   public static function getLatestActivityId($activityID) {
-    static $latestActivityIds = [];
-
-    $activityID = CRM_Utils_Type::escape($activityID, 'Integer');
-
-    if (!array_key_exists($activityID, $latestActivityIds)) {
-      $latestActivityIds[$activityID] = [];
-
-      $originalID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity',
-        $activityID,
-        'original_id'
-      );
-      if ($originalID) {
-        $activityID = $originalID;
-      }
-      $params = [1 => [$activityID, 'Integer']];
-      $query = "SELECT id from civicrm_activity where original_id = %1 and is_current_revision = 1";
-
-      $latestActivityIds[$activityID] = CRM_Core_DAO::singleValueQuery($query, $params);
+    try {
+      $activity = civicrm_api3('Activity', 'getsingle', [
+        'original_id' => $activityID,
+        'is_current_revision' => 1,
+        'return' => 'original_id',
+      ]);
     }
-
-    return $latestActivityIds[$activityID];
+    catch (Exception $e) {
+      return $activityID;
+    }
+    return $activity['id'];
   }
 
   /**
