@@ -586,4 +586,25 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']];
   }
 
+  /**
+   * Make a copy.
+   *
+   * @param int $id The entity id to copy.
+   * @param array $params
+   * @return CRM_Core_DAO
+   */
+  public static function copy($id, $params = []) {
+    $fieldsFix = [
+      'suffix' => [
+        'msg_title' => ' - ' . ts('Copy'),
+      ],
+      'replace' => $params,
+    ];
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_MessageTemplate', ['id' => $id], NULL, $fieldsFix);
+    $copy->save();
+    CRM_Utils_Hook::copy('MessageTemplate', $copy);
+
+    return $copy;
+  }
+
 }

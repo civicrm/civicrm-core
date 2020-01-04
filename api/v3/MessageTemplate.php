@@ -185,3 +185,36 @@ function _civicrm_api3_message_template_send_spec(&$params) {
   $params['pdf_filename']['api.aliases'] = ['PDFFilename'];
   $params['pdf_filename']['type'] = CRM_Utils_Type::T_STRING;
 }
+
+/**
+ * Adjust metadata for clone spec action.
+ *
+ * @param array $spec
+ */
+function _civicrm_api3_message_template_clone_spec(&$spec) {
+  $spec['id']['title'] = 'ID to clone';
+  $spec['id']['type'] = CRM_Utils_Type::T_INT;
+  $spec['id']['api.required'] = 1;
+}
+
+/**
+ * Clone Entity.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ */
+function civicrm_api3_message_template_clone($params) {
+  if (empty($params['id'])) {
+    throw new API_Exception("Mandatory key(s) missing from params array: id field is required");
+  }
+  $id = $params['id'];
+  unset($params['id']);
+  $params['workflow_id'] = 'null';
+  $params['is_reserved'] = 0;
+  $params['is_default'] = 0;
+  $newDAO = CRM_Core_BAO_MessageTemplate::copy($id, $params);
+  return civicrm_api3('MessageTemplate', 'get', ['id' => $newDAO->id]);
+}
