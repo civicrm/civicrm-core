@@ -1,7 +1,7 @@
 <label for="af_config_form_title">
-  {{ ts('Title:') }}
+  {{ ts('Title:') }} <span class="crm-marker">*</span>
 </label>
-<input ng-model="afform.title" class="form-control" id="af_config_form_title" />
+<input ng-model="afform.title" class="form-control" id="af_config_form_title" required />
 <label for="af_config_form_description">
   {{ ts('Description:') }}
 </label>

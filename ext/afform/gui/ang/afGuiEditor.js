@@ -29,13 +29,10 @@
         $scope.saving = false;
         $scope.selectedEntityName = null;
         $scope.meta = this.meta = CRM.afformAdminData;
-        _.each($scope.meta.blocks, function(block) {
-          evaluate(block.layout);
-        });
         this.scope = $scope;
         var editor = $scope.editor = this;
         var newForm = {
-          title: ts('Untitled Form'),
+          title: '',
           permission: 'access CiviCRM',
           layout: [{
             '#tag': 'af-form',
@@ -62,10 +59,9 @@
           if (!$scope.afform) {
             $scope.afform = _.cloneDeep(newForm);
             if ($scope.afGuiEditor.name != '0') {
-              alert('Error: could not find form ' + $scope.afGuiEditor.name);
+              alert('Error: unknown form "' + $scope.afGuiEditor.name + '"');
             }
           }
-          $scope.changesSaved = 1;
           $scope.layout = findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
           $scope.entities = findRecursive($scope.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
@@ -75,6 +71,7 @@
           }
 
           // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
+          $scope.changesSaved = $scope.afGuiEditor.name == '0' ? false : 1;
           $scope.$watch('afform', function () {
             $scope.changesSaved = $scope.changesSaved === 1;
           }, true);
@@ -114,7 +111,7 @@
           };
           // Add default contact name block
           if (meta.entity === 'Contact') {
-            fieldset['#children'].push({'#tag': 'block-name-' + type.toLowerCase()});
+            fieldset['#children'].push({'#tag': 'afblock-name-' + type.toLowerCase()});
           }
           // Attempt to place the new af-fieldset after the last one on the form
           pos = 1 + _.findLastIndex($scope.layout['#children'], 'af-fieldset');
