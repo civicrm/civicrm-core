@@ -774,7 +774,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // rewrite the queries into CREATE TABLE queries for log tables:
     $cols = <<<COLS
             ,
-            log_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            log_date    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             log_conn_id VARCHAR(17),
             log_user_id INTEGER,
             log_action  ENUM('Initialization', 'Insert', 'Update', 'Delete')
