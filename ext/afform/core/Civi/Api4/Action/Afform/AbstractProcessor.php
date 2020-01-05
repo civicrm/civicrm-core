@@ -77,15 +77,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @throws \API_Exception
    */
   protected static function getJoinWhereClause($mainEntityName, $joinEntityName, $mainEntityId) {
-    $joinMeta = \Civi::$statics[__CLASS__][__FUNCTION__][$joinEntityName] ?? NULL;
     $params = [];
-    if (!$joinMeta) {
-      $joinMeta = civicrm_api4($joinEntityName, 'getFields', ['checkPermissions' => FALSE, 'action' => 'create', 'select' => ['name']])->column('name');
-      \Civi::$statics[__CLASS__][__FUNCTION__][$joinEntityName] = $joinMeta;
-    }
-    if (in_array('entity_id', $joinMeta)) {
+    if (self::fieldExists($joinEntityName, 'entity_id')) {
       $params[] = ['entity_id', '=', $mainEntityId];
-      if (in_array('entity_table', $joinMeta)) {
+      if (self::fieldExists($joinEntityName, 'entity_table')) {
         $params[] = ['entity_table', '=', 'civicrm_' . _civicrm_api_get_entity_name_from_camel($mainEntityName)];
       }
     }
@@ -94,6 +89,28 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $params[] = [$mainEntityField, '=', $mainEntityId];
     }
     return $params;
+  }
+
+  /**
+   * Check if a field exists for a given entity
+   *
+   * @param $entityName
+   * @param $fieldName
+   * @return bool
+   * @throws \API_Exception
+   */
+  public static function fieldExists($entityName, $fieldName) {
+    if (empty(\Civi::$statics[__CLASS__][__FUNCTION__][$entityName])) {
+      $getFields = \Civi\Api4\Utils\ActionUtil::getAction($entityName, 'getFields');
+      $getFields->setCheckPermissions(FALSE);
+      $getFields->setAction('create');
+      $getFields->addSelect('name');
+      if (property_exists($getFields, 'includeCustom')) {
+        $getFields->setIncludeCustom(FALSE);
+      }
+      \Civi::$statics[__CLASS__][__FUNCTION__][$entityName] = $getFields->execute()->column('name');
+    }
+    return in_array($fieldName, \Civi::$statics[__CLASS__][__FUNCTION__][$entityName]);
   }
 
 }

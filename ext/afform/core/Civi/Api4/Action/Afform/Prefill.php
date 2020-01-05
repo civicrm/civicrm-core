@@ -53,10 +53,11 @@ class Prefill extends AbstractProcessor {
       $data = ['fields' => $item];
       foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
         $data['joins'][$joinEntity] = (array) civicrm_api4($joinEntity, 'get', [
-          'where' => $this->getJoinWhereClause($entity['type'], $joinEntity, $item['id']),
+          'where' => self::getJoinWhereClause($entity['type'], $joinEntity, $item['id']),
           'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
           'select' => array_keys($join['fields']),
           'checkPermissions' => $checkPermissions,
+          'orderBy' => self::fieldExists($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
         ]);
       }
       $this->_data[$entity['name']][] = $data;
