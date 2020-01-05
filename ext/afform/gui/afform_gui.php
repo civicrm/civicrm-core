@@ -261,6 +261,24 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
         ],
       ],
     ],
+    'fieldset' => [
+      'title' => ts('Fieldset'),
+      'element' => [
+        '#tag' => 'fieldset',
+        'af-fieldset' => NULL,
+        '#children' => [
+          [
+            '#tag' => 'legend',
+            'class' => 'af-text',
+            '#children' => [
+              [
+                '#text' => ts('Enter title'),
+              ],
+            ],
+          ],
+        ],
+      ],
+    ],
   ];
 
   // Reformat options

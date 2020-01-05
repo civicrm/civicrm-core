@@ -22,7 +22,7 @@
     <div class="af-gui-entity-palette-select-list">
       <div ng-if="blockList.length">
         <label>{{ ts('Blocks') }}</label>
-        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] &gt; [ui-sortable]'}" ng-model="blockList">
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="blockList">
           <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
             {{ blockTitles[$index] }}
           </div>
@@ -30,7 +30,7 @@
       </div>
       <div ng-if="elementList.length">
         <label>{{ ts('Elements') }}</label>
-        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]'}" ng-model="elementList">
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="elementList">
           <div ng-repeat="element in elementList" >
             {{ elementTitles[$index] }}
           </div>
@@ -39,7 +39,7 @@
       <div ng-repeat="fieldGroup in fieldList">
         <div ng-if="fieldGroup.fields.length">
           <label>{{ fieldGroup.label }}</label>
-          <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + fieldGroup.entityName + '] &gt; [ui-sortable]'}" ng-model="fieldGroup.fields">
+          <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + fieldGroup.entityName + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="fieldGroup.fields">
             <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name)}">
               {{ editor.getField(fieldGroup.entityType, field.name).title }}
             </div>

@@ -124,7 +124,7 @@
   opacity: 1;
   transition: opacity .2s;
 }
-#afGuiEditor-canvas .panel-body > div > .af-gui-bar {
+#afGuiEditor-canvas-body > div > .af-gui-bar {
   top: -5px;
 }
 
@@ -482,4 +482,10 @@
 }
 #afGuiEditor [af-gui-edit-options] h5 {
   margin-left: 20px;
+}
+
+#afGuiEditor .af-gui-dropzone {
+  background-color: #e9eeff;
+  border: 2px solid #0071bd;
+  min-height: 30px;
 }

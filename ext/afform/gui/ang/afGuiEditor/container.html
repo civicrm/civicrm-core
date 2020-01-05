@@ -22,7 +22,7 @@
     <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/canvas-menu.html'"></ul>
   </div>
 </div>
-<div ui-sortable="{handle: '.af-gui-bar', update: onDrop, connectWith: '[ui-sortable]', cancel: 'input,textarea,button,select,option,a,.dropdown-menu'}" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
+<div ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]', cancel: 'input,textarea,button,select,option,a,.dropdown-menu', placeholder: 'af-gui-dropzone', containment: '#afGuiEditor-canvas-body'}" ui-sortable-update="editor.onDrop" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
   <div ng-repeat="item in getSetChildren()" >
     <div ng-switch="container.getNodeType(item)">
       <div ng-switch-when="fieldset" af-gui-container="item" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" />

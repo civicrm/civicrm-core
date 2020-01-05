@@ -94,21 +94,9 @@
           var pos = 1 + _.findLastIndex($scope.layout['#children'], {'#tag': 'af-entity'});
           $scope.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
-          var fieldset = {
-            '#tag': 'fieldset',
-            'af-fieldset': type + num,
-            '#children': [
-              {
-                '#tag': 'legend',
-                'class': 'af-text',
-                '#children': [
-                  {
-                    '#text': meta.label + ' ' + num
-                  }
-                ]
-              }
-            ]
-          };
+          var fieldset = _.cloneDeep(editor.meta.elements.fieldset.element);
+          fieldset['af-fieldset'] = type + num;
+          fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
           // Add default contact name block
           if (meta.entity === 'Contact') {
             fieldset['#children'].push({'#tag': 'afblock-name-' + type.toLowerCase()});
@@ -144,6 +132,28 @@
 
         this.getSelectedEntityName = function() {
           return $scope.selectedEntityName;
+        };
+
+        // Validates that a drag-n-drop action is allowed
+        this.onDrop = function(event, ui) {
+          var sort = ui.item.sortable;
+          // Check if this is a callback for an item dropped into a different container
+          // @see https://github.com/angular-ui/ui-sortable notes on canceling
+          if (!sort.received && sort.source[0] !== sort.droptarget[0]) {
+            var $source = $(sort.source[0]),
+              $target = $(sort.droptarget[0]),
+              $item = $(ui.item[0]);
+            // Fields cannot be dropped outside their own entity
+            if ($item.is('[af-gui-field]') || $item.has('[af-gui-field]').length) {
+              if ($source.closest('[data-entity]').attr('data-entity') !== $target.closest('[data-entity]').attr('data-entity')) {
+                return sort.cancel();
+              }
+            }
+            // Entity-fieldsets cannot be dropped into other entity-fieldsets
+            if ((sort.model['af-fieldset'] || $item.has('.af-gui-fieldset').length) && $target.closest('.af-gui-fieldset').length) {
+              return sort.cancel();
+            }
+          }
         };
 
         $scope.addEntity = function(entityType) {
@@ -334,8 +344,12 @@
           $scope.elementTitles.length = 0;
           _.each($scope.editor.meta.elements, function(element, name) {
             if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
-              $scope.elementList.push(_.cloneDeep(element.element));
-              $scope.elementTitles.push(element.title);
+              var node = _.cloneDeep(element.element);
+              if (name === 'fieldset') {
+                node['af-fieldset'] = $scope.entity.name;
+              }
+              $scope.elementList.push(node);
+              $scope.elementTitles.push(name === 'fieldset' ? ts('Fieldset for %1', {1: $scope.entity.label}) : element.title);
             }
           });
         }
@@ -456,32 +470,6 @@
         $scope.selectEntity = function() {
           if ($scope.node['af-fieldset']) {
             $scope.editor.selectEntity($scope.node['af-fieldset']);
-          }
-        };
-
-        // Validates that a drag-n-drop action is allowed
-        $scope.onDrop = function(event, ui) {
-          var sort = ui.item.sortable;
-          // Check if this is a callback for an item dropped into a different container
-          // @see https://github.com/angular-ui/ui-sortable notes on canceling
-          if (!sort.received && sort.source[0] !== sort.droptarget[0]) {
-            var $source = $(sort.source[0]),
-              $target = $(sort.droptarget[0]),
-              $item = $(ui.item[0]);
-            // Dropping onto palette is ok; works like a trash can
-            if ($target.closest('#afGuiEditor-palette-config').length) {
-              return;
-            }
-            // Fields cannot be dropped outside their own entity
-            if ($item.is('[af-gui-field]') || $item.has('[af-gui-field]').length) {
-              if ($source.closest('[data-entity]').attr('data-entity') !== $target.closest('[data-entity]').attr('data-entity')) {
-                return sort.cancel();
-              }
-            }
-            // Entity-fieldsets cannot be dropped into other entity-fieldsets
-            if (($item.hasClass('af-gui-fieldset') || $item.has('.af-gui-fieldset').length) && $target.closest('.af-gui-fieldset').length) {
-              return sort.cancel();
-            }
           }
         };
 
