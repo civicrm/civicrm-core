@@ -259,4 +259,42 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $this->assertEquals(1, $recipients['count'], 'Check recipient count');
   }
 
+  /**
+   * Test updating a group with just description and check the recent items
+   * list has the right title.
+   */
+  public function testGroupUpdateDescription() {
+    // Create a group. Copied from $this->testAddSimple().
+    // Note we need $checkParams because the function call changes $params.
+    $checkParams = $params = [
+      'title' => 'Group Uno',
+      'description' => 'Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    ];
+    $group = CRM_Contact_BAO_Group::create($params);
+
+    // Update the group with just id and description.
+    $newParams = [
+      'id' => $group->id,
+      'description' => 'The first group',
+    ];
+    CRM_Contact_BAO_Group::create($newParams);
+
+    // Check it against original array, except description.
+    $result = $this->callAPISuccess('Group', 'getsingle', ['id' => $group->id]);
+    foreach ($checkParams as $key => $value) {
+      if ($key === 'description') {
+        $this->assertEquals($newParams[$key], $result[$key], "$key doesn't match");
+      }
+      else {
+        $this->assertEquals($checkParams[$key], $result[$key], "$key doesn't match");
+      }
+    }
+
+    // Check recent items list.
+    $recentItems = CRM_Utils_Recent::get();
+    $this->assertEquals($checkParams['title'], $recentItems[0]['title']);
+  }
+
 }

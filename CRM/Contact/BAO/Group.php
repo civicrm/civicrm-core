@@ -334,6 +334,21 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Utils_Hook::pre('create', 'Group', NULL, $params);
     }
 
+    // If title isn't specified, retrieve it because we use it later, e.g.
+    // for RecentItems. But note we use array_key_exists not isset or empty
+    // since otherwise there would be no way to blank out an existing title.
+    // I'm not sure what the use-case is for that, but you're allowed to do it
+    // currently.
+    if (!empty($params['id']) && !array_key_exists('title', $params)) {
+      try {
+        $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $params['id'], 'title', 'id');
+        $params['title'] = $groupTitle;
+      }
+      catch (CRM_Core_Exception $groupTitleException) {
+        // don't set title
+      }
+    }
+
     // dev/core#287 Disable child groups if all parents are disabled.
     if (!empty($params['id'])) {
       $allChildGroupIds = self::getChildGroupIds($params['id']);
