@@ -180,8 +180,14 @@
   opacity: 1;
   transition: opacity 0s;
 }
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > span {
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > button > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > span {
   color: white;
+}
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > button:hover > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .open > button > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > button:focus > span {
+  color: #0071bd;
 }
 
 #afGuiEditor [ui-sortable] {
@@ -218,16 +224,14 @@
   left: 4px;
   top: 5px;
 }
+#afGuiEditor .af-gui-add-element-button {
+  background-color: transparent;
+}
 #afGuiEditor .af-gui-add-element-button span {
   display: inline-block;
   width: 18px;
   height: 18px;
-  border: 2px dashed #0071bd;
   color: #0071bd;
-}
-#afGuiEditor .af-gui-add-element-button span i {
-  position: relative;
-  top: -2px;
 }
 
 #afGuiEditor .af-gui-layout-icon {
