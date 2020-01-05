@@ -124,9 +124,6 @@
   opacity: 1;
   transition: opacity .2s;
 }
-#afGuiEditor-canvas-body > div > .af-gui-bar {
-  top: -5px;
-}
 
 #afGuiEditor .af-gui-bar .btn.active {
   background-color: #b3b3b3;
@@ -220,12 +217,6 @@
   position: absolute;
   left: 4px;
   top: 5px;
-}
-#afGuiEditor #afGuiEditor-canvas .af-gui-add-canvas-button {
-  border: 2px dashed #0071bd;
-  color: #0071bd;
-  padding-top: 2px;
-  padding-bottom: 2px;
 }
 #afGuiEditor .af-gui-add-element-button span {
   display: inline-block;

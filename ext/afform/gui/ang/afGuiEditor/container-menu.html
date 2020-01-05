@@ -1,8 +1,3 @@
-<li><a href ng-click="addElement('div.af-container')">{{ ts('Add container') }}</a></li>
-<li><a href ng-click="addElement('p.af-text')">{{ ts('Add text box') }}</a></li>
-<li><a href ng-click="addElement('div.af-markup', {'#markup': false})">{{ ts('Add rich content') }}</a></li>
-<li><a href ng-click="addElement('button.af-button.btn-primary', {'crm-icon': 'fa-check', 'ng-click': 'afform.submit()'})">{{ ts('Add button') }}</a></li>
-<li role="separator" class="divider"></li>
 <li ng-if="!node['af-fieldset'] && !block.layout"><a href ng-click="saveBlock()">{{ ts('Save as block') }}</a></li>
 <li ng-if="!node['af-fieldset'] && !block.layout" role="separator" class="divider"></li>
 <li ng-if="tags[node['#tag']]">

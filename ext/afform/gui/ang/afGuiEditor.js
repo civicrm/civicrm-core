@@ -444,25 +444,6 @@
         $scope.editor = ctrls[0];
         $scope.parentContainer = ctrls[1];
 
-        $scope.addElement = function(type, props) {
-          var classes = type.split('.');
-          var element = _.defaults({
-            '#tag': classes.shift(),
-            'class': classes.join(' '),
-          }, props);
-          if (_.includes(classes, 'af-container')) {
-            element['#children'] = [];
-          } else if (_.intersection(classes, ['af-text', 'af-button']).length) {
-            element['#children'] = [{'#text': ts('Enter text')}];
-          }
-          var children = $scope.getSetChildren();
-          if (children) {
-            // Add it to the top, underneath the fieldset legend if present
-            var pos = children.length && children[0]['#tag'] === 'legend' ? 1 : 0;
-            children.splice(pos, 0, element);
-          }
-        };
-
         $scope.isSelectedFieldset = function(entityName) {
           return entityName === $scope.editor.getSelectedEntityName();
         };
