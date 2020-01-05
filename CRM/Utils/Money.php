@@ -62,9 +62,18 @@ class CRM_Utils_Money {
     }
 
     if ($onlyNumber) {
+      if ($valueFormat === '%!i') {
+        $amount = self::formatNumericByNumberFormatter($amount);
+      }
       // money_format() exists only in certain PHP install (CRM-650)
-      if (is_numeric($amount) and function_exists('money_format')) {
-        $amount = money_format($valueFormat, $amount);
+      if (is_numeric($amount)) {
+        if (!empty($valueFormat)) {
+          Civi::log()->warning(
+           'Having a Money Value format other than !%i is deprecated, please report this on GitLab with the relevant moneyValueFormat you use.',
+             ['civi.tag' => 'deprecated']
+          );
+        }
+        $amount = self::formatNumericByFormat($amount, $valueFormat);
       }
       return $amount;
     }
@@ -86,7 +95,18 @@ class CRM_Utils_Money {
       throw new CRM_Core_Exception("Invalid currency \"{$currency}\"");
     }
 
-    $amount = self::formatNumericByFormat($amount, $valueFormat);
+    if ($valueFormat === '%!i') {
+      $amount = self::formatNumericByNumberFormatter($amount);
+    }
+    else {
+      if (!empty($valueFormat)) {
+        Civi::log()->warning(
+          'Having a Money Value format other than !%i is deprecated, please report this on GitLab with the relevant moneyValueFormat you use.',
+          ['civi.tag' => 'deprecated']
+        );
+      }
+      $amount = self::formatNumericByFormat($amount, $valueFormat);
+    }
     // If it contains tags, means that HTML was passed and the
     // amount is already converted properly,
     // so don't mess with it again.
@@ -170,7 +190,17 @@ class CRM_Utils_Money {
    * @return string
    */
   protected static function formatLocaleNumeric($amount) {
-    return self::formatNumericByFormat($amount, CRM_Core_Config::singleton()->moneyvalueformat);
+    $moneyValueFormat = CRM_Core_Config::singleton()->moneyvalueformat;
+    if ($moneyValueFormat === '%!i') {
+      return self::formatNumericByNumberFormatter($amount);
+    }
+    if (!empty($valueFormat)) {
+      Civi::log()->warning(
+        'Having a Money Value format other than !%i is deprecated, please report this on GitLab with the relevant moneyValueFormat you use.',
+        ['civi.tag' => 'deprecated']
+      );
+    }
+    return self::formatNumericByFormat($amount, $moneyValueFormat);
   }
 
   /**
@@ -257,6 +287,18 @@ class CRM_Utils_Money {
       setlocale(LC_MONETARY, $lc);
     }
     return $amount;
+  }
+
+  /**
+   * Format numeric part of currency by using the NumberFormatter class
+   * @param string $amount
+   * @param int $numberFormatterType
+   *
+   * @return string
+   */
+  protected static function formatNumericByNumberFormatter($amount, $numberFormatterType = NumberFormatter::DECIMAL) {
+    $formatter = new NumberFormatter(CRM_Core_I18n::getLocale(), $numberFormatterType);
+    return $formatter->format($amount);
   }
 
 }
