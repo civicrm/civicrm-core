@@ -502,6 +502,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
     else {
+      // create a new version of activity if activity was found to
+      // have been modified/created by user
+
       // since the params we need to set are very few, and we don't want rest of the
       // work done by bao create method , lets use dao object to make the changes
       $params = ['id' => $this->_activityId];
@@ -509,11 +512,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $activity = new CRM_Activity_DAO_Activity();
       $activity->copyValues($params);
       $activity->save();
-    }
 
-    // create a new version of activity if activity was found to
-    // have been modified/created by user
-    if (isset($newActParams)) {
       // set proper original_id
       if (!empty($this->_defaults['original_id'])) {
         $newActParams['original_id'] = $this->_defaults['original_id'];
