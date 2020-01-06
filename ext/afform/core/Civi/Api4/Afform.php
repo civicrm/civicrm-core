@@ -7,7 +7,7 @@ use Civi\Api4\Generic\BasicBatchAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
- * Class Afform
+ * User-configurable forms
  * @package Civi\Api4
  */
 class Afform extends AbstractEntity {
@@ -126,6 +126,12 @@ class Afform extends AbstractEntity {
       ];
 
       if ($self->getAction() === 'get') {
+        $fields[] = [
+          'name' => 'module_name',
+        ];
+        $fields[] = [
+          'name' => 'directive_name',
+        ];
         $fields[] = [
           'name' => 'has_local',
         ];
