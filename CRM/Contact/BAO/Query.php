@@ -946,7 +946,7 @@ class CRM_Contact_BAO_Query {
             GROUP_CONCAT(DISTINCT IF(civicrm_group_contact.status = 'Added', civicrm_group_contact.group_id, '')),
             GROUP_CONCAT(DISTINCT civicrm_group_contact_cache.group_id)
           )
-          as groups";
+          as `groups`";
           $this->_element[$name] = 1;
           $this->_tables['civicrm_group_contact'] = 1;
           $this->_tables['civicrm_group_contact_cache'] = 1;
