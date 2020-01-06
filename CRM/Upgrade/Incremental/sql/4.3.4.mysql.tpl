@@ -9,8 +9,8 @@ VALUES
 SELECT @option_group_id_csgOpt := max(id) FROM civicrm_option_group WHERE name = 'contact_smart_group_display';
 
 INSERT INTO
-civicrm_option_value (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter,
-is_default, weight)
+civicrm_option_value (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`,
+`is_default`, `weight`)
 VALUES
 (@option_group_id_csgOpt, {localize}'Show Smart Groups on Demand'{/localize}, 1, 'showondemand', NULL, 0, 0, 1),
 (@option_group_id_csgOpt, {localize}'Always Show Smart Groups'{/localize}, 2, 'alwaysshow', NULL, 0, 0, 2),
