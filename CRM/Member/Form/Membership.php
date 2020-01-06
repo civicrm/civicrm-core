@@ -393,7 +393,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $this->buildQuickEntityForm();
     $this->assign('currency', CRM_Core_BAO_Country::defaultCurrencySymbol());
+
+    // Check if we are dealing with an auto-renewing membership.
+    // If so, does the payment processor supports cancelling the subscription?
+    // This is used to freeze certain fields to prevent the user editing them.
     $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
+    $canCancelAutoRenew = $isUpdateToExistingRecurringMembership && CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id);
+
     // build price set form.
     $buildPriceSet = FALSE;
     if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
@@ -552,7 +558,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     );
 
     $sel->setOptions([$selMemTypeOrg, $selOrgMemType]);
-    if ($isUpdateToExistingRecurringMembership) {
+    if ($canCancelAutoRenew) {
       $sel->freeze();
     }
 
@@ -579,7 +585,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $statusOverride = $this->addElement('select', 'is_override', ts('Status Override?'),
         CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
-      if ($statusOverride && $isUpdateToExistingRecurringMembership) {
+      if ($statusOverride && $canCancelAutoRenew) {
         $statusOverride->freeze();
       }
 
@@ -647,7 +653,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('displayName', $this->_memberDisplayName);
     }
 
-    if ($isUpdateToExistingRecurringMembership && CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
+    if ($canCancelAutoRenew) {
       $this->assign('cancelAutoRenew',
         CRM_Utils_System::url('civicrm/contribute/unsubscribe', "reset=1&mid={$this->_id}")
       );
