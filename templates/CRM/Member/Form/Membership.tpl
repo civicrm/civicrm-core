@@ -13,6 +13,11 @@
     <div class="icon inform-icon"></div>
     <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type or Membership Status: <a href="%1">Cancel auto-renew</a>{/ts}</p>
   </div>
+{elseif $isRecur}
+  <div class="messages status no-popup">
+    <div class="icon inform-icon"></div>
+    <p>{ts}This membership is set to renew automatically. Please be aware that any changes that you make here may not be reflected in the payment processor. Please ensure that you alter the related subscription at the payment processor.{/ts}</p>
+  </div>
 {/if}
 <div class="spacer"></div>
 {if $priceSetId}
