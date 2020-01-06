@@ -78,7 +78,14 @@
         </tr>
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
-          <td><span id='mem_type_id'>{$form.membership_type_id.html}</span>
+          <td id="mem_type_id-readonly">
+            {$form.membership_type_id}
+            <a href="#" class="crm-hover-button action-item override-membership-type" id="show-mem-type">
+              {ts}Override membership type{/ts}
+            </a>
+            {help id="override_membership_type"}
+          </td>
+          <td id="mem_type_id-editable"><span id='mem_type_id'>{$form.membership_type_id.html}</span>
             {if $hasPriceSets}
               <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
               <span id='selectPriceSet'>{$form.price_set_id.html}</span>
@@ -126,7 +133,7 @@
           <td id="end-date-readonly">
               {$endDate|crmDate}
               <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
-                {ts}Over-ride end date{/ts}
+                {ts}Override end date{/ts}
               </a>
               {help id="override_end_date"}
           </td>
@@ -342,6 +349,23 @@
       setDifferentContactBlock();
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
+      });
+
+      // give option to override membership type for auto-renew memberships - dev/core#1331
+      {/literal}
+      {if $isRecur}
+      cj('#mem_type_id-readonly').show();
+      cj('#mem_type_id-editable').hide();
+      {else}
+      cj('#mem_type_id-readonly').hide();
+      cj('#mem_type_id-editable').show();
+      {/if}
+      {literal}
+
+      cj('#show-mem-type').click( function( e ) {
+        e.preventDefault();
+        cj('#mem_type_id-readonly').hide();
+        cj('#mem_type_id-editable').show();
       });
 
       // give option to override end-date for auto-renew memberships
