@@ -210,7 +210,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       NULL,
       $recentOther
     );
-    $contributionStatus = $status[$values['contribution_status_id']];
+    $statusOptionValueNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contributionStatus = $statusOptionValueNames[$values['contribution_status_id']];
     if (in_array($contributionStatus, ['Partially paid', 'Pending refund'])
         || ($contributionStatus == 'Pending' && $values['is_pay_later'])
         ) {
