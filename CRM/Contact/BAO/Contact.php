@@ -1384,54 +1384,15 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             $withMultiCustomFields
           )
         );
-        //unset the fields, which are not related to their
-        //contact type.
-        $commonValues = [
-          'Individual' => [
-            'household_name',
-            'legal_name',
-            'sic_code',
-            'organization_name',
-          ],
-          'Household' => [
-            'first_name',
-            'middle_name',
-            'last_name',
-            'formal_title',
-            'job_title',
-            'gender_id',
-            'prefix_id',
-            'suffix_id',
-            'birth_date',
-            'organization_name',
-            'legal_name',
-            'legal_identifier',
-            'sic_code',
-            'home_URL',
-            'is_deceased',
-            'deceased_date',
-          ],
-          'Organization' => [
-            'first_name',
-            'middle_name',
-            'last_name',
-            'formal_title',
-            'job_title',
-            'gender_id',
-            'prefix_id',
-            'suffix_id',
-            'birth_date',
-            'household_name',
-            'is_deceased',
-            'deceased_date',
-          ],
-        ];
-        foreach ($commonValues[$contactType] as $value) {
-          unset($fields[$value]);
+        // Unset the fields which are not related to their contact type.
+        foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
+          if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
+            unset($fields[$name]);
+          }
         }
       }
       else {
-        foreach (['Individual', 'Household', 'Organization'] as $type) {
+        foreach (CRM_Contact_BAO_ContactType::basicTypes() as $type) {
           $fields = array_merge($fields,
             CRM_Core_BAO_CustomField::getFieldsForImport($type,
               $showAll,
@@ -1604,7 +1565,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           );
         }
         else {
-          foreach (['Individual', 'Household', 'Organization'] as $type) {
+          foreach (CRM_Contact_BAO_ContactType::basicTypes() as $type) {
             $fields = array_merge($fields,
               CRM_Core_BAO_CustomField::getFieldsForImport($type, FALSE, FALSE, $search, $checkPermissions, $withMultiRecord)
             );
