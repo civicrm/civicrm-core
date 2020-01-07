@@ -459,7 +459,7 @@ return [
     ],
     'default' => 'en_US',
     'add' => '4.3',
-    'title' => 'Default Language',
+    'title' => ts('Default Language'),
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
@@ -487,7 +487,7 @@ return [
       'maxlength' => '30',
     ],
     'default' => 'Windows-1252',
-    'title' => 'Legacy Encoding',
+    'title' => ts('Legacy Encoding'),
     'description' => 'If import files are NOT encoded as UTF-8, specify an alternate character encoding for these files. The default of Windows-1252 will work for Excel-created .CSV files on many computers.',
   ],
   'timeInputFormat' => [
@@ -505,7 +505,7 @@ return [
       'callback' => 'CRM_Core_SelectValues::getTimeFormats',
     ],
     'default' => '1',
-    'title' => 'Time Input Format',
+    'title' => ts('Time Input Format'),
     'description' => '',
     'on_change' => [
       'CRM_Core_BAO_PreferencesDate::onChangeSetting',
@@ -523,10 +523,9 @@ return [
     ],
     'default' => '0',
     'add' => '4.7',
-    'title' => 'Week begins on',
+    'title' => ts('Week begins on'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => "",
     'help_text' => NULL,
   ],
   'contact_default_language' => [
@@ -547,7 +546,7 @@ return [
     'title' => 'Default Language for contacts',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Default language (if any) for contact records',
+    'description' => ts('Default language (if any) for contact records'),
     'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.'
     . 'You may or may not wish to make an assumption here about whether it matches the site language',
   ],
