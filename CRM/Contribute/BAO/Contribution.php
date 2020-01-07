@@ -133,7 +133,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
     // do the same for chargeback - this entered the code 'accidentally' but moving it to here
     // as part of cleanup maintains consistency.
@@ -142,7 +141,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $params['creditnote_id'] = self::createCreditNoteId();
       }
     }
-    if (empty($params['contribution_status_id'])) {
+    $contributionStatusID = $params['contribution_status_id'] ?? NULL;
+    if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $contributionStatusID) === 'Partially paid' && empty($params['is_post_payment_create'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('Setting status to partially paid other than by using Payment.create is deprecated and unreliable');
+    }
+    if (!$contributionStatusID) {
       // Since the fee amount is expecting this (later on) ensure it is always set.
       // It would only not be set for an update where it is unchanged.
       $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', [
@@ -150,6 +153,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'return' => 'contribution_status_id',
       ]);
     }
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
 
     if (!$contributionID
       && CRM_Utils_Array::value('membership_id', $params)
@@ -184,9 +188,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($contributionID && $setPrevContribution) {
       $params['prevContribution'] = self::getOriginalContribution($contributionID);
     }
+    $previousContributionStatus = ($contributionID && !empty($params['prevContribution'])) ? CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['prevContribution']->contribution_status_id) : NULL;
 
-    if ($contributionID && !empty($params['revenue_recognition_date']) && !empty($params['prevContribution'])
-      && !($contributionStatus[$params['prevContribution']->contribution_status_id] == 'Pending')
+    if ($contributionID && !empty($params['revenue_recognition_date'])
+      && !($previousContributionStatus === 'Pending')
       && !self::allowUpdateRevenueRecognitionDate($contributionID)
     ) {
       unset($params['revenue_recognition_date']);
@@ -233,7 +238,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (self::isUpdateToRecurringContribution($params)) {
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
         (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
-        $contributionStatus[$params['contribution_status_id']],
+        $contributionStatus,
         CRM_Utils_Array::value('receive_date', $params)
       );
     }
