@@ -383,7 +383,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $groupInfo = [];
     $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
-    $this->assertEquals(count($groupContacts), 0);
+    $this->assertEquals(0, count($groupContacts));
 
     //Verify if contact is returned correctly.
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
@@ -392,8 +392,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     ];
     $groupInfo = [];
     $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
-    $this->assertEquals(count($groupContacts), 1);
-    $this->assertEquals(key($groupContacts), $caseResourceContactID);
+    $this->assertEquals(1, count($groupContacts));
+    $this->assertEquals($caseResourceContactID, key($groupContacts));
   }
 
   /**
