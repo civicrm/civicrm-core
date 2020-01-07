@@ -206,7 +206,7 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     }
   }
 
-  // Load fields from entity joins
+  // Load fields from afform blocks with joins
   $blockData = \Civi\Api4\Afform::get()
     ->setCheckPermissions(FALSE)
     ->addWhere('join', 'IS NOT NULL')
@@ -221,7 +221,7 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     }
   }
 
-  // Todo: scan for other elements
+  // Todo: add method for extensions to define other elements
   $data['elements'] = [
     'container' => [
       'title' => ts('Container'),
