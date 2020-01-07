@@ -2039,6 +2039,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
     $migrationInfo = [];
     $conflicts = [];
+    // Try to lock the contacts before we load the data as we don't want it changing under us.
+    // https://lab.civicrm.org/dev/core/issues/1355
+    $locks = self::getLocksOnContacts([$mainId, $otherId]);
     if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
       CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions);
       $resultStats['merged'][] = [
@@ -2060,6 +2063,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     else {
       CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString);
     }
+    self::releaseLocks($locks);
     return $resultStats;
   }
 
@@ -2544,6 +2548,61 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
     return $locationBlock;
+  }
+
+  /**
+   * Get a lock on the given contact.
+   *
+   * The lock is like a gentleman's agreement between php & mysql. It is reserved at the
+   * mysql level so it works across php processes but it doesn't actually lock the database.
+   *
+   * Instead php can check the lock to see if it has been acquired before taking an action.
+   *
+   * In this case we really don't want to attempt to dedupe contacts if another process is
+   * trying to act on the specific contact as it could result in messy deadlocks & possibly data corruption.
+   * In most databases this would be a rare event but if multiple dedupe processes are running
+   * at once (for example) or there is also an import process in play there is potential for them to crash.
+   * By throwing a specific error the calling process can catch it and determine it is worth trying again later without a lot of
+   * noise.
+   *
+   * As of writing no other processes DO grab contact locks but it would be reasonable to consider
+   * grabbing them doing contact edits in general as well as imports etc.
+   *
+   * @param array $contacts
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception_ResourceConflictException
+   */
+  protected static function getLocksOnContacts($contacts):array {
+    $locks = [];
+    if (!CRM_Utils_SQL::supportsMultipleLocks()) {
+      return $locks;
+    }
+    foreach ($contacts as $contactID) {
+      $lock = Civi::lockManager()->acquire("data.core.contact.{$contactID}");
+      if ($lock->isAcquired()) {
+        $locks[] = $lock;
+      }
+      else {
+        self::releaseLocks($locks);
+        throw new CRM_Core_Exception_ResourceConflictException(ts('Contact is in Use'), 'contact_lock');
+      }
+    }
+    return $locks;
+  }
+
+  /**
+   * Release contact locks so another process can alter them if it wants.
+   *
+   * @param array $locks
+   */
+  protected static function releaseLocks(array $locks) {
+    foreach ($locks as $lock) {
+      /* @var Civi\Core\Lock\LockInterface $lock */
+      $lock->release();
+    }
   }
 
 }
