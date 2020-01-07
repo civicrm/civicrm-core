@@ -484,18 +484,32 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
     $completedStatusId = array_search('Completed', $contributionStatuses);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount', 'id', $this->_expensiveFee, "Total Amount equals " . $this->_expensiveFee);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Payment be completed');
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    $this->assertEquals($this->_expensiveFee, $lineItem[1]['line_total']);
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount', 'id', $this->_cheapFee, "Total Amount equals " . $this->_expensiveFee);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $pendingRefundStatusId, 'Contribution must be refunding');
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    $this->assertEquals('0.00', $lineItem[1]['line_total']);
+    $this->assertEquals($this->_cheapFee, $lineItem[2]['line_total']);
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Contribution must, after complete payment be in state completed');
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->veryExpensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    $this->assertEquals($this->_expensiveFee, $lineItem[1]['line_total']);
+    $this->assertEquals('0.00', $lineItem[2]['line_total']);
+    // @todo this doesn't seem to work right even tho it should
+    //$this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount', 'id', $this->_expensiveFee, "Total Amount equals " . $this->_expensiveFee);
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    $this->assertEquals('0.00', $lineItem[1]['line_total']);
+    $this->assertEquals('0.00', $lineItem[2]['line_total']);
+    $this->assertEquals($this->_veryExpensive, $lineItem[3]['line_total']);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount', 'id', $this->_veryExpensive, "Total Amount equals " . $this->_veryExpensive);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $partiallyPaidStatusId, 'Partial Paid');
   }
 
