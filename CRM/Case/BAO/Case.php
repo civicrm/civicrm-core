@@ -1511,7 +1511,7 @@ HERESQL;
           $groupInfo['title'] = $results['title'];
           $params = [['group', '=', $groupInfo['id'], 0, 0]];
           $return = ['contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1];
-          list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
+          list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount, FALSE);
 
           if ($returnOnlyCount) {
             return $globalContacts;
