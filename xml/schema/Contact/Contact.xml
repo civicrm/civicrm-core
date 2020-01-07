@@ -238,7 +238,7 @@
       <type>Text</type>
       <size>30</size>
     </html>
-
+    <contactType>Organization</contactType>
     <import>true</import>
     <headerPattern>/^legal|(l(egal\s)?name)$/i</headerPattern>
     <comment>Legal Name.</comment>
