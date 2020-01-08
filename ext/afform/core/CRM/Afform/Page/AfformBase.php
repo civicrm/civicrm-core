@@ -6,23 +6,27 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
   public function run() {
     list ($pagePath, $pageArgs) = func_get_args();
 
-    $module = _afform_angular_module_name($pageArgs['afform']);
-    $this->set('afModule', $module);
+    $afform = civicrm_api4('Afform', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['name', '=', $pageArgs['afform']]],
+      'select' => ['title', 'module_name', 'directive_name'],
+    ], 0);
+
+    $this->set('afModule', $afform['module_name']);
 
     $loader = new \Civi\Angular\AngularLoader();
-    $loader->setModules([$module, 'afformStandalone']);
+    $loader->setModules([$afform['module_name'], 'afformStandalone']);
     $loader->setPageName(implode('/', $pagePath));
     $loader->getRes()->addSetting([
       'afform' => [
-        'open' => _afform_angular_module_name($pageArgs['afform'], 'dash'),
+        'open' => $afform['directive_name'],
       ],
     ]);
     $loader->load();
 
-    $afform = civicrm_api4('Afform', 'get', ['checkPermissions' => FALSE, 'where' => [['name', '=', $module]], 'select' => ['title']]);
 
-    if (!empty($afform[0]['title'])) {
-      $title = strip_tags($afform[0]['title']);
+    if (!empty($afform['title'])) {
+      $title = strip_tags($afform['title']);
       CRM_Utils_System::setTitle($title);
       CRM_Utils_System::appendBreadCrumb([['title' => $title, 'url' => CRM_Utils_System::url(implode('/', $pagePath), NULL, FALSE, '/')]]);
     }

@@ -50,7 +50,7 @@
           _.each(afforms, function(form) {
             evaluate(form.layout);
             if (form.block) {
-              $scope.meta.blocks[_.kebabCase(form.name)] = form;
+              $scope.meta.blocks[form.directive_name] = form;
             }
             if (form.name === $scope.afGuiEditor.name) {
               $scope.afform = form;
@@ -638,8 +638,8 @@
           }
           dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
             .then(function(block) {
-              $scope.editor.meta.blocks[_.kebabCase(block.name)] = block;
-              setBlockDirective(_.kebabCase(block.name));
+              $scope.editor.meta.blocks[block.directive_name] = block;
+              setBlockDirective(block.directive_name);
               initializeBlockContainer();
             });
         };

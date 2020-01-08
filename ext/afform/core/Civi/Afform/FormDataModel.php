@@ -26,12 +26,11 @@ class FormDataModel {
   public function __construct($layout) {
     $root = AHQ::makeRoot($layout);
     $this->entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
-    foreach (Afform::get()->setCheckPermissions(FALSE)->addSelect('name')->execute() as $block) {
-      $this->blocks[_afform_angular_module_name($block['name'], 'dash')] = $block;
-    }
     foreach (array_keys($this->entities) as $entity) {
       $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
     }
+    // Pre-load full list of afforms in case this layout embeds other afform directives
+    $this->blocks = (array) Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
     $this->parseFields($layout);
   }
 

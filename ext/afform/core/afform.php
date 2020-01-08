@@ -12,18 +12,13 @@ use Civi\Api4\Action\Afform\Submit;
  */
 function _afform_fields_filter($params) {
   $result = [];
-  $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->execute()->indexBy('name');
+  $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->setAction('create')->execute()->indexBy('name');
   foreach ($fields as $fieldName => $field) {
     if (isset($params[$fieldName])) {
       $result[$fieldName] = $params[$fieldName];
-    }
 
-    if (isset($result[$fieldName])) {
-      switch ($fieldName) {
-        case 'is_public':
-          $result[$fieldName] = CRM_Utils_String::strtobool($result[$fieldName]);
-          break;
-
+      if ($field['data_type'] === 'Boolean' && !is_bool($params[$fieldName])) {
+        $result[$fieldName] = CRM_Utils_String::strtobool($params[$fieldName]);
       }
     }
   }
@@ -157,11 +152,11 @@ function afform_civicrm_angularModules(&$angularModules) {
 
   $afforms = \Civi\Api4\Afform::get()
     ->setCheckPermissions(FALSE)
-    ->setSelect(['name', 'requires'])
+    ->setSelect(['name', 'requires', 'module_name', 'directive_name'])
     ->execute();
 
   foreach ($afforms as $afform) {
-    $angularModules[_afform_angular_module_name($afform['name'], 'camel')] = [
+    $angularModules[$afform['module_name']] = [
       'ext' => E::LONG_NAME,
       'js' => ['assetBuilder://afform.js?name=' . urlencode($afform['name'])],
       'requires' => $afform['requires'],
@@ -169,7 +164,7 @@ function afform_civicrm_angularModules(&$angularModules) {
       'partialsCallback' => '_afform_get_partials',
       '_afform' => $afform['name'],
       'exports' => [
-        _afform_angular_module_name($afform['name'], 'dash') => 'AE',
+        $afform['directive_name'] => 'AE',
       ],
     ];
   }

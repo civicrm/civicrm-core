@@ -33,11 +33,8 @@ trait AfformSaveTrait {
     }
     else {
       // Fetch existing metadata
-      $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->addSelect('name')->execute()->column('name');
+      $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->setAction('create')->addSelect('name')->execute()->column('name');
       unset($fields[array_search('layout', $fields)]);
-      unset($fields[array_search('name', $fields)]);
-      unset($fields[array_search('has_local', $fields)]);
-      unset($fields[array_search('has_base', $fields)]);
       $orig = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->setSelect($fields)->execute()->first();
     }
 
@@ -74,6 +71,8 @@ trait AfformSaveTrait {
     }
     // FIXME if asset-caching is enabled, then flush the asset cache.
 
+    $item['module_name'] = _afform_angular_module_name($item['name'], 'camel');
+    $item['directive_name'] = _afform_angular_module_name($item['name'], 'dash');
     return $meta + $item;
   }
 
