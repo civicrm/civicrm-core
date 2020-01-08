@@ -476,7 +476,8 @@ class CRM_Contact_Form_Task_EmailCommon {
       array_keys($form->_toContactDetails),
       $additionalDetails,
       $contributionIds,
-      CRM_Utils_Array::value('campaign_id', $formValues)
+      CRM_Utils_Array::value('campaign_id', $formValues),
+      $form->getVar('_caseId')
     );
 
     $followupStatus = '';
