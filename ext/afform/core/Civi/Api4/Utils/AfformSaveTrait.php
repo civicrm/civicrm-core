@@ -28,8 +28,8 @@ trait AfformSaveTrait {
       $item['name'] .= $suffix;
       $orig = NULL;
     }
-    elseif (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $item['name'])) {
-      throw new \API_Exception("Afform.{$this->getActionName()}: name should use alphanumerics and dashes.");
+    elseif (!preg_match('/^[a-zA-Z][-_a-zA-Z0-9]*$/', $item['name'])) {
+      throw new \API_Exception("Afform.{$this->getActionName()}: name should begin with a letter and only contain alphanumerics underscores and dashes.");
     }
     else {
       // Fetch existing metadata
