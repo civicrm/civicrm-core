@@ -31,7 +31,6 @@ return [
     'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::addressProvider'],
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => 'CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at https://www.usps.com/business/web-tools-apis/address-information.htm. If you are approved, they will provide you with a User ID and the URL for the service. Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below. ',
   ],
   'address_standardization_userid' => [
@@ -45,7 +44,6 @@ return [
     'title' => ts('Provider service user ID'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'address_standardization_url' => [
@@ -59,7 +57,6 @@ return [
     'title' => ts('Provider Service URL'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => 'Web Service URL',
     'validate_callback' => 'CRM_Utils_Rule::url',
   ],
@@ -74,7 +71,7 @@ return [
     'title' => ts('Hide Country in Mailing Labels when same as domain country'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Do not display the country field in mailing labels when the country is the same as that of the domain',
+    'description' => ts('Do not display the country field in mailing labels when the country is the same as that of the domain'),
     'help_text' => NULL,
   ],
 ];
