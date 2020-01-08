@@ -83,4 +83,19 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->assertEquals('UnitTests', $result['values'][0]['uf']);
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testSystemUTFMB8Conversion() {
+    $this->callAPISuccess('System', 'utf8conversion', []);
+    $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
+    $table->fetch();
+    $this->assertStringEndsWith('DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
+
+    $this->callAPISuccess('System', 'utf8conversion', ['is_revert' => 1]);
+    $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
+    $table->fetch();
+    $this->assertStringEndsWith('DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
+  }
+
 }
