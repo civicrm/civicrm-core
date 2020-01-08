@@ -33,7 +33,7 @@ return [
       'callback' => 'CRM_Contribute_PseudoConstant::contributionPage',
     ],
     'add' => '4.1',
-    'title' => 'Default online membership renewal page',
+    'title' => ts('Default online membership renewal page'),
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.'),
