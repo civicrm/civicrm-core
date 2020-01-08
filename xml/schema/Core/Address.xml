@@ -9,7 +9,9 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <uniqueName>address_id</uniqueName>
     <type>int unsigned</type>
+    <export>true</export>
     <title>Address ID</title>
     <required>true</required>
     <comment>Unique Address ID</comment>
