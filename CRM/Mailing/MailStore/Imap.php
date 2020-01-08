@@ -48,7 +48,11 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
     }
 
-    $options = ['ssl' => $ssl, 'uidReferencing' => TRUE];
+    $options = [
+      'listLimit' => defined('MAIL_BATCH_SIZE') ? MAIL_BATCH_SIZE : 1000,
+      'ssl' => $ssl,
+      'uidReferencing' => TRUE,
+    ];
     $this->_transport = new ezcMailImapTransport($host, NULL, $options);
     $this->_transport->authenticate($username, $password);
     $this->_transport->selectMailbox($folder);
