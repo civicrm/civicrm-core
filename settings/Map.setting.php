@@ -34,8 +34,8 @@ return [
       'maxlength' => '64',
     ],
     'default' => NULL,
-    'title' => 'Geo Provider Key',
-    'description' => 'Enter the API key or Application ID associated with your geocoding provider.',
+    'title' => ts('Geo Provider Key'),
+    'description' => ts('Enter the API key or Application ID associated with your geocoding provider.'),
   ],
   'geoProvider' => [
     'add' => '4.7',
@@ -55,8 +55,8 @@ return [
       'callback' => 'CRM_Core_SelectValues::geoProvider',
     ],
     'default' => NULL,
-    'title' => 'Geocoding Provider',
-    'description' => 'This can be the same or different from the mapping provider selected.',
+    'title' => ts('Geocoding Provider'),
+    'description' => ts('This can be the same or different from the mapping provider selected.'),
   ],
   'mapAPIKey' => [
     'add' => '4.7',
@@ -74,8 +74,8 @@ return [
       'maxlength' => '64',
     ],
     'default' => NULL,
-    'title' => 'Map Provider Key',
-    'description' => 'Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.',
+    'title' => ts('Map Provider Key'),
+    'description' => ts('Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.'),
   ],
   'mapProvider' => [
     'add' => '4.7',
@@ -95,7 +95,7 @@ return [
       'callback' => 'CRM_Core_SelectValues::mapProvider',
     ],
     'default' => NULL,
-    'title' => 'Mapping Provider',
-    'description' => 'Choose the mapping provider that has the best coverage for the majority of your contact addresses.',
+    'title' => ts('Mapping Provider'),
+    'description' => ts('Choose the mapping provider that has the best coverage for the majority of your contact addresses.'),
   ],
 ];
