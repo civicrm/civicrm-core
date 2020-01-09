@@ -120,7 +120,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
           WHERE v.is_active = 1 {$report}
                 AND inst.domain_id = %9
-          ORDER BY  v.weight ASC, inst.title ASC";
+          ORDER BY  inst.title ASC";
     $queryParams[9] = [CRM_Core_Config::domainID(), 'Integer'];
 
     $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
