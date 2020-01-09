@@ -14,8 +14,8 @@
     <url desc="Support">http://FIXME</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2019-02-08</releaseDate>
-  <version>0.3</version>
+  <releaseDate>2020-01-09</releaseDate>
+  <version>0.4</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>5.22</ver>
@@ -23,7 +23,7 @@
   <requires>
     <ext>org.civicrm.afform</ext>
   </requires>
-  <comments>This is a new, undeveloped module</comments>
+  <comments>Examples and tests for CiviCRM Afforms.</comments>
   <civix>
     <namespace>CRM/AfformMock</namespace>
   </civix>
