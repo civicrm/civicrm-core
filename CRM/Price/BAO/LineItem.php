@@ -397,16 +397,17 @@ WHERE li.contribution_id = %1";
    * @param string $entityTable
    *   Entity table.
    *
-   * @param bool $update
+   * @return array
+   *   Updated lineItems array.
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
+  public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution') {
     if (!$entityId || !is_array($lineItems)
       || CRM_Utils_System::isNull($lineItems)
     ) {
-      return;
+      return [];
     }
 
     foreach ($lineItems as $priceSetId => &$values) {
@@ -449,18 +450,7 @@ WHERE li.contribution_id = %1";
         $line['id'] = $createdLineItem->id;
       }
     }
-    if (!$update && $contributionDetails) {
-      foreach ($lineItems as &$lineItem) {
-        $lineItemBAO = new CRM_Price_BAO_LineItem();
-        $lineItemBAO->copyValues($lineItem);
-        $financialItem = CRM_Financial_BAO_FinancialItem::add($lineItemBAO, $contributionDetails);
-        $lineItem['financial_item_id'] = $financialItem->id;
-        if (!empty($lineItem['tax_amount'])) {
-          CRM_Financial_BAO_FinancialItem::add($lineItemBAO, $contributionDetails, TRUE);
-        }
-      }
-      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails);
-    }
+    return $lineItems;
   }
 
   /**

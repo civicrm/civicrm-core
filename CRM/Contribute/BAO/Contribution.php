@@ -3754,7 +3754,21 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
+      $lineItemsArray = CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable);
+      if (!$update && $params['contribution']) {
+        foreach ($lineItemsArray as &$lineItems) {
+          foreach ($lineItems as &$lineItem) {
+            $lineItemBAO = new CRM_Price_BAO_LineItem();
+            $lineItemBAO->copyValues($lineItem);
+            $financialItem = CRM_Financial_BAO_FinancialItem::add($lineItemBAO, $params['contribution']);
+            $lineItem['financial_item_id'] = $financialItem->id;
+            if (!empty($lineItem['tax_amount'])) {
+              CRM_Financial_BAO_FinancialItem::add($lineItemBAO, $params['contribution'], TRUE);
+            }
+          }
+        }
+        CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItemsArray, $params['contribution']);
+      }
     }
 
     // create batch entry if batch_id is passed and
