@@ -128,6 +128,38 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that "multiple bulk email recipients" setting is respected.
+   */
+  public function testMultipleBulkRecipients() {
+    Civi::settings()->add([
+      'civimail_multiple_bulk_emails' => 1,
+    ]);
+    $contactID = $this->individualCreate(['first_name' => 'test recipient']);
+    $email1 = $this->callAPISuccess('email', 'create', [
+      'contact_id' => $contactID,
+      'email' => 'mail1@example.org',
+      'is_bulkmail' => 1,
+    ]);
+    $email2 = $this->callAPISuccess('email', 'create', [
+      'contact_id' => $contactID,
+      'email' => 'mail2@example.org',
+      'is_bulkmail' => 1,
+    ]);
+    $this->callAPISuccess('group_contact', 'create', [
+      'contact_id' => $contactID,
+      'group_id' => $this->_groupID,
+      'status' => 'Added',
+    ]);
+    $mailing = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $this->assertEquals(2, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
+    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->_mut->assertRecipients([['mail1@example.org'], ['mail2@example.org']]);
+    // Don't leave data lying around for other tests to screw up on.
+    $this->callAPISuccess('Email', 'delete', ['id' => $email1['id']]);
+    $this->callAPISuccess('Email', 'delete', ['id' => $email2['id']]);
+  }
+
+  /**
    * Test pause and resume on Mailing.
    */
   public function testPauseAndResumeMailing() {
