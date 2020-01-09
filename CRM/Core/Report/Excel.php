@@ -70,13 +70,14 @@ class CRM_Core_Report_Excel {
         else {
           // loic1 : always enclose fields
           //$value = ereg_replace("\015(\012)?", "\012", $value);
+          // Convert  carriage return to line feed.
           $value = preg_replace("/\015(\012)?/", "\012", $value);
           if ((substr($value, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR) &&
             (substr($value, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
           ) {
 
             $strArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-
+            // Filter out empty value separated strings.
             foreach ($strArray as $key => $val) {
               if (trim($val) == '') {
                 unset($strArray[$key]);
