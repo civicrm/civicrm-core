@@ -1477,13 +1477,13 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   /**
    * Make uf join entries for an uf group.
    *
-   * @param array $params
-   *   (reference) an assoc array of name/value pairs.
+   * @param int $weight
+   * @param array $groupTypes
+   *   An assoc array of name/value pairs.
    * @param int $ufGroupId
    *   Ufgroup id.
    */
-  public static function createUFJoin(&$params, $ufGroupId) {
-    $groupTypes = CRM_Utils_Array::value('uf_group_type', $params);
+  public static function createUFJoin($weight, $groupTypes, $ufGroupId) {
 
     // get ufjoin records for uf group
     $ufGroupRecord = CRM_Core_BAO_UFGroup::getUFJoinRecord($ufGroupId);
@@ -1507,7 +1507,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $joinParams = [];
       $joinParams['uf_group_id'] = $ufGroupId;
       $joinParams['module'] = $key;
-      if ($key == 'User Account') {
+      if ($key === 'User Account') {
         $menuRebuild = TRUE;
       }
       if (array_key_exists($key, $groupTypes) && !in_array($key, $ufGroupRecord)) {
@@ -1521,14 +1521,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
 
     //update the weight
-    $query = "
+    $query = '
 UPDATE civicrm_uf_join
 SET    weight = %1
 WHERE  uf_group_id = %2
 AND    ( entity_id IS NULL OR entity_id <= 0 )
-";
+';
     $p = [
-      1 => [$params['weight'], 'Integer'],
+      1 => [$weight, 'Integer'],
       2 => [$ufGroupId, 'Integer'],
     ];
     CRM_Core_DAO::executeQuery($query, $p);
