@@ -39,6 +39,14 @@ function civicrm_api(string $entity = NULL, string $action, array $params, $extr
  */
 function civicrm_api4(string $entity, string $action, array $params = [], $index = NULL) {
   $apiCall = \Civi\Api4\Utils\ActionUtil::getAction($entity, $action);
+  $indexField = $index && is_string($index) && !CRM_Utils_Rule::integer($index) ? $index : NULL;
+  $removeIndexField = FALSE;
+
+  // If index field is not part of the select query, we add it here and remove it below
+  if ($indexField && !empty($params['select']) && is_array($params['select']) && !in_array($indexField, $params['select'])) {
+    $params['select'][] = $indexField;
+    $removeIndexField = TRUE;
+  }
   foreach ($params as $name => $param) {
     $setter = 'set' . ucfirst($name);
     $apiCall->$setter($param);
@@ -46,11 +54,16 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
   $result = $apiCall->execute();
 
   // Index results by key
-  if ($index && is_string($index) && !CRM_Utils_Rule::integer($index)) {
-    $result->indexBy($index);
+  if ($indexField) {
+    $result->indexBy($indexField);
+    if ($removeIndexField) {
+      foreach ($result as $key => $value) {
+        unset($result[$key][$indexField]);
+      }
+    }
   }
   // Return result at index
-  if (CRM_Utils_Rule::integer($index)) {
+  elseif (CRM_Utils_Rule::integer($index)) {
     $item = $result->itemAt($index);
     if (is_null($item)) {
       throw new \API_Exception("Index $index not found in api results");
@@ -60,7 +73,6 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
       return $item;
     }
     $result->exchangeArray($item);
-
   }
   return $result;
 }

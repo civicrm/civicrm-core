@@ -64,4 +64,9 @@ class IndexTest extends UnitTestCase {
     $this->assertContains('not found', $error);
   }
 
+  public function testIndexWithSelect() {
+    $result = civicrm_api4('Activity', 'getFields', ['select' => ['title'], 'where' => [['name', '=', 'subject']]], 'name');
+    $this->assertEquals(['subject' => ['title' => 'Subject']], (array) $result);
+  }
+
 }
