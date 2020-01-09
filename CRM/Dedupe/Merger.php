@@ -1354,25 +1354,24 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     );
 
     foreach ($otherTree as $gid => $group) {
-      $foundField = FALSE;
       if (!isset($group['fields'])) {
         continue;
       }
 
       foreach ($group['fields'] as $fid => $field) {
+        $mainContactValue = $mainTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
+        $otherContactValue = $otherTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
         if (in_array($fid, $compareFields['custom'])) {
-          if (!$foundField) {
-            $rows["custom_group_$gid"]['title'] = $group['title'];
-            $foundField = TRUE;
-          }
-          if (!empty($mainTree[$gid]['fields'][$fid]['customValue'])) {
-            foreach ($mainTree[$gid]['fields'][$fid]['customValue'] as $valueId => $values) {
+          $rows["custom_group_$gid"]['title'] = $rows["custom_group_$gid"]['title'] ?? $group['title'];
+
+          if ($mainContactValue) {
+            foreach ($mainContactValue as $valueId => $values) {
               $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($values['data'], $fid);
             }
           }
-          $value = "null";
-          if (!empty($otherTree[$gid]['fields'][$fid]['customValue'])) {
-            foreach ($otherTree[$gid]['fields'][$fid]['customValue'] as $valueId => $values) {
+          $value = 'null';
+          if ($otherContactValue) {
+            foreach ($otherContactValue as $valueId => $values) {
               $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($values['data'], $fid);
               if ($values['data'] === 0 || $values['data'] === '0') {
                 $values['data'] = $qfZeroBug;
