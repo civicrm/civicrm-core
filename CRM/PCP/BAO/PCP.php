@@ -65,7 +65,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    *   Id for the PCP.
    *
    * @return null|string
-   *   Dispaly name of the contact if found
+   *   Display name of the contact if found
    */
   public static function displayName($id) {
     $id = CRM_Utils_Type::escape($id, 'Integer');
@@ -409,32 +409,53 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
   }
 
   /**
+   * This function builds the supporter text for the pcp
+   *
+   * @param int $pcpID
+   *   the personal campaign page ID
+   * @param int $contributionPageID
+   * @param string $component
+   *   one of 'contribute' or 'event'
+   *
+   * @return string
+   */
+  public static function getPcpSupporterText($pcpID, $contributionPageID, $component) {
+    $pcp_supporter_text = '';
+    $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($contributionPageID, $component);
+    $pcpSupporter = CRM_PCP_BAO_PCP::displayName($pcpID);
+    switch ($component) {
+      case 'event':
+        $pcp_supporter_text = ts('This event registration is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', [1 => $pcpSupporter]);
+        if (!empty($text)) {
+          $pcp_supporter_text .= ts('You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!');
+        }
+        break;
+
+      case 'contribute':
+        $pcp_supporter_text = ts('This contribution is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', [1 => $pcpSupporter]);
+        if (!empty($text)) {
+          $pcp_supporter_text .= ts('You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!');
+        }
+        break;
+    }
+    return $pcp_supporter_text;
+  }
+
+  /**
    * Add PCP form elements to a form.
    *
    * @param int $pcpId
    * @param CRM_Core_Form $page
-   * @param null $elements
+   * @param array $elements
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildPcp($pcpId, &$page, &$elements = NULL) {
-
     $prms = ['id' => $pcpId];
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $prms, $pcpInfo);
-    if ($pcpSupporter = CRM_PCP_BAO_PCP::displayName($pcpId)) {
-      if ($pcpInfo['page_type'] == 'event') {
-        $pcp_supporter_text = ts('This event registration is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', [1 => $pcpSupporter]);
-        $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'event');
-        if (!empty($text)) {
-          $pcp_supporter_text .= "You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!";
-        }
-      }
-      else {
-        $pcp_supporter_text = ts('This contribution is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', [1 => $pcpSupporter]);
-        $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'contribute');
-        if (!empty($text)) {
-          $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
-        }
-      }
 
+    if (CRM_PCP_BAO_PCP::displayName($pcpId)) {
+      $pcp_supporter_text = self::getPcpSupporterText($pcpId, $pcpInfo['page_id'], $pcpInfo['page_type']);
       $page->assign('pcpSupporterText', $pcp_supporter_text);
     }
     $page->assign('pcp', TRUE);
