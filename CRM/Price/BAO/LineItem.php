@@ -446,16 +446,19 @@ WHERE li.contribution_id = %1";
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
-        if (!$update && $contributionDetails) {
-          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
-          $line['financial_item_id'] = $financialItem->id;
-          if (!empty($line['tax_amount'])) {
-            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE);
-          }
-        }
+        $line['id'] = $createdLineItem->id;
       }
     }
     if (!$update && $contributionDetails) {
+      foreach ($lineItems as &$lineItem) {
+        $lineItemBAO = new CRM_Price_BAO_LineItem();
+        $lineItemBAO->copyValues($lineItem);
+        $financialItem = CRM_Financial_BAO_FinancialItem::add($lineItemBAO, $contributionDetails);
+        $lineItem['financial_item_id'] = $financialItem->id;
+        if (!empty($lineItem['tax_amount'])) {
+          CRM_Financial_BAO_FinancialItem::add($lineItemBAO, $contributionDetails, TRUE);
+        }
+      }
       CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails);
     }
   }
