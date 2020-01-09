@@ -358,7 +358,7 @@ class CRM_Core_PseudoConstant {
             $i18n->localizeArray($output, $I18nParams);
             // Maintain sort by label
             if ($order == "ORDER BY %2") {
-              CRM_Utils_Array::asort($output);
+              $output = CRM_Utils_Array::asort($output);
             }
           }
           CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
