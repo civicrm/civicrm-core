@@ -485,6 +485,43 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test negative payment using create API.
+   */
+  public function testRefundPayment() {
+    $result = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => "Donation",
+      'total_amount' => 100,
+      'contact_id' => $this->_individualId,
+    ]);
+    $contributionID = $result['id'];
+
+    //Refund a part of the main amount.
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contributionID,
+      'total_amount' => -10,
+    ]);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'return' => ["contribution_status_id"],
+      'id' => $contributionID,
+    ]);
+    //Still we've a status of Completed after refunding a partial amount.
+    $this->assertEquals($contribution['contribution_status'], 'Completed');
+
+    //Refund the complete amount.
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contributionID,
+      'total_amount' => -90,
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'return' => ["contribution_status_id"],
+      'id' => $contributionID,
+    ]);
+    //Assert if main contribution status is updated to "Refunded".
+    $this->assertEquals($contribution['contribution_status'], 'Refunded Label**');
+  }
+
+  /**
    * Test cancel payment api
    *
    * @throws \CRM_Core_Exception
