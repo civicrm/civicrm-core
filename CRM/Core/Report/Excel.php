@@ -40,13 +40,11 @@ class CRM_Core_Report_Excel {
 
     $config = CRM_Core_Config::singleton();
     $seperator = $config->fieldSeparator;
-    $enclosed = '"';
-    $escaped = $enclosed;
     $add_character = "\015\012";
 
     $schema_insert = '';
     foreach ($header as $field) {
-      $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, stripslashes($field)) . $enclosed;
+      $schema_insert .= '"' . str_replace('"', '""', stripslashes($field)) . '"';
       $schema_insert .= $seperator;
     }
     // end while
@@ -88,7 +86,7 @@ class CRM_Core_Report_Excel {
             $value = &$str;
           }
 
-          $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, $value) . $enclosed;
+          $schema_insert .= '"' . str_replace('"', '""', $value) . '"';
         }
 
         if ($colNo < $fields_cnt - 1) {
