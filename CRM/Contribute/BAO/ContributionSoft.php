@@ -33,6 +33,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *   soft contribution of object that is added
    */
   public static function add(&$params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'ContributionSoft', CRM_Utils_Array::value('id', $params), $params);
+
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
     $contributionSoft->copyValues($params);
 
@@ -41,7 +44,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $config = CRM_Core_Config::singleton();
       $contributionSoft->currency = $config->defaultCurrency;
     }
-    return $contributionSoft->save();
+    $result = $contributionSoft->save();
+    CRM_Utils_Hook::post($hook, 'ContributionSoft', $contributionSoft->id, $contributionSoft);
+    return $result;
   }
 
   /**
