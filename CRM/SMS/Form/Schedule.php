@@ -131,9 +131,9 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
   public function postProcess() {
     $params = [];
 
-    $params['mailing_id'] = $ids['mailing_id'] = $this->_mailingID;
+    $params['id'] = $this->_mailingID;
 
-    if (empty($params['mailing_id'])) {
+    if (empty($params['id'])) {
       CRM_Core_Error::statusBounce(ts('Could not find a mailing id'));
     }
 
@@ -157,7 +157,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     }
 
     // Build the mailing object.
-    CRM_Mailing_BAO_Mailing::create($params, $ids);
+    CRM_Mailing_BAO_Mailing::create($params);
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/mailing/browse/scheduled',
