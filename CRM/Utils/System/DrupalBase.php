@@ -681,4 +681,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     }
   }
 
+  /**
+   * Get role names
+   *
+   * @return array|null
+   */
+  public function getRoleNames() {
+    return array_combine(user_roles(), user_roles());
+  }
+
 }
