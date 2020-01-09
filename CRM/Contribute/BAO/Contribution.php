@@ -4840,11 +4840,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Replace with Order.create->Payment.create flow.
    *
    * @param array $contributions
-   * @param string $contributionStatusId
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function addPayments($contributions, $contributionStatusId = NULL) {
+  public static function addPayments($contributions) {
     // get financial trxn which is a payment
     $ftSql = "SELECT ft.id, ft.total_amount
       FROM civicrm_financial_trxn ft
@@ -4854,9 +4853,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'labelColumn' => 'name',
     ]);
     foreach ($contributions as $contribution) {
-      if (!($contributionStatus[$contribution->contribution_status_id] == 'Partially paid'
-        || CRM_Utils_Array::value($contributionStatusId, $contributionStatus) == 'Partially paid')
-      ) {
+      if ($contributionStatus[$contribution->contribution_status_id] !== 'Partially paid') {
         continue;
       }
       $ftDao = CRM_Core_DAO::executeQuery($ftSql, [
