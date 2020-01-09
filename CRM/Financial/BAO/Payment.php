@@ -149,6 +149,11 @@ class CRM_Financial_BAO_Payment {
     elseif ($contributionStatus === 'Pending' && $params['total_amount'] > 0) {
       self::updateContributionStatus($contribution['id'], 'Partially Paid');
     }
+    elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
+      // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
+      //  change status to refunded.
+      self::updateContributionStatus($contribution['id'], 'Refunded');
+    }
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;
   }
