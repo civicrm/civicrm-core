@@ -1116,162 +1116,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $locations = ['main' => [], 'other' => []];
 
     foreach ($locationBlocks as $blockName => $blockInfo) {
-
-      // Collect existing fields from both 'main' and 'other' contacts first
-      // This allows us to match up location/types when building the table rows
-      $locations['main'][$blockName] = self::buildLocationBlockForContact($mainId, $blockInfo, $blockName);
-      $locations['other'][$blockName] = self::buildLocationBlockForContact($otherId, $blockInfo, $blockName);
-
-      // Now, build the table rows appropriately, based off the information on
-      // the 'other' contact
-      if (!empty($locations['other']) && !empty($locations['other'][$blockName])) {
-        foreach ($locations['other'][$blockName] as $count => $value) {
-
-          $displayValue = $value[$blockInfo['displayField']];
-
-          // Add this value to the table rows
-          $rows["move_location_{$blockName}_{$count}"]['other'] = $displayValue;
-
-          // CRM-17556 Only display 'main' contact value if it's the same location + type
-          // Look it up from main values...
-
-          $lookupLocation = FALSE;
-          if ($blockInfo['hasLocation']) {
-            $lookupLocation = $value['location_type_id'];
-          }
-
-          $lookupType = FALSE;
-          if ($blockInfo['hasType']) {
-            $lookupType = CRM_Utils_Array::value($blockInfo['hasType'], $value);
-          }
-
-          // Hold ID of main contact's matching block
-          $mainContactBlockId = 0;
-
-          if (!empty($locations['main'][$blockName])) {
-            foreach ($locations['main'][$blockName] as $mainValueCheck) {
-              // No location/type, or matching location and type
-              if (
-                (empty($lookupLocation) || $lookupLocation == $mainValueCheck['location_type_id'])
-                && (empty($lookupType) || $lookupType == $mainValueCheck[$blockInfo['hasType']])
-              ) {
-                // Set this value as the default against the 'other' contact value
-                $rows["move_location_{$blockName}_{$count}"]['main'] = $mainValueCheck[$blockInfo['displayField']];
-                $rows["move_location_{$blockName}_{$count}"]['main_is_primary'] = $mainValueCheck['is_primary'];
-                $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
-                $mainContactBlockId = $mainValueCheck['id'];
-                break;
-              }
-            }
-          }
-
-          // Add checkbox to migrate data from 'other' to 'main'
-          $elements[] = ['advcheckbox', "move_location_{$blockName}_{$count}"];
-
-          // Add checkbox to set the 'other' location as primary
-          $elements[] = [
-            'advcheckbox',
-            "location_blocks[$blockName][$count][set_other_primary]",
-            NULL,
-            ts('Set as primary'),
-          ];
-
-          // Flag up this field to skipMerge function (@todo: do we need to?)
-          $migrationInfo["move_location_{$blockName}_{$count}"] = 1;
-
-          // Add a hidden field to store the ID of the target main contact block
-          $elements[] = [
-            'hidden',
-            "location_blocks[$blockName][$count][mainContactBlockId]",
-            $mainContactBlockId,
-          ];
-
-          // Setup variables
-          $thisTypeId = FALSE;
-          $thisLocId = FALSE;
-
-          // Provide a select drop-down for the location's location type
-          // eg: Home, Work...
-
-          if ($blockInfo['hasLocation']) {
-
-            // Load the location options for this entity
-            $locationOptions = civicrm_api3($blockName, 'getoptions', ['field' => 'location_type_id']);
-
-            $thisLocId = $value['location_type_id'];
-
-            // Put this field's location type at the top of the list
-            $tmpIdList = $locationOptions['values'];
-            $defaultLocId = [$thisLocId => $tmpIdList[$thisLocId]];
-            unset($tmpIdList[$thisLocId]);
-
-            // Add the element
-            $elements[] = [
-              'select',
-              "location_blocks[$blockName][$count][locTypeId]",
-              NULL,
-              $defaultLocId + $tmpIdList,
-            ];
-
-            // Add the relevant information to the $migrationInfo
-            // Keep location-type-id same as that of other-contact
-            // @todo Check this logic out
-            $migrationInfo['location_blocks'][$blockName][$count]['locTypeId'] = $thisLocId;
-            if ($blockName != 'address') {
-              $elements[] = [
-                'advcheckbox',
-                "location_blocks[{$blockName}][$count][operation]",
-                NULL,
-                ts('Add new'),
-              ];
-              // always use add operation
-              $migrationInfo['location_blocks'][$blockName][$count]['operation'] = 1;
-            }
-
-          }
-
-          // Provide a select drop-down for the location's type/provider
-          // eg websites: Facebook...
-
-          if ($blockInfo['hasType']) {
-
-            // Load the type options for this entity
-            $typeOptions = civicrm_api3($blockName, 'getoptions', ['field' => $blockInfo['hasType']]);
-
-            $thisTypeId = CRM_Utils_Array::value($blockInfo['hasType'], $value);
-
-            // Put this field's location type at the top of the list
-            $tmpIdList = $typeOptions['values'];
-            $defaultTypeId = [$thisTypeId => CRM_Utils_Array::value($thisTypeId, $tmpIdList)];
-            unset($tmpIdList[$thisTypeId]);
-
-            // Add the element
-            $elements[] = [
-              'select',
-              "location_blocks[$blockName][$count][typeTypeId]",
-              NULL,
-              $defaultTypeId + $tmpIdList,
-            ];
-
-            // Add the information to the migrationInfo
-            $migrationInfo['location_blocks'][$blockName][$count]['typeTypeId'] = $thisTypeId;
-
-          }
-
-          // Set the label for this row
-          $rowTitle = $blockInfo['label'] . ' ' . ($count + 1);
-          if (!empty($thisLocId)) {
-            $rowTitle .= ' (' . $locationOptions['values'][$thisLocId] . ')';
-          }
-          if (!empty($thisTypeId)) {
-            $rowTitle .= ' (' . $typeOptions['values'][$thisTypeId] . ')';
-          }
-          $rows["move_location_{$blockName}_$count"]['title'] = $rowTitle;
-
-        } // End loop through 'other' locations of this type
-
-      } // End if 'other' location for this type exists
-
+      list($locations, $rows, $elements, $migrationInfo) = self::addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, $locations, $rows, $elements, $migrationInfo);
     } // End loop through each location block entity
 
     // add the related tables and unset the ones that don't sport any of the duplicate contact's info
@@ -2602,6 +2447,177 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       /* @var Civi\Core\Lock\LockInterface $lock */
       $lock->release();
     }
+  }
+
+  /**
+   * @param $mainId
+   * @param $otherId
+   * @param $blockInfo
+   * @param $blockName
+   * @param array $locations
+   * @param array $rows
+   * @param array $elements
+   * @param array $migrationInfo
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, array $locations, array $rows, array $elements, array $migrationInfo): array {
+    // Collect existing fields from both 'main' and 'other' contacts first
+    // This allows us to match up location/types when building the table rows
+    $locations['main'][$blockName] = self::buildLocationBlockForContact($mainId, $blockInfo, $blockName);
+    $locations['other'][$blockName] = self::buildLocationBlockForContact($otherId, $blockInfo, $blockName);
+
+    // Now, build the table rows appropriately, based off the information on
+    // the 'other' contact
+    if (!empty($locations['other']) && !empty($locations['other'][$blockName])) {
+      foreach ($locations['other'][$blockName] as $count => $value) {
+
+        $displayValue = $value[$blockInfo['displayField']];
+
+        // Add this value to the table rows
+        $rows["move_location_{$blockName}_{$count}"]['other'] = $displayValue;
+
+        // CRM-17556 Only display 'main' contact value if it's the same location + type
+        // Look it up from main values...
+
+        $lookupLocation = FALSE;
+        if ($blockInfo['hasLocation']) {
+          $lookupLocation = $value['location_type_id'];
+        }
+
+        $lookupType = FALSE;
+        if ($blockInfo['hasType']) {
+          $lookupType = CRM_Utils_Array::value($blockInfo['hasType'], $value);
+        }
+
+        // Hold ID of main contact's matching block
+        $mainContactBlockId = 0;
+
+        if (!empty($locations['main'][$blockName])) {
+          foreach ($locations['main'][$blockName] as $mainValueCheck) {
+            // No location/type, or matching location and type
+            if (
+              (empty($lookupLocation) || $lookupLocation == $mainValueCheck['location_type_id'])
+              && (empty($lookupType) || $lookupType == $mainValueCheck[$blockInfo['hasType']])
+            ) {
+              // Set this value as the default against the 'other' contact value
+              $rows["move_location_{$blockName}_{$count}"]['main'] = $mainValueCheck[$blockInfo['displayField']];
+              $rows["move_location_{$blockName}_{$count}"]['main_is_primary'] = $mainValueCheck['is_primary'];
+              $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
+              $mainContactBlockId = $mainValueCheck['id'];
+              break;
+            }
+          }
+        }
+
+        // Add checkbox to migrate data from 'other' to 'main'
+        $elements[] = ['advcheckbox', "move_location_{$blockName}_{$count}"];
+
+        // Add checkbox to set the 'other' location as primary
+        $elements[] = [
+          'advcheckbox',
+          "location_blocks[$blockName][$count][set_other_primary]",
+          NULL,
+          ts('Set as primary'),
+        ];
+
+        // Flag up this field to skipMerge function (@todo: do we need to?)
+        $migrationInfo["move_location_{$blockName}_{$count}"] = 1;
+
+        // Add a hidden field to store the ID of the target main contact block
+        $elements[] = [
+          'hidden',
+          "location_blocks[$blockName][$count][mainContactBlockId]",
+          $mainContactBlockId,
+        ];
+
+        // Setup variables
+        $thisTypeId = FALSE;
+        $thisLocId = FALSE;
+
+        // Provide a select drop-down for the location's location type
+        // eg: Home, Work...
+
+        if ($blockInfo['hasLocation']) {
+
+          // Load the location options for this entity
+          $locationOptions = civicrm_api3($blockName, 'getoptions', ['field' => 'location_type_id']);
+
+          $thisLocId = $value['location_type_id'];
+
+          // Put this field's location type at the top of the list
+          $tmpIdList = $locationOptions['values'];
+          $defaultLocId = [$thisLocId => $tmpIdList[$thisLocId]];
+          unset($tmpIdList[$thisLocId]);
+
+          // Add the element
+          $elements[] = [
+            'select',
+            "location_blocks[$blockName][$count][locTypeId]",
+            NULL,
+            $defaultLocId + $tmpIdList,
+          ];
+
+          // Add the relevant information to the $migrationInfo
+          // Keep location-type-id same as that of other-contact
+          // @todo Check this logic out
+          $migrationInfo['location_blocks'][$blockName][$count]['locTypeId'] = $thisLocId;
+          if ($blockName != 'address') {
+            $elements[] = [
+              'advcheckbox',
+              "location_blocks[{$blockName}][$count][operation]",
+              NULL,
+              ts('Add new'),
+            ];
+            // always use add operation
+            $migrationInfo['location_blocks'][$blockName][$count]['operation'] = 1;
+          }
+
+        }
+
+        // Provide a select drop-down for the location's type/provider
+        // eg websites: Facebook...
+
+        if ($blockInfo['hasType']) {
+
+          // Load the type options for this entity
+          $typeOptions = civicrm_api3($blockName, 'getoptions', ['field' => $blockInfo['hasType']]);
+
+          $thisTypeId = CRM_Utils_Array::value($blockInfo['hasType'], $value);
+
+          // Put this field's location type at the top of the list
+          $tmpIdList = $typeOptions['values'];
+          $defaultTypeId = [$thisTypeId => CRM_Utils_Array::value($thisTypeId, $tmpIdList)];
+          unset($tmpIdList[$thisTypeId]);
+
+          // Add the element
+          $elements[] = [
+            'select',
+            "location_blocks[$blockName][$count][typeTypeId]",
+            NULL,
+            $defaultTypeId + $tmpIdList,
+          ];
+
+          // Add the information to the migrationInfo
+          $migrationInfo['location_blocks'][$blockName][$count]['typeTypeId'] = $thisTypeId;
+
+        }
+
+        // Set the label for this row
+        $rowTitle = $blockInfo['label'] . ' ' . ($count + 1);
+        if (!empty($thisLocId)) {
+          $rowTitle .= ' (' . $locationOptions['values'][$thisLocId] . ')';
+        }
+        if (!empty($thisTypeId)) {
+          $rowTitle .= ' (' . $typeOptions['values'][$thisTypeId] . ')';
+        }
+        $rows["move_location_{$blockName}_$count"]['title'] = $rowTitle;
+
+      } // End loop through 'other' locations of this type
+
+    }
+    return [$locations, $rows, $elements, $migrationInfo];
   }
 
 }
