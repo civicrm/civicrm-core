@@ -575,9 +575,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Create membership.
+   *
    * @param array $params
    *
-   * @return mixed
+   * @return int
+   * @throws \CRM_Core_Exception
    */
   public function contactMembershipCreate($params) {
     $params = array_merge([
@@ -589,7 +592,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ], $params);
     if (!is_numeric($params['membership_type_id'])) {
       $membershipTypes = $this->callAPISuccess('Membership', 'getoptions', ['action' => 'create', 'field' => 'membership_type_id']);
-      if (!in_array($params['membership_type_id'], $membershipTypes['values'])) {
+      if (!in_array($params['membership_type_id'], $membershipTypes['values'], TRUE)) {
         $this->membershipTypeCreate(['name' => $params['membership_type_id']]);
       }
     }
