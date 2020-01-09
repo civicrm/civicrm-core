@@ -125,6 +125,27 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
       ],
     ];
 
+    // No recipients: Dave has `do_not_email`, Edith is dead, and Francis' email
+    // is on hold.
+    $cs[] = [
+      '2015-02-01 00:00:00',
+      'addDaveMeeting addEdithMeeting addFrancisMeeting scheduleForMeeting startOnTime useHelloFirstName recipientIsActivitySource',
+      [],
+    ];
+
+    // Gretchen has one email on hold, but her primary email is not on hold.
+    $cs[] = [
+      '2015-02-01 00:00:00',
+      'addGretchenMeeting scheduleForMeeting startOnTime useHelloFirstName recipientIsActivitySource',
+      [
+        [
+          'time' => '2015-02-01 00:00:00',
+          'to' => ['gretchen@example.org'],
+          'subject' => '/Hello, Gretchen.*via subject/',
+        ],
+      ],
+    ];
+
     return $cs;
   }
 
@@ -150,6 +171,65 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
       'source_contact_id' => $this->contacts['bob']['id'],
       'activity_type_id' => 'Phone Call',
       'subject' => 'Subject for Bob',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
+      'status_id' => 2,
+      'assignee_contact_id' => [$this->contacts['carol']['id']],
+    ]);
+  }
+
+  /**
+   * Create an activity record for Dave with type "Meeting".  Dave has
+   * "do_not_email" set, so he should never receive an email reminder.
+   */
+  public function addDaveMeeting() {
+    $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $this->contacts['dave']['id'],
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Subject for Dave',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
+      'status_id' => 2,
+      'assignee_contact_id' => [$this->contacts['carol']['id']],
+    ]);
+  }
+
+  /**
+   * Create an activity record for Edith with type "Meeting". Edith is dead, so
+   * she should never receive an email reminder.
+   */
+  public function addEdithMeeting() {
+    $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $this->contacts['edith']['id'],
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Subject for Edith',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
+      'status_id' => 2,
+      'assignee_contact_id' => [$this->contacts['carol']['id']],
+    ]);
+  }
+
+  /**
+   * Create an activity record for Francis with type "Meeting". Francis' email
+   * is misspelled and has bounced, so he should never receive an email reminder.
+   */
+  public function addFrancisMeeting() {
+    $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $this->contacts['francis']['id'],
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Subject for Francis',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
+      'status_id' => 2,
+      'assignee_contact_id' => [$this->contacts['carol']['id']],
+    ]);
+  }
+
+  /**
+   * Create an activity record for Gretchen with type "Meeting".
+   */
+  public function addGretchenMeeting() {
+    $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $this->contacts['gretchen']['id'],
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Subject for Gretchen',
       'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
       'status_id' => 2,
       'assignee_contact_id' => [$this->contacts['carol']['id']],

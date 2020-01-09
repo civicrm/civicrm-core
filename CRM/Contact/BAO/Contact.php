@@ -2495,11 +2495,14 @@ WHERE      civicrm_openid.openid = %1";
    *
    * @param int $contactID
    *   Contact id.
+   * @param bool $polite
+   *   Whether to only pull an email if it's okay to send to it--that is, if it
+   *   is not on_hold and the contact is not do_not_email.
    *
    * @return string
    *   Email address if present else null
    */
-  public static function getPrimaryEmail($contactID) {
+  public static function getPrimaryEmail($contactID, $polite = FALSE) {
     // fetch the primary email
     $query = "
    SELECT civicrm_email.email as email
@@ -2507,6 +2510,11 @@ WHERE      civicrm_openid.openid = %1";
 LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     WHERE civicrm_email.is_primary = 1
       AND civicrm_contact.id = %1";
+    if ($polite) {
+      $query .= '
+      AND civicrm_contact.do_not_email = 0
+      AND civicrm_email.on_hold = 0';
+    }
     $p = [1 => [$contactID, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 
