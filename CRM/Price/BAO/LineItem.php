@@ -181,11 +181,10 @@ WHERE li.contribution_id = %1";
    * @param bool $isQtyZero
    * @param bool $relatedEntity
    *
-   * @param bool $invoice
    * @return array
    *   Array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE, $invoice = FALSE) {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE) {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -218,17 +217,7 @@ WHERE li.contribution_id = %1";
       LEFT JOIN civicrm_line_item li ON ({$condition})
       LEFT JOIN civicrm_price_field_value pfv ON ( pfv.id = li.price_field_value_id )
       LEFT JOIN civicrm_price_field pf ON (pf.id = li.price_field_id )";
-    $whereClause = "
-      WHERE     %2.id = %1";
-
-    // CRM-16250 get additional participant's fee selection details only for invoice PDF (if any)
-    if ($entity == 'participant' && $invoice) {
-      $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
-      if (!empty($additionalParticipantIDs)) {
-        $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
-      }
-    }
-
+    $whereClause = " WHERE     %2.id = %1";
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
     if ($isQuick) {
