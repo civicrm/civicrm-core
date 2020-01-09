@@ -2,7 +2,7 @@
   <div crm-ui-debug="availableParams"></div>
 
   <h1 crm-page-title>
-    {{ ts('CiviCRM API v4') }}{{ entity ? (' (' + entity + '::' + action + ')') : '' }}
+    {{ ts('CiviCRM APIv4') }}{{ entity ? (' (' + entity + '::' + action + ')') : '' }}
   </h1>
 
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
@@ -18,9 +18,13 @@
       <form name="api4-explorer" class="panel panel-default explorer-params-panel">
         <div class="panel-heading">
           <div class="form-inline">
-            <input class="collapsible-optgroups form-control" ng-model="entity" ng-disabled="!entities.length" ng-class="{loading: !entities.length}" crm-ui-select="{placeholder: ts('Entity'), data: entities}" />
-            <input class="collapsible-optgroups form-control" ng-model="action" ng-disabled="!entity || !actions.length" ng-class="{loading: entity && !actions.length}" crm-ui-select="{placeholder: ts('Action'), data: actions}" />
-            <input class="form-control api4-index" type="search" ng-model="index" ng-mouseenter="help('index', indexHelp)" ng-mouseleave="help()" placeholder="{{ ts('Index') }}" />
+            <span ng-mouseenter="help('entity', paramDoc('$entity'))" ng-mouseleave="help()">
+              <input class="collapsible-optgroups form-control" ng-model="entity" ng-disabled="!entities.length" ng-class="{loading: !entities.length}" crm-ui-select="{placeholder: ts('Entity'), data: entities}" />
+            </span>
+            <span ng-mouseenter="help('action', paramDoc('$action'))" ng-mouseleave="help()">
+              <input class="collapsible-optgroups form-control" ng-model="action" ng-disabled="!entity || !actions.length" ng-class="{loading: entity && !actions.length}" crm-ui-select="{placeholder: ts('Action'), data: actions}" />
+            </span>
+            <input class="form-control api4-index" type="search" ng-model="index" ng-mouseenter="help('index', paramDoc('$index'))" ng-mouseleave="help()" placeholder="{{ ts('Index') }}" />
             <button class="btn btn-success pull-right" crm-icon="fa-bolt" ng-disabled="!entity || !action || loading" ng-click="execute()">{{ ts('Execute') }}</button>
           </div>
         </div>
@@ -110,7 +114,12 @@
         <div class="panel-body">
           <h4>{{ helpContent.description }}</h4>
           <div ng-if="helpContent.comment">
-            <p ng-repeat='text in helpContent.comment.split("\n\n")'>{{ text }}</p>
+            <div ng-repeat='text in helpContent.comment.split("\n\n")'>
+              <p ng-if="text[0] !== '-' && text[0] !== '*'">{{ text }}</p>
+              <ul ng-if="text[0] === '-' || text[0] === '*'">
+                <li ng-repeat='item in text.split("\n")'>{{ item.substr(1) }}</li>
+              </ul>
+            </div>
           </div>
           <p ng-repeat="(key, item) in helpContent" ng-if="key !== 'description' && key !== 'comment'">
             <strong>{{ key }}:</strong> {{ item }}

@@ -22,7 +22,7 @@
 #bootstrap-theme.api4-explorer-page > div > .panel {
   flex: 1;
   margin: 10px;
-  min-height: 400px;
+  min-height: 500px;
 }
 #bootstrap-theme.api4-explorer-page > div > form.panel {
   flex: 2;
@@ -47,6 +47,11 @@
 
 #bootstrap-theme.api4-explorer-page .explorer-help-panel .panel-body {
   word-break: break-word;
+}
+
+/* because each help p is in a div, this undoes bootstrap removing margin from last-child */
+#bootstrap-theme.api4-explorer-page .explorer-help-panel .panel-body p {
+  margin-bottom: 10px;
 }
 
 #bootstrap-theme.api4-explorer-page form label {

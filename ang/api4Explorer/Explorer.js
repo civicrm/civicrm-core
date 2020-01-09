@@ -31,6 +31,7 @@
     $scope.index = '';
     var getMetaParams = {},
       objectParams = {orderBy: 'ASC', values: '', chain: ['Entity', '', '{}']},
+      docs = CRM.vars.api4.docs,
       helpTitle = '',
       helpContent = {};
     $scope.helpTitle = '';
@@ -550,8 +551,8 @@
     }
 
     if (!$scope.entity) {
-      $scope.helpTitle = helpTitle = ts('Help');
-      $scope.helpContent = helpContent = {description: ts('Welcome to the api explorer.'), comment: ts('Select an entity to begin.')};
+      $scope.helpTitle = helpTitle = ts('APIv4 Explorer');
+      $scope.helpContent = helpContent = {description: docs.description, comment: docs.comment};
     } else if (!actions.length && !getEntity().actions) {
       getMetaParams.actions = [$scope.entity, 'getActions', {chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]}}];
       fetchMeta();
@@ -582,10 +583,8 @@
       }
     });
 
-    $scope.indexHelp = {
-      description: ts('(string|int) Index results or select by index.'),
-      comment: ts('Pass a string to index the results by a field value. E.g. index: "name" will return an associative array with names as keys.') + '\n\n' +
-        ts('Pass an integer to return a single result; e.g. index: 0 will return the first result, 1 will return the second, and -1 will return the last.')
+    $scope.paramDoc = function(name) {
+      return docs.params[name];
     };
 
     $scope.$watch('params', writeCode, true);
