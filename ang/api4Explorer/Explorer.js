@@ -187,6 +187,7 @@
         $scope.params.select = [];
       } else {
         $scope.params.select = ['row_count'];
+        $scope.index = '';
         if ($scope.params.limit == 25) {
           $scope.params.limit = 0;
         }
@@ -359,7 +360,7 @@
         entity = $scope.entity,
         action = $scope.action,
         params = getParams(),
-        index = isInt($scope.index) ? +$scope.index : $scope.index,
+        index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
         result = 'result';
       if ($scope.entity && $scope.action) {
         if (action.slice(0, 3) === 'get') {
@@ -429,12 +430,17 @@
           }
         });
         code.oop += "\n  ->execute()";
-        if (_.isNumber(index)) {
+        if (isSelectRowCount) {
+          code.oop += "\n  ->count()";
+        } else if (_.isNumber(index)) {
           code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
         } else if (index) {
-          code.oop += "\n  ->indexBy('" + index + "')";
-        } else if (isSelectRowCount) {
-          code.oop += "\n  ->count()";
+          if (_.isString(index) || (_.isPlainObject(index) && !index[0] && !index['0'])) {
+            code.oop += "\n  ->indexBy('" + (_.isPlainObject(index) ? _.keys(index)[0] : index) + "')";
+          }
+          if (_.isArray(index) || _.isPlainObject(index)) {
+            code.oop += "\n  ->column('" + (_.isArray(index) ? index[0] : _.values(index)[0]) + "')";
+          }
         }
         code.oop += ";\n";
         if (!_.isNumber(index) && !isSelectRowCount) {
@@ -474,7 +480,7 @@
       $scope.loading = true;
       $http.post(CRM.url('civicrm/ajax/api4/' + $scope.entity + '/' + $scope.action, {
         params: angular.toJson(getParams()),
-        index: $scope.index
+        index: isInt($scope.index) ? +$scope.index : parseYaml($scope.index)
       }), null, {
         headers: {
           'X-Requested-With': 'XMLHttpRequest'
