@@ -795,6 +795,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'period_type' => 'rolling',
       'visibility' => 'Public',
       'weight' => '1',
+      'tax_rate' => 0.0,
+      'minimum_fee_with_tax' => 100.0,
     ], $values[1]);
   }
 
