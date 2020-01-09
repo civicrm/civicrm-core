@@ -991,101 +991,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
     }
     if ($this->_isPaidEvent) {
-
-      $contributionParams = ['skipCleanMoney' => TRUE];
-      $lineItem = [];
-      $additionalParticipantDetails = [];
-      if (Civi::settings()->get('deferred_revenue_enabled')) {
-        $eventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'start_date');
-        if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
-          $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
-        }
-      }
-      if (($this->_id && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId) {
-        $participantBAO = new CRM_Event_BAO_Participant();
-        $participantBAO->id = $this->_id;
-        $participantBAO->find(TRUE);
-        $contributionParams['total_amount'] = $participantBAO->fee_amount;
-
-        $params['discount_id'] = NULL;
-        //re-enter the values for UPDATE mode
-        $params['fee_level'] = $params['amount_level'] = $participantBAO->fee_level;
-        $params['fee_amount'] = $participantBAO->fee_amount;
-        if (isset($params['priceSetId'])) {
-          $lineItem[0] = CRM_Price_BAO_LineItem::getLineItems($this->_id);
-        }
-        //also add additional participant's fee level/priceset
-        if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
-          $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
-          $hasLineItems = CRM_Utils_Array::value('priceSetId', $params, FALSE);
-          $additionalParticipantDetails = CRM_Event_BAO_Participant::getFeeDetails($additionalIds,
-            $hasLineItems
-          );
-        }
-      }
-      else {
-
-        // check that discount_id is set
-        if (empty($params['discount_id'])) {
-          $params['discount_id'] = 'null';
-        }
-
-        //lets carry currency, CRM-4453
-        $params['fee_currency'] = $config->defaultCurrency;
-        if (!isset($lineItem[0])) {
-          $lineItem[0] = [];
-        }
-        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'],
-          $params, $lineItem[0]
-        );
-        //CRM-11529 for quick config backoffice transactions
-        //when financial_type_id is passed in form, update the
-        //lineitems with the financial type selected in form
-        $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $params);
-        $isPaymentRecorded = CRM_Utils_Array::value('record_contribution', $params);
-        if ($isPaymentRecorded && $this->_quickConfig && $submittedFinancialType) {
-          foreach ($lineItem[0] as &$values) {
-            $values['financial_type_id'] = $submittedFinancialType;
-          }
-        }
-
-        $params['fee_level'] = $params['amount_level'];
-        $contributionParams['total_amount'] = $params['amount'];
-        if ($this->_quickConfig && !empty($params['total_amount']) &&
-          $params['status_id'] != array_search('Partially paid', $participantStatus)
-        ) {
-          $params['fee_amount'] = $params['total_amount'];
-        }
-        else {
-          //fix for CRM-3086
-          $params['fee_amount'] = $params['amount'];
-        }
-      }
-
-      if (isset($params['priceSetId'])) {
-        if (!empty($lineItem[0])) {
-          $this->set('lineItem', $lineItem);
-
-          $this->_lineItem = $lineItem;
-          $lineItem = array_merge($lineItem, $additionalParticipantDetails);
-
-          $participantCount = [];
-          foreach ($lineItem as $k) {
-            foreach ($k as $v) {
-              if (CRM_Utils_Array::value('participant_count', $v) > 0) {
-                $participantCount[] = $v['participant_count'];
-              }
-            }
-          }
-        }
-        if (isset($participantCount)) {
-          $this->assign('pricesetFieldsCount', $participantCount);
-        }
-        $this->assign('lineItem', empty($lineItem[0]) || $this->_quickConfig ? FALSE : $lineItem);
-      }
-      else {
-        $this->assign('amount_level', $params['amount_level']);
-      }
+      list($contributionParams, $lineItem, $additionalParticipantDetails, $params) = $this->preparePaidEventProcessing($params);
     }
 
     $this->_params = $params;
@@ -1965,6 +1871,113 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $mailingInfo = Civi::settings()->get('mailing_backend');
     $form->assign('outBound_option', $mailingInfo['outBound_option']);
     $form->assign('hasPayment', $form->_paymentId);
+  }
+
+  /**
+   * Extracted code relating to paid events.
+   *
+   * @param $params
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function preparePaidEventProcessing($params): array {
+    $participantStatus = CRM_Event_PseudoConstant::participantStatus();
+    $contributionParams = ['skipCleanMoney' => TRUE];
+    $lineItem = [];
+    $additionalParticipantDetails = [];
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
+      $eventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'start_date');
+      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
+        $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
+      }
+    }
+    if (($this->_id && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId) {
+      $participantBAO = new CRM_Event_BAO_Participant();
+      $participantBAO->id = $this->_id;
+      $participantBAO->find(TRUE);
+      $contributionParams['total_amount'] = $participantBAO->fee_amount;
+
+      $params['discount_id'] = NULL;
+      //re-enter the values for UPDATE mode
+      $params['fee_level'] = $params['amount_level'] = $participantBAO->fee_level;
+      $params['fee_amount'] = $participantBAO->fee_amount;
+      if (isset($params['priceSetId'])) {
+        $lineItem[0] = CRM_Price_BAO_LineItem::getLineItems($this->_id);
+      }
+      //also add additional participant's fee level/priceset
+      if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
+        $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
+        $hasLineItems = CRM_Utils_Array::value('priceSetId', $params, FALSE);
+        $additionalParticipantDetails = CRM_Event_BAO_Participant::getFeeDetails($additionalIds,
+          $hasLineItems
+        );
+      }
+    }
+    else {
+
+      // check that discount_id is set
+      if (empty($params['discount_id'])) {
+        $params['discount_id'] = 'null';
+      }
+
+      //lets carry currency, CRM-4453
+      $params['fee_currency'] = CRM_Core_Config::singleton()->defaultCurrency;
+      if (!isset($lineItem[0])) {
+        $lineItem[0] = [];
+      }
+      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'],
+        $params, $lineItem[0]
+      );
+      //CRM-11529 for quick config backoffice transactions
+      //when financial_type_id is passed in form, update the
+      //lineitems with the financial type selected in form
+      $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $params);
+      $isPaymentRecorded = CRM_Utils_Array::value('record_contribution', $params);
+      if ($isPaymentRecorded && $this->_quickConfig && $submittedFinancialType) {
+        foreach ($lineItem[0] as &$values) {
+          $values['financial_type_id'] = $submittedFinancialType;
+        }
+      }
+
+      $params['fee_level'] = $params['amount_level'];
+      $contributionParams['total_amount'] = $params['amount'];
+      if ($this->_quickConfig && !empty($params['total_amount']) &&
+        $params['status_id'] != array_search('Partially paid', $participantStatus)
+      ) {
+        $params['fee_amount'] = $params['total_amount'];
+      }
+      else {
+        //fix for CRM-3086
+        $params['fee_amount'] = $params['amount'];
+      }
+    }
+
+    if (isset($params['priceSetId'])) {
+      if (!empty($lineItem[0])) {
+        $this->set('lineItem', $lineItem);
+
+        $this->_lineItem = $lineItem;
+        $lineItem = array_merge($lineItem, $additionalParticipantDetails);
+
+        $participantCount = [];
+        foreach ($lineItem as $k) {
+          foreach ($k as $v) {
+            if (CRM_Utils_Array::value('participant_count', $v) > 0) {
+              $participantCount[] = $v['participant_count'];
+            }
+          }
+        }
+      }
+      if (isset($participantCount)) {
+        $this->assign('pricesetFieldsCount', $participantCount);
+      }
+      $this->assign('lineItem', empty($lineItem[0]) || $this->_quickConfig ? FALSE : $lineItem);
+    }
+    else {
+      $this->assign('amount_level', $params['amount_level']);
+    }
+    return [$contributionParams, $lineItem, $additionalParticipantDetails, $params];
   }
 
 }
