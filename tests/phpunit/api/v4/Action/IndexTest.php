@@ -69,4 +69,14 @@ class IndexTest extends UnitTestCase {
     $this->assertEquals(['subject' => ['title' => 'Subject']], (array) $result);
   }
 
+  public function testArrayIndex() {
+    // Non-associative
+    $result = civicrm_api4('Activity', 'getFields', ['where' => [['name', '=', 'subject']]], ['name' => 'title']);
+    $this->assertEquals(['subject' => 'Subject'], (array) $result);
+
+    // Associative
+    $result = civicrm_api4('Activity', 'getFields', ['where' => [['name', '=', 'subject']]], ['title']);
+    $this->assertEquals(['Subject'], (array) $result);
+  }
+
 }

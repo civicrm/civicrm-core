@@ -29,9 +29,10 @@ function civicrm_api(string $entity = NULL, string $action, array $params, $extr
  * @param string $entity
  * @param string $action
  * @param array $params
- * @param string|int $index
+ * @param string|int|array $index
  *   If $index is a string, the results array will be indexed by that key.
  *   If $index is an integer, only the result at that index will be returned.
+ *   $index can also be a single-item array representing key|value pairs to be returned ex ['id' => 'title'].
  *
  * @return \Civi\Api4\Generic\Result
  * @throws \API_Exception
@@ -51,6 +52,18 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
     $setter = 'set' . ucfirst($name);
     $apiCall->$setter($param);
   }
+
+  if ($index && is_array($index)) {
+    $indexCol = reset($index);
+    $indexField = key($index);
+    if (property_exists($apiCall, 'select')) {
+      $apiCall->setSelect([$indexCol]);
+      if ($indexField && $indexField != $indexCol) {
+        $apiCall->addSelect($indexField);
+      }
+    }
+  }
+
   $result = $apiCall->execute();
 
   // Index results by key
@@ -73,6 +86,9 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
       return $item;
     }
     $result->exchangeArray($item);
+  }
+  if (!empty($indexCol)) {
+    $result->exchangeArray($result->column($indexCol));
   }
   return $result;
 }
