@@ -411,6 +411,10 @@ trait Api3TestTrait {
       case 'get':
         if ($options['return'] && $v3Action !== 'getcount') {
           $v4Params['select'] = array_keys($options['return']);
+          // Ensure id field is returned as v3 always expects it
+          if ($v4Entity != 'Setting' && !in_array('id', $v4Params['select'])) {
+            $v4Params['select'][] = 'id';
+          }
           // Convert join syntax
           foreach ($v4Params['select'] as &$select) {
             if (strstr($select, '_id.')) {
