@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -665,6 +663,22 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    if (function_exists('drupal_session_start')) {
+      // https://issues.civicrm.org/jira/browse/CRM-14356
+      if (!(isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
+        drupal_session_start();
+      }
+      $_SESSION = [];
+    }
+    else {
+      session_start();
+    }
   }
 
 }
