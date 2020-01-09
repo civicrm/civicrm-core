@@ -298,6 +298,8 @@ class CRM_Utils_System {
    *   URI-scheme such as 'http:').
    * @param bool $isSSL
    *   NULL to autodetect. TRUE to force to SSL.
+   *
+   * @return string rawencoded URL.
    */
   public static function externUrl($path = NULL, $query = NULL, $fragment = NULL, $absolute = TRUE, $isSSL = NULL) {
     $query = self::makeQueryString($query);
@@ -316,7 +318,7 @@ class CRM_Utils_System {
       'isSSL' => $isSSL,
     ]);
     Civi::service('dispatcher')->dispatch('hook_civicrm_alterExternUrl', $event);
-    return CRM_Utils_Url::unparseUrl($event->url);
+    return urldecode(CRM_Utils_Url::unparseUrl($event->url));
   }
 
   /**
