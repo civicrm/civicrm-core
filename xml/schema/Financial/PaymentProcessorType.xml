@@ -19,10 +19,10 @@
   </primaryKey>
   <field>
     <name>name</name>
-    <title>Payment Processor variable name to be used in code</title>
+    <title>Payment Processor Type variable name to be used in code</title>
     <type>varchar</type>
     <length>64</length>
-    <comment>Payment Processor Name.</comment>
+    <comment>Payment Processor Type Name.</comment>
     <add>1.8</add>
     <required>true</required>
   </field>
