@@ -88,4 +88,80 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * @return array
+   */
+  public function checkSmartGroupCustomFieldCriteria() {
+    $messages = $problematicSG = [];
+    $customFieldIds = array_keys(CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE));
+    $smartGroups = civicrm_api3('SavedSearch', 'get', [
+      'sequential' => 1,
+      'options' => ['limit' => 0],
+    ]);
+    if (empty($smartGroups['values'])) {
+      return $messages;
+    }
+    foreach ($smartGroups['values'] as $group) {
+      if (empty($group['form_values'])) {
+        continue;
+      }
+      foreach ($group['form_values'] as $formValues) {
+        if (substr($formValues[0], 0, 7) == 'custom_') {
+          list(, $customFieldID) = explode('custom_', $formValues[0]);
+          if (!in_array($customFieldID, $customFieldIds)) {
+            $problematicSG[CRM_Contact_BAO_SavedSearch::getName($group['id'], 'id')] = [
+              'title' => CRM_Contact_BAO_SavedSearch::getName($group['id'], 'title'),
+              'cfid' => $customFieldID,
+              'ssid' => $group['id'],
+            ];
+          }
+        }
+      }
+    }
+
+    if (!empty($problematicSG)) {
+      $html = '';
+      foreach ($problematicSG as $id => $field) {
+        if (!empty($field['cfid'])) {
+          try {
+            $customField = civicrm_api3('CustomField', 'getsingle', [
+              'sequential' => 1,
+              'id' => $field['cfid'],
+            ]);
+            $fieldName = ts('<a href="%1" title="Edit Custom Field"> %2 </a>', [
+              1 => CRM_Utils_System::url('civicrm/admin/custom/group/field/update',
+                "action=update&reset=1&gid={$customField['custom_group_id']}&id={$field['cfid']}", TRUE
+              ),
+              2 => $customField['label'],
+            ]);
+          }
+          catch (Exception $e) {
+            $fieldName = ' <span style="color:red"> - Deleted - </span> ';
+          }
+        }
+        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "?reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria') . '"> <i class="crm-i fa-pencil"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "?reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings') . '"> <i class="crm-i fa-gear"></i> </a>';
+        $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
+      }
+
+      $message = "<p>The following smart groups include custom fields which are disabled/deleted from the database. This may cause errors on group page.
+        You might need to edit their search criteria and update them to clean outdated fields from saved search OR disable them in order to fix the error.</p>
+        <p><table><thead><tr><th>Group</th><th></th><th>Custom Field</th>
+        </tr></thead><tbody>
+        $html
+        </tbody></table></p>
+       ";
+
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts($message),
+        ts('Disabled/Deleted fields on Smart Groups'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+      $messages[] = $msg;
+    }
+    return $messages;
+  }
+
 }
