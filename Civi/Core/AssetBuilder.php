@@ -226,9 +226,11 @@ class AssetBuilder {
 
   /**
    * Clear out any cache files.
+   *
+   * @param bool $removeDir Should folder itself be removed too.
    */
-  public function clear() {
-    \CRM_Utils_File::cleanDir($this->getCachePath());
+  public function clear($removeDir = TRUE) {
+    \CRM_Utils_File::cleanDir($this->getCachePath(), $removeDir);
   }
 
   /**

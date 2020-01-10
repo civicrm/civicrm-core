@@ -1478,6 +1478,9 @@ class CRM_Utils_System {
     // reset ACL cache
     CRM_ACL_BAO_Cache::resetCache();
 
+    // clear asset builder folder
+    \Civi::service('asset_builder')->clear(FALSE);
+
     // reset various static arrays used here
     CRM_Contact_BAO_Contact::$_importableFields = CRM_Contact_BAO_Contact::$_exportableFields
       = CRM_Contribute_BAO_Contribution::$_importableFields
