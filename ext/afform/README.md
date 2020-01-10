@@ -22,7 +22,7 @@ if you already have a basic understanding of CiviCRM API and AngularJS.  It is l
 ## Requirements
 
 * PHP v7.0+
-* CiviCRM v5.7+
+* CiviCRM v5.22+
 
 <!--
 ## Installation (Web UI)

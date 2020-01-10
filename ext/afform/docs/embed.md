@@ -73,4 +73,4 @@ cv open 'civicrm/contact?cid=100'
 
 What does this buy us?  It means that a downstream admin (using APIs/GUIs) can fork `ang/myContactName.aff.html` --
 but all the other components can cleanly track the canonical release. This significantly reduces the costs and risks
-of manging upgrades and changes.
+of managing upgrades and changes.
