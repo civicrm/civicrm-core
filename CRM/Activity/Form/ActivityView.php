@@ -95,13 +95,13 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $values['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $activityId);
     $this->assign('values', $values);
 
-    $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$activityId}&action=view&cid={$values['source_contact_id']}");
-    CRM_Utils_Recent::add($this->_values['subject'],
+    $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$activityId}&action=view&cid={$defaults['source_contact_id']}");
+    CRM_Utils_Recent::add($defaults['subject'],
       $url,
-      $values['id'],
+      $activityId,
       'Activity',
-      $values['source_contact_id'],
-      $values['source_contact']
+      $defaults['source_contact_id'],
+      $defaults['source_contact']
     );
   }
 
