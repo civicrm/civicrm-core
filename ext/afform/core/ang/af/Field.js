@@ -13,14 +13,15 @@
       link: function($scope, $el, $attr, ctrls) {
         var ts = $scope.ts = CRM.ts('afform'),
           closestController = $($el).closest('[af-fieldset],[af-join],[af-repeat-item]'),
-          afForm = ctrls[0];
+          afForm = ctrls[0],
+          boolOptions = [{key: '1', label: ts('Yes')}, {key: '0', label: ts('No')}];
         $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrls[3] : ctrls[2] || ctrls[1];
         $scope.fieldId = afForm.getFormMeta().name + '-' + $scope.fieldName + '-' + id++;
 
         $el.addClass('af-field-type-' + _.kebabCase($scope.defn.input_type));
 
         $scope.getOptions = function() {
-          return $scope.defn.options || [{key: '1', label: ts('Yes')}, {key: '0', label: ts('No')}];
+          return $scope.defn.options || boolOptions;
         };
 
         $scope.select2Options = function() {
