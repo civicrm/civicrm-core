@@ -933,7 +933,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = []) {
 
-    $conflicts = self::getConflicts($migrationInfo, $mainId, $otherId, $mode);
+    $conflicts = self::getConflicts($migrationInfo, $mainId, $otherId, $mode)['conflicts'];
     // A hook could have set skip_merge in order to alter merge behaviour.
     // This is a something we might ideally deprecate since they really 'should'
     // mess with the conflicts array instead.
@@ -2194,13 +2194,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // allow hook to override / manipulate migrationInfo as well
     $migrationInfo = $migrationData['migration_info'];
     foreach ($conflicts as $key => $val) {
-      if ($val !== NULL || $mode !== 'safe') {
-        // copy over the resolved values
-        $migrationInfo[$key] = $val;
-        unset($conflicts[$key]);
-      }
+      // Copy over the resolved values. If we are in aggressive mode we update to null
+      // so as not to copy over. Why it's different to safe mode is a bit murky.
+      // Working theory is it doesn't matter what we do in safe mode here if $val is NULL.
+      // as the merge is not gonna happen if $val == NULL
+      $migrationInfo[$key] = $val ?? ($mode === 'safe' ? $migrationInfo[$key] : NULL);
     }
-    return self::formatConflictArray($conflicts, $migrationInfo['rows'], $migrationInfo['main_details']['location_blocks'], $migrationInfo['other_details']['location_blocks'], $mainId, $otherId);
+    return self::formatConflictArray($conflicts, $migrationInfo['rows'], $migrationInfo['main_details']['location_blocks'], $migrationInfo['other_details']['location_blocks'], $mainId, $otherId, $mode);
   }
 
   /**
@@ -2210,12 +2210,29 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param $toRemoveContactLocationBlocks
    * @param $toKeepID
    * @param $toRemoveID
+   * @param string $mode
    *
    * @return mixed
    * @throws \CRM_Core_Exception
    */
-  protected static function formatConflictArray($conflicts, $migrationInfo, $toKeepContactLocationBlocks, $toRemoveContactLocationBlocks, $toKeepID, $toRemoveID) {
+  protected static function formatConflictArray($conflicts, $migrationInfo, $toKeepContactLocationBlocks, $toRemoveContactLocationBlocks, $toKeepID, $toRemoveID, $mode) {
     $return = [];
+    $resolved = [];
+    foreach ($conflicts as $key => $val) {
+      if ($val !== NULL) {
+        // copy over the resolved values
+        $resolved[$key] = $val;
+        unset($conflicts[$key]);
+      }
+      elseif ($mode === 'aggressive') {
+        unset($conflicts[$key]);
+        if (strpos($key, 'move_location_') !== 0) {
+          // @todo - just handling plain contact fields for now because I think I need a bigger refactor
+          // of the below to handle locations & will do as a follow up.
+          $resolved['contact'][substr($key, 5)] = $migrationInfo[$key]['main'];
+        }
+      }
+    }
     foreach (array_keys($conflicts) as $index) {
       if (substr($index, 0, 14) === 'move_location_') {
         $parts = explode('_', $index);
@@ -2254,7 +2271,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         throw new CRM_Core_Exception(ts('Unknown parameter') . $index);
       }
     }
-    return $return;
+    return ['conflicts' => $return, 'resolved' => $resolved];
   }
 
   /**

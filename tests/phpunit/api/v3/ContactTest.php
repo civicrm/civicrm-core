@@ -1744,25 +1744,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test the function that determines if 2 contacts have conflicts.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMergeGetConflicts() {
-    $this->createCustomGroupWithFieldOfType();
-    $contact1 = $this->individualCreate([
-      'email' => 'bob@example.com',
-      'api.address.create' => ['location_type_id' => 'work', 'street_address' => 'big office', 'city' => 'small city'],
-      'api.address.create.2' => ['location_type_id' => 'home', 'street_address' => 'big house', 'city' => 'small city'],
-      'external_identifier' => 'unique and special',
-      $this->getCustomFieldName('text') => 'mummy loves me',
-    ]);
-    $contact2 = $this->individualCreate([
-      'first_name' => 'different',
-      'api.address.create.1' => ['location_type_id' => 'home', 'street_address' => 'medium house', 'city' => 'small city'],
-      'api.address.create.2' => ['location_type_id' => 'work', 'street_address' => 'medium office', 'city' => 'small city'],
-      'external_identifier' => 'uniquer and specialler',
-      'api.email.create' => ['location_type_id' => 'Other', 'email' => 'bob@example.com'],
-      $this->getCustomFieldName('text') => 'mummy loves me more',
-    ]);
+    list($contact1, $contact2) = $this->createDeeplyConflictedContacts();
     $conflicts = $this->callAPISuccess('Contact', 'get_merge_conflicts', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2])['values'];
     $this->assertEquals([
       'safe' => [
@@ -1813,10 +1798,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
             ],
           ],
         ],
+        'resolved' => [],
       ],
     ], $conflicts);
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge');
+    $this->callAPISuccess('Job', 'process_batch_merge');
     $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
       'contact_type' => 'Individual',
       'used' => 'Unsupervised',
@@ -1825,14 +1811,36 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
 
     $duplicates = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
-    $this->assertEquals($conflicts['safe'], $duplicates['values'][0]['safe']);
+    $this->assertEquals($conflicts['safe']['conflicts'], $duplicates['values'][0]['safe']['conflicts']);
   }
 
+  /**
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetConflictsAggressiveMode() {
+    list($contact1, $contact2) = $this->createDeeplyConflictedContacts();
+    $conflicts = $this->callAPISuccess('Contact', 'get_merge_conflicts', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2, 'mode' => ['safe', 'aggressive']])['values'];
+    $this->assertEquals([
+      'contact' => [
+        'external_identifier' => 'uniquer and specialler',
+        'first_name' => 'different',
+        'custom_1' => 'mummy loves me more',
+      ],
+    ], $conflicts['aggressive']['resolved']);
+  }
+
+  /**
+   * Create inherited membership type for employer relationship.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
   private function createEmployerOfMembership() {
     $params = [
       'domain_id' => CRM_Core_Config::domainID(),
       'name' => 'Organization Membership',
-      'description' => NULL,
       'member_of_contact_id' => 1,
       'financial_type_id' => 1,
       'minimum_fee' => 10,
@@ -1845,7 +1853,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
-    return $membershipType["values"][$membershipType["id"]];
+    return $membershipType['values'][$membershipType['id']];
   }
 
   /**
@@ -4520,6 +4528,33 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'id' => $contact['id'],
       'skip_undelete' => TRUE,
     ]);
+  }
+
+  /**
+   * Create pair of contacts with multiple conflicts.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createDeeplyConflictedContacts(): array {
+    $this->createCustomGroupWithFieldOfType();
+    $contact1 = $this->individualCreate([
+      'email' => 'bob@example.com',
+      'api.address.create' => ['location_type_id' => 'work', 'street_address' => 'big office', 'city' => 'small city'],
+      'api.address.create.2' => ['location_type_id' => 'home', 'street_address' => 'big house', 'city' => 'small city'],
+      'external_identifier' => 'unique and special',
+      $this->getCustomFieldName('text') => 'mummy loves me',
+    ]);
+    $contact2 = $this->individualCreate([
+      'first_name' => 'different',
+      'api.address.create.1' => ['location_type_id' => 'home', 'street_address' => 'medium house', 'city' => 'small city'],
+      'api.address.create.2' => ['location_type_id' => 'work', 'street_address' => 'medium office', 'city' => 'small city'],
+      'external_identifier' => 'uniquer and specialler',
+      'api.email.create' => ['location_type_id' => 'Other', 'email' => 'bob@example.com'],
+      $this->getCustomFieldName('text') => 'mummy loves me more',
+    ]);
+    return [$contact1, $contact2];
   }
 
 }

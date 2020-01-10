@@ -108,6 +108,8 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
 
   /**
    * Cleanup after tests.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanup(['civicrm_contact'], TRUE);
@@ -129,6 +131,10 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    * 4) NULL (ie not set)
    *  - in safe mode NULL is not a conflict with any option but the other
    *   combos are a conflict.
+   *
+   * @param array $dataSet
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCheckboxCustomFieldHandling($dataSet) {
     $customFieldLabel = 'custom_' . $this->customStringCheckboxID;
@@ -137,8 +143,8 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate($contact1Params);
     $this->individualCreate($contact2Params);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
-    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
-    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']));
+    $this->assertCount($dataSet['merged'], $result['values']['merged']);
+    $this->assertCount($dataSet['skipped'], $result['values']['skipped']);
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
     $this->assertEquals($dataSet['expected'], $contact[$customFieldLabel]);
   }
