@@ -31,6 +31,7 @@
     $scope.index = '';
     var getMetaParams = {},
       objectParams = {orderBy: 'ASC', values: '', chain: ['Entity', '', '{}']},
+      docs = CRM.vars.api4.docs,
       helpTitle = '',
       helpContent = {};
     $scope.helpTitle = '';
@@ -187,6 +188,7 @@
         $scope.params.select = [];
       } else {
         $scope.params.select = ['row_count'];
+        $scope.index = '';
         if ($scope.params.limit == 25) {
           $scope.params.limit = 0;
         }
@@ -359,7 +361,7 @@
         entity = $scope.entity,
         action = $scope.action,
         params = getParams(),
-        index = isInt($scope.index) ? +$scope.index : $scope.index,
+        index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
         result = 'result';
       if ($scope.entity && $scope.action) {
         if (action.slice(0, 3) === 'get') {
@@ -429,12 +431,17 @@
           }
         });
         code.oop += "\n  ->execute()";
-        if (_.isNumber(index)) {
+        if (isSelectRowCount) {
+          code.oop += "\n  ->count()";
+        } else if (_.isNumber(index)) {
           code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
         } else if (index) {
-          code.oop += "\n  ->indexBy('" + index + "')";
-        } else if (isSelectRowCount) {
-          code.oop += "\n  ->count()";
+          if (_.isString(index) || (_.isPlainObject(index) && !index[0] && !index['0'])) {
+            code.oop += "\n  ->indexBy('" + (_.isPlainObject(index) ? _.keys(index)[0] : index) + "')";
+          }
+          if (_.isArray(index) || _.isPlainObject(index)) {
+            code.oop += "\n  ->column('" + (_.isArray(index) ? index[0] : _.values(index)[0]) + "')";
+          }
         }
         code.oop += ";\n";
         if (!_.isNumber(index) && !isSelectRowCount) {
@@ -474,7 +481,7 @@
       $scope.loading = true;
       $http.post(CRM.url('civicrm/ajax/api4/' + $scope.entity + '/' + $scope.action, {
         params: angular.toJson(getParams()),
-        index: $scope.index
+        index: isInt($scope.index) ? +$scope.index : parseYaml($scope.index)
       }), null, {
         headers: {
           'X-Requested-With': 'XMLHttpRequest'
@@ -544,8 +551,8 @@
     }
 
     if (!$scope.entity) {
-      $scope.helpTitle = helpTitle = ts('Help');
-      $scope.helpContent = helpContent = {description: ts('Welcome to the api explorer.'), comment: ts('Select an entity to begin.')};
+      $scope.helpTitle = helpTitle = ts('APIv4 Explorer');
+      $scope.helpContent = helpContent = {description: docs.description, comment: docs.comment};
     } else if (!actions.length && !getEntity().actions) {
       getMetaParams.actions = [$scope.entity, 'getActions', {chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]}}];
       fetchMeta();
@@ -576,10 +583,8 @@
       }
     });
 
-    $scope.indexHelp = {
-      description: ts('(string|int) Index results or select by index.'),
-      comment: ts('Pass a string to index the results by a field value. E.g. index: "name" will return an associative array with names as keys.') + '\n\n' +
-        ts('Pass an integer to return a single result; e.g. index: 0 will return the first result, 1 will return the second, and -1 will return the last.')
+    $scope.paramDoc = function(name) {
+      return docs.params[name];
     };
 
     $scope.$watch('params', writeCode, true);

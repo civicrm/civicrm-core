@@ -63,26 +63,43 @@ class ReflectionUtils {
    */
   public static function parseDocBlock($comment) {
     $info = [];
+    $param = NULL;
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $comment) as $num => $line) {
       if (!$num || strpos($line, '*/') !== FALSE) {
         continue;
       }
-      $line = ltrim(trim($line), '* ');
+      $line = preg_replace('/[ ]+/', ' ', ltrim(trim($line), '* '));
       if (strpos($line, '@') === 0) {
         $words = explode(' ', $line);
-        $key = substr($words[0], 1);
+        $key = substr(array_shift($words), 1);
+        $param = NULL;
         if ($key == 'var') {
-          $info['type'] = explode('|', $words[1]);
+          $info['type'] = explode('|', $words[0]);
         }
         elseif ($key == 'options') {
-          $val = str_replace(', ', ',', implode(' ', array_slice($words, 1)));
+          $val = str_replace(', ', ',', implode(' ', $words));
           $info['options'] = explode(',', $val);
+        }
+        elseif ($key == 'throws') {
+          $info[$key][] = implode(' ', $words);
+        }
+        elseif ($key == 'param' && $words) {
+          $type = $words[0][0] !== '$' ? explode('|', array_shift($words)) : NULL;
+          $param = rtrim(array_shift($words), '-:()/');
+          $info['params'][$param] = [
+            'type' => $type,
+            'description' => $words ? ltrim(implode(' ', $words), '-: ') : '',
+            'comment' => '',
+          ];
         }
         else {
           // Unrecognized annotation, but we'll duly add it to the info array
-          $val = implode(' ', array_slice($words, 1));
+          $val = implode(' ', $words);
           $info[$key] = strlen($val) ? $val : TRUE;
         }
+      }
+      elseif ($param) {
+        $info['params'][$param]['comment'] .= $line . "\n";
       }
       elseif ($num == 1) {
         $info['description'] = $line;

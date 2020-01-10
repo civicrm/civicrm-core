@@ -20,11 +20,13 @@
 class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
 
   public function run() {
+    $apiDoc = new ReflectionFunction('civicrm_api4');
     $vars = [
       'operators' => \CRM_Core_DAO::acceptedSQLOperators(),
       'basePath' => Civi::resources()->getUrl('civicrm'),
       'schema' => (array) \Civi\Api4\Entity::get()->setChain(['fields' => ['$name', 'getFields']])->execute(),
       'links' => (array) \Civi\Api4\Entity::getLinks()->execute(),
+      'docs' => \Civi\Api4\Utils\ReflectionUtils::parseDocBlock($apiDoc->getDocComment()),
     ];
     Civi::resources()
       ->addVars('api4', $vars)

@@ -62,4 +62,52 @@ This is the base class.';
     $this->assertEquals("In the child class, foo has been barred.\n\nIn general, you can do nothing with it.", $doc['comment']);
   }
 
+  public function docBlockExamples() {
+    return [
+      [
+        "/**
+          * This is a function.
+          *
+          * Comment.
+          * IDK
+          * @param int|string \$foo
+          *   Nothing interesting.
+          * @see 0
+          * @throws tantrums
+          * @param \$bar: - Has a title
+          * @return nothing
+          */
+        ",
+        [
+          'description' => 'This is a function.',
+          'comment' => "Comment.\nIDK",
+          'params' => [
+            '$foo' => [
+              'type' => ['int', 'string'],
+              'description' => '',
+              'comment' => "Nothing interesting.\n",
+            ],
+            '$bar' => [
+              'type' => NULL,
+              'description' => 'Has a title',
+              'comment' => '',
+            ],
+          ],
+          'see' => '0',
+          'throws' => ['tantrums'],
+          'return' => 'nothing',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider docBlockExamples
+   * @param $input
+   * @param $expected
+   */
+  public function testParseDocBlock($input, $expected) {
+    $this->assertEquals($expected, ReflectionUtils::parseDocBlock($input));
+  }
+
 }

@@ -64,4 +64,19 @@ class IndexTest extends UnitTestCase {
     $this->assertContains('not found', $error);
   }
 
+  public function testIndexWithSelect() {
+    $result = civicrm_api4('Activity', 'getFields', ['select' => ['title'], 'where' => [['name', '=', 'subject']]], 'name');
+    $this->assertEquals(['subject' => ['title' => 'Subject']], (array) $result);
+  }
+
+  public function testArrayIndex() {
+    // Non-associative
+    $result = civicrm_api4('Activity', 'getFields', ['where' => [['name', '=', 'subject']]], ['name' => 'title']);
+    $this->assertEquals(['subject' => 'Subject'], (array) $result);
+
+    // Associative
+    $result = civicrm_api4('Activity', 'getFields', ['where' => [['name', '=', 'subject']]], ['title']);
+    $this->assertEquals(['Subject'], (array) $result);
+  }
+
 }
