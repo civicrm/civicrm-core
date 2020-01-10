@@ -60,8 +60,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       return $results;
     }
 
-    $fieldSpec = $query->getApiFieldSpec();
-    $this->unserializeFields($results, $query->getEntity(), $fieldSpec);
+    $this->formatFieldValues($results, $query->getApiFieldSpec());
 
     // Group the selects to avoid queries for each field
     $groupedSelects = $this->getNtoManyJoinSelects($query);
@@ -75,7 +74,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       foreach ($results as &$primaryResult) {
         $baseId = $primaryResult['id'];
         $filtered = array_filter($joinResults, function ($res) use ($baseId) {
-          return ($res['_base_id'] === $baseId);
+          return ($res['_base_id'] == $baseId);
         });
         $filtered = array_values($filtered);
         ArrayInsertionUtil::insert($primaryResult, $joinPath, $filtered);
@@ -98,26 +97,55 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       $fields[array_pop($name)] = $field->toArray();
     }
     if ($fields) {
-      $this->unserializeFields($joinResults, NULL, $fields);
+      $this->formatFieldValues($joinResults, $fields);
     }
   }
 
   /**
-   * Unserialize values
+   * Unserialize values and convert to correct type
    *
    * @param array $results
-   * @param string $entity
    * @param array $fields
    */
-  protected function unserializeFields(&$results, $entity, $fields = []) {
+  protected function formatFieldValues(&$results, $fields = []) {
     foreach ($results as &$result) {
-      foreach ($result as $field => &$value) {
-        if (!empty($fields[$field]['serialize']) && is_string($value)) {
-          $serializationType = $fields[$field]['serialize'];
-          $value = \CRM_Core_DAO::unSerializeField($value, $serializationType);
+      foreach ($result as $field => $value) {
+        $dataType = $fields[$field]['data_type'] ?? NULL;
+        if (!empty($fields[$field]['serialize'])) {
+          if (is_string($value)) {
+            $result[$field] = $value = \CRM_Core_DAO::unSerializeField($value, $fields[$field]['serialize']);
+            foreach ($value as $key => $val) {
+              $result[$field][$key] = $this->convertDataType($val, $dataType);
+            }
+          }
+        }
+        else {
+          $result[$field] = $this->convertDataType($value, $dataType);
         }
       }
     }
+  }
+
+  /**
+   * @param mixed $value
+   * @param string $dataType
+   * @return mixed
+   */
+  protected function convertDataType($value, $dataType) {
+    if (isset($value)) {
+      switch ($dataType) {
+        case 'Boolean':
+          return (bool) $value;
+
+        case 'Integer':
+          return (int) $value;
+
+        case 'Money':
+        case 'Float':
+          return (float) $value;
+      }
+    }
+    return $value;
   }
 
   /**
