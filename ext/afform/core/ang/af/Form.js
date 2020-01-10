@@ -20,7 +20,10 @@
 
         this.registerEntity = function registerEntity(entity) {
           schema[entity.modelName] = entity;
-          data[entity.modelName] = [];
+          // Permitting entity.data allows the afform to specify variables like
+          // that has been passing into the afform with the directive that initiates it.
+          // This is an advanced usage & afJoin is more normal.
+          data[entity.modelName] = entity.data || {};
         };
         this.getEntity = function getEntity(name) {
           return schema[name];
