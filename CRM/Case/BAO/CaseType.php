@@ -167,7 +167,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       foreach ($definition['caseRoles'] as $values) {
         $xmlFile .= "<RelationshipType>\n";
         foreach ($values as $key => $value) {
-          $xmlFile .= "<{$key}>" . (is_array($value) ? implode(',', array_map(['\CRM_Case_BAO_CaseType', 'encodeXmlString'], $value)) : self::encodeXmlString($value)) . "</{$key}>\n";
+          $xmlFile .= "<{$key}>" . ($key == 'groups' ? implode(',', array_map(['\CRM_Case_BAO_CaseType', 'encodeXmlString'], (array) $value)) : self::encodeXmlString($value)) . "</{$key}>\n";
         }
         $xmlFile .= "</RelationshipType>\n";
       }
@@ -180,7 +180,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     if (!empty($definition['activityAsgmtGrps'])) {
       $xmlFile .= "<ActivityAsgmtGrps>\n";
-      foreach ($definition['activityAsgmtGrps'] as $value) {
+      foreach ((array) $definition['activityAsgmtGrps'] as $value) {
         $xmlFile .= "<Group>$value</Group>\n";
       }
       $xmlFile .= "</ActivityAsgmtGrps>\n";
