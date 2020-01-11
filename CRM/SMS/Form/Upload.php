@@ -144,7 +144,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   public function postProcess() {
-    $params = $ids = [];
+    $params = [];
     $uploadParams = ['from_name'];
 
     $formValues = $this->controller->exportValues($this->_name);
@@ -232,10 +232,10 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $this->set('template', $params['msg_template_id']);
     }
 
-    $ids['mailing_id'] = $this->_mailingID;
+    $params['id'] = $this->_mailingID;
 
     // Build SMS in mailing table.
-    CRM_Mailing_BAO_Mailing::create($params, $ids);
+    CRM_Mailing_BAO_Mailing::create($params);
   }
 
   /**
