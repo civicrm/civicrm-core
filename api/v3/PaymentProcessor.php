@@ -24,12 +24,6 @@
  *   API result array
  */
 function civicrm_api3_payment_processor_create($params) {
-  if (empty($params['id']) && empty($params['payment_instrument_id'])) {
-    $params['payment_instrument_id'] = civicrm_api3('PaymentProcessorType', 'getvalue', [
-      'id' => $params['payment_processor_type_id'],
-      'return' => 'payment_instrument_id',
-    ]);
-  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'PaymentProcessor');
 }
 

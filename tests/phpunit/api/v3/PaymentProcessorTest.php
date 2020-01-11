@@ -33,6 +33,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'class_name' => 'CRM_Core_Payment_APITest',
       'billing_mode' => 'form',
       'is_recur' => 0,
+      'payment_instrument_id' => 2,
     ];
     $result = $this->callAPISuccess('payment_processor_type', 'create', $params);
     $this->_paymentProcessorType = $result['id'];
@@ -71,6 +72,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
     ]);
     $this->getAndCheck($params, $result['id'], 'PaymentProcessor');
+    $this->assertEquals(2, $result['values'][$result['id']]['payment_instrument_id']);
   }
 
   /**
@@ -80,6 +82,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
    */
   public function testPaymentProcessorUpdate() {
     $params = $this->_params;
+    $params['payment_instrument_id'] = 1;
     $result = $this->callAPISuccess('payment_processor', 'create', $params);
     $this->assertNotNull($result['id']);
 
