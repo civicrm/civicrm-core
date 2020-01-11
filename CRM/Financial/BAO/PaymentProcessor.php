@@ -35,6 +35,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @throws Exception
    */
   public static function create($params) {
+    // If we are creating a new PaymentProcessor and have not specified the payment instrument to use, get the default from the Payment Processor Type.
+    if (empty($params['id']) && empty($params['payment_instrument_id'])) {
+      $params['payment_instrument_id'] = civicrm_api3('PaymentProcessorType', 'getvalue', [
+        'id' => $params['payment_processor_type_id'],
+        'return' => 'payment_instrument_id',
+      ]);
+    }
     $processor = new CRM_Financial_DAO_PaymentProcessor();
     $processor->copyValues($params);
 
