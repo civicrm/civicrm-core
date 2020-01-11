@@ -1353,10 +1353,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (!empty($params['record_contribution'])) {
         if (!empty($params['id'])) {
           if ($this->_onlinePendingContributionId) {
-            $ids['contribution'] = $this->_onlinePendingContributionId;
+            $contributionParams['id'] = $this->_onlinePendingContributionId;
           }
           else {
-            $ids['contribution'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+            $contributionParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
               $params['id'],
               'contribution_id',
               'participant_id'
@@ -1428,7 +1428,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           // if multiple participants are link, consider contribution total amount as the amount Owed
           if ($this->_id && CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
             $amountOwed = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-              $ids['contribution'],
+              $contributionParams['id'],
               'total_amount'
             );
           }
@@ -1447,21 +1447,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         if ($this->_single) {
-          if (empty($ids)) {
-            $ids = [];
-          }
-          $contributions[] = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
+          $contributions[] = CRM_Contribute_BAO_Contribution::create($contributionParams);
         }
         else {
-          $ids = [];
           foreach ($this->_contactIds as $contactID) {
             $contributionParams['contact_id'] = $contactID;
-            $contributions[] = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
+            $contributions[] = CRM_Contribute_BAO_Contribution::create($contributionParams);
           }
         }
 
         // Insert payment record for this participant
-        if (empty($ids['contribution'])) {
+        if (empty($contributionParams['id'])) {
           foreach ($this->_contactIds as $num => $contactID) {
             $participantPaymentParams = [
               'participant_id' => $participants[$num]->id,

@@ -90,6 +90,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (empty($params)) {
       return NULL;
     }
+    if (!empty($ids)) {
+      CRM_Core_Error::deprecatedFunctionWarning('ids should not be passed into Contribution.add');
+    }
     //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
     $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
     $action = $contributionID ? 'edit' : 'create';
@@ -493,7 +496,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \CiviCRM_API3_Exception
    */
   public static function create(&$params, $ids = []) {
-
     $dateFields = [
       'receive_date',
       'cancel_date',
@@ -510,7 +512,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $transaction = new CRM_Core_Transaction();
 
     try {
-      $contribution = self::add($params, $ids);
+      if (!isset($params['id']) && isset($ids['contribution'])) {
+        CRM_Core_Error::deprecatedFunctionWarning('ids should not be used for contribution create');
+        $params['id'] = $ids['contribution'];
+      }
+      $contribution = self::add($params);
     }
     catch (CRM_Core_Exception $e) {
       $transaction->rollback();
@@ -2376,8 +2382,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $contributionParams[$field] = $params[$field];
       }
 
-      $ids = ['contribution' => $contributionId];
-      $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
+      $contributionParams['id'] = $contributionId;
+      $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
     }
 
     return $updateResult;

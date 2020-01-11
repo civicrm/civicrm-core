@@ -321,7 +321,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             }
           }
 
-          $newContribution = CRM_Contribute_BAO_Contribution::create($formatted, $ids);
+          $formatted['id'] = $ids['contribution'];
+          $newContribution = CRM_Contribute_BAO_Contribution::create($formatted);
           $this->_newContributions[] = $newContribution->id;
 
           //return soft valid since we need to show how soft credits were added
