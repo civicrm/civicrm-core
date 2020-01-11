@@ -33,6 +33,7 @@ class CRM_Dedupe_Merger {
       $title = $userRecordUrl = '';
 
       $config = CRM_Core_Config::singleton();
+      // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
       if ($config->userSystem->is_drupal) {
         $userRecordUrl = CRM_Utils_System::url('user/%ufid');
         $title = ts('%1 User: %2; user id: %3', [
@@ -1120,30 +1121,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     } // End loop through each location block entity
 
     // add the related tables and unset the ones that don't sport any of the duplicate contact's info
-    $config = CRM_Core_Config::singleton();
-    $mainUfId = CRM_Core_BAO_UFMatch::getUFId($mainId);
-    $mainUser = NULL;
-    if ($mainUfId) {
-      // d6 compatible
-      if ($config->userSystem->is_drupal == '1' && function_exists($mainUser)) {
-        $mainUser = user_load($mainUfId);
-      }
-      elseif ($config->userFramework == 'Joomla') {
-        $mainUser = JFactory::getUser($mainUfId);
-      }
-    }
-    $otherUfId = CRM_Core_BAO_UFMatch::getUFId($otherId);
-    $otherUser = NULL;
-    if ($otherUfId) {
-      // d6 compatible
-      if ($config->userSystem->is_drupal == '1' && function_exists($mainUser)) {
-        $otherUser = user_load($otherUfId);
-      }
-      elseif ($config->userFramework == 'Joomla') {
-        $otherUser = JFactory::getUser($otherUfId);
-      }
-    }
-
     $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
     $relTables = $mergeHandler->getTablesRelatedToTheMergePair();
     foreach ($relTables as $name => $null) {
@@ -1152,18 +1129,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       $relTables[$name]['main_url'] = str_replace('$cid', $mainId, $relTables[$name]['url']);
       $relTables[$name]['other_url'] = str_replace('$cid', $otherId, $relTables[$name]['url']);
-      if ($name == 'rel_table_users') {
-        $relTables[$name]['main_url'] = str_replace('%ufid', $mainUfId, $relTables[$name]['url']);
-        $relTables[$name]['other_url'] = str_replace('%ufid', $otherUfId, $relTables[$name]['url']);
-        $find = ['$ufid', '$ufname'];
-        if ($mainUser) {
-          $replace = [$mainUfId, $mainUser->name];
-          $relTables[$name]['main_title'] = str_replace($find, $replace, $relTables[$name]['title']);
-        }
-        if ($otherUser) {
-          $replace = [$otherUfId, $otherUser->name];
-          $relTables[$name]['other_title'] = str_replace($find, $replace, $relTables[$name]['title']);
-        }
+      if ($name === 'rel_table_users') {
+        // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
+        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherId), $relTables[$name]['url']);
+        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherId), $relTables[$name]['url']);
       }
       if ($name == 'rel_table_memberships') {
         //Enable 'add new' checkbox if main contact does not contain any membership similar to duplicate contact.
