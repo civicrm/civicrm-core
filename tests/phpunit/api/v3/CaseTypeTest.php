@@ -241,4 +241,31 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $this->assertEquals($template['definition']['statuses'], array_values($result['values']));
   }
 
+  public function testDefinitionGroups() {
+    $gid1 = $this->groupCreate(['name' => 'testDefinitionGroups1', 'title' => 'testDefinitionGroups1']);
+    $gid2 = $this->groupCreate(['name' => 'testDefinitionGroups2', 'title' => 'testDefinitionGroups2']);
+    $def = $this->fixtures['Application_with_Definition'];
+    $def['definition']['caseRoles'][] = [
+      'name' => 'Second role',
+      'groups' => ['testDefinitionGroups1', 'testDefinitionGroups2'],
+    ];
+    $def['definition']['caseRoles'][] = [
+      'name' => 'Third role',
+      'groups' => 'testDefinitionGroups2',
+    ];
+    $def['definition']['activityAsgmtGrps'] = $gid1;
+    $createCaseType = $this->callAPISuccess('CaseType', 'create', $def);
+    $caseType = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $createCaseType['id']]);
+
+    // Assert the group id got converted to array with name not id
+    $this->assertEquals(['testDefinitionGroups1'], $caseType['definition']['activityAsgmtGrps']);
+
+    // Assert multiple groups are stored
+    $this->assertEquals(['testDefinitionGroups1', 'testDefinitionGroups2'], $caseType['definition']['caseRoles'][1]['groups']);
+
+    // Assert single group got converted to array
+    $this->assertEquals(['testDefinitionGroups2'], $caseType['definition']['caseRoles'][2]['groups']);
+
+  }
+
 }

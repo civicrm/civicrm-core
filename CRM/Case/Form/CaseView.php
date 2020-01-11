@@ -168,11 +168,31 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
 
     $allowedRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactID);
+    $relationshipTypeMetadata = CRM_Contact_Form_Relationship::getRelationshipTypeMetadata($allowedRelationshipTypes);
+
+    $caseTypeDefinition = civicrm_api3('CaseType', 'getsingle', ['name' => $this->_caseType])['definition'];
+
+    foreach ($caseTypeDefinition['caseRoles'] as $role) {
+      if (!empty($role['groups'])) {
+        $relationshipType = civicrm_api3('RelationshipType', 'get', [
+          'sequential' => 1,
+          'name_a_b' => $role['name'],
+          'name_b_a' => $role['name'],
+          'options' => ['limit' => 1, 'or' => [["name_a_b", "name_b_a"]]],
+        ]);
+        if (($relationshipType['values'][0]['name_a_b'] ?? NULL) === $role['name']) {
+          $relationshipTypeMetadata[$relationshipType['id']]['group_a'] = $role['groups'];
+        }
+        if (($relationshipType['values'][0]['name_b_a'] ?? NULL) === $role['name']) {
+          $relationshipTypeMetadata[$relationshipType['id']]['group_b'] = $role['groups'];
+        }
+      }
+    }
 
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header')
       ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header')
-      ->addVars('relationshipTypes', CRM_Contact_Form_Relationship::getRelationshipTypeMetadata($allowedRelationshipTypes));
+      ->addVars('relationshipTypes', $relationshipTypeMetadata);
 
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($this->_caseType, 'CaseRoles');
