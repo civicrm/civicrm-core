@@ -153,7 +153,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $entityFinancialType->entity_id = $financialTypeId;
     $entityFinancialType->entity_table = 'civicrm_financial_type';
     $entityFinancialType->delete();
-    return FALSE;
+    return TRUE;
   }
 
   /**
