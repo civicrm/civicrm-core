@@ -92,4 +92,31 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
     }
   }
 
+  /**
+   * Given a roles array, check user has at least one of those roles
+   *
+   * @param array $roles_to_check
+   *   The roles to check. An array indexed starting at 0, e.g. [0 => 'administrator']
+   *
+   * @return bool
+   *   true if user has at least one of the roles, else false
+   */
+  public function checkGroupRole($roles_to_check) {
+    if (isset($roles_to_check)) {
+
+      // This returns an array indexed starting at 0 of role machine names, e.g.
+      // [
+      //   0 => 'authenticated',
+      //   1 => 'administrator',
+      // ]
+      // or
+      // [ 0 => 'anonymous' ]
+      $user_roles = \Drupal::currentUser()->getRoles();
+
+      $roles_in_both = array_intersect($user_roles, $roles_to_check);
+      return !empty($roles_in_both);
+    }
+    return FALSE;
+  }
+
 }
