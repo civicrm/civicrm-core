@@ -42,7 +42,7 @@
       </tr>
       <tr id="is_show_location" class="crm-event-manage-location-form-block-is_show_location">
         <td class="labels">
-          {$form.is_show_location.label}
+          {$form.is_show_location.label} {help id="id-is_show_location"}
         </td>
         <td class="values">
           {$form.is_show_location.html}

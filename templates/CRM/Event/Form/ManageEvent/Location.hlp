@@ -1,0 +1,24 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-is_show_location-title"}
+  {ts}Show Location{/ts}
+{/htxt}
+{htxt id="id-is_show_location"}
+  {ts}If this option is selected, the location will be shown in various places including:
+    <ul>
+      <li>Event information page</li>
+      <li>Event registration confirmation emails</li>
+      <li>HTML, RSS and ICALENDAR feeds of event information</li>
+    </ul>
+  Normally location information is made publicly available.  By deselecting this box, the location is only available to event administrators.{/ts}
+  <br />
+  {ts}Note that if 'Show Location' is not set a map will not be shown, regardless of the setting of 'Include Map to Event Location'.{/ts}
+{/htxt}
+
