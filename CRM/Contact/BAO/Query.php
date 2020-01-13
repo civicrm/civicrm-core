@@ -7066,6 +7066,14 @@ AND   displayRelType.is_active = 1
     $dates = CRM_Utils_Date::getFromTo($value, NULL, NULL);
     // Where end would be populated only if we are handling one of the weird ones with different from & to fields.
     $secondWhere = $fieldSpec['where_end'] ?? $fieldSpec['where'];
+
+    $where = $fieldSpec['where'];
+    if ($fieldSpec['table_name'] === 'civicrm_contact') {
+      // Special handling for contact table as it has a known alias in advanced search.
+      $where = str_replace('civicrm_contact.', 'contact_a.', $where);
+      $secondWhere = str_replace('civicrm_contact.', 'contact_a.', $secondWhere);
+    }
+
     if (empty($dates[0])) {
       // ie. no start date we only have end date
       $this->_where[$grouping][] = $secondWhere . " <= '{$dates[1]}'";
@@ -7077,7 +7085,7 @@ AND   displayRelType.is_active = 1
     elseif (empty($dates[1])) {
 
       // ie. no end date we only have start date
-      $this->_where[$grouping][] = $fieldSpec['where'] . " >= '{$dates[1]}'";
+      $this->_where[$grouping][] = $where . " >= '{$dates[0]}'";
 
       $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("from %1", [
         CRM_Utils_Date::customFormat($dates[0]),
@@ -7085,13 +7093,8 @@ AND   displayRelType.is_active = 1
     }
     else {
       // we have start and end dates.
-      $where = $fieldSpec['where'];
-      if ($fieldSpec['table_name'] === 'civicrm_contact') {
-        // Special handling for contact table as it has a known alias in advanced search.
-        $where = str_replace('civicrm_contact.', 'contact_a.', $where);
-      }
-      if ($secondWhere !== $fieldSpec['where']) {
-        $this->_where[$grouping][] = $fieldSpec['where'] . ">=  '{$dates[0]}' AND $secondWhere <='{$dates[1]}'";
+      if ($secondWhere !== $where) {
+        $this->_where[$grouping][] = $where . ">=  '{$dates[0]}' AND $secondWhere <='{$dates[1]}'";
       }
       else {
         $this->_where[$grouping][] = $where . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
