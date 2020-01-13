@@ -86,6 +86,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
       ], $expectedResult);
+      $this->callAPISuccess('FinancialType', 'delete', ['id' => $financialType['id']]);
     }
   }
 
