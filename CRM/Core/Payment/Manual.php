@@ -161,6 +161,24 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
+   * Are live payments supported - e.g dummy doesn't support this.
+   *
+   * @return bool
+   */
+  protected function supportsLiveMode() {
+    return TRUE;
+  }
+
+  /**
+   * Are test payments supported.
+   *
+   * @return bool
+   */
+  protected function supportsTestMode() {
+    return TRUE;
+  }
+
+  /**
    * Declare that more than one payment can be processed at once.
    *
    * @return bool
