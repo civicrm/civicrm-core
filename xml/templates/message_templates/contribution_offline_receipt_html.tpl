@@ -39,6 +39,14 @@
      </tr>
      <tr>
       <td {$labelStyle}>
+       {ts}Contributor Name{/ts}
+      </td>
+      <td {$valueStyle}>
+       {contact.display_name}
+      </td>
+     </tr>
+     <tr>
+      <td {$labelStyle}>
        {ts}Financial Type{/ts}
       </td>
       <td {$valueStyle}>
