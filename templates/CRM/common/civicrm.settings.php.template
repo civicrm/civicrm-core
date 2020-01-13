@@ -505,6 +505,9 @@ if (!defined('CIVICRM_CLEANURL')) {
   elseif ( function_exists('config_get') && config_get('system.core', 'clean_url') != 0) {
     define('CIVICRM_CLEANURL', 1 );
   }
+  elseif( function_exists('get_option') && get_option('permalink_structure') != '' ) {
+    define('CIVICRM_CLEANURL', 1 );
+  }
   else {
     define('CIVICRM_CLEANURL', 0);
   }
