@@ -190,7 +190,9 @@ class CRM_Core_BAO_ConfigSetting {
     global $dbLocale;
 
     // try to inherit the language from the hosting CMS
-    if ($settings->get('inheritLocale')) {
+    // @fixme On wordpress isFrontEndPage() has not yet been set so we can't use it to trigger frontend pages to follow CMS language.
+    //   Is there anything we can use, or can we set userFrameworkFrontend earlier in the bootstrap?
+    //if ($settings->get('inheritLocale') || CRM_Core_Config::singleton()->userSystem->isFrontEndPage()) {
       // FIXME: On multilanguage installs, CRM_Utils_System::getUFLocale() in many cases returns nothing if $dbLocale is not set
       $lcMessages = $settings->get('lcMessages');
       $dbLocale = $multiLang && $lcMessages ? "_{$lcMessages}" : '';
@@ -198,7 +200,7 @@ class CRM_Core_BAO_ConfigSetting {
       if ($activatedLocales and !in_array($chosenLocale, explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales))) {
         $chosenLocale = NULL;
       }
-    }
+    //}
 
     if (empty($chosenLocale)) {
       //CRM-11993 - if a single-lang site, use default
