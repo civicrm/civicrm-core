@@ -74,6 +74,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    *
    * @return array
    *   the values of the posted saved search used as default values in various Search Form
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getFormValues($id) {
     $specialDateFields = [
@@ -82,7 +85,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     ];
 
     $fv = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'form_values');
-    $result = NULL;
+    $result = [];
     if ($fv) {
       // make sure u CRM_Utils_String::unserialize - since it's stored in serialized form
       $result = CRM_Utils_String::unserialize($fv);
@@ -200,6 +203,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param int $id
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchParams($id) {
     $fv = self::getFormValues($id);
