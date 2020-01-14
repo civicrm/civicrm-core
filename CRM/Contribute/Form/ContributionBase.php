@@ -561,14 +561,30 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('onBehalfEmail', $this->_params['onbehalf_location']['email'][$locTypeId[0]]['email']);
     }
     $this->assignPaymentFields();
-
-    $this->assign('email',
-      $this->controller->exportValue('Main', "email-{$this->_bltID}")
-    );
+    $this->assignEmailField();
 
     // also assign the receipt_text
     if (isset($this->_values['receipt_text'])) {
       $this->assign('receipt_text', $this->_values['receipt_text']);
+    }
+  }
+
+  /**
+   * Assign email variable in the template.
+   */
+  public function assignEmailField() {
+    //If email exist in a profile, the default billing email field is not loaded on the page.
+    //Hence, assign the existing location type email by iterating through the params.
+    if ($this->_emailExists && empty($this->_params["email-{$this->_bltID}"])) {
+      foreach ($this->_params as $key => $val) {
+        if (substr($key, 0, 6) == 'email-') {
+          $this->assign('email', $this->_params[$key]);
+          break;
+        }
+      }
+    }
+    else {
+      $this->assign('email', CRM_Utils_Array::value("email-{$this->_bltID}", $this->_params));
     }
   }
 

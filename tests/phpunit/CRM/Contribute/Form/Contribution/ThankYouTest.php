@@ -68,9 +68,11 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
     $pageContribution = $this->getPageContribution((($withPendingContribution) ? 2 : 1), $isTestContribution);
     $form = $this->getThankYouForm();
     $form->_lineItem = [];
+    $form->_bltID = 5;
 
     $form->_params['contributionID'] = $pageContribution['contribution_id'];
     $form->_params['invoiceID'] = $pageContribution['invoice_id'];
+    $form->_params['email-5'] = 'demo@example.com';
     $form->_params['payment_processor_id'] = $paymentProcessorID;
     if ($isTestContribution) {
       $form->_mode = 'test';
