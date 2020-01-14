@@ -1068,6 +1068,35 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
+   * Test relative date filters to ensure they generate correct SQL.
+   *
+   * @dataProvider relativeDateFilters
+   */
+  public function testRelativeDateFilters($filter, $expectedWhere) {
+    $params = [['created_date_relative', '=', $filter, 0, 0]];
+
+    $dates = CRM_Utils_Date::getFromTo($filter, NULL, NULL);
+    $expectedWhere = str_replace(['date0', 'date1'], [$dates[0], $dates[1]], $expectedWhere);
+
+    $query = new CRM_Contact_BAO_Query(
+      $params, [],
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+
+    list($select, $from, $where, $having) = $query->query();
+    $this->assertEquals($expectedWhere, $where);
+  }
+
+  public function relativeDateFilters() {
+    $dataProvider[] = ['this.year', "WHERE  ( contact_a.created_date BETWEEN 'date0' AND 'date1' )  AND (contact_a.is_deleted = 0)"];
+    $dataProvider[] = ['greater.day', "WHERE  ( contact_a.created_date >= 'date0' )  AND (contact_a.is_deleted = 0)"];
+    $dataProvider[] = ['earlier.week', "WHERE  ( contact_a.created_date <= 'date1' )  AND (contact_a.is_deleted = 0)"];
+    return $dataProvider;
+  }
+
+  /**
    * Create contributions to test summary calculations.
    *
    * financial type     | cancel_date        |total_amount| source    | line_item_financial_types  |number_line_items| line_amounts
