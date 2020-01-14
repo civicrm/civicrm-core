@@ -1196,12 +1196,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $rows["move_custom_$fid"]['title'] = $field['label'];
 
           $elements[] = [
-            'advcheckbox',
-            "move_custom_$fid",
-            NULL,
-            NULL,
-            NULL,
-            $value,
+            0 => 'advcheckbox',
+            1 => "move_custom_$fid",
+            2 => NULL,
+            3 => NULL,
+            4 => NULL,
+            5 => $value,
+            'is_checked' => (!isset($rows["move_custom_$fid"]['main']) || $rows["move_custom_$fid"]['main'] === ''),
           ];
           $migrationInfo["move_custom_$fid"] = $value;
         }
