@@ -211,6 +211,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     // Check permission for action.
@@ -279,7 +282,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->_lineItems = [];
     if ($this->_id) {
-      if (!empty($this->_compId) && $this->_compContext == 'participant') {
+      if (!empty($this->_compId) && $this->_compContext === 'participant') {
         $this->assign('compId', $this->_compId);
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_compId);
       }
@@ -310,6 +313,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Set default values.
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -450,6 +455,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Build the form object.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     if ($this->_id) {
@@ -608,7 +616,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('entityID', $this->_id);
 
     $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE], TRUE);
-    if ($this->_context != 'standalone') {
+    if ($this->_context !== 'standalone') {
       $contactField->freeze();
     }
 

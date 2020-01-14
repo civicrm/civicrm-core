@@ -232,6 +232,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * Pre process function with common actions.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -530,7 +533,6 @@ WHERE  contribution_id = {$id}
 
   /**
    * Common block for setting up the parts of a form that relate to credit / debit card
-   * @throws Exception
    */
   protected function assignPaymentRelatedVariables() {
     try {
