@@ -103,14 +103,14 @@ class CRM_Core_IDS {
   public static function createBaseConfig() {
     $config = \CRM_Core_Config::singleton();
     $tmpDir = empty($config->uploadDir) ? Civi::paths()->getVariable('civicrm.compile', 'path') : $config->uploadDir;
-    global $civicrm_root;
+    $pkgs = Civi::paths()->getVariable('civicrm.packages', 'path');
 
     return [
       'General' => [
         'filter_type' => 'xml',
-        'filter_path' => "{$civicrm_root}/packages/IDS/default_filter.xml",
+        'filter_path' => "{$pkgs}/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
-        'HTML_Purifier_Path' => $civicrm_root . 'packages/IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
+        'HTML_Purifier_Path' => $pkgs . '/IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
         'exceptions' => ['__utmz', '__utmc'],
