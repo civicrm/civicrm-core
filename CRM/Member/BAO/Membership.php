@@ -2259,10 +2259,9 @@ WHERE      civicrm_membership.is_test = 0
 
       // CRM-7248: added excludeIsAdmin param to the following fn call to prevent moving to admin statuses
       //get the membership status as per id.
-      $newStatus = civicrm_api('membership_status', 'calc',
+      $newStatus = civicrm_api3('membership_status', 'calc',
         [
           'membership_id' => $dao2->membership_id,
-          'version' => 3,
           'ignore_admin_only' => TRUE,
         ], TRUE
       );
