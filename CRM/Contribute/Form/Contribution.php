@@ -608,8 +608,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('customDataSubType', $this->_contributionType);
     $this->assign('entityID', $this->_id);
 
-    $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE], TRUE);
-    if ($this->_context != 'standalone') {
+    $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+    if ($this->_context !== 'standalone') {
       $contactField->freeze();
     }
 
