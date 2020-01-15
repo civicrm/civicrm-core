@@ -160,7 +160,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
         if (CRM_Core_DAO_AllCoreTables::isCoreTable($tableName)) {
           // Bad idea.  Prevent group creation because it might lead to a broken configuration.
-          CRM_Core_Error::fatal(ts("Cannot create custom table because %1 is already a core table.", ['1' => $tableName]));
+          throw new CRM_Core_Exception(ts('Cannot create custom table because %1 is already a core table.', ['1' => $tableName]));
         }
       }
     }
@@ -1639,9 +1639,9 @@ ORDER BY civicrm_custom_group.weight,
               $value = NULL;
             }
           }
-          elseif ($field['html_type'] == 'Select' ||
-            ($field['html_type'] == 'Radio' &&
-              $field['data_type'] != 'Boolean'
+          elseif ($field['html_type'] === 'Select' ||
+            ($field['html_type'] === 'Radio' &&
+              $field['data_type'] !== 'Boolean'
             )
           ) {
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($key, TRUE);
@@ -1654,7 +1654,7 @@ ORDER BY civicrm_custom_group.weight,
               }
             }
           }
-          elseif ($field['data_type'] == 'Date') {
+          elseif ($field['data_type'] === 'Date') {
             $valid = CRM_Utils_Rule::date($value);
           }
 
@@ -1679,12 +1679,14 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return bool
    *   false if it matches else true
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
-    $query = "SELECT cg.extends as extends
+    $query = 'SELECT cg.extends as extends
                   FROM civicrm_custom_group as cg, civicrm_custom_field as cf
                   WHERE cg.id = cf.custom_group_id
-                    AND cf.id =" .
+                    AND cf.id =' .
       CRM_Utils_Type::escape($customFieldId, 'Integer');
 
     $extends = CRM_Core_DAO::singleValueQuery($query);
@@ -1762,7 +1764,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           if (array_key_exists($table, $extendObjs)) {
             return $extendObjs[$table];
           }
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Unknown error');
         }
     }
   }
@@ -1839,7 +1841,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           if (isset($properties['customValue'][$groupCount])) {
             $properties['element_name'] = "custom_{$k}_{$properties['customValue'][$groupCount]['id']}";
             $formattedGroupTree[$key]['table_id'] = $properties['customValue'][$groupCount]['id'];
-            if ($properties['data_type'] == 'File') {
+            if ($properties['data_type'] === 'File') {
               $properties['element_value'] = $properties['customValue'][$groupCount];
               $uploadNames[] = $properties['element_name'];
             }
@@ -2076,7 +2078,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           }
 
           if (!is_array($args)) {
-            CRM_Core_Error::fatal('Arg is not of type array');
+            throw new CRM_Core_Exception('Arg is not of type array');
           }
 
           list($className) = explode('::', $callback);
