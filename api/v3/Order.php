@@ -141,6 +141,9 @@ function civicrm_api3_order_create($params) {
       if ($entity == 'pledge') {
         $paymentParams += $entityParams;
       }
+      elseif ($entity == 'membership') {
+        $paymentParams['isSkipLineItem'] = TRUE;
+      }
       $payments = civicrm_api3($entity . '_payment', 'create', $paymentParams);
     }
   }
