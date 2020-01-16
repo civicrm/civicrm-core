@@ -2441,16 +2441,16 @@
         },
         {
             "name": "zetacomponents/mail",
-            "version": "1.9.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Mail.git",
-                "reference": "fa879c688b1142b9b9088f7f3216684e4b903725"
+                "reference": "4dc71ccbcc8b67951a2efe47d3fcc2aeaa7f530d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/fa879c688b1142b9b9088f7f3216684e4b903725",
-                "reference": "fa879c688b1142b9b9088f7f3216684e4b903725",
+                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/4dc71ccbcc8b67951a2efe47d3fcc2aeaa7f530d",
+                "reference": "4dc71ccbcc8b67951a2efe47d3fcc2aeaa7f530d",
                 "shasum": ""
             },
             "require": {
@@ -2517,7 +2517,7 @@
             ],
             "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2020-01-16T12:26:10+00:00"
+            "time": "2020-01-17T11:18:01+00:00"
         }
     ],
     "packages-dev": [

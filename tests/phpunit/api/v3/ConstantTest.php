@@ -138,11 +138,12 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPIAndDocument('mail_settings', 'getoptions', $params, __FUNCTION__, __FILE__);
 
-    $this->assertEquals(4, $result['count'], "In line " . __LINE__);
+    $this->assertEquals(5, $result['count'], "In line " . __LINE__);
     $this->assertContains('IMAP', $result['values'], "In line " . __LINE__);
     $this->assertContains('Maildir', $result['values'], "In line " . __LINE__);
     $this->assertContains('POP3', $result['values'], "In line " . __LINE__);
     $this->assertContains('Localdir', $result['values'], "In line " . __LINE__);
+    $this->assertContains('IMAP XOAUTH2', $result['values'], "In line " . __LINE__);
   }
 
 }
