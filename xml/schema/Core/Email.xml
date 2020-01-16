@@ -76,18 +76,14 @@
   </index>
   <field>
     <name>is_primary</name>
+    <title>Primary email</title>
     <type>boolean</type>
     <default>0</default>
-    <comment>Is this the primary email for this contact and location.</comment>
+    <comment>Is this the primary email address</comment>
     <add>1.1</add>
-  </field>
-  <field>
-    <name>is_primary</name>
-    <title>Is Primary email</title>
-    <type>boolean</type>
-    <default>0</default>
-    <comment>Is this the primary?</comment>
-    <add>2.0</add>
+    <html>
+      <type>Radio</type>
+    </html>
   </field>
   <index>
     <name>index_is_primary</name>
