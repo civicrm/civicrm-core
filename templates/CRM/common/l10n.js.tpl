@@ -13,6 +13,7 @@
   // Config settings
   CRM.config.userFramework = {$config->userFramework|@json_encode};
   CRM.config.resourceBase = {$config->userFrameworkResourceURL|@json_encode};
+  CRM.config.packagesBase = {capture assign=packagesBase}{crmResURL expr='[civicrm.packages]/.'}{/capture}{$packagesBase|@json_encode};
   CRM.config.lcMessages = {$config->lcMessages|@json_encode};
   CRM.config.locale = {$locale|@json_encode};
   CRM.config.cid = {$cid|@json_encode};
