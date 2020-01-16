@@ -61,7 +61,7 @@ class GetFromArrayTest extends UnitTestCase {
   public function testArrayGetWithSelect() {
     $result = MockArrayEntity::get()
       ->addSelect('field1')
-      ->addSelect('field3')
+      ->addSelect('f*3')
       ->setLimit(4)
       ->execute();
     $this->assertEquals([

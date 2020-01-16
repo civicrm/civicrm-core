@@ -49,7 +49,7 @@ class Api4SelectQueryComplexJoinTest extends UnitTestCase {
     $query = new Api4SelectQuery('Contact', FALSE, civicrm_api4('Contact', 'getFields', ['includeCustom' => FALSE, 'checkPermissions' => FALSE, 'action' => 'get'], 'name'));
     $query->select[] = 'id';
     $query->select[] = 'display_name';
-    $query->select[] = 'phones.phone';
+    $query->select[] = 'phones.*_id';
     $query->select[] = 'emails.email';
     $query->select[] = 'emails.location_type.name';
     $query->select[] = 'created_activities.contact_id';
@@ -75,6 +75,11 @@ class Api4SelectQueryComplexJoinTest extends UnitTestCase {
     $this->assertArrayHasKey('activity_type', $firstActivity);
     $activityType = $firstActivity['activity_type'];
     $this->assertArrayHasKey('name', $activityType);
+
+    $this->assertArrayHasKey('name', $firstResult['emails'][0]['location_type']);
+    $this->assertArrayHasKey('location_type_id', $firstResult['phones'][0]);
+    $this->assertArrayHasKey('id', $firstResult['phones'][0]);
+    $this->assertArrayNotHasKey('phone', $firstResult['phones'][0]);
   }
 
   public function testWithSelectOfOrphanDeepValues() {

@@ -26,6 +26,7 @@
     $scope.actions = actions;
     $scope.fields = [];
     $scope.fieldsAndJoins = [];
+    $scope.selectFieldsAndJoins = [];
     $scope.availableParams = {};
     $scope.params = {};
     $scope.index = '';
@@ -113,16 +114,17 @@
       return fields;
     }
 
-    function addJoins(fieldList) {
+    function addJoins(fieldList, addWildcard) {
       var fields = _.cloneDeep(fieldList),
         fks = _.findWhere(links, {entity: $scope.entity}) || {};
       _.each(fks.links, function(link) {
-        var linkFields = entityFields(link.entity);
+        var linkFields = _.cloneDeep(entityFields(link.entity)),
+          wildCard = addWildcard ? [{id: link.alias + '.*', text: link.alias + '.*', 'description': 'All core ' + link.entity + ' fields'}] : [];
         if (linkFields) {
           fields.push({
             text: link.alias,
             description: 'Join to ' + link.entity,
-            children: formatForSelect2(linkFields, [], 'name', ['description'], link.alias + '.')
+            children: wildCard.concat(formatForSelect2(linkFields, [], 'name', ['description'], link.alias + '.'))
           });
         }
       });
@@ -261,7 +263,8 @@
 
     function selectAction() {
       $scope.action = $routeParams.api4action;
-      $scope.fieldsAndJoins = [];
+      $scope.fieldsAndJoins.length = 0;
+      $scope.selectFieldsAndJoins.length = 0;
       if (!actions.length) {
         formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params']);
       }
@@ -270,9 +273,12 @@
         $scope.fields = getFieldList($scope.action);
         if (_.contains(['get', 'update', 'delete', 'replace'], $scope.action)) {
           $scope.fieldsAndJoins = addJoins($scope.fields);
+          $scope.selectFieldsAndJoins = addJoins($scope.fields, true);
         } else {
           $scope.fieldsAndJoins = $scope.fields;
+          $scope.selectFieldsAndJoins = _.cloneDeep($scope.fields);
         }
+        $scope.selectFieldsAndJoins.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
         _.each(actionInfo.params, function (param, name) {
           var format,
             defaultVal = _.cloneDeep(param.default);

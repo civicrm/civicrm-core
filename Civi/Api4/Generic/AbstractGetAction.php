@@ -21,6 +21,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\SelectUtil;
+
 /**
  * Base class for all "Get" api actions.
  *
@@ -33,7 +35,10 @@ namespace Civi\Api4\Generic;
 abstract class AbstractGetAction extends AbstractQueryAction {
 
   /**
-   * Fields to return. Defaults to all fields.
+   * Fields to return. Defaults to all fields ["*"].
+   *
+   * Use the * wildcard by itself to select all available fields, or use it to match similarly-named fields.
+   * E.g. "is_*" will match fields named is_primary, is_active, etc.
    *
    * Set to ["row_count"] to return only the number of items found.
    *
@@ -66,6 +71,20 @@ abstract class AbstractGetAction extends AbstractQueryAction {
         if (isset($field['default_value']) && !$this->_whereContains($field['name'])) {
           $this->addWhere($field['name'], '=', $field['default_value']);
         }
+      }
+    }
+  }
+
+  /**
+   * Adds all fields matched by the * wildcard
+   *
+   * @throws \API_Exception
+   */
+  protected function expandSelectClauseWildcards() {
+    foreach ($this->select as $item) {
+      if (strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE) {
+        $this->select = array_diff($this->select, [$item]);
+        $this->select = array_unique(array_merge($this->select, SelectUtil::getMatchingFields($item, array_column($this->entityFields(), 'name'))));
       }
     }
   }

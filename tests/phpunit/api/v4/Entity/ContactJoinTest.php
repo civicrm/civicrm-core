@@ -56,7 +56,7 @@ class ContactJoinTest extends UnitTestCase {
     foreach ($entitiesToTest as $entity) {
       $results = civicrm_api4($entity, 'get', [
         'where' => [['contact_id', '=', $contact['id']]],
-        'select' => ['contact.display_name', 'contact.id'],
+        'select' => ['contact.*_name', 'contact.id'],
       ]);
       foreach ($results as $result) {
         $this->assertEquals($contact['id'], $result['contact.id']);

@@ -51,7 +51,7 @@
           </div>
           <div class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select && !isSelectRowCount()">
             <label for="api4-param-select">select<span class="crm-marker" ng-if="availableParams.select.required"> *</span></label>
-            <input class="collapsible-optgroups form-control" ng-list crm-ui-select="{data: fieldsAndJoins, multiple: true}" id="api4-param-select" ng-model="params.select" style="width: 85%;"/>
+            <input class="collapsible-optgroups form-control" ng-list crm-ui-select="{data: selectFieldsAndJoins, multiple: true}" placeholder="*" id="api4-param-select" ng-model="params.select" style="width: 85%;"/>
           </div>
           <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()"ng-if="availableParams.fields">
             <label for="api4-param-fields">fields<span class="crm-marker" ng-if="availableParams.fields.required"> *</span></label>

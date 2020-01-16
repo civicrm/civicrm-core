@@ -34,7 +34,14 @@ class MockArrayEntity extends Generic\AbstractEntity {
 
   public static function getFields() {
     return new BasicGetFieldsAction(static::class, __FUNCTION__, function() {
-      return [];
+      return [
+        ['name' => 'field1'],
+        ['name' => 'field2'],
+        ['name' => 'field3'],
+        ['name' => 'field4'],
+        ['name' => 'field5'],
+        ['name' => 'field6'],
+      ];
     });
   }
 

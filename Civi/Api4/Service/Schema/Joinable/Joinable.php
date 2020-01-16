@@ -282,6 +282,17 @@ class Joinable {
   }
 
   /**
+   * @return array
+   */
+  public function getEntityFieldNames() {
+    $fieldNames = [];
+    foreach ($this->getEntityFields() as $fieldSpec) {
+      $fieldNames[] = $fieldSpec->getName();
+    }
+    return $fieldNames;
+  }
+
+  /**
    * @return \Civi\Api4\Service\Spec\FieldSpec|NULL
    */
   public function getField($fieldName) {
