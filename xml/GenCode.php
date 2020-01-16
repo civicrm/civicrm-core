@@ -4,7 +4,8 @@ if (PHP_SAPI !== 'cli') {
   die("GenCode can only be run from command line.");
 }
 
-ini_set('include_path', '.' . PATH_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR . '..');
+$includes = ['.', '../packages', '../../civicrm-packages', '..'];
+ini_set('include_path', implode(PATH_SEPARATOR, $includes));
 // make sure the memory_limit is at least 512 MB
 $memLimitString = trim(ini_get('memory_limit'));
 $memLimitUnit = strtolower(substr($memLimitString, -1));
