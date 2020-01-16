@@ -250,4 +250,34 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertTrue(CRM_Utils_System::isNull($arr));
   }
 
+  /**
+   * Test that flushing cache clears the asset cache.
+   */
+  public function testFlushCacheClearsAssetCache() {
+    // We need to get the file path for the folder and there isn't a public
+    // method to get it, so create a file in the folder using public methods,
+    // then get the path from that, then flush the cache, then check if the
+    // folder is empty.
+    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'flushCacheClearsAssetCache_buildAsset'));
+    $fakeFile = \Civi::service("asset_builder")->getPath('fakeFile.json');
+
+    CRM_Utils_System::flushCache();
+
+    $fileList = scandir(dirname($fakeFile));
+    // count should be 2, just the standard . and ..
+    $this->assertCount(2, $fileList);
+  }
+
+  /**
+   * Implementation of a hook for civicrm_buildAsset() for testFlushCacheClearsAssetCache.
+   * Awkward wording of above sentence is because phpcs is bugging me about it.
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function flushCacheClearsAssetCache_buildAsset(\Civi\Core\Event\GenericHookEvent $e) {
+    if ($e->asset === 'fakeFile.json') {
+      $e->mimeType = 'application/json';
+      $e->content = '{}';
+    }
+  }
+
 }
