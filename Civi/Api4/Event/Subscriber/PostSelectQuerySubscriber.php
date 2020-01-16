@@ -32,6 +32,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class PostSelectQuerySubscriber implements EventSubscriberInterface {
 
+  private $contactFieldsToRemove = [];
+
   /**
    * @inheritdoc
    */
@@ -60,7 +62,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       return $results;
     }
 
-    $this->formatFieldValues($results, $query->getApiFieldSpec());
+    $this->formatFieldValues($results, $query->getApiFieldSpec(), $query->getEntity());
 
     // Group the selects to avoid queries for each field
     $groupedSelects = $this->getNtoManyJoinSelects($query);
@@ -97,7 +99,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       $fields[array_pop($name)] = $field->toArray();
     }
     if ($fields) {
-      $this->formatFieldValues($joinResults, $fields);
+      $this->formatFieldValues($joinResults, $fields, $join->getEntity());
     }
   }
 
@@ -106,9 +108,14 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
    *
    * @param array $results
    * @param array $fields
+   * @param string $entity
    */
-  protected function formatFieldValues(&$results, $fields = []) {
+  protected function formatFieldValues(&$results, $fields, $entity) {
     foreach ($results as &$result) {
+      // Remove inapplicable contact fields
+      if ($entity === 'Contact' && !empty($result['contact_type'])) {
+        \CRM_Utils_Array::remove($result, $this->contactFieldsToRemove($result['contact_type']));
+      }
       foreach ($result as $field => $value) {
         $dataType = $fields[$field]['data_type'] ?? NULL;
         if (!empty($fields[$field]['serialize'])) {
@@ -373,6 +380,22 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
     $subResults = $subQuery->execute()->fetchAll();
 
     return $subResults;
+  }
+
+  /**
+   * @param string $contactType
+   * @return array
+   */
+  private function contactFieldsToRemove($contactType) {
+    if (!isset($this->contactFieldsToRemove[$contactType])) {
+      $this->contactFieldsToRemove[$contactType] = [];
+      foreach (\CRM_Contact_DAO_Contact::fields() as $field) {
+        if (!empty($field['contactType']) && $field['contactType'] != $contactType) {
+          $this->contactFieldsToRemove[$contactType][] = $field['name'];
+        }
+      }
+    }
+    return $this->contactFieldsToRemove[$contactType];
   }
 
 }
