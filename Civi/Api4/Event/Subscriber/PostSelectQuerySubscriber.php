@@ -25,14 +25,13 @@ use Civi\Api4\Event\Events;
 use Civi\Api4\Event\PostSelectQueryEvent;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Utils\ArrayInsertionUtil;
+use Civi\Api4\Utils\FormattingUtil;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Changes the results of a select query, doing 1-n joins and unserializing data
  */
 class PostSelectQuerySubscriber implements EventSubscriberInterface {
-
-  private $contactFieldsToRemove = [];
 
   /**
    * @inheritdoc
@@ -62,7 +61,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       return $results;
     }
 
-    $this->formatFieldValues($results, $query->getApiFieldSpec(), $query->getEntity());
+    FormattingUtil::formatOutputValues($results, $query->getApiFieldSpec(), $query->getEntity());
 
     // Group the selects to avoid queries for each field
     $groupedSelects = $this->getNtoManyJoinSelects($query);
@@ -99,60 +98,8 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       $fields[array_pop($name)] = $field->toArray();
     }
     if ($fields) {
-      $this->formatFieldValues($joinResults, $fields, $join->getEntity());
+      FormattingUtil::formatOutputValues($joinResults, $fields, $join->getEntity());
     }
-  }
-
-  /**
-   * Unserialize values and convert to correct type
-   *
-   * @param array $results
-   * @param array $fields
-   * @param string $entity
-   */
-  protected function formatFieldValues(&$results, $fields, $entity) {
-    foreach ($results as &$result) {
-      // Remove inapplicable contact fields
-      if ($entity === 'Contact' && !empty($result['contact_type'])) {
-        \CRM_Utils_Array::remove($result, $this->contactFieldsToRemove($result['contact_type']));
-      }
-      foreach ($result as $field => $value) {
-        $dataType = $fields[$field]['data_type'] ?? NULL;
-        if (!empty($fields[$field]['serialize'])) {
-          if (is_string($value)) {
-            $result[$field] = $value = \CRM_Core_DAO::unSerializeField($value, $fields[$field]['serialize']);
-            foreach ($value as $key => $val) {
-              $result[$field][$key] = $this->convertDataType($val, $dataType);
-            }
-          }
-        }
-        else {
-          $result[$field] = $this->convertDataType($value, $dataType);
-        }
-      }
-    }
-  }
-
-  /**
-   * @param mixed $value
-   * @param string $dataType
-   * @return mixed
-   */
-  protected function convertDataType($value, $dataType) {
-    if (isset($value)) {
-      switch ($dataType) {
-        case 'Boolean':
-          return (bool) $value;
-
-        case 'Integer':
-          return (int) $value;
-
-        case 'Money':
-        case 'Float':
-          return (float) $value;
-      }
-    }
-    return $value;
   }
 
   /**
@@ -380,22 +327,6 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
     $subResults = $subQuery->execute()->fetchAll();
 
     return $subResults;
-  }
-
-  /**
-   * @param string $contactType
-   * @return array
-   */
-  private function contactFieldsToRemove($contactType) {
-    if (!isset($this->contactFieldsToRemove[$contactType])) {
-      $this->contactFieldsToRemove[$contactType] = [];
-      foreach (\CRM_Contact_DAO_Contact::fields() as $field) {
-        if (!empty($field['contactType']) && $field['contactType'] != $contactType) {
-          $this->contactFieldsToRemove[$contactType][] = $field['name'];
-        }
-      }
-    }
-    return $this->contactFieldsToRemove[$contactType];
   }
 
 }

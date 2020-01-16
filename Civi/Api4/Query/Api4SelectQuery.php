@@ -280,7 +280,7 @@ class Api4SelectQuery extends SelectQuery {
       throw new \API_Exception("Invalid field '$key' in where clause.");
     }
 
-    FormattingUtil::formatValue($value, $fieldSpec, $this->getEntity());
+    FormattingUtil::formatInputValue($value, $fieldSpec, $this->getEntity());
 
     $sql_clause = \CRM_Core_DAO::createSQLFilter("`$table_name`.`$column_name`", [$operator => $value]);
     if ($sql_clause === NULL) {
