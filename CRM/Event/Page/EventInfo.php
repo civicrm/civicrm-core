@@ -338,7 +338,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
     $this->assign('location', $values['location']);
 
-    if (CRM_Core_Permission::check('access CiviEvent')) {
+    if (CRM_Core_Permission::check(['access CiviEvent', 'edit all events'])) {
       $enableCart = Civi::settings()->get('enable_cart');
       $this->assign('manageEventLinks', CRM_Event_Page_ManageEvent::tabs($enableCart));
     }
