@@ -355,7 +355,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     // check and attach and files as needed
-    CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activityId);
+    // copy files attached to old activity if any, to new one,
+    // as long as users have not selected the 'delete attachment' option.
+    if (empty($params['is_delete_attachment']) && ($params['original_id'] != $activityId)) {
+      CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activityId);
+    }
 
     // attempt to save activity assignment
     $resultAssignment = NULL;
