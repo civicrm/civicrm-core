@@ -14,14 +14,16 @@
         var ts = $scope.ts = CRM.ts('afform'),
           closestController = $($el).closest('[af-fieldset],[af-join],[af-repeat-item]'),
           afForm = ctrls[0],
-          boolOptions = [{key: '1', label: ts('Yes')}, {key: '0', label: ts('No')}];
+          boolOptions = [{key: true, label: ts('Yes')}, {key: false, label: ts('No')}],
+          // Only used for is_primary radio button
+          noOptions = [{key: true, label: ''}];
         $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrls[3] : ctrls[2] || ctrls[1];
         $scope.fieldId = afForm.getFormMeta().name + '-' + $scope.fieldName + '-' + id++;
 
         $el.addClass('af-field-type-' + _.kebabCase($scope.defn.input_type));
 
         $scope.getOptions = function() {
-          return $scope.defn.options || boolOptions;
+          return $scope.defn.options || ($scope.fieldName === 'is_primary' && $scope.defn.input_type === 'Radio' ? noOptions : boolOptions);
         };
 
         $scope.select2Options = function() {
@@ -31,6 +33,23 @@
             }, [])
           };
         };
+
+        // is_primary field - watch others in this afRepeat block to ensure only one is selected
+        if ($scope.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
+          $scope.$watch('dataProvider.afRepeat.getEntityController().getData()', function (items, prev) {
+            var index = $scope.dataProvider.repeatIndex;
+            // Set first item to primary if there isn't a primary
+            if (items && !index && !_.find(items, 'is_primary')) {
+              $scope.dataProvider.getFieldData().is_primary = true;
+            }
+            // Set this item to not primary if another has been selected
+            if (items && prev && items.length === prev.length && items[index].is_primary && prev[index].is_primary &&
+              _.filter(items, 'is_primary').length > 1
+            ) {
+              $scope.dataProvider.getFieldData().is_primary = false;
+            }
+          }, true);
+        }
 
         // ChainSelect - watch control field & reload options as needed
         if ($scope.defn.input_type === 'ChainSelect') {

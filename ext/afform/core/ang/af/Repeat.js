@@ -59,7 +59,8 @@
         restrict: 'A',
         require: ['afRepeatItem', '^^afRepeat'],
         bindToController: {
-          item: '=afRepeatItem'
+          item: '=afRepeatItem',
+          repeatIndex: '='
         },
         link: function($scope, $el, $attr, ctrls) {
           var self = ctrls[0];
