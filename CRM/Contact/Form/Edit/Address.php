@@ -58,6 +58,7 @@ class CRM_Contact_Form_Edit_Address {
     $form->addField(
       "address[$blockId][is_primary]", [
         'entity' => 'address',
+        'type' => 'CheckBox',
         'label' => ts('Primary location for this contact'),
         'text' => ts('Primary location for this contact'),
       ] + $js);
