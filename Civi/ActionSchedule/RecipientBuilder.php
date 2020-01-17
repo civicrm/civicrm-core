@@ -138,7 +138,7 @@ class RecipientBuilder {
   public function build() {
     $this->buildRelFirstPass();
 
-    if ($this->prepareAddlFilter('c.id')) {
+    if ($this->prepareAddlFilter('c.id') && $this->notTemplate()) {
       $this->buildAddlFirstPass();
     }
 
@@ -601,6 +601,27 @@ reminder.action_schedule_id = {$this->actionSchedule->id}";
    */
   protected function resetOnTriggerDateChange() {
     return $this->mapping->resetOnTriggerDateChange($this->actionSchedule);
+  }
+
+  /**
+   * Confirm this object isn't attached to a template.
+   * Returns TRUE if this action schedule isn't attached to a template.
+   * Templates are (currently) unique to events, so we only evaluate those.
+   *
+   * @return bool;
+   */
+  private function notTemplate() {
+    if ($this->mapping->getEntity() === 'civicrm_participant') {
+      $entityId = $this->actionSchedule->entity_value;
+      $query = new \CRM_Utils_SQL_Select('civicrm_event e');
+      $sql = $query
+        ->select('is_template')
+        ->where("e.id = {$entityId}")
+        ->toSQL();
+      $dao = \CRM_Core_DAO::executeQuery($sql);
+      return !(bool) $dao->fetchValue();
+    }
+    return TRUE;
   }
 
 }
