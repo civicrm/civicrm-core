@@ -49,25 +49,25 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_EVENT) ||
       CRM_Contact_BAO_Query::componentPresent($query->_returnProperties, 'participant_')
     ) {
-      $query->_select['participant_id'] = "civicrm_participant.id as participant_id";
+      $query->_select['participant_id'] = 'civicrm_participant.id as participant_id';
       $query->_element['participant_id'] = 1;
       $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
 
       //add fee level
       if (!empty($query->_returnProperties['participant_fee_level'])) {
-        $query->_select['participant_fee_level'] = "civicrm_participant.fee_level as participant_fee_level";
+        $query->_select['participant_fee_level'] = 'civicrm_participant.fee_level as participant_fee_level';
         $query->_element['participant_fee_level'] = 1;
       }
 
       //add participant contact ID
       if (!empty($query->_returnProperties['participant_contact_id'])) {
-        $query->_select['participant_contact_id'] = "civicrm_participant.contact_id as participant_contact_id";
+        $query->_select['participant_contact_id'] = 'civicrm_participant.contact_id as participant_contact_id';
         $query->_element['participant_contact_id'] = 1;
       }
 
       //add fee amount
       if (!empty($query->_returnProperties['participant_fee_amount'])) {
-        $query->_select['participant_fee_amount'] = "civicrm_participant.fee_amount as participant_fee_amount";
+        $query->_select['participant_fee_amount'] = 'civicrm_participant.fee_amount as participant_fee_amount';
         $query->_element['participant_fee_amount'] = 1;
       }
 
@@ -471,12 +471,12 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     $from = NULL;
     switch ($name) {
       case 'civicrm_participant':
-        $from = " LEFT JOIN civicrm_participant ON civicrm_participant.contact_id = contact_a.id ";
+        $from = ' LEFT JOIN civicrm_participant ON civicrm_participant.contact_id = contact_a.id ';
         break;
 
       case 'civicrm_event':
         //CRM-17121
-        $from = " LEFT JOIN civicrm_event ON civicrm_participant.event_id = civicrm_event.id ";
+        $from = ' LEFT JOIN civicrm_event ON civicrm_participant.event_id = civicrm_event.id ';
         break;
 
       case 'event_type':

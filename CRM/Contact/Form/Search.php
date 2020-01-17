@@ -502,6 +502,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     // set the various class variables
@@ -598,7 +600,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
 
       // fix for CRM-1907
-      if (isset($this->_ssID) && $this->_context != 'smog') {
+      if (isset($this->_ssID) && $this->_context !== 'smog') {
         // we only retrieve the saved search values if out current values are null
         $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
 
