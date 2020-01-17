@@ -1851,7 +1851,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
       }
     }
-    if (($this->_id && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId) {
+    if ($this->isPaymentOnExistingContribution()) {
       $participantBAO = new CRM_Event_BAO_Participant();
       $participantBAO->id = $this->_id;
       $participantBAO->find(TRUE);
@@ -1985,6 +1985,19 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
       $this->assign('location', $location);
     }
+  }
+
+  /**
+   * Is a payment being made on an existing contribution.
+   *
+   * Note
+   * 1) ideally we should not permit this on this form! Perhaps we don't & this is just cruft.
+   * 2) _paymentID is the contribution id.
+   *
+   * @return bool
+   */
+  protected function isPaymentOnExistingContribution(): bool {
+    return ($this->_id && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId;
   }
 
 }
