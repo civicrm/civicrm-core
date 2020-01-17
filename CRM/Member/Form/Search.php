@@ -80,7 +80,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       $this->_context
     );
     $prefix = NULL;
-    if ($this->_context == 'basic') {
+    if ($this->_context === 'basic') {
       $prefix = $this->_prefix;
     }
 
@@ -188,6 +188,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     if ($this->_done) {
@@ -233,7 +235,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     $selector->setKey($this->controller->_key);
 
     $prefix = NULL;
-    if ($this->_context == 'basic') {
+    if ($this->_context === 'basic') {
       $prefix = $this->_prefix;
     }
 
@@ -255,6 +257,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    * If this search has been forced then see if there are any get values, and if so over-ride the post values.
    *
    * Note that this means that GET over-rides POST :) & that force with no parameters can be very destructive.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function fixFormValues() {
     if (!$this->_force) {

@@ -45,7 +45,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Prefix for the controller.
    * @var string
    */
-  protected $_prefix = "contribute_";
+  protected $_prefix = 'contribute_';
 
   /**
    * Explicitly declare the entity api name.
@@ -78,7 +78,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $this->_context
     );
     $prefix = NULL;
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -231,6 +231,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     if ($this->_done) {
@@ -244,9 +246,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->fixFormValues();
 
     // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['contribution_test']) && $this->_force && !empty($this->_context) && $this->_context == 'dashboard') {
+    if (empty($this->_formValues['contribution_test']) && $this->_force && !empty($this->_context) && $this->_context === 'dashboard') {
       // @todo - stop changing formValues - respect submitted form values, change a working array.
-      $this->_formValues["contribution_test"] = 0;
+      $this->_formValues['contribution_test'] = 0;
     }
 
     foreach ([
@@ -335,7 +337,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $selector->setKey($this->controller->_key);
 
     $prefix = NULL;
-    if ($this->_context == 'basic' || $this->_context == 'user') {
+    if ($this->_context === 'basic' || $this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -350,7 +352,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $controller->setEmbedded(TRUE);
 
     $query = &$selector->getQuery();
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $query->setSkipPermission(TRUE);
     }
 
@@ -361,6 +363,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Use values from $_GET if force is set to TRUE.
    *
    * Note that this means that GET over-rides POST. This was a historical decision & the reasoning is not explained.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function fixFormValues() {
     if (!$this->_force) {

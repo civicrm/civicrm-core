@@ -608,7 +608,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * @return string
+   * @return \CRM_Contact_BAO_Query
    */
   public function &getQuery() {
     return $this->_query;
