@@ -88,7 +88,14 @@
                 <div id="priceset" class="hiddenElement"></div>
               {/if}
             {/if}
-            {if $member_is_test} {ts}(test){/ts}{/if}<br />
+            {if $member_is_test} {ts}(test){/ts}{/if}
+            <span id="mem-type-override">
+              <a href="#" class="crm-hover-button action-item override-mem-type" id="show-mem-type">
+                {ts}Override organisation and type{/ts}
+              </a>
+              {help id="override_membership_type"}
+            </span>
+            <br />
             <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
           </td>
         </tr>
@@ -126,7 +133,7 @@
           <td id="end-date-readonly">
               {$endDate|crmDate}
               <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
-                {ts}Over-ride end date{/ts}
+                {ts}Override end date{/ts}
               </a>
               {help id="override_end_date"}
           </td>
@@ -352,6 +359,22 @@
       setDifferentContactBlock();
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
+      });
+
+      // give option to override membership type for auto-renew memberships - dev/core#1331
+      {/literal}
+      {if $isRecur && !$cancelAutoRenew}
+        cj('#mem_type_id select').attr("disabled","disabled");
+      {else}
+        cj('#mem-type-override').hide();
+      {/if}
+      {literal}
+
+      cj('#show-mem-type').click( function( e ) {
+        e.preventDefault();
+        // enable select buttons
+        cj('#mem_type_id select').removeAttr("disabled");
+        cj('#mem-type-override').hide();
       });
 
       // give option to override end-date for auto-renew memberships
