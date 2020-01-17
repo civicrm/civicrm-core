@@ -1838,7 +1838,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param $params
    *
    * @return array
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function preparePaidEventProcessing($params): array {
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
@@ -1846,7 +1848,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $lineItem = [];
     $additionalParticipantDetails = [];
     if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $eventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'start_date');
+      $eventStartDate = $this->getEventValue('start_date');
       if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
         $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
       }
@@ -1998,6 +2000,21 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function isPaymentOnExistingContribution(): bool {
     return ($this->_id && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId;
+  }
+
+  /**
+   * Get the value for a field relating to the event.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getEventValue(string $fieldName) {
+    if (!isset($this->_event)) {
+      $this->_event = civicrm_api3('Event', 'getsingle', ['id' => $this->_eventId]);
+    }
+    return $this->_event[$fieldName];
   }
 
 }
