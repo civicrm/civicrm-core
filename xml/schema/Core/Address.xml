@@ -63,7 +63,7 @@
     <comment>Is this the primary address.</comment>
     <add>2.0</add>
     <html>
-      <type>Radio</type>
+      <type>CheckBox</type>
     </html>
   </field>
   <index>
