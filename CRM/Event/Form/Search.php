@@ -362,9 +362,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-    $formValues = $this->getFormValues();
+    $this->setFormValues();
 
-    $this->submit($formValues);
+    $this->submit($this->_formValues);
   }
 
   /**
@@ -441,7 +441,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $this->_defaults = parent::setDefaultValues();
+    $this->_defaults = array_merge(parent::setDefaultValues(), (array) $this->_formValues);
     $event = CRM_Utils_Request::retrieve('event', 'Positive');
     if ($event) {
       $this->_defaults['event_id'] = $event;
