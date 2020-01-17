@@ -118,12 +118,6 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       $this, FALSE, 0
     );
 
-    // FIXME: Why are we comparing an integer with a string here?
-    if ($this->_action == 'export') {
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
-    }
-
     if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
       try {
         $jobResult = civicrm_api3('Job', 'clone', array('id' => $this->_id));
