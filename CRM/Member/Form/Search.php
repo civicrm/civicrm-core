@@ -246,8 +246,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       $prefix
     );
     $controller->setEmbedded(TRUE);
-
-    $query = &$selector->getQuery();
     $controller->run();
   }
 
