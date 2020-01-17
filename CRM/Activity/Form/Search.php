@@ -71,7 +71,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $this->set('searchFormName', 'Search');
 
     // set the button names
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;

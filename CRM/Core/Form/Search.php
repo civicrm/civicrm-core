@@ -22,13 +22,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_force;
 
   /**
-   * Name of search button
-   *
-   * @var string
-   */
-  protected $_searchButtonName;
-
-  /**
    * Name of action button
    *
    * @var string
