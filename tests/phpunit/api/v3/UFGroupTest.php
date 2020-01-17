@@ -115,8 +115,11 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       if ($key == 'add_contact_to_group' or $key == 'group') {
         continue;
       }
-      $expected = $this->params[$key];
       $received = $result['values'][$result['id']][$key];
+      if ($key == 'group_type' && $version == 4) {
+        $received = implode(',', $received);
+      }
+      $expected = $this->params[$key];
       $this->assertEquals($expected, $received, "The string '$received' does not equal '$expected' for key '$key' in line " . __LINE__);
     }
   }
@@ -165,7 +168,11 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       if ($key == 'add_contact_to_group' or $key == 'group') {
         continue;
       }
-      $this->assertEquals($result['values'][$result['id']][$key], $params[$key], $key . " doesn't match  " . $value);
+      $received = $result['values'][$result['id']][$key];
+      if ($key == 'group_type' && $version == 4) {
+        $received = implode(',', $received);
+      }
+      $this->assertEquals($received, $params[$key], $key . " doesn't match  " . $value);
     }
 
     $this->assertEquals($result['values'][$this->_ufGroupId]['add_to_group_id'], $params['add_contact_to_group']);

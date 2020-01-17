@@ -21,8 +21,6 @@
 
 namespace Civi\Api4\Utils;
 
-use CRM_Utils_Array as UtilsArray;
-
 require_once 'api/v3/utils.php';
 
 class FormattingUtil {
@@ -43,7 +41,7 @@ class FormattingUtil {
         if ($value === 'null') {
           $value = 'Null';
         }
-        FormattingUtil::formatValue($value, $field, $entity);
+        self::formatInputValue($value, $field, $entity);
         // Ensure we have an array for serialized fields
         if (!empty($field['serialize'] && !is_array($value))) {
           $value = (array) $value;
@@ -80,18 +78,14 @@ class FormattingUtil {
    *   Ex: 'Contact', 'Domain'
    * @throws \API_Exception
    */
-  public static function formatValue(&$value, $fieldSpec, $entity) {
+  public static function formatInputValue(&$value, $fieldSpec, $entity) {
     if (is_array($value)) {
       foreach ($value as &$val) {
-        self::formatValue($val, $fieldSpec, $entity);
+        self::formatInputValue($val, $fieldSpec, $entity);
       }
       return;
     }
-    $fk = UtilsArray::value('fk_entity', $fieldSpec);
-    if ($fieldSpec['name'] == 'id') {
-      $fk = $entity;
-    }
-    $dataType = UtilsArray::value('data_type', $fieldSpec);
+    $fk = $fieldSpec['name'] == 'id' ? $entity : $fieldSpec['fk_entity'] ?? NULL;
 
     if ($fk === 'Domain' && $value === 'current_domain') {
       $value = \CRM_Core_Config::domainID();
@@ -104,7 +98,7 @@ class FormattingUtil {
       }
     }
 
-    switch ($dataType) {
+    switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
         $value = date('Y-m-d H:i:s', strtotime($value));
         break;
@@ -118,6 +112,75 @@ class FormattingUtil {
     if (!$hic->isSkippedField($fieldSpec['name'])) {
       $value = $hic->encodeValue($value);
     }
+  }
+
+  /**
+   * Unserialize raw DAO values and convert to correct type
+   *
+   * @param array $results
+   * @param array $fields
+   * @param string $entity
+   * @throws \CRM_Core_Exception
+   */
+  public static function formatOutputValues(&$results, $fields, $entity) {
+    foreach ($results as &$result) {
+      // Remove inapplicable contact fields
+      if ($entity === 'Contact' && !empty($result['contact_type'])) {
+        \CRM_Utils_Array::remove($result, self::contactFieldsToRemove($result['contact_type']));
+      }
+      foreach ($result as $field => $value) {
+        $dataType = $fields[$field]['data_type'] ?? ($field == 'id' ? 'Integer' : NULL);
+        if (!empty($fields[$field]['serialize'])) {
+          if (is_string($value)) {
+            $result[$field] = $value = \CRM_Core_DAO::unSerializeField($value, $fields[$field]['serialize']);
+            foreach ($value as $key => $val) {
+              $result[$field][$key] = self::convertDataType($val, $dataType);
+            }
+          }
+        }
+        else {
+          $result[$field] = self::convertDataType($value, $dataType);
+        }
+      }
+    }
+  }
+
+  /**
+   * @param mixed $value
+   * @param string $dataType
+   * @return mixed
+   */
+  public static function convertDataType($value, $dataType) {
+    if (isset($value)) {
+      switch ($dataType) {
+        case 'Boolean':
+          return (bool) $value;
+
+        case 'Integer':
+          return (int) $value;
+
+        case 'Money':
+        case 'Float':
+          return (float) $value;
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * @param string $contactType
+   * @return array
+   */
+  public static function contactFieldsToRemove($contactType) {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$contactType])) {
+      \Civi::$statics[__CLASS__][__FUNCTION__][$contactType] = [];
+      foreach (\CRM_Contact_DAO_Contact::fields() as $field) {
+        if (!empty($field['contactType']) && $field['contactType'] != $contactType) {
+          \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'];
+        }
+      }
+    }
+    return \Civi::$statics[__CLASS__][__FUNCTION__][$contactType];
   }
 
 }

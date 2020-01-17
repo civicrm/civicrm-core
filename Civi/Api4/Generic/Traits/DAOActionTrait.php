@@ -20,7 +20,6 @@
 
 namespace Civi\Api4\Generic\Traits;
 
-use CRM_Utils_Array as UtilsArray;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Query\Api4SelectQuery;
 
@@ -129,7 +128,7 @@ trait DAOActionTrait {
     $result = [];
 
     foreach ($items as $item) {
-      $entityId = UtilsArray::value('id', $item);
+      $entityId = $item['id'] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->getEntityName(), $this->entityFields());
       $this->formatCustomParams($item, $entityId);
       $item['check_permissions'] = $this->getCheckPermissions();
@@ -167,6 +166,7 @@ trait DAOActionTrait {
 
       $result[] = $resultArray;
     }
+    FormattingUtil::formatOutputValues($result, $this->entityFields(), $this->getEntityName());
     return $result;
   }
 
@@ -180,7 +180,7 @@ trait DAOActionTrait {
     $baoName = $this->getBaoName();
     $hook = empty($params['id']) ? 'create' : 'edit';
 
-    \CRM_Utils_Hook::pre($hook, $this->getEntityName(), UtilsArray::value('id', $params), $params);
+    \CRM_Utils_Hook::pre($hook, $this->getEntityName(), $params['id'] ?? NULL, $params);
     /** @var \CRM_Core_DAO $instance */
     $instance = new $baoName();
     $instance->copyValues($params, TRUE);

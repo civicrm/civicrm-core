@@ -706,8 +706,8 @@
               });
             } else if (dataType === 'Boolean') {
               $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
-                {id: '1', text: ts('Yes')},
-                {id: '0', text: ts('No')}
+                {id: 'true', text: ts('Yes')},
+                {id: 'false', text: ts('No')}
               ]});
             }
           } else if (dataType === 'Integer' && !multi) {
