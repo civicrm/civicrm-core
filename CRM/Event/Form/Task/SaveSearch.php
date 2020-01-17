@@ -99,12 +99,10 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
     // saved search form values
     $formValues = $this->controller->exportValues();
 
-    $session = CRM_Core_Session::singleton();
-
     //save the search
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
-    $savedSearch->form_values = serialize($this->get('formValues'));
+    $savedSearch->form_values = serialize($this->get('queryParams'));
     $savedSearch->save();
     $this->set('ssID', $savedSearch->id);
     CRM_Core_Session::setStatus(ts("Your smart group has been saved as '%1'.", [1 => $formValues['title']]), ts('Saved'), 'success');
