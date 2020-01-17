@@ -86,6 +86,9 @@ class CustomGroupJoinable extends Joinable {
    * @return string
    */
   public function getSqlColumn($fieldName) {
+    if (strpos($fieldName, '.') !== FALSE) {
+      $fieldName = substr($fieldName, 1 + strrpos($fieldName, '.'));
+    }
     return $this->columns[$fieldName];
   }
 

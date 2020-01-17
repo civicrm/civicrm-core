@@ -63,7 +63,7 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
   $removeIndexField = FALSE;
 
   // If index field is not part of the select query, we add it here and remove it below
-  if ($indexField && !empty($params['select']) && is_array($params['select']) && !in_array($indexField, $params['select'])) {
+  if ($indexField && !empty($params['select']) && is_array($params['select']) && !\Civi\Api4\Utils\SelectUtil::isFieldSelected($indexField, $params['select'])) {
     $params['select'][] = $indexField;
     $removeIndexField = TRUE;
   }

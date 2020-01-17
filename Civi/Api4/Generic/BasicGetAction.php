@@ -57,6 +57,7 @@ class BasicGetAction extends AbstractGetAction {
    */
   public function _run(Result $result) {
     $this->setDefaultWhereClause();
+    $this->expandSelectClauseWildcards();
     $values = $this->getRecords();
     $result->exchangeArray($this->queryArray($values));
   }
