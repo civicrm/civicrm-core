@@ -58,7 +58,6 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
     $liveProcessorID = $testProcessorID + 1;
 
     $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'TestMode']);
-    $this->markTestIncomplete('Not working yet :-(');
     $this->assertEquals([$testProcessorID, 0], array_keys($processors), 'Only the test processor and the manual processor should be returned');
 
     $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'TestMode'], [$liveProcessorID]);
@@ -72,7 +71,6 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
 
     $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'LiveMode'], [$liveProcessorID]);
     $this->assertEquals([$liveProcessorID], array_keys($processors), 'Only the Live processor should be returned');
-
   }
 
 }
