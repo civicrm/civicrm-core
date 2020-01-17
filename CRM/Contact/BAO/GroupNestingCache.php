@@ -19,12 +19,12 @@ class CRM_Contact_BAO_GroupNestingCache {
   /**
    * Update cache.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public static function update() {
     // lets build the tree in memory first
 
-    $sql = "
+    $sql = '
 SELECT n.child_group_id  as child ,
        n.parent_group_id as parent
 FROM   civicrm_group_nesting n,
@@ -32,7 +32,7 @@ FROM   civicrm_group_nesting n,
        civicrm_group gp
 WHERE  n.child_group_id  = gc.id
   AND  n.parent_group_id = gp.id
-";
+';
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -57,15 +57,15 @@ WHERE  n.child_group_id  = gc.id
     }
 
     if (self::checkCyclicGraph($tree)) {
-      CRM_Core_Error::fatal(ts("We detected a cycle which we can't handle. aborting"));
+      throw new CRM_Core_Exception(ts('We detected a cycle which we can\'t handle. aborting'));
     }
 
     // first reset the current cache entries
-    $sql = "
+    $sql = '
 UPDATE civicrm_group
 SET    parents  = null,
        children = null
-";
+';
     CRM_Core_DAO::executeQuery($sql);
 
     $values = [];
@@ -132,9 +132,10 @@ WHERE  id = $id
 
   /**
    * @param int $id
-   * @param $groups
+   * @param array $groups
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getPotentialCandidates($id, &$groups) {
     $tree = Civi::cache('groups')->get('nestable tree hierarchy');
@@ -201,6 +202,8 @@ WHERE  id = $id
 
   /**
    * @return string
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function json() {
     $tree = Civi::cache('groups')->get('nestable tree hierarchy');
