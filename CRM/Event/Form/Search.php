@@ -99,7 +99,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_context
     );
     $prefix = NULL;
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -126,6 +126,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -436,6 +437,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array
    *   the default array reference
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $this->_defaults = array_merge(parent::setDefaultValues(), (array) $this->_formValues);
