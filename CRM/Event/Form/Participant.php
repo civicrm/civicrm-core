@@ -231,19 +231,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     else {
       $this->setPageTitle(ts('Event Registration'));
     }
-
-    // check the current path, if search based, then dont get participantID
-    // CRM-5792
-    $path = CRM_Utils_System::currentPath();
-    if (
-      strpos($path, 'civicrm/contact/search') === 0 ||
-      strpos($path, 'civicrm/group/search') === 0
-    ) {
-      $this->_id = NULL;
-    }
-    else {
-      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    }
+    $this->setID();
 
     if ($this->_id) {
       $this->assign('participantId', $this->_id);
@@ -1643,11 +1631,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
-    // set the participant id if it is not set
-    if (!$this->_id) {
-      $this->_id = $participants[0]->id;
-    }
-
     return $this->getStatusMsg($params, $sent, $updateStatusMsg, $notSent);
   }
 
@@ -1978,6 +1961,26 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->assign('amount_level', $params['amount_level']);
     }
     return [$contributionParams, $lineItem, $additionalParticipantDetails, $params];
+  }
+
+  /**
+   * Set the id variable.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function setID() {
+    // check the current path, if search based, then dont get participantID
+    // CRM-5792
+    $path = CRM_Utils_System::currentPath();
+    if (
+      strpos($path, 'civicrm/contact/search') === 0 ||
+      strpos($path, 'civicrm/group/search') === 0
+    ) {
+      $this->_id = NULL;
+    }
+    else {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
   }
 
 }
