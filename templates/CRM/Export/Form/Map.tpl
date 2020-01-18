@@ -23,11 +23,12 @@
 
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
-{* Table for mapping data to CRM fields *}
-{include file="CRM/Export/Form/table.tpl"}
+  <div ng-app="exportui">
+    <div class="crm-export-field-selector-outer" ng-controller="ExportUiCtrl" ng-include="'~/exportui/export.html'"></div>
+  </div>
 
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-{$initHideBoxes}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {$initHideBoxes}
 </div>
