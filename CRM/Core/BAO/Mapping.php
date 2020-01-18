@@ -302,63 +302,27 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Build the mapping form.
+   * Build the mapping form for Search Builder.
    *
    * @param CRM_Core_Form $form
-   * @param string $mappingType
-   *   (Export/Search Builder). (Import apparently used to use this but does no longer).
    * @param int $mappingId
    * @param int $columnNo
    * @param int $blockCount
    *   (no of blocks shown).
    * @param int $exportMode
    */
-  public static function buildMappingForm(&$form, $mappingType, $mappingId, $columnNo, $blockCount, $exportMode = NULL) {
+  public static function buildMappingForm(&$form, $mappingId, $columnNo, $blockCount, $exportMode = NULL) {
 
     $hasLocationTypes = [];
     $hasRelationTypes = [];
 
-    //get the saved mapping details
-
-    if ($mappingType == 'Export') {
-      $columnCount = ['1' => $columnNo];
-      $form->applyFilter('saveMappingName', 'trim');
-
-      //to save the current mappings
-      if (!isset($mappingId)) {
-        $saveDetailsName = ts('Save this field mapping');
-        $form->add('text', 'saveMappingName', ts('Name'));
-        $form->add('text', 'saveMappingDesc', ts('Description'));
-      }
-      else {
-        $form->assign('loadedMapping', $mappingId);
-
-        $params = ['id' => $mappingId];
-        $temp = [];
-        $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
-
-        $form->assign('savedName', $mappingDetails->name);
-
-        $form->add('hidden', 'mappingId', $mappingId);
-
-        $form->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
-        $saveDetailsName = ts('Save as a new field mapping');
-        $form->add('text', 'saveMappingName', ts('Name'));
-        $form->add('text', 'saveMappingDesc', ts('Description'));
-      }
-
-      $form->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
-      $form->addFormRule(['CRM_Export_Form_Map', 'formRule'], $form->get('mappingTypeId'));
-    }
-    elseif ($mappingType == 'Search Builder') {
-      $columnCount = $columnNo;
-      $form->addElement('submit', 'addBlock', ts('Also include contacts where'),
-        ['class' => 'submit-link']
-      );
-    }
+    $columnCount = $columnNo;
+    $form->addElement('submit', 'addBlock', ts('Also include contacts where'),
+      ['class' => 'submit-link']
+    );
 
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypes();
-    $fields = self::getBasicFields($mappingType);
+    $fields = self::getBasicFields('Search Builder');
 
     // Unset groups, tags, notes for component export
     if ($exportMode != CRM_Export_Form_Select::CONTACT_EXPORT) {
@@ -367,37 +331,35 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       }
     }
 
-    if ($mappingType == 'Search Builder') {
-      // Build the common contact fields array.
-      $fields['Contact'] = [];
-      foreach ($fields[$contactTypes[0]] as $key => $value) {
-        // If a field exists across all contact types, move it to the "Contact" selector
-        $ubiquitious = TRUE;
+    // Build the common contact fields array.
+    $fields['Contact'] = [];
+    foreach ($fields[$contactTypes[0]] as $key => $value) {
+      // If a field exists across all contact types, move it to the "Contact" selector
+      $ubiquitious = TRUE;
+      foreach ($contactTypes as $type) {
+        if (!isset($fields[$type][$key])) {
+          $ubiquitious = FALSE;
+        }
+      }
+      if ($ubiquitious) {
+        $fields['Contact'][$key] = $value;
         foreach ($contactTypes as $type) {
-          if (!isset($fields[$type][$key])) {
-            $ubiquitious = FALSE;
-          }
-        }
-        if ($ubiquitious) {
-          $fields['Contact'][$key] = $value;
-          foreach ($contactTypes as $type) {
-            unset($fields[$type][$key]);
-          }
+          unset($fields[$type][$key]);
         }
       }
-      if (array_key_exists('note', $fields['Contact'])) {
-        $noteTitle = $fields['Contact']['note']['title'];
-        $fields['Contact']['note']['title'] = $noteTitle . ': ' . ts('Body and Subject');
-        $fields['Contact']['note_body'] = ['title' => $noteTitle . ': ' . ts('Body Only'), 'name' => 'note_body'];
-        $fields['Contact']['note_subject'] = [
-          'title' => $noteTitle . ': ' . ts('Subject Only'),
-          'name' => 'note_subject',
-        ];
-      }
+    }
+    if (array_key_exists('note', $fields['Contact'])) {
+      $noteTitle = $fields['Contact']['note']['title'];
+      $fields['Contact']['note']['title'] = $noteTitle . ': ' . ts('Body and Subject');
+      $fields['Contact']['note_body'] = ['title' => $noteTitle . ': ' . ts('Body Only'), 'name' => 'note_body'];
+      $fields['Contact']['note_subject'] = [
+        'title' => $noteTitle . ': ' . ts('Subject Only'),
+        'name' => 'note_subject',
+      ];
     }
 
     // add component fields
-    $compArray = self::addComponentFields($fields, $mappingType, $exportMode);
+    $compArray = self::addComponentFields($fields, 'Search Builder', $exportMode);
 
     foreach ($fields as $key => $value) {
 
@@ -444,9 +406,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     // since we need a hierarchical list to display contact types & subtypes,
     // this is what we going to display in first selector
     $contactTypeSelect = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
-    if ($mappingType == 'Search Builder') {
-      $contactTypeSelect = ['Contact' => ts('Contacts')] + $contactTypeSelect;
-    }
+    $contactTypeSelect = ['Contact' => ts('Contacts')] + $contactTypeSelect;
 
     $sel1 = ['' => ts('- select record type -')] + $contactTypeSelect + $compArray;
 
@@ -493,74 +453,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     // Array for core fields and relationship custom data
     $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
-
-    if ($mappingType == 'Export') {
-      foreach ($sel1 as $k => $sel) {
-        if ($k) {
-          foreach ($mapperFields[$k] as $field => $dontCare) {
-            if (isset($hasRelationTypes[$k][$field])) {
-              list($id, $first, $second) = explode('_', $field);
-              // FIX ME: For now let's not expose custom data related to relationship
-              $relationshipCustomFields = [];
-              //$relationshipCustomFields    = self::getRelationTypeCustomGroupData( $id );
-              //asort($relationshipCustomFields);
-
-              $relatedFields = [];
-              $relationshipType = new CRM_Contact_BAO_RelationshipType();
-              $relationshipType->id = $id;
-              if ($relationshipType->find(TRUE)) {
-                $direction = "contact_sub_type_$second";
-                $target_type = 'contact_type_' . $second;
-                if (isset($relationshipType->$direction)) {
-                  $relatedFields = array_merge((array) $relatedMapperFields[$relationshipType->$direction], (array) $relationshipCustomFields);
-                }
-                elseif (isset($relationshipType->$target_type)) {
-                  $relatedFields = array_merge((array) $relatedMapperFields[$relationshipType->$target_type], (array) $relationshipCustomFields);
-                }
-                //CRM-20672 If contact target type not set e.g. "All Contacts" relationship - present user with all field options and let them determine what they expect to work
-                else {
-                  $types = CRM_Contact_BAO_ContactType::basicTypes(FALSE);
-                  foreach ($types as $contactType => $label) {
-                    $relatedFields = array_merge($relatedFields, (array) $relatedMapperFields[$label]);
-                  }
-                  $relatedFields = array_merge($relatedFields, (array) $relationshipCustomFields);
-                }
-              }
-              asort($relatedFields);
-              $sel5[$k][$field] = $relatedFields;
-            }
-          }
-        }
-      }
-
-      //Location Type for relationship fields
-      foreach ($sel5 as $k => $v) {
-        if ($v) {
-          foreach ($v as $rel => $fields) {
-            foreach ($fields as $field => $fieldLabel) {
-              if (isset($hasLocationTypes[$k][$field])) {
-                $sel6[$k][$rel][$field] = $locationTypes;
-              }
-            }
-          }
-        }
-      }
-
-      //PhoneTypes for  relationship fields
-      $sel7[''] = NULL;
-      foreach ($sel6 as $k => $rel) {
-        if ($k) {
-          foreach ($rel as $phonekey => $phonevalue) {
-            foreach ($locationTypes as $locType => $loc) {
-              if (trim($locType) != '') {
-                $sel7[$k][$phonekey]['phone'][$locType] = &$phoneTypes;
-                $sel7[$k][$phonekey]['im'][$locType] = &$imProviders;
-              }
-            }
-          }
-        }
-      }
-    }
 
     //special fields that have location, hack for primary location
     $specialFields = [
@@ -618,12 +510,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           list($mappingName, $defaults, $noneArray, $jsSet) = self::loadSavedMapping($mappingLocation, $x, $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, $specialFields, $mappingPhoneType, $defaults, $noneArray, $mappingImProvider, $mappingOperator, $mappingValue);
         }
         //Fix for Search Builder
-        if ($mappingType == 'Export') {
-          $j = 7;
-        }
-        else {
-          $j = 4;
-        }
+        $j = 4;
 
         $formValues = $form->exportValues();
         if (!$jsSet) {
@@ -656,48 +543,21 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
         }
         //Fix for Search Builder
-        if ($mappingType == 'Export') {
-          if (!isset($mappingId) || $i >= count(reset($mappingName))) {
-            if (isset($formValues['mapper']) &&
-              isset($formValues['mapper'][$x][$i][1]) &&
-              array_key_exists($formValues['mapper'][$x][$i][1], $relationshipTypes)
-            ) {
-              $sel->setOptions([$sel1, $sel2, $sel5, $sel6, $sel7, $sel3, $sel4]);
-            }
-            else {
-              $sel->setOptions([$sel1, $sel2, $sel3, $sel4, $sel5, $sel6, $sel7]);
-            }
-          }
-          else {
-            $sel->setOptions([$sel1, $sel2, $sel3, $sel4, $sel5, $sel6, $sel7]);
-          }
-        }
-        else {
-          $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
-        }
+        $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
 
-        if ($mappingType == 'Search Builder') {
-          //CRM -2292, restricted array set
-          $operatorArray = ['' => ts('-operator-')] + CRM_Core_SelectValues::getSearchBuilderOperators();
+        //CRM -2292, restricted array set
+        $operatorArray = ['' => ts('-operator-')] + CRM_Core_SelectValues::getSearchBuilderOperators();
 
-          $form->add('select', "operator[$x][$i]", '', $operatorArray);
-          $form->add('text', "value[$x][$i]", '');
-        }
-      }
-      //end of columnCnt for
-      if ($mappingType == 'Search Builder') {
-        $title = ts('Another search field');
-      }
-      else {
-        $title = ts('Select more fields');
+        $form->add('select', "operator[$x][$i]", '', $operatorArray);
+        $form->add('text', "value[$x][$i]", '');
       }
 
-      $form->addElement('submit', "addMore[$x]", $title, ['class' => 'submit-link']);
+      $form->addElement('submit', "addMore[$x]", ts('Another search field'), ['class' => 'submit-link']);
     }
     //end of block for
 
     $js = "<script type='text/javascript'>\n";
-    $formName = "document." . (($mappingType == 'Export') ? 'Map' : 'Builder');
+    $formName = "document.Builder";
     if (!empty($nullArray)) {
       $js .= "var nullArray = [";
       $elements = [];
