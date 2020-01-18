@@ -1184,7 +1184,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contributions[] = $contribution = CRM_Event_Form_Registration_Confirm::processContribution(
         $this, $this->_params,
         $result, $contactID,
-        FALSE, FALSE,
+        FALSE,
         $this->_paymentProcessor
       );
 
