@@ -167,8 +167,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
+   * Add buttons to the form.
    *
    * @param string $title
    *   Title of the main button.

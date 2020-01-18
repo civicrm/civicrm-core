@@ -120,30 +120,4 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
     );
   }
 
-  /**
-   * Simple shell that derived classes can call to add buttons to.
-   * the form with a customized title for the main Submit
-   *
-   * @param string $title
-   *   Title of the main button.
-   * @param string $nextType
-   * @param string $backType
-   * @param bool $submitOnce
-   *
-   * @return void
-   */
-  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons([
-      [
-        'type' => $nextType,
-        'name' => $title,
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => $backType,
-        'name' => ts('Cancel'),
-      ],
-    ]);
-  }
-
 }
