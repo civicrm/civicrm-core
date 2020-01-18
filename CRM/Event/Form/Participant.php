@@ -971,6 +971,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CiviCRM_API3_Exception
    */
   public function submit($params) {
+    if ($this->_mode && !$this->_isPaidEvent) {
+      CRM_Core_Error::statusBounce(ts('Selected Event is not Paid Event '));
+    }
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
     if (!empty($params['contact_id'])) {
@@ -1023,9 +1026,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $now = date('YmdHis');
 
     if ($this->_mode) {
-      if (!$this->_isPaidEvent) {
-        CRM_Core_Error::statusBounce(ts('Selected Event is not Paid Event '));
-      }
 
       $eventTitle
         = CRM_Core_DAO::getFieldValue(
