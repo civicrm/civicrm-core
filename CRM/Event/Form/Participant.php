@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -1432,48 +1430,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       $this->assign('module', 'Event Registration');
-      //use of the message template below requires variables in different format
-      $event = $events = [];
-      $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
-
-      //get all event details.
-      CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
-      $event = $events[$params['event_id']];
-      unset($event['start_date']);
-      unset($event['end_date']);
-
-      $role = CRM_Event_PseudoConstant::participantRole();
-      $participantRoles = CRM_Utils_Array::value('role_id', $params);
-      if (is_array($participantRoles)) {
-        $selectedRoles = [];
-        foreach ($participantRoles as $roleId) {
-          $selectedRoles[] = $role[$roleId];
-        }
-        $event['participant_role'] = implode(', ', $selectedRoles);
-      }
-      else {
-        $event['participant_role'] = CRM_Utils_Array::value($participantRoles, $role);
-      }
-      $event['is_monetary'] = $this->_isPaidEvent;
-
-      if ($params['receipt_text']) {
-        $event['confirm_email_text'] = $params['receipt_text'];
-      }
-
+      $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params), $this->_isPaidEvent);
       $this->assign('isAmountzero', 1);
-      $this->assign('event', $event);
 
-      $this->assign('isShowLocation', $event['is_show_location']);
-      if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
-        $locationParams = [
-          'entity_id' => $params['event_id'],
-          'entity_table' => 'civicrm_event',
-        ];
-        $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
-        $this->assign('location', $location);
-      }
-
-      $status = CRM_Event_PseudoConstant::participantStatus();
       if ($this->_isPaidEvent) {
         $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
         if (!$this->_mode) {
@@ -1978,6 +1937,54 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->assign('amount_level', $params['amount_level']);
     }
     return [$contributionParams, $lineItem, $additionalParticipantDetails, $params];
+  }
+
+  /**
+   * @param $eventID
+   * @param $participantRoles
+   * @param $receiptText
+   * @param $isPaidEvent
+   *
+   * @return void
+   */
+  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText, $isPaidEvent) {
+    //use of the message template below requires variables in different format
+    $events = [];
+    $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
+
+    //get all event details.
+    CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $eventID, $events, $returnProperties);
+    $event = $events[$eventID];
+    unset($event['start_date']);
+    unset($event['end_date']);
+
+    $role = CRM_Event_PseudoConstant::participantRole();
+
+    if (is_array($participantRoles)) {
+      $selectedRoles = [];
+      foreach ($participantRoles as $roleId) {
+        $selectedRoles[] = $role[$roleId];
+      }
+      $event['participant_role'] = implode(', ', $selectedRoles);
+    }
+    else {
+      $event['participant_role'] = CRM_Utils_Array::value($participantRoles, $role);
+    }
+    $event['is_monetary'] = $isPaidEvent;
+
+    if ($receiptText) {
+      $event['confirm_email_text'] = $receiptText;
+    }
+    $this->assign('event', $event);
+    $this->assign('isShowLocation', $event['is_show_location']);
+    if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
+      $locationParams = [
+        'entity_id' => $eventID,
+        'entity_table' => 'civicrm_event',
+      ];
+      $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
+      $this->assign('location', $location);
+    }
   }
 
 }
