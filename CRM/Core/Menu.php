@@ -96,7 +96,7 @@ class CRM_Core_Menu {
    * @throws Exception
    */
   public static function read($name, &$menu) {
-    $xml = simplexml_load_file($name);
+    $xml = simplexml_load_string(file_get_contents($name));
     self::readXML($xml, $menu);
   }
 
