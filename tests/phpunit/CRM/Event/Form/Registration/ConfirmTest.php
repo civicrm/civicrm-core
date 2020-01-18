@@ -165,6 +165,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(8000.67, $contribution['total_amount']);
     $this->assertEquals(1.67, $contribution['fee_amount']);
     $this->assertEquals(7999, $contribution['net_amount']);
+    $this->assertNotContains(' (multiple participants)', $contribution['amount_level']);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
@@ -291,9 +292,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle(
       'Contribution',
       [
-        'return' => ['tax_amount', 'total_amount'],
+        'return' => ['tax_amount', 'total_amount', 'amount_level'],
       ]
     );
+    $this->assertContains(' (multiple participants)', $contribution['amount_level']);
     $this->assertEquals($contribution['tax_amount'], 40, 'Invalid Tax amount.');
     $this->assertEquals($contribution['total_amount'], 440, 'Invalid Tax amount.');
     $mailSent = $mut->getAllMessages();
