@@ -186,9 +186,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_mode = 'Live';
     $form->_quickConfig = TRUE;
-    $form->_fromEmails = [
-      'from_email_id' => ['abc@gmail.com' => 1],
-    ];
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     $form->submit($this->getSubmitParams($form->_eventId, $paymentProcessorID));
     $participants = $this->callAPISuccess('Participant', 'get', []);
@@ -315,6 +312,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_single = TRUE;
     $form->_contactID = $form->_contactId = $contactID;
     $form->setCustomDataTypes();
+    $form->_fromEmails = [
+      'from_email_id' => ['abc@gmail.com' => 1],
+    ];
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
       $form->_bltID = 5;
@@ -464,6 +464,32 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'receipt_text' => '',
     ];
     return $submitParams;
+  }
+
+  /**
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmitWithDeferredRecognition() {
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
+    $futureDate = date('Y') + 1 . '-09-20';
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'start_date' => $futureDate]);
+    $form->_quickConfig = TRUE;
+
+    $form->submit([
+      'register_date' => date('Ymd'),
+      'status_id' => 1,
+      'role_id' => 1,
+      'event_id' => $form->_eventId,
+      'record_contribution' => TRUE,
+      'amount' => 100,
+      'amount_level' => 'blah',
+      'financial_type_id' => 1,
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    // Api doesn't retrieve it & we don't much want to change that as we want to feature freeze BAO_Query.
+    $this->assertEquals($futureDate . ' 00:00:00', CRM_Core_DAO::singleValueQuery("SELECT revenue_recognition_date FROM civicrm_contribution WHERE id = {$contribution['id']}"));
   }
 
 }
