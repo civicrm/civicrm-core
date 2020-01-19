@@ -172,7 +172,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   public function testCreateWithoutModifiedDate($version) {
     $this->_apiversion = $version;
     unset($this->_params['modified_date']);
-    $apiResult = $this->callAPISuccess('note', 'create', $this->_params);
+    $note = $this->callAPISuccess('note', 'create', $this->_params);
+    $apiResult = $this->callAPISuccess('note', 'get', ['id' => $note['id']]);
     $this->assertAPISuccess($apiResult);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($apiResult['values'][$apiResult['id']]['modified_date'])));
   }

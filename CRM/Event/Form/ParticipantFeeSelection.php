@@ -252,7 +252,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
         'note' => $params['note'],
         'entity_id' => $this->_participantId,
         'contact_id' => $this->_contactId,
-        'modified_date' => date('Ymd'),
       ];
       CRM_Core_BAO_Note::add($noteParams);
     }
