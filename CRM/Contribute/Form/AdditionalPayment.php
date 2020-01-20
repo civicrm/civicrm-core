@@ -363,7 +363,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $session = CRM_Core_Session::singleton();
 
     $now = date('YmdHis');
-    $fields = [];
 
     // we need to retrieve email address
     if ($this->_context == 'standalone' && !empty($this->_params['is_email_receipt'])) {
