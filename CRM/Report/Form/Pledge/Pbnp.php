@@ -22,6 +22,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   ];
   public $_drilldownReport = ['pledge/summary' => 'Link to Detail Report'];
 
+  protected $_pledgeStatuses = [];
+  protected $_totalPaid = FALSE;
   protected $_customGroupExtends = [
     'Pledge',
   ];
@@ -30,6 +32,9 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
+    $this->_pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'label'
+    );
     $this->_columns = [
       'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -124,6 +129,15 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_MONEY,
             'title' => ts('Next Payment Amount'),
           ],
+          'total_paid' => [
+            'title' => ts('Total Amount Paid'),
+            'type' => CRM_Utils_Type::T_MONEY,
+          ],
+          'balance_due' => [
+            'title' => ts('Balance Due'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_MONEY,
+          ],
         ],
         'filters' => [
           'scheduled_date' => [
@@ -180,9 +194,30 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+            if ($fieldName == 'total_paid') {
+              $this->_totalPaid = TRUE; // add pledge_payment join
+              $this->_columnHeaders["{$tableName}_{$fieldName}"] = [
+                'title' => $field['title'],
+                'type' => $field['type'],
+              ];
+              $select[] = "COALESCE(sum({$this->_aliases[$tableName]}.actual_amount), 0) as {$tableName}_{$fieldName}";
+            }
+            elseif ($fieldName == 'balance_due') {
+              $this->_totalPaid = TRUE; // add pledge_payment join
+              $cancelledStatus = array_search('Cancelled', $this->_pledgeStatuses);
+              $completedStatus = array_search('Completed', $this->_pledgeStatuses);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field['title'];
+              $this->_columnHeaders["{$tableName}_{$fieldName}"] = [
+                'title' => $field['title'],
+                'type' => $field['type'],
+              ];
+              $select[] = "IF({$this->_aliases['civicrm_pledge']}.status_id IN({$cancelledStatus}, $completedStatus), 0, COALESCE({$this->_aliases['civicrm_pledge']}.amount, 0) - COALESCE(sum({$this->_aliases[$tableName]}.actual_amount),0)) as {$tableName}_{$fieldName}";
+            }
+            else {
+              $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+            }
           }
         }
       }
@@ -219,7 +254,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     // payments have been edited such that they are not in id order. This might be better as a temp table.
     $this->_from .= "LEFT JOIN (SELECT * FROM civicrm_pledge_payment ORDER BY scheduled_date) as {$this->_aliases['civicrm_pledge_payment']}
                         ON ({$this->_aliases['civicrm_pledge']}.id =
-                            {$this->_aliases['civicrm_pledge_payment']}.pledge_id AND  {$this->_aliases['civicrm_pledge_payment']}.status_id = {$pendingStatus} ) ";
+                            {$this->_aliases['civicrm_pledge_payment']}.pledge_id ) ";
 
     $this->joinAddressFromContact();
     $this->joinEmailFromContact();
@@ -242,6 +277,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+
     parent::PostProcess();
   }
 
