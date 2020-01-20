@@ -372,9 +372,7 @@
           {if $urlPathVar}
           dataUrl += '&' + '{$urlPathVar}';
           {/if}
-          {if $isBackOffice}
-            dataUrl += '&' + 'is_backoffice=1';
-          {/if}
+          dataUrl += '&' + 'is_backoffice=1';
 
           {literal}
           var eventId = $('[name=event_id], #event_id', $form).val();
