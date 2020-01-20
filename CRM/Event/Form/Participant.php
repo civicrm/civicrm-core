@@ -22,6 +22,20 @@
  */
 class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment {
 
+  /**
+   * Participant ID - use getParticipantID.
+   *
+   * @var int
+   */
+  public $_pId;
+
+  /**
+   * ID of discount record.
+   *
+   * @var int
+   */
+  public $_discountId;
+
   public $useLivePageJS = TRUE;
 
   /**
@@ -1669,7 +1683,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $form->addElement('hidden', 'hidden_feeblock', 1);
       }
 
-      $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $form->_pId);
+      $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $this->getParticipantID());
       $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
     }
 
@@ -1811,7 +1825,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return array
    *
-   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   protected function preparePaidEventProcessing($params): array {
@@ -2212,7 +2225,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return int|null
    */
   protected function getParticipantID() {
-    return $this->_id;
+    return $this->_id ?? $this->_pId;
   }
 
 }

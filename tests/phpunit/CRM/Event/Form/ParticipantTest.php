@@ -316,8 +316,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
       $form->_bltID = 5;
-      $form->_values['fee'] = [];
       $form->_isPaidEvent = TRUE;
+      $form->buildEventFeeForm($form);
     }
     return $form;
   }
