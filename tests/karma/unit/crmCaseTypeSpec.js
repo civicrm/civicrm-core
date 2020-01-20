@@ -31,6 +31,7 @@ describe('crmCaseType', function() {
     $httpBackend = _$httpBackend_;
     $q = _$q_;
     $rootScope = _$rootScope_;
+    $rootScope.ts = CRM.ts(null);
     $timeout = _$timeout_;
   }));
 
@@ -1059,5 +1060,1488 @@ describe('crmCaseType', function() {
         });
       });
     });
+
+    // Test show/hide for the various dropdown actions
+    describe('showandtell', function() {
+      var templateCache;
+      var template;
+
+      // $templateCache is populated by the nghtml2js plugin. See karma.conf.js
+      // I'm not sure why it can't be injected higher up in the hierarchy. It doesn't seem to work?
+      beforeEach(inject(function($templateCache) {
+        scope = $rootScope.$new();
+        templateCache = $templateCache;
+        template = templateCache.get('~/crmCaseType/list.html');
+      }));
+
+      // Helper function which we call repeatedly. It can't be in beforeEach
+      // because then the timing is wrong because we need different caseTypes
+      // in each test, which happens of course after beforeEach.
+      var compileTemplate = function(scope) {
+        var element = $compile(template)(scope);
+        scope.$digest();
+        return element;
+      };
+
+      // This is the workhorse function that does the actual test, called
+      // repeatedly for each case type variation from the `it()` below.
+      var doTest = function(inputCaseType, expected) {
+        // Mock up our case types based on input, merging some static info
+        // with the variable input.
+        var caseType = {
+          id: 1,
+          title: 'Housing Support',
+          name: 'housing_support'
+        };
+        // PhantomJS at the moment doesn't support ES6, so do a loop.
+        for (var memberVar in inputCaseType) {
+          caseType[memberVar] = inputCaseType[memberVar];
+        }
+        scope.caseTypes = {
+          1: caseType
+        };
+
+        // Render the template in the context of our scope now that the scope
+        // contains our mock case types.
+        var element = compileTemplate(scope);
+        //console.debug(element);
+
+        //
+        // Now verify the expected values
+        //
+
+        // Useful variable for displaying the inputs that caused failure
+        // in readable form.
+        var inputStr = JSON.stringify(inputCaseType);
+
+        expect(element.find('span.more-panel').hasClass('ng-hide')).toBe(expected.more_hidden, 'More link should be ' +
+          (expected.more_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-enable').hasClass('ng-hide')).toBe(expected.enable_hidden, 'Enable should be ' +
+          (expected.enable_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-disable').hasClass('ng-hide')).toBe(expected.disable_hidden, 'Disable should be ' +
+          (expected.disable_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-revert').hasClass('ng-hide')).toBe(expected.revert_hidden, 'Revert should be ' +
+          (expected.revert_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-delete').hasClass('ng-hide')).toBe(expected.delete_hidden, 'Delete should be ' +
+          (expected.delete_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+      };
+
+      // Test show/hide for the various dropdown actions
+      //
+      // There's 625 assertions.
+      // Three variables: [is_active, is_forked, is_reserved],
+      // each with 5 possible values: [0, 1, "0", "1", undefined].
+      // Then, multiply that by 5 because there are 5 UI elements
+      // to be checked.
+      // So 125 possible input tuples, with 5 things to check in each test.
+      it('to be or not to be', function() {
+        var caseTypeSimulations = [
+          [
+            // input case type
+            {"is_active": "1", "is_reserved": "0"},
+            {
+              // should more link be hidden
+              "more_hidden": false,
+              // should enable choice be hidden
+              "enable_hidden": true,
+              // should disable choice be hidden
+              "disable_hidden": false,
+              // should revert choice be hidden
+              "revert_hidden": true,
+              // should delete choice be hidden
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+        ];
+        caseTypeSimulations.forEach(function(simulation) {
+          doTest(simulation[0], simulation[1]);
+        });
+      });
+    });
   });
+
 });
