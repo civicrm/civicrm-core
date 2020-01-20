@@ -70,9 +70,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'role_id' => 1,
       'event_id' => $form->_eventId,
       'priceSetId' => $this->_ids['price_set'],
-      'price_' . $this->_ids['price_field'][0] => [
-        $this->_ids['price_field_value'][0] => 1,
-      ],
+      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value'][0],
       'is_pay_later' => 1,
       'amount_level' => 'Too much',
       'fee_amount' => 55,
@@ -109,14 +107,14 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participants['id'], 'participant');
     // Participants is updated to 0 but line remains.
     $this->assertEquals(0, $lineItem[1]['subTotal']);
-    $this->assertEquals(100, $lineItem[2]['subTotal']);
+    $this->assertEquals(1550.55, $lineItem[2]['subTotal']);
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
 
     $sum = 0;
     foreach ($financialItems['values'] as $financialItem) {
       $sum += $financialItem['amount'];
     }
-    $this->assertEquals(100, $sum);
+    $this->assertEquals(1550.55, $sum);
   }
 
   /**
@@ -300,7 +298,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   protected function getForm($eventParams = []) {
     if (!empty($eventParams['is_monetary'])) {
-      $event = $this->eventCreatePaid($eventParams);
+      $event = $this->eventCreatePaid($eventParams, [['name' => 'big', 'amount' => 1550.55]]);
     }
     else {
       $event = $this->eventCreate($eventParams);
@@ -452,10 +450,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'billing_postal_code-5' => 10545,
       'billing_country_id-5' => 1228,
       'payment_processor_id' => $paymentProcessorID,
-      'priceSetId' => '6',
-      'price_7' => [
-        13 => 1,
-      ],
+      'priceSetId' => $this->_ids['price_set'],
+      'price_' . $this->_ids['price_field'][0]  => $this->_ids['price_field_value'][1],
       'amount_level' => 'Too much',
       'fee_amount' => $this->formatMoneyInput(1550.55),
       'total_amount' => $this->formatMoneyInput(1550.55),
