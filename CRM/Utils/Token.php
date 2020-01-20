@@ -35,6 +35,7 @@ class CRM_Utils_Token {
     ],
     'mailing' => [
       'id',
+      'key',
       'name',
       'group',
       'subject',
@@ -448,6 +449,14 @@ class CRM_Utils_Token {
 
       case 'id':
         $value = $mailing ? $mailing->id : 'undefined';
+        break;
+
+      // Key is the ID, or the hash when the hash URLs setting is enabled
+      case 'key':
+        $value = $mailing->id;
+        if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($value)) {
+          $value = $hash;
+        }
         break;
 
       case 'name':
