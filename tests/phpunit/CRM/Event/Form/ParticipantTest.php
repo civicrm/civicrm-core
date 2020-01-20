@@ -188,8 +188,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_quickConfig = TRUE;
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     $form->submit($this->getSubmitParams($form->_eventId, $paymentProcessorID));
-    $participants = $this->callAPISuccess('Participant', 'get', []);
-    $this->assertEquals(1, $participants['count']);
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by: ', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(1550.55, $contribution['total_amount']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);

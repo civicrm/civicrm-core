@@ -1026,19 +1026,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $now = date('YmdHis');
 
     if ($this->_mode) {
-
-      $eventTitle
-        = CRM_Core_DAO::getFieldValue(
-          'CRM_Event_DAO_Event',
-          $params['event_id'],
-          'title'
-        );
-
       // set source if not set
       if (empty($params['source'])) {
         $this->_params['participant_source'] = ts('Offline Registration for Event: %2 by: %1', [
           1 => $userName,
-          2 => $eventTitle,
+          2 => $this->getEventValue('title'),
         ]);
       }
       else {
@@ -1242,13 +1234,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
 
-      if (isset($params['event_id'])) {
-        $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
-          $params['event_id'],
-          'title'
-        );
-      }
-
       if ($this->_single) {
         $this->_contactIds[] = $this->_contactId;
       }
@@ -1273,7 +1258,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if (!$this->_onlinePendingContributionId) {
           if (empty($params['source'])) {
             $contributionParams['source'] = ts('%1 : Offline registration (by %2)', [
-              1 => $eventTitle,
+              1 => $this->getEventValue('title'),
               2 => $userName,
             ]);
           }
