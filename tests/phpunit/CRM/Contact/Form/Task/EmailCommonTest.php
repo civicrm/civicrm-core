@@ -63,6 +63,9 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
     $form->_emails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
     $form->_fromEmails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
+    // This rule somehow disappears if there's a form-related test before us,
+    // so register it again. See packages/HTML/QuickForm/file.php.
+    $form->registerRule('maxfilesize', 'callback', '_ruleCheckMaxFileSize', 'HTML_QuickForm_file');
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
     CRM_Contact_Form_Task_EmailCommon::buildQuickForm($form);
     CRM_Contact_Form_Task_EmailCommon::submit($form, array_merge($form->_defaultValues, [
