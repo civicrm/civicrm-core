@@ -87,11 +87,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       if (!$this->_rgid) {
         // Unset browse URL as we have come from the search screen.
         $browseUrl = '';
-        $this->_rgid = civicrm_api3('RuleGroup', 'getvalue', [
-          'contact_type' => $this->_contactType,
-          'used' => 'Supervised',
-          'return' => 'id',
-        ]);
+        try {
+          $this->_rgid = civicrm_api3('RuleGroup', 'getvalue', [
+            'contact_type' => $this->_contactType,
+            'used' => 'Supervised',
+            'return' => 'id',
+          ]);
+        }
+        catch (Exception $e) {
+          throw new CRM_Core_Exception(ts('There is no Supervised dedupe rule configured for contact type %1.', [1 => $this->_contactType]));
+        }
       }
       $this->assign('browseUrl', $browseUrl);
       if ($browseUrl) {
