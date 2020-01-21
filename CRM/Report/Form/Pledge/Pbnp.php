@@ -22,7 +22,6 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   ];
   public $_drilldownReport = ['pledge/summary' => 'Link to Detail Report'];
 
-  protected $_pledgeStatuses = [];
   protected $_totalPaid = FALSE;
   protected $_customGroupExtends = [
     'Pledge',
@@ -32,9 +31,6 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $this->_pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
-      FALSE, FALSE, FALSE, NULL, 'label'
-    );
     $this->_columns = [
       'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -195,7 +191,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             !empty($this->_params['fields'][$fieldName])
           ) {
             if ($fieldName == 'total_paid') {
-              $this->_totalPaid = TRUE; // add pledge_payment join
+              $this->_totalPaid = TRUE;
               $this->_columnHeaders["{$tableName}_{$fieldName}"] = [
                 'title' => $field['title'],
                 'type' => $field['type'],
@@ -203,9 +199,9 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
               $select[] = "COALESCE(sum({$this->_aliases[$tableName]}.actual_amount), 0) as {$tableName}_{$fieldName}";
             }
             elseif ($fieldName == 'balance_due') {
-              $this->_totalPaid = TRUE; // add pledge_payment join
-              $cancelledStatus = array_search('Cancelled', $this->_pledgeStatuses);
-              $completedStatus = array_search('Completed', $this->_pledgeStatuses);
+              $this->_totalPaid = TRUE;
+              $cancelledStatus = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled');
+              $completedStatus = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Completed');
               $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field['title'];
               $this->_columnHeaders["{$tableName}_{$fieldName}"] = [
                 'title' => $field['title'],
