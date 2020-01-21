@@ -1044,13 +1044,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $params
    *
+   * @param array $options
+   *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected function eventCreatePaid($params) {
+  protected function eventCreatePaid($params, $options = [['name' => 'hundy', 'amount' => 100]]) {
     $event = $this->eventCreate($params);
-    $this->priceSetID = $this->eventPriceSetCreate(55, 0, 'Radio');
+    $this->priceSetID = $this->ids['PriceSet'][] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->priceSetID);
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->priceSetID, TRUE, FALSE);
     $priceSet = CRM_Utils_Array::value($this->priceSetID, $priceSet);
@@ -2629,11 +2631,13 @@ VALUES
    * @param int $minAmt
    * @param string $type
    *
+   * @param array $options
+   *
    * @return int
    *   Price Set ID.
    * @throws \CRM_Core_Exception
    */
-  protected function eventPriceSetCreate($feeTotal, $minAmt = 0, $type = 'Text') {
+  protected function eventPriceSetCreate($feeTotal, $minAmt = 0, $type = 'Text', $options = [['name' => 'hundy', 'amount' => 100]]) {
     // creating price set, price field
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
@@ -2663,9 +2667,13 @@ VALUES
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     ];
     if ($type === 'Radio') {
-      $paramsField['is_enter_qty'] = 0;
-      $paramsField['option_value'][2] = $paramsField['option_weight'][2] = $paramsField['option_amount'][2] = 100;
-      $paramsField['option_label'][2] = $paramsField['option_name'][2] = 'hundy';
+      foreach ($options as $index => $option) {
+        $paramsField['is_enter_qty'] = 0;
+        $optionID = $index + 2;
+        $paramsField['option_value'][$optionID] = $paramsField['option_weight'][$optionID] = $paramsField['option_amount'][$optionID] = $option['amount'];
+        $paramsField['option_label'][$optionID] = $paramsField['option_name'][$optionID] = $option['name'];
+      }
+
     }
     $this->callAPISuccess('PriceField', 'create', $paramsField);
     $fields = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $this->_ids['price_set']]);
