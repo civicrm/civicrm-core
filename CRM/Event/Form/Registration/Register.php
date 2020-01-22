@@ -1186,7 +1186,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       $participant->is_test = 0;
       $participant->find();
-      $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
+      // Event#30 - Anyone whose status type has `is_counted` OR is on the waitlist should be considered as registered.
+      $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1') + CRM_Event_PseudoConstant::participantStatus(NULL, "name = 'On waitlist'");
       while ($participant->fetch()) {
         if (array_key_exists($participant->status_id, $statusTypes)) {
           if (!$isAdditional && !$form->_values['event']['allow_same_participant_emails']) {
@@ -1196,8 +1197,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             if ($form->_pcpId) {
               $registerUrl .= '&pcpId=' . $form->_pcpId;
             }
-
-            $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', [1 => $registerUrl]);
+            $registrationType = (CRM_Event_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'participant_status_id', 'On waitlist') == $participant->status_id) ? 'waitlisted' : 'registered';
+            $status = ts("It looks like you are already %1 for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.", [1 => $registrationType]);
+            $status .= ' ' . ts('You can also <a href="%1">register another participant</a>.', [1 => $registerUrl]);
             CRM_Core_Session::singleton()->setStatus($status, ts('Oops.'), 'alert');
             $url = CRM_Utils_System::url('civicrm/event/info',
               "reset=1&id={$form->_values['event']['id']}&noFullMsg=true"
