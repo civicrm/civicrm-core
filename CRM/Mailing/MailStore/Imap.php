@@ -33,10 +33,12 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
    *   Whether to use IMAP or IMAPS.
    * @param string $folder
    *   Name of the inbox folder.
+   * @param bool $useXOAUTH2
+   *   Use XOAUTH2 authentication method
    *
    * @return \CRM_Mailing_MailStore_Imap
    */
-  public function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX') {
+  public function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX', $useXOAUTH2 = FALSE) {
     // default to INBOX if an empty string
     if (!$folder) {
       $folder = 'INBOX';
@@ -54,7 +56,12 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
       'uidReferencing' => TRUE,
     ];
     $this->_transport = new ezcMailImapTransport($host, NULL, $options);
-    $this->_transport->authenticate($username, $password);
+    if (useXOAUTH2) {
+      $this->_transport->authenticate($username, $password, ezcMailImapTransport::AUTH_XOAUTH2);
+    }
+    else {
+      $this->_transport->authenticate($username, $password);
+    }
     $this->_transport->selectMailbox($folder);
 
     $this->_ignored = implode($this->_transport->getHierarchyDelimiter(), [$folder, 'CiviMail', 'ignored']);

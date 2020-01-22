@@ -73,6 +73,20 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
   public function upgrade_5_23_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Remove Google + location option', 'removeGooglePlusOption');
+    $this->addTask('dev/mailing#59 Add in IMAP_XOAUTH2 protocol option for mailbox access', 'addXoauth2ProtocolOption');
+  }
+
+  /**
+   * Add in the IMAP XOAUTH2 mailing protocol option
+   */
+  public static function addXoauth2ProtocolOption(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'mail_protocol',
+      'name' => 'IMAP_XOAUTH2',
+      'label' => 'IMAP XOAUTH2',
+      'is_active' => TRUE,
+    ]);
+    return TRUE;
   }
 
   /**

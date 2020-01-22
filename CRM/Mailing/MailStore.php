@@ -39,7 +39,7 @@ class CRM_Mailing_MailStore {
       throw new Exception("Could not find entry named $name in civicrm_mail_settings");
     }
 
-    $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol');
+    $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol', [], 'validate');
     if (empty($protocols[$dao->protocol])) {
       throw new Exception("Empty mail protocol");
     }
@@ -47,6 +47,9 @@ class CRM_Mailing_MailStore {
     switch ($protocols[$dao->protocol]) {
       case 'IMAP':
         return new CRM_Mailing_MailStore_Imap($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl, $dao->source);
+
+      case 'IMAP_XOAUTH2':
+        return new CRM_Mailing_MailStore_Imap($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl, $dao->source, TRUE);
 
       case 'POP3':
         return new CRM_Mailing_MailStore_Pop3($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl);
