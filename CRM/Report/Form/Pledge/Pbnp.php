@@ -22,7 +22,6 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   ];
   public $_drilldownReport = ['pledge/summary' => 'Link to Detail Report'];
 
-  protected $_totalPaid = FALSE;
   protected $_customGroupExtends = [
     'Pledge',
   ];
@@ -128,6 +127,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           'total_paid' => [
             'title' => ts('Total Amount Paid'),
             'type' => CRM_Utils_Type::T_MONEY,
+            'dbAlias' => 'sum(pledge_payment_civireport.actual_amount)',
           ],
           'balance_due' => [
             'title' => ts('Balance Due'),
@@ -190,30 +190,16 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if ($fieldName == 'total_paid') {
-              $this->_totalPaid = TRUE;
-              $this->_columnHeaders["{$tableName}_{$fieldName}"] = [
-                'title' => $field['title'],
-                'type' => $field['type'],
-              ];
-              $select[] = "COALESCE(sum({$this->_aliases[$tableName]}.actual_amount), 0) as {$tableName}_{$fieldName}";
-            }
-            elseif ($fieldName == 'balance_due') {
-              $this->_totalPaid = TRUE;
+            if ($fieldName == 'balance_due') {
               $cancelledStatus = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled');
               $completedStatus = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Completed');
-              $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field['title'];
-              $this->_columnHeaders["{$tableName}_{$fieldName}"] = [
-                'title' => $field['title'],
-                'type' => $field['type'],
-              ];
               $select[] = "IF({$this->_aliases['civicrm_pledge']}.status_id IN({$cancelledStatus}, $completedStatus), 0, COALESCE({$this->_aliases['civicrm_pledge']}.amount, 0) - COALESCE(sum({$this->_aliases[$tableName]}.actual_amount),0)) as {$tableName}_{$fieldName}";
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-            }
+	    }
+	    $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+	    $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
           }
         }
       }
