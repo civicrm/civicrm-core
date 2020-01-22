@@ -89,8 +89,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       ];
       if (CRM_Core_Permission::check('view debug output')) {
         $response['error_message'] = $e->getMessage();
-        if (\Civi::settings()->get('backtrace')) {
-          $response['backtrace'] = $e->getTrace();
+        if (!empty($params['debug']) && \Civi::settings()->get('backtrace')) {
+          $response['debug']['backtrace'] = $e->getTrace();
         }
       }
     }

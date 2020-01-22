@@ -24,6 +24,10 @@ class Result extends \ArrayObject {
    */
   public $action;
   /**
+   * @var array
+   */
+  public $debug;
+  /**
    * Api version
    * @var int
    */

@@ -55,6 +55,13 @@ class Api4SelectQuery extends SelectQuery {
   protected $joinedTables = [];
 
   /**
+   * If set to an array, this will start collecting debug info.
+   *
+   * @var null|array
+   */
+  public $debugOutput = NULL;
+
+  /**
    * @param string $entity
    * @param bool $checkPermissions
    * @param array $fields
@@ -105,6 +112,9 @@ class Api4SelectQuery extends SelectQuery {
 
     $results = [];
     $sql = $this->query->toSQL();
+    if (is_array($this->debugOutput)) {
+      $this->debugOutput['main_sql'] = $sql;
+    }
     $query = \CRM_Core_DAO::executeQuery($sql);
 
     while ($query->fetch()) {

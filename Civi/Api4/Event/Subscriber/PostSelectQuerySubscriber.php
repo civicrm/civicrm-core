@@ -240,9 +240,13 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
     }, $selects, array_keys($selects));
 
     $newSelect = sprintf('SELECT DISTINCT %s', implode(", ", $aliasedSelects));
-    $sql = str_replace("\n", ' ', $query->getQuery()->toSQL());
-    $originalSelect = substr($sql, 0, strpos($sql, ' FROM'));
-    $sql = str_replace($originalSelect, $newSelect, $sql);
+    $sql = $query->getQuery()->toSQL();
+    // Replace the "SELECT" clause
+    $sql = $newSelect . substr($sql, strpos($sql, "\nFROM"));
+
+    if (is_array($query->debugOutput)) {
+      $query->debugOutput['join_sql'][] = $sql;
+    }
 
     $relatedResults = [];
     $resultDAO = \CRM_Core_DAO::executeQuery($sql);
