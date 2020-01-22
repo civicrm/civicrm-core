@@ -44,6 +44,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   protected function getRecords() {
     $entities = [];
+    $toGet = $this->_itemsToGet('name');
     $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
@@ -53,17 +54,22 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         foreach (glob("$dir/*.php") as $file) {
           $matches = [];
           preg_match('/(\w*).php/', $file, $matches);
-          $entity = ['name' => $matches[1]];
-          if ($this->_isFieldSelected('description') || $this->_isFieldSelected('comment')) {
-            $this->addDocs($entity);
+          if (
+            (!$toGet || in_array($matches[1], $toGet))
+            && is_a('\Civi\Api4\\' . $matches[1], '\Civi\Api4\Generic\AbstractEntity', TRUE)
+          ) {
+            $entity = ['name' => $matches[1]];
+            if ($this->_isFieldSelected('description') || $this->_isFieldSelected('comment')) {
+              $this->addDocs($entity);
+            }
+            $entities[$matches[1]] = $entity;
           }
-          $entities[$matches[1]] = $entity;
         }
       }
     }
-    unset($entities['CustomValue']);
 
-    if ($this->includeCustom) {
+    // Fetch custom entities unless we've already fetched everything requested
+    if ($this->includeCustom && (!$toGet || array_diff($toGet, array_keys($entities)))) {
       $this->addCustomEntities($entities);
     }
 
