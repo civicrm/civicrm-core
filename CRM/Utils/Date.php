@@ -1579,6 +1579,16 @@ class CRM_Utils_Date {
             $from = self::intervalAdd('second', 1, $from);
             break;
 
+          case 'ending_6':
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from = self::intervalAdd('month', -6, $to);
+            $from = self::intervalAdd('second', 1, $from);
+            break;
+
           case 'ending':
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
