@@ -90,7 +90,7 @@
         <tr id="maxRelated" class="crm-membership-form-block-max_related">
           <td class="label">{$form.max_related.label}</td>
           <td>{$form.max_related.html}<br />
-            <span class="description">{ts}Maximum number of related memberships (leave blank for unlimited).{/ts}</span>
+            <span class="description">{ts}Maximum number of related memberships (leave blank for unlimited).{/ts} <span id="eligibleRelated"></span></span>
           </td>
         </tr>
         {if $action eq 1}
@@ -664,7 +664,7 @@
                 relatable = '{/literal}{ts escape='js' 1='%1'}%1 contacts are currently eligible to inherit this relationship.{/ts}{literal}';
                 relatable = ts(relatable, {1: result});
               }
-              cj('#max_related').siblings('.description').append(' ' + relatable);
+              cj('#eligibleRelated').text(relatable);
             }
           });
         }
