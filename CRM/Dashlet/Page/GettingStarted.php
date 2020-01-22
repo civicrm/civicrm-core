@@ -72,13 +72,15 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    * @return array
    */
   private function _gettingStarted() {
-    $value = Civi::cache('community_messages')->get('dashboard_gettingStarted');
+    $tsLocale = CRM_Core_I18n::getLocale();
+    $key = 'dashboard_gettingStarted_' . $tsLocale;
+    $value = Civi::cache('community_messages')->get($key);
 
     if (!$value) {
       $value = $this->_getHtml($this->gettingStartedUrl());
 
       if ($value) {
-        Civi::cache('community_messages')->set('dashboard_gettingStarted', $value, (60 * 60 * 24 * self::CACHE_DAYS));
+        Civi::cache('community_messages')->set($key, $value, (60 * 60 * 24 * self::CACHE_DAYS));
       }
     }
 
