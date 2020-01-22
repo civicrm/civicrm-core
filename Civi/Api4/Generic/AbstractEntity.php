@@ -52,13 +52,9 @@ abstract class AbstractEntity {
   }
 
   /**
-   * Should return \Civi\Api4\Generic\BasicGetFieldsAction
-   * @todo make this function abstract when we require php 7.
-   * @throws \Civi\API\Exception\NotImplementedException
+   * @return \Civi\Api4\Generic\BasicGetFieldsAction
    */
-  public static function getFields() {
-    throw new NotImplementedException(self::getEntityName() . ' should implement getFields action.');
-  }
+  abstract public static function getFields();
 
   /**
    * Returns a list of permissions needed to access the various actions in this api.
