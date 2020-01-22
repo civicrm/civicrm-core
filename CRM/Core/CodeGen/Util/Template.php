@@ -106,6 +106,23 @@ class CRM_Core_CodeGen_Util_Template {
   }
 
   /**
+   * Fetch multiple templates - and concatenate them.
+   *
+   * @see runConcat
+   * @param array $inputs
+   *   Template filenames.
+   * @return string
+   */
+  public function fetchConcat($inputs) {
+    $buf = '';
+    foreach ($inputs as $infile) {
+      $buf .= $this->smarty->fetch($infile);
+      $buf .= "\n";
+    }
+    return $buf;
+  }
+
+  /**
    * @param $key
    * @param $value
    */
