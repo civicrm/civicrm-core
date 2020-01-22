@@ -42,7 +42,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $_activityTypeId;
 
   /**
-   * The name of activity type.
+   * The label of the activity type.
+   * Unfortunately this variable is called Name but don't want to change it
+   * since it's public and might be commonly used in customized code. See also
+   * activityTypeNameAndLabel used in the smarty template.
    *
    * @var string
    */

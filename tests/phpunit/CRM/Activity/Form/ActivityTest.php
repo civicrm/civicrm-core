@@ -252,4 +252,90 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $this->callAPISuccess('option_value', 'delete', ['id' => $result['id']]);
   }
 
+  /**
+   * Test that inbound email is still treated properly if you change the label.
+   * I'm not crazy about the strategy used in this test but I can't see another
+   * way to do it.
+   */
+  public function testInboundEmailDisplaysWithLinebreaks() {
+    // Change label
+    $inbound_email = $this->callAPISuccess('OptionValue', 'getsingle', [
+      'option_group_id' => 'activity_type',
+      'name' => 'Inbound Email',
+    ]);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $inbound_email['id'],
+      'label' => 'Probably Spam',
+    ]);
+
+    // Fake an inbound email and store it
+
+    $messageBody = <<<ENDBODY
+-ALTERNATIVE ITEM 0-
+Hi,
+
+Wassup!?!?
+
+Let's check if the output when viewing the form has legible line breaks in the output.
+
+Thanks!
+
+-ALTERNATIVE ITEM 1-
+
+<div dir="ltr">Hi,<br></div>
+<div dir="ltr"><br></div>
+<div dir="ltr">Wassup!?!?<br></div>
+<div dir="ltr"><br></div>
+<div dir="ltr">Let&#39;s check if the output when viewing the form has legible line breaks in the output.<br></div>
+<div dir="ltr"><br></div>
+<div dir="ltr">Thanks!<br></div>
+-ALTERNATIVE END-
+ENDBODY;
+
+    $activity = $this->activityCreate([
+      'subject' => 'Important message read immediately!',
+      'duration' => NULL,
+      'location' => NULL,
+      'details' => $messageBody,
+      'status_id' => 'Completed',
+      'activity_type_id' => 'Inbound Email',
+      'source_contact_id' => $this->source,
+      'assignee_contact_id' => NULL,
+    ]);
+    $activity_id = $activity['id'];
+
+    // Simulate viewing it from the form.
+
+    $form = new CRM_Activity_Form_Activity();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Activity_Form_Activity', 'Activity');
+    $form->set('context', 'standalone');
+    $form->set('cid', $this->source);
+    $form->set('action', 'view');
+    $form->set('id', $activity_id);
+    $form->set('atype', $activity['values'][$activity_id]['activity_type_id']);
+
+    $form->buildForm();
+
+    // Wish there was another way to do this
+    $form->controller->handle($form, 'display');
+
+    // This isn't a faithful representation of the output since there'll
+    // probably be a lot missing, but for now I don't see a simpler way to
+    // do this.
+    // Also this is printing the template code to the console. It doesn't hurt
+    // the test but it's clutter and I don't know where it's coming from
+    // and can't seem to prevent it.
+    $output = $form->getTemplate()->fetch($form->getTemplateFileName());
+
+    // This kind of suffers from the same problem as the old webtests. It's
+    // a bit brittle and tied to the UI.
+    $this->assertContains("Hi,<br />\n<br />\nWassup!?!?<br />\n<br />\nLet's check if the output when viewing the form has legible line breaks in the output.<br />\n<br />\nThanks!", $output);
+
+    // Put label back
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $inbound_email['id'],
+      'label' => $inbound_email['label'],
+    ]);
+  }
+
 }
