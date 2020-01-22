@@ -363,7 +363,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // when fee amount is included in form
     if (!empty($_POST['hidden_feeblock']) || !empty($_POST['send_receipt'])) {
       CRM_Event_Form_EventFees::preProcess($this);
-      self::buildEventFeeForm($this);
+      $this->buildEventFeeForm($this);
       CRM_Event_Form_EventFees::setDefaultValues($this);
     }
 
@@ -585,7 +585,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
     if ($this->_showFeeBlock) {
-      return self::buildEventFeeForm($this);
+      return $this->buildEventFeeForm($this);
     }
 
     //need to assign custom data type to the template
@@ -1653,24 +1653,21 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Build the form object.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Event_Form_Participant $form
    *
    * @return bool
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public static function buildEventFeeForm(&$form) {
+  public function buildEventFeeForm($form) {
     if ($form->_eventId) {
       $form->_isPaidEvent = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'is_monetary');
       if ($form->_isPaidEvent) {
         $form->addElement('hidden', 'hidden_feeblock', 1);
       }
 
-      // make sure this is for backoffice registration.
-      if ($form->getName() == 'Participant') {
-        $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $form->_pId);
-        $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
-      }
+      $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $form->_pId);
+      $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
     }
 
     if ($form->_pId) {
