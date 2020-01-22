@@ -74,6 +74,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Remove Google + location option', 'removeGooglePlusOption');
     $this->addTask('dev/mailing#59 Add in IMAP_XOAUTH2 protocol option for mailbox access', 'addXoauth2ProtocolOption');
+    $this->addTask('dev/translation#34 Fix contact-reference option for Postal Code', 'fixContactRefOptionPostalCode');
   }
 
   /**
@@ -106,6 +107,42 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
           ->execute();
       }
     }
+    return TRUE;
+  }
+
+  /**
+   * Fix the Contact Reference 'Postal Code' option.
+   */
+  public static function fixContactRefOptionPostalCode(CRM_Queue_TaskContext $ctx) {
+    $optionGroup = \Civi\Api4\OptionGroup::get()
+      ->setSelect(['id'])
+      ->addWhere('name', '=', 'contact_reference_options')
+      ->setCheckPermissions(FALSE)
+      ->execute()
+      ->first();
+
+    if (!$optionGroup) {
+      return TRUE;
+    }
+
+    $optionValue = \Civi\Api4\OptionValue::get()
+      ->setSelect(['id', 'name'])
+      ->addWhere('option_group_id', '=', $optionGroup['id'])
+      ->addWhere('label', '=', ts('Postal Code'))
+      ->setCheckPermissions(FALSE)
+      ->execute()
+      ->first();
+
+    if (!$optionValue || $optionValue['name'] == 'postal_code') {
+      return TRUE;
+    }
+
+    \Civi\Api4\OptionValue::update()
+      ->addWhere('id', '=', $optionValue['id'])
+      ->addValue('name', 'postal_code')
+      ->setCheckPermissions(FALSE)
+      ->execute();
+
     return TRUE;
   }
 
