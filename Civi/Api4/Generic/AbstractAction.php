@@ -26,8 +26,10 @@ use Civi\Api4\Utils\ActionUtil;
 /**
  * Base class for all api actions.
  *
- * @method $this setCheckPermissions(bool $value)
+ * @method $this setCheckPermissions(bool $value) Enable/disable permission checks
  * @method bool getCheckPermissions()
+ * @method $this setDebug(bool $value) Enable/disable debug output
+ * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()
  */
@@ -71,6 +73,13 @@ abstract class AbstractAction implements \ArrayAccess {
   protected $checkPermissions = TRUE;
 
   /**
+   * Add debugging info to the api result.
+   *
+   * @var bool
+   */
+  protected $debug = FALSE;
+
+  /**
    * @var string
    */
   protected $_entityName;
@@ -106,6 +115,8 @@ abstract class AbstractAction implements \ArrayAccess {
    * @see \Civi\Core\Transaction\Manager
    */
   private $_id;
+
+  protected $_debugOutput = [];
 
   /**
    * Action constructor.
@@ -216,7 +227,14 @@ abstract class AbstractAction implements \ArrayAccess {
     /** @var \Civi\API\Kernel $kernel */
     $kernel = \Civi::service('civi_api_kernel');
 
-    return $kernel->runRequest($this);
+    $result = $kernel->runRequest($this);
+    if ($this->debug && (!$this->checkPermissions || \CRM_Core_Permission::check('view debug output'))) {
+      $result->debug = array_merge($result->debug, $this->_debugOutput);
+    }
+    else {
+      $result->debug = NULL;
+    }
+    return $result;
   }
 
   /**

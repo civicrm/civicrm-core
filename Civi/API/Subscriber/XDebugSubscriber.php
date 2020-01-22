@@ -36,14 +36,26 @@ class XDebugSubscriber implements EventSubscriberInterface {
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();
-    if (function_exists('xdebug_time_index')
-      && \CRM_Utils_Array::value('debug', $apiRequest['params'])
-      // result would not be an array for getvalue
-      && is_array($result)
+    if (
+      function_exists('xdebug_time_index')
+      && !empty($apiRequest['params']['debug'])
+      && (empty($apiRequest['params']['check_permissions']) || \CRM_Core_Permission::check('view debug output'))
     ) {
-      $result['xdebug']['peakMemory'] = xdebug_peak_memory_usage();
-      $result['xdebug']['memory'] = xdebug_memory_usage();
-      $result['xdebug']['timeIndex'] = xdebug_time_index();
+      if (is_a($result, '\Civi\Api4\Generic\Result')) {
+        $result->debug = $result->debug ?? [];
+        $debug =& $result->debug;
+      }
+      // result would not be an array for api3 getvalue
+      elseif (is_array($result)) {
+        $result['xdebug'] = $result['xdebug'] ?? [];
+        $debug =& $result['xdebug'];
+      }
+      else {
+        return;
+      }
+      $debug['peakMemory'] = xdebug_peak_memory_usage();
+      $debug['memory'] = xdebug_memory_usage();
+      $debug['timeIndex'] = xdebug_time_index();
       $event->setResponse($result);
     }
   }

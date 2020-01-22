@@ -30,6 +30,10 @@
     $scope.availableParams = {};
     $scope.params = {};
     $scope.index = '';
+    $scope.resultTab = {selected: 'result'};
+    $scope.perm = {
+      accessDebugOutput: CRM.checkPerm('access debug output')
+    };
     var getMetaParams = {},
       objectParams = {orderBy: 'ASC', values: '', chain: ['Entity', '', '{}']},
       docs = CRM.vars.api4.docs,
@@ -39,6 +43,7 @@
     $scope.helpContent = {};
     $scope.entity = $routeParams.api4entity;
     $scope.result = [];
+    $scope.debug = null;
     $scope.status = 'default';
     $scope.loading = false;
     $scope.controls = {};
@@ -495,13 +500,21 @@
       }).then(function(resp) {
           $scope.loading = false;
           $scope.status = 'success';
+          $scope.debug = debugFormat(resp.data);
           $scope.result = [formatMeta(resp.data), prettyPrintOne(_.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)];
         }, function(resp) {
           $scope.loading = false;
           $scope.status = 'danger';
+          $scope.debug = debugFormat(resp.data);
           $scope.result = [formatMeta(resp), prettyPrintOne(_.escape(JSON.stringify(resp.data, null, 2)))];
         });
     };
+
+    function debugFormat(data) {
+      var debug = data.debug ? prettyPrintOne(_.escape(JSON.stringify(data.debug, null, 2)).replace(/\\n/g, "\n")) : null;
+      delete data.debug;
+      return debug;
+    }
 
     /**
      * Format value to look like php code
