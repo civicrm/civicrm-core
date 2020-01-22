@@ -390,7 +390,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
       if (!empty($params['is_active'])) {
         //make entry in uf join table
-        CRM_Core_BAO_UFGroup::createUFJoin($params, $ufGroup->id);
+        CRM_Core_BAO_UFGroup::createUFJoin($params['weight'], $params['uf_group_type'] ?? [], $ufGroup->id);
       }
       elseif ($this->_id) {
         // this profile has been set to inactive, delete all corresponding UF Join's
