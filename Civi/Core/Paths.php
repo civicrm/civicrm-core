@@ -249,7 +249,7 @@ class Paths {
       return $value;
     }
 
-    $value = $this->getVariable($defaultContainer, 'url') . $value;
+    $value = rtrim($this->getVariable($defaultContainer, 'url'), '/') . '/' . $value;
 
     if ($preferFormat === 'relative') {
       $parsed = parse_url($value);
