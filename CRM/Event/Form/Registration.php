@@ -692,7 +692,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     // add participant record
-    $participant = CRM_Event_Form_Registration::addParticipant($this, $contactID);
+    $participant = $this->addParticipant($this, $contactID);
     $this->_participantIDS[] = $participant->id;
 
     //setting register_by_id field and primaryContactId
@@ -778,10 +778,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return \CRM_Event_BAO_Participant
    * @throws \CiviCRM_API3_Exception
    */
-  public static function addParticipant(&$form, $contactID) {
+  protected function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
       return NULL;
     }
+    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
     $params = $form->_params;
     $transaction = new CRM_Core_Transaction();
 
