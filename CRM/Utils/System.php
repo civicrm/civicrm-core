@@ -1786,13 +1786,14 @@ class CRM_Utils_System {
     }
     else {
       $config = CRM_Core_Config::singleton();
+      $tsLocale = CRM_Core_I18n::getLocale();
       $vars = [
         '{ver}' => CRM_Utils_System::version(),
         '{uf}' => $config->userFramework,
         '{php}' => phpversion(),
         '{sid}' => self::getSiteID(),
         '{baseUrl}' => $config->userFrameworkBaseURL,
-        '{lang}' => $config->lcMessages,
+        '{lang}' => $tsLocale,
         '{co}' => $config->defaultContactCountry,
       ];
       return strtr($url, array_map('urlencode', $vars));
