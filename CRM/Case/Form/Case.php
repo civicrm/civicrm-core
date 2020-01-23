@@ -94,20 +94,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Get the entity subtype ID being edited
-   *
-   * @param $subTypeId
-   *
-   * @return int|null
-   */
-  public function getEntitySubTypeId($subTypeId) {
-    if ($subTypeId) {
-      return $subTypeId;
-    }
-    return $this->_caseTypeId;
-  }
-
-  /**
    * Build the form object.
    */
   public function preProcess() {

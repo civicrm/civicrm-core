@@ -21,7 +21,7 @@ trait CRM_Core_Form_EntityFormTrait {
    *
    * @var int
    */
-  protected $_entitySubTypeId;
+  protected $_entitySubTypeId = NULL;
 
   /**
    * Get entity fields for the entity to be added to the form.
@@ -83,15 +83,19 @@ trait CRM_Core_Form_EntityFormTrait {
   /**
    * Get the entity subtype ID being edited
    *
-   * @param $subTypeId
-   *
    * @return int|null
    */
-  public function getEntitySubTypeId($subTypeId) {
-    if ($subTypeId) {
-      return $subTypeId;
-    }
+  public function getEntitySubTypeId() {
     return $this->_entitySubTypeId;
+  }
+
+  /**
+   * Set the entity subtype ID being edited
+   *
+   * @param $subTypeId
+   */
+  public function setEntitySubTypeId($subTypeId) {
+    $this->_entitySubTypeId = $subTypeId;
   }
 
   /**
@@ -103,7 +107,7 @@ trait CRM_Core_Form_EntityFormTrait {
     }
     $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
     if (isset($customisableEntities[$this->getDefaultEntity()])) {
-      CRM_Custom_Form_CustomData::addToForm($this);
+      CRM_Custom_Form_CustomData::addToForm($this, $this->getEntitySubTypeId());
     }
   }
 
