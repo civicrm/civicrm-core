@@ -326,6 +326,38 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Event templates should not send reminders to additional contacts.
+   */
+  public function testTemplateRemindAddlContacts() {
+    $contactId = $this->individualCreate();
+    $groupId = $this->groupCreate(['name' => 'Additional Contacts', 'title' => 'Additional Contacts']);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contactId,
+      'group_id' => $groupId,
+    ]);
+    $event = $this->eventCreate(['is_template' => 1, 'template_title' => "I'm a template", 'title' => NULL]);
+    $eventId = $event['id'];
+
+    $actionSchedule = $this->callAPISuccess('action_schedule', 'create', [
+      'title' => "Do not send me",
+      'subject' => "I am a reminder attached to a template.",
+      'entity_value' => $eventId,
+      'mapping_id' => 5,
+      'start_action_date' => 'start_date',
+      'start_action_offset' => 1,
+      'start_action_condition' => 'before',
+      'start_action_unit' => 'day',
+      'group_id' => $groupId,
+      'limit_to' => FALSE,
+      'mode' => 'Email',
+    ]);
+
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals(0, $successfulCronCount);
+  }
+
+  /**
    * Test scheduled reminders respect limit to (since above identified addition_to handling issue).
    *
    * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
