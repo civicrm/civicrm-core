@@ -12,6 +12,13 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
   /**
    * Smoke test to check that "civicrm_data*.mysql" files contain
    * translated strings.
+   *
+   * Note: As currently written, this test relies on the output of setup.sh/GenCode.
+   * Consequently, if you're running locally while iterating on the code, you may find
+   * the following command helps with your dev-test loop:
+   *
+   * $ env CIVICRM_LOCALES=en_US,fr_FR,de_DE ./bin/setup.sh -g \
+   *   && phpunit6 tests/phpunit/E2E/Core/LocalizedDataTest.php
    */
   public function testLocalizedData() {
     $getSql = function($locale) {
