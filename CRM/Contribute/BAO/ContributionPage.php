@@ -828,10 +828,13 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
       case 'financial_type_id':
-        // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
-        return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-
-      break;
+        // @fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
+        // @fixme - https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
+        //   because $relationTypeId is not set in CRM_Financial_BAO_FinancialType::getIncomeFinancialType()
+        if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
+          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+        }
+        return [];
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
