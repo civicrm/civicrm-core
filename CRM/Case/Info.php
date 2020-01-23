@@ -36,7 +36,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'translatedName' => ts('CiviCase'),
       'title' => ts('CiviCase Engine'),
       'search' => 1,
-      'showActivitiesInCore' => 0,
+      'showActivitiesInCore' => Civi::settings()->get('civicaseShowCaseActivities') ?? 0,
     ];
   }
 

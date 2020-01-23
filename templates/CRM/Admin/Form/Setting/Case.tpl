@@ -37,6 +37,12 @@
         <span class="description">{ts}Enable embedded tracking to activity revisions within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".{/ts}</span>
       </td>
     </tr>
+    <tr class="crm-case-form-block-civicaseShowCaseActivities">
+      <td class="label">{$form.civicaseShowCaseActivities.label}</td>
+      <td>{$form.civicaseShowCaseActivities.html}<br />
+        <span class="description">{$civicaseShowCaseActivities_description}</span>
+      </td>
+    </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
