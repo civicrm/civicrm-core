@@ -774,10 +774,6 @@ function ts($text, $params = []) {
         $function = $config->customTranslateFunction;
       }
     }
-    else {
-      // don't _translate_ anything until bootstrap has progressed enough
-      $params['skip_translation'] = 1;
-    }
   }
 
   $activeLocale = CRM_Core_I18n::getLocale();
