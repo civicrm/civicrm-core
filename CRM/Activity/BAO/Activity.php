@@ -804,7 +804,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
           // fetch case subject for case ID found
           if (!empty($activity['case_id'])) {
-            $activities[$id]['case_subject'] = CRM_Core_DAO::executeQuery('CRM_Case_DAO_Case', $activity['case_id'], 'subject');
+            $activities[$id]['case_subject'] = civicrm_api3('Case', 'getvalue', [
+              'return' => 'subject',
+              'id' => reset($activity['case_id']),
+            ]);
           }
         }
         else {
