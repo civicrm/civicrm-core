@@ -954,7 +954,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Get memberships realted to the contribution.
+   * Get memberships related to the contribution.
    *
    * @param int $contributionID
    *

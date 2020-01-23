@@ -834,7 +834,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $id
    *   Relationship id.
    *
-   * $returns  returns the contact ids in the realtionship
+   * $returns  returns the contact ids in the relationship
    *
    * @return \CRM_Contact_DAO_Relationship
    */
