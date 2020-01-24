@@ -86,7 +86,7 @@ class CRM_Api4_Services {
         $container->addResource($resource);
         foreach (glob("$path*.php") as $file) {
           $matches = [];
-          preg_match('/(\w*).php/', $file, $matches);
+          preg_match('/(\w*)\.php$/', $file, $matches);
           $serviceName = $namespace . array_pop($matches);
           $serviceClass = new \ReflectionClass($serviceName);
           if ($serviceClass->isInstantiable()) {
