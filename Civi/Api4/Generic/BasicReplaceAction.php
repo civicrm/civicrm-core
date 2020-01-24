@@ -28,10 +28,8 @@ use Civi\Api4\Utils\ActionUtil;
  * Given a set of records, will appropriately update the database.
  *
  * @method $this setRecords(array $records) Array of records.
- * @method $this addRecord($record) Add a record to update.
  * @method array getRecords()
  * @method $this setDefaults(array $defaults) Array of defaults.
- * @method $this addDefault($name, $value) Add a default value.
  * @method array getDefaults()
  * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
  * @method bool getReload()
@@ -128,6 +126,27 @@ class BasicReplaceAction extends AbstractBatchAction {
         'checkPermissions' => $this->getCheckPermissions(),
       ]);
     }
+  }
+
+  /**
+   * Set default value for a field.
+   * @param string $fieldName
+   * @param mixed $defaultValue
+   * @return $this
+   */
+  public function addDefault(string $fieldName, $defaultValue) {
+    $this->defaults[$fieldName] = $defaultValue;
+    return $this;
+  }
+
+  /**
+   * Add one or more records
+   * @param array ...$records
+   * @return $this
+   */
+  public function addRecord(array ...$records) {
+    $this->records = array_merge($this->records, $records);
+    return $this;
   }
 
 }

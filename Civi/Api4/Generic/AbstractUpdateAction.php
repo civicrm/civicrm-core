@@ -25,7 +25,6 @@ namespace Civi\Api4\Generic;
  * Base class for all "Update" api actions
  *
  * @method $this setValues(array $values) Set all field values from an array of key => value pairs.
- * @method $this addValue($field, $value) Set field value.
  * @method array getValues() Get field values.
  * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
  * @method bool getReload()
@@ -53,12 +52,23 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   protected $reload = FALSE;
 
   /**
-   * @param string $key
+   * @param string $fieldName
    *
    * @return mixed|null
    */
-  public function getValue($key) {
-    return isset($this->values[$key]) ? $this->values[$key] : NULL;
+  public function getValue(string $fieldName) {
+    return isset($this->values[$fieldName]) ? $this->values[$fieldName] : NULL;
+  }
+
+  /**
+   * Add an item to the values array
+   * @param string $fieldName
+   * @param mixed $value
+   * @return $this
+   */
+  public function addValue(string $fieldName, $value) {
+    $this->values[$fieldName] = $value;
+    return $this;
   }
 
 }

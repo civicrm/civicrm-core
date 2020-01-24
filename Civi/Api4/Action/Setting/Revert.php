@@ -26,8 +26,7 @@ use Civi\Api4\Generic\Result;
  * Revert one or more CiviCRM settings to their default value.
  *
  * @method array getSelect
- * @method $this addSelect(string $name)
- * @method $this setSelect(array $select)
+ * @method $this setSelect(array $settingNames) Set settings to be reverted
  */
 class Revert extends AbstractSettingAction {
 
@@ -60,6 +59,16 @@ class Revert extends AbstractSettingAction {
         $setting['value'] = \CRM_Core_DAO::unSerializeField($setting['value'], $meta[$name]['serialize']);
       }
     }
+  }
+
+  /**
+   * Add one or more settings to be reverted
+   * @param string ...$settingNames
+   * @return $this
+   */
+  public function addSelect(string ...$settingNames) {
+    $this->select = array_merge($this->select, $settingNames);
+    return $this;
   }
 
 }

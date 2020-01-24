@@ -27,7 +27,6 @@ use Civi\Api4\Generic\Result;
  *
  * @method array getValues
  * @method $this setValues(array $value)
- * @method $this addValue(string $name, mixed $value)
  */
 class Set extends AbstractSettingAction {
 
@@ -58,6 +57,17 @@ class Set extends AbstractSettingAction {
         'domain_id' => $domain,
       ];
     }
+  }
+
+  /**
+   * Add an item to the values array
+   * @param string $settingName
+   * @param mixed $value
+   * @return $this
+   */
+  public function addValue($settingName, $value) {
+    $this->values[$settingName] = $value;
+    return $this;
   }
 
 }

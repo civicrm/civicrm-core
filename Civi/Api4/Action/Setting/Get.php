@@ -26,8 +26,7 @@ use Civi\Api4\Generic\Result;
  * Get the value of one or more CiviCRM settings.
  *
  * @method array getSelect
- * @method $this addSelect(string $name)
- * @method $this setSelect(array $select)
+ * @method $this setSelect(array $settingNames)
  */
 class Get extends AbstractSettingAction {
 
@@ -69,6 +68,16 @@ class Get extends AbstractSettingAction {
         $setting['value'] = \CRM_Core_DAO::unSerializeField($setting['value'], $meta[$name]['serialize']);
       }
     }
+  }
+
+  /**
+   * Add one or more settings to be selected
+   * @param string ...$settingNames
+   * @return $this
+   */
+  public function addSelect(string ...$settingNames) {
+    $this->select = array_merge($this->select, $settingNames);
+    return $this;
   }
 
 }

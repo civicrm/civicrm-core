@@ -132,12 +132,12 @@ class Kernel {
   }
 
   /**
-   * Execute an API request.
+   * Execute an API v3 or v4 request.
    *
    * The request must be in canonical format. Exceptions will be propagated out.
    *
-   * @param array $apiRequest
-   * @return array
+   * @param array|\Civi\Api4\Generic\AbstractAction $apiRequest
+   * @return array|\Civi\Api4\Generic\Result
    * @throws \API_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws \Civi\API\Exception\UnauthorizedException

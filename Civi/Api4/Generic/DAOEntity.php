@@ -34,7 +34,7 @@ abstract class DAOEntity extends AbstractEntity {
   }
 
   /**
-   * @return DAOGetAction
+   * @return DAOSaveAction
    */
   public static function save() {
     return new DAOSaveAction(static::class, __FUNCTION__);

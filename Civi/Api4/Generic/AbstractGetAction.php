@@ -28,8 +28,7 @@ use Civi\Api4\Utils\SelectUtil;
  *
  * @package Civi\Api4\Generic
  *
- * @method $this addSelect(string $select)
- * @method $this setSelect(array $selects)
+ * @method $this setSelect(array $selects) Set array of fields to be selected (wildcard * allowed)
  * @method array getSelect()
  */
 abstract class AbstractGetAction extends AbstractQueryAction {
@@ -152,6 +151,16 @@ abstract class AbstractGetAction extends AbstractQueryAction {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Add one or more fields to be selected (wildcard * allowed)
+   * @param string ...$fieldNames
+   * @return $this
+   */
+  public function addSelect(string ...$fieldNames) {
+    $this->select = array_merge($this->select, $fieldNames);
+    return $this;
   }
 
 }

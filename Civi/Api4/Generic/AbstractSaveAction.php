@@ -24,11 +24,9 @@ namespace Civi\Api4\Generic;
 /**
  * Base class for all "Save" api actions.
  *
- * @method $this setRecords(array $records) Array of records.
- * @method $this addRecord($record) Add a record to update.
+ * @method $this setRecords(array $records) Set array of records to be saved.
  * @method array getRecords()
  * @method $this setDefaults(array $defaults) Array of defaults.
- * @method $this addDefault($name, $value) Add a default value.
  * @method array getDefaults()
  * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
  * @method bool getReload()
@@ -104,6 +102,27 @@ abstract class AbstractSaveAction extends AbstractAction {
    */
   protected function getIdField() {
     return $this->idField;
+  }
+
+  /**
+   * Add one or more records to be saved.
+   * @param array ...$records
+   * @return $this
+   */
+  public function addRecord(array ...$records) {
+    $this->records = array_merge($this->records, $records);
+    return $this;
+  }
+
+  /**
+   * Set default value for a field.
+   * @param string $fieldName
+   * @param mixed $defaultValue
+   * @return $this
+   */
+  public function addDefault(string $fieldName, $defaultValue) {
+    $this->defaults[$fieldName] = $defaultValue;
+    return $this;
   }
 
 }
