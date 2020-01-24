@@ -1248,10 +1248,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'ids' => $contactIDs,
       'mergeSameAddress' => TRUE,
     ]);
-    // @todo - the below is commented out because it does not yet work.
-    //$this->assertCount(1, $this->csv);
+
+    $this->assertCount(1, $this->csv);
     $row = $this->csv->fetchOne();
-    //$this->assertEquals('Household', $this->csv->fetchOne()['Contact Type']);
+    $this->assertEquals('Household', $this->csv->fetchOne()['Contact Type']);
   }
 
   /**
