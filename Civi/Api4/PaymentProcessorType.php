@@ -20,6 +20,8 @@ namespace Civi\Api4;
 /**
  * Payment Processor Type entity.
  *
+ * @see \Civi\Api4\PaymentProcessor
+ *
  * @package Civi\Api4
  */
 class PaymentProcessorType extends Generic\DAOEntity {

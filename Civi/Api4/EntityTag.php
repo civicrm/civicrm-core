@@ -18,11 +18,12 @@
  *
  */
 
-
 namespace Civi\Api4;
 
 /**
  * EntityTag - links tags to contacts, activities, etc.
+ *
+ * @see \Civi\Api4\Tag
  *
  * @package Civi\Api4
  */

@@ -18,7 +18,6 @@
  *
  */
 
-
 namespace Civi\Api4;
 
 /**

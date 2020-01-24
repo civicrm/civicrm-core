@@ -24,13 +24,13 @@ function civicrm_api(string $entity = NULL, string $action, array $params, $extr
 }
 
 /**
- * Calls the CiviCRM APIv4 with supplied parameters and returns a Result object.
+ * CiviCRM API version 4.
  *
  * This API (Application Programming Interface) is used to access and manage data in CiviCRM.
  *
  * APIv4 is the latest stable version.
  *
- * @see http://example.com/civicrm/api4/explorer
+ * @see https://docs.civicrm.org/dev/en/latest/api/v4/usage/
  *
  * @param string $entity Name of the CiviCRM entity to access.
  *   All entity names are capitalized CamelCase, e.g. "ContributionPage".

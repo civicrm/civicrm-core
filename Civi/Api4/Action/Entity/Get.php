@@ -59,7 +59,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
             && is_a('\Civi\Api4\\' . $matches[1], '\Civi\Api4\Generic\AbstractEntity', TRUE)
           ) {
             $entity = ['name' => $matches[1]];
-            if ($this->_isFieldSelected('description') || $this->_isFieldSelected('comment')) {
+            if ($this->_isFieldSelected('description') || $this->_isFieldSelected('comment') || $this->_isFieldSelected('see')) {
               $this->addDocs($entity);
             }
             $entities[$matches[1]] = $entity;
@@ -95,6 +95,10 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       $entities[$fieldName] = [
         'name' => $fieldName,
         'description' => $customEntity['title'] . ' custom group - extends ' . $customEntity['extends'],
+        'see' => [
+          'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
+          '\\Civi\\Api4\\CustomGroup',
+        ],
       ];
       if (!empty($customEntity['help_pre'])) {
         $entities[$fieldName]['comment'] = $this->plainTextify($customEntity['help_pre']);

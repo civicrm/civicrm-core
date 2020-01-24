@@ -146,6 +146,18 @@
       }
     };
 
+    // Format the href for a @see help annotation
+    $scope.formatRef = function(see) {
+      var match = see.match(/^\\Civi\\Api4\\([a-zA-Z]+)$/);
+      if (match) {
+        return '#/explorer/' + match[1];
+      }
+      if (see[0] === '\\') {
+        return 'https://github.com/civicrm/civicrm-core/blob/master' + see.replace(/\\/i, '/') + '.php';
+      }
+      return see;
+    };
+
     $scope.fieldHelp = function(fieldName) {
       var field = getField(fieldName, $scope.entity, $scope.action);
       if (!field) {
@@ -565,13 +577,14 @@
       $scope.helpTitle = helpTitle = $scope.entity;
       $scope.helpContent = helpContent = {
         description: entityInfo.description,
-        comment: entityInfo.comment
+        comment: entityInfo.comment,
+        see: entityInfo.see
       };
     }
 
     if (!$scope.entity) {
       $scope.helpTitle = helpTitle = ts('APIv4 Explorer');
-      $scope.helpContent = helpContent = {description: docs.description, comment: docs.comment};
+      $scope.helpContent = helpContent = {description: docs.description, comment: docs.comment, see: docs.see};
     } else if (!actions.length && !getEntity().actions) {
       getMetaParams.actions = [$scope.entity, 'getActions', {chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]}}];
       fetchMeta();
@@ -598,7 +611,7 @@
         $location.url('/explorer/' + $scope.entity + '/' + newVal);
       } else if (newVal) {
         $scope.helpTitle = helpTitle = $scope.entity + '::' + newVal;
-        $scope.helpContent = helpContent = _.pick(_.findWhere(getEntity().actions, {name: newVal}), ['description', 'comment']);
+        $scope.helpContent = helpContent = _.pick(_.findWhere(getEntity().actions, {name: newVal}), ['description', 'comment', 'see']);
       }
     });
 

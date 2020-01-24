@@ -24,6 +24,8 @@ namespace Civi\Api4;
 /**
  * Retrieves information about all Api4 entities.
  *
+ * @see \Civi\Api4\Generic\AbstractEntity
+ *
  * @package Civi\Api4
  */
 class Entity extends Generic\AbstractEntity {

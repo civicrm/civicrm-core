@@ -42,7 +42,7 @@ class SpecGatherer {
   /**
    * Returns a RequestSpec with all the fields available. Uses spec providers
    * to add or modify field specifications.
-   * For an example @see CustomFieldSpecProvider.
+   * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
    *
    * @param string $entity
    * @param string $action

@@ -24,6 +24,8 @@ namespace Civi\Api4;
 /**
  * CustomGroup entity.
  *
+ * @see https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/
+ *
  * @package Civi\Api4
  */
 class CustomGroup extends Generic\DAOEntity {

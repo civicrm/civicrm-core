@@ -23,6 +23,9 @@ namespace Civi\Api4;
 /**
  * GroupOrganization entity.
  *
+ * Relates groups to organizations.
+ *
+ * @see \Civi\Api4\Group
  * @package Civi\Api4
  */
 class GroupOrganization extends Generic\DAOEntity {

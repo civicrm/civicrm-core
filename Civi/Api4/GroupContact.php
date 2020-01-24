@@ -18,7 +18,6 @@
  *
  */
 
-
 namespace Civi\Api4;
 
 /**
@@ -26,6 +25,8 @@ namespace Civi\Api4;
  *
  * A contact can either be "Added" "Removed" or "Pending" in a group.
  * CiviCRM only considers them to be "in" a group if their status is "Added".
+ *
+ * @see \Civi\Api4\Group
  *
  * @package Civi\Api4
  */

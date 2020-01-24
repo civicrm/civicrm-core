@@ -28,6 +28,7 @@ namespace Civi\Api4;
  *
  * Creating a new ActivityContact requires at minimum a contact_id and activity_id.
  *
+ * @see \Civi\Api4\Activity
  * @package Civi\Api4
  */
 class ActivityContact extends Generic\DAOEntity {

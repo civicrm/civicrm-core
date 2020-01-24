@@ -30,10 +30,10 @@
         </div>
         <div class="panel-body">
           <div class="api4-input form-inline">
-            <div class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && param.type[0] === 'bool' && param.default !== null">
+            <label class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && param.type[0] === 'bool' && param.default !== null">
               <input type="checkbox" id="api4-param-{{ name }}" ng-model="params[name]"/>
-              <label for="api4-param-{{ name }}">{{ name }}<span class="crm-marker" ng-if="param.required"> *</span></label>
-            </div>
+              {{ name }}<span class="crm-marker" ng-if="param.required"> *</span>
+            </label>
             <div class="form-control" ng-mouseenter="help('selectRowCount', availableParams.select)" ng-mouseleave="help()" ng-class="{'api4-option-selected': isSelectRowCount()}" ng-if="availableParams.select">
               <input type="checkbox" id="api4-param-selectRowCount" ng-checked="isSelectRowCount()" ng-click="selectRowCount()" />
               <label for="api4-param-selectRowCount">SelectRowCount</label>
@@ -121,9 +121,17 @@
               </ul>
             </div>
           </div>
-          <p ng-repeat="(key, item) in helpContent" ng-if="key !== 'description' && key !== 'comment'">
+          <p ng-repeat="(key, item) in helpContent" ng-if="key !== 'description' && key !== 'comment' && key !== 'see'">
             <strong>{{ key }}:</strong> {{ item }}
           </p>
+          <div ng-if="helpContent.see">
+            <strong>See:</strong>
+            <ul>
+              <li ng-repeat="ref in helpContent.see">
+                <a target="{{ formatRef(ref)[0] === '#' ? '_self' : '_blank'}}" ng-href="{{ formatRef(ref) }}">{{ ref }}</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
   </div>

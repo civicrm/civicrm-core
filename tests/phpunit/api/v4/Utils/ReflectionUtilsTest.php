@@ -70,12 +70,13 @@ This is the base class.';
           *
           * Comment.
           * IDK
+          * @see 0
           * @param int|string \$foo
           *   Nothing interesting.
-          * @see 0
+          * @see no evil
           * @throws tantrums
           * @param \$bar: - Has a title
-          * @return nothing
+          * @return nothing|something
           */
         ",
         [
@@ -93,9 +94,9 @@ This is the base class.';
               'comment' => '',
             ],
           ],
-          'see' => '0',
+          'see' => ['0', 'no evil'],
           'throws' => ['tantrums'],
-          'return' => 'nothing',
+          'return' => ['nothing', 'something'],
         ],
       ],
     ];

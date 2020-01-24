@@ -76,11 +76,14 @@ class ReflectionUtils {
         if ($key == 'var') {
           $info['type'] = explode('|', $words[0]);
         }
+        elseif ($key == 'return') {
+          $info['return'] = explode('|', $words[0]);
+        }
         elseif ($key == 'options') {
           $val = str_replace(', ', ',', implode(' ', $words));
           $info['options'] = explode(',', $val);
         }
-        elseif ($key == 'throws') {
+        elseif ($key == 'throws' || $key == 'see') {
           $info[$key][] = implode(' ', $words);
         }
         elseif ($key == 'param' && $words) {
