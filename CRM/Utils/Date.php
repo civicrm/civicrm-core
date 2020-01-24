@@ -2033,19 +2033,6 @@ class CRM_Utils_Date {
       }
     }
 
-    // now we set display date using js, hence we should always setdefault
-    // 'm/d/Y' format. So that submitted value is alwats mm/dd/YY format
-    // note that for date display we dynamically create text field
-    /*
-    if ( !$format ) {
-    $format = $config->dateInputFormat;
-    }
-
-    // get actual format
-    $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats( );
-    $dateFormat       = CRM_Utils_Array::value( $format, $actualPHPFormats );
-     */
-
     $dateFormat = 'm/d/Y';
     $date = date($dateFormat, strtotime($mysqlDate));
 
