@@ -49,7 +49,7 @@ function event_get_expectedresult() {
         'id' => '3',
         'title' => 'Annual CiviCRM meet 2',
         'event_title' => 'Annual CiviCRM meet 2',
-        'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
+        'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
         'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
         'event_description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
         'event_type_id' => '1',
