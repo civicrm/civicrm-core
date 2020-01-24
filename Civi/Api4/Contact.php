@@ -29,6 +29,7 @@ namespace Civi\Api4;
  *
  * Creating a new contact requires at minimum a name or email address.
  *
+ * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
  * @package Civi\Api4
  */
 class Contact extends Generic\DAOEntity {

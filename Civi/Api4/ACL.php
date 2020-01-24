@@ -22,15 +22,17 @@
 namespace Civi\Api4;
 
 /**
- * ACL Entity.
+ * ACL (Access Control List).
  *
- * This entity holds the ACL informatiom. With this entity you add/update/delete an ACL permission which consists of
- * an Operation (e.g. 'View' or 'Edit'), a set of Data that the operation can be performed on (e.g. a group of contacts),
- * and a Role that has permission to do this operation. For more info refer to
- * https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control for more info.
+ * An ACL record consists of:
  *
- * Creating a new ACL requires at minimum a entity table, entity ID and object_table
+ *   - an Operation (e.g. 'View' or 'Edit')
+ *   - a set of Data that the operation can be performed on (e.g. a group of contacts)
+ *   - and a Role that has permission to do this operation.
  *
+ * Creating a new ACL requires at minimum a entity table, entity ID and object_table.
+ *
+ * @see https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control
  * @package Civi\Api4
  */
 class ACL extends Generic\DAOEntity {

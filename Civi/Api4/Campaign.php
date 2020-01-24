@@ -24,6 +24,7 @@ namespace Civi\Api4;
 /**
  * Campaign entity.
  *
+ * @see https://docs.civicrm.org/user/en/latest/campaign/what-is-civicampaign/
  * @package Civi\Api4
  */
 class Campaign extends Generic\DAOEntity {

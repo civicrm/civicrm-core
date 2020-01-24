@@ -18,13 +18,14 @@
  *
  */
 
-
 namespace Civi\Api4;
 
 /**
  * MappingField entity.
  *
  * This represents one field in a Mapping collection.
+ *
+ * @see \Civi\Api4\Mapping
  *
  * @package Civi\Api4
  */

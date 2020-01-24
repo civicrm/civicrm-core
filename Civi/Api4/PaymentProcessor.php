@@ -20,6 +20,8 @@ namespace Civi\Api4;
 /**
  * Payment Processor entity.
  *
+ * @see https://docs.civicrm.org/sysadmin/en/latest/setup/payment-processors/
+ *
  * @package Civi\Api4
  */
 class PaymentProcessor extends Generic\DAOEntity {

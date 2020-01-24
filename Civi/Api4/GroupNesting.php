@@ -23,6 +23,8 @@ namespace Civi\Api4;
 /**
  * GroupNesting entity.
  *
+ * @see \Civi\Api4\Group
+ *
  * @package Civi\Api4
  */
 class GroupNesting extends Generic\DAOEntity {

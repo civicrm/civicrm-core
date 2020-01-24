@@ -121,9 +121,17 @@
               </ul>
             </div>
           </div>
-          <p ng-repeat="(key, item) in helpContent" ng-if="key !== 'description' && key !== 'comment'">
+          <p ng-repeat="(key, item) in helpContent" ng-if="key !== 'description' && key !== 'comment' && key !== 'see'">
             <strong>{{ key }}:</strong> {{ item }}
           </p>
+          <div ng-if="helpContent.see">
+            <strong>See:</strong>
+            <ul>
+              <li ng-repeat="ref in helpContent.see">
+                <a target="{{ formatRef(ref)[0] === '#' ? '_self' : '_blank'}}" ng-href="{{ formatRef(ref) }}">{{ ref }}</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
   </div>

@@ -61,7 +61,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     // Load result class based on @return annotation in the execute() method.
     $reflection = new \ReflectionClass($action);
     $doc = ReflectionUtils::getCodeDocs($reflection->getMethod('execute'), 'Method');
-    $resultClass = \CRM_Utils_Array::value('return', $doc, '\\Civi\\Api4\\Generic\\Result');
+    $resultClass = $doc['return'][0] ?? '\\Civi\\Api4\\Generic\\Result';
     $result = new $resultClass();
     $result->action = $action->getActionName();
     $result->entity = $action->getEntityName();
