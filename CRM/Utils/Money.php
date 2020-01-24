@@ -122,6 +122,10 @@ class CRM_Utils_Money {
   /**
    * Subtract currencies using integers instead of floats, to preserve precision
    *
+   * @param string|float $leftOp
+   * @param string|float $rightOp
+   * @param string $currency
+   *
    * @return float
    *   Result of subtracting $rightOp from $leftOp to the precision of $currency
    */
