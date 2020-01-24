@@ -50,17 +50,20 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   public $kernel;
 
   /**
-   * @var string, the entity for which we want to manage permissions
+   * @var string
+   *  the entity for which we want to manage permissions
    */
   protected $entityName;
 
   /**
-   * @var array <string> the actions for which we want to manage permissions
+   * @var array
+   *  <string> the actions for which we want to manage permissions
    */
   protected $actions;
 
   /**
-   * @var string, SQL. Given a file ID, determine the entity+table it's attached to.
+   * @var string
+   * SQL. Given a file ID, determine the entity+table it's attached to.
    *
    * ex: "SELECT if(cf.id,1,0) as is_valid, cef.entity_table, cef.entity_id
    * FROM civicrm_file cf
@@ -76,7 +79,8 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   protected $lookupDelegateSql;
 
   /**
-   * @var string, SQL. Get a list of (field_name, table_name, extends) tuples.
+   * @var string
+   * SQL. Get a list of (field_name, table_name, extends) tuples.
    *
    * For example, one tuple might be ("custom_123", "civicrm_value_mygroup_4",
    * "Activity").
@@ -91,7 +95,8 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   protected $lookupCustomFieldCache;
 
   /**
-   * @var array list of related tables for which FKs are allowed
+   * @var array
+   * list of related tables for which FKs are allowed
    */
   protected $allowedDelegates;
 

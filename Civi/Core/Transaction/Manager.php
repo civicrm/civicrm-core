@@ -26,7 +26,8 @@ class Manager {
   private $dao;
 
   /**
-   * @var array<Frame> stack of SQL transactions/savepoints
+   * @var array
+   * <Frame> stack of SQL transactions/savepoints
    */
   private $frames = [];
 

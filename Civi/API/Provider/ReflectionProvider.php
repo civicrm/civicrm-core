@@ -41,7 +41,8 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   private $apiKernel;
 
   /**
-   * @var array (string $entityName => array(string $actionName))
+   * @var array\
+   * (string $entityName => array(string $actionName))
    */
   private $actions;
 

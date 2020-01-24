@@ -87,7 +87,8 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
-   * @var string Just for unit testing.
+   * @var string
+   * Just for unit testing.
    */
   public $lastWarning;
 

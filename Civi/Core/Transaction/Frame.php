@@ -29,17 +29,20 @@ class Frame {
   private $dao;
 
   /**
-   * @var string|null e.g. "BEGIN" or "SAVEPOINT foo"
+   * @var string|null
+   * e.g. "BEGIN" or "SAVEPOINT foo"
    */
   private $beginStmt;
 
   /**
-   * @var string|null e.g. "COMMIT"
+   * @var string|null
+   * e.g. "COMMIT"
    */
   private $commitStmt;
 
   /**
-   * @var string|null e.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo"
+   * @var string|null
+   * e.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo"
    */
   private $rollbackStmt;
 

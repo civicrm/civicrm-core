@@ -18,12 +18,13 @@ namespace Civi\Core\DAO\Event;
 class PostDelete extends \Symfony\Component\EventDispatcher\Event {
 
   /**
-   * @var DAO Object
+   * @var DAOObject
    */
   public $object;
 
   /**
-   * @var DAO delete result
+   * @var bool|int
+   * DAO delete result
    */
   public $result;
 

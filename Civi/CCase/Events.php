@@ -17,7 +17,8 @@ namespace Civi\CCase;
  */
 class Events {
   /**
-   * @var array (int $caseId => bool $active) list of cases for which we are actively firing case-change event
+   * @var array
+   * (int $caseId => bool $active) list of cases for which we are actively firing case-change event
    *
    * We do not want to fire case-change events recursively.
    */

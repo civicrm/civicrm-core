@@ -29,7 +29,8 @@ class PreEvent extends GenericHookEvent {
   }
 
   /**
-   * @var string 'create'|'edit'|'delete' etc
+   * @var string
+   * 'create'|'edit'|'delete' etc
    */
   public $action;
 

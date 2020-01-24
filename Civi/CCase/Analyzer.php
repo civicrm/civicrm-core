@@ -22,7 +22,8 @@ class Analyzer {
   private $caseId;
 
   /**
-   * @var array per APIv3
+   * @var array
+   * per APIv3
    */
   private $case;
 
@@ -32,7 +33,8 @@ class Analyzer {
   private $caseType;
 
   /**
-   * @var array per APIv3
+   * @var array
+   * per APIv3
    */
   private $activities;
 
@@ -42,7 +44,8 @@ class Analyzer {
   private $xml;
 
   /**
-   * @var array<string,array>
+   * @var array
+   * <string,array>
    */
   private $indices;
 

@@ -35,7 +35,7 @@ else {
     private $cache = [];
 
     /**
-     * @var \CRM_Core_Transaction|NULL
+     * @var \CRM_Core_Transaction|null
      */
     private $tx;
 

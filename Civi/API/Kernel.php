@@ -28,7 +28,8 @@ class Kernel {
   protected $dispatcher;
 
   /**
-   * @var array<ProviderInterface>
+   * @var array
+   * ProviderInterface.
    */
   protected $apiProviders;
 
