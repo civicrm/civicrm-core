@@ -43,9 +43,23 @@ class Entity extends Generic\AbstractEntity {
   public static function getFields() {
     return new \Civi\Api4\Generic\BasicGetFieldsAction('Entity', __FUNCTION__, function() {
       return [
-        ['name' => 'name'],
-        ['name' => 'description'],
-        ['name' => 'comment'],
+        [
+          'name' => 'name',
+          'description' => 'Entity name',
+        ],
+        [
+          'name' => 'description',
+          'description' => 'Description from docblock',
+        ],
+        [
+          'name' => 'comment',
+          'description' => 'Comments from docblock',
+        ],
+        [
+          'name' => 'see',
+          'type' => 'Array',
+          'description' => 'Any @see annotations from docblock',
+        ],
       ];
     });
   }

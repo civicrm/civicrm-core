@@ -25,7 +25,11 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
- * Get entities
+ * Get the names & docblocks of all APIv4 entities.
+ *
+ * Scans for api entities in core + enabled extensions.
+ *
+ * Also includes pseudo-entities from multi-record custom groups by default.
  *
  * @method $this setIncludeCustom(bool $value)
  * @method bool getIncludeCustom()
