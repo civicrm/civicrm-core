@@ -41,15 +41,21 @@ class TransactionSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * @var array (scalar $apiRequestId => CRM_Core_Transaction $tx)
+   * List of active transaction objects.
+   *
+   * array(scalar $apiRequestId => CRM_Core_Transaction $tx)
+   *
+   * @var array
    */
   private $transactions = [];
 
   /**
-   * @var array (scalar $apiRequestId => bool)
-   *
-   * A list of requests which should be forcibly rolled back to
+   * (Unused?) A list of requests which should be forcibly rolled back to
    * their save points.
+   *
+   * array (scalar $apiRequestId => bool)
+   *
+   * @var array
    */
   private $forceRollback = [];
 
