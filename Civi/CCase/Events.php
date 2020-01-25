@@ -16,10 +16,14 @@ namespace Civi\CCase;
  * @package Civi\CCase
  */
 class Events {
+
   /**
-   * @var array (int $caseId => bool $active) list of cases for which we are actively firing case-change event
-   *
+   * List of cases for which we are actively firing case-change event
    * We do not want to fire case-change events recursively.
+   *
+   * array (int $caseId => bool $active)
+   *
+   * @var array
    */
   public static $isActive = [];
 

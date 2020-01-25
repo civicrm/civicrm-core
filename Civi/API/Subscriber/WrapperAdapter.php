@@ -32,7 +32,7 @@ class WrapperAdapter implements EventSubscriberInterface {
   }
 
   /**
-   * @var array(\API_Wrapper)
+   * @var \API_Wrapper[]
    */
   protected $defaults;
 

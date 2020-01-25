@@ -14,7 +14,7 @@ class System {
   private static $singleton;
 
   /**
-   * @var array cache
+   * @var array
    */
   private $cache = [];
 
