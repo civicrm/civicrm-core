@@ -1690,4 +1690,115 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->membershipDelete($membership['id']);
   }
 
+  /**
+   * Test giving on behalf of an organization.
+   */
+  public function testOnBehalfOf() {
+    $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
+
+    // create a contribution page.
+    $this->createPriceSetWithPage();
+    $contributionPageId = $this->_ids['contribution_page'];
+    // Turn on receipts.
+    $this->callAPISuccess('ContributionPage', 'create', ['id' => $contributionPageId, 'is_email_receipt' => TRUE]);
+    $this->swapMessageTemplateForTestTemplate();
+
+    $this->addProfile('supporter_profile', $contributionPageId);
+    $temp = $this->addProfile('on_behalf_organization', $contributionPageId, 'on_behalf', [
+      // 1 means giving on behalf of an org is optional. 2 means required.
+      'is_for_organization' => 1,
+      'default' => [
+        'for_organization' => 'This donation is on behalf of a company.',
+      ],
+    ]);
+    // Get the profile ID.
+    $onBehalfProfileId = $this->callAPISuccessGetValue('UFJoin', [
+      'return' => "id",
+      'module' => "on_behalf",
+      'entity_table' => "civicrm_contribution_page",
+      'entity_id' => $contributionPageId,
+    ]);
+
+    $form = new CRM_Contribute_Form_Contribution_Confirm();
+    $form->controller = new CRM_Core_Controller();
+    $form->_id = $contributionPageId;
+
+    $form->_paymentProcessor = [
+      'id' => $paymentProcessorID,
+      'billing_mode' => CRM_Core_Payment::BILLING_MODE_FORM,
+      'object' => Civi\Payment\System::singleton()->getById($paymentProcessorID),
+      'is_recur' => FALSE,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit card'),
+    ];
+    $form->_params = [
+      'id' => $contributionPageId,
+      'qfKey' => 'donotcare',
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'total_amount' => 100.00,
+      'payment_processor_id' => $paymentProcessorID,
+      'amount' => 100,
+      'tax_amount' => 0.00,
+      'year' => 2040,
+      'month' => 9,
+      'currencyID' => 'USD',
+      'is_pay_later' => 0,
+      'is_quick_config' => 1,
+      'skipLineItem' => 0,
+      'invoiceID' => '6e443672a9bb2198cc12f076aed70e7b',
+      'description' => 'whatever',
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'email-Primary' => 'billy-goat@the-bridge.net',
+      'is_for_organization' => '1',
+      'organization_name' => 'United States Govt.',
+      'onbehalf' => [
+        'city-3' => 'Washington',
+        'country-3' => '1228',
+        'email-3' => 'president@example.org',
+        'organization_name' => 'United States Govt.',
+        'phone-3-1' => '202-555-5555',
+        'postal_code-3' => '20500',
+        'state_province-3' => '1050',
+        'street_address-3' => '1600 Pennsylvania Avenue NW',
+      ],
+      'onbehalf_location' => [
+        '' => 'United States Govt.',
+        'address' => [
+          '3' => [
+            'city' => 'Washington',
+            'country' => '1228',
+            'is_primary' => 1,
+            'location_type_id' => '3',
+            'postal_code' => '20500',
+            'state_province' => '1050',
+            'street_address' => '1600 Pennsylvania Avenue NW',
+          ],
+          'email' => [
+            '3' => [
+              'email' => 'president@example.org',
+            ],
+          ],
+          'phone' => [
+            '3' => [
+              'phone' => '202-555-5555',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    // Populate $form->_fields with the onbehalf array
+    $form->buildCustom($onBehalfProfileId, 'onbehalfProfile', TRUE, 'onbehalf', ['Contact', 'Organization']);
+    $form->submit($form->_params, $form->_fields);
+    $orgId = $this->callAPISuccessGetValue('Contact', ['return' => 'id', 'contact_type' => 'Organization', 'organization_name' => 'United States Govt.']);
+    // Contribution should be owned by organization, not contact.
+    $this->callAPISuccessGetValue('Contribution', ['return' => 'id', 'contact_id' => $orgId]);
+  }
+
 }

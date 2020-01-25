@@ -1016,6 +1016,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
+    // FIXME: This IF statement can't be reached (that array element doesn't exist).  This should be
+    // revisited when "on behalf of" tests can accurately create activities.
     $targetContactID = NULL;
     if (!empty($params['hidden_onbehalf_profile'])) {
       $targetContactID = $contribution->contact_id;
@@ -1904,13 +1906,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Submit function.
    *
    * @param array $params
+   * @param array $fields
    *
    * @throws CiviCRM_API3_Exception
    */
-  public static function submit($params) {
+  public static function submit($params, $fields = NULL) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];
-
+    $form->_fields = $fields;
     CRM_Contribute_BAO_ContributionPage::setValues($form->_id, $form->_values);
     $form->_separateMembershipPayment = CRM_Contribute_BAO_ContributionPage::getIsMembershipPayment($form->_id);
     //this way the mocked up controller ignores the session stuff
