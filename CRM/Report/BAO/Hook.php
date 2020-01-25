@@ -24,7 +24,7 @@
 class CRM_Report_BAO_Hook {
 
   /**
-   * @var array of CRM_Report_BAO_HookInterface objects
+   * @var \CRM_Report_BAO_HookInterface[]
    */
   protected $_queryObjects = NULL;
 

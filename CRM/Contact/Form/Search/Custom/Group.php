@@ -19,42 +19,46 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   protected $_formValues;
 
   /**
-   * @var CRM_Utils_SQL_TemTable Object
+   * @var \CRM_Utils_SQL_TemTable
    */
   protected $_xGTable = NULL;
 
   /**
-   * @var CRM_Utils_SQL_TempTable object
+   * @var \CRM_Utils_SQL_TempTable
    */
   protected $_iGTable = NULL;
 
   /**
-   * @var string Table Name for xclude Groups
+   * @var string
+   * Table Name for xclude Groups
    */
   protected $_xGTableName = NULL;
 
   /**
-   * @var string Table Name for Inclue Groups
+   * @var string
+   * Table Name for Inclue Groups
    */
   protected $_iGTableName = NULL;
 
   /**
-   * @var CRM_Utils_SQL_TemTable Object
+   * @var \CRM_Utils_SQL_TempTable
    */
   protected $_xTTable = NULL;
 
   /**
-   * @var CRM_Utils_SQL_TempTable object
+   * @var \CRM_Utils_SQL_TempTable
    */
   protected $_iTTable = NULL;
 
   /**
-   * @var string Table Name for xclude Groups
+   * @var string
+   * Table Name for xclude Groups
    */
   protected $_xTTableName = NULL;
 
   /**
-   * @var string Table Name for Inclue Groups
+   * @var string
+   * Table Name for Inclue Groups
    */
   protected $_iTTableName = NULL;
 
