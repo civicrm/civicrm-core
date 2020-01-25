@@ -26,7 +26,9 @@ class Manager {
   private $dao;
 
   /**
-   * @var array<Frame> stack of SQL transactions/savepoints
+   * Stack of SQL transactions/savepoints.
+   *
+   * @var \Civi\Core\Transaction\Frame[]
    */
   private $frames = [];
 
