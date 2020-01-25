@@ -192,6 +192,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_onlinePendingContributionId = NULL;
 
   /**
+   * Stored participant record.
+   *
+   * @var array
+   */
+  protected $participantRecord;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -1832,15 +1839,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     if ($this->isPaymentOnExistingContribution()) {
-      $participantBAO = new CRM_Event_BAO_Participant();
-      $participantBAO->id = $this->_id;
-      $participantBAO->find(TRUE);
-      $contributionParams['total_amount'] = $participantBAO->fee_amount;
+      $contributionParams['total_amount'] = $this->getParticipantValue('fee_amount');
 
       $params['discount_id'] = NULL;
       //re-enter the values for UPDATE mode
-      $params['fee_level'] = $params['amount_level'] = $participantBAO->fee_level;
-      $params['fee_amount'] = $participantBAO->fee_amount;
+      $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
+      $params['fee_amount'] = $this->getParticipantValue('fee_amount');
       if (isset($params['priceSetId'])) {
         $lineItem[0] = CRM_Price_BAO_LineItem::getLineItems($this->_id);
       }
@@ -2182,7 +2186,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return bool
    */
   protected function isPaymentOnExistingContribution(): bool {
-    return ($this->_id && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId;
+    return ($this->getParticipantID() && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId;
   }
 
   /**
@@ -2198,6 +2202,30 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_event = civicrm_api3('Event', 'getsingle', ['id' => $this->_eventId]);
     }
     return $this->_event[$fieldName];
+  }
+
+  /**
+   * Get a value from the existing participant record (applies to edits).
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getParticipantValue($fieldName) {
+    if (!$this->participantRecord) {
+      $this->participantRecord = civicrm_api3('Participant', 'get', ['id' => $this->_id]);
+    }
+    return $this->participantRecord[$fieldName];
+  }
+
+  /**
+   * Get id of participant being edited.
+   *
+   * @return int|null
+   */
+  protected function getParticipantID() {
+    return $this->_id;
   }
 
 }
