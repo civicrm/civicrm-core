@@ -52,7 +52,7 @@
       <tr class="crm-miscellaneous-form-block-wkhtmltopdfPath">
         <td class="label">{$form.wkhtmltopdfPath.label}</td>
         <td>{$form.wkhtmltopdfPath.html}<br />
-          <p class="description">{ts 1="http://wkhtmltopdf.org/"}<a href="%1">wkhtmltopdf is an alternative utility for generating PDF's</a> which may provide better performance especially if you are generating a large number of PDF letters or receipts. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
+          <p class="description">{assign var="wkhtmltopdf_link" value='<a href="https://wkhtmltopdf.org/" target="_blank">wkhtmltopdf</a>'}{ts 1=$wkhtmltopdf_link}%1 is an alternative utility for generating PDF's which may provide better performance especially if you are generating a large number of PDF letters or receipts. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
         </td>
       </tr>
       {foreach from=$pure_config_settings item=setting_name}
@@ -80,7 +80,8 @@
     <h3>{ts}reCAPTCHA Keys{/ts}</h3>
 
     <div class="description">
-      {ts 1="https://www.google.com/recaptcha"}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use reCAPTCHA on public-facing CiviCRM forms: sign up at <a href="%1" "target=_blank">Google's reCaptcha site</a>; enter the provided public and private reCAPTCHA keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
+      {capture name="recaptcha_url" assign="recaptcha_url"}<a href="https://www.google.com/recaptcha" target="_blank">{ts}Google's reCaptcha site{/ts}</a>{/capture}
+      {ts 1=$recaptcha_url}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use reCAPTCHA on public-facing CiviCRM forms: sign up at %1; enter the provided public and private reCAPTCHA keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
     </div>
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-recaptchaPublicKey">
@@ -95,9 +96,8 @@
         <td class="label">{$form.recaptchaOptions.label}</td>
         <td>{$form.recaptchaOptions.html}<br />
           <span class="description">
-            {ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).{/ts}
-            <br />
-            {ts 1='href="https://developers.google.com/recaptcha/docs/display#config" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
+            {capture name="customize_recaptcha_url" assign="customize_recaptcha_url"}<a href="https://developers.google.com/recaptcha/docs/display#configuration" target="_blank">{ts}Customizing the Look and Feel of reCAPTCHA{/ts}</a>{/capture}
+            {ts 1=$customize_recaptcha_url}You can specify the reCAPTCHA theme options as comma separated data. (e.g. theme:'blackglass', lang : 'fr' ). Check the available options at %1.{/ts}
           </span>
         </td>
       </tr>
