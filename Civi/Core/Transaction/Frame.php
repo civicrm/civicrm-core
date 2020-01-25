@@ -29,17 +29,23 @@ class Frame {
   private $dao;
 
   /**
-   * @var string|null e.g. "BEGIN" or "SAVEPOINT foo"
+   * The statement used to start this transaction - e.g. "BEGIN" or "SAVEPOINT foo"
+   *
+   * @var string|null
    */
   private $beginStmt;
 
   /**
-   * @var string|null e.g. "COMMIT"
+   * The statement used to commit this transaction - e.g. "COMMIT"
+   *
+   * @var string|null
    */
   private $commitStmt;
 
   /**
-   * @var string|null e.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo"
+   * The statement used to rollback this transaction - e.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo"
+   *
+   * @var string|null
    */
   private $rollbackStmt;
 

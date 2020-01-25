@@ -23,7 +23,9 @@ class UnhandledExceptionEvent extends GenericHookEvent {
   public $exception;
 
   /**
-   * @var mixed reserved for future use
+   * Reserved for future use.
+   *
+   * @var mixed
    */
   public $request;
 

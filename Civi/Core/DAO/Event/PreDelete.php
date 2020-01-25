@@ -18,7 +18,7 @@ namespace Civi\Core\DAO\Event;
 class PreDelete extends \Symfony\Component\EventDispatcher\Event {
 
   /**
-   * @var DAO Object
+   * @var \CRM_Core_DAO
    */
   public $object;
 
