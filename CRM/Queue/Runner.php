@@ -50,7 +50,8 @@ class CRM_Queue_Runner {
   public $qrid;
 
   /**
-   * @var array whether to display buttons, eg ('retry' => TRUE, 'skip' => FALSE)
+   * @var array
+   * Whether to display buttons, eg ('retry' => TRUE, 'skip' => FALSE)
    */
   public $buttons;
 

@@ -17,12 +17,14 @@
  */
 class CRM_Extension_Downloader {
   /**
-   * @var CRM_Extension_Container_Basic the place where downloaded extensions are ultimately stored
+   * @var CRM_Extension_Container_Basic
+   * The place where downloaded extensions are ultimately stored
    */
   public $container;
 
   /**
-   * @var string local path to a temporary data directory
+   * @var string
+   * Local path to a temporary data directory
    */
   public $tmpDir;
 

@@ -22,7 +22,8 @@ class CRM_Case_XMLRepository {
   private static $singleton;
 
   /**
-   * @var array<String,SimpleXMLElement>
+   * @var array
+   * <String,SimpleXMLElement>
    */
   protected $xml = [];
 

@@ -40,7 +40,8 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * The contact type
    *
-   * @var string ("Individual"/"Household"/"Organization"). Never been tested for something else than Individual
+   * @var string
+   * ("Individual"/"Household"/"Organization"). Never been tested for something else than Individual
    */
   protected $_ctype = 'Individual';
 

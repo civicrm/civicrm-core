@@ -25,17 +25,19 @@ class CRM_Queue_Task {
   const TASK_FAIL = 2;
 
   /**
-   * @var mixed, serializable
+   * @var mixed
+   * serializable
    */
   public $callback;
 
   /**
-   * @var array, serializable
+   * @var array
+   * serializable
    */
   public $arguments;
 
   /**
-   * @var string, NULL-able
+   * @var string|null
    */
   public $title;
 
