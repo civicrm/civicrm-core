@@ -71,9 +71,9 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
 
   /**
    * When comparing timestamps, treat them as the same if they
-   * occur within a certain distance of each other.
+   * occur within a certain distance (seconds) of each other.
    *
-   * @var int seconds
+   * @var int
    */
   public $dateTolerance = 120;
 

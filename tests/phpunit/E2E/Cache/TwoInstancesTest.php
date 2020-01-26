@@ -17,12 +17,12 @@
 class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
 
   /**
-   * @var Psr\SimpleCache\CacheInterface;
+   * @var Psr\SimpleCache\CacheInterface
    */
   protected $a;
 
   /**
-   * @var Psr\SimpleCache\CacheInterface;
+   * @var Psr\SimpleCache\CacheInterface
    */
   protected $b;
 

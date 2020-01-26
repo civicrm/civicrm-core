@@ -25,7 +25,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   /**
-   * @var array e.g. $this->deletes['CRM_Contact_DAO_Contact'][] = $contactID;
+   * @var array
+   * e.g. $this->deletes['CRM_Contact_DAO_Contact'][] = $contactID;
    */
   protected $deletableTestObjects;
 
