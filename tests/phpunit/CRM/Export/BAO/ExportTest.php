@@ -1151,7 +1151,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Tag(s)' => '',
       'Note(s)' => '',
     ];
-    $this->assertExpectedOutput($expected, $this->csv->fetchOne());
+    // Include both possible options as we rely on implicit order here and MySQL 8 in testing is returning a different value for some fields.
+    $this->assertExpectedOutput($expected, $this->csv->fetchOne(), [
+      'Email' => ['home@example.com', 'work@example.com'],
+      'Location Type' => ['Home', 'Work'],
+    ]);
   }
 
   /**
@@ -2924,12 +2928,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @param array $expected
    * @param array $row
+   * @param array $alternatives
    */
-  protected function assertExpectedOutput(array $expected, array $row) {
+  protected function assertExpectedOutput(array $expected, array $row, array $alternatives = []) {
     $variableFields = ['Created Date', 'Modified Date', 'Contact Hash'];
     foreach ($expected as $key => $value) {
       if (in_array($key, $variableFields)) {
         $this->assertTrue(!empty($row[$key]));
+      }
+      elseif (array_key_exists($key, $alternatives)) {
+        $this->assertContains($row[$key], $alternatives[$key]);
       }
       else {
         $this->assertEquals($value, $row[$key]);
