@@ -27,7 +27,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   protected $cache;
 
   /**
-   * @var array list of possible web responses
+   * @var array
+   * list of possible web responses
    */
   protected static $webResponses = NULL;
 

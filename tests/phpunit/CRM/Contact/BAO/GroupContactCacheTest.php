@@ -240,7 +240,8 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   // *** Everything below this should be moved to parent class ****
 
   /**
-   * @var array(DAO_Name => array(int)) List of items to garbage-collect during tearDown
+   * @var array
+   * (DAO_Name => array(int)) List of items to garbage-collect during tearDown
    */
   private $_testObjects;
 

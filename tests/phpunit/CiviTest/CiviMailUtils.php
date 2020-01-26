@@ -31,12 +31,14 @@
 class CiviMailUtils extends PHPUnit\Framework\TestCase {
 
   /**
-   * @var mixed current outbound email option
+   * Current outbound email option
+   * @var mixed
    */
   protected $_outBound_option = NULL;
 
   /**
-   * @var bool is this a webtest
+   * Is this a webtest
+   * @var bool
    */
   protected $_webtest = FALSE;
 

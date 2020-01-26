@@ -9,7 +9,8 @@ class KernelTest extends \CiviUnitTestCase {
   const MOCK_VERSION = 3;
 
   /**
-   * @var array(int => array('name' => string $eventName, 'type' => string $className))
+   * @var array
+   * (int => array('name' => string $eventName, 'type' => string $className))
    */
   public $actualEventSequence;
 
