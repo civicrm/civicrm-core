@@ -10,15 +10,14 @@
  */
 
 /**
- *
+ * Back office participant form.
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class generates form components for processing a participation
- * in an event
+ * Back office participant form.
  */
 class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment {
 
@@ -1829,15 +1828,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function preparePaidEventProcessing($params): array {
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
-    $contributionParams = ['skipCleanMoney' => TRUE];
+    $contributionParams = [
+      'skipCleanMoney' => TRUE,
+      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
+    ];
     $lineItem = [];
     $additionalParticipantDetails = [];
-    if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $eventStartDate = $this->getEventValue('start_date');
-      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
-        $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
-      }
-    }
+
     if ($this->isPaymentOnExistingContribution()) {
       $contributionParams['total_amount'] = $this->getParticipantValue('fee_amount');
 
@@ -2050,19 +2047,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         'invoice_id'
       );
     }
+    $contribParams['revenue_recognition_date'] = $this->getRevenueRecognitionDate();
 
-    if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $eventStartDate = CRM_Utils_Array::value(
-        'start_date',
-        CRM_Utils_Array::value(
-          'event',
-          $form->_values
-        )
-      );
-      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
-        $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
-      }
-    }
     //create an contribution address
     // The concept of contributeMode is deprecated. Elsewhere we use the function processBillingAddress() - although
     // currently that is only inherited by back-office forms.
@@ -2226,6 +2212,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function getParticipantID() {
     return $this->_id ?? $this->_pId;
+  }
+
+  /**
+   * Get the value for the revenue recognition date field.
+   *
+   * @return string
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getRevenueRecognitionDate() {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
+      $eventStartDate = $this->getEventValue('start_date');
+      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
+        return date('Ymd', strtotime($eventStartDate));
+      }
+    }
+    return '';
   }
 
 }
