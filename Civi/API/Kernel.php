@@ -28,7 +28,7 @@ class Kernel {
   protected $dispatcher;
 
   /**
-   * @var array<ProviderInterface>
+   * @var \Civi\API\Provider\ProviderInterface[]
    */
   protected $apiProviders;
 

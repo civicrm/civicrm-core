@@ -37,7 +37,11 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   }
 
   /**
-   * @var array (string $name => array('perm' => string, 'callback' => callable))
+   * List of adhoc actions
+   *
+   * array(string $ame => array('perm' => string, 'callback' => callable))
+   *
+   * @var array
    */
   protected $actions = [];
 

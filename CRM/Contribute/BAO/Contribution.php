@@ -50,7 +50,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * This is used for composing messages because they have dependency on the
    * contribution_page or event page - although over time we may eliminate that
    *
-   * @var "contribution"\"event"
+   * @var string
+   * "contribution"\"event"
    */
   public $_component = NULL;
 

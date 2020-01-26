@@ -26,7 +26,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   protected $mapper;
 
   /**
-   * @var string for testing cache buster generation
+   * @var string
+   * For testing cache buster generation
    */
   protected $cacheBusterString = 'xBkdk3';
 

@@ -24,7 +24,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   protected $xmlRepo;
 
   /**
-   * @var array<string>
+   * @var string[]
    */
   protected $caseTypeNames;
 

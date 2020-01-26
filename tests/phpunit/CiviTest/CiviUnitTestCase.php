@@ -90,12 +90,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $_tablesToTruncate = [];
 
   /**
-   * @var array of temporary directory names
+   * @var array
+   * Array of temporary directory names
    */
   protected $tempDirs;
 
   /**
-   * @var bool populateOnce allows to skip db resets in setUp
+   * @var bool
+   * populateOnce allows to skip db resets in setUp
    *
    *  WARNING! USE WITH CAUTION - IT'LL RENDER DATA DEPENDENCIES
    *  BETWEEN TESTS WHEN RUN IN SUITE. SUITABLE FOR LOCAL, LIMITED
@@ -103,21 +105,22 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    *  IF POSSIBLE, USE $this->DBResetRequired = FALSE IN YOUR TEST CASE!
    *
-   *  see also: http://forum.civicrm.org/index.php/topic,18065.0.html
+   * @see http://forum.civicrm.org/index.php/topic,18065.0.html
    */
   public static $populateOnce = FALSE;
 
   /**
-   * @var bool DBResetRequired allows skipping DB reset
-   *               in specific test case. If you still need
-   *               to reset single test (method) of such case, call
-   *               $this->cleanDB() in the first line of this
-   *               test (method).
+   * DBResetRequired allows skipping DB reset
+   * in specific test case. If you still need
+   * to reset single test (method) of such case, call
+   * $this->cleanDB() in the first line of this
+   * test (method).
+   * @var bool
    */
   public $DBResetRequired = TRUE;
 
   /**
-   * @var CRM_Core_Transaction|NULL
+   * @var CRM_Core_Transaction|null
    */
   private $tx = NULL;
 
@@ -138,12 +141,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
    *
-   * @var CRM_Utils_Hook_UnitTests hookClass
+   * @var \CRM_Utils_Hook_UnitTests
    */
   public $hookClass = NULL;
 
   /**
-   * @var array common values to be re-used multiple times within a class - usually to create the relevant entity
+   * @var array
+   * Common values to be re-used multiple times within a class - usually to create the relevant entity
    */
   protected $_params = [];
 

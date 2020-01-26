@@ -32,7 +32,11 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   }
 
   /**
-   * @var array (string $cachekey => array('function' => string, 'is_generic' => bool))
+   * Local cache of function-mappings.
+   *
+   * array(string $cacheKey => array('function' => string, 'is_generic' => bool))
+   *
+   * @var array
    */
   private $cache;
 

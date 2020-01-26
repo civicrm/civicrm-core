@@ -50,7 +50,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_gid;
 
   /**
-   * @var array details of the UFGroup used on this page
+   * @var array
+   * Details of the UFGroup used on this page
    */
   protected $_ufGroup = ['name' => 'unknown'];
 

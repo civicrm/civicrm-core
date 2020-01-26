@@ -22,7 +22,9 @@ class Analyzer {
   private $caseId;
 
   /**
-   * @var array per APIv3
+   * The "Case" data, formatted per APIv3.
+   *
+   * @var array
    */
   private $case;
 
@@ -32,7 +34,9 @@ class Analyzer {
   private $caseType;
 
   /**
-   * @var array per APIv3
+   * List of activities, formatted per APIv3.
+   *
+   * @var array
    */
   private $activities;
 
@@ -42,7 +46,12 @@ class Analyzer {
   private $xml;
 
   /**
-   * @var array<string,array>
+   * A list of activity indices, which sort the various activities by some set of keys.
+   *
+   * Each index is identified by its key-set - e.g. "activity_type_id;source_contact_id" would be a
+   * two-dimensional index listing activities by their type ID and their source.
+   *
+   * @var array
    */
   private $indices;
 

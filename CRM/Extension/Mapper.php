@@ -45,7 +45,8 @@ class CRM_Extension_Mapper {
   protected $container;
 
   /**
-   * @var array (key => CRM_Extension_Info)
+   * @var \CRM_Extension_Info[]
+   * (key => CRM_Extension_Info)
    */
   protected $infos = [];
 

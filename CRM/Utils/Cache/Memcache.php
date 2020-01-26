@@ -69,7 +69,7 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   protected $_cache;
 
   /**
-   * @var NULL|array
+   * @var null|array
    *
    * This is the effective prefix. It may be bumped up whenever the dataset is flushed.
    *
