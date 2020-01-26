@@ -15,7 +15,8 @@
 class CiviCaseTestCase extends CiviUnitTestCase {
 
   /**
-   * @var string symbolic-name
+   * @var string
+   * Symbolic-name
    */
   protected $caseType;
 

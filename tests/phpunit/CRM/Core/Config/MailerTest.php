@@ -24,7 +24,9 @@
 class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
 
   /**
-   * @var array (string=>int) Keep count of the #times different functions are called
+   * Keep count of the #times different functions are called
+   * @var array
+   * (string=>int)
    */
   public $calls;
 

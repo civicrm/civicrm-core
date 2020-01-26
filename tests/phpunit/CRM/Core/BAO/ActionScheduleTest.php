@@ -2154,7 +2154,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * @var array(DAO_Name => array(int)) List of items to garbage-collect during tearDown
+   * @var array
+   * (DAO_Name => array(int)) List of items to garbage-collect during tearDown
    */
   private $_testObjects;
 
