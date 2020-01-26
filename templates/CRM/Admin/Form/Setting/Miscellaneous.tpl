@@ -80,7 +80,7 @@
     <h3>{ts}reCAPTCHA Keys{/ts}</h3>
 
     <div class="description">
-      {ts 1="https://www.google.com/recaptcha"}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use reCAPTCHA on public-facing CiviCRM forms: sign up at <a href="%1" "target=_blank">Google's reCaptcha site</a>; enter the provided public and private reCAPTCHA keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
+      {ts 1='href="https://www.google.com/recaptcha" target="_blank"'}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use reCAPTCHA on public-facing CiviCRM forms: sign up at <a %1>Google's reCaptcha site</a>; enter the provided public and private reCAPTCHA keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
     </div>
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-recaptchaPublicKey">
@@ -97,7 +97,7 @@
           <span class="description">
             {ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).{/ts}
             <br />
-            {ts 1='href="https://developers.google.com/recaptcha/docs/display#config" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
+            {ts 1='href="https://developers.google.com/recaptcha/docs/display#configuration" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
           </span>
         </td>
       </tr>
