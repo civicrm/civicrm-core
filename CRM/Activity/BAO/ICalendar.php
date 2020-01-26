@@ -21,7 +21,8 @@
 class CRM_Activity_BAO_ICalendar {
 
   /**
-   * @var object The activity for which we're generating ical.
+   * @var \CRM_Activity_BAO_ICalendar
+   * The activity for which we're generating ical.
    */
   protected $activity;
 

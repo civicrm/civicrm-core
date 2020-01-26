@@ -35,28 +35,31 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   public $baseUrl;
 
   /**
-   * @var CRM_Utils_Cache_Interface|NULL
+   * @var CRM_Utils_Cache_Interface|null
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $cache;
 
   /**
-   * @var string the cache key used for any data stored by this container
+   * @var string
+   * The cache key used for any data stored by this container
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $cacheKey;
 
   /**
-   * @var array($key => $relPath)
+   * @var array
+   * ($key => $relPath)
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $relPaths = FALSE;
 
   /**
-   * @var array($key => $relUrl)
+   * @var array
+   * ($key => $relUrl)
    *
    * Derived from $relPaths. On Unix systems (where file-paths and
    * URL-paths both use '/' separator), this isn't necessary. On Windows

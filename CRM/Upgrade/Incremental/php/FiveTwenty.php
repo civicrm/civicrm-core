@@ -14,7 +14,7 @@
 class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Base {
 
   /**
-   * @var $relationshipTypes array
+   * @var array
    *   api call result keyed on relationship_type.id
    */
   protected static $relationshipTypes;
