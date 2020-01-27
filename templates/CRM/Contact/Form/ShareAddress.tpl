@@ -33,7 +33,7 @@
       <div class="shared-address-add-relationship" style="display: none;">
         {$form.address.$blockId.add_relationship.html}
         {$form.address.$blockId.add_relationship.label}
-        <div class="employer">{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}</div>
+        <span class="employer">{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}</span>
       </div>
       <div class="shared-address-list">
         {if !empty($sharedAddresses.$blockId.shared_address_display)}
