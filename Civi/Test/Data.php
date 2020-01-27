@@ -21,7 +21,12 @@ class Data {
       \Civi\Test::execute('SET NAMES utf8');
       $sqlDir = dirname(dirname(__DIR__)) . "/sql";
 
-      $query2 = file_get_contents("$sqlDir/civicrm_data.mysql");
+      if (!isset(\Civi\Test::$statics['locale_data'])) {
+        $schema = new \CRM_Core_CodeGen_Schema(\Civi\Test::codeGen());
+        \Civi\Test::$statics['locale_data'] = $schema->generateLocaleDataSql('en_US');
+      }
+
+      $query2 = \Civi\Test::$statics['locale_data']["civicrm_data.mysql"];
       $query3 = file_get_contents("$sqlDir/test_data.mysql");
       $query4 = file_get_contents("$sqlDir/test_data_second_domain.mysql");
       if (\Civi\Test::execute($query2) === FALSE) {
