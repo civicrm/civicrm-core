@@ -1673,15 +1673,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
     }
 
-    if ($form->_pId) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $form->_pId, 'contribution_id', 'participant_id'
-      )
-      ) {
-        $form->_online = !$form->isBackOffice;
-      }
-    }
-
     if ($form->_isPaidEvent) {
       $params = ['id' => $form->_eventId];
       CRM_Event_BAO_Event::retrieve($params, $event);
@@ -1719,10 +1710,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           FALSE,
           ['class' => "crm-select2"]
         );
-
-        if ($form->_online) {
-          $element->freeze();
-        }
       }
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
         && !CRM_Utils_Array::value('fee', $form->_values)
