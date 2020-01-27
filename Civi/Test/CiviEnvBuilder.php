@@ -168,24 +168,26 @@ class CiviEnvBuilder {
    * @return CiviEnvBuilder
    */
   public function apply($force = FALSE) {
-    $dbName = \Civi\Test::dsn('database');
-    $query = "USE {$dbName};"
-      . "CREATE TABLE IF NOT EXISTS civitest_revs (name VARCHAR(64) PRIMARY KEY, rev VARCHAR(64));";
+    return \Civi\Test::asPreInstall(function() use ($force) {
+      $dbName = \Civi\Test::dsn('database');
+      $query = "USE {$dbName};"
+        . "CREATE TABLE IF NOT EXISTS civitest_revs (name VARCHAR(64) PRIMARY KEY, rev VARCHAR(64));";
 
-    if (\Civi\Test::execute($query) === FALSE) {
-      throw new \RuntimeException("Failed to flag schema version: $query");
-    }
+      if (\Civi\Test::execute($query) === FALSE) {
+        throw new \RuntimeException("Failed to flag schema version: $query");
+      }
 
-    $this->assertValid();
+      $this->assertValid();
 
-    if (!$force && $this->getSavedSignature() === $this->getTargetSignature()) {
+      if (!$force && $this->getSavedSignature() === $this->getTargetSignature()) {
+        return $this;
+      }
+      foreach ($this->steps as $step) {
+        $step->run($this);
+      }
+      $this->setSavedSignature($this->getTargetSignature());
       return $this;
-    }
-    foreach ($this->steps as $step) {
-      $step->run($this);
-    }
-    $this->setSavedSignature($this->getTargetSignature());
-    return $this;
+    });
   }
 
   /**
