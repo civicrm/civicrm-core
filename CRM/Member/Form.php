@@ -382,6 +382,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'is_email_receipt' => $paymentParams['is_email_receipt'],
       'payment_instrument_id' => $paymentParams['payment_instrument_id'],
       'invoice_id' => $paymentParams['invoice_id'],
+      'auto_renew' => $paymentParams['auto_renew'],
     ];
 
     $mapping = [

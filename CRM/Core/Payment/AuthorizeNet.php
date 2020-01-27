@@ -266,7 +266,18 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $template->assign('refId', substr($this->_getParam('invoiceID'), 0, 20));
 
     //for recurring, carry first contribution id
-    $template->assign('invoiceNumber', $this->_getParam('contributionID'));
+    if (!empty($this->_getParam('contributionID'))) {
+      $template->assign('invoiceNumber', $this->_getParam('contributionID'));
+    }
+    else {
+      // Get the contribution from recurring id.
+      $contribution_recur_id = $this->_getParam('contributionRecurID');
+      $contribution_result = civicrm_api3('Contribution', 'getsingle', array(
+        'contribution_recur_id' => $contribution_recur_id,
+        'return' => array('id'),
+      ));
+      $template->assign('invoiceNumber', $contribution_result['id']);
+    }
     $firstPaymentDate = $this->_getParam('receive_date');
     if (!empty($firstPaymentDate)) {
       //allow for post dated payment if set in form

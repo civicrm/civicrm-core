@@ -540,7 +540,20 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $contributionRecurID = $contributionRecurParams['contributionRecurID'];
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
       }
-
+      // Record temporary contribution for membership.
+      if (!empty($this->_params['record_contribution']) || $this->_mode) {
+        $tempContributionParams = array(
+          'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $this->_params),
+          'receive_date' => $this->_params['receive_date'],
+          'total_amount' => $this->_params['total_amount'],
+          'contact_id' => $this->_contributorContactID,
+          'contribution_recur_id' => $contributionRecurID,
+          'skipCleanMoney' => TRUE,
+        );
+        $contribution = CRM_Contribute_BAO_Contribution::create($tempContributionParams);
+        $this->_params['contribution_id'] = $contribution->id;
+        $this->assign('contributionID', $contribution->id);
+      }
       $result = $payment->doPayment($paymentParams);
       $this->_params = array_merge($this->_params, $result);
 
@@ -564,7 +577,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     //if contribution status is pending then set pay later
     $this->_params['is_pay_later'] = FALSE;
-    if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'))) {
+    if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label')) && empty($this->_params['contribution_id'])) {
       $this->_params['is_pay_later'] = 1;
     }
 
@@ -636,6 +649,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       //Remove `tax_amount` if it is not calculated.
       if (CRM_Utils_Array::value('tax_amount', $temporaryParams) === 0) {
         unset($temporaryParams['tax_amount']);
+      }
+      if (!empty($this->_params['contribution_id'])) {
+        $temporaryParams['id'] = $this->_params['contribution_id'];
       }
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
