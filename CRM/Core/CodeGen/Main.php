@@ -151,13 +151,17 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     return $this->sourceDigest;
   }
 
-  protected function init() {
+  /**
+   * @return static
+   */
+  public function init() {
     if (!$this->database || !$this->tables) {
       $specification = new CRM_Core_CodeGen_Specification();
       $specification->parse($this->schemaPath, $this->buildVersion);
       $this->database = $specification->database;
       $this->tables = $specification->tables;
     }
+    return $this;
   }
 
 }

@@ -119,7 +119,7 @@ class Test {
         echo "Installing {$dbName} schema\n";
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
-      ->sqlFile($civiRoot . "/sql/civicrm.mysql")
+      ->coreSchema()
       ->sql("DELETE FROM civicrm_extension")
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
@@ -156,6 +156,19 @@ class Test {
       self::$singletons['schema'] = new \Civi\Test\Schema();
     }
     return self::$singletons['schema'];
+  }
+
+  /**
+   * @return \CRM_Core_CodeGen_Main
+   */
+  public static function codeGen() {
+    if (!isset(self::$singletons['codeGen'])) {
+      $civiRoot = dirname(__DIR__);
+      $codeGen = new \CRM_Core_CodeGen_Main("$civiRoot/CRM/Core/DAO", "$civiRoot/sql", $civiRoot, "$civiRoot/templates", NULL, "UnitTests", NULL, "$civiRoot/xml/schema/Schema.xml", NULL);
+      $codeGen->init();
+      self::$singletons['codeGen'] = $codeGen;
+    }
+    return self::$singletons['codeGen'];
   }
 
   /**

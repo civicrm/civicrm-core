@@ -2,6 +2,7 @@
 namespace Civi\Test;
 
 use Civi\Test\CiviEnvBuilder\CallbackStep;
+use Civi\Test\CiviEnvBuilder\CoreSchemaStep;
 use Civi\Test\CiviEnvBuilder\ExtensionsStep;
 use Civi\Test\CiviEnvBuilder\SqlFileStep;
 use Civi\Test\CiviEnvBuilder\SqlStep;
@@ -39,6 +40,15 @@ class CiviEnvBuilder {
 
   public function callback($callback, $signature = NULL) {
     return $this->addStep(new CallbackStep($callback, $signature));
+  }
+
+  /**
+   * Generate the core SQL tables.
+   *
+   * @return \Civi\Test\CiviEnvBuilder
+   */
+  public function coreSchema() {
+    return $this->addStep(new CoreSchemaStep());
   }
 
   public function sql($sql) {
