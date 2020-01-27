@@ -178,7 +178,6 @@ class CRM_Core_Config_MagicMerge {
       // Option: `restrict` - auto-restrict remote access
       'configAndLogDir' => ['path', 'civicrm.log', ['mkdir', 'restrict']],
       'templateCompileDir' => ['path', 'civicrm.compile', ['mkdir', 'restrict']],
-      'l10nDir' => ['path', 'civicrm.l10n', ['mkdir', 'restrict']],
 
       // "setting-path" properties are settings with special filtering
       // to return normalized file paths.
