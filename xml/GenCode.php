@@ -27,6 +27,7 @@ date_default_timezone_set('UTC');
 
 define('CIVICRM_UF', 'Drupal');
 define('CIVICRM_UF_BASEURL', '/');
+define('CIVICRM_L10N_BASEDIR', getenv('CIVICRM_L10N_BASEDIR') ? getenv('CIVICRM_L10N_BASEDIR') : __DIR__ . '/../l10n');
 
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
