@@ -14,6 +14,18 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * CHeck that all tests that have created payments have created them with the right financial entities.
+   *
+   * Ideally this would be on CiviUnitTestCase but many classes would still fail. Also, it might
+   * be good if it only ran on tests that created at least one contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
+  }
+
+  /**
    * Initial test of submit function.
    *
    * @throws \Exception
@@ -316,8 +328,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
       $form->_bltID = 5;
-      $form->_values['fee'] = [];
       $form->_isPaidEvent = TRUE;
+      $form->buildEventFeeForm($form);
     }
     return $form;
   }
