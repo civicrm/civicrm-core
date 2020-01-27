@@ -25,7 +25,6 @@ namespace Civi\Api4\Generic;
  * Base class for all "Create" api actions.
  *
  * @method $this setValues(array $values) Set all field values from an array of key => value pairs.
- * @method $this addValue($field, $value) Set field value.
  * @method array getValues() Get field values.
  *
  * @package Civi\Api4\Generic
@@ -40,12 +39,22 @@ abstract class AbstractCreateAction extends AbstractAction {
   protected $values = [];
 
   /**
-   * @param string $key
-   *
+   * @param string $fieldName
    * @return mixed|null
    */
-  public function getValue($key) {
-    return isset($this->values[$key]) ? $this->values[$key] : NULL;
+  public function getValue(string $fieldName) {
+    return isset($this->values[$fieldName]) ? $this->values[$fieldName] : NULL;
+  }
+
+  /**
+   * Add a field value.
+   * @param string $fieldName
+   * @param mixed $value
+   * @return $this
+   */
+  public function addValue(string $fieldName, $value) {
+    $this->values[$fieldName] = $value;
+    return $this;
   }
 
   /**

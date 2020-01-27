@@ -30,7 +30,6 @@ use Civi\Api4\Utils\ActionUtil;
  * @method $this setLoadOptions(bool $value)
  * @method bool getLoadOptions()
  * @method $this setAction(string $value)
- * @method $this addValue(string $value)
  * @method $this setValues(array $values)
  * @method array getValues()
  */
@@ -125,6 +124,17 @@ class BasicGetFieldsAction extends BasicGetAction {
       'replace' => 'create',
     ];
     return $sub[$this->action] ?? $this->action;
+  }
+
+  /**
+   * Add an item to the values array
+   * @param string $fieldName
+   * @param mixed $value
+   * @return $this
+   */
+  public function addValue(string $fieldName, $value) {
+    $this->values[$fieldName] = $value;
+    return $this;
   }
 
   public function fields() {

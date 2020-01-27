@@ -151,7 +151,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \API_Exception
    */
   public function setVersion($val) {
-    if ($val != 4) {
+    if ($val !== 4 && $val !== '4') {
       throw new \API_Exception('Cannot modify api version');
     }
     return $this;
@@ -172,7 +172,7 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
-   * Magic function to provide addFoo, getFoo and setFoo for params.
+   * Magic function to provide automatic getter/setter for params.
    *
    * @param $name
    * @param $arguments
@@ -185,10 +185,6 @@ abstract class AbstractAction implements \ArrayAccess {
       throw new \API_Exception('Unknown api parameter: ' . $name);
     }
     $mode = substr($name, 0, 3);
-    // Handle plural when adding to e.g. $values with "addValue" method.
-    if ($mode == 'add' && $this->paramExists($param . 's')) {
-      $param .= 's';
-    }
     if ($this->paramExists($param)) {
       switch ($mode) {
         case 'get':
@@ -196,18 +192,6 @@ abstract class AbstractAction implements \ArrayAccess {
 
         case 'set':
           $this->$param = $arguments[0];
-          return $this;
-
-        case 'add':
-          if (!is_array($this->$param)) {
-            throw new \API_Exception('Cannot add to non-array param');
-          }
-          if (array_key_exists(1, $arguments)) {
-            $this->{$param}[$arguments[0]] = $arguments[1];
-          }
-          else {
-            $this->{$param}[] = $arguments[0];
-          }
           return $this;
       }
     }
@@ -221,12 +205,12 @@ abstract class AbstractAction implements \ArrayAccess {
    * This is basically the outer wrapper for api v4.
    *
    * @return \Civi\Api4\Generic\Result
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function execute() {
     /** @var \Civi\API\Kernel $kernel */
     $kernel = \Civi::service('civi_api_kernel');
-
     $result = $kernel->runRequest($this);
     if ($this->debug && (!$this->checkPermissions || \CRM_Core_Permission::check('view debug output'))) {
       $result->debug = array_merge($result->debug, $this->_debugOutput);
