@@ -17,6 +17,37 @@ class Test {
   private static $singletons = [];
 
   /**
+   * @var array
+   */
+  public static $statics = [];
+
+  /**
+   * Run code in a pre-boot fashion.
+   *
+   * @param callable $callback
+   * @return mixed
+   *   Pass through the result of the callback.
+   */
+  public static function asPreInstall($callback) {
+    $conn = \Civi\Test::pdo();
+
+    $oldEscaper = \CRM_Core_I18n::$SQL_ESCAPER;
+    \Civi::$statics['testPreInstall'] = (\Civi::$statics['testPreInstall'] ?? 0) + 1;
+    try {
+      \CRM_Core_I18n::$SQL_ESCAPER = function ($text) use ($conn) {
+        return substr($conn->quote($text), 1, -1);
+      };
+      return $callback();
+    } finally {
+      \CRM_Core_I18n::$SQL_ESCAPER = $oldEscaper;
+      \Civi::$statics['testPreInstall']--;
+      if (\Civi::$statics['testPreInstall'] <= 0) {
+        unset(\Civi::$statics['testPreInstall']);
+      }
+    }
+  }
+
+  /**
    * Get the data source used for testing.
    *
    * @param string|NULL $part
