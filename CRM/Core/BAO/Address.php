@@ -1040,7 +1040,7 @@ SELECT is_primary,
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
 
     // legacy - for api backward compatibility
-    if (!isset($params['add_relationship'] && isset($params['update_current_employer']))) {
+    if (!isset($params['add_relationship']) && isset($params['update_current_employer'])) {
       // warning
       CRM_Core_Error::deprecatedFunctionWarning('update_current_employer is deprecated, use add_relationship instead');
       $params['add_relationship'] = $params['update_current_employer'];

@@ -30,7 +30,7 @@
     <div id="shared-address-{$blockId}" class="form-layout-compressed">
       {$form.address.$blockId.master_contact_id.label}
       {$form.address.$blockId.master_contact_id.html}
-      <div class="shared-address-create-relationship" style="display: none;">
+      <div class="shared-address-add-relationship" style="display: none;">
         {$form.address.$blockId.add_relationship.html}
         {$form.address.$blockId.add_relationship.label}
         <div class="employer">{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}</div>
