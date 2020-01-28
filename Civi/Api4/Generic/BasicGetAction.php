@@ -96,6 +96,7 @@ class BasicGetAction extends AbstractGetAction {
    */
   protected function getRecords() {
     if (is_callable($this->getter)) {
+      $this->addCallbackToDebugOutput($this->getter);
       return call_user_func($this->getter, $this);
     }
     throw new NotImplementedException('Getter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());

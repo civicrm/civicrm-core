@@ -75,6 +75,11 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * Add debugging info to the api result.
    *
+   * When enabled, the $result->debug will be populated with information about the api call,
+   * including sql queries executed.
+   *
+   * Note: with checkPermissions enabled, debug info will only be returned if the user has "view debug output" permission.
+   *
    * @var bool
    */
   protected $debug = FALSE;
@@ -116,7 +121,7 @@ abstract class AbstractAction implements \ArrayAccess {
    */
   private $_id;
 
-  protected $_debugOutput = [];
+  public $_debugOutput = [];
 
   /**
    * Action constructor.
@@ -213,6 +218,7 @@ abstract class AbstractAction implements \ArrayAccess {
     $kernel = \Civi::service('civi_api_kernel');
     $result = $kernel->runRequest($this);
     if ($this->debug && (!$this->checkPermissions || \CRM_Core_Permission::check('view debug output'))) {
+      $result->debug['actionClass'] = get_class($this);
       $result->debug = array_merge($result->debug, $this->_debugOutput);
     }
     else {
@@ -463,6 +469,27 @@ abstract class AbstractAction implements \ArrayAccess {
     }
     $tpl = "{if $expr}1{else}0{/if}";
     return (bool) trim(\CRM_Core_Smarty::singleton()->fetchWith('string:' . $tpl, $vars));
+  }
+
+  /**
+   * When in debug mode, this logs the callback function being used by a Basic*Action class.
+   *
+   * @param callable $callable
+   */
+  protected function addCallbackToDebugOutput($callable) {
+    if ($this->debug && empty($this->_debugOutput['callback'])) {
+      if (is_scalar($callable)) {
+        $this->_debugOutput['callback'] = (string) $callable;
+      }
+      elseif (is_array($callable)) {
+        foreach ($callable as $key => $unit) {
+          $this->_debugOutput['callback'][$key] = is_object($unit) ? get_class($unit) : (string) $unit;
+        }
+      }
+      elseif (is_object($callable)) {
+        $this->_debugOutput['callback'] = get_class($callable);
+      }
+    }
   }
 
 }
