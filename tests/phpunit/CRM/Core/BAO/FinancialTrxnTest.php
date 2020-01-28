@@ -116,7 +116,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateDeferredTrxn() {
-    Civi::settings()->set('contribution_invoice_settings', ['deferred_revenue_enabled' => '1']);
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $cid = $this->individualCreate();
     $params = [
       'contact_id' => $cid,
