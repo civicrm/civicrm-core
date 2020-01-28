@@ -84,7 +84,7 @@ class GetActions extends BasicGetAction {
         $action = ActionUtil::getAction($this->getEntityName(), $actionName);
         if (is_object($action)) {
           $this->_actions[$actionName] = ['name' => $actionName];
-          if ($this->_isFieldSelected('description') || $this->_isFieldSelected('comment')) {
+          if ($this->_isFieldSelected('description', 'comment')) {
             $actionReflection = new \ReflectionClass($action);
             $actionInfo = ReflectionUtils::getCodeDocs($actionReflection);
             unset($actionInfo['method']);

@@ -176,15 +176,13 @@ class BasicActionsTest extends UnitTestCase {
     // If no "select" is set, should always return true
     $this->assertTrue($isFieldSelected->invoke($get, 'color'));
     $this->assertTrue($isFieldSelected->invoke($get, 'shape'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'size'));
+    $this->assertTrue($isFieldSelected->invoke($get, 'size', 'color', 'shape'));
 
     // With a non-empty "select" fieldsToSelect() will return fields needed to evaluate each clause.
     $get->addSelect('id');
-    $this->assertTrue($isFieldSelected->invoke($get, 'color'));
+    $this->assertTrue($isFieldSelected->invoke($get, 'color', 'shape', 'size'));
     $this->assertTrue($isFieldSelected->invoke($get, 'id'));
-    $this->assertFalse($isFieldSelected->invoke($get, 'shape'));
-    $this->assertFalse($isFieldSelected->invoke($get, 'size'));
-    $this->assertFalse($isFieldSelected->invoke($get, 'weight'));
+    $this->assertFalse($isFieldSelected->invoke($get, 'shape', 'size', 'weight'));
     $this->assertFalse($isFieldSelected->invoke($get, 'group'));
 
     $get->addClause('OR', ['shape', '=', 'round'], ['AND', [['size', '=', 'big'], ['weight', '!=', 'small']]]);
@@ -192,7 +190,7 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertTrue($isFieldSelected->invoke($get, 'id'));
     $this->assertTrue($isFieldSelected->invoke($get, 'shape'));
     $this->assertTrue($isFieldSelected->invoke($get, 'size'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'weight'));
+    $this->assertTrue($isFieldSelected->invoke($get, 'group', 'weight'));
     $this->assertFalse($isFieldSelected->invoke($get, 'group'));
 
     $get->addOrderBy('group');

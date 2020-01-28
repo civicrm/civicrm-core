@@ -112,41 +112,46 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   }
 
   /**
-   * Helper to see if a field should be selected by the getRecords function.
+   * Helper to see if field(s) should be selected by the getRecords function.
    *
    * Checks the SELECT, WHERE and ORDER BY params to see what fields are needed.
    *
    * Note that if no SELECT clause has been set then all fields should be selected
    * and this function will always return TRUE.
    *
-   * @param string $field
+   * @param string ...$fieldNames
+   *   One or more field names to check (uses OR if multiple)
    * @return bool
+   *   Returns true if any given fields are in use.
    */
-  protected function _isFieldSelected($field) {
-    if (!$this->select || in_array($field, $this->select) || isset($this->orderBy[$field])) {
+  protected function _isFieldSelected(string ...$fieldNames) {
+    if (!$this->select || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
       return TRUE;
     }
-    return $this->_whereContains($field);
+    return $this->_whereContains($fieldNames);
   }
 
   /**
-   * Walk through the where clause and check if a field is in use.
+   * Walk through the where clause and check if field(s) are in use.
    *
-   * @param string $field
+   * @param string|array $fieldName
+   *   A single fieldName or an array of names (uses OR if multiple)
    * @param array $clauses
    * @return bool
+   *   Returns true if any given fields are found in the where clause.
    */
-  protected function _whereContains($field, $clauses = NULL) {
+  protected function _whereContains($fieldName, $clauses = NULL) {
     if ($clauses === NULL) {
       $clauses = $this->where;
     }
+    $fieldName = (array) $fieldName;
     foreach ($clauses as $clause) {
       if (is_array($clause) && is_string($clause[0])) {
-        if ($clause[0] == $field) {
+        if (in_array($clause[0], $fieldName)) {
           return TRUE;
         }
         elseif (is_array($clause[1])) {
-          return $this->_whereContains($field, $clause[1]);
+          return $this->_whereContains($fieldName, $clause[1]);
         }
       }
     }
