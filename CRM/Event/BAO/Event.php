@@ -1232,8 +1232,6 @@ WHERE civicrm_event.is_active = 1
             $values['event']
           );
           // append invoice pdf to email
-          $template = CRM_Core_Smarty::singleton();
-          $taxAmt = $template->get_template_vars('totalTaxAmount');
           $prefixValue = Civi::settings()->get('contribution_invoice_settings');
           $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
           if (isset($invoicing) && isset($prefixValue['is_email_pdf']) && !empty($values['contributionId'])) {
