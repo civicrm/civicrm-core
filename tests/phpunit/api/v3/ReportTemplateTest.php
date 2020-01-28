@@ -842,16 +842,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test Deferred Revenue Report.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testDeferredRevenueReport() {
     $indv1 = $this->individualCreate();
     $indv2 = $this->individualCreate();
-    $params = [
-      'contribution_invoice_settings' => [
-        'deferred_revenue_enabled' => '1',
-      ],
-    ];
-    $this->callAPISuccess('Setting', 'create', $params);
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $this->contributionCreate(
       [
         'contact_id' => $indv1,
