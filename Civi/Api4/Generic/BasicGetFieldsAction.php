@@ -25,7 +25,13 @@ use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\ActionUtil;
 
 /**
- * Get fields for an entity.
+ * Get information about an entity's fields.
+ *
+ * This field information is also known as "metadata."
+ *
+ * Note that different actions may support different lists of fields.
+ * By default this will fetch the field list relevant to Get,
+ * but a different list may be returned if you specify another action.
  *
  * @method $this setLoadOptions(bool $value)
  * @method bool getLoadOptions()

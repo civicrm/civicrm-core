@@ -57,7 +57,7 @@ class Entity extends Generic\AbstractEntity {
         ],
         [
           'name' => 'see',
-          'type' => 'Array',
+          'data_type' => 'Array',
           'description' => 'Any @see annotations from docblock',
         ],
       ];
