@@ -819,7 +819,10 @@ function civicrm_api3_contact_getquick($params) {
         if ($value == 'phone') {
           $actualSelectElements[] = $select[] = 'phone_ext';
         }
-        $from[$value] = "LEFT JOIN civicrm_{$value} {$suffix} ON ( cc.id = {$suffix}.contact_id AND {$suffix}.is_primary = 1 ) ";
+        $from[$value] = "LEFT JOIN civicrm_{$value} {$suffix} ON cc.id = {$suffix}.contact_id ";
+        if (\Civi::settings()->get('searchPrimaryDetailsOnly') != 0) {
+          $from[$value] .= "AND {$suffix}.is_primary = 1 ";
+        }
         break;
 
       case 'country':
@@ -827,7 +830,10 @@ function civicrm_api3_contact_getquick($params) {
         $select[] = "{$suffix}.name as {$value}";
         $actualSelectElements[] = "{$suffix}.name";
         if (!in_array('address', $from)) {
-          $from['address'] = 'LEFT JOIN civicrm_address sts ON ( cc.id = sts.contact_id AND sts.is_primary = 1) ';
+          $from['address'] = 'LEFT JOIN civicrm_address sts ON cc.id = sts.contact_id ';
+          if (\Civi::settings()->get('searchPrimaryDetailsOnly') != 0) {
+            $from[$value] .= 'AND sts.is_primary = 1 ';
+          }
         }
         $from[$value] = " LEFT JOIN civicrm_{$value} {$suffix} ON ( sts.{$value}_id = {$suffix}.id  ) ";
         break;
