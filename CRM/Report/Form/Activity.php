@@ -351,7 +351,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
   public function preProcess() {
     // Is "Include Case Activities" selected?  If yes, include the case_id as a hidden column
-    $includeCaseActivities = CRM_Utils_Request::retrieveValue('include_case_activities_value', 'Boolean');
+    $formToUse = $this->noController ? NULL : $this;
+    $includeCaseActivities = CRM_Utils_Request::retrieve('include_case_activities_value', 'Boolean', $formToUse);
     if (!empty($includeCaseActivities)) {
       $this->_columns['civicrm_case_activity'] = [
         'dao' => 'CRM_Case_DAO_CaseActivity',
