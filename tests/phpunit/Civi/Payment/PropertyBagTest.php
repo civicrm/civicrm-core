@@ -69,12 +69,12 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Now access via legacy name - should work but generate warning.
     $this->assertEquals(123, $propertyBag['contact_id']);
-    $this->assertEquals("Deprecated code: We have translated 'contact_id' to 'contactID' for you, but please update your code to use the propper setters and getters.", $propertyBag->lastWarning);
+    $this->assertEquals("We have translated 'contact_id' to 'contactID' for you, but please update your code to use the propper setters and getters.", $propertyBag->lastWarning);
 
     // Repeat but this time set the property using a legacy name, fetch by new name.
     $propertyBag = new PropertyBag();
     $propertyBag['contact_id'] = 123;
-    $this->assertEquals("Deprecated code: We have translated 'contact_id' to 'contactID' for you, but please update your code to use the propper setters and getters.", $propertyBag->lastWarning);
+    $this->assertEquals("We have translated 'contact_id' to 'contactID' for you, but please update your code to use the propper setters and getters.", $propertyBag->lastWarning);
     $this->assertEquals(123, $propertyBag->getContactID());
     $this->assertEquals(123, $propertyBag['contactID']);
     $this->assertEquals(123, $propertyBag['contact_id']);
@@ -88,7 +88,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'contactID' => 123,
       'contributionRecurID' => 456,
     ]);
-    $this->assertEquals("Deprecated code: We have merged input params into the property bag for now but please rewrite code to not use this.", $propertyBag->lastWarning);
+    $this->assertEquals("We have merged input params into the property bag for now but please rewrite code to not use this.", $propertyBag->lastWarning);
     $this->assertEquals(123, $propertyBag->getContactID());
     $this->assertEquals(456, $propertyBag->getContributionRecurID());
   }
@@ -106,7 +106,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag = new PropertyBag();
     $propertyBag['customThingForMyProcessor'] = 'fidget';
     $this->assertEquals('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
-    $this->assertEquals("Deprecated code: Unknown property 'customThingForMyProcessor'. We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties", $propertyBag->lastWarning);
+    $this->assertEquals("Unknown property 'customThingForMyProcessor'. We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties", $propertyBag->lastWarning);
   }
 
   /**
