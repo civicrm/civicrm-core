@@ -4123,7 +4123,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             [
               'id' => $resultDAO->id,
               'contribution_id' => $contributionId,
-            ]
+            ],
+            'more',
+            FALSE,
+            'payment.manage.action',
+            'Payment',
+            $resultDAO->id
           );
         }
 
