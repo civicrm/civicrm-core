@@ -39,6 +39,9 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   protected $_yearStatisticsTo = '';
 
   /**
+   * Class constructor.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;

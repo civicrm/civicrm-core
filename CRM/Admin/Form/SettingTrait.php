@@ -151,6 +151,8 @@ trait CRM_Admin_Form_SettingTrait {
 
   /**
    * Add fields in the metadata to the template.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function addFieldsDefinedInSettingsMetadata() {
     $settingMetaData = $this->getSettingsMetaData();
@@ -178,7 +180,7 @@ trait CRM_Admin_Form_SettingTrait {
         }
 
         $add = 'add' . $quickFormType;
-        if ($add == 'addElement') {
+        if ($add === 'addElement') {
           $this->$add(
             $props['html_type'],
             $setting,
@@ -187,13 +189,13 @@ trait CRM_Admin_Form_SettingTrait {
             ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
           );
         }
-        elseif ($add == 'addSelect') {
+        elseif ($add === 'addSelect') {
           $this->addElement('select', $setting, $props['title'], $options, CRM_Utils_Array::value('html_attributes', $props));
         }
-        elseif ($add == 'addCheckBox') {
+        elseif ($add === 'addCheckBox') {
           $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
         }
-        elseif ($add == 'addCheckBoxes') {
+        elseif ($add === 'addCheckBoxes') {
           $newOptions = array_flip($options);
           $classes = 'crm-checkbox-list';
           if (!empty($props['sortable'])) {
@@ -208,12 +210,12 @@ trait CRM_Admin_Form_SettingTrait {
             '</li><li>'
           );
         }
-        elseif ($add == 'addChainSelect') {
+        elseif ($add === 'addChainSelect') {
           $this->addChainSelect($setting, [
             'label' => $props['title'],
           ]);
         }
-        elseif ($add == 'addMonthDay') {
+        elseif ($add === 'addMonthDay') {
           $this->add('date', $setting, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         elseif ($add === 'addEntityRef') {
@@ -232,15 +234,15 @@ trait CRM_Admin_Form_SettingTrait {
         $description = CRM_Utils_Array::value('description', $props);
         $descriptions[$setting] = $description;
         $this->assign("{$setting}_description", $description);
-        if ($setting == 'max_attachments') {
+        if ($setting === 'max_attachments') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
         }
-        if ($setting == 'max_attachments_backend') {
+        if ($setting === 'max_attachments_backend') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments_backend', ts('Value should be a positive number'), 'positiveInteger');
         }
-        if ($setting == 'maxFileSize') {
+        if ($setting === 'maxFileSize') {
           //temp hack
           $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
         }
@@ -293,12 +295,15 @@ trait CRM_Admin_Form_SettingTrait {
    * Get the defaults for all fields defined in the metadata.
    *
    * All others are pending conversion.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setDefaultsForMetadataDefinedFields() {
     CRM_Core_BAO_ConfigSetting::retrieve($this->_defaults);
     foreach (array_keys($this->_settings) as $setting) {
       $this->_defaults[$setting] = civicrm_api3('setting', 'getvalue', ['name' => $setting]);
-      $spec = $this->getSettingsMetadata()[$setting];
+      $spec = $this->getSettingsMetaData()[$setting];
       if (!empty($spec['serialize'])) {
         $this->_defaults[$setting] = CRM_Core_DAO::unSerializeField($this->_defaults[$setting], $spec['serialize']);
       }
@@ -355,6 +360,8 @@ trait CRM_Admin_Form_SettingTrait {
    * @param array $settingValue
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   private function getReorderedSettingData($setting, $settingValue) {
     // Get order from $_POST as $_POST maintains the order the sorted setting
