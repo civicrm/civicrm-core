@@ -87,7 +87,7 @@ class CRM_Core_SelectValues {
       'month' => ts('month'),
       'year' => ts('year'),
     ];
-    if ($unitType == 'duration') {
+    if ($unitType === 'duration') {
       $unitList['lifetime'] = ts('lifetime');
     }
     return $unitList;
@@ -121,10 +121,10 @@ class CRM_Core_SelectValues {
    */
   public static function emailSelectMethods() {
     return [
-      'automatic' => ts("Automatic"),
-      'location-only' => ts("Only send to email addresses assigned to the specified location"),
-      'location-prefer' => ts("Prefer email addresses assigned to the specified location"),
-      'location-exclude' => ts("Exclude email addresses assigned to the specified location"),
+      'automatic' => ts('Automatic'),
+      'location-only' => ts('Only send to email addresses assigned to the specified location'),
+      'location-prefer' => ts('Prefer email addresses assigned to the specified location'),
+      'location-exclude' => ts('Exclude email addresses assigned to the specified location'),
     ];
   }
 
@@ -294,7 +294,7 @@ class CRM_Core_SelectValues {
    *
    * @return array
    *   the date array
-   * @throws \Exception
+   * @throws CRM_Core_Exception
    */
   public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL, $context = 'display') {
     // These options are deprecated. Definitely not used in datepicker. Possibly not even in jcalendar+addDateTime.
@@ -312,7 +312,7 @@ class CRM_Core_SelectValues {
         $dao = new CRM_Core_DAO_PreferencesDate();
         $dao->name = $type;
         if (!$dao->find(TRUE)) {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Date preferences not configured.');
         }
         if (!$maxOffset) {
           $maxOffset = $dao->end;
@@ -326,7 +326,7 @@ class CRM_Core_SelectValues {
       }
 
       if (empty($date['format'])) {
-        if ($context == 'Input') {
+        if ($context === 'Input') {
           $date['format'] = Civi::settings()->get('dateInputFormat');
         }
         else {
@@ -866,7 +866,7 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function getSearchBuilderOperators($fieldType = NULL) {
+  public static function getSearchBuilderOperators() {
     return [
       '=' => '=',
       '!=' => '≠',
@@ -1099,6 +1099,7 @@ class CRM_Core_SelectValues {
    * Dropdown options for quicksearch in the menu
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   public static function quicksearchOptions() {
     $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);
