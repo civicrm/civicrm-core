@@ -325,9 +325,26 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       $this->markTestIncomplete($reportID . " has non enotices when calling statistics fn");
     }
     $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
+    if ($reportID === 'contribute/summary') {
+      $this->hookClass->setHook('civicrm_alterReportVar', [$this, 'alterReportVarHook']);
+    }
     $result = $this->callAPIAndDocument('report_template', 'getstatistics', [
       'report_id' => $reportID,
     ], __FUNCTION__, __FILE__, $description, 'Getstatistics', 'getstatistics');
+  }
+
+  /**
+   * Implements hook_civicrm_alterReportVar().
+   */
+  public function alterReportVarHook($varType, &$var, &$object) {
+    if ($varType === 'sql' && $object instanceof CRM_Report_Form_Contribute_Summary) {
+      $from = $var->getVar('_from');
+      $from .= " LEFT JOIN civicrm_financial_type as temp ON temp.id = contribution_civireport.financial_type_id";
+      $var->setVar('_from', $from);
+      $where = $var->getVar('_where');
+      $where .= " AND ( temp.id IS NOT NULL )";
+      $var->setVar('_where', $where);
+    }
   }
 
   /**
