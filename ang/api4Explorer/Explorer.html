@@ -137,22 +137,26 @@
   </div>
   <div class="api4-explorer-row">
       <div class="panel panel-warning explorer-code-panel">
-        <div class="panel-heading">
-          <h3 class="panel-title" crm-icon="fa-code">{{ ts('Code') }}</h3>
-        </div>
+        <ul class="panel-heading nav nav-tabs">
+          <li role="presentation" ng-repeat="tab in code" ng-class="{active: selectedTab.code === tab.lang}">
+            <a href ng-click="selectedTab.code = tab.lang">
+              {{ tab.lang }}
+            </a>
+          </li>
+        </ul>
         <div class="panel-body">
-          <table>
-            <tr ng-repeat="(type, item) in code">
-              <td>{{ codeLabel[type] }}</td>
-              <td><pre class="prettyprint" ng-bind-html="item"></pre></td>
+          <table ng-repeat="tab in code" ng-show="selectedTab.code === tab.lang">
+            <tr ng-repeat="style in tab.style">
+              <td>{{ style.label }}</td>
+              <td><pre class="prettyprint" ng-bind-html="style.code"></pre></td>
             </tr>
           </table>
         </div>
       </div>
       <div class="panel explorer-result-panel panel-{{ status }}" >
         <ul class="panel-heading nav nav-tabs">
-          <li role="presentation" ng-class="{active: resultTab.selected === 'result'}">
-            <a href ng-click="resultTab.selected = 'result'">
+          <li role="presentation" ng-class="{active: selectedTab.result === 'result'}">
+            <a href ng-click="selectedTab.result = 'result'">
               <i class="fa fa-fw fa-circle-o" ng-if="status === 'default'"></i>
               <i class="fa fa-fw fa-check-circle" ng-if="status === 'success'"></i>
               <i class="fa fa-fw fa-minus-circle" ng-if="status === 'danger'"></i>
@@ -160,18 +164,18 @@
               <span>{{ ts('Result') }}</span>
             </a>
           </li>
-          <li role="presentation" ng-if="perm.accessDebugOutput" ng-class="{active: resultTab.selected === 'debug'}">
-            <a href ng-click="resultTab.selected = 'debug'">
+          <li role="presentation" ng-if="perm.accessDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
+            <a href ng-click="selectedTab.result = 'debug'">
               <i class="fa fa-fw fa-{{ debug ? 'bug' : 'circle-o' }}"></i>
               <span>{{ ts('Debug') }}</span>
             </a>
           </li>
         </ul>
         <div class="panel-body">
-          <div ng-show="resultTab.selected === 'result'">
+          <div ng-show="selectedTab.result === 'result'">
             <pre class="prettyprint" ng-repeat="code in result" ng-bind-html="code"></pre>
           </div>
-          <div ng-show="resultTab.selected === 'debug'">
+          <div ng-show="selectedTab.result === 'debug'">
             <pre ng-if="debug" class="prettyprint" ng-bind-html="debug"></pre>
             <p ng-if="!debug">
               {{ ts('To view debugging output, enable the debug param before executing.') }}
@@ -183,6 +187,4 @@
         </div>
       </div>
   </div>
-
-
 </div>

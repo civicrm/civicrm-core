@@ -40,7 +40,14 @@
   background-color: #f1f1f18c
 }
 #bootstrap-theme.api4-explorer-page .explorer-code-panel table td:first-child {
-  width: 5em;
+  width: 6em;
+  word-break: break-word;
+}
+#bootstrap-theme.api4-explorer-page .explorer-code-panel table td pre {
+  min-height: 3.3em;
+}
+#bootstrap-theme.api4-explorer-page .explorer-code-panel .panel-heading.nav li a {
+  text-transform: uppercase;
 }
 
 #bootstrap-theme.api4-explorer-page .explorer-params-panel > .panel-body > div.api4-input {
