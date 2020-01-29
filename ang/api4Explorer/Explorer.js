@@ -330,8 +330,11 @@
               default:
                 format = 'raw';
             }
-            if (name == 'limit') {
+            if (name === 'limit') {
               defaultVal = 25;
+            }
+            if (name === 'debug') {
+              defaultVal = true;
             }
             if (name === 'values') {
               defaultVal = defaultValues(defaultVal);
@@ -403,6 +406,7 @@
         index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
         result = 'result';
       if ($scope.entity && $scope.action) {
+        delete params.debug;
         if (action.slice(0, 3) === 'get') {
           result = entity.substr(0, 7) === 'Custom_' ? _.camelCase(entity.substr(7)) : entity;
           result = lcfirst(action.replace(/s$/, '').slice(3) || result);
