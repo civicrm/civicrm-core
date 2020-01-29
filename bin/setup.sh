@@ -141,8 +141,10 @@ set -x
 
 if [ -n "$DO_DOWNLOAD" ]; then
   pushd "$CALLEDPATH/.."
-    COMPOSER=$(pickcmd composer composer.phar)
-    $COMPOSER install
+    if [ "$GENCODE_CMS" != "Drupal8" ]; then
+      COMPOSER=$(pickcmd composer composer.phar)
+      $COMPOSER install
+    fi
 
     if has_commands karma ; then
       ## dev dependencies have been installed globally; don't force developer to redownload
