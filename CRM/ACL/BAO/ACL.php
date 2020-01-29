@@ -168,8 +168,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $acl = self::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
-    $c2g = CRM_Contact_BAO_GroupContact::getTableName();
-    $group = CRM_Contact_BAO_Group::getTableName();
 
     $query = " SELECT acl.*
      FROM $acl acl";
@@ -293,7 +291,6 @@ SELECT      acl.*
 
     $aclER = CRM_ACL_DAO_EntityRole::getTableName();
     $c2g = CRM_Contact_BAO_GroupContact::getTableName();
-    $group = CRM_Contact_BAO_Group::getTableName();
 
     $query = "   SELECT          acl.*
                         FROM            $acl acl

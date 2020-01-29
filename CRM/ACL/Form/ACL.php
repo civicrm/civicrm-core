@@ -94,8 +94,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       return;
     }
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_ACL_DAO_ACL');
-
     $this->add('text', 'name', ts('Description'), CRM_Core_DAO::getAttribute('CRM_ACL_DAO_ACL', 'name'), TRUE);
 
     $operations = ['' => ts('- select -')] + CRM_ACL_BAO_ACL::operation();
