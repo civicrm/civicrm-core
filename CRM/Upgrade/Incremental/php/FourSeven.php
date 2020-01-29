@@ -455,9 +455,10 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('CRM-20572: Fix date fields in save search criteria of Contrib Sybunt custom search ', 'fixDateFieldsInSmartGroups');
     // CRM-20868 : Update invoice_numbers (in batch) with value in [invoice prefix][contribution id] format
-    if ($invoicePrefix = CRM_Contribute_BAO_Contribution::checkContributeSettings('invoice_prefix', TRUE)) {
+    $contributionSettings = Civi::settings()->get('contribution_invoice_settings');
+    if (!empty($contributionSettings['invoicing']) && !empty($contributionSettings['invoice_prefix'])) {
       list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
-        FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
+      FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
         $title = ts("Upgrade DB to %1: Update Contribution Invoice number (%2 => %3)", [
@@ -465,7 +466,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
           2 => $startId,
           3 => $endId,
         ]);
-        $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoicePrefix);
+        $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $contributionSettings['invoice_prefix']);
       }
     }
 

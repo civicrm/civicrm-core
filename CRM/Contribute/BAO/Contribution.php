@@ -131,7 +131,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
 
-      if (empty($params['invoice_number'])) {
+      if (empty($params['invoice_number']) && CRM_Invoicing_Utils::isInvoicingEnabled()) {
         $nextContributionID = CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(id) + 1, 1) FROM civicrm_contribution");
         $params['invoice_number'] = self::getInvoiceNumber($nextContributionID);
       }
@@ -5059,21 +5059,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    *
    * @param string $name
-   * @param bool $checkInvoicing
+   *
    * @return string
    *
    */
-  public static function checkContributeSettings($name = NULL, $checkInvoicing = FALSE) {
+  public static function checkContributeSettings($name) {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-
-    if ($checkInvoicing && empty($contributeSettings['invoicing'])) {
-      return NULL;
-    }
-
-    if ($name) {
-      return CRM_Utils_Array::value($name, $contributeSettings);
-    }
-    return $contributeSettings;
+    return CRM_Utils_Array::value($name, $contributeSettings);
   }
 
   /**
@@ -5888,7 +5880,7 @@ LIMIT 1;";
    * @return string
    */
   public static function getInvoiceNumber($contributionID) {
-    if ($invoicePrefix = self::checkContributeSettings('invoice_prefix', TRUE)) {
+    if ($invoicePrefix = self::checkContributeSettings('invoice_prefix')) {
       return $invoicePrefix . $contributionID;
     }
 
