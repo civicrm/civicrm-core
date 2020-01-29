@@ -57,6 +57,8 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    *
    * The scenario is that a pending contribution exists and the IPN call will update it to completed.
    * And also if Tax and Invoicing is enabled, this unit test ensure that invoice pdf is attached with email recipet
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testInvoiceSentOnIPNPaymentSuccess() {
     $this->enableTaxAndInvoicing();
@@ -81,7 +83,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $_REQUEST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $this->getPaypalTransaction();
 
     $mut = new CiviMailUtils($this, TRUE);
-    $paymentProcesors = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $this->_paymentProcessorID]);
+    $paymentProcesors = $this->callAPISuccessGetSingle('PaymentProcessor', ['id' => $this->_paymentProcessorID]);
     $payment = Civi\Payment\System::singleton()->getByProcessor($paymentProcesors);
     $payment->handlePaymentNotification();
 

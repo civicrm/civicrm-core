@@ -135,6 +135,9 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
 
   /**
    * Test the content of the dashboard.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testDashboardContentContributions() {
     $this->contributionCreate(['contact_id' => $this->contactID]);

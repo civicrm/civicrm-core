@@ -24,6 +24,8 @@ class CRM_Invoicing_Utils {
    * @param bool $oldValue
    * @param bool $newValue
    * @param array $metadata
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function onToggle($oldValue, $newValue, $metadata) {
     if ($oldValue == $newValue) {
@@ -32,7 +34,7 @@ class CRM_Invoicing_Utils {
     $existingUserViewOptions = civicrm_api3('Setting', 'get', ['return' => 'user_dashboard_options'])['values'][CRM_Core_Config::domainID()]['user_dashboard_options'];
     $optionValues = civicrm_api3('Setting', 'getoptions', ['field' => 'user_dashboard_options'])['values'];
     $invoiceKey = array_search('Invoices / Credit Notes', $optionValues);
-    $existingIndex = in_array($invoiceKey, $existingUserViewOptions);
+    $existingIndex = array_search($invoiceKey, $existingUserViewOptions);
 
     if ($newValue && $existingIndex === FALSE) {
       $existingUserViewOptions[] = $invoiceKey;

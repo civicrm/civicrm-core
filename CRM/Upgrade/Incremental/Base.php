@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\SettingsBag;
+
 /**
  * Base class for incremental upgrades
  */
@@ -195,11 +197,16 @@ class CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function updateContributeSettings($ctx) {
-    $settings = Civi::settings()->get('contribution_invoice_settings');
-    $metadata = \Civi\Core\SettingsMetadata::getMetadata();
-    $conversions = array_intersect_key((array) $settings, $metadata);
-    foreach ($conversions as $key => $conversion) {
-      Civi::settings()->set($key, $conversion);
+    // Use a direct query as api now does some handling on this.
+    $settings = CRM_Core_DAO::executeQuery("SELECT value, domain_id FROM civicrm_setting WHERE name = 'contribution_invoice_settings'");
+
+    while ($settings->fetch()) {
+      $contributionSettings = (array) CRM_Utils_String::unserialize($settings->value);
+      foreach (array_merge(SettingsBag::getContributionInvoiceSettingKeys(), ['deferred_revenue_enabled' => 'deferred_revenue_enabled']) as $possibleKeyName => $settingName) {
+        if (!empty($contributionSettings[$possibleKeyName]) && empty(Civi::settings($settings->domain_id)->getExplicit($settingName))) {
+          Civi::settings($settings->domain_id)->set($settingName, $contributionSettings[$possibleKeyName]);
+        }
+      }
     }
     return TRUE;
   }
