@@ -33,6 +33,11 @@
     }
   },
   "include-path": ["vendor/tecnickcom"],
+  "config": {
+    "platform": {
+      "php": "7.0.10"
+    }
+  },
   "require": {
     "php": "~7.0",
     "dompdf/dompdf" : "0.8.*",
