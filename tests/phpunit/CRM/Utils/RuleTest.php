@@ -82,6 +82,9 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @dataProvider moneyDataProvider
    * @param $inputData
+   * @param $decimalPoint
+   * @param $thousandSeparator
+   * @param $currency
    * @param $expectedResult
    */
   public function testMoney($inputData, $decimalPoint, $thousandSeparator, $currency, $expectedResult) {
