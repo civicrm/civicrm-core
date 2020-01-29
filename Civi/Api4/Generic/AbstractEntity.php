@@ -30,17 +30,20 @@ use Civi\API\Exception\NotImplementedException;
  *
  * The recommended way to create a non-DAO-based api is to extend this class
  * and then add a getFields function and any other actions you wish, e.g.
- * - a get() function which returns BasicGetAction using your custom getter callback
- * - a create() function which returns BasicCreateAction using your custom setter callback
- * - an update() function which returns BasicUpdateAction using your custom setter callback
- * - a delete() function which returns BasicBatchAction using your custom delete callback
+ * - a get() function which returns BasicGetAction using your custom getter callback.
+ * - a create() function which returns BasicCreateAction using your custom setter callback.
+ * - a save() function which returns BasicSaveAction using your custom setter callback.
+ * - an update() function which returns BasicUpdateAction using your custom setter callback.
+ * - a delete() function which returns BasicBatchAction using your custom delete callback.
  * - a replace() function which returns BasicReplaceAction (no callback needed but
- *   depends on the existence of get, create, update & delete actions)
+ *   depends on the existence of get, save & delete actions).
  *
  * Note that you can use the same setter callback function for update as create -
  * that function can distinguish between new & existing records by checking if the
  * unique identifier has been set (identifier field defaults to "id" but you can change
- * that when constructing BasicUpdateAction)
+ * that when constructing BasicUpdateAction).
+ *
+ * @see https://lab.civicrm.org/extensions/api4example
  */
 abstract class AbstractEntity {
 

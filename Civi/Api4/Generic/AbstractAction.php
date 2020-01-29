@@ -26,6 +26,15 @@ use Civi\Api4\Utils\ActionUtil;
 /**
  * Base class for all api actions.
  *
+ * An api Action object stores the parameters of the api call, and defines a _run function to execute the action.
+ *
+ * Every `protected` class var is considered a parameter (unless it starts with an underscore).
+ *
+ * Adding a `protected` var to your Action named e.g. `$thing` will automatically:
+ *  - Provide a getter/setter (via `__call` MagicMethod) named `getThing()` and `setThing()`.
+ *  - Expose the param in the Api Explorer (be sure to add a doc-block as it displays in the help panel).
+ *  - Require a value for the param if you add the "@required" annotation.
+ *
  * @method $this setCheckPermissions(bool $value) Enable/disable permission checks
  * @method bool getCheckPermissions()
  * @method $this setDebug(bool $value) Enable/disable debug output
