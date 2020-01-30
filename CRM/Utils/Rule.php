@@ -596,19 +596,6 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function money($value) {
-    $config = CRM_Core_Config::singleton();
-
-    // only edge case when we have a decimal point in the input money
-    // field and not defined in the decimal Point in config settings
-    if ($config->monetaryDecimalPoint &&
-      $config->monetaryDecimalPoint != '.' &&
-      // CRM-7122 also check for Thousands Separator in config settings
-      $config->monetaryThousandSeparator != '.' &&
-      substr_count($value, '.')
-    ) {
-      return FALSE;
-    }
-
     $value = self::cleanMoney($value);
 
     if (self::integer($value)) {

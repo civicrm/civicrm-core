@@ -705,6 +705,104 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider createLocalizedContributionDataProvider
+   * @param $totalAmount
+   * @param $decimalPoint
+   * @param $thousandSeparator
+   * @param $currency
+   * @param $expectedResult
+   * @throws \Exception
+   */
+  public function testCreateLocalizedContribution($totalAmount, $decimalPoint, $thousandSeparator, $currency, $expectedResult) {
+    $this->setDefaultCurrency($currency);
+    $this->setMonetaryDecimalPoint($decimalPoint);
+    $this->setMonetaryThousandSeparator($thousandSeparator);
+
+    $_params = [
+      'contact_id' => $this->_individualId,
+      'receive_date' => '20120511',
+      'total_amount' => $totalAmount,
+      'financial_type_id' => $this->_financialTypeId,
+      'contribution_status_id' => 1,
+    ];
+
+    if ($expectedResult) {
+      $this->callAPISuccess('Contribution', 'create', $_params);
+    }
+    else {
+      $this->callAPIFailure('Contribution', 'create', $_params);
+    }
+  }
+
+  /**
+   * @return array
+   */
+  public function createLocalizedContributionDataProvider() {
+    return [
+      [10, '.', ',', 'USD', TRUE],
+      ['145.0E+3', '.', ',', 'USD', FALSE],
+      ['10', '.', ',', 'USD', TRUE],
+      [-10, '.', ',', 'USD', TRUE],
+      ['-10', '.', ',', 'USD', TRUE],
+      ['-10foo', '.', ',', 'USD', FALSE],
+      ['-10.0345619', '.', ',', 'USD', TRUE],
+      ['-10.010,4345619', '.', ',', 'USD', TRUE],
+      ['10.0104345619', '.', ',', 'USD', TRUE],
+      ['-0', '.', ',', 'USD', TRUE],
+      ['-.1', '.', ',', 'USD', TRUE],
+      ['.1', '.', ',', 'USD', TRUE],
+      // Test currency symbols too, default locale uses $, so if we wanted to test others we'd need to reconfigure locale
+      ['$1,234,567.89', '.', ',', 'USD', TRUE],
+      ['-$1,234,567.89', '.', ',', 'USD', TRUE],
+      ['$-1,234,567.89', '.', ',', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'USD', TRUE],
+      // Test EURO currency
+      ['€1,234,567.89', '.', ',', 'EUR', TRUE],
+      ['-€1,234,567.89', '.', ',', 'EUR', TRUE],
+      ['€-1,234,567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'EUR', TRUE],
+      // Test Norwegian KR currency
+      ['kr1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr 1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['-kr1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['-kr 1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr-1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr -1,234,567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'NOK', TRUE],
+      // Test different localization options: , as decimal separator and dot as thousand separator
+      ['$1.234.567,89', ',', '.', 'USD', TRUE],
+      ['-$1.234.567,89', ',', '.', 'USD', TRUE],
+      ['$-1.234.567,89', ',', '.', 'USD', TRUE],
+      ['1.234.567,89', ',', '.', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', '.', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', '.', 'USD', TRUE],
+      ['$1,234,567.89', ',', '.', 'USD', FALSE],
+      ['-$1,234,567.89', ',', '.', 'USD', FALSE],
+      ['$-1,234,567.89', ',', '.', 'USD', FALSE],
+      // Now with a space as thousand separator
+      ['$1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['-$1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['$-1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['1 234 567,89', ',', ' ', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', ' ', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', ' ', 'USD', TRUE],
+    ];
+  }
+
+  /**
    * Create test with unique field name on source.
    */
   public function testCreateContributionSource() {
