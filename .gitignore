@@ -30,6 +30,7 @@ authors.txt
 WordPress
 joomla
 packages/
+tests/extern/
 tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tests/phpunit/CiviTest/truncate.xml

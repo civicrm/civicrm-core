@@ -30,6 +30,9 @@
       "PHPUnit_": ["packages/"],
       "Civi": "",
       "Civi\\": [".", "tests/phpunit/"]
+    },
+    "psr-4": {
+      "Cache\\IntegrationTests\\": "tests/extern/Cache/IntegrationTests"
     }
   },
   "include-path": ["vendor/tecnickcom"],
@@ -72,9 +75,6 @@
     "league/csv": "^9.2",
     "tplaner/when": "~3.0.0",
     "xkerman/restricted-unserialize": "~1.1"
-  },
-  "require-dev": {
-    "cache/integration-tests": "dev-master"
   },
   "scripts": {
     "post-install-cmd": [
@@ -232,6 +232,10 @@
       "smartmenus": {
         "url": "https://github.com/vadikom/smartmenus/archive/1.1.0.zip",
         "ignore": [".gitignore", "Gruntfile.js"]
+      },
+      "cache/integration-tests": {
+        "url": "https://raw.githubusercontent.com/php-cache/integration-tests/b97328797ab199f0ac933e39842a86ab732f21f9/src/SimpleCacheTest.php",
+        "path": "tests/extern/Cache/IntegrationTests/SimpleCacheTest.php"
       }
     },
     "patches": {
