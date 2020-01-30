@@ -78,6 +78,20 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
       ],
     ];
 
+    $this->fixtures['com.example.one-Job'] = [
+      'module' => 'com.example.one',
+      'name' => 'Job',
+      'entity' => 'Job',
+      'params' => [
+        'version' => 3,
+        'name' => 'test_job',
+        'run_frequency' => 'Daily',
+        'api_entity' => 'Job',
+        'api_action' => 'Get',
+        'parameters' => '',
+      ],
+    ];
+
     $this->apiKernel = \Civi::service('civi_api_kernel');
     $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'CustomSearch');
     $this->apiKernel->registerApiProvider($this->adhocProvider);
@@ -388,6 +402,72 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertEquals(1, $foo['is_active']);
     $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // Special case: Job entities.
+    //
+    // First we repeat the above steps, but adding the context that
+    // CRM_Extension_Manager adds when installing/enabling extensions.
+    //
+    // The behaviour should be as above.
+    $decls = [$this->fixtures['com.example.one-Job']];
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    // Add the contextual info.
+    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(1, $job['is_active']);
+    $this->assertEquals('test_job', $job['name']);
+    $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+    // Reset context.
+    unset(Civi::$statics['CRM_Extension_Manager']);
+
+    // now deactivate module, which has empty decls and which cascades to managed object
+    $this->modules['one']->is_active = FALSE;
+    $me = new CRM_Core_ManagedEntities($this->modules, []);
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(0, $job['is_active']);
+    $this->assertEquals('test_job', $job['name']);
+    $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+
+    // and reactivate module, which again provides decls and which cascades to managed object
+    $this->modules['one']->is_active = TRUE;
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    // Add the contextual info.
+    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(1, $job['is_active']);
+    $this->assertEquals('test_job', $job['name']);
+    $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+    // Reset context.
+    unset(Civi::$statics['CRM_Extension_Manager']);
+
+    // Currently: module enabled, job enabled.
+    // Test that if we now manually disable the job, calling reconcile in a
+    // normal flush situation does NOT re-enable it.
+    // ... manually disable job.
+    $this->callAPISuccess('Job', 'create', ['id' => $job['id'], 'is_active' => 0]);
+    // ... now call reconcile in the context of a normal flush operation.
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(0, $job['is_active'], "Job that was manually set inactive should not have been set active again, but it was.");
+    $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+
+    // Now call reconcile again, but in the context of the job's extension being enabled. This should re-enable the job.
+    // Add the contextual info.
+    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    // Add the contextual info.
+    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(1, $job['is_active']);
+    $this->assertEquals('test_job', $job['name']);
+    $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+    // Reset context.
+    unset(Civi::$statics['CRM_Extension_Manager']);
   }
 
   /**
