@@ -77,7 +77,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    */
   public function preProcess() {
     if (!$this->_contactId) {
-      CRM_Core_Error::fatal(ts('You must be logged in to view this page.'));
+      throw new CRM_Core_Exception(ts('You must be logged in to view this page.'));
     }
 
     list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
