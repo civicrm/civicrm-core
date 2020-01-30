@@ -2873,6 +2873,10 @@ tbody.scrollContent tr.alternateRow {
   color: #3e3e3e;
 }
 
+.crm-container a.crm-icon-picker-button .ui-button-icon {
+  margin: 5px 0 5px 5px;
+}
+
 .crm-container a.crm-icon-picker-button .ui-button-text {
   color: #9f9f9f;
 }
