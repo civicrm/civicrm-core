@@ -136,6 +136,7 @@ class SettingsBag {
       while ($dao->fetch()) {
         $this->values[$dao->name] = ($dao->value !== NULL) ? \CRM_Utils_String::unserialize($dao->value) : NULL;
       }
+      $dao->values['contribution_invoice_settings'] = $this->getContributionSettings();
     }
 
     return $this;
@@ -253,10 +254,49 @@ class SettingsBag {
    * @return SettingsBag
    */
   public function set($key, $value) {
+    if ($key === 'contribution_invoice_settings') {
+      $this->setContributionSettings($value);
+      return $this;
+    }
     $this->setDb($key, $value);
     $this->values[$key] = $value;
     $this->combined = NULL;
     return $this;
+  }
+
+  /**
+   * Temporary handling for phasing out contribution_invoice_settings.
+   *
+   * Until we have transitioned we need to handle setting & retrieving
+   * contribution_invoice_settings.
+   *
+   * Once removed from core we will add deprecation notices & then remove this.
+   *
+   * https://lab.civicrm.org/dev/core/issues/1558
+   *
+   * @param array $value
+   */
+  public function setContributionSettings($value) {
+    foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
+      $keyValue = $value[$possibleKeyName] ?? '';
+      $this->set($settingName, $keyValue);
+    }
+    $this->values['contribution_invoice_settings'] = $this->getContributionSettings();
+  }
+
+  /**
+   * Temporary function to handle returning the contribution_settings key despite it being deprecated.
+   *
+   * See more in comment block on previous function.
+   *
+   * @return array
+   */
+  public function getContributionSettings() {
+    $contributionSettings = [];
+    foreach (SettingsBag::getContributionInvoiceSettingKeys() as $keyName => $settingName) {
+      $contributionSettings[$keyName] = $this->values[$settingName] ?? '';
+    }
+    return $contributionSettings;
   }
 
   /**
@@ -376,6 +416,24 @@ class SettingsBag {
       // to save the field `group_name`, which is required in older schema.
       \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
     }
+  }
+
+  /**
+   * @return array
+   */
+  public static function getContributionInvoiceSettingKeys(): array {
+    $convertedKeys = [
+      'credit_notes_prefix' => 'credit_notes_prefix',
+      'invoice_prefix' => 'invoice_prefix',
+      'due_date' => 'invoice_due_date',
+      'due_date_period' => 'invoice_due_date_period',
+      'notes' => 'invoice_notes',
+      'is_email_pdf'  => 'invoice_is_email_pdf',
+      'tax_term' => 'tax_term',
+      'tax_display_settings' => 'tax_display_settings',
+      'invoicing' => 'invoicing',
+    ];
+    return $convertedKeys;
   }
 
 }

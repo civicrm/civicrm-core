@@ -461,10 +461,27 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
    * 'proper' setting.
    */
   public function testConvertUpgradeContributeSettings() {
-    Civi::settings()->set('contribution_invoice_settings', ['foo' => 'bar', 'deferred_revenue_enabled' => 1]);
-    $this->assertEquals(0, Civi::settings()->get('deferred_revenue_enabled'));
+    $setting = [
+      'deferred_revenue_enabled' => 1,
+      'invoice_prefix' => 'G_',
+      'credit_notes_prefix' => 'XX_',
+      'due_date' => '20',
+      'due_date_period' => 'weeks',
+      'notes' => '<p>Give me money</p>',
+      'tax_term' => 'Extortion',
+      'tax_display_settings' => 'Exclusive',
+    ];
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_setting (name, domain_id, value)
+    VALUES ('contribution_invoice_settings', 1, '" . serialize($setting) . "')");
     CRM_Upgrade_Incremental_Base::updateContributeSettings(NULL, 5.1);
     $this->assertEquals(1, Civi::settings()->get('deferred_revenue_enabled'));
+    $this->assertEquals('G_', Civi::settings()->get('invoice_prefix'));
+    $this->assertEquals('XX_', Civi::settings()->get('credit_notes_prefix'));
+    $this->assertEquals('20', Civi::settings()->get('invoice_due_date'));
+    $this->assertEquals('weeks', Civi::settings()->get('invoice_due_date_period'));
+    $this->assertEquals('<p>Give me money</p>', Civi::settings()->get('invoice_notes'));
+    $this->assertEquals('Extortion', Civi::settings()->get('tax_term'));
+    $this->assertEquals('Exclusive', Civi::settings()->get('tax_display_settings'));
   }
 
   /**

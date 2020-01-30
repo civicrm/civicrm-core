@@ -444,6 +444,27 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * Get options for displaying tax.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function taxDisplayOptions() {
+    return [
+      'Do_not_show' => ts('Do not show breakdown, only show total - i.e %1', [
+        1 => CRM_Utils_Money::format(120),
+      ]),
+      'Inclusive' => ts('Show [tax term] inclusive price - i.e. %1', [
+        1 => ts('%1 (includes [tax term] of %2)', [1 => CRM_Utils_Money::format(120), 2 => CRM_Utils_Money::format(20)]),
+      ]),
+      'Exclusive' => ts('Show [tax term] exclusive price - i.e. %1', [
+        1 => ts('%1 + %2 [tax term]', [1 => CRM_Utils_Money::format(120), 2 => CRM_Utils_Money::format(20)]),
+      ]),
+    ];
+  }
+
+  /**
    * Get the Address Standardization Providers from available plugins.
    *
    * @return array

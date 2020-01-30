@@ -360,7 +360,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     ]);
     $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($contribution['id'], $totalAmount);
     $this->assertEquals(0.0, $balance);
-    Civi::settings()->revert('contribution_invoice_settings');
+    Civi::settings()->set('deferred_revenue_enabled', FALSE);
   }
 
   /**
