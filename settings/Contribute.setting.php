@@ -32,6 +32,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Is the CVV code required for back office credit card transactions'),
     'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
+    'settings_pages' => ['contribute' => ['weight' => 1]],
   ],
   'contribution_invoice_settings' => [
     // @todo our standard is to have a setting per item not to hide settings in an array with
@@ -70,6 +71,7 @@ return [
     'on_change' => [
       'CRM_Invoicing_Utils::onToggle',
     ],
+    'settings_pages' => ['contribute' => ['weight' => 9]],
   ],
   'credit_notes_prefix' => [
     'group_name' => 'Contribute Preferences',
@@ -85,6 +87,7 @@ return [
     'description' => ts('Prefix to be prepended to credit note ids'),
     'default' => 'CN_',
     'help_text' => ts('The credit note ID is generated when a contribution is set to Refunded, Cancelled or Chargeback. It is visible on invoices, if invoices are enabled'),
+    'settings_pages' => ['contribute' => ['weight' => 8]],
   ],
   'invoice_prefix' => [
     'html_type' => 'text',
@@ -176,6 +179,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'help' => ['id' => 'acl_financial_type'],
+    'settings_pages' => ['contribute' => ['weight' => 3]],
   ],
   'deferred_revenue_enabled' => [
     'group_name' => 'Contribute Preferences',
@@ -190,6 +194,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 5]],
   ],
   'default_invoice_page' => [
     'group_name' => 'Contribute Preferences',
@@ -208,6 +213,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 7]],
   ],
   'always_post_to_accounts_receivable' => [
     'group_name' => 'Contribute Preferences',
@@ -222,6 +228,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 4]],
   ],
   'update_contribution_on_membership_type_change' => [
     'group_name' => 'Contribute Preferences',
@@ -237,5 +244,6 @@ return [
     'is_contact' => 0,
     'description' => ts('Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.'),
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 2]],
   ],
 ];

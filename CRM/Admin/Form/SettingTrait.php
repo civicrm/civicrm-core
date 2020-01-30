@@ -153,8 +153,10 @@ trait CRM_Admin_Form_SettingTrait {
    * Add fields in the metadata to the template.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function addFieldsDefinedInSettingsMetadata() {
+    $this->addSettingsToFormFromMetadata();
     $settingMetaData = $this->getSettingsMetaData();
     $descriptions = [];
     foreach ($settingMetaData as $setting => $props) {
@@ -370,6 +372,21 @@ trait CRM_Admin_Form_SettingTrait {
     $order = array_keys(\CRM_Utils_Request::retrieve($setting, 'String'));
     $settingValueKeys = array_keys($settingValue);
     return array_intersect($order, $settingValueKeys);
+  }
+
+  /**
+   * Add settings to form if the metadata designates they should be on the page.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function addSettingsToFormFromMetadata() {
+    $filter = $this->getSettingPageFilter();
+    $settings = civicrm_api3('Setting', 'getfields', [])['values'];
+    foreach ($settings as $key => $setting) {
+      if (isset($setting['settings_pages'][$filter])) {
+        $this->_settings[$key] = $setting;
+      }
+    }
   }
 
 }
