@@ -93,6 +93,7 @@
     <comment>Backend configuration.</comment>
     <serialize>PHP</serialize>
     <add>1.6</add>
+    <drop>5.23</drop>
   </field>
   <field>
     <name>version</name>

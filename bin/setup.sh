@@ -211,9 +211,9 @@ fi
 
 if [ -n "$DO_FLUSH" ]; then
   pushd "$CALLEDPATH/.."
-    # reset config_backend and userFrameworkResourceURL which gets set
+    # reset userFrameworkResourceURL which gets set
     # when config object is initialized
-    $MYSQLCMD -e "UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
+    $MYSQLCMD -e "UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
   popd
 fi
 
