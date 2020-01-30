@@ -553,7 +553,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             list($result, $value) = $this->processPayment($payment, $value);
           }
           else {
-            CRM_Core_Error::fatal($paymentObjError);
+            throw new CRM_Core_Exception($paymentObjError);
           }
         }
 
@@ -793,7 +793,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $this->processPayment($payment, $primaryParticipant);
         }
         else {
-          CRM_Core_Error::fatal($paymentObjError);
+          throw new CRM_Core_Exception($paymentObjError);
         }
       }
     }

@@ -159,7 +159,7 @@ AND    {$this->_componentClause}";
       $ids['event'] = CRM_Utils_Array::value('event', $detail);
 
       if (!$elements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('invalid data');
       }
 
       $contribution = &$objects['contribution'];

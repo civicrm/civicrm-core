@@ -69,7 +69,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
-      CRM_Core_Error::fatal('ufGroupId is missing');
+      throw new CRM_Core_Exception('ufGroupId is missing');
     }
     $this->_title = ts('Update multiple contributions') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
