@@ -504,7 +504,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
       //CRM-18827 - override the default value if total_amount is submitted
       if (!empty($this->_submitValues['total_amount'])) {
-        $totalAmount = $this->_submitValues['total_amount'];
+        $totalAmount = CRM_Utils_Rule::cleanMoney($this->_submitValues['total_amount']);
       }
       // build membership info array, which is used when membership type is selected to:
       // - set the payment information block
