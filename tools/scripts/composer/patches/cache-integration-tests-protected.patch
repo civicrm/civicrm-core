@@ -1,0 +1,60 @@
+commit 05f97174c09364dc10c084a38ba0cfd5124f4cec
+Author: Arnold Daniels <arnold@jasny.net>
+Date:   Fri Jun 15 13:33:12 2018 +0600
+
+    Allow adding tests (#93)
+    
+    Make the `cache` property protected, to allow additional tests for a cache implementation.
+
+diff --git a/src/CachePoolTest.php b/src/CachePoolTest.php
+index 2b44c51..8fd9cea 100644
+--- a/src/CachePoolTest.php
++++ b/src/CachePoolTest.php
+@@ -25,7 +25,7 @@ abstract class CachePoolTest extends TestCase
+     /**
+      * @type CacheItemPoolInterface
+      */
+-    private $cache;
++    protected $cache;
+ 
+     /**
+      * @return CacheItemPoolInterface that is used in the tests
+diff --git a/src/HierarchicalCachePoolTest.php b/src/HierarchicalCachePoolTest.php
+index 768d120..518bc10 100644
+--- a/src/HierarchicalCachePoolTest.php
++++ b/src/HierarchicalCachePoolTest.php
+@@ -27,7 +27,7 @@ abstract class HierarchicalCachePoolTest extends TestCase
+     /**
+      * @type CacheItemPoolInterface
+      */
+-    private $cache;
++    protected $cache;
+ 
+     /**
+      * @return CacheItemPoolInterface that is used in the tests
+diff --git a/src/SimpleCacheTest.php b/src/SimpleCacheTest.php
+index fdb74fb..f1cce7a 100644
+--- a/src/SimpleCacheTest.php
++++ b/src/SimpleCacheTest.php
+@@ -24,7 +24,7 @@ abstract class SimpleCacheTest extends TestCase
+     /**
+      * @type CacheInterface
+      */
+-    private $cache;
++    protected $cache;
+ 
+     /**
+      * @return CacheInterface that is used in the tests
+diff --git a/src/TaggableCachePoolTest.php b/src/TaggableCachePoolTest.php
+index 763b775..ec656e8 100644
+--- a/src/TaggableCachePoolTest.php
++++ b/src/TaggableCachePoolTest.php
+@@ -27,7 +27,7 @@ abstract class TaggableCachePoolTest extends TestCase
+     /**
+      * @type TaggableCacheItemPoolInterface
+      */
+-    private $cache;
++    protected $cache;
+ 
+     /**
+      * @return TaggableCacheItemPoolInterface that is used in the tests

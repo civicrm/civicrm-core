@@ -40,6 +40,7 @@
   },
   "require": {
     "php": "~7.0",
+    "cache/integration-tests": "~0.16.0",
     "dompdf/dompdf" : "0.8.*",
     "electrolinux/phpquery": "^0.9.6",
     "symfony/config": "^2.8.50 || ~3.0",
@@ -72,9 +73,6 @@
     "league/csv": "^9.2",
     "tplaner/when": "~3.0.0",
     "xkerman/restricted-unserialize": "~1.1"
-  },
-  "require-dev": {
-    "cache/integration-tests": "dev-master"
   },
   "scripts": {
     "post-install-cmd": [
@@ -235,6 +233,11 @@
       }
     },
     "patches": {
+      "cache/integration-tests": {
+        "Allow adding tests": "tools/scripts/composer/patches/cache-integration-tests-protected.patch",
+        "Support PHPUnit 6+": "tools/scripts/composer/patches/cache-integration-tests-phpunit.patch",
+        "Add tests for binary data round trip": "tools/scripts/composer/patches/cache-integration-tests-binary.patch"
+      },
       "phpoffice/common": {
         "Fix handling of libxml_disable_entity_loader": "tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
       },

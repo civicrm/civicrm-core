@@ -1,0 +1,52 @@
+diff --git a/src/CachePoolTest.php b/src/CachePoolTest.php
+index c2bc29e..5e98b8d 100644
+--- a/src/CachePoolTest.php
++++ b/src/CachePoolTest.php
+@@ -14,7 +14,7 @@ namespace Cache\IntegrationTests;
+ use Psr\Cache\CacheItemInterface;
+ use Psr\Cache\CacheItemPoolInterface;
+ 
+-abstract class CachePoolTest extends \PHPUnit_Framework_TestCase
++abstract class CachePoolTest extends \PHPUnit\Framework\TestCase
+ {
+     /**
+      * @type array with functionName => reason.
+diff --git a/src/HierarchicalCachePoolTest.php b/src/HierarchicalCachePoolTest.php
+index a643d3e..f66aeac 100644
+--- a/src/HierarchicalCachePoolTest.php
++++ b/src/HierarchicalCachePoolTest.php
+@@ -16,7 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
+ /**
+  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+  */
+-abstract class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
++abstract class HierarchicalCachePoolTest extends \PHPUnit\Framework\TestCase
+ {
+     /**
+      * @type array with functionName => reason.
+diff --git a/src/SimpleCacheTest.php b/src/SimpleCacheTest.php
+index 45060a6..304dee1 100644
+--- a/src/SimpleCacheTest.php
++++ b/src/SimpleCacheTest.php
+@@ -13,7 +13,7 @@ namespace Cache\IntegrationTests;
+ 
+ use Psr\SimpleCache\CacheInterface;
+ 
+-abstract class SimpleCacheTest extends \PHPUnit_Framework_TestCase
++abstract class SimpleCacheTest extends \PHPUnit\Framework\TestCase
+ {
+     /**
+      * @type array with functionName => reason.
+diff --git a/src/TaggableCachePoolTest.php b/src/TaggableCachePoolTest.php
+index 2a27341..cc98e3f 100644
+--- a/src/TaggableCachePoolTest.php
++++ b/src/TaggableCachePoolTest.php
+@@ -16,7 +16,7 @@ use Cache\TagInterop\TaggableCacheItemPoolInterface;
+ /**
+  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+  */
+-abstract class TaggableCachePoolTest extends \PHPUnit_Framework_TestCase
++abstract class TaggableCachePoolTest extends \PHPUnit\Framework\TestCase
+ {
+     /**
+      * @type array with functionName => reason.

@@ -1,0 +1,66 @@
+commit 89cd7068e83aa776774bfc44f6bcba858c085616
+Author: Stephen Clouse <stephenclouse@gmail.com>
+Date:   Tue Nov 7 04:49:12 2017 -0600
+
+    Add tests for binary data round trip (#85)
+
+diff --git a/src/CachePoolTest.php b/src/CachePoolTest.php
+index f16397f..f30121d 100644
+--- a/src/CachePoolTest.php
++++ b/src/CachePoolTest.php
+@@ -735,6 +735,27 @@ abstract class CachePoolTest extends TestCase
+         $this->assertTrue($item->isHit(), 'isHit() should return true when object are stored. ');
+     }
+ 
++    public function testBinaryData()
++    {
++        if (isset($this->skippedTests[__FUNCTION__])) {
++            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
++
++            return;
++        }
++
++        $data = '';
++        for ($i = 0; $i < 256; $i++) {
++            $data .= chr($i);
++        }
++
++        $item = $this->cache->getItem('key');
++        $item->set($data);
++        $this->cache->save($item);
++
++        $item = $this->cache->getItem('key');
++        $this->assertTrue($data === $item->get(), 'Binary data must survive a round trip.');
++    }
++
+     public function testIsHit()
+     {
+         if (isset($this->skippedTests[__FUNCTION__])) {
+diff --git a/src/SimpleCacheTest.php b/src/SimpleCacheTest.php
+index 8814221..fdb74fb 100644
+--- a/src/SimpleCacheTest.php
++++ b/src/SimpleCacheTest.php
+@@ -647,6 +647,23 @@ abstract class SimpleCacheTest extends TestCase
+         $this->assertEquals($object, $result);
+     }
+ 
++    public function testBinaryData()
++    {
++        if (isset($this->skippedTests[__FUNCTION__])) {
++            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
++        }
++
++        $data = '';
++        for ($i = 0; $i < 256; $i++) {
++            $data .= chr($i);
++        }
++
++        $array = ['a' => 'foo', 2 => 'bar'];
++        $this->cache->set('key', $data);
++        $result = $this->cache->get('key');
++        $this->assertTrue($data === $result, 'Binary data must survive a round trip.');
++    }
++
+     /**
+      * @dataProvider validKeys
+      */
