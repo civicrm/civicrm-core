@@ -306,6 +306,9 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext}');
     $this->assertEquals('http://ext-dir/com.example.ext/', $actual);
+
+    $actual = $smarty->fetch('string:{crmResURL expr="[civicrm.root]/foo"}');
+    $this->assertEquals(Civi::paths()->getUrl('[civicrm.root]/foo'), $actual);
   }
 
   public function testGlob() {
