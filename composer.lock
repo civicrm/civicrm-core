@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b00b30a1ff5e53daf097978e3940c067",
+    "content-hash": "b3fb18d6fdb3244cc94be8eaa883b7ae",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -45,16 +45,16 @@
         },
         {
             "name": "civicrm/civicrm-setup",
-            "version": "v0.2.0",
+            "version": "v0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/civicrm-setup.git",
-                "reference": "e7991aff516c3fff952bed8f90832804a134358a"
+                "reference": "8417d0c62b6e725ef7a49a75935995d0269cbbe8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-setup/zipball/e7991aff516c3fff952bed8f90832804a134358a",
-                "reference": "e7991aff516c3fff952bed8f90832804a134358a",
+                "url": "https://api.github.com/repos/civicrm/civicrm-setup/zipball/8417d0c62b6e725ef7a49a75935995d0269cbbe8",
+                "reference": "8417d0c62b6e725ef7a49a75935995d0269cbbe8",
                 "shasum": ""
             },
             "require": {
@@ -78,7 +78,7 @@
                 }
             ],
             "description": "CiviCRM installation library",
-            "time": "2018-01-23T06:26:55+00:00"
+            "time": "2020-01-18T03:46:43+00:00"
         },
         {
             "name": "civicrm/composer-downloads-plugin",
