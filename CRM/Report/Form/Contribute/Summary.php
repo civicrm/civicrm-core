@@ -611,7 +611,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     $this->from('contribution');
+    if ($softCredit) {
+      $this->from();
+    }
     $this->customDataFrom();
+
+    // Ensure that Extensions that modify the from statement in the sql also modify it in the statistics.
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
 
     $contriQuery = "
 COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,
@@ -621,8 +627,6 @@ ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm
 {$this->_from} {$this->_where}";
 
     if ($softCredit) {
-      $this->from();
-      $this->customDataFrom();
       $select = "
 COUNT({$this->_aliases['civicrm_contribution_soft']}.amount )        as civicrm_contribution_soft_soft_amount_count,
 SUM({$this->_aliases['civicrm_contribution_soft']}.amount )          as civicrm_contribution_soft_soft_amount_sum,
