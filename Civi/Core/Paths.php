@@ -146,11 +146,46 @@ class Paths {
       if (isset($GLOBALS['civicrm_paths'][$name])) {
         $this->variables[$name] = array_merge($this->variables[$name], $GLOBALS['civicrm_paths'][$name]);
       }
+      if (isset($this->variables[$name]['url'])) {
+        // Typical behavior is to return an absolute URL. If an admin has put an override that's site-relative, then convert.
+        $this->variables[$name]['url'] = $this->toAbsoluteUrl($this->variables[$name]['url'], $name);
+      }
     }
     if (!isset($this->variables[$name][$attr])) {
       throw new \RuntimeException("Cannot resolve path using \"$name.$attr\"");
     }
     return $this->variables[$name][$attr];
+  }
+
+  /**
+   * @param string $url
+   *   Ex: 'https://example.com:8000/foobar' or '/foobar'
+   * @param string $for
+   *   Ex: 'civicrm.root' or 'civicrm.packages'
+   * @return string
+   */
+  private function toAbsoluteUrl($url, $for) {
+    if (!$url) {
+      return $url;
+    }
+    elseif ($url[0] === '/') {
+      // Relative URL interpretation
+      if ($for === 'cms.root') {
+        throw new \RuntimeException('Invalid configuration: the [cms.root] path must be an absolute URL');
+      }
+      $cmsUrl = rtrim($this->getVariable('cms.root', 'url'), '/');
+      // The norms for relative URLs dictate:
+      // Single-slash: "/sub/dir" or "/" (domain-relative)
+      // Double-slash: "//example.com/sub/dir" (same-scheme)
+      $prefix = ($url === '/' || $url[1] !== '/')
+        ? $cmsUrl
+        : (parse_url($cmsUrl, PHP_URL_SCHEME) . ':');
+      return $prefix . $url;
+    }
+    else {
+      // Assume this is an absolute URL, as in the past ('_h_ttp://').
+      return $url;
+    }
   }
 
   /**
