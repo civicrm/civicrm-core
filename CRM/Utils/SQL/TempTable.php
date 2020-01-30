@@ -252,7 +252,7 @@ class CRM_Utils_SQL_TempTable {
    */
   public function setCategory($category) {
     if ($category && !preg_match(self::CATEGORY_REGEXP, $category) || strlen($category) > self::CATEGORY_LENGTH) {
-      throw new \RuntimeException("Malformed temp table category");
+      throw new \RuntimeException("Malformed temp table category $category");
     }
     $this->category = $category;
     return $this;
