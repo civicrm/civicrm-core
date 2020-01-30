@@ -818,6 +818,19 @@ class CRM_Core_Resources {
     // Allow hooks to modify this list
     CRM_Utils_Hook::coreResourceList($items, $region);
 
+    // Oof, existing listeners would expect $items to typically begin with 'bower_components/' or 'packages/'
+    // (using an implicit base of `[civicrm.root]`). We preserve the hook contract and cleanup $items post-hook.
+    $map = [
+      'bower_components' => rtrim(Civi::paths()->getUrl('[civicrm.bower]/.', 'absolute'), '/'),
+      'packages' => rtrim(Civi::paths()->getUrl('[civicrm.packages]/.', 'absolute'), '/'),
+    ];
+    $filter = function($m) use ($map) {
+      return $map[$m[1]] . $m[2];
+    };
+    $items = array_map(function($item) use ($filter) {
+      return is_array($item) ? $item : preg_replace_callback(';^(bower_components|packages)(/.*);', $filter, $item);
+    }, $items);
+
     return $items;
   }
 
