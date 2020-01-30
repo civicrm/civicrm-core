@@ -29,8 +29,8 @@ namespace Civi\Api4;
  *
  * Each action takes the name of the custom group as a parameter, or in traditional syntax the entity is prefixed with 'Custom_'
  *
- * Ex. OOP: \Civi\Api4\CustomValue::get('MyStuff')->addWhere('id', '=', 123)
- * Non-OOP: civicrm_api4('Custom_MyStuff', 'get', ['where' => [['id', '=', 123]]]);
+ * **Ex. OOP:** `\Civi\Api4\CustomValue::get('MyStuff')->addWhere('id', '=', 123);`
+ * **Non-OOP:** `civicrm_api4('Custom_MyStuff', 'get', ['where' => [['id', '=', 123]]]);`
  *
  * Note: This class does NOT extend AbstractEntity so it doesn't get mistaken for a "real" entity.
  * @package Civi\Api4

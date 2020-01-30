@@ -26,11 +26,11 @@ namespace Civi\Api4;
  *
  * An ACL record consists of:
  *
- *   - an Operation (e.g. 'View' or 'Edit')
- *   - a set of Data that the operation can be performed on (e.g. a group of contacts)
- *   - and a Role that has permission to do this operation.
+ *   1. An Operation (e.g. 'View' or 'Edit').
+ *   2. A set of Data that the operation can be performed on (e.g. a group of contacts).
+ *   3. A Role that has permission to do this operation.
  *
- * Creating a new ACL requires at minimum a entity table, entity ID and object_table.
+ * Creating a new ACL requires at minimum an entity table, entity ID and object_table.
  *
  * @see https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control
  * @package Civi\Api4

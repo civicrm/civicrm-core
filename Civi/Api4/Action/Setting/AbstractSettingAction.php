@@ -58,7 +58,7 @@ abstract class AbstractSettingAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Checks that really ought to be taken care of by Civi::settings
+   * Checks that really ought to be taken care of by `Civi::settings`.
    *
    * @param int $domain
    * @return array

@@ -68,10 +68,13 @@ class ReflectionUtils {
       if (!$num || strpos($line, '*/') !== FALSE) {
         continue;
       }
-      $line = preg_replace('/[ ]+/', ' ', ltrim(trim($line), '* '));
-      if (strpos($line, '@') === 0) {
-        $words = explode(' ', $line);
-        $key = substr(array_shift($words), 1);
+      $line = ltrim(trim($line), '*');
+      if (strlen($line) && $line[0] === ' ') {
+        $line = substr($line, 1);
+      }
+      if (strpos(ltrim($line), '@') === 0) {
+        $words = explode(' ', ltrim($line, ' @'));
+        $key = array_shift($words);
         $param = NULL;
         if ($key == 'var') {
           $info['type'] = explode('|', $words[0]);

@@ -34,6 +34,7 @@
     $scope.perm = {
       accessDebugOutput: CRM.checkPerm('access debug output')
     };
+    marked.setOptions({highlight: prettyPrintOne});
     var getMetaParams = {},
       objectParams = {orderBy: 'ASC', values: '', chain: ['Entity', '', '{}']},
       docs = CRM.vars.api4.docs,
@@ -152,15 +153,32 @@
       return fields;
     }
 
-    $scope.help = function(title, param) {
-      if (!param) {
+    $scope.help = function(title, content) {
+      if (!content) {
         $scope.helpTitle = helpTitle;
         $scope.helpContent = helpContent;
       } else {
         $scope.helpTitle = title;
-        $scope.helpContent = param;
+        $scope.helpContent = convertMarkdown(content);
       }
     };
+
+    // Sets the static help text (which gets overridden by mousing over other elements)
+    function setHelp(title, content) {
+      $scope.helpTitle = helpTitle = title;
+      $scope.helpContent = helpContent = convertMarkdown(content);
+    }
+
+    function convertMarkdown(rawContent) {
+      var formatted = _.cloneDeep(rawContent);
+      if (formatted.description) {
+        formatted.description = marked(formatted.description);
+      }
+      if (formatted.comment) {
+        formatted.comment = marked(formatted.comment);
+      }
+      return formatted;
+    }
 
     // Format the href for a @see help annotation
     $scope.formatRef = function(see) {
@@ -599,17 +617,15 @@
     // Help for an entity with no action selected
     function showEntityHelp(entityName) {
       var entityInfo = getEntity(entityName);
-      $scope.helpTitle = helpTitle = $scope.entity;
-      $scope.helpContent = helpContent = {
+      setHelp($scope.entity, {
         description: entityInfo.description,
         comment: entityInfo.comment,
         see: entityInfo.see
-      };
+      });
     }
 
     if (!$scope.entity) {
-      $scope.helpTitle = helpTitle = ts('APIv4 Explorer');
-      $scope.helpContent = helpContent = {description: docs.description, comment: docs.comment, see: docs.see};
+      setHelp(ts('APIv4 Explorer'), {description: docs.description, comment: docs.comment, see: docs.see});
     } else if (!actions.length && !getEntity().actions) {
       getMetaParams.actions = [$scope.entity, 'getActions', {chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]}}];
       fetchMeta();
@@ -635,8 +651,7 @@
       if ($scope.entity && $routeParams.api4action !== newVal && !_.isUndefined(newVal)) {
         $location.url('/explorer/' + $scope.entity + '/' + newVal);
       } else if (newVal) {
-        $scope.helpTitle = helpTitle = $scope.entity + '::' + newVal;
-        $scope.helpContent = helpContent = _.pick(_.findWhere(getEntity().actions, {name: newVal}), ['description', 'comment', 'see']);
+        setHelp($scope.entity + '::' + newVal, _.pick(_.findWhere(getEntity().actions, {name: newVal}), ['description', 'comment', 'see']));
       }
     });
 

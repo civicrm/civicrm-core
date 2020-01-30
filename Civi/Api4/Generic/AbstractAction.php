@@ -56,16 +56,21 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * Keys can be any string - this will be the name given to the output.
    *
-   * You can reference other values in the api results in this call by prefixing them with $
+   * You can reference other values in the api results in this call by prefixing them with `$`.
    *
    * For example, you could create a contact and place them in a group by chaining the
-   * GroupContact api to the Contact api:
+   * `GroupContact` api to the `Contact` api:
    *
+   * ```php
    * Contact::create()
    *   ->setValue('first_name', 'Hello')
-   *   ->addChain('add_to_a_group', GroupContact::create()->setValue('contact_id', '$id')->setValue('group_id', 123))
+   *   ->addChain('add_a_group', GroupContact::create()
+   *     ->setValue('contact_id', '$id')
+   *     ->setValue('group_id', 123)
+   *   )
+   * ```
    *
-   * This will substitute the id of the newly created contact with $id.
+   * This will substitute the id of the newly created contact with `$id`.
    *
    * @var array
    */
@@ -84,10 +89,10 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * Add debugging info to the api result.
    *
-   * When enabled, the $result->debug will be populated with information about the api call,
+   * When enabled, `$result->debug` will be populated with information about the api call,
    * including sql queries executed.
    *
-   * Note: with checkPermissions enabled, debug info will only be returned if the user has "view debug output" permission.
+   * **Note:** with checkPermissions enabled, debug info will only be returned if the user has "view debug output" permission.
    *
    * @var bool
    */
@@ -175,9 +180,8 @@ abstract class AbstractAction implements \ArrayAccess {
    * @param string $name
    *   Unique name for this chained request
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
-   * @param string|int $index
-   *   Either a string for how the results should be indexed e.g. 'name'
-   *   or the index of a single result to return e.g. 0 for the first result.
+   * @param string|int|array $index
+   *   See `civicrm_api4()` for documentation of `$index` param
    * @return $this
    */
   public function addChain($name, AbstractAction $apiRequest, $index = NULL) {

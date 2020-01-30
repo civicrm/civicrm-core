@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3fb18d6fdb3244cc94be8eaa883b7ae",
+    "content-hash": "36eeb97f14e2af530920b89c59124de3",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
