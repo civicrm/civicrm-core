@@ -707,7 +707,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider createLocalizedContributionDataProvider
-   * @param $inputData
+   * @param $totalAmount
    * @param $decimalPoint
    * @param $thousandSeparator
    * @param $currency
@@ -729,7 +729,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     if ($expectedResult) {
       $this->callAPISuccess('Contribution', 'create', $_params);
-    } else {
+    }
+    else {
       $this->callAPIFailure('Contribution', 'create', $_params);
     }
   }
@@ -755,14 +756,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ['$1,234,567.89', '.', ',', 'USD', TRUE],
       ['-$1,234,567.89', '.', ',', 'USD', TRUE],
       ['$-1,234,567.89', '.', ',', 'USD', TRUE],
-      ['1234567.89', '.', ',', 'USD', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, '.', ',', 'USD', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'USD', TRUE],
       // Test EURO currency
       ['€1,234,567.89', '.', ',', 'EUR', TRUE],
       ['-€1,234,567.89', '.', ',', 'EUR', TRUE],
       ['€-1,234,567.89', '.', ',', 'EUR', TRUE],
-      ['1234567.89', '.', ',', 'EUR', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, '.', ',', 'EUR', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'EUR', TRUE],
       // Test Norwegian KR currency
       ['kr1,234,567.89', '.', ',', 'NOK', TRUE],
       ['kr 1,234,567.89', '.', ',', 'NOK', TRUE],
@@ -770,15 +775,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ['-kr 1,234,567.89', '.', ',', 'NOK', TRUE],
       ['kr-1,234,567.89', '.', ',', 'NOK', TRUE],
       ['kr -1,234,567.89', '.', ',', 'NOK', TRUE],
-      ['1234567.89', '.', ',', 'NOK', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, '.', ',', 'NOK', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'NOK', TRUE],
       // Test different localization options: , as decimal separator and dot as thousand separator
       ['$1.234.567,89', ',', '.', 'USD', TRUE],
       ['-$1.234.567,89', ',', '.', 'USD', TRUE],
       ['$-1.234.567,89', ',', '.', 'USD', TRUE],
       ['1.234.567,89', ',', '.', 'USD', TRUE],
-      ['1234567.89', ',', '.', 'USD', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, ',', '.', 'USD', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', '.', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', '.', 'USD', TRUE],
       ['$1,234,567.89', ',', '.', 'USD', FALSE],
       ['-$1,234,567.89', ',', '.', 'USD', FALSE],
       ['$-1,234,567.89', ',', '.', 'USD', FALSE],
@@ -787,8 +796,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ['-$1 234 567,89', ',', ' ', 'USD', TRUE],
       ['$-1 234 567,89', ',', ' ', 'USD', TRUE],
       ['1 234 567,89', ',', ' ', 'USD', TRUE],
-      ['1234567.89', ',', ' ', 'USD', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, ',', ' ', 'USD', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', ' ', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', ' ', 'USD', TRUE],
     ];
   }
 

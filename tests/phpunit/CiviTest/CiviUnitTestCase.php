@@ -3278,7 +3278,7 @@ VALUES
    *
    * If you use this function also set the thousand separator setMonetaryDecimalPoint
    *
-   * @param $thousandSeparator
+   * @param $decimalPoint
    */
   protected function setMonetaryDecimalPoint($decimalPoint) {
     Civi::settings()->set('monetaryDecimalPoint', $decimalPoint);

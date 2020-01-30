@@ -115,14 +115,18 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       ['$1,234,567.89', '.', ',', 'USD', TRUE],
       ['-$1,234,567.89', '.', ',', 'USD', TRUE],
       ['$-1,234,567.89', '.', ',', 'USD', TRUE],
-      ['1234567.89', '.', ',', 'USD', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, '.', ',', 'USD', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'USD', TRUE],
       // Test EURO currency
       ['€1,234,567.89', '.', ',', 'EUR', TRUE],
       ['-€1,234,567.89', '.', ',', 'EUR', TRUE],
       ['€-1,234,567.89', '.', ',', 'EUR', TRUE],
-      ['1234567.89', '.', ',', 'EUR', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, '.', ',', 'EUR', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'EUR', TRUE],
       // Test Norwegian KR currency
       ['kr1,234,567.89', '.', ',', 'NOK', TRUE],
       ['kr 1,234,567.89', '.', ',', 'NOK', TRUE],
@@ -130,15 +134,19 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       ['-kr 1,234,567.89', '.', ',', 'NOK', TRUE],
       ['kr-1,234,567.89', '.', ',', 'NOK', TRUE],
       ['kr -1,234,567.89', '.', ',', 'NOK', TRUE],
-      ['1234567.89', '.', ',', 'NOK', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, '.', ',', 'NOK', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'NOK', TRUE],
       // Test different localization options: , as decimal separator and dot as thousand separator
       ['$1.234.567,89', ',', '.', 'USD', TRUE],
       ['-$1.234.567,89', ',', '.', 'USD', TRUE],
       ['$-1.234.567,89', ',', '.', 'USD', TRUE],
       ['1.234.567,89', ',', '.', 'USD', TRUE],
-      ['1234567.89', ',', '.', 'USD', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, ',', '.', 'USD', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', '.', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', '.', 'USD', TRUE],
       ['$1,234,567.89', ',', '.', 'USD', FALSE],
       ['-$1,234,567.89', ',', '.', 'USD', FALSE],
       ['$-1,234,567.89', ',', '.', 'USD', FALSE],
@@ -147,8 +155,10 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       ['-$1 234 567,89', ',', ' ', 'USD', TRUE],
       ['$-1 234 567,89', ',', ' ', 'USD', TRUE],
       ['1 234 567,89', ',', ' ', 'USD', TRUE],
-      ['1234567.89', ',', ' ', 'USD', TRUE], // This is the float format. Encapsulated in strings
-      [1234567.89, ',', ' ', 'USD', TRUE], // This is the float format.
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', ' ', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', ' ', 'USD', TRUE],
     ];
   }
 
