@@ -4693,16 +4693,17 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @return string
    *   Credit Note Id.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function createCreditNoteId() {
-    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
     $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution WHERE creditnote_id IS NOT NULL");
     $creditNoteId = NULL;
 
     do {
       $creditNoteNum++;
-      $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $creditNoteNum;
+      $creditNoteId = Civi::settings()->get('credit_notes_prefix') . '' . $creditNoteNum;
       $result = civicrm_api3('Contribution', 'getcount', [
         'sequential' => 1,
         'creditnote_id' => $creditNoteId,

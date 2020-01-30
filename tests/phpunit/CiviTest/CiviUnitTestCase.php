@@ -3025,7 +3025,6 @@ VALUES
       [
         'invoicing' => 1,
         'invoice_prefix' => 'INV_',
-        'credit_notes_prefix' => 'CN_',
         'due_date' => 10,
         'due_date_period' => 'days',
         'notes' => '',
