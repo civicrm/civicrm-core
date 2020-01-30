@@ -34,7 +34,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PostSelectQuerySubscriber implements EventSubscriberInterface {
 
   /**
-   * @inheritdoc
+   * @inheritDoc
    */
   public static function getSubscribedEvents() {
     return [

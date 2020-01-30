@@ -84,6 +84,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
    */
   protected function writeRecord($item) {
     if (is_callable($this->setter)) {
+      $this->addCallbackToDebugOutput($this->setter);
       return call_user_func($this->setter, $item, $this);
     }
     throw new NotImplementedException('Setter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());

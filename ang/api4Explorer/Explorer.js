@@ -30,7 +30,7 @@
     $scope.availableParams = {};
     $scope.params = {};
     $scope.index = '';
-    $scope.resultTab = {selected: 'result'};
+    $scope.selectedTab = {result: 'result', code: 'php'};
     $scope.perm = {
       accessDebugOutput: CRM.checkPerm('access debug output')
     };
@@ -47,19 +47,35 @@
     $scope.status = 'default';
     $scope.loading = false;
     $scope.controls = {};
-    $scope.codeLabel = {
-      oop: ts('PHP (oop style)'),
-      php: ts('PHP (traditional)'),
-      js: ts('Javascript'),
-      cli: ts('Command Line')
-    };
-    $scope.code = codeDefaults();
-
-    function codeDefaults() {
-      return _.mapValues($scope.codeLabel, function(val, key) {
-        return key === 'oop' ? ts('Select an entity and action') : '';
-      });
-    }
+    $scope.code = [
+      {
+        lang: 'php',
+        style: [
+          {name: 'oop', label: ts('OOP Style'), code: ''},
+          {name: 'php', label: ts('Traditional'), code: ''}
+        ]
+      },
+      {
+        lang: 'js',
+        style: [
+          {name: 'js', label: ts('Single Call'), code: ''},
+          {name: 'js2', label: ts('Batch Calls'), code: ''}
+        ]
+      },
+      {
+        lang: 'ang',
+        style: [
+          {name: 'ang', label: ts('Single Call'), code: ''},
+          {name: 'ang2', label: ts('Batch Calls'), code: ''}
+        ]
+      },
+      {
+        lang: 'cli',
+        style: [
+          {name: 'cv', label: ts('CV'), code: ''}
+        ]
+      },
+    ];
 
     if (!entities.length) {
       formatForSelect2(schema, entities, 'name', ['description']);
@@ -314,8 +330,11 @@
               default:
                 format = 'raw';
             }
-            if (name == 'limit') {
+            if (name === 'limit') {
               defaultVal = 25;
+            }
+            if (name === 'debug') {
+              defaultVal = true;
             }
             if (name === 'values') {
               defaultVal = defaultValues(defaultVal);
@@ -380,13 +399,14 @@
     }
 
     function writeCode() {
-      var code = codeDefaults(),
+      var code = {},
         entity = $scope.entity,
         action = $scope.action,
         params = getParams(),
         index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
         result = 'result';
       if ($scope.entity && $scope.action) {
+        delete params.debug;
         if (action.slice(0, 3) === 'get') {
           result = entity.substr(0, 7) === 'Custom_' ? _.camelCase(entity.substr(7)) : entity;
           result = lcfirst(action.replace(/s$/, '').slice(3) || result);
@@ -401,19 +421,22 @@
         }
 
         // Write javascript
-        code.js = "CRM.api4('" + entity + "', '" + action + "', {";
+        var js = "'" + entity + "', '" + action + "', {";
         _.each(params, function(param, key) {
-          code.js += "\n  " + key + ': ' + stringify(param) +
+          js += "\n  " + key + ': ' + stringify(param) +
             (++i < paramCount ? ',' : '');
           if (key === 'checkPermissions') {
-            code.js += ' // IGNORED: permissions are always enforced from client-side requests';
+            js += ' // IGNORED: permissions are always enforced from client-side requests';
           }
         });
-        code.js += "\n}";
+        js += "\n}";
         if (index || index === 0) {
-          code.js += ', ' + JSON.stringify(index);
+          js += ', ' + JSON.stringify(index);
         }
-        code.js += ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
+        code.js = "CRM.api4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
+        code.js2 = "CRM.api4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
+        code.ang = "crmApi4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
+        code.ang2 = "crmApi4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
 
         // Write php code
         code.php = '$' + results + " = civicrm_api4('" + entity + "', '" + action + "', [";
@@ -472,10 +495,12 @@
         }
 
         // Write cli code
-        code.cli = 'cv api4 ' + entity + '.' + action + " '" + stringify(params) + "'";
+        code.cv = 'cv api4 ' + entity + '.' + action + " '" + stringify(params) + "'";
       }
-      _.each(code, function(val, type) {
-        $scope.code[type] = prettyPrintOne(_.escape(val));
+      _.each($scope.code, function(vals) {
+        _.each(vals.style, function(style) {
+          style.code = code[style.name] ? prettyPrintOne(code[style.name]) : '';
+        });
       });
     }
 

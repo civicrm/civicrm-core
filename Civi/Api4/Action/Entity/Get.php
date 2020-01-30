@@ -25,7 +25,11 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
- * Get entities
+ * Get the names & docblocks of all APIv4 entities.
+ *
+ * Scans for api entities in core + enabled extensions.
+ *
+ * Also includes pseudo-entities from multi-record custom groups by default.
  *
  * @method $this setIncludeCustom(bool $value)
  * @method bool getIncludeCustom()
@@ -45,6 +49,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
   protected function getRecords() {
     $entities = [];
     $toGet = $this->_itemsToGet('name');
+    $getDocs = $this->_isFieldSelected('description', 'comment', 'see');
     $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
@@ -59,7 +64,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
             && is_a('\Civi\Api4\\' . $matches[1], '\Civi\Api4\Generic\AbstractEntity', TRUE)
           ) {
             $entity = ['name' => $matches[1]];
-            if ($this->_isFieldSelected('description') || $this->_isFieldSelected('comment') || $this->_isFieldSelected('see')) {
+            if ($getDocs) {
               $this->addDocs($entity);
             }
             $entities[$matches[1]] = $entity;

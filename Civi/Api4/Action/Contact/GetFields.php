@@ -22,6 +22,9 @@ namespace Civi\Api4\Action\Contact;
 
 use Civi\Api4\Generic\DAOGetFieldsAction;
 
+/**
+ * @inheritDoc
+ */
 class GetFields extends DAOGetFieldsAction {
 
   protected function getRecords() {

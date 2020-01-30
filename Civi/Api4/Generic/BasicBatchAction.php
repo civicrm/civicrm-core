@@ -84,6 +84,7 @@ class BasicBatchAction extends AbstractBatchAction {
    */
   protected function doTask($item) {
     if (is_callable($this->doer)) {
+      $this->addCallbackToDebugOutput($this->doer);
       return call_user_func($this->doer, $item, $this);
     }
     throw new NotImplementedException('Doer function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());
