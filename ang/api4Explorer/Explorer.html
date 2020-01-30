@@ -34,10 +34,10 @@
               <input type="checkbox" id="api4-param-{{ name }}" ng-model="params[name]"/>
               {{ name }}<span class="crm-marker" ng-if="param.required"> *</span>
             </label>
-            <div class="form-control" ng-mouseenter="help('selectRowCount', availableParams.select)" ng-mouseleave="help()" ng-class="{'api4-option-selected': isSelectRowCount()}" ng-if="availableParams.select">
+            <label class="form-control" ng-mouseenter="help('selectRowCount', availableParams.select)" ng-mouseleave="help()" ng-class="{'api4-option-selected': isSelectRowCount()}" ng-if="availableParams.select">
               <input type="checkbox" id="api4-param-selectRowCount" ng-checked="isSelectRowCount()" ng-click="selectRowCount()" />
-              <label for="api4-param-selectRowCount">SelectRowCount</label>
-            </div>
+              SelectRowCount
+            </label>
           </div>
           <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && param.type[0] === 'bool' && param.default === null">
             <label>{{ name }}<span class="crm-marker" ng-if="param.required"> *</span></label>
