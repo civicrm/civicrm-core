@@ -203,6 +203,24 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(1550.55, $contribution['total_amount']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
+    $expected = [
+      'contribution_id' => $contribution['id'],
+      'entity_table' => 'civicrm_participant',
+      'qty' => 1,
+      'label' => 'big',
+      'unit_price' => 1550.55,
+      'line_total' => 1550.55,
+      'participant_count' => 0,
+      'price_field_id' => $this->_ids['price_field'][0],
+      'price_field_value_id' => $this->_ids['price_field_value'][1],
+      'tax_amount' => 0,
+      // Interestingly the financial_type_id set in this test is ignored but currently locking in what is happening with this test so setting to 'actual'
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'),
+    ];
+    foreach ($expected as $key => $value) {
+      $this->assertEquals($value, $lineItem[$key], $key);
+    }
   }
 
   /**

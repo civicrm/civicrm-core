@@ -593,7 +593,7 @@ WHERE li.contribution_id = %1";
    *   These are per the way the form processes them - ie
    *   ['price_1' => 1, 'price_2' => 8]
    *   This would mean price field id 1, option 1 (or 1 unit if using is_enter_qty).
-   * @param float|NULL $overrideAmount
+   * @param float|null $overrideAmount
    *   Optional override of the amount.
    *
    * @param int|null $financialTypeID
