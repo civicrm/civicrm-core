@@ -221,6 +221,11 @@ class CRM_Extension_Manager {
       throw new CRM_Extension_Exception('Cannot install incompatible extension: ' . implode(', ', $incompatible));
     }
 
+    // Store a list of extensions that we're processing. This is referenced in
+    // CRM_Core_ManagedEntities which set entities belonging to these
+    // extensions as is_active.
+    Civi::$statics[__CLASS__]['processing'] = $keys;
+
     foreach ($keys as $key) {
       /** @var CRM_Extension_Info $info */
       /** @var CRM_Extension_Manager_Base $typeManager */
@@ -264,6 +269,10 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+
+    // We no longer require this set.
+    unset(Civi::$statics[__CLASS__]['processing']);
+
     $schema = new CRM_Logging_Schema();
     $schema->fixSchemaDifferences();
 
