@@ -8,6 +8,13 @@
  */
 class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
+  /**
+   * Options on the from Email address array.
+   *
+   * @var array
+   */
+  protected $fromEmailAddressOptions = [];
+
   public function setUp() {
     $this->useTransaction(TRUE);
     parent::setUp();
@@ -23,6 +30,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   protected function assertPostConditions() {
     $this->validateAllPayments();
+    $this->validateAllContributions();
   }
 
   /**
@@ -347,7 +355,22 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       CRM_Event_Form_EventFees::preProcess($form);
       $form->buildEventFeeForm($form);
     }
+    else {
+      $form->_fromEmails = [
+        'from_email_id' => ['abc@gmail.com' => 1],
+      ];
+    }
+    $this->fromEmailAddressOptions = $form->_fromEmails['from_email_id'];
     return $form;
+  }
+
+  /**
+   * Get a valid value for from_email_address.
+   *
+   * @return int|string
+   */
+  public function getFromEmailAddress() {
+    return key($this->fromEmailAddressOptions);
   }
 
   /**
@@ -483,7 +506,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'amount_level' => 'Too much',
       'fee_amount' => $this->formatMoneyInput(1550.55),
       'total_amount' => $this->formatMoneyInput(1550.55),
-      'from_email_address' => 'abc@gmail.com',
+      'from_email_address' => $this->getFromEmailAddress(),
       'send_receipt' => 1,
       'receipt_text' => '',
     ];
@@ -530,9 +553,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPartialPayment($isQuickConfig) {
+    $mut = new CiviMailUtils($this, TRUE);
     $form = $this->getForm(['is_monetary' => 1]);
     $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
-
+    $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $submitParams = [
       'hidden_feeblock' => '1',
       'hidden_eventFullMsg' => '',
@@ -542,12 +566,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'record_contribution' => '1',
       'financial_type_id' => '4',
       'receive_date' => '2020-01-31 00:51:00',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $paymentInstrumentID,
       'trxn_id' => '',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'total_amount' => '20',
       'send_receipt' => '1',
-      'from_email_address' => key($form->_fromEmails['from_email_id']),
+      'from_email_address' => $this->getFromEmailAddress(),
       'receipt_text' => 'Contact the Development Department if you need to make any changes to your registration.',
       'hidden_custom' => '1',
       'hidden_custom_group_count' => ['' => 1],
@@ -563,6 +587,104 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'MAX_FILE_SIZE' => '33554432',
     ];
     $form->submit($submitParams);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    $expected = [
+      'contact_id' => $form->_contactID,
+      'total_amount' => '1550.55',
+      'fee_amount' => '0.00',
+      'net_amount' => '20.00',
+      'contribution_source' => 'I wrote this',
+      'amount_level' => '',
+      'is_template' => '0',
+      'financial_type' => 'Event Fee',
+      'payment_instrument' => 'Check',
+      'contribution_status' => 'Partially paid',
+      'check_number' => '879',
+    ];
+    $this->assertAttributesEquals($expected, $contribution);
+
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertAttributesEquals([
+      'contact_id' => $form->_contactID,
+      'event_title' => 'Annual CiviCRM meet',
+      'participant_fee_level' => [0 => 'big - 1'],
+      'participant_fee_amount' => '1550.55',
+      'participant_fee_currency' => 'USD',
+      'event_type' => 'Conference',
+      'participant_status' => 'Partially paid',
+      'participant_role' => 'Attendee',
+      'participant_source' => 'I wrote this',
+      'participant_note' => 'I wrote a note',
+      'participant_is_pay_later' => '0',
+    ], $participant);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
+    $this->assertAttributesEquals([
+      'entity_table' => 'civicrm_participant',
+      'entity_id' => $participant['id'],
+      'contribution_id' => $contribution['id'],
+      'price_field_id' => $this->getPriceFieldID(),
+      'label' => 'big',
+      'qty' => '1.00',
+      'unit_price' => '1550.55',
+      'line_total' => '1550.55',
+      'participant_count' => '0',
+      'price_field_value_id' => $this->getPriceFieldValueID(),
+      'financial_type_id' => '4',
+      'tax_amount' => '0.00',
+    ], $lineItem);
+
+    $financialTrxn = $this->callAPISuccessGetSingle('FinancialTrxn', ['is_payment' => 0]);
+    $this->assertAttributesEquals([
+      'to_financial_account_id' => '7',
+      'total_amount' => '1550.55',
+      'fee_amount' => '0.00',
+      'net_amount' => '1550.55',
+      'currency' => 'USD',
+      'status_id' => '1',
+      'payment_instrument_id' => $paymentInstrumentID,
+      'check_number' => '879',
+    ], $financialTrxn);
+
+    $payment = $this->callAPISuccessGetSingle('FinancialTrxn', ['is_payment' => 1]);
+    $this->assertAttributesEquals([
+      'to_financial_account_id' => 6,
+      'from_financial_account_id' => 7,
+      'total_amount' => 20,
+      'fee_amount' => '0.00',
+      'net_amount' => 20,
+      'currency' => 'USD',
+      'status_id' => '1',
+      'payment_instrument_id' => $paymentInstrumentID,
+      'check_number' => '879',
+    ], $payment);
+
+    $financialItem = $this->callAPISuccessGetSingle('FinancialItem', []);
+    $this->assertAttributesEquals([
+      'description' => 'big',
+      'contact_id' => $form->_contactID,
+      'amount' => 1550.55,
+      'currency' => 'USD',
+      'status_id' => 2,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $lineItem['id'],
+      'financial_account_id' => 4,
+    ], $financialItem);
+
+    $mut->checkMailLog([
+      'From: "FIXME" <info@EXAMPLE.ORG>',
+      'To: Anthony Anderson <anthony_anderson@civicrm.org>',
+      'Subject: Event Confirmation - Annual CiviCRM meet - Mr. Anthony Anderson II',
+      'Dear Anthony,Contact the Development Department if you need to make any changes to your registration.',
+      'Event Information and Location',
+      'Annual CiviCRM meet',
+      'Registered Email',
+      $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
+      'Total Paid: $ 20.00',
+      'Balance: $ 1,530.55',
+      'Financial Type: Event Fee',
+      'Paid By: Check',
+      'Check Number: 879',
+    ]);
   }
 
   /**

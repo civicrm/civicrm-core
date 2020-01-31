@@ -999,7 +999,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if (!empty($params['contact_id'])) {
       $this->_contactID = $this->_contactId = $params['contact_id'];
     }
-    if (!$this->_priceSetId) {
+    if (!$this->_priceSetId && $this->_isPaidEvent) {
       CRM_Core_Error::deprecatedFunctionWarning('this should never be true, handling to be removed');
     }
     if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
