@@ -28,10 +28,6 @@
  *   api result array
  */
 function civicrm_api3_line_item_create($params) {
-  // @todo the following line is not really appropriate for the api. The BAO should
-  // do the work, and it should be in a tighter function. The below function is  not really
-  // readable because it is handling contribution and line item together.
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'LineItem');
 }
 
@@ -49,6 +45,11 @@ function _civicrm_api3_line_item_create_spec(&$params) {
   $params['unit_price']['api.required'] = 1;
   $params['line_total']['api.required'] = 1;
   $params['label']['api.default'] = 'line item';
+  $params['check_tax_amount'] = [
+    'title' => ts('Should the tax amount on the line item be checked when creating the Line Item'),
+    'api.default' => 1,
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
 }
 
 /**

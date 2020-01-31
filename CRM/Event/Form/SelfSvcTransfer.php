@@ -369,6 +369,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $item['entity_id'] = $participant->id;
       $item['id'] = NULL;
       $item['entity_table'] = "civicrm_participant";
+      $item['check_tax_amount'] = 0;
       $new_item = CRM_Price_BAO_LineItem::create($item);
     }
     //now cancel the from participant record, leaving the original line-item(s)

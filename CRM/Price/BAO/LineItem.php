@@ -32,6 +32,12 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @throws \Exception
    */
   public static function create(&$params) {
+    if ($params['check_tax_amount']) {
+      // @todo the following line is not really appropriate for the api. The BAO should
+      // do the work, and it should be in a tighter function. The below function is  not really
+      // readable because it is handling contribution and line item together.
+      $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
+    }
     $id = CRM_Utils_Array::value('id', $params);
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
@@ -445,6 +451,7 @@ WHERE li.contribution_id = %1";
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
+        $line['check_tax_amount'] = 0;
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
           $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
@@ -692,6 +699,7 @@ WHERE li.contribution_id = %1";
 
     foreach (array_merge($requiredChanges['line_items_to_resurrect'], $requiredChanges['line_items_to_cancel'], $requiredChanges['line_items_to_update']) as $lineItemToAlter) {
       // Must use BAO rather than api because a bad line it in the api which we want to avoid.
+      $lineItemToAlter['check_tax_amount'] = 0;
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 

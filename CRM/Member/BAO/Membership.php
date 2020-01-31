@@ -2134,6 +2134,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       foreach ($values as $line) {
         $line['entity_table'] = 'civicrm_membership';
         $line['entity_id'] = $membershipId;
+        $line['check_tax_amount'] = 0;
         CRM_Price_BAO_LineItem::create($line);
       }
     }
