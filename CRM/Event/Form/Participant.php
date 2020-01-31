@@ -107,60 +107,70 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * If event is paid or unpaid.
+   *
    * @var bool
    */
   public $_isPaidEvent;
 
   /**
    * Page action.
+   *
    * @var int
    */
   public $_action;
 
   /**
    * Role Id.
+   *
    * @var int
    */
   protected $_roleId = NULL;
 
   /**
    * Event Type Id.
+   *
    * @var int
    */
   protected $_eventTypeId = NULL;
 
   /**
    * Participant status Id.
+   *
    * @var int
    */
   protected $_statusId = NULL;
 
   /**
    * Cache all the participant statuses.
+   *
    * @var array
    */
   protected $_participantStatuses;
 
   /**
    * Participant mode.
+   *
    * @var string
    */
   public $_mode = NULL;
 
   /**
    * Event ID preselect.
+   *
    * @var int
    */
   public $_eID = NULL;
 
   /**
    * Line Item for Price Set.
+   *
    * @var array
    */
   public $_lineItem = NULL;
 
   /**
    * Contribution mode for event registration for offline mode.
+   *
    * @var string
    * @deprecated
    */
@@ -170,30 +180,35 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Store id of role custom data type ( option value )
+   *
    * @var int
    */
   protected $_roleCustomDataTypeID;
 
   /**
    * Store id of event Name custom data type ( option value)
+   *
    * @var int
    */
   protected $_eventNameCustomDataTypeID;
 
   /**
    * Selected discount id.
+   *
    * @var int
    */
   public $_originalDiscountId = NULL;
 
   /**
    * Event id.
+   *
    * @var int
    */
   public $_eventId = NULL;
 
   /**
    * Id of payment, if any
+   *
    * @var int
    */
   public $_paymentId = NULL;
@@ -2078,10 +2093,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Process the participant.
    *
    * @param CRM_Core_Form $form
+   * @param array $params
    * @param int $contactID
    *
    * @return \CRM_Event_BAO_Participant
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addParticipant(&$form, $params, $contactID) {
     $transaction = new CRM_Core_Transaction();
@@ -2099,7 +2115,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $participantFields = CRM_Event_DAO_Participant::fields();
-    $participantParams = array(
+    $participantParams = [
       'id' => CRM_Utils_Array::value('participant_id', $params),
       'contact_id' => $contactID,
       'event_id' => $form->_eventId ? $form->_eventId : $params['event_id'],
@@ -2119,7 +2135,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'discount_id' => CRM_Utils_Array::value('discount_id', $params),
       'fee_currency' => CRM_Utils_Array::value('currencyID', $params),
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
-    );
+    ];
 
     if ($form->_action & CRM_Core_Action::PREVIEW || CRM_Utils_Array::value('mode', $params) == 'test') {
       $participantParams['is_test'] = 1;
