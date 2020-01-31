@@ -375,9 +375,13 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * module
    */
   public function testDeactivateReactivateModule() {
+    $manager = CRM_Extension_System::singleton()->getManager();
+
     // create first managed entity ('foo')
     $decls = [];
     $decls[] = $this->fixtures['com.example.one-foo'];
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::install
+    $manager->setProcessesForTesting(['com.example.one' => ['install']]);
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -387,6 +391,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // now deactivate module, which has empty decls and which cascades to managed object
     $this->modules['one']->is_active = FALSE;
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::disable
+    $manager->setProcessesForTesting(['com.example.one' => ['disable']]);
     $me = new CRM_Core_ManagedEntities($this->modules, []);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -396,6 +402,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // and reactivate module, which again provides decls and which cascades to managed object
     $this->modules['one']->is_active = TRUE;
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::enable
+    $manager->setProcessesForTesting(['com.example.one' => ['enable']]);
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -410,19 +418,21 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     //
     // The behaviour should be as above.
     $decls = [$this->fixtures['com.example.one-Job']];
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::install
+    $manager->setProcessesForTesting(['com.example.one' => ['install']]);
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
-    // Add the contextual info.
-    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
     $me->reconcile();
     $job = $me->get('com.example.one', 'Job');
     $this->assertEquals(1, $job['is_active']);
     $this->assertEquals('test_job', $job['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
     // Reset context.
-    unset(Civi::$statics['CRM_Extension_Manager']);
+    $manager->setProcessesForTesting([]);
 
     // now deactivate module, which has empty decls and which cascades to managed object
     $this->modules['one']->is_active = FALSE;
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::disable
+    $manager->setProcessesForTesting(['com.example.one' => ['disable']]);
     $me = new CRM_Core_ManagedEntities($this->modules, []);
     $me->reconcile();
     $job = $me->get('com.example.one', 'Job');
@@ -433,41 +443,45 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     // and reactivate module, which again provides decls and which cascades to managed object
     $this->modules['one']->is_active = TRUE;
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
-    // Add the contextual info.
-    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::enable
+    $manager->setProcessesForTesting(['com.example.one' => ['enable']]);
     $me->reconcile();
     $job = $me->get('com.example.one', 'Job');
     $this->assertEquals(1, $job['is_active']);
     $this->assertEquals('test_job', $job['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
-    // Reset context.
-    unset(Civi::$statics['CRM_Extension_Manager']);
 
     // Currently: module enabled, job enabled.
     // Test that if we now manually disable the job, calling reconcile in a
     // normal flush situation does NOT re-enable it.
     // ... manually disable job.
     $this->callAPISuccess('Job', 'create', ['id' => $job['id'], 'is_active' => 0]);
+
     // ... now call reconcile in the context of a normal flush operation.
+    // Mock the contextual process info - there would not be any
+    $manager->setProcessesForTesting([]);
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $job = $me->get('com.example.one', 'Job');
     $this->assertEquals(0, $job['is_active'], "Job that was manually set inactive should not have been set active again, but it was.");
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
 
-    // Now call reconcile again, but in the context of the job's extension being enabled. This should re-enable the job.
-    // Add the contextual info.
-    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
-    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
-    // Add the contextual info.
-    Civi::$statics['CRM_Extension_Manager']['processing'] = ['com.example.one'];
-    $me->reconcile();
-    $job = $me->get('com.example.one', 'Job');
-    $this->assertEquals(1, $job['is_active']);
-    $this->assertEquals('test_job', $job['name']);
-    $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+    // Now call reconcile again, but in the context of the job's extension being installed/enabled. This should re-enable the job.
+    foreach (['enable', 'install'] as $process) {
+      // Manually disable the job
+      $this->callAPISuccess('Job', 'create', ['id' => $job['id'], 'is_active' => 0]);
+      // Mock the contextual process info that would be added by CRM_Extension_Manager::enable
+      $manager->setProcessesForTesting(['com.example.one' => [$process]]);
+      $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+      $me->reconcile();
+      $job = $me->get('com.example.one', 'Job');
+      $this->assertEquals(1, $job['is_active']);
+      $this->assertEquals('test_job', $job['name']);
+      $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+    }
+
     // Reset context.
-    unset(Civi::$statics['CRM_Extension_Manager']);
+    $manager->setProcessesForTesting([]);
   }
 
   /**

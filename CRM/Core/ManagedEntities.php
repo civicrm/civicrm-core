@@ -265,8 +265,8 @@ class CRM_Core_ManagedEntities {
       $defaults = ['id' => $dao->entity_id, 'is_active' => 1];
       $params = array_merge($defaults, $todo['params']);
 
-      $moduleIsBeingEnabled = in_array($dao->module, Civi::$statics['CRM_Extension_Manager']['processing'] ?? []);
-      if ($dao->entity_type === 'Job' && !$moduleIsBeingEnabled) {
+      $manager = CRM_Extension_System::singleton()->getManager();
+      if ($dao->entity_type === 'Job' && !$manager->extensionIsBeingInstalledOrEnabled($dao->module)) {
         // Special treatment for scheduled jobs:
         //
         // If we're being called as part of enabling/installing a module then
