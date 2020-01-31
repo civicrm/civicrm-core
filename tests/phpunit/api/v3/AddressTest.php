@@ -183,7 +183,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $individualParams = [
       'contact_id' => $individualID,
       'master_id' => $address['id'],
-      'update_current_employer' => 0,
+      'add_relationship' => 0,
     ];
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
     $this->callAPISuccess('relationship', 'getcount', [

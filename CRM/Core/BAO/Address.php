@@ -1023,8 +1023,15 @@ SELECT is_primary,
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
 
+    // legacy - for api backward compatibility
+    if (!isset($params['add_relationship']) && isset($params['update_current_employer'])) {
+      // warning
+      CRM_Core_Error::deprecatedFunctionWarning('update_current_employer is deprecated, use add_relationship instead');
+      $params['add_relationship'] = $params['update_current_employer'];
+    }
+
     // Default to TRUE if not set to maintain api backward compatibility.
-    $createRelationship = isset($params['update_current_employer']) ? $params['update_current_employer'] : TRUE;
+    $createRelationship = isset($params['add_relationship']) ? $params['add_relationship'] : TRUE;
 
     // unset contact id
     $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'contact_id'];

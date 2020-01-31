@@ -157,7 +157,9 @@ class CRM_Contact_Form_Edit_Address {
       $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), ['create' => $profileLinks, 'api' => ['extra' => ['contact_type']]]);
 
       // do we want to update employer for shared address
-      $form->addElement('checkbox', "address[$blockId][update_current_employer]", NULL, ts('Set this organization as current employer'));
+      $employer_label = '<span class="addrel-employer">' . ts('Set this organization as current employer') . '</span>';
+      $household_label = '<span class="addrel-household">' . ts('Create a household member relationship with this contact') . '</span>';
+      $form->addElement('checkbox', "address[$blockId][add_relationship]", NULL, $employer_label . $household_label);
     }
   }
 

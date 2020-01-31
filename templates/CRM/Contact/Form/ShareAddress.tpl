@@ -14,10 +14,10 @@
     <div id="shared-address-{$blockId}" class="form-layout-compressed">
       {$form.address.$blockId.master_contact_id.label}
       {$form.address.$blockId.master_contact_id.html}
-      <div class="shared-address-update-employer" style="display: none;">
-        {$form.address.$blockId.update_current_employer.html}
-        {$form.address.$blockId.update_current_employer.label}
-        {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}
+      <div class="shared-address-add-relationship" style="display: none;">
+        {$form.address.$blockId.add_relationship.html}
+        {$form.address.$blockId.add_relationship.label}
+        <span class="employer">{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}</span>
       </div>
       <div class="shared-address-list">
         {if !empty($sharedAddresses.$blockId.shared_address_display)}
@@ -39,7 +39,10 @@
   CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal},
       contactType = {/literal}{$contactType|@json_encode}{literal},
-      $employerSection = $('#shared-address-' + blockNo + ' .shared-address-update-employer'),
+      $addRelationshipSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship'),
+      $employerSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship .employer'),
+      $employerLabel = $('#shared-address-' + blockNo + ' .shared-address-add-relationship label .addrel-employer'),
+      $householdLabel = $('#shared-address-' + blockNo + ' .shared-address-add-relationship label .addrel-household'),
       $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
       $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
 
@@ -68,11 +71,20 @@
 
       if (!sharedContactId || isNaN(sharedContactId)) {
         $employerSection.hide();
+        $addRelationshipSection.hide();
+        $employerLabel.hide();
+        $householdLabel.hide();
         return;
       }
 
       var otherContactType = $el.select2('data').extra.contact_type;
+      $addRelationshipSection.toggle(contactType === 'Individual' && (otherContactType === 'Organization' || otherContactType === 'Household'));
       $employerSection.toggle(contactType === 'Individual' && otherContactType === 'Organization');
+
+      // use the appropriate label
+      $employerLabel.toggle(contactType === 'Individual' && otherContactType === 'Organization');
+      $householdLabel.toggle(contactType === 'Individual' && otherContactType === 'Household');
+
 
       $.post(CRM.url('civicrm/ajax/inline'), {
           'contact_id': sharedContactId,
