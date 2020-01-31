@@ -4829,40 +4829,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Function to add payments for contribution for Partially Paid status
-   *
-   * @deprecated this is known to be flawed and possibly buggy.
-   *
-   * Replace with Order.create->Payment.create flow.
-   *
-   * @param array $contribution
-   *
-   * @throws \CiviCRM_API3_Exception
-   */
-  public static function addPayments($contribution) {
-    // get financial trxn which is a payment
-    $ftSql = "SELECT ft.id, ft.total_amount
-      FROM civicrm_financial_trxn ft
-      INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
-      WHERE eft.entity_id = %1 AND ft.is_payment = 1 ORDER BY ft.id DESC LIMIT 1";
-
-    $ftDao = CRM_Core_DAO::executeQuery($ftSql, [
-      1 => [
-        $contribution->id,
-        'Integer',
-      ],
-    ]);
-    $ftDao->fetch();
-
-    // store financial item Proportionaly.
-    $trxnParams = [
-      'total_amount' => $ftDao->total_amount,
-      'contribution_id' => $contribution->id,
-    ];
-    self::assignProportionalLineItems($trxnParams, $ftDao->id, $contribution->total_amount);
-  }
-
-  /**
    * Function use to store line item proportionally in in entity financial trxn table
    *
    * @param array $trxnParams

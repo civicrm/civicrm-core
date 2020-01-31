@@ -589,7 +589,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $form->_contactID,
       'total_amount' => '1550.55',
       'fee_amount' => '0.00',
-      'net_amount' => '20.00',
+      'net_amount' => '1550.55',
       'contribution_source' => 'I wrote this',
       'amount_level' => '',
       'is_template' => '0',
@@ -630,18 +630,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'tax_amount' => '0.00',
     ], $lineItem);
 
-    $financialTrxn = $this->callAPISuccessGetSingle('FinancialTrxn', ['is_payment' => 0]);
-    $this->assertAttributesEquals([
-      'to_financial_account_id' => '7',
-      'total_amount' => '1550.55',
-      'fee_amount' => '0.00',
-      'net_amount' => '1550.55',
-      'currency' => 'USD',
-      'status_id' => '1',
-      'payment_instrument_id' => $paymentInstrumentID,
-      'check_number' => '879',
-    ], $financialTrxn);
-
     $payment = $this->callAPISuccessGetSingle('FinancialTrxn', ['is_payment' => 1]);
     $this->assertAttributesEquals([
       'to_financial_account_id' => 6,
@@ -661,7 +649,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $form->_contactID,
       'amount' => 1550.55,
       'currency' => 'USD',
-      'status_id' => 2,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Unpaid'),
       'entity_table' => 'civicrm_line_item',
       'entity_id' => $lineItem['id'],
       'financial_account_id' => 4,

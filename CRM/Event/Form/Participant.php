@@ -227,6 +227,31 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $participantRecord;
 
   /**
+   * Params for creating a payment to add to the contribution.
+   *
+   * @var array
+   */
+  protected $createPaymentParams = [];
+
+  /**
+   * Get params to create payments.
+   *
+   * @return array
+   */
+  public function getCreatePaymentParams(): array {
+    return $this->createPaymentParams;
+  }
+
+  /**
+   * Set params to create payments.
+   *
+   * @param array $createPaymentParams
+   */
+  public function setCreatePaymentParams(array $createPaymentParams) {
+    $this->createPaymentParams = $createPaymentParams;
+  }
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -1360,10 +1385,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           // CRM-13964 partial_payment_total
           if ($amountOwed > $params['total_amount']) {
             // the owed amount
-            $contributionParams['partial_payment_total'] = $amountOwed;
-            // the actual amount paid
-            $contributionParams['partial_amount_to_pay'] = $params['total_amount'];
-            $this->assign('balanceAmount', $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_to_pay']);
+            $contributionParams['total_amount'] = $amountOwed;
+            $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+            $this->assign('balanceAmount', $amountOwed - $params['total_amount']);
+            $this->storePaymentCreateParams($params);
           }
         }
 
@@ -1429,8 +1454,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
       foreach ($contributions as $contribution) {
-        if ('Partially paid' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id)) {
-          CRM_Contribute_BAO_Contribution::addPayments($contribution);
+        if (!empty($this->getCreatePaymentParams())) {
+          civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $contribution->id], $this->getCreatePaymentParams()));
         }
       }
     }
@@ -1467,7 +1492,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
 
-        $this->assign('totalAmount', $contributionParams['total_amount']);
+        $this->assign('totalAmount', $params['total_amount'] ?? $contributionParams['total_amount']);
         $this->assign('isPrimary', 1);
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
       }
@@ -2233,6 +2258,28 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     return '';
+  }
+
+  /**
+   * Store the parameters to create a payment, if approprite, on the form.
+   *
+   * @param array $params
+   *   Params as submitted.
+   */
+  protected function storePaymentCreateParams($params) {
+    if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
+      $this->setCreatePaymentParams([
+        'total_amount' => $params['total_amount'],
+        'is_send_contribution_notification' => FALSE,
+        'payment_instrument_id' => $params['payment_instrument_id'],
+        'trxn_date' => $params['receive_date'] ?? date('Y-m-d'),
+        'trxn_id' => $params['trxn_id'],
+        'pan_truncation' => $params['pan_truncation'] ?? '',
+        'card_type_id' => $params['card_type_id'] ?? '',
+        'check_number' => $params['check_number'] ?? '',
+        'skipCleanMoney' => TRUE,
+      ]);
+    }
   }
 
 }
