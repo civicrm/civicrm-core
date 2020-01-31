@@ -33,12 +33,12 @@ function civicrm_api(string $entity = NULL, string $action, array $params, $extr
  * @see https://docs.civicrm.org/dev/en/latest/api/v4/usage/
  *
  * @param string $entity Name of the CiviCRM entity to access.
- *   All entity names are capitalized CamelCase, e.g. "ContributionPage".
- *   Most entities correspond to a database table (e.g. "Contact" is the table "civicrm_contact").
- *   For a complete list of available entities, call civicrm_api4('Entity', 'get');
+ *   All entity names are capitalized CamelCase, e.g. `ContributionPage`.
+ *   Most entities correspond to a database table (e.g. `Contact` is the table `civicrm_contact`).
+ *   For a complete list of available entities, call `civicrm_api4('Entity', 'get');`
  *
  * @param string $action The "verb" of the api call.
- *   For a complete list of actions for a given entity (e.g. Contact), call civicrm_api4('Contact', 'getActions');
+ *   For a complete list of actions for a given entity (e.g. `Contact`), call `civicrm_api4('Contact', 'getActions');`
  *
  * @param array $params An array of API input keyed by parameter name.
  *   The easiest way to discover all available parameters is to visit the API Explorer on your CiviCRM site.
@@ -47,11 +47,14 @@ function civicrm_api(string $entity = NULL, string $action, array $params, $extr
  * @param string|int|array $index Controls the Result array format.
  *   By default the api Result contains a non-associative array of data. Passing an $index tells the api to
  *   automatically reformat the array, depending on the variable type passed:
- *
- *     - Integer: return a single result array; e.g. index = 0 will return the first result, 1 will return the second, and -1 will return the last.
- *     - String: index the results by a field value; e.g. index = "name" will return an associative array with the field 'name' as keys.
- *     - Non-associative array: return a single value from each result; e.g. index = ['title'] will return a non-associative array of strings - the 'title' field from each result.
- *     - Associative array: a combination of the previous two modes; e.g. index = ['name' => 'title'] will return an array of strings - the 'title' field keyed by the 'name' field.
+ *   - **Integer:** return a single result array;
+ *     e.g. `$index = 0` will return the first result, 1 will return the second, and -1 will return the last.
+ *   - **String:** index the results by a field value;
+ *     e.g. `$index = "name"` will return an associative array with the field 'name' as keys.
+ *   - **Non-associative array:** return a single value from each result;
+ *     e.g. `$index = ['title']` will return a non-associative array of strings - the 'title' field from each result.
+ *   - **Associative array:** a combination of the previous two modes;
+ *     e.g. `$index = ['name' => 'title']` will return an array of strings - the 'title' field keyed by the 'name' field.
  *
  * @return \Civi\Api4\Generic\Result
  * @throws \API_Exception

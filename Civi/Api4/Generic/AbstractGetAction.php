@@ -34,12 +34,12 @@ use Civi\Api4\Utils\SelectUtil;
 abstract class AbstractGetAction extends AbstractQueryAction {
 
   /**
-   * Fields to return. Defaults to all fields ["*"].
+   * Fields to return. Defaults to all fields `["*"]`.
    *
    * Use the * wildcard by itself to select all available fields, or use it to match similarly-named fields.
-   * E.g. "is_*" will match fields named is_primary, is_active, etc.
+   * E.g. `is_*` will match fields named is_primary, is_active, etc.
    *
-   * Set to ["row_count"] to return only the number of items found.
+   * Set to `["row_count"]` to return only the number of items found.
    *
    * @var array
    */
@@ -96,7 +96,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    *
    * Ex: If getRecords fetches a long list of items each with a unique name,
    * but the user has specified a single record to retrieve, you can optimize the call
-   * by checking $this->_itemsToGet('name') and only fetching the item(s) with that name.
+   * by checking `$this->_itemsToGet('name')` and only fetching the item(s) with that name.
    *
    * @param string $field
    * @return array|null

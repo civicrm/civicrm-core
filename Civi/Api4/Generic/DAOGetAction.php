@@ -32,9 +32,9 @@ class DAOGetAction extends AbstractGetAction {
   use Traits\DAOActionTrait;
 
   /**
-   * Fields to return. Defaults to all non-custom fields ["*"].
+   * Fields to return. Defaults to all non-custom fields `["*"]`.
    *
-   * Use the dot notation to perform joins in the select clause, e.g. selecting ["*", "contact.*"] from Email.get
+   * Use the dot notation to perform joins in the select clause, e.g. selecting `["*", "contact.*"]` from `Email::get()`
    * will select all fields for the email + all fields for the related contact.
    *
    * @var array

@@ -194,6 +194,10 @@
         "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
         "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
       },
+      "marked": {
+        "url": "https://github.com/markedjs/marked/archive/v0.8.0.zip",
+        "ignore": [".*", "*.json", "*.md", "Makefile", "*/*"]
+      },
       "google-code-prettify": {
         "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
         "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile"]

@@ -86,7 +86,7 @@ This is the base class.';
             '$foo' => [
               'type' => ['int', 'string'],
               'description' => '',
-              'comment' => "Nothing interesting.\n",
+              'comment' => "  Nothing interesting.\n",
             ],
             '$bar' => [
               'type' => NULL,
