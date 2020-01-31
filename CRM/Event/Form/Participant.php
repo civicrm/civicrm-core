@@ -1211,7 +1211,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //CRM-15372 patch to fix fee amount replacing amount
       $this->_params['fee_amount'] = $this->_params['amount'];
 
-      $participants[] = $this->addParticipant($this, $contactID);
+      $participants[] = $this->addParticipant($this, $this->_params, $contactID);
 
       //add custom data for participant
       CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
@@ -2083,11 +2083,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return \CRM_Event_BAO_Participant
    * @throws \CiviCRM_API3_Exception
    */
-  protected function addParticipant(&$form, $contactID) {
-    if (empty($form->_params)) {
-      return NULL;
-    }
-    $params = $form->_params;
+  protected function addParticipant(&$form, $params, $contactID) {
     $transaction = new CRM_Core_Transaction();
 
     // handle register date CRM-4320
