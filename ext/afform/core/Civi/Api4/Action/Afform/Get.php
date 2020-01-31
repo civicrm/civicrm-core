@@ -79,8 +79,8 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         $groupNames[] = substr($name, 13);
       }
     }
-    if (
-      (!empty($toGet['name']) && !$groupNames)
+    // Early return if this api call is fetching afforms by name and those names are not custom-related
+    if ((!empty($toGet['name']) && !$groupNames)
       || (!empty($toGet['module_name']) && !strstr(implode(' ', $toGet['module_name']), 'afjoinCustom'))
       || (!empty($toGet['directive_name']) && !strstr(implode(' ', $toGet['directive_name']), 'afjoin-custom'))
     ) {
