@@ -365,11 +365,7 @@ class CRM_Afform_ArrayHtml {
    * @return string
    */
   public function replaceUnicodeChars($markup) {
-    // TODO: Potentially replace other unicode characters that can be represented as html entities
-    $replace = [
-      ["\xc2\xa0", '&nbsp;'],
-    ];
-    return str_replace(array_column($replace, 0), array_column($replace, 1), $markup);
+    return mb_convert_encoding($markup, 'HTML-ENTITIES', 'UTF-8');
   }
 
   /**
