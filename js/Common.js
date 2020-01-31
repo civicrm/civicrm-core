@@ -1517,7 +1517,7 @@ if (!CRM.vars) CRM.vars = {};
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (precision ? decimal + Math.abs(value - i).toFixed(precision).slice(2) : '');
-    if ( onlyNumber ) {
+    if (onlyNumber) {
       return result;
     }
     switch (precision) {
