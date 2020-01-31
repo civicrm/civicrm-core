@@ -70,7 +70,7 @@
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
     "pear/log": "1.13.1",
-    "katzien/php-mime-type": "2.1.0",
+    "adrienrn/php-mimetyper": "0.2.2",
     "civicrm/composer-downloads-plugin": "^2.0",
     "league/csv": "^9.2",
     "tplaner/when": "~3.0.0",
