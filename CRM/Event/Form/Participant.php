@@ -1040,7 +1040,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     //participant method (addParticipant)
     $this->_params['participant_status_id'] = $params['status_id'];
     $this->_params['participant_role_id'] = is_array($params['role_id']) ? $params['role_id'] : explode(',', $params['role_id']);
-    $this->_params['participant_register_date'] = $params['register_date'];
     $roleIdWithSeparator = implode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_params['participant_role_id']);
 
     $now = date('YmdHis');
@@ -1066,8 +1065,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       // set email for primary location.
       $fields['email-Primary'] = 1;
       $params['email-Primary'] = $params["email-{$this->_bltID}"] = $this->_contributorEmail;
-
-      $params['register_date'] = $now;
 
       // now set the values for the billing location.
       foreach ($this->_fields as $name => $dontCare) {
@@ -2090,18 +2087,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $params = $form->_params;
     $transaction = new CRM_Core_Transaction();
 
-    // handle register date CRM-4320
-    $registerDate = NULL;
-    if (!empty($form->_allowConfirmation) && $form->_participantId) {
-      $registerDate = $params['participant_register_date'];
-    }
-    elseif (!empty($params['participant_register_date']) &&
-      is_array($params['participant_register_date']) &&
-      !empty($params['participant_register_date'])
-    ) {
-      $registerDate = CRM_Utils_Date::format($params['participant_register_date']);
-    }
-
     $participantFields = CRM_Event_DAO_Participant::fields();
     $participantParams = array(
       'id' => CRM_Utils_Array::value('participant_id', $params),
@@ -2111,7 +2096,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $params, 1
       ),
       'role_id' => CRM_Utils_Array::value('participant_role_id', $params) ?: self::getDefaultRoleID(),
-      'register_date' => ($registerDate) ? $registerDate : date('YmdHis'),
+      'register_date' => $params['register_date'],
       'source' => CRM_Utils_String::ellipsify(
         isset($params['participant_source']) ? CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
         $participantFields['participant_source']['maxlength']
