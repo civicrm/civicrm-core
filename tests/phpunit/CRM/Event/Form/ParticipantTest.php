@@ -8,6 +8,13 @@
  */
 class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
+  /**
+   * Options on the from Email address array.
+   *
+   * @var array
+   */
+  protected $fromEmailAddressOptions = [];
+
   public function setUp() {
     $this->useTransaction(TRUE);
     parent::setUp();
@@ -23,6 +30,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   protected function assertPostConditions() {
     $this->validateAllPayments();
+    $this->validateAllContributions();
   }
 
   /**
@@ -276,15 +284,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     //Get workflow id of event_offline receipt.
     $workflowId = $this->callAPISuccess('OptionValue', 'get', [
-      'return' => ["id"],
-      'option_group_id' => "msg_tpl_workflow_event",
-      'name' => "event_offline_receipt",
+      'return' => ['id'],
+      'option_group_id' => 'msg_tpl_workflow_event',
+      'name' => 'event_offline_receipt',
     ]);
 
     //Modify html to contain event_type_id token.
     $result = $this->callAPISuccess('MessageTemplate', 'get', [
       'sequential' => 1,
-      'return' => ["id", "msg_html"],
+      'return' => ['id', 'msg_html'],
       'workflow_id' => $workflowId['id'],
       'is_default' => 1,
     ]);
@@ -341,16 +349,29 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_single = TRUE;
     $form->_contactID = $form->_contactId = $contactID;
     $form->setCustomDataTypes();
-    $form->_fromEmails = [
-      'from_email_id' => ['abc@gmail.com' => 1],
-    ];
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
       $form->_bltID = 5;
       $form->_isPaidEvent = TRUE;
+      CRM_Event_Form_EventFees::preProcess($form);
       $form->buildEventFeeForm($form);
     }
+    else {
+      $form->_fromEmails = [
+        'from_email_id' => ['abc@gmail.com' => 1],
+      ];
+    }
+    $this->fromEmailAddressOptions = $form->_fromEmails['from_email_id'];
     return $form;
+  }
+
+  /**
+   * Get a valid value for from_email_address.
+   *
+   * @return int|string
+   */
+  public function getFromEmailAddress() {
+    return key($this->fromEmailAddressOptions);
   }
 
   /**
@@ -486,7 +507,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'amount_level' => 'Too much',
       'fee_amount' => $this->formatMoneyInput(1550.55),
       'total_amount' => $this->formatMoneyInput(1550.55),
-      'from_email_address' => 'abc@gmail.com',
+      'from_email_address' => $this->getFromEmailAddress(),
       'send_receipt' => 1,
       'receipt_text' => '',
     ];
@@ -517,6 +538,190 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     // Api doesn't retrieve it & we don't much want to change that as we want to feature freeze BAO_Query.
     $this->assertEquals($futureDate . ' 00:00:00', CRM_Core_DAO::singleValueQuery("SELECT revenue_recognition_date FROM civicrm_contribution WHERE id = {$contribution['id']}"));
+  }
+
+  /**
+   * Test submitting a partially paid event registration.
+   *
+   * In this case the participant status is selected as 'partially paid' and
+   * a contribution is created for the full amount with a payment equal to the entered amount.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isQuickConfig
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmitPartialPayment($isQuickConfig) {
+    $mut = new CiviMailUtils($this, TRUE);
+    $form = $this->getForm(['is_monetary' => 1]);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
+    $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $submitParams = [
+      'hidden_feeblock' => '1',
+      'hidden_eventFullMsg' => '',
+      'priceSetId' => $this->getPriceSetID(),
+      $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
+      'check_number' => '879',
+      'record_contribution' => '1',
+      'financial_type_id' => '4',
+      'receive_date' => '2020-01-31 00:51:00',
+      'payment_instrument_id' => $paymentInstrumentID,
+      'trxn_id' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'total_amount' => '20',
+      'send_receipt' => '1',
+      'from_email_address' => $this->getFromEmailAddress(),
+      'receipt_text' => 'Contact the Development Department if you need to make any changes to your registration.',
+      'hidden_custom' => '1',
+      'hidden_custom_group_count' => ['' => 1],
+      'custom_4_-1' => '',
+      'contact_id' => $form->_contactID,
+      'event_id' => $form->_eventId,
+      'campaign_id' => '',
+      'register_date' => '2020-01-31 00:50:00',
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Partially paid'),
+      'source' => 'I wrote this',
+      'note' => 'I wrote a note',
+      'MAX_FILE_SIZE' => '33554432',
+    ];
+    $form->submit($submitParams);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    $expected = [
+      'contact_id' => $form->_contactID,
+      'total_amount' => '1550.55',
+      'fee_amount' => '0.00',
+      'net_amount' => '20.00',
+      'contribution_source' => 'I wrote this',
+      'amount_level' => '',
+      'is_template' => '0',
+      'financial_type' => 'Event Fee',
+      'payment_instrument' => 'Check',
+      'contribution_status' => 'Partially paid',
+      'check_number' => '879',
+    ];
+    $this->assertAttributesEquals($expected, $contribution);
+
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertAttributesEquals([
+      'contact_id' => $form->_contactID,
+      'event_title' => 'Annual CiviCRM meet',
+      'participant_fee_level' => [0 => 'big - 1'],
+      'participant_fee_amount' => '1550.55',
+      'participant_fee_currency' => 'USD',
+      'event_type' => 'Conference',
+      'participant_status' => 'Partially paid',
+      'participant_role' => 'Attendee',
+      'participant_source' => 'I wrote this',
+      'participant_note' => 'I wrote a note',
+      'participant_is_pay_later' => '0',
+    ], $participant);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
+    $this->assertAttributesEquals([
+      'entity_table' => 'civicrm_participant',
+      'entity_id' => $participant['id'],
+      'contribution_id' => $contribution['id'],
+      'price_field_id' => $this->getPriceFieldID(),
+      'label' => 'big',
+      'qty' => '1.00',
+      'unit_price' => '1550.55',
+      'line_total' => '1550.55',
+      'participant_count' => '0',
+      'price_field_value_id' => $this->getPriceFieldValueID(),
+      'financial_type_id' => '4',
+      'tax_amount' => '0.00',
+    ], $lineItem);
+
+    $financialTrxn = $this->callAPISuccessGetSingle('FinancialTrxn', ['is_payment' => 0]);
+    $this->assertAttributesEquals([
+      'to_financial_account_id' => '7',
+      'total_amount' => '1550.55',
+      'fee_amount' => '0.00',
+      'net_amount' => '1550.55',
+      'currency' => 'USD',
+      'status_id' => '1',
+      'payment_instrument_id' => $paymentInstrumentID,
+      'check_number' => '879',
+    ], $financialTrxn);
+
+    $payment = $this->callAPISuccessGetSingle('FinancialTrxn', ['is_payment' => 1]);
+    $this->assertAttributesEquals([
+      'to_financial_account_id' => 6,
+      'from_financial_account_id' => 7,
+      'total_amount' => 20,
+      'fee_amount' => '0.00',
+      'net_amount' => 20,
+      'currency' => 'USD',
+      'status_id' => '1',
+      'payment_instrument_id' => $paymentInstrumentID,
+      'check_number' => '879',
+    ], $payment);
+
+    $financialItem = $this->callAPISuccessGetSingle('FinancialItem', []);
+    $this->assertAttributesEquals([
+      'description' => 'big',
+      'contact_id' => $form->_contactID,
+      'amount' => 1550.55,
+      'currency' => 'USD',
+      'status_id' => 2,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $lineItem['id'],
+      'financial_account_id' => 4,
+    ], $financialItem);
+
+    $mut->checkMailLog([
+      'From: "FIXME" <info@EXAMPLE.ORG>',
+      'To: Anthony Anderson <anthony_anderson@civicrm.org>',
+      'Subject: Event Confirmation - Annual CiviCRM meet - Mr. Anthony Anderson II',
+      'Dear Anthony,Contact the Development Department if you need to make any changes to your registration.',
+      'Event Information and Location',
+      'Annual CiviCRM meet',
+      'Registered Email',
+      $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
+      'Total Paid: $ 20.00',
+      'Balance: $ 1,530.55',
+      'Financial Type: Event Fee',
+      'Paid By: Check',
+      'Check Number: 879',
+    ]);
+  }
+
+  /**
+   * Get the id of the configured price set.
+   *
+   * @return int
+   */
+  protected function getPriceSetID() {
+    return (int) $this->_ids['price_set'];
+  }
+
+  /**
+   * Get the price field id that has been created for the test.
+   *
+   * @return int
+   */
+  protected function getPriceFieldID() {
+    return (int) $this->_ids['price_field'][0];
+  }
+
+  /**
+   * Get the array key for the configured price field.
+   *
+   * @return string
+   */
+  protected function getPriceFieldKey(): string {
+    return 'price_' . $this->getPriceFieldID();
+  }
+
+  /**
+   * Get the price field value id that has been created for the test.
+   *
+   * @return int
+   */
+  protected function getPriceFieldValueID(): int {
+    return (int) $this->_ids['price_field_value'][1];
   }
 
 }
