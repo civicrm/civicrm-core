@@ -64,10 +64,6 @@ class BasicUpdateAction extends AbstractUpdateAction {
     foreach ($this->getBatchRecords() as $item) {
       $result[] = $this->writeRecord($this->values + $item);
     }
-
-    if (!$result->count()) {
-      throw new \API_Exception('Cannot ' . $this->getActionName() . ' ' . $this->getEntityName() . ', no records found with ' . $this->whereClauseToString());
-    }
   }
 
   /**

@@ -459,7 +459,7 @@ trait Api3TestTrait {
         break;
 
       case 'delete':
-        if (!empty($v3Params['id'])) {
+        if (isset($v3Params['id'])) {
           $v4Params['where'][] = ['id', '=', $v3Params['id']];
         }
         break;
@@ -531,7 +531,7 @@ trait Api3TestTrait {
       ];
     }
 
-    if (($v3Action == 'getsingle' || $v3Action == 'getvalue') && count($result) != 1) {
+    if (($v3Action == 'getsingle' || $v3Action == 'getvalue' || $v3Action == 'delete') && count($result) != 1) {
       return $onlySuccess ? 0 : [
         'is_error' => 1,
         'error_message' => "Expected one $v4Entity but found " . count($result),

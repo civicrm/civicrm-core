@@ -32,19 +32,14 @@ class DAODeleteAction extends AbstractBatchAction {
    */
   public function _run(Result $result) {
     $defaults = $this->getParamDefaults();
-    if ($defaults['where'] && !array_diff_key($this->where, $defaults['where'])) {
+    if ($defaults['where'] && $this->where === $defaults['where']) {
       throw new \API_Exception('Cannot delete ' . $this->getEntityName() . ' with no "where" parameter specified');
     }
 
     $items = $this->getObjects();
-
-    if (!$items) {
-      throw new \API_Exception('Cannot delete ' . $this->getEntityName() . ', no records found with ' . $this->whereClauseToString());
+    if ($items) {
+      $result->exchangeArray($this->deleteObjects($items));
     }
-
-    $ids = $this->deleteObjects($items);
-
-    $result->exchangeArray($ids);
   }
 
   /**
