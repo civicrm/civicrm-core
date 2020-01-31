@@ -4834,38 +4834,31 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * Replace with Order.create->Payment.create flow.
    *
-   * @param array $contributions
+   * @param array $contribution
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function addPayments($contributions) {
+  public static function addPayments($contribution) {
     // get financial trxn which is a payment
     $ftSql = "SELECT ft.id, ft.total_amount
       FROM civicrm_financial_trxn ft
       INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
       WHERE eft.entity_id = %1 AND ft.is_payment = 1 ORDER BY ft.id DESC LIMIT 1";
-    $contributionStatus = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-      'labelColumn' => 'name',
-    ]);
-    foreach ($contributions as $contribution) {
-      if ($contributionStatus[$contribution->contribution_status_id] !== 'Partially paid') {
-        continue;
-      }
-      $ftDao = CRM_Core_DAO::executeQuery($ftSql, [
-        1 => [
-          $contribution->id,
-          'Integer',
-        ],
-      ]);
-      $ftDao->fetch();
 
-      // store financial item Proportionaly.
-      $trxnParams = [
-        'total_amount' => $ftDao->total_amount,
-        'contribution_id' => $contribution->id,
-      ];
-      self::assignProportionalLineItems($trxnParams, $ftDao->id, $contribution->total_amount);
-    }
+    $ftDao = CRM_Core_DAO::executeQuery($ftSql, [
+      1 => [
+        $contribution->id,
+        'Integer',
+      ],
+    ]);
+    $ftDao->fetch();
+
+    // store financial item Proportionaly.
+    $trxnParams = [
+      'total_amount' => $ftDao->total_amount,
+      'contribution_id' => $contribution->id,
+    ];
+    self::assignProportionalLineItems($trxnParams, $ftDao->id, $contribution->total_amount);
   }
 
   /**
