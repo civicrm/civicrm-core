@@ -171,7 +171,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   (required) An api formatted array of keys and values.
    * @param null $domains
    *
-   * @throws api_Exception
+   * @throws API_Exception
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return array
    */
@@ -211,7 +211,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   Empty array to be populated with fields metadata.
    * @param bool $createMode
    *
-   * @throws api_Exception
+   * @throws API_Exception
    * @return array
    *   name => value array of the fields to be set (with extraneous removed)
    */
@@ -253,7 +253,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $fields = civicrm_api3('setting', 'getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
-      throw new api_Exception(implode(',', array_keys($invalidParams)) . " not valid settings");
+      throw new API_Exception(implode(',', array_keys($invalidParams)) . " not valid settings");
     }
     if (!empty($settingParams)) {
       $filteredFields = array_intersect_key($settingParams, $fields['values']);
@@ -274,9 +274,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   Metadata for given field (drawn from the xml)
    *
    * @return bool
-   * @throws \api_Exception
+   * @throws \API_Exception
    */
   public static function validateSetting(&$value, array $fieldSpec) {
+    // Deprecated guesswork - should use $fieldSpec['serialize']
     if ($fieldSpec['type'] == 'String' && is_array($value)) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
@@ -286,7 +287,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     else {
       $cb = Civi\Core\Resolver::singleton()->get($fieldSpec['validate_callback']);
       if (!call_user_func_array($cb, array(&$value, $fieldSpec))) {
-        throw new api_Exception("validation failed for {$fieldSpec['name']} = $value  based on callback {$fieldSpec['validate_callback']}");
+        throw new API_Exception("validation failed for {$fieldSpec['name']} = $value  based on callback {$fieldSpec['validate_callback']}");
       }
     }
   }
@@ -298,11 +299,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param array $fieldSpec Metadata for given field (drawn from the xml)
    *
    * @return bool
-   * @throws \api_Exception
+   * @throws \API_Exception
    */
   public static function validateBoolSetting(&$value, $fieldSpec) {
     if (!CRM_Utils_Rule::boolean($value)) {
-      throw new api_Exception("Boolean value required for {$fieldSpec['name']}");
+      throw new API_Exception("Boolean value required for {$fieldSpec['name']}");
     }
     if (!$value) {
       $value = 0;

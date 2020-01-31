@@ -157,17 +157,16 @@ class Kernel {
   /**
    * Bootstrap - Load basic dependencies and sanity-check inputs.
    *
-   * @param \Civi\API\V4\Action|array $apiRequest
+   * @param \Civi\Api4\Generic\AbstractAction|array $apiRequest
    * @throws \API_Exception
    */
   public function boot($apiRequest) {
     require_once 'api/Exception.php';
-
-    if (!is_array($apiRequest['params'])) {
-      throw new \API_Exception('Input variable `params` is not an array', 2000);
-    }
     switch ($apiRequest['version']) {
       case 3:
+        if (!is_array($apiRequest['params'])) {
+          throw new \API_Exception('Input variable `params` is not an array', 2000);
+        }
         require_once 'api/v3/utils.php';
         _civicrm_api3_initialize();
         break;
