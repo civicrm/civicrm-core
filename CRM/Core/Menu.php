@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * This file contains the various menus of the CiviCRM module
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'CRM/Core/I18n.php';
@@ -44,16 +28,16 @@ class CRM_Core_Menu {
    *
    * @var array
    */
-  static $_items = NULL;
+  public static $_items = NULL;
 
   /**
    * The list of permissioned menu items.
    *
    * @var array
    */
-  static $_permissionedItems = NULL;
+  public static $_permissionedItems = NULL;
 
-  static $_serializedElements = array(
+  public static $_serializedElements = array(
     'access_arguments',
     'access_callback',
     'page_arguments',
@@ -61,7 +45,7 @@ class CRM_Core_Menu {
     'breadcrumb',
   );
 
-  static $_menuCache = NULL;
+  public static $_menuCache = NULL;
   const MENU_ITEM = 1;
 
   /**
@@ -112,7 +96,7 @@ class CRM_Core_Menu {
    * @throws Exception
    */
   public static function read($name, &$menu) {
-    $xml = simplexml_load_file($name);
+    $xml = simplexml_load_string(file_get_contents($name));
     self::readXML($xml, $menu);
   }
 
@@ -367,13 +351,12 @@ class CRM_Core_Menu {
         'title' => $item['title'],
         'desc' => CRM_Utils_Array::value('desc', $item),
         'id' => strtr($item['title'], array(
-            '(' => '_',
-            ')' => '',
-            ' ' => '',
-            ',' => '_',
-            '/' => '_',
-          )
-        ),
+          '(' => '_',
+          ')' => '',
+          ' ' => '',
+          ',' => '_',
+          '/' => '_',
+        )),
         'url' => CRM_Utils_System::url($path, $query,
           FALSE,
           NULL,
@@ -400,120 +383,6 @@ class CRM_Core_Menu {
     }
 
     $menu['admin'] = array('breadcrumb' => $values);
-  }
-
-  /**
-   * Get navigation.
-   *
-   * @param bool $all
-   *
-   * @return mixed
-   * @throws Exception
-   */
-  public static function &getNavigation($all = FALSE) {
-    CRM_Core_Error::fatal();
-
-    if (!self::$_menuCache) {
-      self::get('navigation');
-    }
-
-    if (CRM_Core_Config::isUpgradeMode()) {
-      return array();
-    }
-
-    if (!array_key_exists('navigation', self::$_menuCache)) {
-      // problem could be due to menu table empty. Just do a
-      // menu store and try again
-      self::store();
-
-      // here we goo
-      self::get('navigation');
-      if (!array_key_exists('navigation', self::$_menuCache)) {
-        CRM_Core_Error::fatal();
-      }
-    }
-    $nav = &self::$_menuCache['navigation'];
-
-    if (!$nav ||
-      !isset($nav['breadcrumb'])
-    ) {
-      return NULL;
-    }
-
-    $values = &$nav['breadcrumb'];
-    $config = CRM_Core_Config::singleton();
-    foreach ($values as $index => $item) {
-      if (strpos(CRM_Utils_Array::value($config->userFrameworkURLVar, $_REQUEST),
-          $item['path']
-        ) === 0
-      ) {
-        $values[$index]['active'] = 'class="active"';
-      }
-      else {
-        $values[$index]['active'] = '';
-      }
-
-      if ($values[$index]['parent']) {
-        $parent = $values[$index]['parent'];
-
-        // only reset if still a leaf
-        if ($values[$parent]['class'] == 'leaf') {
-          $values[$parent]['class'] = 'collapsed';
-        }
-
-        // if a child or the parent is active, expand the menu
-        if ($values[$index]['active'] ||
-          $values[$parent]['active']
-        ) {
-          $values[$parent]['class'] = 'expanded';
-        }
-
-        // make the parent inactive if the child is active
-        if ($values[$index]['active'] &&
-          $values[$parent]['active']
-        ) {
-          $values[$parent]['active'] = '';
-        }
-      }
-    }
-
-    if (!$all) {
-      // remove all collapsed menu items from the array
-      foreach ($values as $weight => $v) {
-        if ($v['parent'] &&
-          $values[$v['parent']]['class'] == 'collapsed'
-        ) {
-          unset($values[$weight]);
-        }
-      }
-    }
-
-    // check permissions for the rest
-    $activeChildren = array();
-
-    foreach ($values as $weight => $v) {
-      if (CRM_Core_Permission::checkMenuItem($v)) {
-        if ($v['parent']) {
-          $activeChildren[] = $weight;
-        }
-      }
-      else {
-        unset($values[$weight]);
-      }
-    }
-
-    // add the start / end tags
-    $len = count($activeChildren) - 1;
-    if ($len >= 0) {
-      $values[$activeChildren[0]]['start'] = TRUE;
-      $values[$activeChildren[$len]]['end'] = TRUE;
-    }
-
-    ksort($values, SORT_NUMERIC);
-    $i18n = CRM_Core_I18n::singleton();
-    $i18n->localizeTitles($values);
-
-    return $values;
   }
 
   /**
@@ -570,11 +439,16 @@ class CRM_Core_Menu {
           'title' => $menu[$currentPath]['title'],
           'url' => CRM_Utils_System::url($currentPath,
             'reset=1' . $urlVar,
-            FALSE, // absolute
-            NULL, // fragment
-            TRUE, // htmlize
-            FALSE, // frontend
-            TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+            // absolute
+            FALSE,
+            // fragment
+            NULL,
+            // htmlize
+            TRUE,
+            // frontend
+            FALSE,
+            // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+            TRUE
           ),
         );
       }
@@ -719,13 +593,13 @@ UNION (
       // Move module_data into main item.
       if (isset(self::$_menuCache[$menu->path]['module_data'])) {
         CRM_Utils_Array::extend(self::$_menuCache[$menu->path],
-          unserialize(self::$_menuCache[$menu->path]['module_data']));
+          CRM_Utils_String::unserialize(self::$_menuCache[$menu->path]['module_data']));
         unset(self::$_menuCache[$menu->path]['module_data']);
       }
 
       // Unserialize other elements.
       foreach (self::$_serializedElements as $element) {
-        self::$_menuCache[$menu->path][$element] = unserialize($menu->$element);
+        self::$_menuCache[$menu->path][$element] = CRM_Utils_String::unserialize($menu->$element);
 
         if (strpos($path, $menu->path) !== FALSE) {
           $menuPath = &self::$_menuCache[$menu->path];

@@ -1,28 +1,12 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 5                                                  |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -52,7 +36,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    * @throws Exception
    */
   public static function create(&$params) {
-    $participantParams = array(
+    $participantParams = [
       'id' => CRM_Utils_Array::value('id', $params),
       'role_id' => self::get_attendee_role_id(),
       'status_id' => self::get_pending_in_cart_status_id(),
@@ -63,7 +47,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
       //'registered_by_id'  =>
       //'discount_amount'   =>
       //'fee_level'         => $params['fee_level'],
-    );
+    ];
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
     if (is_a($participant, 'CRM_Core_Error')) {
@@ -102,7 +86,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
     if ($event_cart_id == NULL) {
       return NULL;
     }
-    return self::find_all_by_params(array('cart_id' => $event_cart_id));
+    return self::find_all_by_params(['cart_id' => $event_cart_id]);
   }
 
   /**
@@ -115,7 +99,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
     if ($event_cart_id == NULL) {
       return NULL;
     }
-    return self::find_all_by_params(array('event_id' => $event_id, 'cart_id' => $event_cart_id));
+    return self::find_all_by_params(['event_id' => $event_id, 'cart_id' => $event_cart_id]);
   }
 
   /**
@@ -126,7 +110,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   public static function find_all_by_params($params) {
     $participant = new CRM_Event_BAO_Participant();
     $participant->copyValues($params);
-    $result = array();
+    $result = [];
     if ($participant->find()) {
       while ($participant->fetch()) {
         $result[] = new CRM_Event_Cart_BAO_MerParticipant(clone($participant));
@@ -141,7 +125,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    * @return mixed
    */
   public static function get_by_id($id) {
-    $results = self::find_all_by_params(array('id' => $id));
+    $results = self::find_all_by_params(['id' => $id]);
     return array_pop($results);
   }
 

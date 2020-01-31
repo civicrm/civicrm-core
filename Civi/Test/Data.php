@@ -12,39 +12,49 @@ class Data {
    * @return bool
    */
   public function populate() {
-    \Civi\Test::schema()->truncateAll();
+    \Civi\Test::asPreInstall(function() {
+      \Civi\Test::schema()->truncateAll();
 
-    \Civi\Test::schema()->setStrict(FALSE);
-    $sqlDir = dirname(dirname(__DIR__)) . "/sql";
+      \Civi\Test::schema()->setStrict(FALSE);
 
-    $query2 = file_get_contents("$sqlDir/civicrm_data.mysql");
-    $query3 = file_get_contents("$sqlDir/test_data.mysql");
-    $query4 = file_get_contents("$sqlDir/test_data_second_domain.mysql");
-    if (\Civi\Test::execute($query2) === FALSE) {
-      throw new RuntimeException("Cannot load civicrm_data.mysql. Aborting.");
-    }
-    if (\Civi\Test::execute($query3) === FALSE) {
-      throw new RuntimeException("Cannot load test_data.mysql. Aborting.");
-    }
-    if (\Civi\Test::execute($query4) === FALSE) {
-      throw new RuntimeException("Cannot load test_data.mysql. Aborting.");
-    }
+      // Ensure that when we populate the database it is done in utf8 mode
+      \Civi\Test::execute('SET NAMES utf8');
+      $sqlDir = dirname(dirname(__DIR__)) . "/sql";
 
-    unset($query, $query2, $query3);
+      if (!isset(\Civi\Test::$statics['locale_data'])) {
+        $schema = new \CRM_Core_CodeGen_Schema(\Civi\Test::codeGen());
+        \Civi\Test::$statics['locale_data'] = $schema->generateLocaleDataSql('en_US');
+      }
 
-    \Civi\Test::schema()->setStrict(TRUE);
+      $query2 = \Civi\Test::$statics['locale_data']["civicrm_data.mysql"];
+      $query3 = file_get_contents("$sqlDir/test_data.mysql");
+      $query4 = file_get_contents("$sqlDir/test_data_second_domain.mysql");
+      if (\Civi\Test::execute($query2) === FALSE) {
+        throw new RuntimeException("Cannot load civicrm_data.mysql. Aborting.");
+      }
+      if (\Civi\Test::execute($query3) === FALSE) {
+        throw new RuntimeException("Cannot load test_data.mysql. Aborting.");
+      }
+      if (\Civi\Test::execute($query4) === FALSE) {
+        throw new RuntimeException("Cannot load test_data.mysql. Aborting.");
+      }
+
+      unset($query, $query2, $query3);
+
+      \Civi\Test::schema()->setStrict(TRUE);
+    });
 
     // Rebuild triggers
-    civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
+    civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
 
-    \CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
+    \CRM_Core_BAO_ConfigSetting::setEnabledComponents([
       'CiviEvent',
       'CiviContribute',
       'CiviMember',
       'CiviMail',
       'CiviReport',
       'CiviPledge',
-    ));
+    ]);
 
     return TRUE;
   }

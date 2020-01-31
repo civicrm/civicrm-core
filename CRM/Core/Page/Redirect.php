@@ -19,7 +19,7 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
    * @param string $path
    * @param array $pageArgs
    */
-  public function run($path = NULL, $pageArgs = array()) {
+  public function run($path = NULL, $pageArgs = []) {
     $url = self::createUrl($path, $_REQUEST, $pageArgs, TRUE);
     CRM_Utils_System::redirect($url);
   }
@@ -41,7 +41,7 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
       CRM_Core_Error::fatal('This page is configured as a redirect, but it does not have a target.');
     }
 
-    $vars = array();
+    $vars = [];
     // note: %% isn't legal in a well-formed URL, so it's not a bad variable-delimiter
     foreach ($requestPath as $pathPos => $pathPart) {
       $vars["%%{$pathPos}%%"] = urlencode($pathPart);

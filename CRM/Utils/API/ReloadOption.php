@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -38,7 +22,7 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'api/Wrapper.php';
@@ -76,7 +60,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
   public function toApiOutput($apiRequest, $result) {
     $reloadMode = NULL;
     if ($apiRequest['action'] === 'create' && isset($apiRequest['params'], $apiRequest['params']['options']) && is_array($apiRequest['params']['options']) && isset($apiRequest['params']['options']['reload'])) {
-      if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
+      if (empty($result['is_error'])) {
         $reloadMode = $apiRequest['params']['options']['reload'];
       }
       $id = (!empty($apiRequest['params']['sequential'])) ? 0 : $result['id'];
@@ -91,9 +75,9 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
 
       case '1':
       case 'default':
-        $params = array(
+        $params = [
           'id' => $result['id'],
-        );
+        ];
         $reloadResult = civicrm_api3($apiRequest['entity'], 'get', $params);
         if ($reloadResult['is_error']) {
           throw new API_Exception($reloadResult['error_message']);
@@ -102,10 +86,10 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
         return $result;
 
       case 'selected':
-        $params = array(
+        $params = [
           'id' => $id,
           'return' => $this->pickReturnFields($apiRequest),
-        );
+        ];
         $reloadResult = civicrm_api3($apiRequest['entity'], 'get', $params);
         $result['values'][$id] = array_merge($result['values'][$id], $reloadResult['values'][$id]);
         return $result;
@@ -122,7 +106,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
    * @return array
    */
   public function pickReturnFields($apiRequest) {
-    $fields = civicrm_api3($apiRequest['entity'], 'getfields', array());
+    $fields = civicrm_api3($apiRequest['entity'], 'getfields', []);
     $returnKeys = array_intersect(
       array_keys($apiRequest['params']),
       array_keys($fields['values'])

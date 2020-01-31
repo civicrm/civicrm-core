@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -34,12 +18,13 @@
  */
 class api_v3_DomainTest extends CiviUnitTestCase {
 
-  /* This test case doesn't require DB reset - apart from
-  where cleanDB() is called. */
-
+  /**
+   * This test case doesn't require DB reset - apart from
+   * where cleanDB() is called.
+   * @var bool
+   */
   public $DBResetRequired = FALSE;
 
-  protected $_apiversion = 3;
   protected $params;
 
   /**
@@ -55,36 +40,34 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $params['entity_id'] = 1;
     $params['entity_table'] = CRM_Core_BAO_Domain::getTableName();
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    $domContact = $this->callAPISuccess('contact', 'create', array(
-        'contact_type' => 'Organization',
-        'organization_name' => 'new org',
-        'api.phone.create' => array(
-          'location_type_id' => $defaultLocationType->id,
-          'phone_type_id' => 1,
-          'phone' => '456-456',
-        ),
-        'api.address.create' => array(
-          'location_type_id' => $defaultLocationType->id,
-          'street_address' => '45 Penny Lane',
-        ),
-        'api.email.create' => array(
-          'location_type_id' => $defaultLocationType->id,
-          'email' => 'my@email.com',
-        ),
-      )
-    );
+    $domContact = $this->callAPISuccess('contact', 'create', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'new org',
+      'api.phone.create' => [
+        'location_type_id' => $defaultLocationType->id,
+        'phone_type_id' => 1,
+        'phone' => '456-456',
+      ],
+      'api.address.create' => [
+        'location_type_id' => $defaultLocationType->id,
+        'street_address' => '45 Penny Lane',
+      ],
+      'api.email.create' => [
+        'location_type_id' => $defaultLocationType->id,
+        'email' => 'my@email.com',
+      ],
+    ]);
 
-    $this->callAPISuccess('domain', 'create', array(
-        'id' => 1,
-        'contact_id' => $domContact['id'],
-      )
-    );
-    $this->params = array(
+    $this->callAPISuccess('domain', 'create', [
+      'id' => 1,
+      'contact_id' => $domContact['id'],
+    ]);
+    $this->params = [
       'name' => 'A-team domain',
       'description' => 'domain of chaos',
       'domain_version' => '4.2',
       'contact_id' => $domContact['id'],
-    );
+    ];
   }
 
   /**
@@ -95,7 +78,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    */
   public function testGet() {
 
-    $params = array('sequential' => 1);
+    $params = ['sequential' => 1];
     $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
 
     $this->assertType('array', $result);
@@ -108,10 +91,10 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('id', $domain);
     $this->assertArrayHasKey('name', $domain);
     $this->assertArrayHasKey('domain_email', $domain);
-    $this->assertEquals(array(
+    $this->assertEquals([
       'phone_type' => 'Phone',
       'phone' => '456-456',
-    ), $domain['domain_phone']);
+    ], $domain['domain_phone']);
     $this->assertArrayHasKey('domain_address', $domain);
   }
 
@@ -119,7 +102,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * Test get function with current domain.
    */
   public function testGetCurrentDomain() {
-    $params = array('current_domain' => 1);
+    $params = ['current_domain' => 1];
     $result = $this->callAPISuccess('domain', 'get', $params);
 
     $this->assertType('array', $result);
@@ -149,17 +132,20 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * This test checks for a memory leak.
    *
    * The leak was observed when doing 2 gets on current domain.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetCurrentDomainTwice() {
-    $domain = $this->callAPISuccess('domain', 'getvalue', array(
+  public function testGetCurrentDomainTwice($version) {
+    $this->_apiversion = $version;
+    $domain = $this->callAPISuccess('domain', 'getvalue', [
       'current_domain' => 1,
       'return' => 'name',
-    ));
+    ]);
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
-    $domain = $this->callAPISuccess('domain', 'getvalue', array(
+    $domain = $this->callAPISuccess('domain', 'getvalue', [
       'current_domain' => 1,
       'return' => 'name',
-    ));
+    ]);
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
   }
 
@@ -178,20 +164,23 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * Test if Domain.create does not touch the version of the domain.
    *
    * See CRM-17430.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testUpdateDomainName() {
+  public function testUpdateDomainName($version) {
+    $this->_apiversion = $version;
     // First create a domain.
     $domain_result = $this->callAPISuccess('domain', 'create', $this->params);
-    $domain_before = $this->callAPISuccess('Domain', 'getsingle', array('id' => $domain_result['id']));
+    $domain_before = $this->callAPISuccess('Domain', 'getsingle', ['id' => $domain_result['id']]);
 
     // Change domain name.
-    $this->callAPISuccess('Domain', 'create', array(
+    $this->callAPISuccess('Domain', 'create', [
       'id' => $domain_result['id'],
       'name' => 'B-Team domain',
-    ));
+    ]);
 
     // Get domain again.
-    $domain_after = $this->callAPISuccess('Domain', 'getsingle', array('id' => $domain_result['id']));
+    $domain_after = $this->callAPISuccess('Domain', 'getsingle', ['id' => $domain_result['id']]);
 
     // Version should still be the same.
     $this->assertEquals($domain_before['version'], $domain_after['version']);
@@ -215,9 +204,12 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * Test civicrm_domain_create with empty params.
    *
    * Error expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateWithEmptyParams() {
-    $this->callAPIFailure('domain', 'create', array());
+  public function testCreateWithEmptyParams($version) {
+    $this->_apiversion = $version;
+    $this->callAPIFailure('domain', 'create', []);
   }
 
 }

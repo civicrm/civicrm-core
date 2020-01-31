@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -47,7 +31,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   /**
    * Array of successfully imported activity id's
    *
-   * @array
+   * @var array
    */
   protected $_newActivity;
 
@@ -78,16 +62,16 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $activityTarget
     );
 
-    $fields = array_merge($fields, array(
-      'source_contact_id' => array(
+    $fields = array_merge($fields, [
+      'source_contact_id' => [
         'title' => ts('Source Contact'),
         'headerPattern' => '/Source.Contact?/i',
-      ),
-      'activity_label' => array(
+      ],
+      'activity_label' => [
         'title' => ts('Activity Type Label'),
         'headerPattern' => '/(activity.)?type label?/i',
-      ),
-    ));
+      ],
+    ]);
 
     foreach ($fields as $name => $field) {
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
@@ -96,7 +80,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 
-    $this->_newActivity = array();
+    $this->_newActivity = [];
 
     $this->setActiveFields($this->_mapperKeys);
 
@@ -258,7 +242,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     $params = &$this->getActiveFieldParams();
     $activityLabel = array_search('activity_label', $this->_mapperKeys);
     if ($activityLabel) {
-      $params = array_merge($params, array('activity_label' => $values[$activityLabel]));
+      $params = array_merge($params, ['activity_label' => $values[$activityLabel]]);
     }
     // For date-Formats.
     $session = CRM_Core_Session::singleton();
@@ -332,10 +316,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       }
       else {
         // Using new Dedupe rule.
-        $ruleParams = array(
+        $ruleParams = [
           'contact_type' => 'Individual',
           'used' => 'Unsupervised',
-        );
+        ];
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 
         $disp = NULL;

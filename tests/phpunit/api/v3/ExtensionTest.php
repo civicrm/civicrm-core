@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -51,7 +35,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test getremote.
    */
   public function testGetremote() {
-    $result = $this->callAPISuccess('extension', 'getremote', array());
+    $result = $this->callAPISuccess('extension', 'getremote', []);
     $this->assertEquals('org.civicrm.module.cividiscount', $result['values'][0]['key']);
     $this->assertEquals('module', $result['values'][0]['type']);
     $this->assertEquals('CiviDiscount', $result['values'][0]['name']);
@@ -62,7 +46,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * CRM-20532
    */
   public function testExtensionGetSingleExtension() {
-    $result = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.moduletest'));
+    $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest']);
     $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
     $this->assertEquals('module', $result['values'][$result['id']]['type']);
     $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
@@ -73,7 +57,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * CRM-20532
    */
   public function testSingleExtensionGetWithReturnFields() {
-    $result = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.moduletest', 'return' => array('name', 'status', 'key')));
+    $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest', 'return' => ['name', 'status', 'key']]);
     $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
     $this->assertFalse(isset($result['values'][$result['id']]['type']));
     $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
@@ -86,8 +70,8 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * CRM-20532
    */
   public function testExtensionGet() {
-    $result = $this->callAPISuccess('extension', 'get', array());
-    $testExtensionResult = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.paymenttest'));
+    $result = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
+    $testExtensionResult = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.paymenttest']);
     $this->assertNotNull($result['values'][$testExtensionResult['id']]['typeInfo']);
     $this->assertTrue($result['count'] >= 6);
   }
@@ -96,24 +80,24 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Filtering by status=installed or status=uninstalled should produce different results.
    */
   public function testExtensionGetByStatus() {
-    $installed = $this->callAPISuccess('extension', 'get', array('status' => 'installed'));
-    $uninstalled = $this->callAPISuccess('extension', 'get', array('status' => 'uninstalled'));
+    $installed = $this->callAPISuccess('extension', 'get', ['status' => 'installed', 'options' => ['limit' => 0]]);
+    $uninstalled = $this->callAPISuccess('extension', 'get', ['status' => 'uninstalled', 'options' => ['limit' => 0]]);
 
     // If the filter works, then results should be strictly independent.
     $this->assertEquals(
-      array(),
+      [],
       array_intersect(
         CRM_Utils_Array::collect('key', $installed['values']),
         CRM_Utils_Array::collect('key', $uninstalled['values'])
       )
     );
 
-    $all = $this->callAPISuccess('extension', 'get', array());
+    $all = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
     $this->assertEquals($all['count'], $installed['count'] + $uninstalled['count']);
   }
 
   public function testGetMultipleExtensions() {
-    $result = $this->callAPISuccess('extension', 'get', array('key' => array('test.extension.manager.paymenttest', 'test.extension.manager.moduletest')));
+    $result = $this->callAPISuccess('extension', 'get', ['key' => ['test.extension.manager.paymenttest', 'test.extension.manager.moduletest']]);
     $this->assertEquals(2, $result['count']);
   }
 
@@ -121,7 +105,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test that extension get works with api request with parameter full_name as build by api explorer.
    */
   public function testGetMultipleExtensionsApiExplorer() {
-    $result = $this->callAPISuccess('extension', 'get', array('full_name' => array('test.extension.manager.paymenttest', 'test.extension.manager.moduletest')));
+    $result = $this->callAPISuccess('extension', 'get', ['full_name' => ['test.extension.manager.paymenttest', 'test.extension.manager.moduletest']]);
     $this->assertEquals(2, $result['count']);
   }
 
@@ -129,7 +113,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test that extension get can be filtered by id.
    */
   public function testGetExtensionByID() {
-    $result = $this->callAPISuccess('extension', 'get', array('id' => 2, 'return' => array('label')));
+    $result = $this->callAPISuccess('extension', 'get', ['id' => 2, 'return' => ['label']]);
     $this->assertEquals(1, $result['count']);
   }
 

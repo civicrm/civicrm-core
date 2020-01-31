@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -43,20 +27,20 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = array(
+  public static $_properties = [
     'contact_id',
     'mailing_id',
     'mailing_name',
@@ -68,19 +52,19 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     'contact_opt_out',
     'mailing_job_status',
     'mailing_job_end_date',
-  );
+  ];
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -192,26 +176,26 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
       $extraParams = ($key) ? "&key={$key}" : NULL;
       $searchContext = ($context) ? "&context=$context" : NULL;
 
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view',
           'qs' => "reset=1&cid=%%cid%%{$searchContext}{$extraParams}",
           'title' => ts('View Contact Details'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/add',
           'qs' => "reset=1&action=update&cid=%%cid%%{$searchContext}{$extraParams}",
           'title' => ts('Edit Contact Details'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/delete',
           'qs' => "reset=1&delete=1&cid=%%cid%%{$searchContext}{$extraParams}",
           'title' => ts('Delete Contact'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -279,8 +263,8 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     );
 
     // process the result of the query
-    $rows = array();
-    $permissions = array(CRM_Core_Permission::getPermission());
+    $rows = [];
+    $permissions = [CRM_Core_Permission::getPermission()];
     if (CRM_Core_Permission::check('delete contacts')) {
       $permissions[] = CRM_Core_Permission::DELETE;
     }
@@ -288,7 +272,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     $qfKey = $this->_key;
 
     while ($result->fetch()) {
-      $row = array();
+      $row = [];
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (property_exists($result, $property)) {
@@ -298,10 +282,10 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->mailing_recipients_id;
 
-      $actions = array(
+      $actions = [
         'cid' => $result->contact_id,
         'cxt' => $this->_context,
-      );
+      ];
 
       $row['action'] = CRM_Core_Action::formLink(
         self::links($qfKey, $this->_context),
@@ -341,46 +325,54 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
+
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(
-        array('desc' => ts('Contact Type')),
-        array(
+      $isMultiLingual = CRM_Core_I18n::isMultiLingual();
+      $headers = [
+        ['desc' => ts('Contact Type')],
+        [
           'name' => ts('Name'),
           'sort' => 'sort_name',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Email'),
           'sort' => 'email',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Mailing Name'),
           'sort' => 'mailing_name',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+      ];
+
+      // Check to see if languages column should be displayed.
+      if ($isMultiLingual) {
+        $headers[] = [
           'name' => ts('Language'),
           'sort' => 'language',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ];
+      }
+      self::$_columnHeaders = array_merge($headers, [
+        [
           'name' => ts('Mailing Subject'),
           'sort' => 'mailing_subject',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Mailing Status'),
           'sort' => 'mailing_job_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Completed Date'),
           'sort' => 'mailing_job_end_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array('desc' => ts('Actions')),
-      );
+        ],
+        ['desc' => ts('Actions')],
+      ]);
     }
     return self::$_columnHeaders;
   }
@@ -389,7 +381,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * @return mixed
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**

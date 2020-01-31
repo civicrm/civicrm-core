@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -30,24 +14,27 @@
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_JobManager {
 
   /**
-   * @var array ($id => CRM_Core_ScheduledJob)
+   * Jobs.
+   *
+   * Format is ($id => CRM_Core_ScheduledJob).
+   *
+   * @var array
    */
-  var $jobs = NULL;
+  public $jobs = NULL;
 
   /**
    * @var CRM_Core_ScheduledJob
    */
-  var $currentJob = NULL;
+  public $currentJob = NULL;
 
-  var $singleRunParams = array();
+  public $singleRunParams = [];
 
-  var $_source = NULL;
-
+  public $_source = NULL;
 
   /**
    * Class constructor.
@@ -83,10 +70,10 @@ class CRM_Core_JobManager {
     $this->logEntry('Finishing scheduled jobs execution.');
 
     // Set last cron date for the status check
-    $statusPref = array(
+    $statusPref = [
       'name' => 'checkLastCron',
       'check_info' => gmdate('U'),
-    );
+    ];
     CRM_Core_BAO_StatusPreference::create($statusPref);
   }
 
@@ -156,7 +143,7 @@ class CRM_Core_JobManager {
     //Disable outBound option after executing the job.
     $environment = CRM_Core_Config::environment(NULL, TRUE);
     if ($environment != 'Production' && !empty($job->apiParams['runInNonProductionEnvironment'])) {
-      Civi::settings()->set('mailing_backend', array('outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED));
+      Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);
     }
   }
 
@@ -168,13 +155,13 @@ class CRM_Core_JobManager {
    *   ($id => CRM_Core_ScheduledJob)
    */
   private function _getJobs() {
-    $jobs = array();
+    $jobs = [];
     $dao = new CRM_Core_DAO_Job();
     $dao->orderBy('name');
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
     while ($dao->fetch()) {
-      $temp = array();
+      $temp = [];
       CRM_Core_DAO::storeValues($dao, $temp);
       $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
     }

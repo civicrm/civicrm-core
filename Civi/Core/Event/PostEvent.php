@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -45,7 +29,9 @@ class PostEvent extends GenericHookEvent {
   }
 
   /**
-   * @var string 'create'|'edit'|'delete' etc
+   * One of: 'create'|'edit'|'delete'
+   *
+   * @var string
    */
   public $action;
 
@@ -55,7 +41,7 @@ class PostEvent extends GenericHookEvent {
   public $entity;
 
   /**
-   * @var int|NULL
+   * @var int|null
    */
   public $id;
 
@@ -65,10 +51,12 @@ class PostEvent extends GenericHookEvent {
   public $object;
 
   /**
-   * @param $action
-   * @param $entity
-   * @param $id
-   * @param $object
+   * Class constructor
+   *
+   * @param string $action
+   * @param string $entity
+   * @param int $id
+   * @param object $object
    */
   public function __construct($action, $entity, $id, &$object) {
     $this->action = $action;
@@ -81,7 +69,7 @@ class PostEvent extends GenericHookEvent {
    * @inheritDoc
    */
   public function getHookValues() {
-    return array($this->action, $this->entity, $this->id, &$this->object);
+    return [$this->action, $this->entity, $this->id, &$this->object];
   }
 
 }

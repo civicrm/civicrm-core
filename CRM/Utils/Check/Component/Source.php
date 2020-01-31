@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
 
@@ -51,6 +35,24 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $files[] = '[civicrm.vendor]/pear/net_smtp/phpdoc.sh';
     $files[] = '[civicrm.vendor]/phpoffice/phpword/samples';
     $files[] = '[civicrm.root]/templates/CRM/common/version.tpl';
+    $files[] = '[civicrm.packages]/Log.php';
+    $files[] = '[civicrm.packages]/_ORIGINAL_/Log.php';
+    $files[] = '[civicrm.packages]/Log/composite.php';
+    $files[] = '[civicrm.packages]/Log/console.php';
+    $files[] = '[civicrm.packages]/Log/daemon.php';
+    $files[] = '[civicrm.packages]/Log/display.php';
+    $files[] = '[civicrm.packages]/Log/error_log.php';
+    $files[] = '[civicrm.packages]/Log/file.php';
+    $files[] = '[civicrm.packages]/Log/firebug.php';
+    $files[] = '[civicrm.packages]/Log/mail.php';
+    $files[] = '[civicrm.packages]/Log/mcal.php';
+    $files[] = '[civicrm.packages]/Log/mdb2.php';
+    $files[] = '[civicrm.packages]/Log/null.php';
+    $files[] = '[civicrm.packages]/Log/observer.php';
+    $files[] = '[civicrm.packages]/Log/sql.php';
+    $files[] = '[civicrm.packages]/Log/sqlite.php';
+    $files[] = '[civicrm.packages]/Log/syslog.php';
+    $files[] = '[civicrm.packages]/Log/win.php';
 
     return $files;
   }
@@ -63,21 +65,21 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
    *   Files are returned in deletable order (ie children before parents).
    */
   public function findOrphanedFiles() {
-    $orphans = array();
+    $orphans = [];
 
     foreach ($this->getRemovedFiles() as $file) {
       $path = Civi::paths()->getPath($file);
       if (empty($path) || strpos('[civicrm', $path) !== FALSE) {
-        Civi::log()->warning('Failed to resolve path of old file \"{file}\" ({path})', array(
+        Civi::log()->warning('Failed to resolve path of old file \"{file}\" ({path})', [
           'file' => $file,
           'path' => $path,
-        ));
+        ]);
       }
       if (file_exists($path)) {
-        $orphans[] = array(
+        $orphans[] = [
           'name' => $file,
           'path' => $path,
-        );
+        ];
       }
     }
 
@@ -102,16 +104,16 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   public function checkOrphans() {
     $orphans = $this->findOrphanedFiles();
     if (empty($orphans)) {
-      return array();
+      return [];
     }
 
-    $messages = array();
+    $messages = [];
     $messages[] = new CRM_Utils_Check_Message(
       __FUNCTION__,
       ts('The local system includes old files which should not exist: "%1"',
-        array(
+        [
           1 => implode('", "', CRM_Utils_Array::collect('path', $orphans)),
-        )),
+        ]),
       ts('Old files'),
       \Psr\Log\LogLevel::WARNING,
       'fa-server'

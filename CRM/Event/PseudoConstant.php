@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -101,7 +85,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
     $key = "{$id}_{$all}_{$condition}";
 
     if (!isset(self::$event[$key])) {
-      self::$event[$key] = array();
+      self::$event[$key] = [];
     }
 
     if (!self::$event[$key]) {
@@ -136,13 +120,13 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &participantStatus($id = NULL, $cond = NULL, $retColumn = 'name') {
     if (self::$participantStatus === NULL) {
-      self::$participantStatus = array();
+      self::$participantStatus = [];
     }
 
     $index = $cond ? $cond : 'No Condition';
     $index = "{$index}_{$retColumn}";
     if (!CRM_Utils_Array::value($index, self::$participantStatus)) {
-      self::$participantStatus[$index] = array();
+      self::$participantStatus[$index] = [];
       CRM_Core_PseudoConstant::populate(self::$participantStatus[$index],
         'CRM_Event_DAO_ParticipantStatusType',
         FALSE, $retColumn, 'is_active', $cond, 'weight'
@@ -162,12 +146,12 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array
    */
   public static function participantStatusClassOptions() {
-    return array(
+    return [
       'Positive' => ts('Positive'),
       'Pending' => ts('Pending'),
       'Waiting' => ts('Waiting'),
       'Negative' => ts('Negative'),
-    );
+    ];
   }
 
   /**
@@ -193,13 +177,13 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $id
    * @param null $cond
    *
-   * @return array
+   * @return array|string
    *   array reference of all participant roles if any
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
     $index = $cond ? $cond : 'No Condition';
     if (!CRM_Utils_Array::value($index, self::$participantRole)) {
-      self::$participantRole[$index] = array();
+      self::$participantRole[$index] = [];
 
       $condition = NULL;
 
@@ -224,12 +208,12 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    *
-   * @return array
+   * @return array|string
    *   array reference of all participant listings if any
    */
   public static function &participantListing($id = NULL) {
     if (!self::$participantListing) {
-      self::$participantListing = array();
+      self::$participantListing = [];
       self::$participantListing = CRM_Core_OptionGroup::values('participant_listing');
     }
 
@@ -245,12 +229,12 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
-   * @return array
+   * @return array|string
    *   array reference of all event types.
    */
   public static function &eventType($id = NULL) {
     if (!self::$eventType) {
-      self::$eventType = array();
+      self::$eventType = [];
       self::$eventType = CRM_Core_OptionGroup::values('event_type');
     }
 

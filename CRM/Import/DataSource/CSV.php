@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   const
@@ -41,7 +25,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *   collection of info about this data source
    */
   public function getInfo() {
-    return array('title' => ts('Comma-Separated Values (CSV)'));
+    return ['title' => ts('Comma-Separated Values (CSV)')];
   }
 
   /**
@@ -74,10 +58,10 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
     $form->setMaxFileSize($uploadFileSize);
-    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
-          1 => $uploadSize,
-          2 => $uploadFileSize,
-        )), 'maxfilesize', $uploadFileSize);
+    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
+      1 => $uploadSize,
+      2 => $uploadFileSize,
+    ]), 'maxfilesize', $uploadFileSize);
     $form->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
     $form->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
 
@@ -131,7 +115,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $table = NULL,
     $fieldSeparator = ','
   ) {
-    $result = array();
+    $result = [];
     $fd = fopen($file, 'r');
     if (!$fd) {
       CRM_Core_Error::fatal("Could not read $file");
@@ -192,7 +176,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
     }
     else {
-      $columns = array();
+      $columns = [];
       foreach ($firstrow as $i => $_) {
         $columns[] = "col_$i";
       }
@@ -239,7 +223,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
         function($string) {
           return trim($string, chr(0xC2) . chr(0xA0));
         }, $row);
-      $row = array_map(array('CRM_Core_DAO', 'escapeString'), $row);
+      $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;
 

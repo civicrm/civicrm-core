@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -40,6 +24,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
    * Variable defined for Contribution Page Id.
+   * @var int
    */
   public $_pageId = NULL;
   public $_id = NULL;
@@ -48,7 +33,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single;
 
@@ -107,7 +92,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $this->_defaults = array();
+    $this->_defaults = [];
     if ($this->_contactID) {
       foreach ($this->_fields as $name => $dontcare) {
         $fields[$name] = 1;
@@ -143,7 +128,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($id, $this->_contactID)) {
         $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD);
       }
-      $this->addFormRule(array('CRM_PCP_Form_PCPAccount', 'formRule'), $this);
+      $this->addFormRule(['CRM_PCP_Form_PCPAccount', 'formRule'], $this);
     }
     else {
       CRM_Core_BAO_CMSUser::buildForm($this, $id, TRUE);
@@ -183,28 +168,28 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
 
     if ($this->_single) {
-      $button = array(
-        array(
+      $button = [
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      );
+        ],
+      ];
     }
     else {
-      $button[] = array(
+      $button[] = [
         'type' => 'next',
         'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
-      );
+      ];
     }
-    $this->addFormRule(array('CRM_PCP_Form_PCPAccount', 'formRule'), $this);
+    $this->addFormRule(['CRM_PCP_Form_PCPAccount', 'formRule'], $this);
     $this->addButtons($button);
   }
 
@@ -222,7 +207,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     foreach ($fields as $key => $value) {
       if (strpos($key, 'email-') !== FALSE && !empty($value)) {
         $ufContactId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $value, 'contact_id', 'uf_name');
@@ -257,7 +242,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
             $isPrimary = 1;
           }
 
-          $params['email'] = array();
+          $params['email'] = [];
           $params['email'][1]['email'] = $value;
           $params['email'][1]['location_type_id'] = $locTypeId;
           $params['email'][1]['is_primary'] = $isPrimary;
@@ -265,7 +250,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-    $this->_contactID  = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', array(), FALSE);
+    $this->_contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
 
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
     $this->set('contactID', $contactID);

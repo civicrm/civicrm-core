@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -41,10 +25,10 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    *   collection of info about this data source
    */
   public function getInfo() {
-    return array(
+    return [
       'title' => ts('SQL Query'),
-      'permissions' => array('import SQL datasource'),
-    );
+      'permissions' => ['import SQL datasource'],
+    ];
   }
 
   /**
@@ -68,7 +52,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_SQL');
     $form->add('textarea', 'sqlQuery', ts('Specify SQL Query'), 'rows=10 cols=45', TRUE);
-    $form->addFormRule(array('CRM_Import_DataSource_SQL', 'formRule'), $form);
+    $form->addFormRule(['CRM_Import_DataSource_SQL', 'formRule'], $form);
   }
 
   /**
@@ -79,13 +63,13 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * @return array|bool
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
 
     // Makeshift query validation (case-insensitive regex matching on word boundaries)
-    $forbidden = array('ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'information_schema');
+    $forbidden = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'information_schema'];
     foreach ($forbidden as $pattern) {
       if (preg_match("/\\b$pattern\\b/i", $fields['sqlQuery'])) {
-        $errors['sqlQuery'] = ts('The query contains the forbidden %1 command.', array(1 => $pattern));
+        $errors['sqlQuery'] = ts('The query contains the forbidden %1 command.', [1 => $pattern]);
       }
     }
 

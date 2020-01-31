@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -42,14 +26,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  static $_validContext = NULL;
+  public static $_validContext = NULL;
 
   /**
    * List of values used when we want to display other objects.
    *
    * @var array
    */
-  static $_modeValues = NULL;
+  public static $_modeValues = NULL;
 
   /**
    * The contextMenu.
@@ -120,7 +104,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * The profile group id used for display.
    *
-   * @var integer
+   * @var int
    */
   protected $_ufGroupID;
 
@@ -129,16 +113,19 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  static $csv = array('contact_type', 'group', 'tag');
+  public static $csv = ['contact_type', 'group', 'tag'];
 
   /**
-   * @var string how to display the results. Should we display as
-   *             contributons, members, cases etc
+   * How to display the results. Should we display as contributons, members, cases etc.
+   *
+   * @var string
    */
   protected $_componentMode;
 
   /**
-   * @var string what operator should we use, AND or OR
+   * What operator should we use, AND or OR.
+   *
+   * @var string
    */
   protected $_operator;
 
@@ -149,16 +136,17 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  protected $entityReferenceFields = array('event_id', 'membership_type_id');
+  protected $entityReferenceFields = ['event_id', 'membership_type_id'];
 
   /**
    * Name of the selector to use.
+   * @var string
    */
-  static $_selectorName = 'CRM_Contact_Selector';
+  public static $_selectorName = 'CRM_Contact_Selector';
   protected $_customSearchID = NULL;
   protected $_customSearchClass = NULL;
 
-  protected $_openedPanes = array();
+  protected $_openedPanes = [];
 
   /**
    * Explicitly declare the entity api name.
@@ -175,7 +163,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public static function &validContext() {
     if (!(self::$_validContext)) {
-      self::$_validContext = array(
+      self::$_validContext = [
         'smog' => 'Show members of group',
         'amtg' => 'Add members to group',
         'basic' => 'Basic Search',
@@ -183,7 +171,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'builder' => 'Search Builder',
         'advanced' => 'Advanced Search',
         'custom' => 'Custom Search',
-      );
+      ];
     }
     return self::$_validContext;
   }
@@ -199,8 +187,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   public static function setModeValues() {
-    self::$_modeValues = array(
-      CRM_Contact_BAO_Query::MODE_CONTACTS => array(
+    self::$_modeValues = [
+      CRM_Contact_BAO_Query::MODE_CONTACTS => [
         'selectorName' => self::$_selectorName,
         'selectorLabel' => ts('Contacts'),
         'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
@@ -209,8 +197,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => NULL,
         'taskClassName' => 'CRM_Contact_Task',
         'component' => '',
-      ),
-      CRM_Contact_BAO_Query::MODE_CONTRIBUTE => array(
+      ],
+      CRM_Contact_BAO_Query::MODE_CONTRIBUTE => [
         'selectorName' => 'CRM_Contribute_Selector_Search',
         'selectorLabel' => ts('Contributions'),
         'taskFile' => 'CRM/common/searchResultTasks.tpl',
@@ -219,8 +207,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Contribute_Task',
         'component' => 'CiviContribute',
-      ),
-      CRM_Contact_BAO_Query::MODE_EVENT => array(
+      ],
+      CRM_Contact_BAO_Query::MODE_EVENT => [
         'selectorName' => 'CRM_Event_Selector_Search',
         'selectorLabel' => ts('Event Participants'),
         'taskFile' => 'CRM/common/searchResultTasks.tpl',
@@ -229,8 +217,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Event_Task',
         'component' => 'CiviEvent',
-      ),
-      CRM_Contact_BAO_Query::MODE_ACTIVITY => array(
+      ],
+      CRM_Contact_BAO_Query::MODE_ACTIVITY => [
         'selectorName' => 'CRM_Activity_Selector_Search',
         'selectorLabel' => ts('Activities'),
         'taskFile' => 'CRM/common/searchResultTasks.tpl',
@@ -239,8 +227,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Activity_Task',
         'component' => 'activity',
-      ),
-      CRM_Contact_BAO_Query::MODE_MEMBER => array(
+      ],
+      CRM_Contact_BAO_Query::MODE_MEMBER => [
         'selectorName' => 'CRM_Member_Selector_Search',
         'selectorLabel' => ts('Memberships'),
         'taskFile' => "CRM/common/searchResultTasks.tpl",
@@ -249,8 +237,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Member_Task',
         'component' => 'CiviMember',
-      ),
-      CRM_Contact_BAO_Query::MODE_CASE => array(
+      ],
+      CRM_Contact_BAO_Query::MODE_CASE => [
         'selectorName' => 'CRM_Case_Selector_Search',
         'selectorLabel' => ts('Cases'),
         'taskFile' => "CRM/common/searchResultTasks.tpl",
@@ -259,8 +247,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Case_Task',
         'component' => 'CiviCase',
-      ),
-      CRM_Contact_BAO_Query::MODE_CONTACTSRELATED => array(
+      ],
+      CRM_Contact_BAO_Query::MODE_CONTACTSRELATED => [
         'selectorName' => self::$_selectorName,
         'selectorLabel' => ts('Related Contacts'),
         'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
@@ -269,8 +257,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => NULL,
         'taskClassName' => 'CRM_Contact_Task',
         'component' => 'related_contact',
-      ),
-      CRM_Contact_BAO_Query::MODE_MAILING => array(
+      ],
+      CRM_Contact_BAO_Query::MODE_MAILING => [
         'selectorName' => 'CRM_Mailing_Selector_Search',
         'selectorLabel' => ts('Mailings'),
         'taskFile' => "CRM/common/searchResultTasks.tpl",
@@ -279,8 +267,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Mailing_Task',
         'component' => 'CiviMail',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
@@ -298,7 +286,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     self::setModeValues();
-    if (!array_key_exists($mode, self::$_modeValues)) {
+    // Note $mode might === FALSE because array_search above failed, e.g. for searchPane='location'
+    if (empty(self::$_modeValues[$mode])) {
       $mode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
 
@@ -329,12 +318,16 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public static function getModeSelect() {
     self::setModeValues();
 
-    $componentModes = array();
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $componentModes = [];
     foreach (self::$_modeValues as $id => & $value) {
+      if (strpos($value['component'], 'Civi') !== FALSE
+        && !array_key_exists($value['component'], $enabledComponents)
+      ) {
+        continue;
+      }
       $componentModes[$id] = $value['selectorLabel'];
     }
-
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
 
     // unset disabled components
     if (!array_key_exists('CiviMail', $enabledComponents)) {
@@ -394,11 +387,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $search_custom_id
         = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'search_custom_id');
 
-      $savedSearchValues = array(
+      $savedSearchValues = [
         'id' => $this->_ssID,
         'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
         'search_custom_id' => $search_custom_id,
-      );
+      ];
       $this->assign_by_ref('savedSearch', $savedSearchValues);
       $this->assign('ssID', $this->_ssID);
     }
@@ -429,7 +422,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         }
 
         // set the group title
-        $groupValues = array('id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]);
+        $groupValues = ['id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]];
         $this->assign_by_ref('group', $groupValues);
 
         // also set ssID if this is a saved search
@@ -444,10 +437,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         }
 
         // Set dynamic page title for 'Show Members of Group'
-        CRM_Utils_System::setTitle(ts('Contacts in Group: %1', array(1 => $this->_group[$this->_groupID])));
+        CRM_Utils_System::setTitle(ts('Contacts in Group: %1', [1 => $this->_group[$this->_groupID]]));
       }
 
-      $group_contact_status = array();
+      $group_contact_status = [];
       foreach (CRM_Core_SelectValues::groupContactStatus() as $k => $v) {
         if (!empty($k)) {
           $group_contact_status[] = $this->createElement('checkbox', $k, NULL, $v);
@@ -471,23 +464,23 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
 
       // Set dynamic page title for 'Add Members Group'
-      CRM_Utils_System::setTitle(ts('Add to Group: %1', array(1 => $this->_group[$this->_amtgID])));
+      CRM_Utils_System::setTitle(ts('Add to Group: %1', [1 => $this->_group[$this->_amtgID]]));
       // also set the group title and freeze the action task with Add Members to Group
-      $groupValues = array('id' => $this->_amtgID, 'title' => $this->_group[$this->_amtgID]);
+      $groupValues = ['id' => $this->_amtgID, 'title' => $this->_group[$this->_amtgID]];
       $this->assign_by_ref('group', $groupValues);
-      $this->add('submit', $this->_actionButtonName, ts('Add Contacts to %1', array(1 => $this->_group[$this->_amtgID])),
-        array(
+      $this->add('submit', $this->_actionButtonName, ts('Add Contacts to %1', [1 => $this->_group[$this->_amtgID]]),
+        [
           'class' => 'crm-form-submit',
-        )
+        ]
       );
       $this->add('hidden', 'task', CRM_Contact_Task::GROUP_ADD);
-      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
+      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', ['checked' => 'checked']);
       $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
       $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
 
-    $selectedContactIds = array();
+    $selectedContactIds = [];
     $qfKeyParam = CRM_Utils_Array::value('qfKey', $this->_formValues);
     // We use ajax to handle selections only if the search results component_mode is set to "contacts"
     if ($qfKeyParam && ($this->get('component_mode') <= CRM_Contact_BAO_Query::MODE_CONTACTS || $this->get('component_mode') == CRM_Contact_BAO_Query::MODE_CONTACTSRELATED)) {
@@ -509,6 +502,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     // set the various class variables
@@ -537,7 +532,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     /**
      * set the button names
      */
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->assign('actionButtonName', $this->_actionButtonName);
@@ -606,7 +600,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
 
       // fix for CRM-1907
-      if (isset($this->_ssID) && $this->_context != 'smog') {
+      if (isset($this->_ssID) && $this->_context !== 'smog') {
         // we only retrieve the saved search values if out current values are null
         $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
 
@@ -633,23 +627,26 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
         // FIXME: we should generalise in a way that components could inject url-filters
         // just like they build their own form elements
-        foreach (array(
-                   'mailing_id',
-                   'mailing_delivery_status',
-                   'mailing_open_status',
-                   'mailing_click_status',
-                   'mailing_reply_status',
-                   'mailing_optout',
-                   'mailing_forward',
-                   'mailing_unsubscribe',
-                   'mailing_date_low',
-                   'mailing_date_high',
-                 ) as $mailingFilter) {
+        foreach ([
+          'mailing_id',
+          'mailing_delivery_status',
+          'mailing_open_status',
+          'mailing_click_status',
+          'mailing_reply_status',
+          'mailing_optout',
+          'mailing_forward',
+          'mailing_unsubscribe',
+          'mailing_date_low',
+          'mailing_date_high',
+          'mailing_job_start_date_low',
+          'mailing_job_start_date_high',
+          'mailing_job_start_date_relative',
+        ] as $mailingFilter) {
           $type = 'String';
           if ($mailingFilter == 'mailing_id' &&
             $filterVal = CRM_Utils_Request::retrieve('mailing_id', 'Positive', $this)
           ) {
-            $this->_formValues[$mailingFilter] = array($filterVal);
+            $this->_formValues[$mailingFilter] = [$filterVal];
           }
           elseif ($filterVal = CRM_Utils_Request::retrieve($mailingFilter, $type, $this)) {
             $this->_formValues[$mailingFilter] = $filterVal;
@@ -676,8 +673,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
     if (empty($this->_formValues['deleted_contacts'])) {
       $menuItems = CRM_Contact_BAO_Contact::contextMenu();
-      $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, array());
-      $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, array());
+      $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, []);
+      $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, []);
       $this->assign('contextMenu', $primaryActions + $this->_contextMenu);
     }
 
@@ -723,7 +720,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $controller->setDynamicAction($setDynamic);
 
     if ($this->_force) {
-
+      $this->loadMetadata();
       $this->postProcess();
 
       /*
@@ -731,15 +728,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
        * values that potentially change the controller behavior. i.e. things
        * like totalCount etc
        */
-      $sortID = NULL;
-      if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-        $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-          $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-        );
-      }
       $controller = new CRM_Contact_Selector_Controller($selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
-        $sortID,
+        $this->getSortID(),
         CRM_Core_Action::VIEW, $this, CRM_Core_Selector_Controller::TRANSFER
       );
       $controller->setEmbedded(TRUE);
@@ -747,13 +738,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     $controller->moveFromSessionToTemplate();
-  }
-
-  /**
-   * @return array
-   */
-  public function &getFormValues() {
-    return $this->_formValues;
   }
 
   /**
@@ -772,14 +756,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
-
-    if (array_key_exists($this->_searchButtonName, $_POST) ||
-      ($this->_force && !$crmPID)
-    ) {
-      //reset the cache table for new search
-      $cacheKey = "civicrm search {$this->controller->_key}";
-      Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
-    }
 
     //get the button name
     $buttonName = $this->controller->getButtonName();
@@ -818,6 +794,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       return;
     }
     else {
+      if (array_key_exists($this->getButtonName('refresh'), $_POST) ||
+        ($this->_force && !$crmPID)
+      ) {
+        //reset the cache table for new search
+        $cacheKey = "civicrm search {$this->controller->_key}";
+        Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
+      }
       $output = CRM_Core_Selector_Controller::SESSION;
 
       // create the selector, controller and run - store results in session
@@ -867,15 +850,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-      $sortID = NULL;
-      if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-        $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-          $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-        );
-      }
       $controller = new CRM_Contact_Selector_Controller($selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
-        $sortID,
+        $this->getSortID(),
         CRM_Core_Action::VIEW,
         $this,
         $output
@@ -900,6 +877,48 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Search');
+  }
+
+  /**
+   * Check Access for a component
+   * @param string $component
+   * @return bool
+   */
+  protected static function checkComponentAccess($component) {
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    if (!array_key_exists($component, $enabledComponents)) {
+      return FALSE;
+    }
+    return CRM_Core_Permission::access($component);
+  }
+
+  /**
+   * Load metadata for fields on the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function loadMetadata() {
+    // can't by pass acls by passing search criteria in the url.
+    if (self::checkComponentAccess('CiviContribute')) {
+      $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviPledge')) {
+      $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviEvent')) {
+      $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviMember')) {
+      $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviGrant')) {
+      $this->addSearchFieldMetadata(['Grant' => CRM_Grant_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviCase')) {
+      $this->addSearchFieldMetadata(['Case' => CRM_Case_BAO_Query::getSearchFieldMetadata()]);
+    }
   }
 
 }

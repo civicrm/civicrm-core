@@ -31,8 +31,8 @@
     <dataPattern>/^\d+$/</dataPattern>
     <comment>FK to Contact ID</comment>
     <html>
-       <type>EntityRef</type>
-     </html>
+      <type>EntityRef</type>
+    </html>
     <add>1.3</add>
   </field>
   <foreignKey>
@@ -265,6 +265,7 @@
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
       <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -272,6 +273,7 @@
   </field>
   <field>
     <name>cancel_date</name>
+    <title>Cancelled / Refunded Date</title>
     <type>datetime</type>
     <import>true</import>
     <headerPattern>/cancel(.?date)?/i</headerPattern>
@@ -282,6 +284,7 @@
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
+    <uniqueName>contribution_cancel_date</uniqueName>
   </field>
   <field>
     <name>cancel_reason</name>
@@ -537,5 +540,17 @@
         <formatType>activityDateTime</formatType>
     </html>
     <add>4.7</add>
+  </field>
+   <field>
+    <name>is_template</name>
+    <title>Is a Template Contribution</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <comment>Shows this is a template for recurring contributions.</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>5.20</add>
   </field>
 </table>

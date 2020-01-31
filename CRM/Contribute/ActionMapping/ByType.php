@@ -1,31 +1,14 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Contribute_ActionMapping_ByType
@@ -102,7 +85,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    * @throws CRM_Core_Exception
    */
   public function getValueLabels() {
-    return CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'get', array());
+    return CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'get', []);
   }
 
   /**
@@ -117,7 +100,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    * @throws CRM_Core_Exception
    */
   public function getStatusLabels($value) {
-    return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', array());
+    return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', []);
   }
 
   /**
@@ -127,12 +110,12 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   Array(string $fieldName => string $fieldLabel).
    */
   public function getDateFields() {
-    return array(
+    return [
       'receive_date' => ts('Receive Date'),
       'cancel_date' => ts('Cancel Date'),
       'receipt_date' => ts('Receipt Date'),
       'thankyou_date' => ts('Thank You Date'),
-    );
+    ];
   }
 
   /**
@@ -146,9 +129,9 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   Ex: array('assignee' => 'Activity Assignee').
    */
   public function getRecipientTypes() {
-    return array(
+    return [
       'soft_credit_type' => ts('Soft Credit Role'),
-    );
+    ];
   }
 
   /**
@@ -170,7 +153,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
         return \CRM_Core_OptionGroup::values('soft_credit_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
 
       default:
-        return array();
+        return [];
     }
   }
 
@@ -184,7 +167,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   List of error messages.
    */
   public function validateSchedule($schedule) {
-    return array();
+    return [];
   }
 
   /**
@@ -204,7 +187,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("civicrm_contribution e")->param($defaultParams);;
+    $query = \CRM_Utils_SQL_Select::from("civicrm_contribution e")->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_contribution e';
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
@@ -238,6 +221,18 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
     }
 
     return $query;
+  }
+
+  /**
+   * Determine whether a schedule based on this mapping should
+   * reset the reminder state if the trigger date changes.
+   *
+   * @return bool
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   */
+  public function resetOnTriggerDateChange($schedule) {
+    return FALSE;
   }
 
 }

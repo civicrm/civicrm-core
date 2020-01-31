@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -71,7 +55,7 @@ class CRM_Report_Utils_Report {
 
     if ($optionVal) {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
-      return array(CRM_Utils_Array::value('id', $templateInfo), $optionVal);
+      return [CRM_Utils_Array::value('id', $templateInfo), $optionVal];
     }
 
     return FALSE;
@@ -83,14 +67,14 @@ class CRM_Report_Utils_Report {
    * @return mixed
    */
   public static function getInstanceIDForValue($optionVal) {
-    static $valId = array();
+    static $valId = [];
 
     if (!array_key_exists($optionVal, $valId)) {
       $sql = "
 SELECT MIN(id) FROM civicrm_report_instance
 WHERE  report_id = %1";
 
-      $params = array(1 => array($optionVal, 'String'));
+      $params = [1 => [$optionVal, 'String']];
       $valId[$optionVal] = CRM_Core_DAO::singleValueQuery($sql, $params);
     }
     return $valId[$optionVal];
@@ -102,7 +86,7 @@ WHERE  report_id = %1";
    * @return mixed
    */
   public static function getInstanceIDForPath($path = NULL) {
-    static $valId = array();
+    static $valId = [];
 
     // if $path is null, try to get it from url
     $path = self::getInstancePath();
@@ -112,7 +96,7 @@ WHERE  report_id = %1";
 SELECT MIN(id) FROM civicrm_report_instance
 WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
 
-      $params = array(1 => array($path, 'String'));
+      $params = [1 => [$path, 'String']];
       $valId[$path] = CRM_Core_DAO::singleValueQuery($sql, $params);
     }
     return CRM_Utils_Array::value($path, $valId);
@@ -127,7 +111,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
    *
    * @return bool|string
    */
-  public static function getNextUrl($urlValue, $query = 'reset=1', $absolute = FALSE, $instanceID = NULL, $drilldownReport = array()) {
+  public static function getNextUrl($urlValue, $query = 'reset=1', $absolute = FALSE, $instanceID = NULL, $drilldownReport = []) {
     if ($instanceID) {
       $drilldownInstanceID = FALSE;
       if (array_key_exists($urlValue, $drilldownReport)) {
@@ -170,7 +154,7 @@ SELECT count(inst.id)
 FROM   civicrm_report_instance inst
 WHERE  inst.report_id = %1";
 
-    $params = array(1 => array($optionVal, 'String'));
+    $params = [1 => [$optionVal, 'String']];
     $count = CRM_Core_DAO::singleValueQuery($sql, $params);
     return $count;
   }
@@ -183,7 +167,7 @@ WHERE  inst.report_id = %1";
    *
    * @return bool
    */
-  public static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array()) {
+  public static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = []) {
     if (!$instanceID) {
       return FALSE;
     }
@@ -192,14 +176,14 @@ WHERE  inst.report_id = %1";
       $domainEmailAddress
       ) = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $params = array('id' => $instanceID);
-    $instanceInfo = array();
+    $params = ['id' => $instanceID];
+    $instanceInfo = [];
     CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_ReportInstance',
       $params,
       $instanceInfo
     );
 
-    $params = array();
+    $params = [];
     $params['groupName'] = 'Report Email Sender';
     $params['from'] = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
     //$domainEmailName;
@@ -208,7 +192,7 @@ WHERE  inst.report_id = %1";
     $params['cc'] = CRM_Utils_Array::value('email_cc', $instanceInfo);
     $params['subject'] = CRM_Utils_Array::value('email_subject', $instanceInfo);
     if (empty($instanceInfo['attachments'])) {
-      $instanceInfo['attachments'] = array();
+      $instanceInfo['attachments'] = [];
     }
     $params['attachments'] = array_merge(CRM_Utils_Array::value('attachments', $instanceInfo), $attachments);
     $params['text'] = '';
@@ -228,6 +212,10 @@ WHERE  inst.report_id = %1";
     //Force a download and name the file using the current timestamp.
     $datetime = date('Ymd-Gi', $_SERVER['REQUEST_TIME']);
     CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=Report_' . $datetime . '.csv');
+    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
+    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
+    // and it continues to work on Libre Office, Numbers, Notes etc.
+    echo "\xEF\xBB\xBF";
     echo self::makeCsv($form, $rows);
     CRM_Utils_System::civiExit();
   }
@@ -259,7 +247,7 @@ WHERE  inst.report_id = %1";
         $headers
       ) . "\r\n";
 
-    $displayRows = array();
+    $displayRows = [];
     $value = NULL;
     foreach ($rows as $row) {
       foreach ($columnHeaders as $k => $v) {
@@ -348,8 +336,8 @@ WHERE  inst.report_id = %1";
       return TRUE;
     }
 
-    $instanceValues = array();
-    $params = array('id' => $instanceId);
+    $instanceValues = [];
+    $params = ['id' => $instanceId];
     CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_ReportInstance',
       $params,
       $instanceValues
@@ -381,8 +369,8 @@ WHERE  inst.report_id = %1";
       return TRUE;
     }
 
-    $instanceValues = array();
-    $params = array('id' => $instanceId);
+    $instanceValues = [];
+    $params = ['id' => $instanceId];
     CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_ReportInstance',
       $params,
       $instanceValues
@@ -418,14 +406,14 @@ WHERE  inst.report_id = %1";
     $_REQUEST['reset'] = CRM_Utils_Array::value('reset', $params, 1);
 
     $optionVal = self::getValueFromUrl($instanceId);
-    $messages = array("Report Mail Triggered...");
+    $messages = ["Report Mail Triggered..."];
 
     $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
     $obj = new CRM_Report_Page_Instance();
     $is_error = 0;
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
-      $instanceInfo = array();
-      CRM_Report_BAO_ReportInstance::retrieve(array('id' => $instanceId), $instanceInfo);
+      $instanceInfo = [];
+      CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
 
       if (!empty($instanceInfo['title'])) {
         $obj->assign('reportTitle', $instanceInfo['title']);
@@ -435,17 +423,17 @@ WHERE  inst.report_id = %1";
       }
 
       $wrapper = new CRM_Utils_Wrapper();
-      $arguments = array(
-        'urlToSession' => array(
-          array(
+      $arguments = [
+        'urlToSession' => [
+          [
             'urlVar' => 'instanceId',
             'type' => 'Positive',
             'sessionVar' => 'instanceId',
             'default' => 'null',
-          ),
-        ),
+          ],
+        ],
         'ignoreKey' => TRUE,
-      );
+      ];
       $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
     }
     else {
@@ -458,10 +446,10 @@ WHERE  inst.report_id = %1";
       }
     }
 
-    $result = array(
+    $result = [
       'is_error' => $is_error,
       'messages' => implode("\n", $messages),
-    );
+    ];
     return $result;
   }
 
@@ -478,11 +466,11 @@ WHERE  inst.report_id = %1";
    * @return string
    *   URL query string
    */
-  public static function getPreviewCriteriaQueryParams($defaults = array(), $params = array()) {
+  public static function getPreviewCriteriaQueryParams($defaults = [], $params = []) {
     static $query_string;
     if (!isset($query_string)) {
       if (!empty($params)) {
-        $url_params = $op_values = $string_values = $process_params = array();
+        $url_params = $op_values = $string_values = $process_params = [];
 
         // We'll only use $params that are different from what's in $default.
         foreach ($params as $field_name => $field_value) {
@@ -553,15 +541,15 @@ WHERE  inst.report_id = %1";
    * @return mixed
    */
   public static function getInstanceList($reportUrl) {
-    static $instanceDetails = array();
+    static $instanceDetails = [];
 
     if (!array_key_exists($reportUrl, $instanceDetails)) {
-      $instanceDetails[$reportUrl] = array();
+      $instanceDetails[$reportUrl] = [];
 
       $sql = "
 SELECT id, title FROM civicrm_report_instance
 WHERE  report_id = %1";
-      $params = array(1 => array($reportUrl, 'String'));
+      $params = [1 => [$reportUrl, 'String']];
       $result = CRM_Core_DAO::executeQuery($sql, $params);
       while ($result->fetch()) {
         $instanceDetails[$reportUrl][$result->id] = $result->title . " (ID: {$result->id})";

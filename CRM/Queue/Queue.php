@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -71,24 +55,24 @@ abstract class CRM_Queue_Queue {
   /**
    * Perform any registation or resource-allocation for a new queue
    */
-  public abstract function createQueue();
+  abstract public function createQueue();
 
   /**
    * Perform any loading or pre-fetch for an existing queue.
    */
-  public abstract function loadQueue();
+  abstract public function loadQueue();
 
   /**
    * Release any resources claimed by the queue (memory, DB rows, etc)
    */
-  public abstract function deleteQueue();
+  abstract public function deleteQueue();
 
   /**
    * Check if the queue exists.
    *
    * @return bool
    */
-  public abstract function existsQueue();
+  abstract public function existsQueue();
 
   /**
    * Add a new item to the queue.
@@ -99,14 +83,14 @@ abstract class CRM_Queue_Queue {
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
    */
-  public abstract function createItem($data, $options = array());
+  abstract public function createItem($data, $options = []);
 
   /**
    * Determine number of items remaining in the queue.
    *
    * @return int
    */
-  public abstract function numberOfItems();
+  abstract public function numberOfItems();
 
   /**
    * Get the next item.
@@ -117,7 +101,7 @@ abstract class CRM_Queue_Queue {
    * @return object
    *   with key 'data' that matches the inputted data
    */
-  public abstract function claimItem($lease_time = 3600);
+  abstract public function claimItem($lease_time = 3600);
 
   /**
    * Get the next item, even if there's an active lease
@@ -128,7 +112,7 @@ abstract class CRM_Queue_Queue {
    * @return object
    *   with key 'data' that matches the inputted data
    */
-  public abstract function stealItem($lease_time = 3600);
+  abstract public function stealItem($lease_time = 3600);
 
   /**
    * Remove an item from the queue.
@@ -136,7 +120,7 @@ abstract class CRM_Queue_Queue {
    * @param object $item
    *   The item returned by claimItem.
    */
-  public abstract function deleteItem($item);
+  abstract public function deleteItem($item);
 
   /**
    * Return an item that could not be processed.
@@ -144,6 +128,6 @@ abstract class CRM_Queue_Queue {
    * @param object $item
    *   The item returned by claimItem.
    */
-  public abstract function releaseItem($item);
+  abstract public function releaseItem($item);
 
 }

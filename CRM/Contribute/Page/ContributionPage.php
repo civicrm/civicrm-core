@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -215,6 +199,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'title' => ts('Test-drive'),
           'url' => $urlString,
           'qs' => $urlParams . '&action=preview',
+          // Addresses https://lab.civicrm.org/dev/core/issues/658
+          'fe' => TRUE,
           'uniqueName' => 'test_drive',
         ),
       );
@@ -238,28 +224,28 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       $yearNow = $yearDate + 10000;
 
       $urlString = 'civicrm/contribute/search';
-      $urlParams = 'reset=1&pid=%%id%%&force=1&test=0';
+      $urlParams = 'reset=1&contribution_page_id=%%id%%&force=1&test=0';
 
       self::$_contributionLinks = array(
         CRM_Core_Action::DETACH => array(
           'name' => ts('Current Month-To-Date'),
           'title' => ts('Current Month-To-Date'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&start={$monthDate}&end={$now}",
+          'qs' => "{$urlParams}&receive_date_low={$monthDate}&receive_date_high={$now}",
           'uniqueName' => 'current_month_to_date',
         ),
         CRM_Core_Action::REVERT => array(
           'name' => ts('Fiscal Year-To-Date'),
           'title' => ts('Fiscal Year-To-Date'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&start={$yearDate}&end={$yearNow}",
+          'qs' => "{$urlParams}&receive_date_low={$yearDate}&receive_date_high={$yearNow}",
           'uniqueName' => 'fiscal_year_to_date',
         ),
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Cumulative'),
           'title' => ts('Cumulative'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&start=&end=$now",
+          'qs' => "{$urlParams}&receive_date_low=&receive_date_high=$now",
           'uniqueName' => 'cumulative',
         ),
       );
@@ -382,9 +368,18 @@ AND         cp.page_type = 'contribute'
       $this, TRUE, 0, 'GET'
     );
 
-    CRM_Contribute_BAO_ContributionPage::copy($gid);
+    $copy = CRM_Contribute_BAO_ContributionPage::copy($gid);
 
-    CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
+    $urlString = CRM_Utils_System::currentPath();
+    $urlParams = 'reset=1';
+
+    // Redirect to copied contribution page
+    if ($copy->id) {
+      $urlString = 'civicrm/admin/contribute/settings';
+      $urlParams .= '&action=update&id=' . $copy->id;
+    }
+
+    CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
   }
 
   /**
@@ -419,8 +414,10 @@ AND         cp.page_type = 'contribute'
     $params = array();
 
     $whereClause = $this->whereClause($params, FALSE);
-    $this->pagerAToZ($whereClause, $params);
-
+    $config = CRM_Core_Config::singleton();
+    if ($config->includeAlphabeticalPager) {
+      $this->pagerAToZ($whereClause, $params);
+    }
     $params = array();
     $whereClause = $this->whereClause($params, TRUE);
     $this->pager($whereClause, $params);

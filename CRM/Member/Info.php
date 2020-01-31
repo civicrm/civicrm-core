@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,13 +15,14 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Member_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'member';
@@ -51,19 +36,19 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array
    *   collection of required component settings
    */
+
   /**
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviMember',
       'translatedName' => ts('CiviMember'),
       'title' => ts('CiviCRM Membership Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
-
 
   /**
    * @inheritDoc
@@ -82,20 +67,20 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of permissions, null if none
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviMember' => array(
+    $permissions = [
+      'access CiviMember' => [
         ts('access CiviMember'),
         ts('View memberships'),
-      ),
-      'edit memberships' => array(
+      ],
+      'edit memberships' => [
         ts('edit memberships'),
         ts('Create and update memberships'),
-      ),
-      'delete in CiviMember' => array(
+      ],
+      'delete in CiviMember' => [
         ts('delete in CiviMember'),
         ts('Delete memberships'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -115,19 +100,20 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
   public function getUserDashboardElement() {
-    return array(
+    return [
       'name' => ts('Memberships'),
       'title' => ts('Your Membership(s)'),
       // this is CiviContribute specific permission, since
       // there is no permission that could be checked for
       // CiviMember
-      'perm' => array('make online contributions'),
+      'perm' => ['make online contributions'],
       'weight' => 30,
-    );
+    ];
   }
 
   /**
@@ -139,15 +125,16 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Memberships'),
       'url' => 'membership',
       'weight' => 30,
-    );
+    ];
   }
 
   /**
@@ -167,14 +154,15 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required pane settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Memberships'),
       'weight' => 30,
-    );
+    ];
   }
 
   /**
@@ -187,6 +175,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of activity types
    */
+
   /**
    * @return array|null
    */
@@ -203,20 +192,20 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviMember') &&
       CRM_Core_Permission::check('edit memberships')
     ) {
-      $shortCut[] = array(
+      $shortCut[] = [
         'path' => 'civicrm/member/add',
         'query' => "reset=1&action=add&context=standalone",
         'ref' => 'new-membership',
         'title' => ts('Membership'),
-      );
+      ];
       if ($newCredit) {
         $title = ts('Membership') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCut[0]['shortCuts'][] = array(
+        $shortCut[0]['shortCuts'][] = [
           'path' => 'civicrm/member/add',
           'query' => "reset=1&action=add&context=standalone&mode=live",
           'ref' => 'new-membership-cc',
           'title' => $title,
-        );
+        ];
       }
       $shortCuts = array_merge($shortCuts, $shortCut);
     }

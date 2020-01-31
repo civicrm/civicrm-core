@@ -11,7 +11,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   public function testStripPathChars() {
-    $testSet = array(
+    $testSet = [
       '' => '',
       NULL => NULL,
       'civicrm' => 'civicrm',
@@ -19,7 +19,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       'civicrm/contribute/transact' => 'civicrm/contribute/transact',
       'civicrm/<hack>attempt</hack>' => 'civicrm/_hack_attempt_/hack_',
       'civicrm dashboard & force = 1,;' => 'civicrm_dashboard___force___1__',
-    );
+    ];
 
     foreach ($testSet as $in => $expected) {
       $out = CRM_Utils_String::stripPathChars($in);
@@ -28,47 +28,47 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   public function testExtractName() {
-    $cases = array(
-      array(
+    $cases = [
+      [
         'full_name' => 'Alan',
         'first_name' => 'Alan',
-      ),
-      array(
+      ],
+      [
         'full_name' => 'Alan Arkin',
         'first_name' => 'Alan',
         'last_name' => 'Arkin',
-      ),
-      array(
+      ],
+      [
         'full_name' => '"Alan Arkin"',
         'first_name' => 'Alan',
         'last_name' => 'Arkin',
-      ),
-      array(
+      ],
+      [
         'full_name' => 'Alan A Arkin',
         'first_name' => 'Alan',
         'middle_name' => 'A',
         'last_name' => 'Arkin',
-      ),
-      array(
+      ],
+      [
         'full_name' => 'Adams, Amy',
         'first_name' => 'Amy',
         'last_name' => 'Adams',
-      ),
-      array(
+      ],
+      [
         'full_name' => 'Adams, Amy A',
         'first_name' => 'Amy',
         'middle_name' => 'A',
         'last_name' => 'Adams',
-      ),
-      array(
+      ],
+      [
         'full_name' => '"Adams, Amy A"',
         'first_name' => 'Amy',
         'middle_name' => 'A',
         'last_name' => 'Adams',
-      ),
-    );
+      ],
+    ];
     foreach ($cases as $case) {
-      $actual = array();
+      $actual = [];
       CRM_Utils_String::extractName($case['full_name'], $actual);
       $this->assertEquals($actual['first_name'], $case['first_name']);
       $this->assertEquals(CRM_Utils_Array::value('last_name', $actual), CRM_Utils_Array::value('last_name', $case));
@@ -78,11 +78,11 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
   public function testEllipsify() {
     $maxLen = 5;
-    $cases = array(
+    $cases = [
       '1' => '1',
       '12345' => '12345',
       '123456' => '12...',
-    );
+    ];
     foreach ($cases as $input => $expected) {
       $this->assertEquals($expected, CRM_Utils_String::ellipsify($input, $maxLen));
     }
@@ -108,11 +108,11 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @return array
    */
   public function parsePrefixData() {
-    $cases = array();
-    $cases[] = array('administer CiviCRM', NULL, array(NULL, 'administer CiviCRM'));
-    $cases[] = array('administer CiviCRM', 'com_civicrm', array('com_civicrm', 'administer CiviCRM'));
-    $cases[] = array('Drupal:access user profiles', NULL, array('Drupal', 'access user profiles'));
-    $cases[] = array('Joomla:component:perm', NULL, array('Joomla', 'component:perm'));
+    $cases = [];
+    $cases[] = ['administer CiviCRM', NULL, [NULL, 'administer CiviCRM']];
+    $cases[] = ['administer CiviCRM', 'com_civicrm', ['com_civicrm', 'administer CiviCRM']];
+    $cases[] = ['Drupal:access user profiles', NULL, ['Drupal', 'access user profiles']];
+    $cases[] = ['Joomla:component:perm', NULL, ['Joomla', 'component:perm']];
     return $cases;
   }
 
@@ -131,27 +131,28 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @return array
    */
   public function booleanDataProvider() {
-    $cases = array(); // array(0 => $input, 1 => $expectedOutput)
-    $cases[] = array(TRUE, TRUE);
-    $cases[] = array(FALSE, FALSE);
-    $cases[] = array(1, TRUE);
-    $cases[] = array(0, FALSE);
-    $cases[] = array('1', TRUE);
-    $cases[] = array('0', FALSE);
-    $cases[] = array(TRUE, TRUE);
-    $cases[] = array(FALSE, FALSE);
-    $cases[] = array('Y', TRUE);
-    $cases[] = array('N', FALSE);
-    $cases[] = array('y', TRUE);
-    $cases[] = array('n', FALSE);
-    $cases[] = array('Yes', TRUE);
-    $cases[] = array('No', FALSE);
-    $cases[] = array('True', TRUE);
-    $cases[] = array('False', FALSE);
-    $cases[] = array('yEs', TRUE);
-    $cases[] = array('nO', FALSE);
-    $cases[] = array('tRuE', TRUE);
-    $cases[] = array('FaLsE', FALSE);
+    // array(0 => $input, 1 => $expectedOutput)
+    $cases = [];
+    $cases[] = [TRUE, TRUE];
+    $cases[] = [FALSE, FALSE];
+    $cases[] = [1, TRUE];
+    $cases[] = [0, FALSE];
+    $cases[] = ['1', TRUE];
+    $cases[] = ['0', FALSE];
+    $cases[] = [TRUE, TRUE];
+    $cases[] = [FALSE, FALSE];
+    $cases[] = ['Y', TRUE];
+    $cases[] = ['N', FALSE];
+    $cases[] = ['y', TRUE];
+    $cases[] = ['n', FALSE];
+    $cases[] = ['Yes', TRUE];
+    $cases[] = ['No', FALSE];
+    $cases[] = ['True', TRUE];
+    $cases[] = ['False', FALSE];
+    $cases[] = ['yEs', TRUE];
+    $cases[] = ['nO', FALSE];
+    $cases[] = ['tRuE', TRUE];
+    $cases[] = ['FaLsE', FALSE];
     return $cases;
   }
 
@@ -166,20 +167,20 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   public function startEndCases() {
-    $cases = array();
-    $cases[] = array('startsWith', 'foo', '', TRUE);
-    $cases[] = array('startsWith', 'foo', 'f', TRUE);
-    $cases[] = array('startsWith', 'foo', 'fo', TRUE);
-    $cases[] = array('startsWith', 'foo', 'foo', TRUE);
-    $cases[] = array('startsWith', 'foo', 'fooo', FALSE);
-    $cases[] = array('startsWith', 'foo', 'o', FALSE);
-    $cases[] = array('endsWith', 'foo', 'f', FALSE);
-    $cases[] = array('endsWith', 'foo', '', TRUE);
-    $cases[] = array('endsWith', 'foo', 'o', TRUE);
-    $cases[] = array('endsWith', 'foo', 'oo', TRUE);
-    $cases[] = array('endsWith', 'foo', 'foo', TRUE);
-    $cases[] = array('endsWith', 'foo', 'fooo', FALSE);
-    $cases[] = array('endsWith', 'foo*', '*', TRUE);
+    $cases = [];
+    $cases[] = ['startsWith', 'foo', '', TRUE];
+    $cases[] = ['startsWith', 'foo', 'f', TRUE];
+    $cases[] = ['startsWith', 'foo', 'fo', TRUE];
+    $cases[] = ['startsWith', 'foo', 'foo', TRUE];
+    $cases[] = ['startsWith', 'foo', 'fooo', FALSE];
+    $cases[] = ['startsWith', 'foo', 'o', FALSE];
+    $cases[] = ['endsWith', 'foo', 'f', FALSE];
+    $cases[] = ['endsWith', 'foo', '', TRUE];
+    $cases[] = ['endsWith', 'foo', 'o', TRUE];
+    $cases[] = ['endsWith', 'foo', 'oo', TRUE];
+    $cases[] = ['endsWith', 'foo', 'foo', TRUE];
+    $cases[] = ['endsWith', 'foo', 'fooo', FALSE];
+    $cases[] = ['endsWith', 'foo*', '*', TRUE];
     return $cases;
   }
 
@@ -197,12 +198,12 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   public function wildcardCases() {
-    $cases = array();
-    $cases[] = array('*', array('foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang'));
-    $cases[] = array('foo.*', array('foo.bar.1', 'foo.bar.2', 'foo.whiz'));
-    $cases[] = array('foo.bar.*', array('foo.bar.1', 'foo.bar.2'));
-    $cases[] = array(array('foo.bar.*', 'foo.bar.2'), array('foo.bar.1', 'foo.bar.2'));
-    $cases[] = array(array('foo.bar.2', 'foo.w*'), array('foo.bar.2', 'foo.whiz'));
+    $cases = [];
+    $cases[] = ['*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang']];
+    $cases[] = ['foo.*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz']];
+    $cases[] = ['foo.bar.*', ['foo.bar.1', 'foo.bar.2']];
+    $cases[] = [['foo.bar.*', 'foo.bar.2'], ['foo.bar.1', 'foo.bar.2']];
+    $cases[] = [['foo.bar.2', 'foo.w*'], ['foo.bar.2', 'foo.whiz']];
     return $cases;
   }
 
@@ -212,7 +213,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @dataProvider wildcardCases
    */
   public function testFilterByWildCards($patterns, $expectedResults) {
-    $data = array('foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang');
+    $data = ['foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang'];
 
     $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data);
     $this->assertEquals($expectedResults, $actualResults);
@@ -224,7 +225,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResults, $actualResults);
 
     $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data, TRUE);
-    $this->assertEquals(array_merge($expectedResults, array('noise')), $actualResults);
+    $this->assertEquals(array_merge($expectedResults, ['noise']), $actualResults);
   }
 
   /**
@@ -263,43 +264,43 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       $externalDomain = 'example.net';
     }
 
-    return array(
-      'prototypical example' => array(
+    return [
+      'prototypical example' => [
         "https://$localDomain/sites/default/files/coffee-mug.jpg",
         FALSE,
         '/sites/default/files/coffee-mug.jpg',
-      ),
-      'external domain with https' => array(
+      ],
+      'external domain with https' => [
         "https://$externalDomain/sites/default/files/coffee-mug.jpg",
         FALSE,
         "https://$externalDomain/sites/default/files/coffee-mug.jpg",
-      ),
-      'external domain with http forced to https' => array(
+      ],
+      'external domain with http forced to https' => [
         "http://$externalDomain/sites/default/files/coffee-mug.jpg",
         TRUE,
         "https://$externalDomain/sites/default/files/coffee-mug.jpg",
-      ),
-      'external domain with http not forced' => array(
+      ],
+      'external domain with http not forced' => [
         "http://$externalDomain/sites/default/files/coffee-mug.jpg",
         FALSE,
         "http://$externalDomain/sites/default/files/coffee-mug.jpg",
-      ),
-      'local URL' => array(
+      ],
+      'local URL' => [
         "/sites/default/files/coffee-mug.jpg",
         FALSE,
         "/sites/default/files/coffee-mug.jpg",
-      ),
-      'local URL without a forward slash' => array(
+      ],
+      'local URL without a forward slash' => [
         "sites/default/files/coffee-mug.jpg",
         FALSE,
         "/sites/default/files/coffee-mug.jpg",
-      ),
-      'empty input' => array(
+      ],
+      'empty input' => [
         '',
         FALSE,
         '',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
@@ -321,36 +322,92 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @return array
    */
   public function parseURLProvider() {
-    return array(
-      "prototypical example" => array(
+    return [
+      "prototypical example" => [
         "https://example.com:8000/foo/bar/?id=1#fragment",
-        array(
+        [
           'host+port' => "example.com:8000",
           'path+query' => "/foo/bar/?id=1",
-        ),
-      ),
-      "default port example" => array(
+        ],
+      ],
+      "default port example" => [
         "https://example.com/foo/bar/?id=1#fragment",
-        array(
+        [
           'host+port' => "example.com",
           'path+query' => "/foo/bar/?id=1",
-        ),
-      ),
-      "empty" => array(
+        ],
+      ],
+      "empty" => [
         "",
-        array(
+        [
           'host+port' => "",
           'path+query' => "",
-        ),
-      ),
-      "path only" => array(
+        ],
+      ],
+      "path only" => [
         "/foo/bar/image.png",
-        array(
+        [
           'host+port' => "",
           'path+query' => "/foo/bar/image.png",
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
+  }
+
+  public function purifyHTMLProvider() {
+    $tests = [];
+    $tests[] = ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'];
+    $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'];
+    return $tests;
+  }
+
+  /**
+   * Test ouput of purifyHTML
+   * @param string $testString
+   * @param string $expectedString
+   * @dataProvider purifyHTMLProvider
+   */
+  public function testPurifyHTML($testString, $expectedString) {
+    $this->assertEquals($expectedString, CRM_Utils_String::purifyHTML($testString));
+  }
+
+  public function getGoodSerializeExamples() {
+    $strs = [];
+
+    $strs[] = ['a:1:{s:1:"a";s:1:"b";}'];
+    $strs[] = ['d:1.2;'];
+    $strs[] = ['s:3:"abc";'];
+    $strs[] = ['N;'];
+    $strs[] = ['a:7:{i:0;N;i:1;s:3:"abc";i:2;i:1;i:3;d:2.3;i:4;b:1;i:5;b:0;i:6;i:0;}'];
+
+    return $strs;
+  }
+
+  /**
+   * @param string $str
+   *   A safe serialized value.
+   * @dataProvider getGoodSerializeExamples
+   */
+  public function testGoodSerialize($str) {
+    $this->assertEquals(unserialize($str), CRM_Utils_String::unserialize($str));
+  }
+
+  public function getBadSerializeExamples() {
+    $strs = [];
+
+    $strs[] = ['O:8:"stdClass":0:{}'];
+    $strs[] = ['O:9:"Exception":7:{s:10:"*message";s:3:"abc";s:17:"Exceptionstring";s:0:"";s:7:"*code";i:0;s:7:"*file";s:17:"Command line code";s:7:"*line";i:1;s:16:"Exceptiontrace";a:0:{}s:19:"Exceptionprevious";N;}'];
+
+    return $strs;
+  }
+
+  /**
+   * @param string $str
+   *   An unsafe serialized value.
+   * @dataProvider getBadSerializeExamples
+   */
+  public function testBadSerializeExamples($str) {
+    $this->assertFalse(CRM_Utils_String::unserialize($str));
   }
 
 }

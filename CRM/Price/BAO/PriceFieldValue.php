@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -47,30 +31,30 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return CRM_Price_DAO_PriceFieldValue
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'PriceFieldValue', CRM_Utils_Array::value('id', $params), $params);
 
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
 
-    if ($id = CRM_Utils_Array::value('id', $ids)) {
-      $fieldValueBAO->id = $id;
-      $prevLabel = self::getOptionLabel($id);
-      if (!empty($params['label']) && $prevLabel != $params['label']) {
-        self::updateAmountAndFeeLevel($id, $prevLabel, $params['label']);
-      }
-    }
     // CRM-16189
     $priceFieldID = CRM_Utils_Array::value('price_field_id', $params);
+
+    $id = CRM_Utils_Array::value('id', $ids, CRM_Utils_Array::value('id', $params));
+
     if (!$priceFieldID) {
       $priceFieldID = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceFieldValue', $id, 'price_field_id');
     }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
-      $p = array(1 => array($params['price_field_id'], 'Integer'));
+      $p = [1 => [$params['price_field_id'], 'Integer']];
       CRM_Core_DAO::executeQuery($query, $p);
     }
 
     $fieldValueBAO->save();
+    CRM_Utils_Hook::post($hook, 'PriceFieldValue', $fieldValueBAO->id, $fieldValueBAO);
+
     // Reset the cached values in this function.
     CRM_Price_BAO_PriceField::getOptions(CRM_Utils_Array::value('price_field_id', $params), FALSE, TRUE);
     return $fieldValueBAO;
@@ -85,8 +69,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param $ids
    *
    * @return CRM_Price_DAO_PriceFieldValue
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function create(&$params, $ids = array()) {
+  public static function create(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     if (!is_array($params) || empty($params)) {
       return NULL;
@@ -104,7 +90,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       if ($id) {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'weight', 'id');
       }
-      $fieldValues = array('price_field_id' => CRM_Utils_Array::value('price_field_id', $params, 0));
+      $fieldValues = ['price_field_id' => CRM_Utils_Array::value('price_field_id', $params, 0)];
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
@@ -132,10 +118,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @return array
    */
   public static function getDefaults() {
-    return array(
+    return [
       'is_active' => 1,
       'weight' => 1,
-    );
+    ];
 
   }
 
@@ -283,11 +269,11 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     if (!$entityId || !$entityTable || !$financialTypeID) {
       return;
     }
-    $params = array(
-      1 => array($entityId, 'Integer'),
-      2 => array($entityTable, 'String'),
-      3 => array($financialTypeID, 'Integer'),
-    );
+    $params = [
+      1 => [$entityId, 'Integer'],
+      2 => [$entityTable, 'String'],
+      3 => [$financialTypeID, 'Integer'],
+    ];
     // for event discount
     $join = $where = '';
     if ($entityTable == 'civicrm_event') {
@@ -308,41 +294,6 @@ cps.financial_type_id = %3
 WHERE cpse.id IS NOT NULL {$where}";
 
     CRM_Core_DAO::executeQuery($sql, $params);
-  }
-
-  /**
-   * Update price option label in line_item, civicrm_contribution and civicrm_participant.
-   *
-   * @param int $id - id of the price_field_value
-   * @param string $prevLabel
-   * @param string $newLabel
-   *
-   */
-  public static function updateAmountAndFeeLevel($id, $prevLabel, $newLabel) {
-    // update price field label in line item.
-    $lineItem = new CRM_Price_DAO_LineItem();
-    $lineItem->price_field_value_id = $id;
-    $lineItem->label = $prevLabel;
-    $lineItem->find();
-    while ($lineItem->fetch()) {
-      $lineItemParams['id'] = $lineItem->id;
-      $lineItemParams['label'] = $newLabel;
-      CRM_Price_BAO_LineItem::create($lineItemParams);
-
-      // update amount and fee level in civicrm_contribution and civicrm_participant
-      $params = array(
-        1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'),
-        2 => array(CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -', 'String'),
-      );
-      // Update contribution
-      if (!empty($lineItem->contribution_id)) {
-        CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$lineItem->contribution_id}", $params);
-      }
-      // Update participant
-      if ($lineItem->entity_table == 'civicrm_participant') {
-        CRM_Core_DAO::executeQuery("UPDATE `civicrm_participant` SET `fee_level` = REPLACE(fee_level, %1, %2) WHERE id = {$lineItem->entity_id}", $params);
-      }
-    }
   }
 
 }

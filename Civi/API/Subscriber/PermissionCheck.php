@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -36,15 +20,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Civi\API\Annotation\Permission.
  */
 class PermissionCheck implements EventSubscriberInterface {
+
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_LATE),
-      ),
-    );
+    return [
+      Events::AUTHORIZE => [
+        ['onApiAuthorize', Events::W_LATE],
+      ],
+    ];
   }
 
   /**
@@ -122,8 +107,8 @@ class PermissionCheck implements EventSubscriberInterface {
       case 'ActionSchedule':
         $events = \CRM_Event_BAO_Event::getEvents();
         $aclEdit = \CRM_ACL_API::group(\CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $events);
-        $param = array('id' => $apiRequest['params']['id']);
-        $eventId = \CRM_Core_BAO_ActionSchedule::retrieve($param, $value = array());
+        $param = ['id' => $apiRequest['params']['id']];
+        $eventId = \CRM_Core_BAO_ActionSchedule::retrieve($param, $value = []);
         if (in_array($eventId->entity_value, $aclEdit)) {
           return TRUE;
         }

@@ -1,41 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * Money utilties
  */
 class CRM_Utils_Money {
-  static $_currencySymbols = NULL;
+  public static $_currencySymbols = NULL;
 
   /**
    * Format a monetary string.
@@ -86,15 +70,22 @@ class CRM_Utils_Money {
     }
 
     if (!self::$_currencySymbols) {
-      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
-          'keyColumn' => 'name',
-          'labelColumn' => 'symbol',
-        ));
+      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
+        'keyColumn' => 'name',
+        'labelColumn' => 'symbol',
+      ]);
     }
 
     if (!$currency) {
       $currency = $config->defaultCurrency;
     }
+
+    // ensure $currency is a valid currency code
+    // for backwards-compatibility, also accept one space instead of a currency
+    if ($currency != ' ' && !array_key_exists($currency, self::$_currencySymbols)) {
+      throw new CRM_Core_Exception("Invalid currency \"{$currency}\"");
+    }
+
     $amount = self::formatNumericByFormat($amount, $valueFormat);
     // If it contains tags, means that HTML was passed and the
     // amount is already converted properly,
@@ -104,11 +95,11 @@ class CRM_Utils_Money {
       $amount = self::replaceCurrencySeparators($amount);
     }
 
-    $replacements = array(
+    $replacements = [
       '%a' => $amount,
       '%C' => $currency,
       '%c' => CRM_Utils_Array::value($currency, self::$_currencySymbols, $currency),
-    );
+    ];
     return strtr($format, $replacements);
   }
 
@@ -130,6 +121,10 @@ class CRM_Utils_Money {
 
   /**
    * Subtract currencies using integers instead of floats, to preserve precision
+   *
+   * @param string|float $leftOp
+   * @param string|float $rightOp
+   * @param string $currency
    *
    * @return float
    *   Result of subtracting $rightOp from $leftOp to the precision of $currency
@@ -243,10 +238,10 @@ class CRM_Utils_Money {
    */
   protected static function replaceCurrencySeparators($amount) {
     $config = CRM_Core_Config::singleton();
-    $rep = array(
+    $rep = [
       ',' => $config->monetaryThousandSeparator,
       '.' => $config->monetaryDecimalPoint,
-    );
+    ];
     return strtr($amount, $rep);
   }
 

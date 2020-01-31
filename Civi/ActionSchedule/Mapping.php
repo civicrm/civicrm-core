@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -63,7 +47,7 @@ namespace Civi\ActionSchedule;
  */
 abstract class Mapping implements MappingInterface {
 
-  private static $fields = array(
+  private static $fields = [
     'id',
     'entity',
     'entity_label',
@@ -73,7 +57,7 @@ abstract class Mapping implements MappingInterface {
     'entity_status_label',
     'entity_date_start',
     'entity_date_end',
-  );
+  ];
 
   /**
    * Create mapping.
@@ -112,7 +96,7 @@ abstract class Mapping implements MappingInterface {
   /**
    * The basic entity to query (label).
    *
-   * @var
+   * @var string
    *   Ex: 'Activity', 'Event'
    */
   private $entity_label;
@@ -149,14 +133,14 @@ abstract class Mapping implements MappingInterface {
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_start_date'
    */
   private $entity_date_start;
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_end_date'.
    */
   private $entity_date_end;
@@ -229,7 +213,7 @@ abstract class Mapping implements MappingInterface {
         return \CRM_Core_OptionGroup::values('auto_renew_options');
       }
       else {
-        return array();
+        return [];
       }
     }
     return self::getValueLabelMap($this->entity_status);
@@ -242,7 +226,7 @@ abstract class Mapping implements MappingInterface {
    *   Array(string $fieldName => string $fieldLabel).
    */
   public function getDateFields() {
-    $dateFieldLabels = array();
+    $dateFieldLabels = [];
     if (!empty($this->entity_date_start)) {
       $dateFieldLabels[$this->entity_date_start] = ucwords(str_replace('_', ' ', $this->entity_date_start));
     }
@@ -263,7 +247,7 @@ abstract class Mapping implements MappingInterface {
    *   Ex: array('assignee' => 'Activity Assignee').
    */
   public function getRecipientTypes() {
-    return array();
+    return [];
   }
 
   /**
@@ -280,7 +264,7 @@ abstract class Mapping implements MappingInterface {
    * @see getRecipientTypes
    */
   public function getRecipientListing($recipientType) {
-    return array();
+    return [];
   }
 
   protected static function getValueLabelMap($name) {
@@ -300,11 +284,11 @@ abstract class Mapping implements MappingInterface {
       $valueLabelMap['civicrm_membership_type'] = \CRM_Member_PseudoConstant::membershipType();
 
       $allCustomFields = \CRM_Core_BAO_CustomField::getFields('');
-      $dateFields = array(
+      $dateFields = [
         'birth_date' => ts('Birth Date'),
         'created_date' => ts('Created Date'),
         'modified_date' => ts('Modified Date'),
-      );
+      ];
       foreach ($allCustomFields as $fieldID => $field) {
         if ($field['data_type'] == 'Date') {
           $dateFields["custom_$fieldID"] = $field['label'];
@@ -326,7 +310,7 @@ abstract class Mapping implements MappingInterface {
    *   List of error messages.
    */
   public function validateSchedule($schedule) {
-    return array();
+    return [];
   }
 
   /**
@@ -339,6 +323,18 @@ abstract class Mapping implements MappingInterface {
    * @param array $defaultParams
    * @return \CRM_Utils_SQL_Select
    */
-  public abstract function createQuery($schedule, $phase, $defaultParams);
+  abstract public function createQuery($schedule, $phase, $defaultParams);
+
+  /**
+   * Determine whether a schedule based on this mapping should
+   * reset the reminder state if the trigger date changes.
+   *
+   * @return bool
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   */
+  public function resetOnTriggerDateChange($schedule) {
+    return FALSE;
+  }
 
 }

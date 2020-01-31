@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -37,7 +21,8 @@
 class CRM_Activity_BAO_ICalendar {
 
   /**
-   * @var object The activity for which we're generating ical.
+   * @var \CRM_Activity_BAO_ICalendar
+   * The activity for which we're generating ical.
    */
   protected $activity;
 
@@ -67,8 +52,7 @@ class CRM_Activity_BAO_ICalendar {
   public function addAttachment(&$attachments, $contacts) {
     // Check preferences setting
     if (Civi::settings()->get('activity_assignee_notification_ics')) {
-      $config = &CRM_Core_Config::singleton();
-      $this->icsfile = tempnam($config->customFileUploadDir, 'ics');
+      $this->icsfile = tempnam(CRM_Core_Config::singleton()->customFileUploadDir, 'ics');
       if ($this->icsfile !== FALSE) {
         rename($this->icsfile, $this->icsfile . '.ics');
         $this->icsfile .= '.ics';
@@ -86,14 +70,14 @@ class CRM_Activity_BAO_ICalendar {
         $calendar = $template->fetch('CRM/Activity/Calendar/ICal.tpl');
         if (file_put_contents($this->icsfile, $calendar) !== FALSE) {
           if (empty($attachments)) {
-            $attachments = array();
+            $attachments = [];
           }
-          $attachments['activity_ics'] = array(
+          $attachments['activity_ics'] = [
             'mime_type' => 'text/calendar',
             'fileName' => $icsFileName,
             'cleanName' => $icsFileName,
             'fullPath' => $this->icsfile,
-          );
+          ];
           return 'activity_ics';
         }
       }
@@ -105,7 +89,7 @@ class CRM_Activity_BAO_ICalendar {
    * Remove temp file.
    */
   public function cleanup() {
-    if (!empty ($this->icsfile)) {
+    if (!empty($this->icsfile)) {
       @unlink($this->icsfile);
     }
   }

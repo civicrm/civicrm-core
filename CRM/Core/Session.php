@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -32,8 +16,9 @@ class CRM_Core_Session {
 
   /**
    * Cache of all the session names that we manage.
+   * @var array
    */
-  static $_managedNames = NULL;
+  public static $_managedNames = NULL;
 
   /**
    * Key is used to allow the application to have multiple top
@@ -57,6 +42,13 @@ class CRM_Core_Session {
   protected $_session = NULL;
 
   /**
+   * Current php Session ID : needed to detect if the session is changed
+   *
+   * @var string
+   */
+  protected $sessionID;
+
+  /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
@@ -68,9 +60,6 @@ class CRM_Core_Session {
    * Constructor.
    *
    * The CMS takes care of initiating the php session handler session_start().
-   *
-   * When using CiviCRM standalone (w/o a CMS), we start the session
-   * in index.php and then pass it off to here.
    *
    * All crm code should always use the session using
    * CRM_Core_Session. we prefix stuff to avoid collisions with the CMS and also
@@ -106,6 +95,11 @@ class CRM_Core_Session {
    *   Is this a read operation, in this case, the session will not be touched.
    */
   public function initialize($isRead = FALSE) {
+    // remove $_SESSION reference if session is changed
+    if (($sid = session_id()) !== $this->sessionID) {
+      $this->_session = NULL;
+      $this->sessionID = $sid;
+    }
     // lets initialize the _session variable just before we need it
     // hopefully any bootstrapping code will actually load the session from the CMS
     if (!isset($this->_session)) {
@@ -114,18 +108,7 @@ class CRM_Core_Session {
         if ($isRead) {
           return;
         }
-        $config =& CRM_Core_Config::singleton();
-        // FIXME: This belongs in CRM_Utils_System_*
-        if ($config->userSystem->is_drupal && function_exists('drupal_session_start')) {
-          // https://issues.civicrm.org/jira/browse/CRM-14356
-          if (!(isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
-            drupal_session_start();
-          }
-          $_SESSION = array();
-        }
-        else {
-          session_start();
-        }
+        CRM_Core_Config::singleton()->userSystem->sessionStart();
       }
       $this->_session =& $_SESSION;
     }
@@ -137,7 +120,7 @@ class CRM_Core_Session {
     if (!isset($this->_session[$this->_key]) ||
       !is_array($this->_session[$this->_key])
     ) {
-      $this->_session[$this->_key] = array();
+      $this->_session[$this->_key] = [];
     }
   }
 
@@ -151,11 +134,11 @@ class CRM_Core_Session {
       $this->initialize();
 
       // to make certain we clear it, first initialize it to empty
-      $this->_session[$this->_key] = array();
+      $this->_session[$this->_key] = [];
       unset($this->_session[$this->_key]);
     }
     else {
-      $this->_session['CiviCRM'] = array();
+      $this->_session = [];
     }
 
   }
@@ -176,7 +159,7 @@ class CRM_Core_Session {
     }
 
     if (empty($this->_session[$this->_key][$prefix])) {
-      $this->_session[$this->_key][$prefix] = array();
+      $this->_session[$this->_key][$prefix] = [];
     }
   }
 
@@ -466,7 +449,7 @@ class CRM_Core_Session {
    *                 defaults to 10 seconds for most messages, 5 if it has a title but no body,
    *                 or 0 for errors or messages containing links
    */
-  public static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
+  public static function setStatus($text, $title = '', $type = 'alert', $options = []) {
     // make sure session is initialized, CRM-8120
     $session = self::singleton();
     $session->initialize();
@@ -476,10 +459,10 @@ class CRM_Core_Session {
     $title = CRM_Utils_String::purifyHTML($title);
 
     // default options
-    $options += array('unique' => TRUE);
+    $options += ['unique' => TRUE];
 
     if (!isset(self::$_singleton->_session[self::$_singleton->_key]['status'])) {
-      self::$_singleton->_session[self::$_singleton->_key]['status'] = array();
+      self::$_singleton->_session[self::$_singleton->_key]['status'] = [];
     }
     if ($text || $title) {
       if ($options['unique']) {
@@ -490,12 +473,12 @@ class CRM_Core_Session {
         }
       }
       unset($options['unique']);
-      self::$_singleton->_session[self::$_singleton->_key]['status'][] = array(
+      self::$_singleton->_session[self::$_singleton->_key]['status'][] = [
         'text' => $text,
         'title' => $title,
         'type' => $type,
         'options' => $options ? $options : NULL,
-      );
+      ];
     }
   }
 
@@ -506,7 +489,7 @@ class CRM_Core_Session {
    */
   public static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {
-      $names = array($names);
+      $names = [$names];
     }
 
     if (!self::$_managedNames) {
@@ -539,7 +522,7 @@ class CRM_Core_Session {
   /**
    * Retrieve contact id of the logged in user.
    *
-   * @return int|NULL
+   * @return int|null
    *   contact ID of logged in user
    */
   public static function getLoggedInContactID() {
@@ -562,7 +545,7 @@ class CRM_Core_Session {
     if (!$userContactID) {
       return '';
     }
-    return civicrm_api3('Contact', 'getvalue', array('id' => $userContactID, 'return' => 'display_name'));
+    return civicrm_api3('Contact', 'getvalue', ['id' => $userContactID, 'return' => 'display_name']);
   }
 
   /**

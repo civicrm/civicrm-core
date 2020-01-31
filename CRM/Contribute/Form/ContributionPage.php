@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -53,21 +37,21 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single;
 
   /**
    * Is this the first page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_first = FALSE;
 
   /**
    * Is this the last page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_last = FALSE;
 
@@ -85,6 +69,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    */
   public function getDefaultEntity() {
     return 'Contribution';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
   }
 
   /**
@@ -120,21 +111,21 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     CRM_Contribute_Form_ContributionPage_TabHeader::build($this);
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      CRM_Utils_System::setTitle(ts('Configure Page - %1', array(1 => $title)));
+      $this->setTitle(ts('Configure Page - %1', [1 => $title]));
     }
     elseif ($this->_action == CRM_Core_Action::VIEW) {
-      CRM_Utils_System::setTitle(ts('Preview Page - %1', array(1 => $title)));
+      $this->setTitle(ts('Preview Page - %1', [1 => $title]));
     }
     elseif ($this->_action == CRM_Core_Action::DELETE) {
-      CRM_Utils_System::setTitle(ts('Delete Page - %1', array(1 => $title)));
+      $this->setTitle(ts('Delete Page - %1', [1 => $title]));
     }
 
     //cache values.
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
-      $this->_values = array();
+      $this->_values = [];
       if (isset($this->_id) && $this->_id) {
-        $params = array('id' => $this->_id);
+        $params = ['id' => $this->_id];
         CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $this->_values);
         CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
       }
@@ -145,12 +136,12 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::UPDATE) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
       if (!CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
     }
 
     // Preload libraries required by the "Profiles" tab
-    $schemas = array('IndividualModel', 'OrganizationModel', 'ContributionModel');
+    $schemas = ['IndividualModel', 'OrganizationModel', 'ContributionModel'];
     if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents)) {
       $schemas[] = 'MembershipModel';
     }
@@ -176,53 +167,53 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
 
     if ($this->_single) {
-      $buttons = array(
-        array(
+      $buttons = [
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'upload',
           'name' => ts('Save and Done'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'subName' => 'done',
-        ),
-      );
+        ],
+      ];
       if (!$this->_last) {
-        $buttons[] = array(
+        $buttons[] = [
           'type' => 'submit',
           'name' => ts('Save and Next'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'subName' => 'savenext',
-        );
+        ];
       }
-      $buttons[] = array(
+      $buttons[] = [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      );
+      ];
       $this->addButtons($buttons);
     }
     else {
-      $buttons = array();
+      $buttons = [];
       if (!$this->_first) {
-        $buttons[] = array(
+        $buttons[] = [
           'type' => 'back',
           'name' => ts('Previous'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        );
+        ];
       }
-      $buttons[] = array(
+      $buttons[] = [
         'type' => 'next',
         'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
-      );
-      $buttons[] = array(
+      ];
+      $buttons[] = [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      );
+      ];
 
       $this->addButtons($buttons);
     }
@@ -231,7 +222,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     // views are implemented as frozen form
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), array('onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"));
+      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"]);
     }
 
     // don't show option for contribution amounts section if membership price set
@@ -251,7 +242,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
     }
     // set value in DOM that membership price set exists
-    CRM_Core_Resources::singleton()->addSetting(array('memberPriceset' => $hasMembershipBlk));
+    CRM_Core_Resources::singleton()->addSetting(['memberPriceset' => $hasMembershipBlk]);
   }
 
   /**
@@ -266,9 +257,9 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     //some child classes calling setdefaults directly w/o preprocess.
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
-      $this->_values = array();
+      $this->_values = [];
       if (isset($this->_id) && $this->_id) {
-        $params = array('id' => $this->_id);
+        $params = ['id' => $this->_id];
         CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $this->_values);
       }
       $this->set('values', $this->_values);
@@ -279,16 +270,16 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     if (isset($this->_id)) {
 
       //set defaults for pledgeBlock values.
-      $pledgeBlockParams = array(
+      $pledgeBlockParams = [
         'entity_id' => $this->_id,
         'entity_table' => ts('civicrm_contribution_page'),
-      );
-      $pledgeBlockDefaults = array();
+      ];
+      $pledgeBlockDefaults = [];
       CRM_Pledge_BAO_PledgeBlock::retrieve($pledgeBlockParams, $pledgeBlockDefaults);
       if ($this->_pledgeBlockID = CRM_Utils_Array::value('id', $pledgeBlockDefaults)) {
         $defaults['is_pledge_active'] = TRUE;
       }
-      $pledgeBlock = array(
+      $pledgeBlock = [
         'is_pledge_interval',
         'max_reminders',
         'initial_reminder_day',
@@ -296,15 +287,15 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         'pledge_start_date',
         'is_pledge_start_date_visible',
         'is_pledge_start_date_editable',
-      );
+      ];
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
-        if ($key == 'pledge_start_date' && CRM_Utils_Array::value($key, $pledgeBlockDefaults)) {
+        if ($key == 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
           $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
-          $pledgeDateFields = array(
+          $pledgeDateFields = [
             'pledge_calendar_date' => 'calendar_date',
             'pledge_calendar_month' => 'calendar_month',
-          );
+          ];
           $defaults['pledge_default_toggle'] = key($defaultPledgeDate);
           foreach ($pledgeDateFields as $key => $value) {
             if (array_key_exists($value, $defaultPledgeDate)) {
@@ -339,7 +330,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       // @todo look to change to $defaults['start_date'] = date('Ymd His');
       // main settings form overrides this to implement above but this is left here
       // 'in case' another extending form uses start_date - for now
-      list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
+      $defaults['start_date'] = date('Y-m-d H:i:s');
     }
 
     if (!empty($defaults['recur_frequency_unit'])) {
@@ -349,7 +340,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
     else {
       // CRM-10860
-      $defaults['recur_frequency_unit'] = array('month' => 1);
+      $defaults['recur_frequency_unit'] = ['month' => 1];
     }
 
     // confirm page starts out enabled
@@ -405,6 +396,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
           $nextPage = 'thankyou';
           break;
 
+        case 'Widget':
+          $subPage = 'widget';
+          $nextPage = 'pcp';
+          break;
+
         default:
           $subPage = strtolower($className);
           $nextPage = strtolower($nextPage);
@@ -419,8 +415,8 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-        array(1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className))
-      ), ts('Saved'), 'success');
+        [1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className)]
+      ), $this->getTitle(), 'success');
 
       $this->postProcessHook();
 
@@ -452,6 +448,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    *
    * @return string
    */
+
   /**
    * @return string
    */

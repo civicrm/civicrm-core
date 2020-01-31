@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 namespace Civi\CCase;
@@ -32,12 +16,16 @@ namespace Civi\CCase;
  * @package Civi\CCase
  */
 class Events {
+
   /**
-   * @var array (int $caseId => bool $active) list of cases for which we are actively firing case-change event
-   *
+   * List of cases for which we are actively firing case-change event
    * We do not want to fire case-change events recursively.
+   *
+   * array (int $caseId => bool $active)
+   *
+   * @var array
    */
-  static $isActive = array();
+  public static $isActive = [];
 
   /**
    * Following a change to an activity or case, fire the case-change event.
@@ -73,8 +61,8 @@ class Events {
           $tx = new \CRM_Core_Transaction();
           \CRM_Core_Transaction::addCallback(
             \CRM_Core_Transaction::PHASE_POST_COMMIT,
-            array(__CLASS__, 'fireCaseChangeForRealz'),
-            array($caseId),
+            [__CLASS__, 'fireCaseChangeForRealz'],
+            [$caseId],
             "Civi_CCase_Events::fire::{$caseId}"
           );
         }

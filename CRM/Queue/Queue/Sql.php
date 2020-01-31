@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -69,9 +53,9 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     return CRM_Core_DAO::singleValueQuery("
       DELETE FROM civicrm_queue_item
       WHERE queue_name = %1
-    ", array(
-      1 => array($this->getName(), 'String'),
-    ));
+    ", [
+      1 => [$this->getName(), 'String'],
+    ]);
   }
 
   /**
@@ -92,7 +76,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
    */
-  public function createItem($data, $options = array()) {
+  public function createItem($data, $options = []) {
     $dao = new CRM_Queue_DAO_QueueItem();
     $dao->queue_name = $this->getName();
     $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
@@ -111,9 +95,9 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       SELECT count(*)
       FROM civicrm_queue_item
       WHERE queue_name = %1
-    ", array(
-      1 => array($this->getName(), 'String'),
-    ));
+    ", [
+      1 => [$this->getName(), 'String'],
+    ]);
   }
 
   /**
@@ -126,16 +110,23 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    *   With key 'data' that matches the inputted data.
    */
   public function claimItem($lease_time = 3600) {
+
+    $result = NULL;
+    $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
     $sql = "
-      SELECT id, queue_name, submit_time, release_time, data
-      FROM civicrm_queue_item
-      WHERE queue_name = %1
-      ORDER BY weight ASC, id ASC
-      LIMIT 1
-    ";
-    $params = array(
-      1 => array($this->getName(), 'String'),
-    );
+        SELECT first_in_queue.* FROM (
+          SELECT id, queue_name, submit_time, release_time, data
+          FROM civicrm_queue_item
+          WHERE queue_name = %1
+          ORDER BY weight ASC, id ASC
+          LIMIT 1
+        ) first_in_queue
+        WHERE release_time IS NULL OR release_time < %2
+      ";
+    $params = [
+      1 => [$this->getName(), 'String'],
+      2 => [CRM_Utils_Time::getTime(), 'Timestamp'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if (is_a($dao, 'DB_Error')) {
       // FIXME - Adding code to allow tests to pass
@@ -144,19 +135,22 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
 
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      if ($dao->release_time === NULL || strtotime($dao->release_time) < $nowEpoch) {
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", array(
-          '1' => array(date('YmdHis', $nowEpoch + $lease_time), 'String'),
-          '2' => array($dao->id, 'Integer'),
-        ));
-        // work-around: inconsistent date-formatting causes unintentional breakage
-        #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
-        #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
-        #        $dao->save();
-        $dao->data = unserialize($dao->data);
-        return $dao;
-      }
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
+        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+        '2' => [$dao->id, 'Integer'],
+      ]);
+      // (Comment by artfulrobot Sep 2019: Not sure what the below comment means, should be removed/clarified?)
+      // work-around: inconsistent date-formatting causes unintentional breakage
+      #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
+      #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
+      #        $dao->save();
+      $dao->data = unserialize($dao->data);
+      $result = $dao;
     }
+
+    $dao = CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
+
+    return $result;
   }
 
   /**
@@ -176,16 +170,16 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       ORDER BY weight ASC, id ASC
       LIMIT 1
     ";
-    $params = array(
-      1 => array($this->getName(), 'String'),
-    );
+    $params = [
+      1 => [$this->getName(), 'String'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", array(
-        '1' => array(date('YmdHis', $nowEpoch + $lease_time), 'String'),
-        '2' => array($dao->id, 'Integer'),
-      ));
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
+        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+        '2' => [$dao->id, 'Integer'],
+      ]);
       $dao->data = unserialize($dao->data);
       return $dao;
     }
@@ -199,7 +193,6 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    */
   public function deleteItem($dao) {
     $dao->delete();
-    $dao->free();
   }
 
   /**
@@ -210,11 +203,10 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    */
   public function releaseItem($dao) {
     $sql = "UPDATE civicrm_queue_item SET release_time = NULL WHERE id = %1";
-    $params = array(
-      1 => array($dao->id, 'Integer'),
-    );
+    $params = [
+      1 => [$dao->id, 'Integer'],
+    ];
     CRM_Core_DAO::executeQuery($sql, $params);
-    $dao->free();
   }
 
 }

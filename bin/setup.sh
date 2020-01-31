@@ -60,6 +60,7 @@ while getopts "aDgsdef" opt; do
       DO_GENCODE=1
       DO_SCHEMA=1
       DO_DATA=1
+      DEFAULT_DATA=civicrm_generated.mysql
       DO_FLUSH=1
       FOUND_ACTION=1
       ;;
@@ -140,35 +141,17 @@ set -x
 
 if [ -n "$DO_DOWNLOAD" ]; then
   pushd "$CALLEDPATH/.."
-    COMPOSER=$(pickcmd composer composer.phar)
-    $COMPOSER install
+    if [ "$GENCODE_CMS" != "Drupal8" ]; then
+      COMPOSER=$(pickcmd composer composer.phar)
+      $COMPOSER install
+    fi
 
-    if has_commands bower karma ; then
+    if has_commands karma ; then
       ## dev dependencies have been installed globally; don't force developer to redownload
       npm install --production
     else
       npm install
     fi
-
-    BOWER=$(pickcmd node_modules/bower/bin/bower bower)
-    if [ -f "$BOWER" ]; then
-      NODE=$(pickcmd node nodejs)
-      BOWER="$NODE $BOWER"
-    fi
-    # Without the force flag, bower may not check for new versions or verify that installed software matches version specified in bower.json
-    # With the force flag, bower will ignore all caches and download all deps.
-    if [ -n "$OFFLINE" ]; then
-      BOWER_OPT=
-    elif [ ! -f "bower_components/.setupsh.ts" ]; then
-      ## First run -- or cleanup from failed run
-      BOWER_OPT=-f
-    elif [ "bower.json" -nt "bower_components/.setupsh.ts" ]; then
-      ## Bower.json has changed since last run
-      BOWER_OPT=-f
-    fi
-    [ -f "bower_components/.setupsh.ts" ] && rm -f "bower_components/.setupsh.ts"
-    $BOWER install $BOWER_OPT
-    touch bower_components/.setupsh.ts
   popd
 fi
 
@@ -228,9 +211,9 @@ fi
 
 if [ -n "$DO_FLUSH" ]; then
   pushd "$CALLEDPATH/.."
-    # reset config_backend and userFrameworkResourceURL which gets set
+    # reset userFrameworkResourceURL which gets set
     # when config object is initialized
-    $MYSQLCMD -e "UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
+    $MYSQLCMD -e "UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
   popd
 fi
 

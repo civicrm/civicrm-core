@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -69,11 +53,11 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       ],
       'label_b_a' => [
         'name' => 'label_b_a',
-        'description' => ts("Label for the relationship from Contact B to Contact A. EXAMPLE: Contact B is 'Child of' Contact A. You may leave this blank for relationships where the name is the same in both directions (e.g. Spouse).")
+        'description' => ts("Label for the relationship from Contact B to Contact A. EXAMPLE: Contact B is 'Child of' Contact A. You may leave this blank for relationships where the name is the same in both directions (e.g. Spouse)."),
       ],
       'description' => [
         'name' => 'description',
-        'description' => ''
+        'description' => '',
       ],
       'contact_types_a' => ['name' => 'contact_types_a', 'not-auto-addable' => TRUE],
       'contact_types_b' => ['name' => 'contact_types_b', 'not-auto-addable' => TRUE],
@@ -119,18 +103,18 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     }
 
     $this->addRule('label_a_b', ts('Label already exists in Database.'),
-      'objectExists', array('CRM_Contact_DAO_RelationshipType', $this->_id, 'label_a_b')
+      'objectExists', ['CRM_Contact_DAO_RelationshipType', $this->_id, 'label_a_b']
     );
     $this->addRule('label_b_a', ts('Label already exists in Database.'),
-      'objectExists', array('CRM_Contact_DAO_RelationshipType', $this->_id, 'label_b_a')
+      'objectExists', ['CRM_Contact_DAO_RelationshipType', $this->_id, 'label_b_a']
     );
 
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '__');
     foreach (['contact_types_a' => ts('Contact Type A'), 'contact_types_b' => ts('Contact Type B')] as $name => $label) {
       $element = $this->add('select', $name, $label . ' ',
-        array(
+        [
           '' => ts('All Contacts'),
-        ) + $contactTypes
+        ] + $contactTypes
       );
       if ($isReserved) {
         $element->freeze();
@@ -150,8 +134,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     if ($this->_action != CRM_Core_Action::DELETE &&
       isset($this->_id)
     ) {
-      $defaults = $params = array();
-      $params = array('id' => $this->_id);
+      $defaults = $params = [];
+      $params = ['id' => $this->_id];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
       $defaults['contact_types_a'] = CRM_Utils_Array::value('contact_type_a', $defaults);
@@ -208,8 +192,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
       if (empty($params['id'])) {
         // Set name on created but don't update on update as the machine name is not exposed.
-        $params['name_b_a'] = CRM_Utils_String::munge($params['label_b_a']);
-        $params['name_a_b'] = CRM_Utils_String::munge($params['label_a_b']);
+        $params['name_b_a'] = $params['label_b_a'];
+        $params['name_a_b'] = $params['label_a_b'];
       }
 
       $result = civicrm_api3('RelationshipType', 'create', $params);

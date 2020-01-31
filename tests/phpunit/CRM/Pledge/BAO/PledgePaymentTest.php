@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -53,7 +37,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function testAdd() {
     $pledge = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge');
-    $params = array(
+    $params = [
       'pledge_id' => $pledge->id,
       'scheduled_amount' => 100.55,
       'currency' => 'USD',
@@ -61,7 +45,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'reminder_date' => '20100520000000',
       'reminder_count' => 5,
       'status_id' => 1,
-    );
+    ];
 
     //do test for normal add.
     $payment = CRM_Pledge_BAO_PledgePayment::add($params);
@@ -70,7 +54,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     }
 
     //do test for update mode.
-    $params = array(
+    $params = [
       'id' => $payment->id,
       'pledge_id' => $pledge->id,
       'scheduled_amount' => 55.55,
@@ -79,7 +63,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'reminder_date' => '20100425000000',
       'reminder_count' => 10,
       'status_id' => 2,
-    );
+    ];
 
     $payment = CRM_Pledge_BAO_PledgePayment::add($params);
     foreach ($params as $param => $value) {
@@ -93,8 +77,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function testRetrieveZeroPledeID() {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
-    $params = array('pledge_id' => 0);
-    $defaults = array();
+    $params = ['pledge_id' => 0];
+    $defaults = [];
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
     $this->assertEquals(is_null($paymentid), 1, "Pledge Id must be greater than 0");
@@ -106,8 +90,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function testRetrieveStringPledgeID() {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
-    $params = array('pledge_id' => 'Test');
-    $defaults = array();
+    $params = ['pledge_id' => 'Test'];
+    $defaults = [];
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
     $this->assertEquals(is_null($paymentid), 1, "Pledge Id cannot be a string");
@@ -120,8 +104,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   public function testRetrieveKnownPledgeID() {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $pledgeId = $payment->pledge_id;
-    $params = array('pledge_id' => $pledgeId);
-    $defaults = array();
+    $params = ['pledge_id' => $pledgeId];
+    $defaults = [];
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
     $this->assertEquals($paymentid->N, 1, "Pledge was retrieved");
@@ -144,7 +128,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function testDeletePledgePayments() {
     $contactId = $this->individualCreate();
-    $pledgeId = $this->pledgeCreate(array('contact_id' => $contactId));
+    $pledgeId = $this->pledgeCreate(['contact_id' => $contactId]);
     CRM_Pledge_BAO_PledgePayment::deletePayments($pledgeId);
 
     // No payments should be retrieved
@@ -175,12 +159,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Test calculateBaseScheduleDate - should give 15th day of month
    */
   public function testcalculateBaseScheduleDateMonth() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'month',
       'frequency_day' => 15,
       'frequency_interval' => 2,
-    );
+    ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
     $this->assertEquals('20110515000000', $date);
@@ -190,12 +174,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Test calculateBaseScheduleDate - should give original date
    */
   public function testcalculateBaseScheduleDateDay() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'day',
       'frequency_day' => 15,
       'frequency_interval' => 2,
-    );
+    ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
     $this->assertEquals('20110510000000', $date);
@@ -206,12 +190,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    * testing each day as this is really the only unit that does anything
    */
   public function testcalculateBaseScheduleDateWeek() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'week',
       'frequency_day' => 1,
       'frequency_interval' => 2,
-    );
+    ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
     $this->assertEquals('20110509000000', $date);
@@ -239,12 +223,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Test calculateBaseScheduleDate - should give original date
    */
   public function testcalculateBaseScheduleDateYear() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'year',
       'frequency_day' => 15,
       'frequency_interval' => 2,
-    );
+    ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
     $this->assertEquals('20110510000000', $date);
@@ -254,12 +238,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Test calculateNextScheduledDate - no date provided
    */
   public function testcalculateNextScheduledDateYear() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'year',
       'frequency_day' => 15,
       'frequency_interval' => 2,
-    );
+    ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 1);
     $this->assertEquals('20130510000000', $date);
@@ -270,12 +254,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Test culateNextScheduledDateMonth for months.
    */
   public function testcalculateNextScheduledDateMonth() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'month',
       'frequency_day' => 31,
       'frequency_interval' => 1,
-    );
+    ];
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 2);
     $this->assertEquals('20110731000000', $nextScheduleDate);
     // assert pledge scheduled date for month february.
@@ -334,12 +318,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Test calculateNextScheduledDate - no date provided
    */
   public function testcalculateNextScheduledDateYearDateProvided() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'year',
       'frequency_day' => 15,
       'frequency_interval' => 2,
-    );
+    ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 3, '20080510');
     $this->assertEquals('20140510000000', $date);
@@ -354,7 +338,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $contact_id = 2;
 
-    $pledge = $this->callAPISuccess('Pledge', 'create', array(
+    $pledge = $this->callAPISuccess('Pledge', 'create', [
       'contact_id' => $contact_id,
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
@@ -369,9 +353,9 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'frequency_day' => 1,
       'installments' => 12,
       'sequential' => 1,
-    ));
+    ]);
 
-    $contributionID = $this->contributionCreate(array(
+    $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
       'financial_type_id' => 1,
       'invoice_id' => 46,
@@ -381,13 +365,13 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'net_amount' => 404.70,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 0.00,
-    ));
+    ]);
 
     // Fetch the first planned pledge payment/installment
-    $pledgePayments = civicrm_api3('PledgePayment', 'get', array(
+    $pledgePayments = civicrm_api3('PledgePayment', 'get', [
       'pledge_id' => $pledge['id'],
       'sequential' => 1,
-    ));
+    ]);
 
     // Does all sorts of shenanigans if the amount was not the expected amount,
     // and this is what we really want to test in this function.
@@ -395,19 +379,22 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       CRM_Core_Action::ADD,
       $pledgePayments['values'][0]['id'],
       $contributionID,
-      NULL, // adjustTotalAmount
+      // adjustTotalAmount
+      NULL,
       404.70,
       134.90,
-      1, // contribution_status_id
-      NULL // original_contribution_status_id
+      // contribution_status_id
+      1,
+      // original_contribution_status_id
+      NULL
     );
 
     // Fetch the pledge payments again to see if the amounts and statuses
     // have been updated correctly.
-    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', array(
+    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', [
       'pledge_id' => $pledge['id'],
       'sequential' => 1,
-    ));
+    ]);
 
     // The status of the first 3 pledges should be set to complete
     $this->assertEquals($pledgePayments['values'][0]['status_id'], 1);
@@ -423,9 +410,9 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals($pledgePayments['values'][3]['status_id'], 2);
 
     // Cleanup
-    civicrm_api3('Pledge', 'delete', array(
+    civicrm_api3('Pledge', 'delete', [
       'id' => $pledge['id'],
-    ));
+    ]);
   }
 
   /**
@@ -442,7 +429,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $contact_id = 2;
 
-    $params = array(
+    $params = [
       'contact_id' => $contact_id,
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
@@ -450,17 +437,18 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'amount' => 100.00,
       'pledge_status_id' => 2,
       'pledge_financial_type_id' => 1,
-      'original_installment_amount' => (100 / 12), // the API does not allow this
+      // the API does not allow this
+      'original_installment_amount' => (100 / 12),
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'frequency_day' => 1,
       'installments' => 12,
       'sequential' => 1,
-    );
+    ];
 
     $pledge = CRM_Pledge_BAO_Pledge::create($params);
 
-    $contributionID = $this->contributionCreate(array(
+    $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
       'financial_type_id' => 1,
       'invoice_id' => 47,
@@ -470,13 +458,13 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'net_amount' => 100.00,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 0.00,
-    ));
+    ]);
 
     // Fetch the first planned pledge payment/installment
-    $pledgePayments = civicrm_api3('PledgePayment', 'get', array(
+    $pledgePayments = civicrm_api3('PledgePayment', 'get', [
       'pledge_id' => $pledge->id,
       'sequential' => 1,
-    ));
+    ]);
 
     // The last pledge payment is 8.37 because 12*8.33 = 99.96
     // So CiviCRM automatically creates a larger final pledge to catch the missing cents.
@@ -491,19 +479,22 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       CRM_Core_Action::ADD,
       $pledgePayments['values'][0]['id'],
       $contributionID,
-      NULL, // adjustTotalAmount
+    // adjustTotalAmount
+      NULL,
       100.00,
       100.00,
-      1, // contribution_status_id
-      NULL // original_contribution_status_id
+    // contribution_status_id
+      1,
+    // original_contribution_status_id
+      NULL
     );
 
     // Fetch the pledge payments again to see if the amounts and statuses
     // have been updated correctly.
-    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', array(
+    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', [
       'pledge_id' => $pledge->id,
       'sequential' => 1,
-    ));
+    ]);
 
     foreach ($pledgePayments['values'] as $key => $pp) {
       if ($key == 0) {
@@ -520,10 +511,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       $this->assertEquals(1, $pp['status_id']);
     }
 
+    $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge->id, 2));
+
     // Cleanup
-    civicrm_api3('Pledge', 'delete', array(
+    civicrm_api3('Pledge', 'delete', [
       'id' => $pledge->id,
-    ));
+    ]);
   }
 
 }

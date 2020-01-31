@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,31 +25,31 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   public function buildQuickForm() {
 
     // Register 'contact_1' model
-    $entities = array();
-    $entities[] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
-    $allowCoreTypes = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
-    $allowSubTypes = array();
+    $entities = [];
+    $entities[] = ['entity_name' => 'contact_1', 'entity_type' => 'IndividualModel'];
+    $allowCoreTypes = array_merge(['Contact', 'Individual'], CRM_Contact_BAO_ContactType::subTypes('Individual'));
+    $allowSubTypes = [];
 
     // Register 'contribution_1'
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'financial_type_id');
     $allowCoreTypes[] = 'Contribution';
     //CRM-15427
-    $allowSubTypes['ContributionType'] = array($financialTypeId);
-    $entities[] = array(
+    $allowSubTypes['ContributionType'] = [$financialTypeId];
+    $entities[] = [
       'entity_name' => 'contribution_1',
       'entity_type' => 'ContributionModel',
       'entity_sub_type' => '*',
-    );
+    ];
 
     // If applicable, register 'membership_1'
     $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
     if ($member && $member['is_active']) {
       //CRM-15427
-      $entities[] = array(
+      $entities[] = [
         'entity_name' => 'membership_1',
         'entity_type' => 'MembershipModel',
         'entity_sub_type' => '*',
-      );
+      ];
       $allowCoreTypes[] = 'Membership';
       $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);
     }
@@ -73,7 +57,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
     $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
 
-    $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Custom', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Custom', 'formRule'], $this);
 
     parent::buildQuickForm();
   }
@@ -106,12 +90,12 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     $transaction = new CRM_Core_Transaction();
 
     // also update uf join table
-    $ufJoinParams = array(
+    $ufJoinParams = [
       'is_active' => 1,
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $this->_id,
-    );
+    ];
 
     // first delete all past entries
     CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
@@ -156,7 +140,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
     $preProfileType = $postProfileType = NULL;
     // for membership profile make sure Membership section is enabled
     // get membership section for this contribution page

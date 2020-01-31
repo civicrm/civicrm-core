@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -37,34 +21,46 @@
 class CRM_Extension_Container_Collection implements CRM_Extension_Container_Interface {
 
   /**
-   * @var array ($name => CRM_Extension_Container_Interface)
+   * Containers.
+   *
+   * Format is [$name => CRM_Extension_Container_Interface]
+   *
+   * @var array
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $containers;
 
   /**
-   * @var CRM_Utils_Cache_Interface|NULL
+   * @var CRM_Utils_Cache_Interface|null
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $cache;
 
   /**
-   * @var string the cache key used for any data stored by this container
+   * The cache key used for any data stored by this container.
+   *
+   * @var string
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $cacheKey;
 
   /**
-   * @var array ($key => $containerName)
+   * K2C ....
+   *
+   * Format is ($key => $containerName).
+   *
+   * @var array
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $k2c;
 
   /**
+   * Class constructor.
+   *
    * @param array $containers
    *   Array($name => CRM_Extension_Container_Interface) in order from highest
    *   priority (winners) to lowest priority (losers).
@@ -85,7 +81,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @return array
    */
   public function checkRequirements() {
-    $errors = array();
+    $errors = [];
     foreach ($this->containers as $container) {
       $errors = array_merge($errors, $container->checkRequirements());
     }
@@ -95,7 +91,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   /**
    * @inheritDoc
    *
-   * @return array_keys
+   * @return array
    */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
@@ -106,6 +102,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @inheritDoc
    *
    * @param string $key
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getPath($key) {
     return $this->getContainer($key)->getPath($key);
@@ -115,6 +113,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @inheritDoc
    *
    * @param string $key
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getResUrl($key) {
     return $this->getContainer($key)->getResUrl($key);
@@ -163,7 +163,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
       $k2c = $this->cache->get($this->cacheKey);
     }
     if (!isset($k2c) || !is_array($k2c)) {
-      $k2c = array();
+      $k2c = [];
       $containerNames = array_reverse(array_keys($this->containers));
       foreach ($containerNames as $name) {
         $keys = $this->containers[$name]->getKeys();

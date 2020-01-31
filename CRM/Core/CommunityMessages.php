@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -36,7 +20,8 @@ class CRM_Core_CommunityMessages {
   /**
    * Default time to wait before retrying.
    */
-  const DEFAULT_RETRY = 7200; // 2 hours
+  // 2 hours
+  const DEFAULT_RETRY = 7200;
 
   /**
    * @var CRM_Utils_HttpClient
@@ -49,7 +34,11 @@ class CRM_Core_CommunityMessages {
   protected $cache;
 
   /**
-   * @var FALSE|string
+   * Url to retrieve community messages from.
+   *
+   * False means a retrieval will not be attempted.
+   *
+   * @var false|string
    */
   protected $messagesUrl;
 
@@ -66,9 +55,11 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
+   * Class constructor.
+   *
    * @param CRM_Utils_Cache_Interface $cache
    * @param CRM_Utils_HttpClient $client
-   * @param null $messagesUrl
+   * @param string|false $messagesUrl
    */
   public function __construct($cache, $client, $messagesUrl = NULL) {
     $this->cache = $cache;
@@ -85,7 +76,7 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Get the messages document (either from the cache or by downloading)
+   * Get the messages document (either from the cache or by downloading).
    *
    * @return NULL|array
    */
@@ -94,12 +85,13 @@ class CRM_Core_CommunityMessages {
     $document = $this->cache->get('communityMessages');
 
     if (empty($document) || !is_array($document)) {
-      $document = array(
-        'messages' => array(),
-        'expires' => 0, // ASAP
+      $document = [
+        'messages' => [],
+        // ASAP
+        'expires' => 0,
         'ttl' => self::DEFAULT_RETRY,
         'retry' => self::DEFAULT_RETRY,
-      );
+      ];
       $isChanged = TRUE;
     }
 
@@ -164,10 +156,10 @@ class CRM_Core_CommunityMessages {
    */
   public function pick() {
     $document = $this->getDocument();
-    $messages = array();
+    $messages = [];
     foreach ($document['messages'] as $message) {
       if (!isset($message['perms'])) {
-        $message['perms'] = array(self::DEFAULT_PERMISSION);
+        $message['perms'] = [self::DEFAULT_PERMISSION];
       }
       if (!CRM_Core_Permission::checkAnyPerm($message['perms'])) {
         continue;
@@ -196,7 +188,7 @@ class CRM_Core_CommunityMessages {
    */
   public static function evalMarkup($markup) {
     $config = CRM_Core_Config::singleton();
-    $vals = array(
+    $vals = [
       'resourceUrl' => rtrim($config->resourceBase, '/'),
       'ver' => CRM_Utils_System::version(),
       'uf' => $config->userFramework,
@@ -205,8 +197,8 @@ class CRM_Core_CommunityMessages {
       'baseUrl' => $config->userFrameworkBaseURL,
       'lang' => $config->lcMessages,
       'co' => $config->defaultContactCountry,
-    );
-    $vars = array();
+    ];
+    $vars = [];
     foreach ($vals as $k => $v) {
       $vars['%%' . $k . '%%'] = $v;
       $vars['{{' . $k . '}}'] = urlencode($v);

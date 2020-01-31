@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -41,7 +25,8 @@
  */
 class CRM_Core_Page_AJAX_Attachment {
 
-  const ATTACHMENT_TOKEN_TTL = 10800; // 3hr; 3*60*60
+  // 3hr; 3*60*60
+  const ATTACHMENT_TOKEN_TTL = 10800;
 
   /**
    * (Page Callback)
@@ -62,18 +47,18 @@ class CRM_Core_Page_AJAX_Attachment {
    */
   public static function _attachFile($post, $files, $server) {
     $config = CRM_Core_Config::singleton();
-    $results = array();
+    $results = [];
 
     foreach ($files as $key => $file) {
       if (!$config->debug && !self::checkToken($post['crm_attachment_token'])) {
         require_once 'api/v3/utils.php';
         $results[$key] = civicrm_api3_create_error("SECURITY ALERT: Attaching files via AJAX requires a recent, valid token.",
-          array(
+          [
             'IP' => $server['REMOTE_ADDR'],
             'level' => 'security',
             'referer' => $server['HTTP_REFERER'],
             'reason' => 'CSRF suspected',
-          )
+          ]
         );
       }
       elseif ($file['error']) {
@@ -85,14 +70,14 @@ class CRM_Core_Page_AJAX_Attachment {
             // We want check_permissions=1 while creating the DB record and check_permissions=0 while moving upload,
             // so split the work across two api calls.
 
-            $params = array();
+            $params = [];
             if (isset($file['name'])) {
               $params['name'] = $file['name'];
             }
             if (isset($file['type'])) {
               $params['mime_type'] = $file['type'];
             }
-            foreach (array('entity_table', 'entity_id', 'description') as $field) {
+            foreach (['entity_table', 'entity_id', 'description'] as $field) {
               if (isset($post[$field])) {
                 $params[$field] = $post[$field];
               }
@@ -103,12 +88,12 @@ class CRM_Core_Page_AJAX_Attachment {
             $results[$key] = civicrm_api('Attachment', 'create', $params);
 
             if (!$results[$key]['is_error']) {
-              $moveParams = array(
+              $moveParams = [
                 'id' => $results[$key]['id'],
                 'version' => 3,
                 'options.move-file' => $file['tmp_name'],
                 // note: in this second call, check_permissions==false
-              );
+              ];
               $moveResult = civicrm_api('Attachment', 'create', $moveParams);
               if ($moveResult['is_error']) {
                 $results[$key] = $moveResult;
@@ -149,12 +134,12 @@ class CRM_Core_Page_AJAX_Attachment {
    * @return string
    */
   public static function createToken() {
-    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), ['for', 'ts']);
     $ts = CRM_Utils_Time::getTimeRaw();
-    return $signer->sign(array(
+    return $signer->sign([
       'for' => 'crmAttachment',
       'ts' => $ts,
-    )) . ';;;' . $ts;
+    ]) . ';;;' . $ts;
   }
 
   /**
@@ -166,14 +151,14 @@ class CRM_Core_Page_AJAX_Attachment {
    */
   public static function checkToken($token) {
     list ($signature, $ts) = explode(';;;', $token);
-    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), ['for', 'ts']);
     if (!is_numeric($ts) || CRM_Utils_Time::getTimeRaw() > $ts + self::ATTACHMENT_TOKEN_TTL) {
       return FALSE;
     }
-    return $signer->validate($signature, array(
+    return $signer->validate($signature, [
       'for' => 'crmAttachment',
       'ts' => $ts,
-    ));
+    ]);
   }
 
 }

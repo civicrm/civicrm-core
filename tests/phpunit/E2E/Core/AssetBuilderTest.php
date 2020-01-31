@@ -5,7 +5,6 @@ namespace E2E\Core;
 use Civi\Core\AssetBuilder;
 use Civi\Core\Event\GenericHookEvent;
 
-
 /**
  * Class AssetBuilderTest
  * @package E2E\Core
@@ -150,7 +149,8 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     \Civi::service('asset_builder')->setCacheEnabled(FALSE);
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(0, $this->fired['hook_civicrm_buildAsset']);
-    $this->assertRegExp(';^https?:.*civicrm/asset/builder.*square.(txt|js);', $url);
+    // Ex: Traditional URLs on D7 have "/". Traditional URLs on WP have "%2F".
+    $this->assertRegExp(';^https?:.*civicrm(/|%2F)asset(/|%2F)builder.*square.(txt|js);', $url);
 
     // Simulate a request. Our fake hook won't fire in a real request.
     parse_str(parse_url($url, PHP_URL_QUERY), $get);
@@ -162,9 +162,16 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
   public function testInvalid() {
     \Civi::service('asset_builder')->setCacheEnabled(FALSE);
     $url = \Civi::service('asset_builder')->getUrl('invalid.json');
-    $this->assertEmpty(file_get_contents($url));
-    $this->assertNotEmpty(preg_grep(';HTTP/1.1 404;', $http_response_header),
-      'Expect to find HTTP 404. Found: ' . json_encode(preg_grep(';^HTTP;', $http_response_header)));
+    try {
+      $guzzleClient = new \GuzzleHttp\Client();
+      $guzzleResponse = $guzzleClient->request('GET', $url, array('timeout' => 1));
+      $this->fail('Expecting ClientException... but it was not thrown!');
+    }
+    catch (\GuzzleHttp\Exception\ClientException $e) {
+      $this->assertNotEmpty(preg_match(';404;', $e->getMessage()),
+        'Expect to find HTTP 404. Found: ' . json_encode(preg_match(';^HTTP;', $e->getMessage())));
+      $this->assertEquals('Unrecognized asset name: invalid.json', $e->getResponse()->getBody());
+    }
   }
 
 }

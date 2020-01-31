@@ -1,38 +1,23 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
+
   /**
    * Class constructor.
    *
@@ -41,7 +26,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_columns = array(
+    $this->_columns = [
       // If possible, don't use aliases for the columns you select.
       // You can prefix columns with table aliases, if needed.
       //
@@ -59,21 +44,21 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
       // If you don't do this, the patch of CRM-16587 might cause database
       // errors.
       ts('State') => 'state_province.name',
-    );
+    ];
   }
 
   /**
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
-    $groups = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(FALSE);
-    $form->addElement('select', 'group_id', ts('Group'), $groups, array('class' => 'crm-select2 huge'));
+    $groups = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(FALSE);
+    $form->addElement('select', 'group_id', ts('Group'), $groups, ['class' => 'crm-select2 huge']);
 
     /**
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('group_id'));
+    $form->assign('elements', ['group_id']);
   }
 
   /**
@@ -148,15 +133,15 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $params = array();
+    $params = [];
 
     $count = 1;
-    $clause = array();
+    $clause = [];
     $groupID = CRM_Utils_Array::value('group_id',
       $this->_formValues
     );
     if ($groupID) {
-      $params[$count] = array($groupID, 'Integer');
+      $params[$count] = [$groupID, 'Integer'];
       $clause[] = "cgc.group_id = %{$count}";
     }
 

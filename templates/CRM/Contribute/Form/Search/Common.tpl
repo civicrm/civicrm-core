@@ -1,32 +1,15 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
-<tr><td><label>{ts}Date Received{/ts}</label></td></tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" colspan="2"}
 </tr>
 <tr>
   <td><label>{ts}Contribution Amounts{/ts}</label> <br />
@@ -157,27 +140,21 @@
     {$form.contribution_pcp_made_through_id.html}
     {include file="CRM/Contribute/Form/PCP.js.tpl"}
   </td>
-  <td>
-    {$form.cancel_reason.label}<br />
-    {$form.cancel_reason.html}
-  </td>
+  <td>&nbsp;</td>
 </tr>
 <tr>
   <td>
     {$form.contribution_pcp_display_in_roll.label}
     {$form.contribution_pcp_display_in_roll.html}
   </td>
+</tr>
+<tr>
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_cancel_date" colspan="2"}
+</tr>
+<tr>
   <td>
-    <table style="width:auto">
-      <tr>
-        <td>
-          <label>{ts}Cancelled / Refunded Date{/ts}</label>
-        </td>
-      </tr>
-      <tr>
-        {include file="CRM/Core/DateRange.tpl" fieldName="contribution_cancel_date" from='_low' to='_high'}
-      </tr>
-    </table>
+    {$form.cancel_reason.label}<br />
+    {$form.cancel_reason.html}
   </td>
 </tr>
 

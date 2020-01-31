@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -84,16 +68,16 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   public function buildQuickForm() {
 
     //create radio buttons to select existing group or add a new group
-    $options = array(ts('Add Contact To Existing Group'), ts('Create New Group'));
+    $options = [ts('Add Contact To Existing Group'), ts('Create New Group')];
 
     if (!$this->_id) {
-      $this->addRadio('group_option', ts('Group Options'), $options, array('onclick' => "return showElements();"));
+      $this->addRadio('group_option', ts('Group Options'), $options, ['onclick' => "return showElements();"]);
 
       $this->add('text', 'title', ts('Group Name:') . ' ',
         CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title')
       );
       $this->addRule('title', ts('Name already exists in Database.'),
-        'objectExists', array('CRM_Contact_DAO_Group', $this->_id, 'title')
+        'objectExists', ['CRM_Contact_DAO_Group', $this->_id, 'title']
       );
 
       $this->add('textarea', 'description', ts('Description:') . ' ',
@@ -122,7 +106,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
     }
 
     // add select for groups
-    $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::group();
+    $group = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::group();
 
     $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group);
 
@@ -132,13 +116,13 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       $groupElement->freeze();
 
       // also set the group title
-      $groupValues = array('id' => $this->_id, 'title' => $this->_title);
+      $groupValues = ['id' => $this->_id, 'title' => $this->_title];
       $this->assign_by_ref('group', $groupValues);
     }
 
     // Set dynamic page title for 'Add Members Group (confirm)'
     if ($this->_id) {
-      CRM_Utils_System::setTitle(ts('Add Contacts: %1', array(1 => $this->_title)));
+      CRM_Utils_System::setTitle(ts('Add Contacts: %1', [1 => $this->_title]));
     }
     else {
       CRM_Utils_System::setTitle(ts('Add Contacts to A Group'));
@@ -155,7 +139,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if ($this->_context === 'amtg') {
       $defaults['group_id'] = $this->_id;
@@ -172,7 +156,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
    * @return void
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Event_Form_Task_AddToGroup', 'formRule'));
+    $this->addFormRule(['CRM_Event_Form_Task_AddToGroup', 'formRule']);
   }
 
   /**
@@ -185,7 +169,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
    *   list of errors to be posted back to the form
    */
   public static function formRule($params) {
-    $errors = array();
+    $errors = [];
 
     if (!empty($params['group_option']) && empty($params['title'])) {
       $errors['title'] = "Group Name is a required field";
@@ -207,7 +191,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
     $params = $this->controller->exportValues();
     $groupOption = CRM_Utils_Array::value('group_option', $params, NULL);
     if ($groupOption) {
-      $groupParams = array();
+      $groupParams = [];
       $groupParams['title'] = $params['title'];
       $groupParams['description'] = $params['description'];
       $groupParams['visibility'] = "User and User Admin Only";
@@ -233,24 +217,24 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
     list($total, $added, $notAdded) = CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $groupID);
 
-    $status = array(
-      ts('%count contact added to group', array(
-          'count' => $added,
-          'plural' => '%count contacts added to group',
-      )),
-    );
+    $status = [
+      ts('%count contact added to group', [
+        'count' => $added,
+        'plural' => '%count contacts added to group',
+      ]),
+    ];
     if ($notAdded) {
-      $status[] = ts('%count contact was already in group', array(
-          'count' => $notAdded,
-          'plural' => '%count contacts were already in group',
-        ));
+      $status[] = ts('%count contact was already in group', [
+        'count' => $notAdded,
+        'plural' => '%count contacts were already in group',
+      ]);
     }
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-    CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(
-          1 => $groupName,
-          'count' => $added,
-          'plural' => 'Added Contacts to %1',
-        )), 'success', array('expires' => 0));
+    CRM_Core_Session::setStatus($status, ts('Added Contact to %1', [
+      1 => $groupName,
+      'count' => $added,
+      'plural' => 'Added Contacts to %1',
+    ]), 'success', ['expires' => 0]);
   }
 
 }

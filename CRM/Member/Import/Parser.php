@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -36,29 +20,28 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
-   * @var integer
-   */
-
   /**
    * Imported file size
+   * @var int
    */
   protected $_fileSize;
 
   /**
    * Seperator being used
+   * @var string
    */
   protected $_seperator;
 
   /**
    * Total number of lines in file
+   * @var int
    */
   protected $_lineCount;
 
   /**
    * Whether the file has a column header or not
    *
-   * @var boolean
+   * @var bool
    */
   protected $_haveColumnHeader;
 
@@ -70,6 +53,8 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    * @param int $mode
    * @param int $contactType
    * @param int $onDuplicate
+   * @param int $statusID
+   * @param int $totalRowCount
    *
    * @return mixed
    * @throws Exception
@@ -118,14 +103,14 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
     $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
-    $this->_errors = array();
-    $this->_warnings = array();
-    $this->_conflicts = array();
+    $this->_errors = [];
+    $this->_warnings = [];
+    $this->_conflicts = [];
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
     if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = array();
+      $this->_rows = [];
     }
     else {
       $this->_activeFieldCount = count($this->_activeFields);
@@ -250,27 +235,27 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
       }
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(
+        $headers = array_merge([
           ts('Line Number'),
           ts('Reason'),
-        ), $customHeaders);
+        ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
 
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
-        $headers = array_merge(array(
+        $headers = array_merge([
           ts('Line Number'),
           ts('Reason'),
-        ), $customHeaders);
+        ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
-        $headers = array_merge(array(
+        $headers = array_merge([
           ts('Line Number'),
           ts('View Membership URL'),
-        ), $customHeaders);
+        ], $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
@@ -306,7 +291,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    *   (reference ) associative array of name/value pairs
    */
   public function &getActiveFieldParams() {
-    $params = array();
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -411,7 +396,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    * @return void
    */
   public static function exportCSV($fileName, $header, $data) {
-    $output = array();
+    $output = [];
     $fd = fopen($fileName, 'w');
 
     foreach ($header as $key => $value) {

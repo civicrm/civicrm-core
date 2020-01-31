@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_Form_Approve extends CRM_Core_Form {
 
@@ -75,7 +59,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if ($this->_mailingID) {
       $defaults['approval_status_id'] = $this->_mailing->approval_status_id;
       $defaults['approval_note'] = $this->_mailing->approval_note;
@@ -101,25 +85,25 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       unset($mailApprovalStatus[$noneOptionID]);
     }
 
-    $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, array(), NULL, TRUE);
+    $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, [], NULL, TRUE);
 
-    $buttons = array(
-      array(
+    $buttons = [
+      [
         'type' => 'next',
         'name' => ts('Save'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    );
+      ],
+    ];
 
     $this->addButtons($buttons);
 
     // add the preview elements
-    $preview = array();
+    $preview = [];
 
     $preview['subject'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing',
       $this->_mailingID,
@@ -145,7 +129,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
 
-    $ids = array();
+    $ids = [];
     if (isset($this->_mailingID)) {
       $ids['mailing_id'] = $this->_mailingID;
     }
@@ -154,7 +138,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     }
 
     if (!$ids['mailing_id']) {
-      CRM_Core_Error::fatal();
+      CRM_Core_Error::statusBounce(ts('No mailing id has been able to be determined'));
     }
 
     $params['approver_id'] = $this->_contactID;

@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -77,7 +61,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     $this->setDefaults($defaults);
 
-    $descArray = array();
+    $descArray = [];
     foreach ($permissionsDesc as $perm => $attr) {
       if (count($attr) > 1) {
         $descArray[$perm] = $attr[1];
@@ -85,7 +69,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     }
 
     // build table rows by merging role perms
-    $rows = array();
+    $rows = [];
     foreach ($rolePerms as $role => $perms) {
       foreach ($perms as $name => $title) {
         $rows[$name] = $title;
@@ -93,14 +77,14 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     }
 
     // Build array keyed by permission
-    $table = array();
+    $table = [];
     foreach ($rows as $perm => $label) {
 
       // Init row with permission label
-      $table[$perm] = array(
+      $table[$perm] = [
         'label' => $label,
-        'roles' => array(),
-      );
+        'roles' => [],
+      ];
 
       // Add permission description and role names
       foreach ($roles as $key => $label) {
@@ -117,14 +101,14 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     $this->assign('roles', $roles);
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '',
           'isDefault' => FALSE,
-        ),
-      )
+        ],
+      ]
     );
 
   }
@@ -165,16 +149,16 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
           $allWarningPermissions[$key] = CRM_Utils_String::munge(strtolower($permission));
         }
         $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));
-        $warningPermissionNames = array();
+        $warningPermissionNames = [];
         foreach ($warningPermissions as $permission) {
           $warningPermissionNames[$permission] = $permissionsArray[$permission];
         }
         if (!empty($warningPermissionNames)) {
           CRM_Core_Session::setStatus(
-            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array(
-                1 => $wp_roles->role_names[$role],
-                2 => implode(', ', $warningPermissionNames),
-              )),
+            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', [
+              1 => $wp_roles->role_names[$role],
+              2 => implode(', ', $warningPermissionNames),
+            ]),
             ts('Unsafe Permission Settings')
           );
         }
@@ -210,11 +194,10 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    *   civicrm permissions
    */
   public static function getPermissionArray($descriptions = FALSE) {
-    global $civicrm_root;
 
     $permissions = CRM_Core_Permission::basicPermissions(FALSE, $descriptions);
 
-    $perms_array = array();
+    $perms_array = [];
     foreach ($permissions as $perm => $title) {
       //order matters here, but we deal with that later
       $perms_array[CRM_Utils_String::munge(strtolower($perm))] = $title;

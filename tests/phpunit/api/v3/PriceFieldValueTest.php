@@ -1,28 +1,12 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 5                                                  |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -49,7 +33,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     // Put stuff here that should happen before all tests in this unit.
-    $priceSetParams = array(
+    $priceSetParams = [
       'name' => 'default_goat_priceset',
       'title' => 'Goat accommodation',
       'is_active' => 1,
@@ -59,32 +43,32 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'is_quick_config' => 1,
       'is_reserved' => 1,
-    );
+    ];
 
     $price_set = $this->callAPISuccess('price_set', 'create', $priceSetParams);
     $this->priceSetID = $price_set['id'];
 
-    $priceFieldParams = array(
+    $priceFieldParams = [
       'price_set_id' => $this->priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
       'html_type' => 'Text',
       'is_enter_qty' => 1,
       'is_active' => 1,
-    );
+    ];
     $priceField = $this->callAPISuccess('price_field', 'create', $priceFieldParams);
     $this->priceFieldID = $priceField['id'];
-    $this->_params = array(
+    $this->_params = [
       'price_field_id' => $this->priceFieldID,
       'name' => 'rye grass',
       'label' => 'juicy and healthy',
       'amount' => 1,
       'financial_type_id' => 1,
-    );
+    ];
 
     $membershipOrgId = $this->organizationCreate(NULL);
-    $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $membershipOrgId));
-    $priceSetParams1 = array(
+    $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $membershipOrgId]);
+    $priceSetParams1 = [
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
       'is_active' => 1,
@@ -92,17 +76,17 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'financial_type_id' => 2,
       'is_quick_config' => 1,
       'is_reserved' => 1,
-    );
+    ];
     $price_set1 = $this->callAPISuccess('price_set', 'create', $priceSetParams1);
     $this->priceSetID1 = $price_set1['id'];
-    $priceFieldParams1 = array(
+    $priceFieldParams1 = [
       'price_set_id' => $this->priceSetID1,
       'name' => 'memtype',
       'label' => 'memtype',
       'html_type' => 'Radio',
       'is_enter_qty' => 1,
       'is_active' => 1,
-    );
+    ];
     $priceField1 = $this->callAPISuccess('price_field', 'create', $priceFieldParams1);
     $this->priceFieldID1 = $priceField1['id'];
   }
@@ -113,24 +97,24 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function tearDown() {
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_contact',
       'civicrm_contribution',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate);
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
-    $this->callAPISuccess('PriceField', 'delete', array(
+    $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
+    $this->callAPISuccess('PriceField', 'delete', [
       'id' => $this->priceFieldID1,
-    ));
-    $this->callAPISuccess('PriceSet', 'delete', array(
+    ]);
+    $this->callAPISuccess('PriceSet', 'delete', [
       'id' => $this->priceSetID1,
-    ));
-    $this->callAPISuccess('PriceField', 'delete', array(
+    ]);
+    $this->callAPISuccess('PriceField', 'delete', [
       'id' => $this->priceFieldID,
-    ));
-    $delete = $this->callAPISuccess('PriceSet', 'delete', array(
+    ]);
+    $delete = $this->callAPISuccess('PriceSet', 'delete', [
       'id' => $this->priceSetID,
-    ));
+    ]);
 
     $this->assertAPISuccess($delete);
   }
@@ -147,31 +131,31 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->id = $createResult['id'];
     $this->assertAPISuccess($createResult);
-    $getParams = array(
+    $getParams = [
       'name' => 'contribution_amount',
-    );
+    ];
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $getResult['count']);
-    $this->callAPISuccess('price_field_value', 'delete', array('id' => $createResult['id']));
+    $this->callAPISuccess('price_field_value', 'delete', ['id' => $createResult['id']]);
   }
 
   public function testDeletePriceFieldValue() {
-    $startCount = $this->callAPISuccess($this->_entity, 'getcount', array());
+    $startCount = $this->callAPISuccess($this->_entity, 'getcount', []);
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $deleteParams = array('id' => $createResult['id']);
+    $deleteParams = ['id' => $createResult['id']];
     $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
 
-    $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
+    $endCount = $this->callAPISuccess($this->_entity, 'getcount', []);
     $this->assertEquals($startCount, $endCount);
   }
 
   public function testGetFieldsPriceFieldValue() {
-    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
+    $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertEquals(1, $result['values']['max_value']['type']);
   }
 
   public function testCreatePriceFieldValuewithMultipleTerms() {
-    $params = array(
+    $params = [
       'price_field_id' => $this->priceFieldID1,
       'membership_type_id' => $this->_membershipTypeID,
       'name' => 'memType1',
@@ -180,15 +164,15 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'membership_num_terms' => 2,
       'is_active' => 1,
       'financial_type_id' => 2,
-    );
+    ];
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
     $this->assertEquals(1, $result['count']);
-    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
 
   public function testGetPriceFieldValuewithMultipleTerms() {
-    $params1 = array(
+    $params1 = [
       'price_field_id' => $this->priceFieldID1,
       'membership_type_id' => $this->_membershipTypeID,
       'name' => 'memType1',
@@ -197,8 +181,8 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'membership_num_terms' => 2,
       'is_active' => 1,
       'financial_type_id' => 2,
-    );
-    $params2 = array(
+    ];
+    $params2 = [
       'price_field_id' => $this->priceFieldID1,
       'membership_type_id' => $this->_membershipTypeID,
       'name' => 'memType2',
@@ -207,29 +191,29 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'membership_num_terms' => 3,
       'is_active' => 1,
       'financial_type_id' => 2,
-    );
+    ];
     $result1 = $this->callAPISuccess($this->_entity, 'create', $params1);
     $result2 = $this->callAPISuccess($this->_entity, 'create', $params2);
-    $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' => $this->priceFieldID1));
+    $result = $this->callAPISuccess($this->_entity, 'get', ['price_field_id' => $this->priceFieldID1]);
     $this->assertEquals(2, $result['count']);
-    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result1['id']));
-    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result2['id']));
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result1['id']]);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result2['id']]);
   }
 
   public function testCreatePriceFieldValueWithDisabledFinancialType() {
-    $financialTypeParams = array(
+    $financialTypeParams = [
       'is_active' => 0,
       'name' => 'Disabled Donations',
-    );
+    ];
     $financialType = $this->callAPISuccess('financial_type', 'create', $financialTypeParams);
-    $params = array(
+    $params = [
       'price_field_id' => $this->priceFieldID,
       'name' => 'DonType1',
       'label' => 'DonType1',
       'amount' => 90,
       'is_active' => 1,
       'financial_type_id' => $financialType['id'],
-    );
+    ];
     $this->callAPIFailure($this->_entity, 'create', $params);
   }
 

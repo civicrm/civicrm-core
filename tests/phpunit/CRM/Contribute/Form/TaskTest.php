@@ -1,37 +1,19 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | Use of this source code is governed by the AGPL license with some  |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * Class CRM_Contribute_Form_Tasktest
  */
-class CRM_Contribute_Form_Tasktest extends CiviUnitTestCase {
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
+
   protected $_individualId;
 
   /**
@@ -45,32 +27,38 @@ class CRM_Contribute_Form_Tasktest extends CiviUnitTestCase {
   /**
    * CRM-19722 - Check CRM_Contribute_Form_Task::preProcessCommon()
    * executes without any error after sorting the search result.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPreProcessCommonAfterSorting() {
-    $fields = array(
+    $fields = [
       'source' => 'contribution_source',
       'status' => 'contribution_status',
       'financialTypes' => 'financial_type',
-    );
-    $financialTypes = array('Member Dues', 'Event Fee', 'Donation');
-    $status = array('Completed', 'Partially paid', 'Pending');
-    $source = array('test source text', 'check source text', 'source text');
+    ];
+    $financialTypes = ['Member Dues', 'Event Fee', 'Donation'];
+    $status = ['Completed', 'Partially paid', 'Pending'];
+    $source = ['test source text', 'check source text', 'source text'];
     $this->_individualId = $this->individualCreate();
 
     for ($i = 0; $i < 3; $i++) {
-      $contributionParams = array(
+      $contributionParams = [
         'contact_id' => $this->_individualId,
         'total_amount' => 100,
         'source' => $source[$i],
         'financial_type_id' => $financialTypes[$i],
         'contribution_status_id' => $status[$i],
-      );
+      ];
+      if ($status[$i] === 'Partially paid') {
+        $contributionParams['contribution_status_id'] = 'Pending';
+        $contributionParams['api.Payment.create'] = ['total_amount' => 50];
+      }
       $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
       $contributionIds[] = $contribution['id'];
     }
 
     // Generate expected sorted array.
-    $expectedValues = array();
+    $expectedValues = [];
     foreach ($fields as $key => $fld) {
       $sortedFields = array_combine($$key, $contributionIds);
       ksort($sortedFields);

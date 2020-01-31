@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Location {
 
@@ -51,11 +35,11 @@ class CRM_Contact_Form_Location {
 
     if (is_a($form, 'CRM_Event_Form_ManageEvent_Location')
     || is_a($form, 'CRM_Contact_Form_Domain')) {
-      $form->_blocks = array(
+      $form->_blocks = [
         'Address' => ts('Address'),
         'Email' => ts('Email'),
         'Phone' => ts('Phone'),
-      );
+      ];
     }
 
     $form->assign('blocks', $form->_blocks);
@@ -76,14 +60,14 @@ class CRM_Contact_Form_Location {
    */
   public static function buildQuickForm(&$form) {
     // required for subsequent AJAX requests.
-    $ajaxRequestBlocks = array();
+    $ajaxRequestBlocks = [];
     $generateAjaxRequest = 0;
 
     //build 1 instance of all blocks, without using ajax ...
     foreach ($form->_blocks as $blockName => $label) {
       $name = strtolower($blockName);
 
-      $instances = array(1);
+      $instances = [1];
       if (!empty($_POST[$name]) && is_array($_POST[$name])) {
         $instances = array_keys($_POST[$name]);
       }

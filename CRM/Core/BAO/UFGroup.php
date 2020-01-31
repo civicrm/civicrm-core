@@ -1,40 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * UF group BAO class.
  */
 class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
+
   const PUBLIC_VISIBILITY = 1,
     ADMIN_VISIBILITY = 2,
     LISTINGS_VISIBILITY = 4;
@@ -44,7 +29,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @var string
    */
-  static $_matchFields = NULL;
+  public static $_matchFields = NULL;
 
   /**
    * Fetch object based on array of properties.
@@ -131,10 +116,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param int $mode
    *   Mode.
    *
-   * @param null $ctype
+   * @param string $ctype
    *
    * @return array
    *   the fields that are needed for registration
+   *
+   * @throws \Exception
    */
   public static function getRegistrationFields($action, $mode, $ctype = NULL) {
     if ($mode & CRM_Profile_Form::MODE_REGISTER) {
@@ -148,7 +135,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       return FALSE;
     }
 
-    $fields = array();
+    $fields = [];
 
     foreach ($ufGroups as $id => $title) {
       if ($ctype) {
@@ -194,8 +181,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param null $restrict
    * @param bool $skipPermission
    * @param int $permissionType
+   *
    * @return array
    *   the fields that are listings related
+   *
+   * @throws \Exception
    */
   public static function getListingFields(
     $action,
@@ -228,7 +218,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     else {
       $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
-      $fields = array();
+      $fields = [];
       foreach ($ufGroups as $id => $title) {
         $subset = self::getFields($id, FALSE, $action,
           $visibility, $searchable,
@@ -277,7 +267,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return array
    *   The fields that belong to this ufgroup(s)
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getFields(
     $id,
@@ -296,21 +287,21 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   ) {
     if (!is_array($id)) {
       $id = CRM_Utils_Type::escape($id, 'Positive');
-      $profileIds = array($id);
+      $profileIds = [$id];
     }
     else {
       $profileIds = $id;
     }
 
     $gids = implode(',', $profileIds);
-    $params = array();
+    $params = [];
     if ($restrict) {
       $query = "SELECT g.* from civicrm_uf_group g
                 LEFT JOIN civicrm_uf_join j ON (j.uf_group_id = g.id)
                 WHERE g.id IN ( {$gids} )
                 AND ((j.uf_group_id IN ( {$gids} ) AND j.module = %1) OR g.is_reserved = 1 )
                 ";
-      $params = array(1 => array($restrict, 'String'));
+      $params = [1 => [$restrict, 'String']];
     }
     else {
       $query = "SELECT g.* from civicrm_uf_group g WHERE g.id IN ( {$gids} ) ";
@@ -320,12 +311,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $query .= " AND g.is_active = 1";
     }
 
-    $checkPermission = array(
-      array(
+    $checkPermission = [
+      [
         'administer CiviCRM',
         'manage event profiles',
-      ),
-    );
+      ],
+    ];
     if ($eventProfile && CRM_Core_Permission::check($checkPermission)) {
       $skipPermission = TRUE;
     }
@@ -336,11 +327,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $query .= " AND $permissionClause ";
     }
 
-    if ($orderProfiles AND count($profileIds) > 1) {
+    if ($orderProfiles and count($profileIds) > 1) {
       $query .= " ORDER BY FIELD(  g.id, {$gids} )";
     }
     $group = CRM_Core_DAO::executeQuery($query, $params);
-    $fields = array();
+    $fields = [];
     $validGroup = FALSE;
 
     while ($group->fetch()) {
@@ -357,12 +348,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $fields[$name] = $formattedField;
         }
       }
-      $field->free();
     }
 
     if (empty($fields) && !$validGroup) {
-      CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is disabled OR it is not configured to be used for \'Profile\' listings in its Settings OR there is no Profile with that ID OR you do not have permission to access this profile. Please contact the site administrator if you need assistance.',
-        array(1 => implode(',', $profileIds))
+      throw new CRM_Core_Exception(ts('The requested Profile (gid=%1) is disabled OR it is not configured to be used for \'Profile\' listings in its Settings OR there is no Profile with that ID OR you do not have permission to access this profile. Please contact the site administrator if you need assistance.',
+        [1 => implode(',', $profileIds)]
       ));
     }
     else {
@@ -412,7 +402,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $importableFields = self::getImportableFields($showAll, $profileType, $contactActivityProfile);
     list($customFields, $addressCustomFields) = self::getCustomFields($ctype);
 
-    $formattedFields = array();
+    $formattedFields = [];
     foreach ($fieldArrs as $fieldArr) {
       $field = (object) $fieldArr;
       if (!self::filterUFField($field, $searchable, $showAll, $visibility)) {
@@ -437,6 +427,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param array $importableFields
    * @param int $permissionType
    *   Eg CRM_Core_Permission::CREATE.
+   *
    * @return array
    */
   protected static function formatUFField(
@@ -451,10 +442,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $title = $field->label;
 
     $addressCustom = FALSE;
-    if (in_array($permissionType, array(
-        CRM_Core_Permission::CREATE,
-        CRM_Core_Permission::EDIT,
-      )) &&
+    if (in_array($permissionType, [CRM_Core_Permission::CREATE, CRM_Core_Permission::EDIT]) &&
       in_array($field->field_name, array_keys($addressCustomFields))
     ) {
       $addressCustom = TRUE;
@@ -476,11 +464,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     if (isset($field->phone_type_id)) {
       $name .= "-{$field->phone_type_id}";
     }
-    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, (isset($importableFields[$field->field_name]) ? $importableFields[$field->field_name] : array()));
+    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, (isset($importableFields[$field->field_name]) ? $importableFields[$field->field_name] : []));
 
     // No lie: this is bizarre; why do we need to mix so many UFGroup properties into UFFields?
     // I guess to make field self sufficient with all the required data and avoid additional calls
-    $formattedField = array(
+    $formattedField = [
       'name' => $name,
       'groupTitle' => $group->title,
       'groupName' => $group->name,
@@ -517,7 +505,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'skipDisplay' => 0,
       'data_type' => CRM_Utils_Type::getDataTypeFromFieldMetadata($fieldMetaData),
       'bao' => CRM_Utils_Array::value('bao', $fieldMetaData),
-    );
+    ];
 
     $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
 
@@ -541,14 +529,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         }
 
         $formattedField['is_multi_summary'] = $field->is_multi_summary;
-        return array($name, $formattedField);
+        return [$name, $formattedField];
       }
       else {
         $formattedField = NULL;
-        return array($name, $formattedField);
+        return [$name, $formattedField];
       }
     }
-    return array($name, $formattedField);
+    return [$name, $formattedField];
   }
 
   /**
@@ -562,6 +550,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param int $visibility
    * @param string $orderBy
    *   Comma-delimited list of SQL columns.
+   *
    * @return string
    */
   protected static function createUFFieldQuery($groupId, $searchable, $showAll, $visibility, $orderBy) {
@@ -576,7 +565,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
 
     if ($visibility) {
-      $clause = array();
+      $clause = [];
       if ($visibility & self::PUBLIC_VISIBILITY) {
         $clause[] = 'visibility = "Public Pages"';
       }
@@ -608,6 +597,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param bool $searchable
    * @param bool $showAll
    * @param int $visibility
+   *
    * @return bool
    *   TRUE if field is displayable
    */
@@ -621,7 +611,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
 
     if ($visibility) {
-      $allowedVisibilities = array();
+      $allowedVisibilities = [];
       if ($visibility & self::PUBLIC_VISIBILITY) {
         $allowedVisibilities[] = 'Public Pages';
       }
@@ -643,8 +633,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   /**
    * Get a list of filtered field metadata.
    *
-   * @deprecated use getProfileFieldMetadata
-   *
    * @param $showAll
    * @param $profileType
    * @param $contactActivityProfile
@@ -657,6 +645,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   send this confusion to history.
    *
    * @return array
+   * @deprecated use getProfileFieldMetadata
+   *
    */
   protected static function getImportableFields($showAll, $profileType, $contactActivityProfile, $filterMode = TRUE) {
     if (!$showAll) {
@@ -706,7 +696,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return array
    */
   public static function getLocationFields() {
-    static $locationFields = array(
+    static $locationFields = [
       'street_address',
       'supplemental_address_1',
       'supplemental_address_2',
@@ -725,7 +715,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'im',
       'address_name',
       'phone_ext',
-    );
+    ];
     return $locationFields;
   }
 
@@ -735,20 +725,20 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return mixed
    */
   protected static function getCustomFields($ctype) {
-    static $customFieldCache = array();
-    if (!isset($customFieldCache[$ctype])) {
+    $cacheKey = 'uf_group_custom_fields_' . $ctype;
+    if (!Civi::cache('metadata')->has($cacheKey)) {
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, TRUE, TRUE);
 
       // hack to add custom data for components
-      $components = array('Contribution', 'Participant', 'Membership', 'Activity', 'Case');
+      $components = ['Contribution', 'Participant', 'Membership', 'Activity', 'Case'];
       foreach ($components as $value) {
         $customFields = array_merge($customFields, CRM_Core_BAO_CustomField::getFieldsForImport($value));
       }
       $addressCustomFields = CRM_Core_BAO_CustomField::getFieldsForImport('Address');
       $customFields = array_merge($customFields, $addressCustomFields);
-      $customFieldCache[$ctype] = array($customFields, $addressCustomFields);
+      Civi::cache('metadata')->set($cacheKey, [$customFields, $addressCustomFields]);
     }
-    return $customFieldCache[$ctype];
+    return Civi::cache('metadata')->get($cacheKey);
   }
 
   /**
@@ -982,7 +972,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     // get the contact details (hier)
     $returnProperties = CRM_Contact_BAO_Contact::makeHierReturnProperties($fields);
-    $params = $cid ? array(array('contact_id', '=', $cid, 0, 0)) : array();
+    $params = $cid ? [['contact_id', '=', $cid, 0, 0]] : [];
 
     // add conditions specified by components. eg partcipant_id etc
     if (!empty($componentWhere)) {
@@ -993,17 +983,18 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $details = $query->searchQuery(0, 0, NULL, FALSE, FALSE,
       FALSE, FALSE, FALSE, $additionalWhereClause);
-    if (!$details->fetch()) {
-      return;
+    while ($details->fetch()) {
+      if (!$details) {
+        return;
+      }
     }
     $query->convertToPseudoNames($details);
-    $config = CRM_Core_Config::singleton();
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id', 'validate');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
+    $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
 
-    $multipleFields = array('url');
+    $multipleFields = ['url'];
 
     //start of code to set the default values
     foreach ($fields as $name => $field) {
@@ -1031,7 +1022,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       // hack for CRM-665
       if (isset($details->$name) || $name == 'group' || $name == 'tag') {
         // to handle gender / suffix / prefix
-        if (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
+        if (in_array(substr($name, 0, -3), ['gender', 'prefix', 'suffix'])) {
           $params[$index] = $details->$name;
           $values[$index] = $details->$name;
         }
@@ -1041,11 +1032,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $name = $name . '_id';
           $params[$index] = $details->$name;
         }
-        elseif (in_array($name, array(
+        elseif (in_array($name, [
           'state_province',
           'country',
           'county',
-        ))) {
+        ])) {
           $values[$index] = $details->$name;
           $idx = $name . '_id';
           $params[$index] = $details->$idx;
@@ -1056,7 +1047,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         }
         elseif ($name == 'group') {
           $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE);
-          $title = $ids = array();
+          $title = $ids = [];
 
           foreach ($groups as $g) {
             // CRM-8362: User and User Admin visibility groups should be included in display if user has
@@ -1077,8 +1068,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         }
         elseif ($name == 'tag') {
           $entityTags = CRM_Core_BAO_EntityTag::getTag($cid);
-          $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-          $title = array();
+          $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+          $title = [];
           foreach ($entityTags as $tagId) {
             $title[] = $allTags[$tagId];
           }
@@ -1097,7 +1088,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         elseif ($name == 'contact_sub_type') {
           $contactSubTypeNames = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details->$name);
           if (!empty($contactSubTypeNames)) {
-            $contactSubTypeLabels = array();
+            $contactSubTypeLabels = [];
             // get all contact subtypes
             $allContactSubTypes = CRM_Contact_BAO_ContactType::subTypeInfo();
             // build contact subtype labels array
@@ -1188,10 +1179,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
               $image_URL = '<img src="' . $details->$name . '" height= ' . $thumbHeight . ' width= ' . $thumbWidth . '  />';
               $values[$index] = "<a href='#' onclick='contactImagePopUp(\"{$details->$name}\", {$width}, {$height});'>{$image_URL}</a>";
             }
-            elseif (in_array($name, array(
+            elseif (in_array($name, [
               'birth_date',
               'deceased_date',
-            ))) {
+            ])) {
               // @todo this set should be determined from metadata, not hard-coded.
               $values[$index] = CRM_Utils_Date::customFormat($details->$name);
               $params[$index] = CRM_Utils_Date::isoToMysql($details->$name);
@@ -1237,22 +1228,22 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $detailName = "{$locationTypeName}-{$fieldName}";
           $detailName = str_replace(' ', '_', $detailName);
 
-          if (in_array($fieldName, array(
+          if (in_array($fieldName, [
             'phone',
             'im',
             'email',
             'openid',
-          ))) {
+          ])) {
             if ($type) {
               $detailName .= "-{$type}";
             }
           }
 
-          if (in_array($fieldName, array(
+          if (in_array($fieldName, [
             'state_province',
             'country',
             'county',
-          ))) {
+          ])) {
             $values[$index] = $details->$detailName;
             $idx = $detailName . '_id';
             $params[$index] = $details->$idx;
@@ -1318,12 +1309,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           if ($htmlType == 'Link') {
             $url = $params[$index];
           }
-          elseif (in_array($htmlType, array(
+          elseif (in_array($htmlType, [
             'CheckBox',
             'Multi-Select',
             'Multi-Select State/Province',
             'Multi-Select Country',
-          ))) {
+          ])) {
             $valSeperator = CRM_Core_DAO::VALUE_SEPARATOR;
             $selectedOptions = explode($valSeperator, $params[$index]);
 
@@ -1362,7 +1353,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         ) {
 
           if (is_array($url) && !empty($url)) {
-            $links = array();
+            $links = [];
             $eachMultiValue = explode(', ', $values[$index]);
             foreach ($eachMultiValue as $key => $valueLabel) {
               $links[] = '<a href="' . $url[$key] . '">' . $valueLabel . '</a>';
@@ -1443,8 +1434,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return object
    */
-  public static function add(&$params, $ids = array()) {
-    $fields = array(
+  public static function add(&$params, $ids = []) {
+    $fields = [
       'is_active',
       'add_captcha',
       'is_map',
@@ -1452,7 +1443,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'is_edit_link',
       'is_uf_link',
       'is_cms_user',
-    );
+    ];
     foreach ($fields as $field) {
       $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
     }
@@ -1486,13 +1477,13 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   /**
    * Make uf join entries for an uf group.
    *
-   * @param array $params
-   *   (reference) an assoc array of name/value pairs.
+   * @param int $weight
+   * @param array $groupTypes
+   *   An assoc array of name/value pairs.
    * @param int $ufGroupId
    *   Ufgroup id.
    */
-  public static function createUFJoin(&$params, $ufGroupId) {
-    $groupTypes = CRM_Utils_Array::value('uf_group_type', $params);
+  public static function createUFJoin($weight, $groupTypes, $ufGroupId) {
 
     // get ufjoin records for uf group
     $ufGroupRecord = CRM_Core_BAO_UFGroup::getUFJoinRecord($ufGroupId);
@@ -1502,21 +1493,21 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     // this fix is done to prevent warning generated by array_key_exits incase of empty array is given as input
     if (!is_array($groupTypes)) {
-      $groupTypes = array();
+      $groupTypes = [];
     }
 
     // this fix is done to prevent warning generated by array_key_exits incase of empty array is given as input
     if (!is_array($ufGroupRecord)) {
-      $ufGroupRecord = array();
+      $ufGroupRecord = [];
     }
 
     // check which values has to be inserted/deleted for contact
     $menuRebuild = FALSE;
     foreach ($allUFGroupType as $key => $value) {
-      $joinParams = array();
+      $joinParams = [];
       $joinParams['uf_group_id'] = $ufGroupId;
       $joinParams['module'] = $key;
-      if ($key == 'User Account') {
+      if ($key === 'User Account') {
         $menuRebuild = TRUE;
       }
       if (array_key_exists($key, $groupTypes) && !in_array($key, $ufGroupRecord)) {
@@ -1530,16 +1521,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
 
     //update the weight
-    $query = "
+    $query = '
 UPDATE civicrm_uf_join
 SET    weight = %1
 WHERE  uf_group_id = %2
 AND    ( entity_id IS NULL OR entity_id <= 0 )
-";
-    $p = array(
-      1 => array($params['weight'], 'Integer'),
-      2 => array($ufGroupId, 'Integer'),
-    );
+';
+    $p = [
+      1 => [$weight, 'Integer'],
+      2 => [$ufGroupId, 'Integer'],
+    ];
     CRM_Core_DAO::executeQuery($query, $p);
 
     // Do a menu rebuild, so it gets all the new menu entries for user account
@@ -1564,11 +1555,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function getUFJoinRecord($ufGroupId = NULL, $displayName = NULL, $status = NULL) {
     if ($displayName) {
-      $UFGroupType = array();
+      $UFGroupType = [];
       $UFGroupType = CRM_Core_SelectValues::ufGroupTypes();
     }
 
-    $ufJoin = array();
+    $ufJoin = [];
     $dao = new CRM_Core_DAO_UFJoin();
 
     if ($ufGroupId) {
@@ -1576,7 +1567,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $dao->find();
-    $ufJoin = array();
+    $ufJoin = [];
 
     while ($dao->fetch()) {
       if (!$displayName) {
@@ -1636,7 +1627,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function getWeight($ufGroupId = NULL) {
     //calculate the weight
-    $p = array();
+    $p = [];
     if (!$ufGroupId) {
       $queryString = "SELECT ( MAX(civicrm_uf_join.weight)+1) as new_weight
                             FROM civicrm_uf_join
@@ -1647,7 +1638,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                             FROM civicrm_uf_join
                             WHERE civicrm_uf_join.uf_group_id = %1
                             AND ( entity_id IS NULL OR entity_id <= 0 )";
-      $p[1] = array($ufGroupId, 'Integer');
+      $p[1] = [$ufGroupId, 'Integer'];
     }
 
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
@@ -1671,7 +1662,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   array of ufgroups for a module
    */
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
-    $selectFields = array('id', 'title', 'created_id', 'is_active', 'is_reserved', 'group_type');
+    $selectFields = ['id', 'title', 'created_id', 'is_active', 'is_reserved', 'group_type'];
 
     if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_uf_group', 'description')) {
       // CRM-13555, since description field was added later (4.4), and to avoid any problems with upgrade
@@ -1689,11 +1680,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $queryString = 'SELECT civicrm_uf_group.' . implode(', civicrm_uf_group.', $selectFields) . '
                         FROM civicrm_uf_group
                         LEFT JOIN civicrm_uf_join ON (civicrm_uf_group.id = uf_group_id)';
-    $p = array();
+    $p = [];
     if ($moduleName) {
       $queryString .= ' AND civicrm_uf_group.is_active = 1
                               WHERE civicrm_uf_join.module = %2';
-      $p[2] = array($moduleName, 'String');
+      $p[2] = [$moduleName, 'String'];
     }
 
     // add permissioning for profiles only if not registration
@@ -1710,16 +1701,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $queryString .= ' ORDER BY civicrm_uf_join.weight, civicrm_uf_group.title';
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
 
-    $ufGroups = array();
+    $ufGroups = [];
     while ($dao->fetch()) {
       //skip mix profiles in user Registration / User Account
-      if (($moduleName == 'User Registration' || $moduleName == 'User Account') &&
+      if (($moduleName === 'User Registration' || $moduleName === 'User Account') &&
         CRM_Core_BAO_UFField::checkProfileType($dao->id)
       ) {
         continue;
       }
       foreach ($selectFields as $key => $field) {
-        if ($field == 'id') {
+        if ($field === 'id') {
           continue;
         }
         $ufGroups[$dao->id][$field] = $dao->$field;
@@ -1765,7 +1756,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
 
       //allow special mix profiles for Contribution and Participant
-      $specialProfiles = array('Contribution', 'Participant', 'Membership');
+      $specialProfiles = ['Contribution', 'Participant', 'Membership'];
 
       if (in_array($profileType, $specialProfiles)) {
         return TRUE;
@@ -1806,7 +1797,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $rowNumber = NULL,
     $prefix = ''
   ) {
-    $defaultValues = array();
+    $defaultValues = [];
     $fieldName = $field['name'];
     $title = $field['title'];
     $attributes = $field['attributes'];
@@ -1841,24 +1832,24 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $name = $fieldName;
     }
 
-    $selectAttributes = array('class' => 'crm-select2', 'placeholder' => TRUE);
+    $selectAttributes = ['class' => 'crm-select2', 'placeholder' => TRUE];
 
     if ($fieldName == 'image_URL' && $mode == CRM_Profile_Form::MODE_EDIT) {
       $deleteExtra = json_encode(ts('Are you sure you want to delete contact image.'));
-      $deleteURL = array(
-        CRM_Core_Action::DELETE => array(
+      $deleteURL = [
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
           'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
           'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
-        ),
-      );
+        ],
+      ];
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
         CRM_Core_Action::DELETE,
-        array(
+        [
           'id' => $form->get('id'),
           'gid' => $form->get('gid'),
-        ),
+        ],
         ts('more'),
         FALSE,
         'contact.profileimage.delete',
@@ -1872,12 +1863,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     );
 
     if (substr($fieldName, 0, 14) === 'state_province') {
-      $form->addChainSelect($name, array('label' => $title, 'required' => $required));
+      $form->addChainSelect($name, ['label' => $title, 'required' => $required]);
       $config = CRM_Core_Config::singleton();
-      if (!in_array($mode, array(
-          CRM_Profile_Form::MODE_EDIT,
-          CRM_Profile_Form::MODE_SEARCH,
-        )) &&
+      if (!in_array($mode, [CRM_Profile_Form::MODE_EDIT, CRM_Profile_Form::MODE_SEARCH]) &&
         $config->defaultContactStateProvince
       ) {
         $defaultValues[$name] = $config->defaultContactStateProvince;
@@ -1885,12 +1873,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif (substr($fieldName, 0, 7) === 'country') {
-      $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Core_PseudoConstant::country(), $required, $selectAttributes);
+      $form->add('select', $name, $title, ['' => ts('- select -')] + CRM_Core_PseudoConstant::country(), $required, $selectAttributes);
       $config = CRM_Core_Config::singleton();
-      if (!in_array($mode, array(
-          CRM_Profile_Form::MODE_EDIT,
-          CRM_Profile_Form::MODE_SEARCH,
-        )) &&
+      if (!in_array($mode, [CRM_Profile_Form::MODE_EDIT, CRM_Profile_Form::MODE_SEARCH]) &&
         $config->defaultContactCountry
       ) {
         $defaultValues[$name] = $config->defaultContactCountry;
@@ -1899,7 +1884,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (substr($fieldName, 0, 6) === 'county') {
       if ($addressOptions['county']) {
-        $form->addChainSelect($name, array('label' => $title, 'required' => $required));
+        $form->addChainSelect($name, ['label' => $title, 'required' => $required]);
       }
     }
     elseif (substr($fieldName, 0, 9) === 'image_URL') {
@@ -1910,20 +1895,20 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('text', $name, $title, $attributes, $required);
       if (!$contactId) {
         if ($usedFor) {
-          if (substr($name, -1) == ']') {
+          if (substr($name, -1) === ']') {
             $providerName = substr($name, 0, -1) . '-provider_id]';
           }
           $form->add('select', $providerName, NULL,
-            array(
+            [
               '' => ts('- select -'),
-            ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
+            ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
           );
         }
         else {
           $form->add('select', $name . '-provider_id', $title,
-            array(
+            [
               '' => ts('- select -'),
-            ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
+            ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
           );
         }
 
@@ -1935,7 +1920,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif (CRM_Utils_Array::value('name', $field) == 'membership_type') {
       list($orgInfo, $types) = CRM_Member_BAO_MembershipType::getMembershipTypeInfo();
       $sel = &$form->addElement('hierselect', $name, $title);
-      $select = array('' => ts('- select -'));
+      $select = ['' => ts('- select -')];
       if (count($orgInfo) == 1 && $field['is_required']) {
         // we only have one org - so we should default to it. Not sure about defaulting to first type
         // as it could be missed - so adding a select
@@ -1947,37 +1932,37 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       else {
         $orgInfo = $select + $orgInfo;
       }
-      $sel->setOptions(array($orgInfo, $types));
+      $sel->setOptions([$orgInfo, $types]);
     }
     elseif (CRM_Utils_Array::value('name', $field) == 'membership_status') {
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
+        ] + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
       );
     }
-    elseif (in_array($fieldName, array('gender_id', 'communication_style_id'))) {
-      $options = array();
+    elseif (in_array($fieldName, ['gender_id', 'communication_style_id'])) {
+      $options = [];
       $pseudoValues = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $fieldName);
       foreach ($pseudoValues as $key => $var) {
         $options[$key] = $form->createElement('radio', NULL, ts($title), $var, $key);
       }
       $group = $form->addGroup($options, $name, $title);
       if ($required) {
-        $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
+        $form->addRule($name, ts('%1 is a required field.', [1 => $title]), 'required');
       }
       else {
         $group->setAttribute('allowClear', TRUE);
       }
     }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
-      $form->addSelect($name, array(
+      $form->addSelect($name, [
         'label' => $title,
         'entity' => 'contact',
         'field' => $fieldName,
         'class' => 'six',
         'placeholder' => '',
-      ), $required);
+      ], $required);
     }
     elseif ($fieldName === 'contact_sub_type') {
       $gId = $form->get('gid') ? $form->get('gid') : CRM_Utils_Array::value('group_id', $field);
@@ -2000,46 +1985,36 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $profileType = CRM_Contact_BAO_ContactType::getBasicType($profileType);
       }
 
-      $subtypes = $profileType ? CRM_Contact_BAO_ContactType::subTypePairs($profileType) : array();
+      $subtypes = $profileType ? CRM_Contact_BAO_ContactType::subTypePairs($profileType) : [];
 
       if ($setSubtype) {
-        $subtypeList = array();
+        $subtypeList = [];
         $subtypeList[$setSubtype] = $subtypes[$setSubtype];
       }
       else {
         $subtypeList = $subtypes;
       }
 
-      $form->add('select', $name, $title, $subtypeList, $required, array('class' => 'crm-select2', 'multiple' => TRUE));
+      $form->add('select', $name, $title, $subtypeList, $required, ['class' => 'crm-select2', 'multiple' => TRUE]);
     }
     elseif (in_array($fieldName, CRM_Contact_BAO_Contact::$_greetingTypes)) {
-      //add email greeting, postal greeting, addressee, CRM-4575
-      $gId = $form->get('gid') ? $form->get('gid') : CRM_Utils_Array::value('group_id', $field);
+      // Get contact type for greeting selector
+      $gId = $form->get('gid') ?: CRM_Utils_Array::value('group_id', $field);
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
-      if (empty($profileType) || in_array($profileType, array(
-          'Contact',
-          'Contribution',
-          'Participant',
-          'Membership',
-        ))
-      ) {
-        $profileType = 'Individual';
+      if (!$profileType || in_array($profileType, ['Contact', 'Contribution', 'Participant', 'Membership'])) {
+        $profileType = ($profileType == 'Contact' && $form->get('id')) ? CRM_Contact_BAO_Contact::getContactType($form->get('id')) : 'Individual';
       }
       if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
         $profileType = CRM_Contact_BAO_ContactType::getBasicType($profileType);
       }
-      $greeting = array(
+      $greeting = [
         'contact_type' => $profileType,
         'greeting_type' => $fieldName,
-      );
-      $form->add('select', $name, $title,
-        array(
-          '' => ts('- select -'),
-        ) + CRM_Core_PseudoConstant::greeting($greeting), $required
-      );
+      ];
+      $form->add('select', $name, $title, ['' => ts('- select -')] + CRM_Core_PseudoConstant::greeting($greeting), $required);
       // add custom greeting element
-      $form->add('text', $fieldName . '_custom', ts('Custom %1', array(1 => ucwords(str_replace('_', ' ', $fieldName)))),
+      $form->add('text', $fieldName . '_custom', ts('Custom %1', [1 => ucwords(str_replace('_', ' ', $fieldName))]),
         NULL, FALSE
       );
     }
@@ -2057,7 +2032,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title, CRM_Core_SelectValues::pmf());
     }
     elseif ($fieldName === 'preferred_language') {
-      $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Contact_BAO_Contact::buildOptions('preferred_language'));
+      $form->add('select', $name, $title, ['' => ts('- select -')] + CRM_Contact_BAO_Contact::buildOptions('preferred_language'));
     }
     elseif ($fieldName == 'external_identifier') {
       $form->add('text', $name, $title, $attributes, $required);
@@ -2068,7 +2043,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addRule($name,
         ts('External ID already exists in Database.'),
         'objectExists',
-        array('CRM_Contact_DAO_Contact', $contID, 'external_identifier')
+        ['CRM_Contact_DAO_Contact', $contID, 'external_identifier']
       );
     }
     elseif ($fieldName === 'group') {
@@ -2110,51 +2085,41 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addElement('checkbox', $name, $title);
     }
     elseif ($fieldName == 'soft_credit') {
-      $form->addEntityRef("soft_credit_contact_id[$rowNumber]", ts('Soft Credit To'), array('create' => TRUE));
+      $form->addEntityRef("soft_credit_contact_id[$rowNumber]", ts('Soft Credit To'), ['create' => TRUE]);
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
     }
-    elseif ($fieldName == 'product_name') {
+    elseif ($fieldName === 'product_name') {
       list($products, $options) = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
       $sel = &$form->addElement('hierselect', $name, $title);
-      $products = array(
-        '0' => ts('- select -'),
-      ) + $products;
-      $sel->setOptions(array($products, $options));
+      $products = ['0' => ts('- select -')] + $products;
+      $sel->setOptions([$products, $options]);
     }
-    elseif ($fieldName == 'payment_instrument') {
+    elseif ($fieldName === 'payment_instrument') {
       $form->add('select', $name, $title,
-        array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(), $required);
+        ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(), $required);
     }
-    elseif ($fieldName == 'financial_type') {
+    elseif ($fieldName === 'financial_type') {
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Contribute_PseudoConstant::financialType(), $required
+        ] + CRM_Contribute_PseudoConstant::financialType(), $required
       );
     }
-    elseif ($fieldName == 'contribution_status_id') {
-      $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
-      $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      foreach (array(
-                 'In Progress',
-                 'Overdue',
-                 'Refunded',
-               ) as $suppress) {
-        unset($contributionStatuses[CRM_Utils_Array::key($suppress, $statusName)]);
-      }
+    elseif ($fieldName === 'contribution_status_id') {
+      $contributionStatuses = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses();
 
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + $contributionStatuses, $required
+        ] + $contributionStatuses, $required
       );
     }
-    elseif ($fieldName == 'soft_credit_type') {
+    elseif ($fieldName === 'soft_credit_type') {
       $name = "soft_credit_type[$rowNumber]";
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Core_OptionGroup::values("soft_credit_type")
+        ] + CRM_Core_OptionGroup::values("soft_credit_type")
       );
       //CRM-15350: choose SCT field default value as 'Gift' for membership use
       //else (for contribution), use configured SCT default value
@@ -2162,7 +2127,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       if ($field['field_type'] == 'Membership') {
         $SCTDefaultValue = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'gift');
       }
-      $form->addElement('hidden', 'sct_default_id', $SCTDefaultValue, array('id' => 'sct_default_id'));
+      $form->addElement('hidden', 'sct_default_id', $SCTDefaultValue, ['id' => 'sct_default_id']);
     }
     elseif ($fieldName == 'contribution_soft_credit_pcp_id') {
       CRM_Contribute_Form_SoftCredit::addPCPFields($form, "[$rowNumber]");
@@ -2172,23 +2137,23 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName == 'contribution_page_id') {
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Contribute_PseudoConstant::contributionPage(), $required, 'class="big"'
+        ] + CRM_Contribute_PseudoConstant::contributionPage(), $required, 'class="big"'
       );
     }
     elseif ($fieldName == 'activity_status_id') {
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Core_PseudoConstant::activityStatus(), $required
+        ] + CRM_Core_PseudoConstant::activityStatus(), $required
       );
     }
     elseif ($fieldName == 'activity_engagement_level') {
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Campaign_PseudoConstant::engagementLevel(), $required
+        ] + CRM_Campaign_PseudoConstant::engagementLevel(), $required
       );
     }
     elseif ($fieldName == 'participant_status') {
@@ -2197,9 +2162,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $cond = 'visibility_id = 1';
       }
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Event_PseudoConstant::participantStatus(NULL, $cond, 'label'), $required
+        ] + CRM_Event_PseudoConstant::participantStatus(NULL, $cond, 'label'), $required
       );
     }
     elseif ($fieldName == 'participant_role') {
@@ -2208,9 +2173,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       else {
         $form->add('select', $name, $title,
-          array(
+          [
             '' => ts('- select -'),
-          ) + CRM_Event_PseudoConstant::participantRole(), $required
+          ] + CRM_Event_PseudoConstant::participantRole(), $required
         );
       }
     }
@@ -2229,14 +2194,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           $form->_componentCampaigns
         ));
         $form->add('select', $name, $title,
-          array(
+          [
             '' => ts('- select -'),
-          ) + $campaigns, $required, 'class="crm-select2 big"'
+          ] + $campaigns, $required, 'class="crm-select2 big"'
         );
       }
     }
     elseif ($fieldName == 'activity_details') {
-      $form->add('wysiwyg', $fieldName, $title, array('rows' => 4, 'cols' => 60), $required);
+      $form->add('wysiwyg', $fieldName, $title, ['rows' => 4, 'cols' => 60], $required);
     }
     elseif ($fieldName == 'activity_duration') {
       $form->add('text', $name, $title, $attributes, $required);
@@ -2244,9 +2209,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName == 'case_status') {
       $form->add('select', $name, $title,
-        array(
+        [
           '' => ts('- select -'),
-        ) + CRM_Case_BAO_Case::buildOptions('case_status_id', 'create'),
+        ] + CRM_Case_BAO_Case::buildOptions('case_status_id', 'create'),
         $required
       );
     }
@@ -2286,17 +2251,17 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     //add the rules
-    if (in_array($fieldName, array(
+    if (in_array($fieldName, [
       'non_deductible_amount',
       'total_amount',
       'fee_amount',
       'net_amount',
-    ))) {
+    ])) {
       $form->addRule($name, ts('Please enter a valid amount.'), 'money');
     }
     if ($rule) {
       if (!($rule == 'email' && $mode == CRM_Profile_Form::MODE_SEARCH)) {
-        $form->addRule($name, ts('Please enter a valid %1', array(1 => $title)), $rule);
+        $form->addRule($name, ts('Please enter a valid %1', [1 => $title]), $rule);
       }
     }
   }
@@ -2322,9 +2287,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   ) {
     if (!$componentId) {
       //get the contact details
-      list($contactDetails, $options) = CRM_Contact_BAO_Contact::getHierContactDetails($contactId, $fields);
+      $contactDetails = CRM_Contact_BAO_Contact::getHierContactDetails($contactId, $fields);
       $details = CRM_Utils_Array::value($contactId, $contactDetails);
-      $multipleFields = array('website' => 'url');
+      $multipleFields = ['website' => 'url'];
 
       //start of code to set the default values
       foreach ($fields as $name => $field) {
@@ -2373,52 +2338,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$fldName] = $details['worldregion_id'];
           }
           elseif ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($name)) {
-            // @todo retrieving the custom fields here seems obsolete - $field holds more data for the fields.
-            $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $details));
-
-            // hack to add custom data for components
-            $components = array('Contribution', 'Participant', 'Membership', 'Activity');
-            foreach ($components as $value) {
-              $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-                CRM_Core_BAO_CustomField::getFieldsForImport($value)
-              );
-            }
-
-            switch ($customFields[$customFieldId]['html_type']) {
-              case 'Multi-Select State/Province':
-              case 'Multi-Select Country':
-              case 'Multi-Select':
-                $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
-                foreach ($v as $item) {
-                  if ($item) {
-                    $defaults[$fldName][$item] = $item;
-                  }
-                }
-                break;
-
-              case 'CheckBox':
-                $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
-                foreach ($v as $item) {
-                  if ($item) {
-                    $defaults[$fldName][$item] = 1;
-                    // seems like we need this for QF style checkboxes in profile where its multiindexed
-                    // CRM-2969
-                    $defaults["{$fldName}[{$item}]"] = 1;
-                  }
-                }
-                break;
-
-              default:
-                $defaults[$fldName] = $details[$name];
-                break;
-            }
+            $defaults[$fldName] = self::reformatProfileDefaults($field, $details[$name]);
           }
           else {
             $defaults[$fldName] = $details[$name];
           }
         }
         else {
-          $blocks = array('email', 'phone', 'im', 'openid');
+          $blocks = ['email', 'phone', 'im', 'openid'];
           list($fieldName, $locTypeId, $phoneTypeId) = CRM_Utils_System::explode('-', $name, 3);
           if (!in_array($fieldName, $multipleFields)) {
             if (is_array($details)) {
@@ -2493,8 +2420,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     elseif (substr($fieldName, 0, 14) === 'address_custom' &&
                       CRM_Utils_Array::value(substr($fieldName, 8), $value)
                     ) {
-                      $defaults[$fldName] = $value[substr($fieldName, 8)];
+                      $defaults[$fldName] = self::reformatProfileDefaults($field, $value[substr($fieldName, 8)]);
                     }
+                  }
+                }
+                else {
+                  if (substr($fieldName, 0, 14) === 'address_custom' &&
+                    CRM_Utils_Array::value(substr($fieldName, 8), $value)
+                  ) {
+                    $defaults[$fldName] = self::reformatProfileDefaults($field, $value[substr($fieldName, 8)]);
                   }
                 }
               }
@@ -2552,7 +2486,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   associative array of profiles
    */
   public static function getProfiles($types, $onlyPure = FALSE) {
-    $profiles = array();
+    $profiles = [];
     $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
@@ -2586,7 +2520,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       return NULL;
     }
 
-    $profiles = array();
+    $profiles = [];
     $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
@@ -2628,7 +2562,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       CRM_Core_Permission::CREATE, NULL
     );
 
-    $validProfile = array();
+    $validProfile = [];
     if (!empty($profileFields)) {
       $fields = array_keys($profileFields);
       foreach ($fields as $val) {
@@ -2682,16 +2616,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   public static function copy($id) {
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_uf_group");
 
-    $title = ts('[Copy id %1]', array(1 => $maxId + 1));
-    $fieldsFix = array(
-      'suffix' => array(
+    $title = ts('[Copy id %1]', [1 => $maxId + 1]);
+    $fieldsFix = [
+      'suffix' => [
         'title' => ' ' . $title,
         'name' => '__Copy_id_' . ($maxId + 1) . '_',
-      ),
-    );
+      ],
+    ];
 
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFGroup',
-      array('id' => $id),
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFGroup',
+      ['id' => $id],
       NULL,
       $fieldsFix
     );
@@ -2702,16 +2636,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $copy->name = CRM_Utils_String::munge($copy->name, '_', 56) . "_{$copy->id}";
     $copy->save();
 
-    $copyUFJoin = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
-      array('uf_group_id' => $id),
-      array('uf_group_id' => $copy->id),
+    $copyUFJoin = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
+      ['uf_group_id' => $id],
+      ['uf_group_id' => $copy->id],
       NULL,
       'entity_table'
     );
 
-    $copyUFField = &CRM_Core_DAO::copyGeneric('CRM_Core_BAO_UFField',
-      array('uf_group_id' => $id),
-      array('uf_group_id' => $copy->id)
+    $copyUFField = CRM_Core_DAO::copyGeneric('CRM_Core_BAO_UFField',
+      ['uf_group_id' => $id],
+      ['uf_group_id' => $copy->id]
     );
 
     $maxWeight = CRM_Utils_Weight::getMax('CRM_Core_DAO_UFJoin', NULL, 'weight');
@@ -2723,14 +2657,14 @@ SET    weight = %1
 WHERE  uf_group_id = %2
 AND    ( entity_id IS NULL OR entity_id <= 0 )
 ";
-    $p = array(
-      1 => array($maxWeight + 1, 'Integer'),
-      2 => array($copy->id, 'Integer'),
-    );
+    $p = [
+      1 => [$maxWeight + 1, 'Integer'],
+      2 => [$copy->id, 'Integer'],
+    ];
     CRM_Core_DAO::executeQuery($query, $p);
     if ($copy->is_reserved) {
       $query = "UPDATE civicrm_uf_group SET is_reserved = 0 WHERE id = %1";
-      $params = array(1 => array($copy->id, 'Integer'));
+      $params = [1 => [$copy->id, 'Integer']];
       CRM_Core_DAO::executeQuery($query, $params);
     }
     CRM_Utils_Hook::copy('UFGroup', $copy);
@@ -2771,24 +2705,24 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       $fixUrl = CRM_Utils_System::url('civicrm/admin/domain', 'action=update&reset=1');
-      CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', array(1 => $fixUrl)));
+      CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 
     foreach ($emailList as $emailTo) {
       // FIXME: take the below out of the foreach loop
       CRM_Core_BAO_MessageTemplate::sendTemplate(
-        array(
+        [
           'groupName' => 'msg_tpl_workflow_uf',
           'valueName' => 'uf_notify',
           'contactId' => $contactID,
-          'tplParams' => array(
+          'tplParams' => [
             'displayName' => $displayName,
             'currentDate' => date('r'),
             'contactLink' => $contactLink,
-          ),
+          ],
           'from' => "$domainEmailName <$domainEmailAddress>",
           'toEmail' => $emailTo,
-        )
+        ]
       );
     }
   }
@@ -2810,7 +2744,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   public function checkFieldsEmptyValues($gid, $cid, $params, $skipCheck = FALSE) {
     if ($gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid) || $skipCheck) {
-        $values = array();
+        $values = [];
         $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW);
         CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params, TRUE);
 
@@ -2819,11 +2753,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (!empty($values) &&
           !empty($email)
         ) {
-          $val = array(
+          $val = [
             'id' => $gid,
             'values' => $values,
             'email' => $email,
-          );
+          ];
           return $val;
         }
       }
@@ -2839,7 +2773,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $values
    * @param CRM_Core_Smarty $template
    */
-  static public function profileDisplay($gid, $values, $template) {
+  public static function profileDisplay($gid, $values, $template) {
     $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
     $template->assign('grouptitle', $groupTitle);
     if (count($values)) {
@@ -2867,8 +2801,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $primaryLocationType = $defaultLocationType->id;
     }
 
-    $data = array();
-    $locationType = array();
+    $data = [];
+    $locationType = [];
     $count = 1;
     $primaryLocation = 0;
     foreach ($params as $key => $value) {
@@ -2954,13 +2888,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
               $value = $date;
             }
 
-            $data['custom'][$customFieldID] = array(
+            $data['custom'][$customFieldID] = [
               'id' => $id,
               'value' => $value,
               'extends' => $customFields[$customFieldID]['extends'],
               'type' => $customFields[$customFieldID]['data_type'],
               'custom_field_id' => $customFieldID,
-            );
+            ];
           }
         }
         elseif ($key == 'edit') {
@@ -3010,7 +2944,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   list of calculated group type
    */
   public static function _calculateGroupType($ufFields, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
-    $groupType = $groupTypeValues = $customFieldIds = array();
+    $groupType = $groupTypeValues = $customFieldIds = [];
     if (!empty($ufFields)) {
       foreach ($ufFields as $fieldName => $fieldValue) {
         //ignore field from group type when provided.
@@ -3078,7 +3012,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return bool
    */
-  public static function updateGroupTypes($gId, $groupTypes = array()) {
+  public static function updateGroupTypes($gId, $groupTypes = []) {
     if (!is_array($groupTypes) || !$gId) {
       return FALSE;
     }
@@ -3088,17 +3022,17 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', $gId, 'group_type', 'null');
     }
 
-    $componentGroupTypes = array('Contribution', 'Participant', 'Membership', 'Activity', 'Case');
-    $validGroupTypes = array_merge(array(
+    $componentGroupTypes = ['Contribution', 'Participant', 'Membership', 'Activity', 'Case'];
+    $validGroupTypes = array_merge([
       'Contact',
       'Individual',
       'Organization',
       'Household',
-    ), $componentGroupTypes, CRM_Contact_BAO_ContactType::subTypes());
+    ], $componentGroupTypes, CRM_Contact_BAO_ContactType::subTypes());
 
-    $gTypes = $gTypeValues = array();
+    $gTypes = $gTypeValues = [];
 
-    $participantExtends = array('ParticipantRole', 'ParticipantEventName', 'ParticipantEventType');
+    $participantExtends = ['ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'];
     // Get valid group type and group subtypes
     foreach ($groupTypes as $groupType => $value) {
       if (in_array($groupType, $validGroupTypes) && !in_array($groupType, $gTypes)) {
@@ -3184,7 +3118,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||
-      !in_array($component, array('Contribute', 'Membership', 'Event', 'Activity', 'Case'))
+      !in_array($component, ['Contribute', 'Membership', 'Event', 'Activity', 'Case'])
     ) {
       return;
     }
@@ -3194,44 +3128,44 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       case 'Membership':
         $componentBAO = 'CRM_Member_BAO_Membership';
         $componentBAOName = 'Membership';
-        $componentSubType = array('membership_type_id');
+        $componentSubType = ['membership_type_id'];
         break;
 
       case 'Contribute':
         $componentBAO = 'CRM_Contribute_BAO_Contribution';
         $componentBAOName = 'Contribution';
-        $componentSubType = array('financial_type_id');
+        $componentSubType = ['financial_type_id'];
         break;
 
       case 'Event':
         $componentBAO = 'CRM_Event_BAO_Participant';
         $componentBAOName = 'Participant';
-        $componentSubType = array('role_id', 'event_id', 'event_type_id');
+        $componentSubType = ['role_id', 'event_id', 'event_type_id'];
         break;
 
       case 'Activity':
         $componentBAO = 'CRM_Activity_BAO_Activity';
         $componentBAOName = 'Activity';
-        $componentSubType = array('activity_type_id');
+        $componentSubType = ['activity_type_id'];
         break;
 
       case 'Case':
         $componentBAO = 'CRM_Case_BAO_Case';
         $componentBAOName = 'Case';
-        $componentSubType = array('case_type_id');
+        $componentSubType = ['case_type_id'];
         break;
     }
 
-    $values = array();
-    $params = array('id' => $componentId);
+    $values = [];
+    $params = ['id' => $componentId];
 
     //get the component values.
     CRM_Core_DAO::commonRetrieve($componentBAO, $params, $values);
     if ($componentBAOName == 'Participant') {
-      $values += array('event_type_id' => CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values['event_id'], 'event_type_id'));
+      $values += ['event_type_id' => CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values['event_id'], 'event_type_id')];
     }
 
-    $formattedGroupTree = array();
+    $formattedGroupTree = [];
 
     foreach ($fields as $name => $field) {
       $fldName = $isStandalone ? $name : "field[$componentId][$name]";
@@ -3242,12 +3176,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $noteDetails = CRM_Core_BAO_Note::getNote($componentId, 'civicrm_participant');
         $defaults[$fldName] = array_pop($noteDetails);
       }
-      elseif (in_array($name, array(
+      elseif (in_array($name, [
         'financial_type',
         'payment_instrument',
         'participant_status',
         'participant_role',
-      ))) {
+      ])) {
         $defaults[$fldName] = $values["{$name}_id"];
       }
       elseif ($name == 'membership_type') {
@@ -3262,10 +3196,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       elseif ($name == 'case_status') {
         $defaults[$fldName] = $values['case_status_id'];
       }
-      elseif (CRM_Core_BAO_CustomField::getKeyID($name, TRUE) !== array(NULL, NULL)) {
+      elseif (CRM_Core_BAO_CustomField::getKeyID($name, TRUE) !== [NULL, NULL]) {
         if (empty($formattedGroupTree)) {
           //get the groupTree as per subTypes.
-          $groupTree = array();
+          $groupTree = [];
           foreach ($componentSubType as $subType) {
             $subTree = CRM_Core_BAO_CustomGroup::getTree($componentBAOName, NULL,
               $componentId, 0, $values[$subType]
@@ -3321,48 +3255,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * @param array|string $profiles - name of profile(s) to create links for
-   * @param array $appendProfiles
-   *   Name of profile(s) to append to each link.
-   *
-   * @return array
-   */
-  public static function getCreateLinks($profiles = '', $appendProfiles = array()) {
-    // Default to contact profiles
-    if (!$profiles) {
-      $profiles = array('new_individual', 'new_organization', 'new_household');
-    }
-    $profiles = (array) $profiles;
-    $toGet = array_merge($profiles, (array) $appendProfiles);
-    $retrieved = civicrm_api3('uf_group', 'get', array(
-      'name' => array('IN' => $toGet),
-      'is_active' => 1,
-    ));
-    $links = $append = array();
-    if (!empty($retrieved['values'])) {
-      foreach ($retrieved['values'] as $id => $profile) {
-        if (in_array($profile['name'], $profiles)) {
-          $links[] = array(
-            'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
-              NULL, NULL, FALSE, FALSE, TRUE),
-            'type' => ucfirst(str_replace('new_', '', $profile['name'])),
-          );
-        }
-        else {
-          $append[] = $id;
-        }
-      }
-      foreach ($append as $id) {
-        foreach ($links as &$link) {
-          $link['url'] .= ",$id";
-        }
-      }
-    }
-    return $links;
-  }
-
-  /**
    * Retrieve groups of  profiles.
    *
    * @param int $profileID
@@ -3372,7 +3264,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   returns array
    */
   public static function profileGroups($profileID) {
-    $groupTypes = array();
+    $groupTypes = [];
     $profileTypes = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'group_type');
     if ($profileTypes) {
       $groupTypeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $profileTypes);
@@ -3395,7 +3287,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function getDoubleOptInGroupIds(&$params, $contactId = NULL) {
     $config = CRM_Core_Config::singleton();
-    $subscribeGroupIds = array();
+    $subscribeGroupIds = [];
 
     // process further only if profileDoubleOptIn enabled and if groups exist
     if (!array_key_exists('group', $params) ||
@@ -3420,7 +3312,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     //do check for already subscriptions.
-    $contactGroups = array();
+    $contactGroups = [];
     if ($contactId) {
       $query = "
 SELECT  group_id
@@ -3428,7 +3320,7 @@ SELECT  group_id
   WHERE status = 'Added'
     AND contact_id = %1";
 
-      $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($contactId, 'Integer')));
+      $dao = CRM_Core_DAO::executeQuery($query, [1 => [$contactId, 'Integer']]);
       while ($dao->fetch()) {
         $contactGroups[$dao->group_id] = $dao->group_id;
       }
@@ -3470,12 +3362,12 @@ SELECT  group_id
   public static function checkForMixProfiles($profileIds) {
     $mixProfile = FALSE;
 
-    $contactTypes = array('Individual', 'Household', 'Organization');
+    $contactTypes = ['Individual', 'Household', 'Organization'];
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
 
-    $components = array('Contribution', 'Participant', 'Membership', 'Activity');
+    $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
 
-    $typeCount = array('ctype' => array(), 'subtype' => array());
+    $typeCount = ['ctype' => [], 'subtype' => []];
     foreach ($profileIds as $gid) {
       $profileType = CRM_Core_BAO_UFField::getProfileType($gid);
       // ignore profile of type Contact
@@ -3545,17 +3437,17 @@ SELECT  group_id
    *   group type values
    */
   public static function groupTypeValues($profileId, $groupType = NULL) {
-    $groupTypeValue = array();
+    $groupTypeValue = [];
     $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileId, 'group_type');
 
     $groupTypeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $groupTypes);
     if (empty($groupTypeParts[1])) {
       return $groupTypeValue;
     }
-    $participantExtends = array('ParticipantRole', 'ParticipantEventName', 'ParticipantEventType');
+    $participantExtends = ['ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'];
 
     foreach (explode(',', $groupTypeParts[1]) as $groupTypeValues) {
-      $values = array();
+      $values = [];
       $valueParts = explode(':', $groupTypeValues);
       if ($groupType &&
         ($valueParts[0] != "{$groupType}Type" ||
@@ -3618,7 +3510,7 @@ SELECT  group_id
       FROM civicrm_uf_group
       WHERE name IN ('contribution_batch_entry', 'membership_batch_entry')";
     $dao = CRM_Core_DAO::executeQuery($query);
-    $profileIds = array();
+    $profileIds = [];
     while ($dao->fetch()) {
       $profileIds[$dao->id] = $dao->id;
     }
@@ -3626,15 +3518,15 @@ SELECT  group_id
   }
 
   /**
-   * @todo what do I do?
    * @param $source
    * @param $destination
    * @param bool $returnMultiSummaryFields
    *
    * @return array|null
+   * @todo what do I do?
    */
   public static function shiftMultiRecordFields(&$source, &$destination, $returnMultiSummaryFields = FALSE) {
-    $multiSummaryFields = $returnMultiSummaryFields ? array() : NULL;
+    $multiSummaryFields = $returnMultiSummaryFields ? [] : NULL;
     foreach ($source as $field => $properties) {
       if (!CRM_Core_BAO_CustomField::getKeyID($field)) {
         continue;
@@ -3681,6 +3573,65 @@ SELECT  group_id
         $fields["phone_ext-{$fieldSuffix}"]['is_required'] = 0;
       }
     }
+  }
+
+  /**
+   * Get the frontend_title for the profile, falling back on 'title' if none.
+   *
+   * @param int $profileID
+   *
+   * @return string
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getFrontEndTitle(int $profileID) {
+    $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $profileID, 'return' => ['title', 'frontend_title']]);
+    return $profile['frontend_title'] ?? $profile['title'];
+  }
+
+  /**
+   * This function is used to format the profile default values.
+   *
+   * @param array $field
+   *   Associated array of profile fields to render.
+   * @param string $value
+   *   Value to render
+   *
+   * @return $defaults
+   *   String or array, depending on the html type
+   */
+  public static function reformatProfileDefaults($field, $value) {
+    $defaults = [];
+
+    switch ($field['html_type']) {
+      case 'Multi-Select State/Province':
+      case 'Multi-Select Country':
+      case 'Multi-Select':
+        $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($value));
+        foreach ($v as $item) {
+          if ($item) {
+            $defaults[$item] = $item;
+          }
+        }
+        break;
+
+      case 'CheckBox':
+        $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+        foreach ($v as $item) {
+          if ($item) {
+            $defaults[$item] = 1;
+            // seems like we need this for QF style checkboxes in profile where its multiindexed
+            // CRM-2969
+            $defaults["[{$item}]"] = 1;
+          }
+        }
+        break;
+
+      default:
+        $defaults = $value;
+        break;
+    }
+    return $defaults;
   }
 
 }

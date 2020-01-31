@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -39,7 +23,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method add()
    */
   public function testAdd() {
-    $params = array(
+    $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -47,7 +31,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'cost' => 5,
       'min_contribution' => 5,
       'is_active' => 1,
-    );
+    ];
 
     $product = CRM_Contribute_BAO_Product::create($params);
     $result = $this->assertDBNotNull('CRM_Contribute_BAO_Product', $product->id,
@@ -62,7 +46,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method retrieve( )
    */
   public function testRetrieve() {
-    $params = array(
+    $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -70,11 +54,11 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'cost' => 5,
       'min_contribution' => 5,
       'is_active' => 1,
-    );
+    ];
 
     $product = CRM_Contribute_BAO_Product::create($params);
-    $params = array('id' => $product->id);
-    $default = array();
+    $params = ['id' => $product->id];
+    $default = [];
     $result = CRM_Contribute_BAO_Product::retrieve($params, $default);
     $this->assertEquals(empty($result), FALSE, 'Verify products record.');
   }
@@ -83,7 +67,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method setIsActive( )
    */
   public function testSetIsActive() {
-    $params = array(
+    $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -91,7 +75,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'cost' => 5,
       'min_contribution' => 5,
       'is_active' => 1,
-    );
+    ];
 
     $product = CRM_Contribute_BAO_Product::create($params);
     CRM_Contribute_BAO_Product::setIsActive($product->id, 0);
@@ -108,7 +92,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method del( )
    */
   public function testDel() {
-    $params = array(
+    $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -116,13 +100,13 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'cost' => 5,
       'min_contribution' => 5,
       'is_active' => 1,
-    );
+    ];
 
     $product = CRM_Contribute_BAO_Product::create($params);
     CRM_Contribute_BAO_Product::del($product->id);
 
-    $params = array('id' => $product->id);
-    $defaults = array();
+    $params = ['id' => $product->id];
+    $defaults = [];
     $retrievedProduct = CRM_Contribute_BAO_Product::retrieve($params, $defaults);
 
     $this->assertEquals(empty($retrievedProduct), TRUE, 'Verify product record deletion.');

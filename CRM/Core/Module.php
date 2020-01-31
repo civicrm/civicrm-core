@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,9 +15,7 @@
  * a Joomla Plugin.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Module {
 
@@ -43,13 +25,17 @@ class CRM_Core_Module {
   public $name;
 
   /**
-   * @var bool, TRUE if fully enabled; FALSE if module exists but is disabled
+   * Is the module enabled.
+   *
+   * @var bool
    */
   public $is_active;
 
   /**
+   * Class constructor.
+   *
    * @param string $name
-   * @param $is_active
+   * @param bool $is_active
    */
   public function __construct($name, $is_active) {
     $this->name = $name;
@@ -68,7 +54,8 @@ class CRM_Core_Module {
     static $result;
     if ($fresh || !is_array($result)) {
       $result = CRM_Extension_System::singleton()->getMapper()->getModules();
-      $result[] = new CRM_Core_Module('civicrm', TRUE); // pseudo-module for core
+      // pseudo-module for core
+      $result[] = new CRM_Core_Module('civicrm', TRUE);
 
       $config = CRM_Core_Config::singleton();
       $result = array_merge($result, $config->userSystem->getModules());
@@ -87,7 +74,7 @@ class CRM_Core_Module {
    * @see CRM_Extension_Manager::STATUS_DISABLED
    */
   public static function collectStatuses($modules) {
-    $statuses = array();
+    $statuses = [];
     foreach ($modules as $module) {
       $statuses[$module->name] = $module->is_active ? CRM_Extension_Manager::STATUS_INSTALLED : CRM_Extension_Manager::STATUS_DISABLED;
 

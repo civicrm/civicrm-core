@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -61,7 +45,6 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   public $debug = 0;
   protected $_params;
 
-
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -69,10 +52,10 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->_individualId = $this->individualCreate();
     $this->_softIndividual1Id = $this->individualCreate();
     $this->_softIndividual2Id = $this->individualCreate();
-    $this->_contributionId = $this->contributionCreate(array('contact_id' => $this->_individualId));
+    $this->_contributionId = $this->contributionCreate(['contact_id' => $this->_individualId]);
 
     $this->processorCreate();
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
@@ -82,8 +65,8 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'net_amount' => 95.00,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-    );
-    $this->_processorParams = array(
+    ];
+    $this->_processorParams = [
       'domain_id' => 1,
       'name' => 'Dummy',
       'payment_processor_type_id' => 10,
@@ -93,7 +76,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'url_site' => 'http://dummy.com',
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
-    );
+    ];
   }
 
   /**
@@ -103,18 +86,18 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    */
   public function testGetContributionSoft() {
     //We don't test for PCP fields because there's no PCP API, so we can't create campaigns.
-    $p = array(
+    $p = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 10.00,
       'currency' => 'USD',
       'soft_credit_type_id' => 4,
-    );
+    ];
 
     $this->_softcontribution = $this->callAPISuccess('contribution_soft', 'create', $p);
-    $params = array(
+    $params = [
       'id' => $this->_softcontribution['id'],
-    );
+    ];
     $softcontribution = $this->callAPIAndDocument('contribution_soft', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $softcontribution['count']);
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contribution_id'], $this->_contributionId);
@@ -128,69 +111,67 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->_softcontribution2 = $this->callAPISuccess('contribution_soft', 'create', $p);
 
     // now we have 2 - test getcount
-    $softcontribution = $this->callAPISuccess('contribution_soft', 'getcount', array());
+    $softcontribution = $this->callAPISuccess('contribution_soft', 'getcount', []);
     $this->assertEquals(2, $softcontribution);
 
     //check first contribution
-    $result = $this->callAPISuccess('contribution_soft', 'get', array(
+    $result = $this->callAPISuccess('contribution_soft', 'get', [
       'id' => $this->_softcontribution['id'],
-    ));
+    ]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($this->_softcontribution['id'], $result['id']);
     $this->assertEquals($this->_softcontribution['id'], $result['id'], print_r($softcontribution, TRUE));
 
     //test id only format - second soft credit
-    $resultID2 = $this->callAPISuccess('contribution_soft', 'get', array(
+    $resultID2 = $this->callAPISuccess('contribution_soft', 'get', [
       'id' => $this->_softcontribution2['id'],
       'format.only_id' => 1,
-    ));
+    ]);
     $this->assertEquals($this->_softcontribution2['id'], $resultID2);
 
     //test get by contact id works
-    $result = $this->callAPISuccess('contribution_soft', 'get', array(
-        'contact_id' => $this->_softIndividual2Id,
-      )
-    );
+    $result = $this->callAPISuccess('contribution_soft', 'get', [
+      'contact_id' => $this->_softIndividual2Id,
+    ]);
     $this->assertEquals(1, $result['count']);
 
-    $this->callAPISuccess('contribution_soft', 'Delete', array(
+    $this->callAPISuccess('contribution_soft', 'Delete', [
       'id' => $this->_softcontribution['id'],
-    ));
+    ]);
     // check one soft credit remains
     $expectedCount = 1;
-    $this->callAPISuccess('contribution_soft', 'getcount', array(), $expectedCount);
+    $this->callAPISuccess('contribution_soft', 'getcount', [], $expectedCount);
 
     //check id is same as 2
-    $this->assertEquals($this->_softcontribution2['id'], $this->callAPISuccess('contribution_soft', 'getvalue', array('return' => 'id')));
+    $this->assertEquals($this->_softcontribution2['id'], $this->callAPISuccess('contribution_soft', 'getvalue', ['return' => 'id']));
 
-    $this->callAPISuccess('ContributionSoft', 'Delete', array(
+    $this->callAPISuccess('ContributionSoft', 'Delete', [
       'id' => $this->_softcontribution2['id'],
-    ));
+    ]);
   }
-
 
   /**
    * civicrm_contribution_soft.
    */
   public function testCreateEmptyParamsContributionSoft() {
-    $softcontribution = $this->callAPIFailure('contribution_soft', 'create', array(),
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'create', [],
       'Mandatory key(s) missing from params array: contribution_id, amount, contact_id'
     );
   }
 
   public function testCreateParamsWithoutRequiredKeysContributionSoft() {
-    $softcontribution = $this->callAPIFailure('contribution_soft', 'create', array(),
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'create', [],
       'Mandatory key(s) missing from params array: contribution_id, amount, contact_id'
     );
   }
 
   public function testCreateContributionSoftInvalidContact() {
-    $params = array(
+    $params = [
       'contact_id' => 999,
       'contribution_id' => $this->_contributionId,
       'amount' => 10.00,
       'currency' => 'USD',
-    );
+    ];
 
     $softcontribution = $this->callAPIFailure('contribution_soft', 'create', $params,
       'contact_id is not valid : 999'
@@ -198,12 +179,12 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionSoftInvalidContributionId() {
-    $params = array(
+    $params = [
       'contribution_id' => 999999,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 10.00,
       'currency' => 'USD',
-    );
+    ];
 
     $softcontribution = $this->callAPIFailure('contribution_soft', 'create', $params,
       'contribution_id is not valid : 999999'
@@ -214,13 +195,13 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    * Function tests that additional financial records are created when fee amount is recorded.
    */
   public function testCreateContributionSoft() {
-    $params = array(
+    $params = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 10.00,
       'currency' => 'USD',
       'soft_credit_type_id' => 5,
-    );
+    ];
 
     $softcontribution = $this->callAPIAndDocument('contribution_soft', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contribution_id'], $this->_contributionId);
@@ -236,20 +217,20 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateContributionSoft() {
     //create a soft credit
-    $params = array(
+    $params = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 10.00,
       'currency' => 'USD',
       'soft_credit_type_id' => 6,
-    );
+    ];
 
     $softcontribution = $this->callAPISuccess('contribution_soft', 'create', $params);
     $softcontributionID = $softcontribution['id'];
 
-    $old_params = array(
+    $old_params = [
       'contribution_soft_id' => $softcontributionID,
-    );
+    ];
     $original = $this->callAPISuccess('contribution_soft', 'get', $old_params);
     //Make sure it came back
     $this->assertEquals($original['id'], $softcontributionID);
@@ -266,20 +247,20 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($old_amount, 10.00);
     $this->assertEquals($old_currency, 'USD');
     $this->assertEquals($old_soft_credit_type_id, 6);
-    $params = array(
+    $params = [
       'id' => $softcontributionID,
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 7.00,
       'currency' => 'CAD',
       'soft_credit_type_id' => 7,
-    );
+    ];
 
     $softcontribution = $this->callAPISuccess('contribution_soft', 'create', $params);
 
-    $new_params = array(
+    $new_params = [
       'id' => $softcontribution['id'],
-    );
+    ];
     $softcontribution = $this->callAPISuccess('contribution_soft', 'get', $new_params);
     //check against original values
     $this->assertEquals($softcontribution['values'][$softcontributionID]['contribution_id'], $this->_contributionId);
@@ -288,9 +269,9 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($softcontribution['values'][$softcontributionID]['currency'], 'CAD');
     $this->assertEquals($softcontribution['values'][$softcontributionID]['soft_credit_type_id'], 7);
 
-    $params = array(
+    $params = [
       'id' => $softcontributionID,
-    );
+    ];
     $this->callAPISuccess('contribution_soft', 'delete', $params);
   }
 
@@ -299,31 +280,31 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    *
    */
   public function testDeleteEmptyParamsContributionSoft() {
-    $params = array();
+    $params = [];
     $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
   public function testDeleteWrongParamContributionSoft() {
-    $params = array(
+    $params = [
       'contribution_source' => 'SSF',
-    );
+    ];
     $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
   public function testDeleteContributionSoft() {
     //create a soft credit
-    $params = array(
+    $params = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 10.00,
       'currency' => 'USD',
-    );
+    ];
 
     $softcontribution = $this->callAPISuccess('contribution_soft', 'create', $params);
     $softcontributionID = $softcontribution['id'];
-    $params = array(
+    $params = [
       'id' => $softcontributionID,
-    );
+    ];
     $this->callAPIAndDocument('contribution_soft', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
@@ -334,15 +315,15 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    * All available contributions expected.
    */
   public function testSearchEmptyParams() {
-    $p = array(
+    $p = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 10.00,
       'currency' => 'USD',
-    );
+    ];
     $softcontribution = $this->callAPISuccess('contribution_soft', 'create', $p);
 
-    $result = $this->callAPISuccess('contribution_soft', 'get', array());
+    $result = $this->callAPISuccess('contribution_soft', 'get', []);
     // We're taking the first element.
     $res = $result['values'][$softcontribution['id']];
 
@@ -356,25 +337,25 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    * Test civicrm_contribution_soft_search. Success expected.
    */
   public function testSearch() {
-    $p1 = array(
+    $p1 = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
       'amount' => 10.00,
       'currency' => 'USD',
-    );
+    ];
     $softcontribution1 = $this->callAPISuccess('contribution_soft', 'create', $p1);
 
-    $p2 = array(
+    $p2 = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual2Id,
       'amount' => 25.00,
       'currency' => 'CAD',
-    );
+    ];
     $softcontribution2 = $this->callAPISuccess('contribution_soft', 'create', $p2);
 
-    $params = array(
+    $params = [
       'id' => $softcontribution2['id'],
-    );
+    ];
     $result = $this->callAPISuccess('contribution_soft', 'get', $params);
     $res = $result['values'][$softcontribution2['id']];
 

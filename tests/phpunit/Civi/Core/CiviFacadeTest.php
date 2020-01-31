@@ -11,7 +11,7 @@ class CiviFacadeTest extends \CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->mandates = array();
+    $this->mandates = [];
   }
 
   public function tearDown() {

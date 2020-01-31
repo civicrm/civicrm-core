@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -95,7 +79,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     );
 
     CRM_Utils_System::setTitle(ts('Custom Field Move: %1',
-      array(1 => $this->_srcFieldLabel)
+      [1 => $this->_srcFieldLabel]
     ));
 
     $session = CRM_Core_Session::singleton();
@@ -115,9 +99,9 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('You need more than one custom group to move fields'));
     }
 
-    $customGroup = array(
+    $customGroup = [
       '' => ts('- select -'),
-    ) + $customGroup;
+    ] + $customGroup;
     $this->add('select',
       'dst_group_id',
       ts('Destination'),
@@ -125,20 +109,19 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
       TRUE
     );
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Move Custom Field'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Move Custom Field'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
-    $this->addFormRule(array('CRM_Custom_Form_MoveField', 'formRule'), $this);
+    $this->addFormRule(['CRM_Custom_Form_MoveField', 'formRule'], $this);
   }
 
   /**
@@ -151,7 +134,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
   public static function formRule($fields, $files, $self) {
     $self->_dstGID = $fields['dst_group_id'];
     $tmp = CRM_Core_BAO_CustomField::_moveFieldValidate($self->_srcFID, $self->_dstGID);
-    $errors = array();
+    $errors = [];
     if ($tmp['newGroupID']) {
       $errors['dst_group_id'] = $tmp['newGroupID'];
     }
@@ -172,11 +155,11 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     );
     $srcUrl = CRM_Utils_System::url('civicrm/admin/custom/group/field', "reset=1&action=browse&gid={$this->_dstGID}");
     CRM_Core_Session::setStatus(ts("%1 has been moved to the custom set <a href='%3'>%2</a>.",
-      array(
+      [
         1 => $this->_srcFieldLabel,
         2 => $dstGroup,
         3 => $srcUrl,
-      )), '', 'success');
+      ]), '', 'success');
   }
 
 }

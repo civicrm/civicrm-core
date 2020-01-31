@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -71,33 +55,27 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   }
 
   public function buildTempTable() {
-    $randomNum = md5(uniqid());
-    $this->_tableName = "civicrm_temp_custom_{$randomNum}";
-    $sql = "
-CREATE TEMPORARY TABLE {$this->_tableName} (
-  id int unsigned NOT NULL AUTO_INCREMENT,
+    $sql = "id int unsigned NOT NULL AUTO_INCREMENT,
   contact_id int unsigned NOT NULL,
   participant_id int unsigned NOT NULL,
 ";
 
     foreach ($this->_columns as $dontCare => $fieldName) {
-      if (in_array($fieldName, array(
+      if (in_array($fieldName, [
         'contact_id',
         'participant_id',
         'display_name',
-      ))) {
+      ])) {
         continue;
       }
       $sql .= "{$fieldName} int default 0,\n";
     }
 
     $sql .= "
-PRIMARY KEY ( id ),
-UNIQUE INDEX unique_participant_id ( participant_id )
-) ENGINE=HEAP
-";
+      PRIMARY KEY ( id ),
+      UNIQUE INDEX unique_participant_id ( participant_id )";
 
-    CRM_Core_DAO::executeQuery($sql);
+    $this->_tableName = CRM_Utils_SQL_TempTable::build()->setCategory('priceset')->setMemory()->createWithColumns($sql)->getName();
   }
 
   public function fillTable() {
@@ -133,12 +111,12 @@ ORDER BY c.id, l.price_field_value_id;
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     // first store all the information by option value id
-    $rows = array();
+    $rows = [];
     while ($dao->fetch()) {
       $contactID = $dao->contact_id;
       $participantID = $dao->participant_id;
       if (!isset($rows[$participantID])) {
-        $rows[$participantID] = array();
+        $rows[$participantID] = [];
       }
 
       $rows[$participantID][] = "price_field_{$dao->price_field_value_id} = {$dao->qty}";
@@ -176,9 +154,9 @@ WHERE  p.entity_table = 'civicrm_event'
 AND    p.entity_id    = e.id
 ";
 
-    $params = array();
+    $params = [];
     if ($eventID) {
-      $params[1] = array($eventID, 'Integer');
+      $params[1] = [$eventID, 'Integer'];
       $sql .= " AND e.id = $eventID";
     }
 
@@ -196,7 +174,7 @@ AND    p.entity_id    = e.id
   public function buildForm(&$form) {
     $dao = $this->priceSetDAO();
 
-    $event = array();
+    $event = [];
     while ($dao->fetch()) {
       $event[$dao->id] = $dao->title;
     }
@@ -221,15 +199,15 @@ AND    p.entity_id    = e.id
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('event_id'));
+    $form->assign('elements', ['event_id']);
   }
 
   public function setColumns() {
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Participant ID') => 'participant_id',
       ts('Name') => 'display_name',
-    );
+    ];
 
     if (!$this->_eventID) {
       return;
@@ -292,10 +270,10 @@ contact_a.id             as contact_id  ,
 contact_a.display_name   as display_name";
 
       foreach ($this->_columns as $dontCare => $fieldName) {
-        if (in_array($fieldName, array(
+        if (in_array($fieldName, [
           'contact_id',
           'display_name',
-        ))) {
+        ])) {
           continue;
         }
         $selectClause .= ",\ntempTable.{$fieldName} as {$fieldName}";

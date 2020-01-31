@@ -211,4 +211,4 @@ function onReady( ) {
 }
 </script>
 {/literal}
-<script type="text/javascript" src="{$config->userFrameworkResourceURL}/extern/widget.php?cpageId={$cpageId}&widgetId={$widget_id}&format=3"></script>
+<script type="text/javascript" src="{$widgetExternUrl}"></script>

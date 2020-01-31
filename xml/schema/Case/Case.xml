@@ -14,6 +14,9 @@
     <import>true</import>
     <title>Case ID</title>
     <comment>Unique Case ID</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -186,6 +189,9 @@
     <default>0</default>
     <import>true</import>
     <title>Case Deleted</title>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>2.2</add>
   </field>
   <index>

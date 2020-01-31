@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -99,10 +83,15 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
     $ids = self::allWebsites($contactID);
     foreach ($params as $key => $values) {
+      $id = CRM_Utils_Array::value('id', $values);
+      if (array_key_exists($id, $ids)) {
+        unset($ids[$id]);
+      }
       if (empty($values['id']) && is_array($ids) && !empty($ids)) {
         foreach ($ids as $id => $value) {
           if (($value['website_type_id'] == $values['website_type_id'])) {
             $values['id'] = $id;
+            unset($ids[$id]);
           }
         }
       }
@@ -136,7 +125,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
       return FALSE;
     }
     CRM_Utils_Hook::post('delete', 'Website', $id, $obj);
-    $obj->free();
     return TRUE;
   }
 
@@ -149,15 +137,15 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    *
    * @return bool
    */
-  public static function &getValues(&$params, &$values) {
-    $websites = array();
+  public static function &getValues(&$params = [], &$values = []) {
+    $websites = [];
     $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];
     $website->find();
 
     $count = 1;
     while ($website->fetch()) {
-      $values['website'][$count] = array();
+      $values['website'][$count] = [];
       CRM_Core_DAO::storeValues($website, $values['website'][$count]);
 
       $websites[$count] = $values['website'][$count];
@@ -187,16 +175,16 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 SELECT  id, website_type_id
   FROM  civicrm_website
  WHERE  civicrm_website.contact_id = %1';
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
-    $websites = $values = array();
+    $websites = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'id' => $dao->id,
         'website_type_id' => $dao->website_type_id,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $websites[$count++] = $values;

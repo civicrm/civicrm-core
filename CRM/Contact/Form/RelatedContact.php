@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -80,7 +64,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $this->_contactId;
       if (!$contact->find(TRUE)) {
-        CRM_Core_Error::statusBounce(ts('contact does not exist: %1', array(1 => $this->_contactId)));
+        CRM_Core_Error::statusBounce(ts('contact does not exist: %1', [1 => $this->_contactId]));
       }
       $this->_contactType = $contact->contact_type;
 
@@ -111,7 +95,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $params = array();
+    $params = [];
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
 
@@ -132,17 +116,17 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       ts('Contact Information')
     );
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'next',
         'name' => ts('Save'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
   }
 
   /**
@@ -153,11 +137,11 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     $locType = CRM_Core_BAO_LocationType::getDefault();
-    foreach (array(
-               'phone',
-               'email',
-               'address',
-             ) as $locFld) {
+    foreach ([
+      'phone',
+      'email',
+      'address',
+    ] as $locFld) {
       if (!empty($this->_defaults[$locFld]) && $this->_defaults[$locFld][1]['location_type_id']) {
         $params[$locFld][1]['is_primary'] = $this->_defaults[$locFld][1]['is_primary'];
         $params[$locFld][1]['location_type_id'] = $this->_defaults[$locFld][1]['location_type_id'];
@@ -179,10 +163,10 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
     // set status message.
     if ($this->_contactId) {
-      $message = ts('%1 has been updated.', array(1 => $contact->display_name));
+      $message = ts('%1 has been updated.', [1 => $contact->display_name]);
     }
     else {
-      $message = ts('%1 has been created.', array(1 => $contact->display_name));
+      $message = ts('%1 has been created.', [1 => $contact->display_name]);
     }
     CRM_Core_Session::setStatus($message, ts('Contact Saved'), 'success');
   }

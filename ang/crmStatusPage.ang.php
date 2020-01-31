@@ -5,11 +5,11 @@
 
 // ODDITY: Angular name 'statuspage' doesn't match the file name 'crmStatusPage'.
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('ang/crmStatusPage.js', 'ang/crmStatusPage/*.js'),
-  'css' => array('ang/crmStatusPage.css'),
-  'partials' => array('ang/crmStatusPage'),
-  'settings' => array(),
-  'requires' => array('crmUi', 'crmUtil', 'ngRoute', 'crmResource'),
-);
+  'js' => ['ang/crmStatusPage.js', 'ang/crmStatusPage/*.js'],
+  'css' => ['ang/crmStatusPage.css'],
+  'partials' => ['ang/crmStatusPage'],
+  'settings' => [],
+  'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'crmResource'],
+];

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This code is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -57,60 +41,60 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
   public function testBrowseDisplaysCorrectListOfAddedGroups() {
     // create admin-only non-smart group
     $adminStdGroupTitle = 'The Admin-only Std Group';
-    $adminStdGroup = $this->callAPISuccess('Group', 'create', array(
+    $adminStdGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $adminStdGroupTitle,
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    ));
+    ]);
     // create public non-smart group
     $publicStdGroupTitle = 'The Public Std Group';
-    $publicStdGroup = $this->callAPISuccess('Group', 'create', array(
+    $publicStdGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $publicStdGroupTitle,
       'visibility' => 'Public Pages',
       'is_active' => 1,
-    ));
+    ]);
 
     // Prepare to create smart groups based on saved criteria Gender = Male.
     // Start by creating the saved search.
-    $savedSearch = $this->callAPISuccess('SavedSearch', 'create', array(
+    $savedSearch = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => 'a:1:{i:0;a:5:{i:0;s:9:"gender_id";i:1;s:1:"=";i:2;i:2;i:3;i:0;i:4;i:0;}}',
-    ));
+    ]);
     // Create contact with Gender - Male
-    $savedSearchContact = $this->individualCreate(array(
+    $savedSearchContact = $this->individualCreate([
       'gender_id' => "Male",
       'first_name' => 'C',
-    ), 1);
+    ], 1);
     // Create admin-only smart group for this saved search.
     $adminSmartGroupTitle = 'The Admin-only Smart Group';
-    $adminSmartGroup = $this->callAPISuccess('Group', 'create', array(
+    $adminSmartGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $adminSmartGroupTitle,
       'visibility' => 'User and User Admin Only',
       'saved_search_id' => $savedSearch['id'],
       'is_active' => 1,
-    ));
+    ]);
     // Create public smart group for this saved search.
     $publicSmartGroupTitle = 'The Public Smart Group';
-    $publicSmartGroup = $this->callAPISuccess('Group', 'create', array(
+    $publicSmartGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $publicSmartGroupTitle,
       'visibility' => 'Public Pages',
       'saved_search_id' => $savedSearch['id'],
       'is_active' => 1,
-    ));
+    ]);
 
     // Get logged in user contact ID.
     $user_id = $this->createLoggedInUser();
     $_REQUEST['id'] = $user_id;
 
     // Add current user to the test groups.
-    $publicSmartGroup = $this->callAPISuccess('Contact', 'create', array(
+    $publicSmartGroup = $this->callAPISuccess('Contact', 'create', [
       'id' => $user_id,
-      'group' => array(
+      'group' => [
         $adminStdGroup['id'] => 1,
         $adminSmartGroup['id'] => 1,
         $publicStdGroup['id'] => 1,
         $publicSmartGroup['id'] => 1,
-      ),
-    ));
+      ],
+    ]);
 
     // Run the contact dashboard and assert that only the public groups appear
     // in the variables.
@@ -133,52 +117,52 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
 
     // create admin-only non-smart group
     $adminStdGroupTitle = 'The Admin-only Std Group' . uniqid();
-    $adminStdGroup = $this->callAPISuccess('Group', 'create', array(
+    $adminStdGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $adminStdGroupTitle,
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    ));
+    ]);
     // create public non-smart group
     $publicStdGroupTitle = 'The Public Std Group' . uniqid();
-    $publicStdGroup = $this->callAPISuccess('Group', 'create', array(
+    $publicStdGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $publicStdGroupTitle,
       'visibility' => 'Public Pages',
       'is_active' => 1,
-    ));
+    ]);
     // create second public non-smart group
     $publicStdGroupTitle2 = 'The 2nd Public Std Group' . uniqid();
-    $publicStdGroup2 = $this->callAPISuccess('Group', 'create', array(
+    $publicStdGroup2 = $this->callAPISuccess('Group', 'create', [
       'title' => $publicStdGroupTitle2,
       'visibility' => 'Public Pages',
       'is_active' => 1,
-    ));
+    ]);
 
     // Prepare to create smart groups based on saved criteria Gender = Male.
     // Start by creating the saved search.
-    $savedSearch = $this->callAPISuccess('SavedSearch', 'create', array(
+    $savedSearch = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => 'a:1:{i:0;a:5:{i:0;s:9:"gender_id";i:1;s:1:"=";i:2;i:2;i:3;i:0;i:4;i:0;}}',
-    ));
+    ]);
     // Create contact with Gender - Male
-    $savedSearchContact = $this->individualCreate(array(
+    $savedSearchContact = $this->individualCreate([
       'gender_id' => "Male",
       'first_name' => 'C',
-    ), 1);
+    ], 1);
     // Create admin-only smart group for this saved search.
     $adminSmartGroupTitle = 'The Admin-only Smart Group' . uniqid();
-    $adminSmartGroup = $this->callAPISuccess('Group', 'create', array(
+    $adminSmartGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $adminSmartGroupTitle,
       'visibility' => 'User and User Admin Only',
       'saved_search_id' => $savedSearch['id'],
       'is_active' => 1,
-    ));
+    ]);
     // Create public smart group for this saved search.
     $publicSmartGroupTitle = 'The Public Smart Group' . uniqid();
-    $publicSmartGroup = $this->callAPISuccess('Group', 'create', array(
+    $publicSmartGroup = $this->callAPISuccess('Group', 'create', [
       'title' => $publicSmartGroupTitle,
       'visibility' => 'Public Pages',
       'saved_search_id' => $savedSearch['id'],
       'is_active' => 1,
-    ));
+    ]);
 
     // Get logged in user contact ID.
     $user_id = $this->createLoggedInUser();
@@ -197,15 +181,15 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
     $this->assertNotContains($adminStdGroupTitle, $group_id_field_html, "Group '$adminStdGroupTitle' should not be in listed available groups, but is.");
 
     // Add current user to the test groups.
-    $publicSmartGroup = $this->callAPISuccess('Contact', 'create', array(
+    $publicSmartGroup = $this->callAPISuccess('Contact', 'create', [
       'id' => $user_id,
-      'group' => array(
+      'group' => [
         $adminStdGroup['id'] => 1,
         $adminSmartGroup['id'] => 1,
         $publicStdGroup['id'] => 1,
         $publicSmartGroup['id'] => 1,
-      ),
-    ));
+      ],
+    ]);
 
     // Run the contact dashboard and assert that none of the groups appear
     // in select list of available groups.

@@ -4,7 +4,6 @@ namespace Civi\Token;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Traversable;
 
 class TokenProcessor {
@@ -25,11 +24,15 @@ class TokenProcessor {
    *     automatically from contactId.)
    *   - actionSchedule: DAO, the rule which triggered the mailing
    *     [for CRM_Core_BAO_ActionScheduler].
+   *   - schema: array, a list of fields that will be provided for each row.
+   *     This is automatically populated with any general context
+   *     keys, but you may need to add extra keys for token-row data.
+   *     ex: ['contactId', 'activityId'].
    */
   public $context;
 
   /**
-   * @var EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
   protected $dispatcher;
 
@@ -68,13 +71,23 @@ class TokenProcessor {
    */
   protected $tokens = NULL;
 
+  /**
+   * A list of available tokens formatted for display
+   * @var array
+   *   Array('{' . $dottedName . '}' => 'labelString')
+   */
+  protected $listTokens = NULL;
+
   protected $next = 0;
 
   /**
-   * @param EventDispatcherInterface $dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    * @param array $context
    */
   public function __construct($dispatcher, $context) {
+    $context['schema'] = isset($context['schema'])
+      ? array_unique(array_merge($context['schema'], array_keys($context)))
+      : array_keys($context);
     $this->dispatcher = $dispatcher;
     $this->context = $context;
   }
@@ -91,11 +104,11 @@ class TokenProcessor {
    * @return TokenProcessor
    */
   public function addMessage($name, $value, $format) {
-    $this->messages[$name] = array(
+    $this->messages[$name] = [
       'string' => $value,
       'format' => $format,
       'tokens' => \CRM_Utils_Token::getTokens($value),
-    );
+    ];
     return $this;
   }
 
@@ -106,11 +119,11 @@ class TokenProcessor {
    */
   public function addRow() {
     $key = $this->next++;
-    $this->rowContexts[$key] = array();
-    $this->rowValues[$key] = array(
-      'text/plain' => array(),
-      'text/html' => array(),
-    );
+    $this->rowContexts[$key] = [];
+    $this->rowValues[$key] = [
+      'text/plain' => [],
+      'text/html' => [],
+    ];
 
     return new TokenRow($this, $key);
   }
@@ -146,7 +159,7 @@ class TokenProcessor {
    * @return array
    */
   public function getMessageTokens() {
-    $tokens = array();
+    $tokens = [];
     foreach ($this->messages as $message) {
       $tokens = \CRM_Utils_Array::crmArrayMerge($tokens, $message['tokens']);
     }
@@ -169,6 +182,44 @@ class TokenProcessor {
   }
 
   /**
+   * Get a list of all unique values for a given context field,
+   * whether defined at the processor or row level.
+   *
+   * @param string $field
+   *   Ex: 'contactId'.
+   * @param $subfield
+   * @return array
+   *   Ex: [12, 34, 56].
+   */
+  public function getContextValues($field, $subfield = NULL) {
+    $values = [];
+    if (isset($this->context[$field])) {
+      if ($subfield) {
+        if (isset($this->context[$field]->$subfield)) {
+          $values[] = $this->context[$field]->$subfield;
+        }
+      }
+      else {
+        $values[] = $this->context[$field];
+      }
+    }
+    foreach ($this->getRows() as $row) {
+      if (isset($row->context[$field])) {
+        if ($subfield) {
+          if (isset($row->context[$field]->$subfield)) {
+            $values[] = $row->context[$field]->$subfield;
+          }
+        }
+        else {
+          $values[] = $row->context[$field];
+        }
+      }
+    }
+    $values = array_unique($values);
+    return $values;
+  }
+
+  /**
    * Get the list of available tokens.
    *
    * @return array
@@ -176,11 +227,27 @@ class TokenProcessor {
    */
   public function getTokens() {
     if ($this->tokens === NULL) {
-      $this->tokens = array();
-      $event = new TokenRegisterEvent($this, array('entity' => 'undefined'));
+      $this->tokens = [];
+      $event = new TokenRegisterEvent($this, ['entity' => 'undefined']);
       $this->dispatcher->dispatch(Events::TOKEN_REGISTER, $event);
     }
     return $this->tokens;
+  }
+
+  /**
+   * Get the list of available tokens, formatted for display
+   *
+   * @return array
+   *   Ex: $tokens[ '{token.name}' ] = "Token label"
+   */
+  public function listTokens() {
+    if ($this->listTokens === NULL) {
+      $this->listTokens = [];
+      foreach ($this->getTokens() as $token => $values) {
+        $this->listTokens['{' . $token . '}'] = $values['label'];
+      }
+    }
+    return $this->listTokens;
   }
 
   /**
@@ -211,11 +278,13 @@ class TokenProcessor {
     $row->fill($message['format']);
     $useSmarty = !empty($row->context['smarty']);
 
-    // FIXME preg_callback.
+    /**
+     *@FIXME preg_callback.
+     */
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $flatTokens = array();
+    $flatTokens = [];
     \CRM_Utils_Array::flatten($tokens, $flatTokens, '', '.');
-    $filteredTokens = array();
+    $filteredTokens = [];
     foreach ($flatTokens as $k => $v) {
       $filteredTokens['{' . $k . '}'] = ($useSmarty ? \CRM_Utils_Token::tokenEscapeSmarty($v) : $v);
     }
@@ -237,10 +306,11 @@ class TokenRowIterator extends \IteratorIterator {
 
   /**
    * @param TokenProcessor $tokenProcessor
-   * @param Traversable $iterator
+   * @param \Traversable $iterator
    */
   public function __construct(TokenProcessor $tokenProcessor, Traversable $iterator) {
-    parent::__construct($iterator); // TODO: Change the autogenerated stub
+    // TODO: Change the autogenerated stub
+    parent::__construct($iterator);
     $this->tokenProcessor = $tokenProcessor;
   }
 

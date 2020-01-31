@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -43,7 +27,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The option group name.
@@ -79,9 +63,9 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
     $this->assign('gName', $this->_gName);
     $this->assign('GName', $this->_GName);
 
-    CRM_Utils_System::setTitle(ts('%1 Options', array(1 => $this->_GName)));
+    CRM_Utils_System::setTitle(ts('%1 Options', [1 => $this->_GName]));
 
-    $this->assign('addSurveyType', array("civicrm/admin/campaign/surveyType", "reset=1&action=add"));
+    $this->assign('addSurveyType', ["civicrm/admin/campaign/surveyType", "reset=1&action=add"]);
   }
 
   /**
@@ -102,30 +86,30 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/campaign/surveyType',
           'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit %1', array(1 => $this->_gName)),
-        ),
-        CRM_Core_Action::DISABLE => array(
+          'title' => ts('Edit %1', [1 => $this->_gName]),
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Disable %1', array(1 => $this->_gName)),
-        ),
-        CRM_Core_Action::ENABLE => array(
+          'title' => ts('Disable %1', [1 => $this->_gName]),
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Enable %1', array(1 => $this->_gName)),
-        ),
-        CRM_Core_Action::DELETE => array(
+          'title' => ts('Enable %1', [1 => $this->_gName]),
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/campaign/surveyType',
           'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete %1 Type', array(1 => $this->_gName)),
-        ),
-      );
+          'title' => ts('Delete %1 Type', [1 => $this->_gName]),
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -143,7 +127,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    */
   public function browse() {
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');
-    $groupParams = array('name' => $this->_gName);
+    $groupParams = ['name' => $this->_gName];
     $optionValues = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
 
     foreach ($optionValues as $key => $optionValue) {

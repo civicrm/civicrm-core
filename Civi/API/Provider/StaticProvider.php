@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -44,14 +28,14 @@ class StaticProvider extends AdhocProvider {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::RESOLVE => array(
-        array('onApiResolve', Events::W_MIDDLE),
-      ),
-      Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_MIDDLE),
-      ),
-    );
+    return [
+      Events::RESOLVE => [
+        ['onApiResolve', Events::W_MIDDLE],
+      ],
+      Events::AUTHORIZE => [
+        ['onApiAuthorize', Events::W_MIDDLE],
+      ],
+    ];
   }
 
   /**
@@ -66,21 +50,21 @@ class StaticProvider extends AdhocProvider {
    * @param array $records
    *   List of mock records to be read/updated by API calls.
    */
-  public function __construct($version, $entity, $fields, $perms = array(), $records = array()) {
+  public function __construct($version, $entity, $fields, $perms = [], $records = []) {
     parent::__construct($version, $entity);
 
-    $perms = array_merge(array(
+    $perms = array_merge([
       'create' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'get' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'delete' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
-    ), $perms);
+    ], $perms);
 
-    $this->records = \CRM_Utils_Array::index(array('id'), $records);
+    $this->records = \CRM_Utils_Array::index(['id'], $records);
     $this->fields = $fields;
 
-    $this->addAction('create', $perms['create'], array($this, 'doCreate'));
-    $this->addAction('get', $perms['get'], array($this, 'doGet'));
-    $this->addAction('delete', $perms['delete'], array($this, 'doDelete'));
+    $this->addAction('create', $perms['create'], [$this, 'doCreate']);
+    $this->addAction('get', $perms['get'], [$this, 'doGet']);
+    $this->addAction('delete', $perms['delete'], [$this, 'doDelete']);
   }
 
   /**
@@ -102,7 +86,7 @@ class StaticProvider extends AdhocProvider {
    * @param array $apiRequest
    *   The full description of the API request.
    * @return array
-   *    Formatted API result
+   *   Formatted API result
    * @throws \API_Exception
    */
   public function doCreate($apiRequest) {
@@ -111,7 +95,7 @@ class StaticProvider extends AdhocProvider {
     }
     else {
       $id = max(array_keys($this->records)) + 1;
-      $this->records[$id] = array();
+      $this->records[$id] = [];
     }
 
     if (!isset($this->records[$id])) {
@@ -131,7 +115,7 @@ class StaticProvider extends AdhocProvider {
    * @param array $apiRequest
    *   The full description of the API request.
    * @return array
-   *    Formatted API result
+   *   Formatted API result
    * @throws \API_Exception
    */
   public function doGet($apiRequest) {
@@ -142,7 +126,7 @@ class StaticProvider extends AdhocProvider {
    * @param array $apiRequest
    *   The full description of the API request.
    * @return array
-   *    Formatted API result
+   *   Formatted API result
    * @throws \API_Exception
    */
   public function doDelete($apiRequest) {
@@ -150,7 +134,7 @@ class StaticProvider extends AdhocProvider {
     if ($id && isset($this->records[$id])) {
       unset($this->records[$id]);
     }
-    return civicrm_api3_create_success(array());
+    return civicrm_api3_create_success([]);
   }
 
 }

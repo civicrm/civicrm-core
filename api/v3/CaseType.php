@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -52,8 +36,10 @@ function civicrm_api3_case_type_create($params) {
   }
   // This is an existing case-type.
   if (!empty($params['id']) && isset($params['definition'])
-    && !CRM_Case_BAO_CaseType::isForked($params['id']) // which is not yet forked
-    && !CRM_Case_BAO_CaseType::isForkable($params['id']) // for which new forks are prohibited
+    // which is not yet forked
+    && !CRM_Case_BAO_CaseType::isForked($params['id'])
+    // for which new forks are prohibited
+    && !CRM_Case_BAO_CaseType::isForkable($params['id'])
   ) {
     unset($params['definition']);
   }
@@ -88,17 +74,17 @@ function civicrm_api3_case_type_get($params) {
  * @return array
  * @throws \CRM_Core_Exception
  */
-function _civicrm_api3_case_type_get_formatResult(&$result, $options = array()) {
+function _civicrm_api3_case_type_get_formatResult(&$result, $options = []) {
   foreach ($result['values'] as $key => &$caseType) {
     if (!empty($caseType['definition'])) {
       list($xml) = CRM_Utils_XML::parseString($caseType['definition']);
-      $caseType['definition'] = $xml ? CRM_Case_BAO_CaseType::convertXmlToDefinition($xml) : array();
+      $caseType['definition'] = $xml ? CRM_Case_BAO_CaseType::convertXmlToDefinition($xml) : [];
     }
     else {
       if (empty($options['return']) || !empty($options['return']['definition'])) {
         $caseTypeName = (isset($caseType['name'])) ? $caseType['name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseType['id'], 'name', 'id', TRUE);
         $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
-        $caseType['definition'] = $xml ? CRM_Case_BAO_CaseType::convertXmlToDefinition($xml) : array();
+        $caseType['definition'] = $xml ? CRM_Case_BAO_CaseType::convertXmlToDefinition($xml) : [];
       }
     }
     $caseType['is_forkable'] = CRM_Case_BAO_CaseType::isForkable($caseType['id']);

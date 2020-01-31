@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting grant *}
@@ -35,12 +19,10 @@
   {else}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
-      {if $context eq 'standalone'}
         <tr class="crm-grant-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html}</td>
         </tr>
-      {/if}
       <tr class="crm-grant-form-block-status_id">
          <td class="label">{$form.status_id.label}</td>
          <td>{$form.status_id.html}</td>
@@ -97,27 +79,11 @@
       </tr>
   </table>
 
-        <div id="customData" class="crm-grant-form-block-custom_data"></div>
-        {*include custom data js file*}
-        {include file="CRM/common/customData.tpl"}
+  {include file="CRM/common/customDataBlock.tpl"}
 
-{literal}
-<script type="text/javascript">
-    CRM.$(function($) {
-        {/literal}
-        CRM.buildCustomData( '{$customDataType}' );
-        {if $customDataSubType}
-        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {/if}
-        {literal}
-    });
-
-</script>
-{/literal}
-
- <div class="crm-grant-form-block-attachment">
-     {include file="CRM/Form/attachment.tpl"}
- </div>
+  <div class="crm-grant-form-block-attachment">
+    {include file="CRM/Form/attachment.tpl"}
+  </div>
 
    {/if}
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

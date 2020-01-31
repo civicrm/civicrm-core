@@ -72,7 +72,7 @@
   <item>
      <path>civicrm/admin/setting/preferences/campaign</path>
      <title>CiviCampaign Component Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Campaign</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
      <desc>Configure global CiviCampaign behaviors.</desc>
      <adminGroup>CiviCampaign</adminGroup>
      <weight>10</weight>

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -71,28 +55,28 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
       $participantPayment->find(TRUE);
     }
     if ($id) {
-      CRM_Utils_Hook::post('edit', 'ParticipantPayment', $id, $participantPayment);
+      CRM_Utils_Hook::post('edit', 'ParticipantPayment', $participantPayment->id, $participantPayment);
     }
     else {
-      CRM_Utils_Hook::post('create', 'ParticipantPayment', NULL, $participantPayment);
+      CRM_Utils_Hook::post('create', 'ParticipantPayment', $participantPayment->id, $participantPayment);
     }
 
     //generally if people are creating participant_payments via the api they won't be setting the line item correctly - we can't help them if they are doing complex transactions
     // but if they have a single line item for the contribution we can assume it should refer to the participant line
-    $lineItemCount = CRM_Core_DAO::singleValueQuery("select count(*) FROM civicrm_line_item WHERE contribution_id = %1", array(
-        1 => array(
-          $participantPayment->contribution_id,
-          'Integer',
-        ),
-      ));
+    $lineItemCount = CRM_Core_DAO::singleValueQuery("select count(*) FROM civicrm_line_item WHERE contribution_id = %1", [
+      1 => [
+        $participantPayment->contribution_id,
+        'Integer',
+      ],
+    ]);
     if ($lineItemCount == 1) {
       $sql = "UPDATE civicrm_line_item li
       SET entity_table = 'civicrm_participant', entity_id = %1
       WHERE contribution_id = %2 AND entity_table = 'civicrm_contribution'";
-      CRM_Core_DAO::executeQuery($sql, array(
-          1 => array($participantPayment->participant_id, 'Integer'),
-          2 => array($participantPayment->contribution_id, 'Integer'),
-        ));
+      CRM_Core_DAO::executeQuery($sql, [
+        1 => [$participantPayment->participant_id, 'Integer'],
+        2 => [$participantPayment->contribution_id, 'Integer'],
+      ]);
     }
 
     return $participantPayment;

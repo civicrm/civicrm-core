@@ -9,12 +9,12 @@ class GenericHookEventTest extends \CiviUnitTestCase {
   }
 
   public function testConstructParams() {
-    $event = GenericHookEvent::create(array(
+    $event = GenericHookEvent::create([
       'ab' => 123,
-      'cd' => array('foo' => 'bar'),
+      'cd' => ['foo' => 'bar'],
       'nothingNull' => NULL,
       'nothingZero' => 0,
-    ));
+    ]);
     $this->assertEquals(123, $event->ab);
     $this->assertEquals('bar', $event->cd['foo']);
     $this->assertTrue($event->hasField('ab'));
@@ -27,8 +27,8 @@ class GenericHookEventTest extends \CiviUnitTestCase {
 
   public function testConstructOrdered() {
     $event = GenericHookEvent::createOrdered(
-      array('alpha', 'beta', 'nothingNull', 'nothingZero'),
-      array(456, array('whiz' => 'bang'), NULL, 0, \CRM_Utils_Hook::$_nullObject)
+      ['alpha', 'beta', 'nothingNull', 'nothingZero'],
+      [456, ['whiz' => 'bang'], NULL, 0, \CRM_Utils_Hook::$_nullObject]
     );
     $this->assertEquals(456, $event->alpha);
     $this->assertEquals('bang', $event->beta['whiz']);
@@ -43,14 +43,14 @@ class GenericHookEventTest extends \CiviUnitTestCase {
 
   public function testDispatch() {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_ghet',
-      array($this, 'hook_civicrm_ghet'));
+      [$this, 'hook_civicrm_ghet']);
     \Civi::service('dispatcher')->addListener('hook_civicrm_ghet',
-      array($this, 'onGhet'));
+      [$this, 'onGhet']);
 
     $roString = 'readonly';
     $rwString = 'readwrite';
-    $roArray = array('readonly');
-    $rwArray = array('readwrite');
+    $roArray = ['readonly'];
+    $rwArray = ['readwrite'];
     $plainObj = new \stdClass();
     $refObj = new \stdClass();
 
@@ -58,11 +58,11 @@ class GenericHookEventTest extends \CiviUnitTestCase {
 
     $this->assertEquals('readonly', $roString);
     $this->assertEquals('readwrite added-string-via-event added-string-via-hook', $rwString);
-    $this->assertEquals(array('readonly'), $roArray);
-    $this->assertEquals(array('readwrite', 'added-to-array-via-event', 'added-to-array-via-hook'), $rwArray);
+    $this->assertEquals(['readonly'], $roArray);
+    $this->assertEquals(['readwrite', 'added-to-array-via-event', 'added-to-array-via-hook'], $rwArray);
     $this->assertEquals('added-to-object-via-hook', $plainObj->prop1);
     $this->assertEquals('added-to-object-via-hook', $refObj->prop2);
-    $this->assertEquals(array('early-running-result', 'late-running-result'), $returnValue);
+    $this->assertEquals(['early-running-result', 'late-running-result'], $returnValue);
   }
 
   /**
@@ -79,7 +79,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
    */
   public function hookStub($roString, &$rwString, $roArray, &$rwArray, $plainObj, &$refObj) {
     return \CRM_Utils_Hook::singleton()->invoke(
-      array('roString', 'rwString', 'roArray', 'rwArray', 'plainObj', 'refObj'),
+      ['roString', 'rwString', 'roArray', 'rwArray', 'plainObj', 'refObj'],
       $roString, $rwString, $roArray, $rwArray, $plainObj, $refObj,
       'civicrm_ghet'
     );
@@ -92,7 +92,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
     $rwArray[] = 'added-to-array-via-hook';
     $plainObj->prop1 = 'added-to-object-via-hook';
     $refObj->prop2 = 'added-to-object-via-hook';
-    return array('late-running-result');
+    return ['late-running-result'];
   }
 
   public function onGhet(GenericHookEvent $e) {
@@ -102,7 +102,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
     $e->rwArray[] = 'added-to-array-via-event';
     $e->plainObj->prop1 = 'added-to-object-via-event';
     $e->refObj->prop2 = 'added-to-object-via-event';
-    $e->addReturnValues(array('early-running-result'));
+    $e->addReturnValues(['early-running-result']);
   }
 
 }

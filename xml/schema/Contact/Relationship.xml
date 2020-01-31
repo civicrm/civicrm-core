@@ -72,6 +72,7 @@
   </foreignKey>
   <field>
     <name>start_date</name>
+    <uniqueName>relationship_start_date</uniqueName>
     <type>date</type>
     <title>Relationship Start Date</title>
     <comment>date when the relationship started</comment>
@@ -83,6 +84,7 @@
   </field>
   <field>
     <name>end_date</name>
+    <uniqueName>relationship_end_date</uniqueName>
     <type>date</type>
     <title>Relationship End Date</title>
     <comment>date when the relationship ended</comment>

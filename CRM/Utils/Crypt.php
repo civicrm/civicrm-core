@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Crypt {
 
@@ -55,6 +39,7 @@ class CRM_Utils_Crypt {
     if (function_exists('mcrypt_module_open') &&
       defined('CIVICRM_SITE_KEY')
     ) {
+      // phpcs:disable
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
       $iv = '00000000000000000000000000000000';
@@ -66,6 +51,7 @@ class CRM_Utils_Crypt {
       mcrypt_generic_deinit($td);
       mcrypt_module_close($td);
     }
+    // phpcs:enable
     return base64_encode($string);
   }
 
@@ -94,6 +80,7 @@ class CRM_Utils_Crypt {
     if (function_exists('mcrypt_module_open') &&
       defined('CIVICRM_SITE_KEY')
     ) {
+      // phpcs:disable
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
       $iv = '00000000000000000000000000000000';
@@ -104,6 +91,7 @@ class CRM_Utils_Crypt {
       $string = rtrim(mdecrypt_generic($td, $string));
       mcrypt_generic_deinit($td);
       mcrypt_module_close($td);
+      // phpcs:enable
     }
 
     return $string;

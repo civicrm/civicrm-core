@@ -1,40 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * Page for displaying Administer CiviCRM Control Panel.
  */
 class CRM_Admin_Page_Admin extends CRM_Core_Page {
+
   /**
    * Run page.
    *
@@ -45,13 +30,13 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
 
     $this->assign('registerSite', htmlspecialchars('https://civicrm.org/register-your-site?src=iam&sid=' . CRM_Utils_System::getSiteID()));
 
-    $groups = array(
+    $groups = [
       'Customize Data and Screens' => ts('Customize Data and Screens'),
       'Communications' => ts('Communications'),
       'Localization' => ts('Localization'),
       'Users and Permissions' => ts('Users and Permissions'),
       'System Settings' => ts('System Settings'),
-    );
+    ];
 
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviContribute', $config->enableComponents)) {
@@ -98,12 +83,14 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
         $adminPanel[$groupId]['title'] = $title;
       }
       else {
-        $adminPanel[$groupId] = array();
+        $adminPanel[$groupId] = [];
         $adminPanel[$groupId]['show'] = '';
         $adminPanel[$groupId]['hide'] = '';
         $adminPanel[$groupId]['title'] = $title;
       }
     }
+
+    CRM_Utils_Hook::alterAdminPanel($adminPanel);
     $this->assign('adminPanel', $adminPanel);
     $this->_showHide->addToTemplate();
     return parent::run();

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
@@ -71,7 +55,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
   public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
-    $contactSQL = array();
+    $contactSQL = [];
 
     $contactSQL[] = "
 SELECT     distinct ca.id
@@ -82,7 +66,7 @@ LEFT  JOIN civicrm_email e ON cat.contact_id = e.contact_id
 LEFT  JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT  JOIN civicrm_option_value ov ON ( ov.option_group_id = og.id )
 WHERE      (
-             ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
+             ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name', 'nick_name'], $queryText)})
              OR
              ({$this->matchText('civicrm_email e', 'email', $queryText)} AND ca.activity_type_id = ov.value AND ov.name IN ('Inbound Email', 'Email') )
            )
@@ -105,23 +89,23 @@ GROUP BY   et.entity_id
     $contactSQL[] = "
 SELECT distinct ca.id
 FROM   civicrm_activity ca
-WHERE  ({$this->matchText('civicrm_activity ca', array('subject', 'details'), $queryText)})
+WHERE  ({$this->matchText('civicrm_activity ca', ['subject', 'details'], $queryText)})
 AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 ";
 
-    $final = array();
+    $final = [];
 
-    $tables = array(
-      'civicrm_activity' => array('fields' => array()),
-      'file' => array(
+    $tables = [
+      'civicrm_activity' => ['fields' => []],
+      'file' => [
         'xparent_table' => 'civicrm_activity',
-      ),
+      ],
       'sql' => $contactSQL,
       'final' => $final,
-    );
+    ];
 
     $this->fillCustomInfo($tables, "( 'Activity' )");
-    return $tables;;
+    return $tables;
   }
 
   /**

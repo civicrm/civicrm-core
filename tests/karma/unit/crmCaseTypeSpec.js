@@ -18,10 +18,6 @@ describe('crmCaseType', function() {
     CRM.resourceUrls = {
       'civicrm': ''
     };
-    // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    CRM.crmCaseType = {
-      'REL_TYPE_CNAME': 'label_b_a'
-    };
     module('crmCaseType');
     module('crmJsonComparator');
     inject(function(crmJsonComparator) {
@@ -190,12 +186,37 @@ describe('crmCaseType', function() {
               "is_active": "1"
             },
             {
+              "id": "10",
+              "name_a_b": "Homeless Services Coordinator is",
+              "label_a_b": "Homeless Services Coordinator is",
+              "name_b_a": "Homeless Services Coordinator",
+              "label_b_a": "Homeless Services Coordinator",
+              "description": "Homeless Services Coordinator",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
+            },
+            {
               "id": "2",
               "name_a_b": "Spouse of",
               "label_a_b": "Spouse of",
               "name_b_a": "Spouse of",
               "label_b_a": "Spouse of",
               "description": "Spousal relationship.",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
+            },
+            // include one where name is different from label
+            {
+              "id": "27",
+              "name_a_b": "GA123ab",
+              "label_a_b": "Guardian Angel is",
+              "name_b_a": "GA123ba",
+              "label_b_a": "Guardian Angel for",
+              "description": "Guardian Angel.",
               "contact_type_a": "Individual",
               "contact_type_b": "Individual",
               "is_reserved": "0",
@@ -326,24 +347,58 @@ describe('crmCaseType', function() {
       expect(scope.defaultAssigneeTypeValues).toEqual(defaultAssigneeTypeValues);
     });
 
-    it('should store the default assignee relationship type options', function() {
-      var defaultRelationshipTypeOptions = _.transform(apiCalls.relTypes.values, function(result, relType) {
-        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
-
-        result.push({
-          label: relType.label_b_a,
-          value: relType.id + '_b_a'
-        });
-
-        if (!isBidirectionalRelationship) {
-          result.push({
-            label: relType.label_a_b,
-            value: relType.id + '_a_b'
-          });
+    it('should compute the relationship type options', function() {
+      var expectedRelationshipTypeOptions = [
+        {
+          "id": "14_a_b",
+          "text": "Benefits Specialist",
+          "xmlName": "Benefits Specialist is"
+        },
+        {
+          "id": "14_b_a",
+          "text": "Benefits Specialist is",
+          "xmlName": "Benefits Specialist"
+        },
+        {
+          "id": "9_a_b",
+          "text": "Case Coordinator",
+          "xmlName": "Case Coordinator is"
+        },
+        {
+          "id": "9_b_a",
+          "text": "Case Coordinator is",
+          "xmlName": "Case Coordinator"
+        },
+        {
+          "id": "10_a_b",
+          "text": "Homeless Services Coordinator",
+          "xmlName": "Homeless Services Coordinator is"
+        },
+        {
+          "id": "10_b_a",
+          "text": "Homeless Services Coordinator is",
+          "xmlName": "Homeless Services Coordinator"
+        },
+        // Bidirectional, so should only have the one direction in the list
+        {
+          "id": "2_a_b",
+          "text": "Spouse of",
+          "xmlName": "Spouse of"
+        },
+        // include one where name is different from label
+        {
+          "id": "27_a_b",
+          "text": "Guardian Angel for",
+          "xmlName": "GA123ab",
+        },
+        {
+          "id": "27_b_a",
+          "text": "Guardian Angel is",
+          "xmlName": "GA123ba",
         }
-      }, []);
+      ];
 
-      expect(scope.defaultRelationshipTypeOptions).toEqual(defaultRelationshipTypeOptions);
+      expect(scope.relationshipTypeOptions).toEqual(expectedRelationshipTypeOptions);
     });
 
     it('addActivitySet should add an activitySet to the case type', function() {
@@ -431,6 +486,241 @@ describe('crmCaseType', function() {
           status: 'Completed',
           default_assignee_type: defaultAssigneeDefaultValue.value
         }]);
+      });
+    });
+
+    describe('when adding a role', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles', function() {
+
+        // This line sort of simulates selecting a relationship type from the
+        // dropdown. It doesn't test that clicking picks the right value to
+        // add, just that if it did then the function that gets called does
+        // the right thing with it.
+        // Note the value returned by the dropdown is "backwards" to match
+        // historically what has been stored in the xml as name, e.g.
+        // for the client perspective direction the dropdown returns the other
+        // direction.
+        // So 9_b_a is "Case Coordinator", which means that they actually
+        // selected "Case Coordinator is".
+        scope.addRole(scope.caseType.definition.caseRoles, '9_b_a');
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Case Coordinator',
+              displayLabel: 'Case Coordinator is'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles when name and label are different', function() {
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displayLabel: 'Guardian Angel is'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles if choose non-client-perspective direction', function() {
+        // again, the dropdown returns the opposite direction
+        scope.addRole(scope.caseType.definition.caseRoles, '10_a_b');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Homeless Services Coordinator is',
+              displayLabel: 'Homeless Services Coordinator'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles non-client-perspective direction name/label different', function() {
+        scope.addRole(scope.caseType.definition.caseRoles, '27_a_b');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ab',
+              displayLabel: 'Guardian Angel for'
+            }
+          ]
+        );
+      });
+
+      it("doesn't add the same role twice", function() {
+        // This is in the mock casetype to start, so check if can add twice.
+        scope.addRole(scope.caseType.definition.caseRoles, '10_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            }
+          ]
+        );
+
+        // Try with name and label different. We already tested one time in
+        // another test so just go straight to twice.
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displayLabel: 'Guardian Angel is'
+            }
+          ]
+        );
+      });
+    });
+
+    describe('when adding a role on-the-fly', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles for unidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "33",
+          "name_a_b": "Some New Type is",
+          "label_a_b": "Some New Type is",
+          "name_b_a": "Some New Type for",
+          "label_b_a": "Some New Type for",
+          "description": "Some New Type",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Some New Type for',
+              displayLabel: 'Some New Type is'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-2)).toEqual(
+          [
+            {
+              xmlName: 'Some New Type is',
+              id: '33_a_b',
+              text: 'Some New Type for'
+            },
+            {
+              xmlName: 'Some New Type for',
+              id: '33_b_a',
+              text: 'Some New Type is'
+            }
+          ]
+        );
+      });
+
+      it('updates the case roles for bidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "34",
+          "name_a_b": "Friend of",
+          "label_a_b": "Friend of",
+          "name_b_a": "Friend of",
+          "label_b_a": "Friend of",
+          "description": "Friend",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Friend of',
+              displayLabel: 'Friend of'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-1)).toEqual(
+          [
+            {
+              xmlName: 'Friend of',
+              id: '34_a_b',
+              text: 'Friend of'
+            }
+          ]
+        );
+
+        // Check that it did NOT add two entries for this bidirectional type
+        expect(scope.relationshipTypeOptions.slice(-2,-1)).not.toEqual(
+          [
+            {
+              xmlName: 'Friend of',
+              id: '34_b_a',
+              text: 'Friend of'
+            }
+          ]
+        );
       });
     });
   });

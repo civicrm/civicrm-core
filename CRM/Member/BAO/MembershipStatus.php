@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -36,8 +20,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
    * Static holder for the default LT.
+   * @var int
    */
-  static $_defaultMembershipStatus = NULL;
+  public static $_defaultMembershipStatus = NULL;
 
   /**
    * Class constructor.
@@ -92,7 +77,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return CRM_Member_BAO_MembershipStatus
    */
   public static function create($params) {
-    $ids = array();
+    $ids = [];
     if (!empty($params['id'])) {
       $ids['membershipStatus'] = $params['id'];
     }
@@ -119,7 +104,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *
    * @return object
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipStatus', $ids));
     if (!$id) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
@@ -136,9 +121,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     // set all other defaults to false.
     if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_membership_status SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query,
-        CRM_Core_DAO::$_nullArray
-      );
+      CRM_Core_DAO::executeQuery($query);
     }
 
     // action is taken depending upon the mode
@@ -157,12 +140,12 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return array
    */
   public static function getDefaults() {
-    return array(
+    return [
       'is_active' => FALSE,
       'is_current_member' => FALSE,
       'is_admin' => FALSE,
       'is_default' => FALSE,
-    );
+    ];
   }
 
   /**
@@ -173,7 +156,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return array
    */
   public static function getMembershipStatus($membershipStatusId) {
-    $statusDetails = array();
+    $statusDetails = [];
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->id = $membershipStatusId;
     if ($membershipStatus->find(TRUE)) {
@@ -194,7 +177,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     //checking if membership status is present in some other table
     $check = FALSE;
 
-    $dependency = array('Membership', 'MembershipLog');
+    $dependency = ['Membership', 'MembershipLog'];
     foreach ($dependency as $name) {
       $baoString = 'CRM_Member_BAO_' . $name;
       $dao = new $baoString();
@@ -212,7 +195,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     }
     $membershipStatus->delete();
     CRM_Member_PseudoConstant::flush('membershipStatus');
-    $membershipStatus->free();
   }
 
   /**
@@ -235,9 +217,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    */
   public static function getMembershipStatusByDate(
     $startDate, $endDate, $joinDate,
-    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = array()
+    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = []
   ) {
-    $membershipDetails = array();
+    $membershipDetails = [];
 
     if (!$statusDate || $statusDate == 'today') {
       $statusDate = getdate();
@@ -255,8 +237,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
     }
 
-    $dates = array('start', 'end', 'join');
-    $events = array('start', 'end');
+    $dates = ['start', 'end', 'join'];
+    $events = ['start', 'end'];
 
     foreach ($dates as $dat) {
       if (${$dat . 'Date'} && ${$dat . 'Date'} != "null") {
@@ -361,11 +343,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     }
     //end fetch
 
-    $membershipStatus->free();
-
     //we bundle the arguments into an array as we can't pass 8 variables to the hook otherwise
     // the membership array might contain the pre-altered settings so we don't want to merge this
-    $arguments = array(
+    $arguments = [
       'start_date' => $startDate,
       'end_date' => $endDate,
       'join_date' => $joinDate,
@@ -374,7 +354,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       'membership_type_id' => $membershipTypeID,
       'start_event' => $startEvent,
       'end_event' => $endEvent,
-    );
+    ];
     CRM_Utils_Hook::alterCalculatedMembershipStatus($membershipDetails, $arguments, $membership);
     return $membershipDetails;
   }
@@ -385,7 +365,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return array
    */
   public static function getMembershipStatusCurrent() {
-    $statusIds = array();
+    $statusIds = [];
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->is_current_member = 1;
     $membershipStatus->find();
@@ -394,7 +374,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     while ($membershipStatus->fetch()) {
       $statusIds[] = $membershipStatus->id;
     }
-    $membershipStatus->free();
     return $statusIds;
   }
 

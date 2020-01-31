@@ -2,27 +2,11 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -47,7 +31,7 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function __construct() {
     // TODO: Think about supporting dynamic tokens like "{action.subscribe.\d+}"
-    parent::__construct('action', array(
+    parent::__construct('action', [
       'subscribeUrl' => ts('Subscribe URL (Action)'),
       'forward' => ts('Forward URL (Action)'),
       'optOut' => ts('Opt-Out (Action)'),
@@ -58,14 +42,15 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
       'resubscribe' => ts('Resubscribe (Action)'),
       'resubscribeUrl' => ts('Resubscribe URL (Action)'),
       'eventQueueId' => ts('Event Queue ID'),
-    ));
+    ]);
   }
 
   /**
    * @inheritDoc
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return !empty($processor->context['mailingId']) || !empty($processor->context['mailing']);
+    return !empty($processor->context['mailingId']) || !empty($processor->context['mailing'])
+      || in_array('mailingId', $processor->context['schema']) || in_array('mailing', $processor->context['schema']);
   }
 
   /**
@@ -85,7 +70,9 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
     // replaceSubscribeInviteTokens().
 
     if (empty($row->context['mailingJobId']) || empty($row->context['mailingActionTarget']['hash'])) {
-      throw new \CRM_Core_Exception("Error: Cannot use action tokens unless context defines mailingJobId and mailingActionTarget.");
+      // Strictly speaking, it doesn't make much sense to generate action-tokens when there's no job ID, but traditional CiviMail
+      // does this in v5.6+ for "Preview" functionality. Relaxing this strictness check ensures parity between newer+older styles.
+      // throw new \CRM_Core_Exception("Error: Cannot use action tokens unless context defines mailingJobId and mailingActionTarget.");
     }
 
     if ($field === 'eventQueueId') {

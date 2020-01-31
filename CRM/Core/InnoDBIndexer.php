@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -43,38 +27,38 @@ class CRM_Core_InnoDBIndexer {
    */
   public static function singleton($fresh = FALSE) {
     if ($fresh || self::$singleton === NULL) {
-      $indices = array(
-        'civicrm_address' => array(
-          array('street_address', 'city', 'postal_code'),
-        ),
-        'civicrm_activity' => array(
-          array('subject', 'details'),
-        ),
-        'civicrm_contact' => array(
-          array('sort_name', 'nick_name', 'display_name'),
-        ),
-        'civicrm_contribution' => array(
-          array('source', 'amount_level', 'trxn_Id', 'invoice_id'),
-        ),
-        'civicrm_email' => array(
-          array('email'),
-        ),
-        'civicrm_membership' => array(
-          array('source'),
-        ),
-        'civicrm_note' => array(
-          array('subject', 'note'),
-        ),
-        'civicrm_participant' => array(
-          array('source', 'fee_level'),
-        ),
-        'civicrm_phone' => array(
-          array('phone'),
-        ),
-        'civicrm_tag' => array(
-          array('name'),
-        ),
-      );
+      $indices = [
+        'civicrm_address' => [
+          ['street_address', 'city', 'postal_code'],
+        ],
+        'civicrm_activity' => [
+          ['subject', 'details'],
+        ],
+        'civicrm_contact' => [
+          ['sort_name', 'nick_name', 'display_name'],
+        ],
+        'civicrm_contribution' => [
+          ['source', 'amount_level', 'trxn_Id', 'invoice_id'],
+        ],
+        'civicrm_email' => [
+          ['email'],
+        ],
+        'civicrm_membership' => [
+          ['source'],
+        ],
+        'civicrm_note' => [
+          ['subject', 'note'],
+        ],
+        'civicrm_participant' => [
+          ['source', 'fee_level'],
+        ],
+        'civicrm_phone' => [
+          ['phone'],
+        ],
+        'civicrm_tag' => [
+          ['name'],
+        ],
+      ];
       $active = Civi::settings()->get('enable_innodb_fts');
       self::$singleton = new self($active, $indices);
     }
@@ -101,9 +85,13 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * @var array (string $table => array $indices)
+   * Indices.
+   *
+   * (string $table => array $indices)
    *
    * ex: $indices['civicrm_contact'][0] = array('first_name', 'last_name');
+   *
+   * @var array
    */
   protected $indices;
 
@@ -115,8 +103,8 @@ class CRM_Core_InnoDBIndexer {
   /**
    * Class constructor.
    *
-   * @param $isActive
-   * @param $indices
+   * @param bool $isActive
+   * @param array $indices
    */
   public function __construct($isActive, $indices) {
     $this->isActive = $isActive;
@@ -156,7 +144,7 @@ class CRM_Core_InnoDBIndexer {
       foreach ($this->indices[$table] as $idxFields) {
         // TODO determine if $idxFields must be exact match or merely a subset
         // if (sort($fields) == sort($idxFields)) {
-        if (array_diff($fields, $idxFields) == array()) {
+        if (array_diff($fields, $idxFields) == []) {
           return TRUE;
         }
       }
@@ -177,19 +165,26 @@ class CRM_Core_InnoDBIndexer {
     if (version_compare($mysqlVersion, '5.6', '<')) {
       // If we're not on 5.6+, then there cannot be any InnoDB FTS indices!
       // Also: information_schema.innodb_sys_indexes is only available on 5.6+.
-      return array();
+      return [];
     }
 
     // Note: this only works in MySQL 5.6,  but this whole system is intended to only work in MySQL 5.6
+    // Note: In MYSQL 8 the Tables have been renamed from INNODB_SYS_TABLES and INNODB_SYS_INDEXES to INNODB_TABLES and INNODB_INDEXES
+    $innodbTable = "innodb_sys_tables";
+    $innodbIndex = "innodb_sys_indexes";
+    if (version_compare($mysqlVersion, '8.0', '>=')) {
+      $innodbTable = "innodb_tables";
+      $innodbIndex = "innodb_indexes";
+    }
     $sql = "
-      SELECT i.name as index_name
-      FROM information_schema.innodb_sys_tables t
-      JOIN information_schema.innodb_sys_indexes i USING (table_id)
+      SELECT i.name as `index_name`
+      FROM information_schema.$innodbTable t
+      JOIN information_schema.$innodbIndex i USING (table_id)
       WHERE t.name = concat(database(),'/$table')
       AND i.name like '" . self::IDX_PREFIX . "%'
       ";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $indexNames = array();
+    $indexNames = [];
     while ($dao->fetch()) {
       $indexNames[$dao->index_name] = $dao->index_name;
     }
@@ -206,7 +201,8 @@ class CRM_Core_InnoDBIndexer {
    *   (string $indexName => string $sql)
    */
   public function buildIndexSql($table) {
-    $sqls = array(); // array (string $idxName => string $sql)
+    // array (string $idxName => string $sql)
+    $sqls = [];
     if ($this->isActive && isset($this->indices[$table])) {
       foreach ($this->indices[$table] as $fields) {
         $name = self::IDX_PREFIX . md5($table . '::' . implode(',', $fields));
@@ -225,7 +221,7 @@ class CRM_Core_InnoDBIndexer {
    *   (string $idxName => string $sql)
    */
   public function dropIndexSql($table) {
-    $sqls = array();
+    $sqls = [];
     $names = $this->findActualFtsIndexNames($table);
     foreach ($names as $name) {
       $sqls[$name] = sprintf("DROP INDEX %s ON %s", $name, $table);
@@ -250,7 +246,7 @@ class CRM_Core_InnoDBIndexer {
       array_keys($buildIndexSqls)
     ));
 
-    $todoSqls = array();
+    $todoSqls = [];
     foreach ($allIndexNames as $indexName) {
       if (isset($buildIndexSqls[$indexName]) && isset($dropIndexSqls[$indexName])) {
         // already exists
@@ -272,7 +268,7 @@ class CRM_Core_InnoDBIndexer {
    * @return array
    */
   public function normalizeIndices($indices) {
-    $result = array();
+    $result = [];
     foreach ($indices as $table => $indicesByTable) {
       foreach ($indicesByTable as $k => $fields) {
         sort($fields);

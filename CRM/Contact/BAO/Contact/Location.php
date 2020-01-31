@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_Contact_Location {
 
@@ -46,20 +30,33 @@ class CRM_Contact_BAO_Contact_Location {
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
     $params = array(
-      'location_type_id' => $locationTypeID,
       'contact_id' => $id,
-      'return' => array('contact_id.display_name', 'email', 'location_type_id', 'id'),
+      'return' => array('display_name', 'email.email'),
+      'api.Email.get' => array(
+        'location_type_id' => $locationTypeID,
+        'sequential' => 0,
+        'return' => array('email', 'location_type_id', 'id'),
+      ),
     );
     if ($isPrimary) {
-      $params['is_primary'] = 1;
+      $params['api.Email.get']['is_primary'] = 1;
     }
-    $emails = civicrm_api3('Email', 'get', $params);
 
-    if ($emails['count'] > 0) {
-      $email = reset($emails['values']);
-      return array($email['contact_id.display_name'], $email['email'], $email['location_type_id'], $email['id']);
+    $contacts = civicrm_api3('Contact', 'get', $params);
+    if ($contacts['count'] > 0) {
+      $contact = reset($contacts['values']);
+      if ($contact['api.Email.get']['count'] > 0) {
+        $email = reset($contact['api.Email.get']['values']);
+      }
     }
-    return array(NULL, NULL, NULL, NULL);
+    $returnParams = array(
+      (isset($contact['display_name'])) ? $contact['display_name'] : NULL,
+      (isset($email['email'])) ? $email['email'] : NULL,
+      (isset($email['location_type_id'])) ? $email['location_type_id'] : NULL,
+      (isset($email['id'])) ? $email['id'] : NULL,
+    );
+
+    return $returnParams;
   }
 
   /**
@@ -77,7 +74,7 @@ class CRM_Contact_BAO_Contact_Location {
   public static function getPhoneDetails($id, $type = NULL) {
     CRM_Core_Error::deprecatedFunctionWarning('Phone.get API instead');
     if (!$id) {
-      return array(NULL, NULL);
+      return [NULL, NULL];
     }
 
     $cond = NULL;
@@ -93,12 +90,12 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
           $cond
       AND civicrm_contact.id = %1";
 
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     if ($dao->fetch()) {
-      return array($dao->display_name, $dao->phone, $dao->do_not_sms);
+      return [$dao->display_name, $dao->phone, $dao->do_not_sms];
     }
-    return array(NULL, NULL, NULL);
+    return [NULL, NULL, NULL];
   }
 
   /**
@@ -142,22 +139,22 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
 AND civicrm_address.geo_code_2 IS NOT NULL
 AND civicrm_contact.id IN $idString ";
 
-    $params = array();
+    $params = [];
     if (!$locationTypeID) {
       $sql .= " AND civicrm_address.is_primary = 1";
     }
     else {
       $sql .= " AND civicrm_address.location_type_id = %1";
-      $params[1] = array($locationTypeID, 'Integer');
+      $params[1] = [$locationTypeID, 'Integer'];
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
-    $locations = array();
+    $locations = [];
     $config = CRM_Core_Config::singleton();
 
     while ($dao->fetch()) {
-      $location = array();
+      $location = [];
       $location['contactID'] = $dao->contact_id;
       $location['displayName'] = addslashes($dao->display_name);
       $location['city'] = $dao->city;
@@ -169,19 +166,19 @@ AND civicrm_contact.id IN $idString ";
       $address = '';
 
       CRM_Utils_String::append($address, '<br />',
-        array(
+        [
           $dao->street_address,
           $dao->supplemental_address_1,
           $dao->supplemental_address_2,
           $dao->supplemental_address_3,
           $dao->city,
-        )
+        ]
       );
       CRM_Utils_String::append($address, ', ',
-        array($dao->state, $dao->postal_code)
+        [$dao->state, $dao->postal_code]
       );
       CRM_Utils_String::append($address, '<br /> ',
-        array($dao->country)
+        [$dao->country]
       );
       $location['address'] = addslashes($address);
       $location['displayAddress'] = str_replace('<br />', ', ', addslashes($address));

@@ -44,7 +44,7 @@ switch (@$argv[2]) {
 echo "Changing version from $oldVersion to $newVersion...\n";
 
 $verName = makeVerName($newVersion);
-$phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function() use ($verName) {
+$phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function () use ($verName) {
   ob_start();
   global $camelNumber;
   $camelNumber = $verName;
@@ -53,7 +53,7 @@ $phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function() use
   return ob_get_clean();
 });
 
-$sqlFile = initFile("CRM/Upgrade/Incremental/sql/{$newVersion}.mysql.tpl", function() use ($newVersion) {
+$sqlFile = initFile("CRM/Upgrade/Incremental/sql/{$newVersion}.mysql.tpl", function () use ($newVersion) {
   return "{* file to handle db changes in $newVersion during upgrade *}\n";
 });
 

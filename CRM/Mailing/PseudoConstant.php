@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -75,6 +59,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Default component id's, indexed by component type
+   * @var array
    */
   private static $defaultComponent;
 
@@ -89,11 +74,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function abStatus() {
     if (!is_array(self::$abStatus)) {
-      self::$abStatus = array(
+      self::$abStatus = [
         'Draft' => ts('Draft'),
         'Testing' => ts('Testing'),
         'Final' => ts('Final'),
-      );
+      ];
     }
     return self::$abStatus;
   }
@@ -103,11 +88,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function abTestCriteria() {
     if (!is_array(self::$abTestCriteria)) {
-      self::$abTestCriteria = array(
+      self::$abTestCriteria = [
         'subject' => ts('Test different "Subject" lines'),
         'from' => ts('Test different "From" lines'),
         'full_email' => ts('Test entirely different emails'),
-      );
+      ];
     }
     return self::$abTestCriteria;
   }
@@ -117,11 +102,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function abWinnerCriteria() {
     if (!is_array(self::$abWinnerCriteria)) {
-      self::$abWinnerCriteria  = array(
+      self::$abWinnerCriteria = [
         'open' => ts('Open'),
         'unique_click' => ts('Total Unique Clicks'),
         'link_click' => ts('Total Clicks on a particular link'),
-      );
+      ];
     }
     return self::$abWinnerCriteria;
   }
@@ -131,11 +116,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function mailingTypes() {
     if (!is_array(self::$mailingTypes)) {
-      self::$mailingTypes  = array(
+      self::$mailingTypes = [
         'standalone' => ts('Standalone'),
         'experiment' => ts('Experimental'),
         'winner' => ts('Winner'),
-      );
+      ];
     }
     return self::$mailingTypes;
   }
@@ -154,7 +139,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
     if (!self::$component || !array_key_exists($name, self::$component)) {
       if (!self::$component) {
-        self::$component = array();
+        self::$component = [];
       }
       if (!$type) {
         self::$component[$name] = NULL;
@@ -162,7 +147,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
       }
       else {
         // we need to add an additional filter for $type
-        self::$component[$name] = array();
+        self::$component[$name] = [];
 
         $object = new CRM_Mailing_BAO_MailingComponent();
         $object->component_type = $type;
@@ -200,7 +185,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
       $dao = CRM_Core_DAO::executeQuery($queryDefaultComponents);
 
-      self::$defaultComponent = array();
+      self::$defaultComponent = [];
       while ($dao->fetch()) {
         self::$defaultComponent[$dao->component_type] = $dao->id;
       }
@@ -258,28 +243,28 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function &yesNoOptions($field) {
     static $options;
     if (!$options) {
-      $options = array(
-        'bounce' => array(
+      $options = [
+        'bounce' => [
           'N' => ts('Successful '),
           'Y' => ts('Bounced '),
-        ),
-        'delivered' => array(
+        ],
+        'delivered' => [
           'Y' => ts('Successful '),
           'N' => ts('Bounced '),
-        ),
-        'open' => array(
+        ],
+        'open' => [
           'Y' => ts('Opened '),
           'N' => ts('Unopened/Hidden '),
-        ),
-        'click' => array(
+        ],
+        'click' => [
           'Y' => ts('Clicked '),
           'N' => ts('Not Clicked '),
-        ),
-        'reply' => array(
+        ],
+        'reply' => [
           'Y' => ts('Replied '),
           'N' => ts('No Reply '),
-        ),
-      );
+        ],
+      ];
     }
     return $options[$field];
   }

@@ -36,14 +36,24 @@
     <default>NULL</default>
     <required>false</required>
     <comment>date on which this job was scheduled.</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>start_date</name>
+    <uniqueName>mailing_job_start_date</uniqueName>
+    <uniqueTitle>Mailing Start Date</uniqueTitle>
     <title>Mailing Job Start Date</title>
     <type>timestamp</type>
     <default>NULL</default>
     <required>false</required>
     <comment>date on which this job was started.</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>end_date</name>
@@ -52,9 +62,14 @@
     <default>NULL</default>
     <required>false</required>
     <comment>date on which this job ended.</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>status</name>
+    <uniqueName>mailing_job_status</uniqueName>
     <title>Mailing Job Status</title>
     <type>varchar</type>
     <length>12</length>

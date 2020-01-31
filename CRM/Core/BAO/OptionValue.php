@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
@@ -53,9 +37,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     if (empty($params['id'])) {
       self::setDefaults($params);
     }
-    $ids = array();
+    $ids = [];
     if (!empty($params['id'])) {
-      $ids = array('optionValue' => $params['id']);
+      $ids = ['optionValue' => $params['id']];
     }
     return CRM_Core_BAO_OptionValue::add($params, $ids);
   }
@@ -100,7 +84,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    */
   public static function getDefaultWeight($params) {
     return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-      array('option_group_id' => $params['option_group_id']));
+      ['option_group_id' => $params['option_group_id']]);
   }
 
   /**
@@ -169,7 +153,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @return \CRM_Core_DAO_OptionValue
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('optionValue', $ids));
     // CRM-10921: do not reset attributes to default if this is an update
     //@todo consider if defaults are being set in the right place. 'dumb' defaults like
@@ -213,7 +197,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
         }
       }
 
-      $p = array(1 => array($params['option_group_id'], 'Integer'));
+      $p = [1 => [$params['option_group_id'], 'Integer']];
       CRM_Core_DAO::executeQuery($query, $p);
     }
 
@@ -244,13 +228,13 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue->save();
     CRM_Core_PseudoConstant::flush();
 
-    // Create relationship for payment intrument options
+    // Create relationship for payment instrument options
     if (!empty($params['financial_account_id'])) {
       $optionName = civicrm_api3('OptionGroup', 'getvalue', [
         'return' => 'name',
         'id' => $params['option_group_id'],
       ]);
-      // Only create relationship for payment intrument options
+      // Only create relationship for payment instrument options
       if ($optionName == 'payment_instrument') {
         $relationTypeId = civicrm_api3('OptionValue', 'getvalue', [
           'return' => 'value',
@@ -311,7 +295,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
     $dao->fetch();
 
-    return array($dao->label, $dao->description);
+    return [$dao->label, $dao->description];
   }
 
   /**
@@ -355,18 +339,18 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
     // get the proper group name & affected field name
     // todo: this may no longer be needed for individuals - check inputs
-    $individuals = array(
+    $individuals = [
       'gender' => 'gender_id',
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
       'communication_style' => 'communication_style_id',
       // Not only Individuals -- but the code seems to be generic for all contact types, despite the naming...
-    );
-    $contributions = array('payment_instrument' => 'payment_instrument_id');
-    $activities = array('activity_type' => 'activity_type_id');
-    $participant = array('participant_role' => 'role_id');
-    $eventType = array('event_type' => 'event_type_id');
-    $aclRole = array('acl_role' => 'acl_role_id');
+    ];
+    $contributions = ['payment_instrument' => 'payment_instrument_id'];
+    $activities = ['activity_type' => 'activity_type_id'];
+    $participant = ['participant_role' => 'role_id'];
+    $eventType = ['event_type' => 'event_type_id'];
+    $aclRole = ['acl_role' => 'acl_role_id'];
 
     $all = array_merge($individuals, $contributions, $activities, $participant, $eventType, $aclRole);
     $fieldName = '';
@@ -480,7 +464,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
         $optionValue->weight = $opWeight;
         $optionValue->save();
       }
-      $optionValue->free();
     }
   }
 
@@ -506,9 +489,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $dao->orderBy('weight ASC, label ASC');
       $dao->find();
 
-      $optionValues = array();
+      $optionValues = [];
       while ($dao->fetch()) {
-        $optionValues[$dao->id] = array();
+        $optionValues[$dao->id] = [];
         CRM_Core_DAO::storeValues($dao, $optionValues[$dao->id]);
       }
 
@@ -531,7 +514,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   public static function getOptionValuesAssocArray($optionGroupID) {
     $optionValues = self::getOptionValuesArray($optionGroupID);
 
-    $options = array();
+    $options = [];
     foreach ($optionValues as $id => $value) {
       $options[$value['value']] = $value['label'];
     }
@@ -556,7 +539,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $dao->find(TRUE);
     $optionValues = self::getOptionValuesArray($dao->id);
 
-    $options = array();
+    $options = [];
     foreach ($optionValues as $id => $value) {
       $options[$value['value']] = $value['label'];
     }
@@ -575,12 +558,12 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @return array the option value attributes.
    */
   public static function ensureOptionValueExists($params) {
-    $result = civicrm_api3('OptionValue', 'get', array(
+    $result = civicrm_api3('OptionValue', 'get', [
       'option_group_id' => $params['option_group_id'],
       'name' => $params['name'],
       'return' => ['id', 'value'],
       'sequential' => 1,
-    ));
+    ]);
 
     if (!$result['count']) {
       $result = civicrm_api3('OptionValue', 'create', $params);

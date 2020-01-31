@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 namespace Civi\API;
@@ -62,7 +46,7 @@ class Request {
     $version = \CRM_Utils_Array::value('version', $params);
     switch ($version) {
       default:
-        $apiRequest = array();
+        $apiRequest = [];
         $apiRequest['id'] = self::$nextId++;
         $apiRequest['version'] = (int) $version;
         $apiRequest['params'] = $params;
@@ -73,7 +57,7 @@ class Request {
         return $apiRequest;
 
       case 4:
-        $callable = array("Civi\\Api4\\$entity", $action);
+        $callable = ["Civi\\Api4\\$entity", $action];
         if (!is_callable($callable)) {
           throw new Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
         }
@@ -113,6 +97,10 @@ class Request {
    */
   public static function normalizeActionName($action, $version) {
     return strtolower(\CRM_Utils_String::munge($action));
+  }
+
+  public static function getNextId() {
+    return self::$nextId++;
   }
 
 }

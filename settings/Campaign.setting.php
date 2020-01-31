@@ -1,42 +1,26 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
  * Settings metadata file
  */
 
-return array(
-  'tag_unconfirmed' => array(
+return [
+  'tag_unconfirmed' => [
     'group_name' => 'Campaign Preferences',
     'group' => 'campaign',
     'name' => 'tag_unconfirmed',
@@ -49,8 +33,9 @@ return array(
     'is_contact' => 0,
     'description' => ts('If set, new contacts that are created when signing a petition are assigned a tag of this name.'),
     'help_text' => '',
-  ),
-  'petition_contacts' => array(
+    'settings_pages' => ['campaign' => ['weight' => 10]],
+  ],
+  'petition_contacts' => [
     'group_name' => 'Campaign Preferences',
     'group' => 'campaign',
     'name' => 'petition_contacts',
@@ -63,6 +48,7 @@ return array(
     'is_contact' => 0,
     'description' => ts('All contacts that have signed a CiviCampaign petition will be added to this group. The group will be created if it does not exist (it is required for email verification).'),
     'help_text' => '',
-  ),
+    'settings_pages' => ['campaign' => ['weight' => 20]],
+  ],
 
-);
+];

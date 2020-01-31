@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -84,13 +68,14 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @return array
    *   reference to the array of default values
    */
+
   /**
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (isset($this->_activityId)) {
-      $params = array('id' => $this->_activityId);
+      $params = ['id' => $this->_activityId];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
       $defaults['html_message'] = CRM_Utils_Array::value('details', $defaults);
     }
@@ -117,42 +102,41 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->add('checkbox', 'thankyou_update', ts('Update thank-you dates for these contributions'), FALSE);
 
     // Group options for tokens are not yet implemented. dgg
-    $options = array(
+    $options = [
       '' => ts('- no grouping -'),
       'contact_id' => ts('Contact'),
       'contribution_recur_id' => ts('Contact and Recurring'),
       'financial_type_id' => ts('Contact and Financial Type'),
       'campaign_id' => ts('Contact and Campaign'),
       'payment_instrument_id' => ts('Contact and Payment Method'),
-    );
-    $this->addElement('select', 'group_by', ts('Group contributions by'), $options, array(), "<br/>", FALSE);
+    ];
+    $this->addElement('select', 'group_by', ts('Group contributions by'), $options, [], "<br/>", FALSE);
     // this was going to be free-text but I opted for radio options in case there was a script injection risk
-    $separatorOptions = array('comma' => 'Comma', 'td' => 'Horizontal Table Cell', 'tr' => 'Vertical Table Cell', 'br' => 'Line Break');
+    $separatorOptions = ['comma' => 'Comma', 'td' => 'Horizontal Table Cell', 'tr' => 'Vertical Table Cell', 'br' => 'Line Break'];
 
     $this->addElement('select', 'group_by_separator', ts('Separator (grouped contributions)'), $separatorOptions);
-    $emailOptions = array(
+    $emailOptions = [
       '' => ts('Generate PDFs for printing (only)'),
       'email' => ts('Send emails where possible. Generate printable PDFs for contacts who cannot receive email.'),
       'both' => ts('Send emails where possible. Generate printable PDFs for all contacts.'),
-    );
+    ];
     if (CRM_Core_Config::singleton()->doNotAttachPDFReceipt) {
       $emailOptions['pdfemail'] = ts('Send emails with an attached PDF where possible. Generate printable PDFs for contacts who cannot receive email.');
       $emailOptions['pdfemail_both'] = ts('Send emails with an attached PDF where possible. Generate printable PDFs for all contacts.');
     }
-    $this->addElement('select', 'email_options', ts('Print and email options'), $emailOptions, array(), "<br/>", FALSE);
+    $this->addElement('select', 'email_options', ts('Print and email options'), $emailOptions, [], "<br/>", FALSE);
 
-    $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Make Thank-you Letters'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Make Thank-you Letters'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Done'),
+      ],
+    ]);
 
   }
 

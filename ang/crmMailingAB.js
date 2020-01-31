@@ -32,6 +32,9 @@
         templateUrl: '~/crmMailingAB/EditCtrl/main.html',
         controller: 'CrmMailingABEditCtrl',
         resolve: {
+          mailingFields: function(crmMetadata) {
+            return crmMetadata.getFields('Mailing');
+          },
           abtest: function($route, CrmMailingAB) {
             var abtest = new CrmMailingAB($route.current.params.id == 'new' ? null : $route.current.params.id);
             return abtest.load();

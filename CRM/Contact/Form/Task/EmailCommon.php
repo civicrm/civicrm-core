@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -124,6 +108,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     if (count($form->_contactIds) > 1) {
       $form->_single = FALSE;
     }
+    CRM_Contact_Form_Task_EmailCommon::bounceIfSimpleMailLimitExceeded(count($form->_contactIds));
 
     $emailAttributes = array(
       'class' => 'huge',
@@ -315,7 +300,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     );
 
     //add followup date
-    $form->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
+    $form->add('datepicker', 'followup_date', ts('in'));
 
     foreach ($fields as $field => $values) {
       if (!empty($fields[$field])) {
@@ -399,13 +384,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     // dev/core#357 User Emails are keyed by their id so that the Signature is able to be added
     // If we have had a contact email used here the value returned from the line above will be the
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>
-    if (is_numeric($from)) {
-      $result = civicrm_api3('Email', 'get', [
-        'id' => $from,
-        'return' => ['contact_id.display_name', 'email'],
-      ]);
-      $from = '"' . $result['values'][$from]['contact_id.display_name'] . '" <' . $result['values'][$from]['email'] . '>';
-    }
+    $from = CRM_Utils_Mail::formatFromAddress($from);
     $subject = $formValues['subject'];
 
     // CRM-13378: Append CC and BCC information at the end of Activity Details and format cc and bcc fields
@@ -497,7 +476,8 @@ class CRM_Contact_Form_Task_EmailCommon {
       array_keys($form->_toContactDetails),
       $additionalDetails,
       $contributionIds,
-      CRM_Utils_Array::value('campaign_id', $formValues)
+      CRM_Utils_Array::value('campaign_id', $formValues),
+      $form->getVar('_caseId')
     );
 
     $followupStatus = '';
@@ -507,7 +487,6 @@ class CRM_Contact_Form_Task_EmailCommon {
         $params['followup_activity_type_id'] = $formValues['followup_activity_type_id'];
         $params['followup_activity_subject'] = $formValues['followup_activity_subject'];
         $params['followup_date'] = $formValues['followup_date'];
-        $params['followup_date_time'] = $formValues['followup_date_time'];
         $params['target_contact_id'] = $form->_contactIds;
         $params['followup_assignee_contact_id'] = explode(',', $formValues['followup_assignee_contact_id']);
         $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);
@@ -532,9 +511,9 @@ class CRM_Contact_Form_Task_EmailCommon {
 
       $count_success = count($form->_toContactDetails);
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', array(
-            'plural' => '%count messages were sent successfully. ',
-            'count' => $count_success,
-          )) . $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
+        'plural' => '%count messages were sent successfully. ',
+        'count' => $count_success,
+      )) . $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
     }
 
     // Display the name and number of contacts for those email is not sent.
@@ -553,9 +532,9 @@ class CRM_Contact_Form_Task_EmailCommon {
       }
       $status = '(' . ts('because no email address on file or communication preferences specify DO NOT EMAIL or Contact is deceased or Primary email address is On Hold') . ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array(
-            'count' => count($emailsNotSent),
-            'plural' => '%count Messages Not Sent',
-          )), 'info');
+        'count' => count($emailsNotSent),
+        'plural' => '%count Messages Not Sent',
+      )), 'info');
     }
 
     if (isset($form->_caseId)) {

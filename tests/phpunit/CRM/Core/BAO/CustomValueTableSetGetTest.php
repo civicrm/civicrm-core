@@ -14,43 +14,43 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
    * Test setValues() and GetValues() methods with custom Date field
    */
   public function testSetGetValuesDate() {
-    $params = array();
+    $params = [];
     $contactID = $this->individualCreate();
 
     //create Custom Group
-    $customGroup = $this->customGroupCreate(array('is_multiple' => 1));
+    $customGroup = $this->customGroupCreate(['is_multiple' => 1]);
 
     //create Custom Field of data type Date
-    $fields = array(
+    $fields = [
       'custom_group_id' => $customGroup['id'],
       'data_type' => 'Date',
       'html_type' => 'Select Date',
       'default_value' => '',
-    );
+    ];
     $customField = $this->customFieldCreate($fields);
 
     // Retrieve the field ID for sample custom field 'test_Date'
-    $params = array('label' => 'test_Date');
-    $field = array();
+    $params = ['label' => 'test_Date'];
+    $field = [];
 
     CRM_Core_BAO_CustomField::retrieve($params, $field);
     $fieldID = $customField['id'];
 
     // Set test_Date to a valid date value
     $date = '20080608000000';
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => $date,
-    );
+    ];
     $result = CRM_Core_BAO_CustomValueTable::setValues($params);
     $this->assertEquals($result['is_error'], 0, 'Verify that is_error = 0 (success).');
 
     // Check that the date value is stored
-    $values = array();
-    $params = array(
+    $values = [];
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => 1,
-    );
+    ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
 
     $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
@@ -61,10 +61,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
     // Now set test_Date to an invalid date value and try to reset
     $badDate = '20080631000000';
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => $badDate,
-    );
+    ];
 
     CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
@@ -79,10 +79,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     // Check that an exception has been thrown
     $this->assertNotNull($message, 'Verify than an exception is thrown when bad date is passed');
 
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => 1,
-    );
+    ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
     $this->assertEquals($values['custom_' . $fieldID . '_1'],
       CRM_Utils_Date::mysqlToIso($date),
@@ -90,17 +90,17 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     );
 
     // Test setting test_Date to null
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => NULL,
-    );
+    ];
     $result = CRM_Core_BAO_CustomValueTable::setValues($params);
 
     // Check that the date value is empty
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => 1,
-    );
+    ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
     $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
 
@@ -116,20 +116,20 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
   public function testSetGetValuesYesNoRadio() {
     $contactID = $this->individualCreate();
 
-    $customGroup = $this->customGroupCreate(array('is_multiple' => 1));
+    $customGroup = $this->customGroupCreate(['is_multiple' => 1]);
 
     //create Custom Field of type YesNo(Boolean) Radio
-    $fields = array(
+    $fields = [
       'custom_group_id' => $customGroup['id'],
       'data_type' => 'Boolean',
       'html_type' => 'Radio',
       'default_value' => '',
-    );
+    ];
     $customField = $this->customFieldCreate($fields);
 
     // Retrieve the field ID for sample custom field 'test_Boolean'
-    $params = array('label' => 'test_Boolean');
-    $field = array();
+    $params = ['label' => 'test_Boolean'];
+    $field = [];
 
     //get field Id
     CRM_Core_BAO_CustomField::retrieve($params, $field);
@@ -138,19 +138,19 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
     // valid boolean value '1' for Boolean Radio
     $yesNo = '1';
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => $yesNo,
-    );
+    ];
     $result = CRM_Core_BAO_CustomValueTable::setValues($params);
 
     $this->assertEquals($result['is_error'], 0, 'Verify that is_error = 0 (success).');
 
     // Check that the YesNo radio value is stored
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => 1,
-    );
+    ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
 
     $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
@@ -160,10 +160,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
     // Now set YesNo radio to an invalid boolean value and try to reset
     $badYesNo = '20';
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => $badYesNo,
-    );
+    ];
 
     CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
@@ -178,10 +178,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     // Check that an exception has been thrown
     $this->assertNotNull($message, 'Verify than an exception is thrown when bad boolean is passed');
 
-    $params = array(
+    $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => 1,
-    );
+    ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
 
     $this->assertEquals($values["custom_{$fieldID}_1"], $yesNo,

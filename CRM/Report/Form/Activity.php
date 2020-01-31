@@ -1,43 +1,27 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Activity extends CRM_Report_Form {
-  protected $_selectAliasesTotal = array();
+  protected $_selectAliasesTotal = [];
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Activity',
-  );
+  ];
 
-  protected $_nonDisplayFields = array();
+  protected $_nonDisplayFields = [];
 
   /**
    * This report has not been optimised for group filtering.
@@ -66,9 +50,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     $caseEnabled = in_array("CiviCase", $config->enableComponents);
     if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
       $this->engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
     }
 
@@ -94,286 +75,296 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     // @todo split the 3 different contact tables into their own array items.
     // this will massively simplify the needs of this report.
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'contact_source' => array(
+        'fields' => [
+          'contact_source' => [
             'name' => 'sort_name',
             'title' => ts('Source Name'),
             'alias' => 'civicrm_contact_source',
             'no_repeat' => TRUE,
-          ),
-          'contact_assignee' => array(
+          ],
+          'contact_assignee' => [
             'name' => 'sort_name',
             'title' => ts('Assignee Name'),
             'alias' => 'civicrm_contact_assignee',
             'dbAlias' => "civicrm_contact_assignee.sort_name",
             'default' => TRUE,
-          ),
-          'contact_target' => array(
+          ],
+          'contact_target' => [
             'name' => 'sort_name',
             'title' => ts('Target Name'),
             'alias' => 'civicrm_contact_target',
             'dbAlias' => "civicrm_contact_target.sort_name",
             'default' => TRUE,
-          ),
-          'contact_source_id' => array(
+          ],
+          'contact_source_id' => [
             'name' => 'id',
             'alias' => 'civicrm_contact_source',
             'dbAlias' => "civicrm_contact_source.id",
             'no_display' => TRUE,
             'default' => TRUE,
             'required' => TRUE,
-          ),
-          'contact_assignee_id' => array(
+          ],
+          'contact_assignee_id' => [
             'name' => 'id',
             'alias' => 'civicrm_contact_assignee',
             'dbAlias' => "civicrm_contact_assignee.id",
             'no_display' => TRUE,
             'default' => TRUE,
             'required' => TRUE,
-          ),
-          'contact_target_id' => array(
+          ],
+          'contact_target_id' => [
             'name' => 'id',
             'alias' => 'civicrm_contact_target',
             'dbAlias' => "civicrm_contact_target.id",
             'no_display' => TRUE,
             'default' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'contact_source' => array(
+          ],
+        ],
+        'filters' => [
+          'contact_source' => [
             'name' => 'sort_name',
             'alias' => 'civicrm_contact_source',
             'title' => ts('Source Name'),
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'contact_assignee' => array(
+          ],
+          'contact_assignee' => [
             'name' => 'sort_name',
             'alias' => 'civicrm_contact_assignee',
             'title' => ts('Assignee Name'),
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'contact_target' => array(
+          ],
+          'contact_target' => [
             'name' => 'sort_name',
             'alias' => 'civicrm_contact_target',
             'title' => ts('Target Name'),
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'current_user' => array(
+          ],
+          'current_user' => [
             'name' => 'current_user',
             'title' => ts('Limit To Current User'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array('0' => ts('No'), '1' => ts('Yes')),
-          ),
-        ),
+            'options' => ['0' => ts('No'), '1' => ts('Yes')],
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_email' => array(
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'contact_source_email' => array(
+        'fields' => [
+          'contact_source_email' => [
             'name' => 'email',
             'title' => ts('Source Email'),
             'alias' => 'civicrm_email_source',
-          ),
-          'contact_assignee_email' => array(
+          ],
+          'contact_assignee_email' => [
             'name' => 'email',
             'title' => ts('Assignee Email'),
             'alias' => 'civicrm_email_assignee',
-          ),
-          'contact_target_email' => array(
+          ],
+          'contact_target_email' => [
             'name' => 'email',
             'title' => ts('Target Email'),
             'alias' => 'civicrm_email_target',
-          ),
-        ),
-        'order_bys' => array(
-          'source_contact_email' => array(
+          ],
+        ],
+        'order_bys' => [
+          'source_contact_email' => [
             'name' => 'email',
             'title' => ts('Source Email'),
             'dbAlias' => 'civicrm_email_contact_source_email',
-          ),
-        ),
-      ),
-      'civicrm_phone' => array(
+          ],
+        ],
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array(
-          'contact_source_phone' => array(
+        'fields' => [
+          'contact_source_phone' => [
             'name' => 'phone',
             'title' => ts('Source Phone'),
             'alias' => 'civicrm_phone_source',
-          ),
-          'contact_assignee_phone' => array(
+          ],
+          'contact_assignee_phone' => [
             'name' => 'phone',
             'title' => ts('Assignee Phone'),
             'alias' => 'civicrm_phone_assignee',
-          ),
-          'contact_target_phone' => array(
+          ],
+          'contact_target_phone' => [
             'name' => 'phone',
             'title' => ts('Target Phone'),
             'alias' => 'civicrm_phone_target',
-          ),
-        ),
-      ),
-      'civicrm_activity' => array(
+          ],
+        ],
+      ],
+      'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'no_display' => TRUE,
             'title' => ts('Activity ID'),
             'required' => TRUE,
-          ),
-          'source_record_id' => array(
+          ],
+          'source_record_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => ts('Activity Type'),
             'required' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'activity_subject' => array(
+          ],
+          'activity_subject' => [
             'title' => ts('Subject'),
             'default' => TRUE,
-          ),
-          'activity_date_time' => array(
+          ],
+          'activity_date_time' => [
             'title' => ts('Activity Date'),
             'required' => TRUE,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Activity Status'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'duration' => array(
+          ],
+          'duration' => [
             'title' => ts('Duration'),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'location' => array(
+          ],
+          'location' => [
             'title' => ts('Location'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'details' => array(
+          ],
+          'details' => [
             'title' => ts('Activity Details'),
-          ),
-          'priority_id' => array(
+          ],
+          'priority_id' => [
             'title' => ts('Priority'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'filters' => array(
-          'activity_date_time' => array(
+          ],
+        ],
+        'filters' => [
+          'activity_date_time' => [
             'default' => 'this.month',
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'activity_subject' => array('title' => ts('Activity Subject')),
-          'activity_type_id' => array(
+          ],
+          'activity_subject' => ['title' => ts('Activity Subject')],
+          'activity_type_id' => [
             'title' => ts('Activity Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->activityTypes,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Activity Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
-          ),
-          'location' => array(
+          ],
+          'location' => [
             'title' => ts('Location'),
             'type' => CRM_Utils_Type::T_TEXT,
-          ),
-          'details' => array(
+          ],
+          'details' => [
             'title' => ts('Activity Details'),
             'type' => CRM_Utils_Type::T_TEXT,
-          ),
-          'priority_id' => array(
+          ],
+          'priority_id' => [
             'title' => ts('Activity Priority'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
-          ),
-        ),
-        'order_bys' => array(
-          'activity_date_time' => array(
+          ],
+        ],
+        'order_bys' => [
+          'activity_date_time' => [
             'title' => ts('Activity Date'),
             'default_weight' => '1',
             'dbAlias' => 'civicrm_activity_activity_date_time',
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => ts('Activity Type'),
             'default_weight' => '2',
             'dbAlias' => 'field(civicrm_activity_activity_type_id, ' . implode(', ', array_keys($this->activityTypes)) . ')',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
         'alias' => 'activity',
-      ),
+      ],
       // Hack to get $this->_alias populated for the table.
-      'civicrm_activity_contact' => array(
+      'civicrm_activity_contact' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(),
-      ),
-    ) + $this->addressFields(TRUE);
+        'fields' => [],
+      ],
+    ] + $this->addressFields(TRUE);
 
     if ($caseEnabled && CRM_Core_Permission::check('access all cases and activities')) {
-      $this->_columns['civicrm_activity']['filters']['include_case_activities'] = array(
+      $this->_columns['civicrm_activity']['filters']['include_case_activities'] = [
         'name' => 'include_case_activities',
         'title' => ts('Include Case Activities'),
         'type' => CRM_Utils_Type::T_INT,
         'operatorType' => CRM_Report_Form::OP_SELECT,
-        'options' => array('0' => ts('No'), '1' => ts('Yes')),
-      );
+        'options' => ['0' => ts('No'), '1' => ts('Yes')],
+      ];
     }
 
     if ($campaignEnabled) {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
 
-      $this->_columns['civicrm_activity']['fields']['result'] = array(
+      $this->_columns['civicrm_activity']['fields']['result'] = [
         'title' => ts('Survey Result'),
         'default' => 'false',
-      );
-      $this->_columns['civicrm_activity']['filters']['result'] = array(
+      ];
+      $this->_columns['civicrm_activity']['filters']['result'] = [
         'title' => ts('Survey Result'),
         'operator' => 'like',
         'type' => CRM_Utils_Type::T_STRING,
-      );
-      if (!empty($this->activeCampaigns)) {
-        $this->_columns['civicrm_activity']['fields']['campaign_id'] = array(
-          'title' => ts('Campaign'),
-          'default' => 'false',
-        );
-        $this->_columns['civicrm_activity']['filters']['campaign_id'] = array(
-          'title' => ts('Campaign'),
-          'type' => CRM_Utils_Type::T_INT,
-          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => $this->activeCampaigns,
-        );
-      }
+      ];
+      // If we have campaigns enabled, add those elements to both the fields, filters.
+      $this->addCampaignFields('civicrm_activity');
+
       if (!empty($this->engagementLevels)) {
-        $this->_columns['civicrm_activity']['fields']['engagement_level'] = array(
+        $this->_columns['civicrm_activity']['fields']['engagement_level'] = [
           'title' => ts('Engagement Index'),
           'default' => 'false',
-        );
-        $this->_columns['civicrm_activity']['filters']['engagement_level'] = array(
+        ];
+        $this->_columns['civicrm_activity']['filters']['engagement_level'] = [
           'title' => ts('Engagement Index'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $this->engagementLevels,
-        );
+        ];
       }
     }
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_tagFilterTable = 'civicrm_activity';
+
     parent::__construct();
+  }
+
+  public function preProcess() {
+    // Is "Include Case Activities" selected?  If yes, include the case_id as a hidden column
+    $formToUse = $this->noController ? NULL : $this;
+    $includeCaseActivities = CRM_Utils_Request::retrieve('include_case_activities_value', 'Boolean', $formToUse);
+    if (!empty($includeCaseActivities)) {
+      $this->_columns['civicrm_case_activity'] = [
+        'dao' => 'CRM_Case_DAO_CaseActivity',
+        'fields' => [
+          'case_id' => [
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ],
+        ],
+      ];
+    }
+    parent::preProcess();
   }
 
   /**
@@ -422,7 +413,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       $this->_selectAliasesTotal = $this->_selectAliases;
     }
 
-    $removeKeys = array();
+    $removeKeys = [];
     if ($recordType == 'target') {
       // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
@@ -514,34 +505,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * @todo remove this function & declare the 3 contact tables separately
    */
   public function from() {
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-
-    $this->_from = "
-      FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-           INNER JOIN civicrm_activity_contact  {$this->_aliases['civicrm_activity_contact']}
-                  ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
-                     {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$targetID}
-           INNER JOIN civicrm_contact civicrm_contact_target
-                  ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_target.id
-           {$this->_aclFrom}";
-
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-          LEFT JOIN civicrm_email civicrm_email_target
-                 ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_target.contact_id AND
-                    civicrm_email_target.is_primary = 1";
-    }
-
-    if ($this->isTableSelected('civicrm_phone')) {
-      $this->_from .= "
-          LEFT JOIN civicrm_phone civicrm_phone_target
-                 ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_target.contact_id AND
-                    civicrm_phone_target.is_primary = 1 ";
-    }
-    $this->_aliases['civicrm_contact'] = 'civicrm_contact_target';
-
-    $this->joinAddressFromContact();
+    $this->buildFrom('target');
   }
 
   /**
@@ -557,7 +521,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
 
-    $clauses = array();
+    $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
 
@@ -669,7 +633,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $contactID = CRM_Utils_Type::escape($contactID, 'Integer');
 
     CRM_Contact_BAO_Contact_Permission::cache($contactID);
-    $clauses = array();
+    $clauses = [];
     foreach ($tableAlias as $k => $alias) {
       $clauses[] = " INNER JOIN civicrm_acl_contact_cache aclContactCache_{$k} ON ( {$alias}.id = aclContactCache_{$k}.contact_id OR {$alias}.id IS NULL ) AND aclContactCache_{$k}.user_id = $contactID ";
     }
@@ -701,7 +665,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $dao = $this->executeReportQuery($query);
     CRM_Core_DAO::reenableFullGroupByMode();
 
-    $contactIDs = array();
+    $contactIDs = [];
     // Add resulting contacts to group
     while ($dao->fetch()) {
       if ($dao->addtogroup_contact_id) {
@@ -729,7 +693,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     $config = CRM_Core_Config::singleton();
     if (in_array("CiviCase", $config->enableComponents)) {
       $componentId = CRM_Core_Component::getComponentID('CiviCase');
@@ -755,8 +719,8 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
-    $nullFilters = array();
-    foreach (array('target', 'source', 'assignee') as $type) {
+    $nullFilters = [];
+    foreach (['target', 'source', 'assignee'] as $type) {
       if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) ==
         'nnll' || !empty($this->_params["contact_{$type}_value"])
       ) {
@@ -773,7 +737,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     // form did not exist.
     // Fixing the way the construct method declares them will make all this redundant.
     // 1. fill temp table with target results
-    $this->buildACLClause(array('civicrm_contact_target'));
+    $this->buildACLClause(['civicrm_contact_target']);
     $this->select('target');
     $this->from();
     $this->customDataFrom();
@@ -796,7 +760,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->executeReportQuery($tempQuery);
 
     // 3. fill temp table with assignee results
-    $this->buildACLClause(array('civicrm_contact_assignee'));
+    $this->buildACLClause(['civicrm_contact_assignee']);
     $this->select('assignee');
     $this->buildAssigneeFrom();
 
@@ -809,7 +773,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->executeReportQuery($tempQuery);
 
     // 4. fill temp table with source results
-    $this->buildACLClause(array('civicrm_contact_source'));
+    $this->buildACLClause(['civicrm_contact_source']);
     $this->select('source');
     $this->buildSourceFrom();
     $this->customDataFrom();
@@ -821,7 +785,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->executeReportQuery($tempQuery);
 
     // 5. show final result set from temp table
-    $rows = array();
+    $rows = [];
     $this->select('final');
     $this->_having = "";
     if (!empty($nullFilters)) {
@@ -846,12 +810,18 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_where .= " AND {$this->_aclWhere} ";
     }
 
+    $caseJoin = '';
+    if (!empty($this->_params['include_case_activities_value'])) {
+      $caseJoin = "LEFT JOIN civicrm_case_activity {$this->_aliases['civicrm_case_activity']} ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_case_activity']}.activity_id";
+    }
+
     $sql = "{$this->_select}
       FROM $tempTableName tar
       INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON {$this->_aliases['civicrm_activity']}.id = tar.civicrm_activity_id
       INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']} ON {$this->_aliases['civicrm_activity_contact']}.activity_id = {$this->_aliases['civicrm_activity']}.id
       AND {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
       LEFT JOIN civicrm_contact contact_civireport ON contact_civireport.id = {$this->_aliases['civicrm_activity_contact']}.contact_id
+      {$caseJoin}
       {$this->_where} {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
 
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
@@ -921,20 +891,36 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $cid = $rows[$rowNum]['civicrm_contact_contact_source_id'];
         }
 
-        $actActionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
-          CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
-          FALSE,
-          $rows[$rowNum]['civicrm_activity_id']
-        );
+        if (empty($this->_params['include_case_activities_value']) || empty($rows[$rowNum]['civicrm_case_activity_case_id'])) {
+          // Generate a "view activity" link
+          $actActionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
+            CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
+            FALSE,
+            $rows[$rowNum]['civicrm_activity_id']
+          );
 
-        $actLinkValues = array(
-          'id' => $rows[$rowNum]['civicrm_activity_id'],
-          'cid' => $cid,
-          'cxt' => $context,
-        );
-        $actUrl = CRM_Utils_System::url($actActionLinks[CRM_Core_Action::VIEW]['url'],
-          CRM_Core_Action::replace($actActionLinks[CRM_Core_Action::VIEW]['qs'], $actLinkValues), TRUE
-        );
+          $actLinkValues = [
+            'id' => $rows[$rowNum]['civicrm_activity_id'],
+            'cid' => $cid,
+            'cxt' => $context,
+          ];
+          $actUrl = CRM_Utils_System::url($actActionLinks[CRM_Core_Action::VIEW]['url'],
+            CRM_Core_Action::replace($actActionLinks[CRM_Core_Action::VIEW]['qs'], $actLinkValues), TRUE
+          );
+        }
+        else {
+          // Generate a "view case activity" link
+          $caseActionLinks = CRM_Case_Selector_Search::actionLinks();
+          $caseLinkValues = [
+            'aid' => $rows[$rowNum]['civicrm_activity_id'],
+            'caseid' => $rows[$rowNum]['civicrm_case_activity_case_id'],
+            'cid' => $cid,
+            'cxt' => $context,
+          ];
+          $actUrl = CRM_Utils_System::url($caseActionLinks[CRM_Core_Action::VIEW]['url'],
+            CRM_Core_Action::replace($caseActionLinks[CRM_Core_Action::VIEW]['qs'], $caseLinkValues), TRUE
+          );
+        }
       }
 
       if (array_key_exists('civicrm_contact_contact_source', $row)) {
@@ -955,7 +941,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         $assigneeNames = explode(';', $row['civicrm_contact_contact_assignee']);
         if ($value = $row['civicrm_contact_contact_assignee_id']) {
           $assigneeContactIds = explode(';', $value);
-          $link = array();
+          $link = [];
           if ($viewLinks) {
             foreach ($assigneeContactIds as $id => $value) {
               if (isset($value) && isset($assigneeNames[$id])) {
@@ -977,7 +963,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         $targetNames = explode(';', $row['civicrm_contact_contact_target']);
         if ($value = $row['civicrm_contact_contact_target_id']) {
           $targetContactIds = explode(';', $value);
-          $link = array();
+          $link = [];
           if ($viewLinks) {
             foreach ($targetContactIds as $id => $value) {
               if (isset($value) && isset($targetNames[$id])) {
@@ -1033,7 +1019,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
 
       if (array_key_exists('civicrm_activity_campaign_id', $row)) {
         if ($value = $row['civicrm_activity_campaign_id']) {
-          $rows[$rowNum]['civicrm_activity_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_activity_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }
@@ -1074,7 +1060,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       // pull section aliases out of $this->_sections
       $sectionAliases = array_keys($this->_sections);
 
-      $ifnulls = array();
+      $ifnulls = [];
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
@@ -1086,7 +1072,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         implode(", ", $sectionAliases);
 
       // initialize array of total counts
-      $totals = array();
+      $totals = [];
       $dao = $this->executeReportQuery($query);
       while ($dao->fetch()) {
         // let $this->_alterDisplay translate any integer ids to human-readable values.
@@ -1095,7 +1081,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         $row = $rows[0];
 
         // add totals for all permutations of section values
-        $values = array();
+        $values = [];
         $i = 1;
         $aliasCount = count($sectionAliases);
         foreach ($sectionAliases as $alias) {
@@ -1122,31 +1108,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
    * refactor in order to get this under ReportTemplateTests)
    */
   protected function buildAssigneeFrom() {
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    $this->_from = "
-        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-             INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
-                       {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$assigneeID}
-             INNER JOIN civicrm_contact civicrm_contact_assignee
-                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_assignee.id
-             {$this->_aclFrom}";
-
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email civicrm_email_assignee
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_assignee.contact_id AND
-                      civicrm_email_assignee.is_primary = 1";
-    }
-    if ($this->isTableSelected('civicrm_phone')) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone civicrm_phone_assignee
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_assignee.contact_id AND
-                      civicrm_phone_assignee.is_primary = 1 ";
-    }
-    $this->_aliases['civicrm_contact'] = 'civicrm_contact_assignee';
-    $this->joinAddressFromContact();
+    $this->buildFrom('assignee');
   }
 
   /**
@@ -1156,30 +1118,60 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
    * refactor in order to get this under ReportTemplateTests)
    */
   protected function buildSourceFrom() {
+    $this->buildFrom('source');
+  }
+
+  /**
+   * Shared function to build the from clause
+   *
+   * @param string $recordType (one of 'source', 'activity', 'target')
+   */
+  protected function buildFrom($recordType) {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    switch ($recordType) {
+      case 'target':
+        $recordTypeID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+        break;
+
+      case 'source':
+        $recordTypeID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        break;
+
+      case 'assignee':
+        $recordTypeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+        break;
+
+    }
+
     $this->_from = "
-        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-             INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
-                       {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
-             INNER JOIN civicrm_contact civicrm_contact_source
-                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_source.id
-             {$this->_aclFrom}";
+      FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+           INNER JOIN civicrm_activity_contact  {$this->_aliases['civicrm_activity_contact']}
+                  ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
+                     {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$recordTypeID}
+           INNER JOIN civicrm_contact civicrm_contact_{$recordType}
+                  ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_{$recordType}.id
+           {$this->_aclFrom}";
+    if (!empty($this->_params['include_case_activities_value'])) {
+      $this->_from .= "
+          LEFT JOIN civicrm_case_activity {$this->_aliases['civicrm_case_activity']}
+                  ON {$this->_aliases['civicrm_case_activity']}.activity_id = {$this->_aliases['civicrm_activity']}.id";
+    }
 
     if ($this->isTableSelected('civicrm_email')) {
       $this->_from .= "
-            LEFT JOIN civicrm_email civicrm_email_source
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_source.contact_id AND
-                      civicrm_email_source.is_primary = 1";
+          LEFT JOIN civicrm_email civicrm_email_{$recordType}
+                 ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_{$recordType}.contact_id AND
+                    civicrm_email_{$recordType}.is_primary = 1";
     }
+
     if ($this->isTableSelected('civicrm_phone')) {
       $this->_from .= "
-            LEFT JOIN civicrm_phone civicrm_phone_source
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_source.contact_id AND
-                      civicrm_phone_source.is_primary = 1 ";
+          LEFT JOIN civicrm_phone civicrm_phone_{$recordType}
+                 ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_{$recordType}.contact_id AND
+                    civicrm_phone_{$recordType}.is_primary = 1 ";
     }
-    $this->_aliases['civicrm_contact'] = 'civicrm_contact_source';
+    $this->_aliases['civicrm_contact'] = "civicrm_contact_{$recordType}";
+
     $this->joinAddressFromContact();
   }
 

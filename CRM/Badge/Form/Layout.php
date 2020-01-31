@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -49,9 +33,9 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $config = CRM_Core_Config::singleton();
     $resources = CRM_Core_Resources::singleton();
     $resources->addSetting(
-      array(
-        'kcfinderPath' => $config->userFrameworkResourceURL . 'packages' . DIRECTORY_SEPARATOR,
-      )
+      [
+        'kcfinderPath' => CRM_Utils_File::addTrailingSlash(Civi::paths()->getVariable('civicrm.packages', 'url'), '/'),
+      ]
     );
     $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js', 1, 'html-header');
 
@@ -60,25 +44,25 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), TRUE);
 
     $labelStyle = CRM_Core_BAO_LabelFormat::getList(TRUE, 'name_badge');
-    $this->add('select', 'label_format_name', ts('Label Format'), array('' => ts('- select -')) + $labelStyle, TRUE);
+    $this->add('select', 'label_format_name', ts('Label Format'), ['' => ts('- select -')] + $labelStyle, TRUE);
 
     $this->add('text', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
     // get the tokens
     $contactTokens = CRM_Core_SelectValues::contactTokens();
-    $eventTokens = array(
+    $eventTokens = [
       '{event.event_id}' => ts('Event ID'),
       '{event.title}' => ts('Event Title'),
       '{event.start_date}' => ts('Event Start Date'),
       '{event.end_date}' => ts('Event End Date'),
-    );
+    ];
     $participantTokens = CRM_Core_SelectValues::participantTokens();
 
     $tokens = array_merge($contactTokens, $eventTokens, $participantTokens);
     asort($tokens);
 
-    $tokens = array_merge(array('spacer' => ts('- spacer -')) + $tokens);
+    $tokens = array_merge(['spacer' => ts('- spacer -')] + $tokens);
 
     $fontSizes = CRM_Core_BAO_LabelFormat::getFontSizes();
     $fontStyles = CRM_Core_BAO_LabelFormat::getFontStyles();
@@ -89,7 +73,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     $rowCount = self::FIELD_ROWCOUNT;
     for ($i = 1; $i <= $rowCount; $i++) {
-      $this->add('select', "token[$i]", ts('Token'), array('' => ts('- skip -')) + $tokens);
+      $this->add('select', "token[$i]", ts('Token'), ['' => ts('- skip -')] + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
       $this->add('select', "font_size[$i]", ts('Font Size'), $fontSizes);
       $this->add('select', "font_style[$i]", ts('Font Style'), $fontStyles);
@@ -103,20 +87,20 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('select', "barcode_type", ts('Type'), $barcodeTypes);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
-    $attributes = array('readonly' => TRUE);
+    $attributes = ['readonly' => TRUE];
     $this->add('text', 'image_1', ts('Image (top left)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'width_image_1', ts('Width (mm)'), array('size' => 6));
-    $this->add('text', 'height_image_1', ts('Height (mm)'), array('size' => 6));
+    $this->add('text', 'width_image_1', ts('Width (mm)'), ['size' => 6]);
+    $this->add('text', 'height_image_1', ts('Height (mm)'), ['size' => 6]);
 
     $this->add('text', 'image_2', ts('Image (top right)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'width_image_2', ts('Width (mm)'), array('size' => 6));
-    $this->add('text', 'height_image_2', ts('Height (mm)'), array('size' => 6));
+    $this->add('text', 'width_image_2', ts('Width (mm)'), ['size' => 6]);
+    $this->add('text', 'height_image_2', ts('Height (mm)'), ['size' => 6]);
 
     $this->add('checkbox', 'show_participant_image', ts('Use Participant Image?'));
-    $this->add('text', 'width_participant_image', ts('Width (mm)'), array('size' => 6));
-    $this->add('text', 'height_participant_image', ts('Height (mm)'), array('size' => 6));
+    $this->add('text', 'width_participant_image', ts('Width (mm)'), ['size' => 6]);
+    $this->add('text', 'height_participant_image', ts('Height (mm)'), ['size' => 6]);
     $this->add('select', "alignment_participant_image", ts('Image Alignment'), $imageAlignment);
 
     $this->add('checkbox', 'is_default', ts('Default?'));
@@ -130,22 +114,21 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->addRule('height_participant_image', ts('Enter valid height'), 'positiveInteger');
     $this->addRule('width_participant_image', ts('Enter valid height'), 'positiveInteger');
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'refresh',
-          'name' => ts('Save and Preview'),
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'refresh',
+        'name' => ts('Save and Preview'),
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -201,7 +184,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     }
     else {
       CRM_Core_Session::setStatus(ts("The badge layout '%1' has been saved.",
-        array(1 => $params['title'])
+        [1 => $params['title']]
       ), ts('Saved'), 'success');
     }
   }
@@ -220,7 +203,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     }
 
     $this->_single = TRUE;
-    $this->_participantIds = array($participantID);
+    $this->_participantIds = [$participantID];
     $this->_componentClause = " civicrm_participant.id = $participantID ";
 
     CRM_Badge_BAO_Badge::buildBadges($params, $this);

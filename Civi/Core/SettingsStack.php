@@ -19,7 +19,7 @@ class SettingsStack {
    * @var array
    *   Ex: $stack[0] == ['settingName', 'oldSettingValue'];
    */
-  protected $stack = array();
+  protected $stack = [];
 
   /**
    * Temporarily apply a setting.
@@ -29,10 +29,10 @@ class SettingsStack {
    */
   public function push($setting, $settingValue) {
     if (isset($GLOBALS['civicrm_setting']['domain'][$setting])) {
-      $this->stack[] = array($setting, $GLOBALS['civicrm_setting']['domain'][$setting]);
+      $this->stack[] = [$setting, $GLOBALS['civicrm_setting']['domain'][$setting]];
     }
     else {
-      $this->stack[] = array($setting, NULL);
+      $this->stack[] = [$setting, NULL];
     }
     $GLOBALS['civicrm_setting']['domain'][$setting] = $settingValue;
     \Civi::service('settings_manager')->useMandatory();

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -38,54 +22,28 @@ class CRM_Core_Report_Excel {
    * Outputs a result set with a given header
    * in the string buffer result
    *
-   * @param string $header
-   *   (reference ) column headers.
-   * @param string $rows
-   *   (reference ) result set rows.
-   * @param null $titleHeader
-   * @param bool $print
-   *   Should the output be printed.
+   * @param array $header
+   *   column headers.
+   * @param array $rows
+   *   result set rows.
+   * @param string $titleHeader
    * @param bool $outputHeader
    *
    * @return mixed
    *   empty if output is printed, else output
    *
    */
-  public static function makeCSVTable(&$header, &$rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {
+  public static function makeCSVTable($header, $rows, $titleHeader = NULL, $outputHeader = TRUE) {
     if ($titleHeader) {
       echo $titleHeader;
     }
 
-    $result = '';
-
     $config = CRM_Core_Config::singleton();
     $seperator = $config->fieldSeparator;
-    $enclosed = '"';
-    $escaped = $enclosed;
     $add_character = "\015\012";
 
-    $schema_insert = '';
-    foreach ($header as $field) {
-      if ($enclosed == '') {
-        $schema_insert .= stripslashes($field);
-      }
-      else {
-        $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, stripslashes($field)) . $enclosed;
-      }
-      $schema_insert .= $seperator;
-    }
-    // end while
-
     if ($outputHeader) {
-      // need to add PMA_exportOutputHandler functionality out here, rather than
-      // doing it the moronic way of assembling a buffer
-      $out = trim(substr($schema_insert, 0, -1)) . $add_character;
-      if ($print) {
-        echo $out;
-      }
-      else {
-        $result .= $out;
-      }
+      self::outputHeaderRow($header);
     }
 
     $fields_cnt = count($header);
@@ -94,38 +52,31 @@ class CRM_Core_Report_Excel {
       $colNo = 0;
 
       foreach ($row as $j => $value) {
-        if (!isset($value) || is_null($value)) {
+        if (!isset($value) || is_null($value) || $value === '') {
           $schema_insert .= '';
-        }
-        elseif ($value == '0' || $value != '') {
-          // loic1 : always enclose fields
-          //$value = ereg_replace("\015(\012)?", "\012", $value);
-          $value = preg_replace("/\015(\012)?/", "\012", $value);
-          if ($enclosed == '') {
-            $schema_insert .= $value;
-          }
-          else {
-            if ((substr($value, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR) &&
-              (substr($value, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
-            ) {
-
-              $strArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-
-              foreach ($strArray as $key => $val) {
-                if (trim($val) == '') {
-                  unset($strArray[$key]);
-                }
-              }
-
-              $str = implode($seperator, $strArray);
-              $value = &$str;
-            }
-
-            $schema_insert .= $enclosed . str_replace($enclosed, $escaped . $enclosed, $value) . $enclosed;
-          }
         }
         else {
-          $schema_insert .= '';
+          // loic1 : always enclose fields
+          //$value = ereg_replace("\015(\012)?", "\012", $value);
+          // Convert  carriage return to line feed.
+          $value = preg_replace("/\015(\012)?/", "\012", $value);
+          if ((substr($value, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR) &&
+            (substr($value, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
+          ) {
+
+            $strArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+            // Filter out empty value separated strings.
+            foreach ($strArray as $key => $val) {
+              if (trim($val) == '') {
+                unset($strArray[$key]);
+              }
+            }
+
+            $str = implode($seperator, $strArray);
+            $value = &$str;
+          }
+
+          $schema_insert .= '"' . str_replace('"', '""', $value) . '"';
         }
 
         if ($colNo < $fields_cnt - 1) {
@@ -136,20 +87,28 @@ class CRM_Core_Report_Excel {
       // end for
 
       $out = $schema_insert . $add_character;
-      if ($print) {
-        echo $out;
-      }
-      else {
-        $result .= $out;
-      }
+      echo $out;
     }
+  }
 
-    if ($print) {
-      return;
+  /**
+   * Output the header row for a csv file.
+   *
+   * @param array $header
+   *   Array of field names.
+   */
+  public static function outputHeaderRow($header) {
+    $schema_insert = '';
+    $separator = Civi::settings()->get('fieldSeparator');
+    foreach ($header as $field) {
+      $schema_insert .= '"' . str_replace('"', '""', stripslashes($field)) . '"';
+      $schema_insert .= $separator;
     }
-    else {
-      return $result;
-    }
+    // end while
+    // need to add PMA_exportOutputHandler functionality out here, rather than
+    // doing it the moronic way of assembling a buffer
+    // We append a hex newline at the end.
+    echo trim(substr($schema_insert, 0, -1)) . "\015\012";
   }
 
   /**
@@ -159,7 +118,7 @@ class CRM_Core_Report_Excel {
    * @param null $titleHeader
    * @param bool $outputHeader
    */
-  public function writeHTMLFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE) {
+  public function writeHTMLFile($fileName, $header, $rows, $titleHeader = NULL, $outputHeader = TRUE) {
     if ($outputHeader) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
         'application/vnd.ms-excel',
@@ -201,13 +160,11 @@ class CRM_Core_Report_Excel {
    *   If set this will be the title in the CSV.
    * @param bool $outputHeader
    *   Should we output the header row.
-   * @param bool $saveFile
-   *   -.
    *
    * @return void
    */
-  public static function writeCSVFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {
-    if ($outputHeader && !$saveFile) {
+  public static function writeCSVFile($fileName, $header, $rows, $titleHeader = NULL, $outputHeader = TRUE) {
+    if ($outputHeader) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
         'text/x-csv',
         CRM_Core_DAO::$_nullObject,
@@ -217,11 +174,7 @@ class CRM_Core_Report_Excel {
     }
 
     if (!empty($rows)) {
-      $print = TRUE;
-      if ($saveFile) {
-        $print = FALSE;
-      }
-      return self::makeCSVTable($header, $rows, $titleHeader, $print, $outputHeader);
+      return self::makeCSVTable($header, $rows, $titleHeader, $outputHeader);
     }
   }
 

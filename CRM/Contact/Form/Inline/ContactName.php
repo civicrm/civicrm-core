@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -45,7 +29,7 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
     // Build contact type specific fields
     $class = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $class::buildQuickForm($this, 1);
-    $this->addFormRule(array('CRM_Contact_Form_Inline_ContactName', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Inline_ContactName', 'formRule'], $this);
   }
 
   /**
@@ -63,7 +47,7 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
     if (empty($fields['first_name']) && empty($fields['last_name'])
       && empty($fields['organization_name'])
       && empty($fields['household_name'])) {
-      $emails = civicrm_api3('Email', 'getcount', array('contact_id' => $form->_contactId));
+      $emails = civicrm_api3('Email', 'getcount', ['contact_id' => $form->_contactId]);
       if (!$emails) {
         $errorField = $form->_contactType == 'Individual' ? 'last' : strtolower($form->_contactType);
         $errors[$errorField . '_name'] = ts('Contact with no email must have a name.');

@@ -23,14 +23,14 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function integerDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145E+3', FALSE),
-      array('10', TRUE),
-      array(-10, TRUE),
-      array('-10', TRUE),
-      array('-10foo', FALSE),
-    );
+    return [
+      [10, TRUE],
+      ['145E+3', FALSE],
+      ['10', TRUE],
+      [-10, TRUE],
+      ['-10', TRUE],
+      ['-10foo', FALSE],
+    ];
   }
 
   /**
@@ -46,14 +46,14 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function positiveDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145.0E+3', FALSE),
-      array('10', TRUE),
-      array(-10, FALSE),
-      array('-10', FALSE),
-      array('-10foo', FALSE),
-    );
+    return [
+      [10, TRUE],
+      ['145.0E+3', FALSE],
+      ['10', TRUE],
+      [-10, FALSE],
+      ['-10', FALSE],
+      ['-10foo', FALSE],
+    ];
   }
 
   /**
@@ -69,22 +69,28 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function numericDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145.0E+3', FALSE),
-      array('10', TRUE),
-      array(-10, TRUE),
-      array('-10', TRUE),
-      array('-10foo', FALSE),
-    );
+    return [
+      [10, TRUE],
+      ['145.0E+3', FALSE],
+      ['10', TRUE],
+      [-10, TRUE],
+      ['-10', TRUE],
+      ['-10foo', FALSE],
+    ];
   }
 
   /**
    * @dataProvider moneyDataProvider
    * @param $inputData
+   * @param $decimalPoint
+   * @param $thousandSeparator
+   * @param $currency
    * @param $expectedResult
    */
-  public function testMoney($inputData, $expectedResult) {
+  public function testMoney($inputData, $decimalPoint, $thousandSeparator, $currency, $expectedResult) {
+    $this->setDefaultCurrency($currency);
+    $this->setMonetaryDecimalPoint($decimalPoint);
+    $this->setMonetaryThousandSeparator($thousandSeparator);
     $this->assertEquals($expectedResult, CRM_Utils_Rule::money($inputData));
   }
 
@@ -92,34 +98,108 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function moneyDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145.0E+3', FALSE),
-      array('10', TRUE),
-      array(-10, TRUE),
-      array('-10', TRUE),
-      array('-10foo', FALSE),
-      array('-10.0345619', TRUE),
-      array('-10.010,4345619', TRUE),
-      array('10.0104345619', TRUE),
-      array('-0', TRUE),
-      array('-.1', TRUE),
-      array('.1', TRUE),
+    return [
+      [10, '.', ',', 'USD', TRUE],
+      ['145.0E+3', '.', ',', 'USD', FALSE],
+      ['10', '.', ',', 'USD', TRUE],
+      [-10, '.', ',', 'USD', TRUE],
+      ['-10', '.', ',', 'USD', TRUE],
+      ['-10foo', '.', ',', 'USD', FALSE],
+      ['-10.0345619', '.', ',', 'USD', TRUE],
+      ['-10.010,4345619', '.', ',', 'USD', TRUE],
+      ['10.0104345619', '.', ',', 'USD', TRUE],
+      ['-0', '.', ',', 'USD', TRUE],
+      ['-.1', '.', ',', 'USD', TRUE],
+      ['.1', '.', ',', 'USD', TRUE],
       // Test currency symbols too, default locale uses $, so if we wanted to test others we'd need to reconfigure locale
-      array('$500.3333', TRUE),
-      array('-$500.3333', TRUE),
-      array('$-500.3333', TRUE),
-    );
+      ['$1,234,567.89', '.', ',', 'USD', TRUE],
+      ['-$1,234,567.89', '.', ',', 'USD', TRUE],
+      ['$-1,234,567.89', '.', ',', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'USD', TRUE],
+      // Test EURO currency
+      ['€1,234,567.89', '.', ',', 'EUR', TRUE],
+      ['-€1,234,567.89', '.', ',', 'EUR', TRUE],
+      ['€-1,234,567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'EUR', TRUE],
+      // Test Norwegian KR currency
+      ['kr1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr 1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['-kr1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['-kr 1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr-1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr -1,234,567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'NOK', TRUE],
+      // Test different localization options: , as decimal separator and dot as thousand separator
+      ['$1.234.567,89', ',', '.', 'USD', TRUE],
+      ['-$1.234.567,89', ',', '.', 'USD', TRUE],
+      ['$-1.234.567,89', ',', '.', 'USD', TRUE],
+      ['1.234.567,89', ',', '.', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', '.', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', '.', 'USD', TRUE],
+      ['$1,234,567.89', ',', '.', 'USD', FALSE],
+      ['-$1,234,567.89', ',', '.', 'USD', FALSE],
+      ['$-1,234,567.89', ',', '.', 'USD', FALSE],
+      // Now with a space as thousand separator
+      ['$1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['-$1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['$-1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['1 234 567,89', ',', ' ', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', ' ', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', ' ', 'USD', TRUE],
+    ];
+  }
+
+  /**
+   * @dataProvider colorDataProvider
+   * @param $inputData
+   * @param $expectedResult
+   */
+  public function testColor($inputData, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::color($inputData));
+  }
+
+  /**
+   * @return array
+   */
+  public function colorDataProvider() {
+    return [
+      ['#000000', TRUE],
+      ['#ffffff', TRUE],
+      ['#123456', TRUE],
+      ['#00aaff', TRUE],
+      // Some of these are valid css colors but we reject anything that doesn't conform to the html5 spec for <input type="color">
+      ['#ffffff00', FALSE],
+      ['#fff', FALSE],
+      ['##000000', FALSE],
+      ['ffffff', FALSE],
+      ['red', FALSE],
+      ['#orange', FALSE],
+      ['', FALSE],
+      ['rgb(255, 255, 255)', FALSE],
+    ];
   }
 
   /**
    * @return array
    */
   public function extenionKeyTests() {
-    $keys = array();
-    $keys[] = array('org.civicrm.multisite', TRUE);
-    $keys[] = array('au.org.contribute2016', TRUE);
-    $keys[] = array('%3Csvg%20onload=alert(0)%3E', FALSE);
+    $keys = [];
+    $keys[] = ['org.civicrm.multisite', TRUE];
+    $keys[] = ['au.org.contribute2016', TRUE];
+    $keys[] = ['%3Csvg%20onload=alert(0)%3E', FALSE];
     return $keys;
   }
 
@@ -146,7 +226,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       '-',
       '_foo',
       'one-two',
-      'f00'
+      'f00',
     ];
     $expectFalse = [
       ' ',
@@ -157,7 +237,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       "<script>alert('XSS');</script>",
       '(foo)',
       'foo;',
-      '[foo]'
+      '[foo]',
     ];
     $data = [];
     foreach ($expectTrue as $value) {

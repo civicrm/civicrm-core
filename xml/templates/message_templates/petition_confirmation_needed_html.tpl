@@ -1,3 +1,5 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+
 <p>Thank you for signing {$petition.title}.</p>
 
 <p>In order to <b>complete your signature</b>, we must confirm your e-mail.

@@ -2,33 +2,15 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 namespace Civi\Core\SqlTrigger;
-
-use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Build a set of SQL triggers for tracking timestamps on an entity.
@@ -36,7 +18,7 @@ use Civi\Core\Event\GenericHookEvent;
  * This class is a generalization of CRM-10554 with the aim of enabling CRM-20958.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class TimestampTriggers {
 
@@ -110,7 +92,7 @@ class TimestampTriggers {
     $customDataEntity,
     $createdDate = 'created_date',
     $modifiedDate = 'modified_date',
-    $relations = array()
+    $relations = []
   ) {
     $this->tableName = $tableName;
     $this->customDataEntity = $customDataEntity;
@@ -153,17 +135,17 @@ class TimestampTriggers {
     }
 
     if ($tableFilter == NULL || $tableFilter == $this->getTableName()) {
-      $info[] = array(
-        'table' => array($this->getTableName()),
+      $info[] = [
+        'table' => [$this->getTableName()],
         'when' => 'BEFORE',
-        'event' => array('INSERT'),
+        'event' => ['INSERT'],
         'sql' => "\nSET NEW.{$this->getCreatedDate()} = CURRENT_TIMESTAMP;\n",
-      );
+      ];
     }
 
     // Update timestamp when modifying closely related tables
     $relIdx = \CRM_Utils_Array::index(
-      array('column', 'table'),
+      ['column', 'table'],
       $this->getAllRelations()
     );
     foreach ($relIdx as $column => $someRelations) {
@@ -203,24 +185,24 @@ class TimestampTriggers {
     // If specific related table requested, just process that one.
     // (Reply: This feels fishy.)
     if (in_array($tableFilter, $relatedTableNames)) {
-      $relatedTableNames = array($tableFilter);
+      $relatedTableNames = [$tableFilter];
     }
 
     // If no specific table requested (include all related tables),
     // or a specific related table requested (as matched above)
     if (empty($tableFilter) || isset($relatedTableNames[$tableFilter])) {
-      $info[] = array(
+      $info[] = [
         'table' => $relatedTableNames,
         'when' => 'AFTER',
-        'event' => array('INSERT', 'UPDATE'),
+        'event' => ['INSERT', 'UPDATE'],
         'sql' => "\nUPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = NEW.$contactRefColumn;\n",
-      );
-      $info[] = array(
+      ];
+      $info[] = [
         'table' => $relatedTableNames,
         'when' => 'AFTER',
-        'event' => array('DELETE'),
+        'event' => ['DELETE'],
         'sql' => "\nUPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = OLD.$contactRefColumn;\n",
-      );
+      ];
     }
   }
 
@@ -321,10 +303,10 @@ class TimestampTriggers {
       $customGroupDAO->is_multiple = 0;
       $customGroupDAO->find();
       while ($customGroupDAO->fetch()) {
-        $relations[] = array(
+        $relations[] = [
           'table' => $customGroupDAO->table_name,
           'column' => 'entity_id',
-        );
+        ];
       }
     }
 

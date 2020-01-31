@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * and similar across all objects (thus providing both reuse and standards)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -41,7 +25,7 @@ class CRM_Core_Action {
    * Different possible actions are defined here. Keep in sync with the
    * constant from CRM_Core_Form for various modes.
    *
-   * @var integer const
+   * @var int
    */
   const
     NONE = 0,
@@ -74,10 +58,10 @@ class CRM_Core_Action {
    * bit manipulation operations so we can perform multiple
    * actions on the same object if needed
    *
-   * @var array $_names type of variable name to action constant
+   * @var array
    *
    */
-  static $_names = array(
+  public static $_names = [
     'add' => self::ADD,
     'update' => self::UPDATE,
     'view' => self::VIEW,
@@ -95,14 +79,14 @@ class CRM_Core_Action {
     'revert' => self::REVERT,
     'close' => self::CLOSE,
     'reopen' => self::REOPEN,
-  );
+  ];
 
   /**
    * The flipped version of the names array, initialized when used
    *
    * @var array
    */
-  static $_description;
+  public static $_description;
 
   /**
    * Called by the request object to translate a string into a mask.
@@ -216,7 +200,7 @@ class CRM_Core_Action {
 
     // make links indexed sequentially instead of by bitmask
     // otherwise it's next to impossible to reliably add new ones
-    $seqLinks = array();
+    $seqLinks = [];
     foreach ($links as $bit => $link) {
       $link['bit'] = $bit;
       $seqLinks[] = $link;
@@ -226,7 +210,7 @@ class CRM_Core_Action {
       CRM_Utils_Hook::links($op, $objectName, $objectId, $seqLinks, $mask, $values);
     }
 
-    $url = array();
+    $url = [];
 
     foreach ($seqLinks as $i => $link) {
       if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
@@ -296,6 +280,65 @@ class CRM_Core_Action {
     }
 
     return $result;
+  }
+
+  /**
+   * Given a set of links and a mask, return a filtered (by mask) array containing the final links with parsed values
+   *   and calling hooks as appropriate.
+   * Use this when passing a set of action links to the API or to the form without adding html formatting.
+   *
+   * @param array $links
+   *   The set of link items.
+   * @param int $mask
+   *   The mask to be used. a null mask means all items.
+   * @param array $values
+   *   The array of values for parameter substitution in the link items.
+   * @param null $op
+   * @param null $objectName
+   * @param int $objectId
+   *
+   * @return array|null
+   *   The array describing each link
+   */
+  public static function filterLinks(
+    $links,
+    $mask,
+    $values,
+    $op = NULL,
+    $objectName = NULL,
+    $objectId = NULL
+  ) {
+    if (empty($links)) {
+      return NULL;
+    }
+
+    // make links indexed sequentially instead of by bitmask
+    // otherwise it's next to impossible to reliably add new ones
+    $seqLinks = array();
+    foreach ($links as $bit => $link) {
+      $link['bit'] = $bit;
+      $seqLinks[] = $link;
+    }
+
+    if ($op && $objectName && $objectId) {
+      CRM_Utils_Hook::links($op, $objectName, $objectId, $seqLinks, $mask, $values);
+    }
+
+    foreach ($seqLinks as $i => $link) {
+      if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
+        $seqLinks[$i]['extra'] = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
+
+        if (isset($link['qs']) && !CRM_Utils_System::isNull($link['qs'])) {
+          $seqLinks[$i]['url'] = self::replace($link['url'], $values);
+          $seqLinks[$i]['qs'] = self::replace($link['qs'], $values);
+        }
+      }
+      else {
+        unset($seqLinks[$i]);
+      }
+    }
+
+    return $seqLinks;
   }
 
   /**

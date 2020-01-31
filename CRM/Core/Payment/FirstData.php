@@ -52,7 +52,7 @@
  * **************************
  */
 class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
-  # (not used, implicit in the API, might need to convert?)
+  // (not used, implicit in the API, might need to convert?)
   const CHARSET = 'UFT-8';
 
   /**
@@ -122,7 +122,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $requestFields['email'] = $params['email'];
     $requestFields['ip'] = $params['ip_address'];
     $requestFields['transactionorigin'] = "Eci";
-    #32 character string
+    // 32 character string
     $requestFields['invoice_number'] = $params['invoiceID'];
     $requestFields['ordertype'] = 'Sale';
     $requestFields['comments'] = $params['description'];
@@ -160,7 +160,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('%1 - Gateway requires curl with SSL support', array(1 => $paymentProcessor)));
+      CRM_Core_Error::fatal(ts('%1 - Gateway requires curl with SSL support', [1 => $paymentProcessor]));
     }
 
     /**********************************************************
@@ -179,9 +179,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
      * define variables for connecting with the gateway
      **********************************************************/
 
-    # Name and location of certificate file
+    // Name and location of certificate file
     $key = $this->_paymentProcessor['password'];
-    # Your store number
+    // Your store number
     $requestFields["configfile"] = $this->_paymentProcessor['user_name'];
     $port = "1129";
     $host = $this->_paymentProcessor['url_site'] . ":" . $port . "/LSGSXML";
@@ -309,6 +309,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       return $params;
     }
   }
+
   // end function doDirectPayment
 
   /**
@@ -346,7 +347,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    * CiviCRM V2.0 Declaration
    */
   public function checkConfig() {
-    $errorMsg = array();
+    $errorMsg = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ts(' Store Name is not set for this payment processor');

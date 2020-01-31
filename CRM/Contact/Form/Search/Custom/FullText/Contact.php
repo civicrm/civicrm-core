@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
@@ -70,7 +54,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_S
   public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
-    $contactSQL = array();
+    $contactSQL = [];
     $contactSQL[] = "
 SELECT     et.entity_id
 FROM       civicrm_entity_tag et
@@ -84,48 +68,48 @@ GROUP BY   et.entity_id
     // lets delete all the deceased contacts from the entityID box
     // this allows us to keep numbers in sync
     // when we have acl contacts, the situation gets even more murky
-    $final = array();
+    $final = [];
     $final[] = "DELETE FROM {$entityIDTableName} WHERE entity_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)";
 
-    $tables = array(
-      'civicrm_contact' => array(
+    $tables = [
+      'civicrm_contact' => [
         'id' => 'id',
-        'fields' => array(
+        'fields' => [
           'sort_name' => NULL,
           'nick_name' => NULL,
           'display_name' => NULL,
-        ),
-      ),
-      'civicrm_address' => array(
+        ],
+      ],
+      'civicrm_address' => [
         'id' => 'contact_id',
-        'fields' => array(
+        'fields' => [
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-        ),
-      ),
-      'civicrm_email' => array(
+        ],
+      ],
+      'civicrm_email' => [
         'id' => 'contact_id',
-        'fields' => array('email' => NULL),
-      ),
-      'civicrm_phone' => array(
+        'fields' => ['email' => NULL],
+      ],
+      'civicrm_phone' => [
         'id' => 'contact_id',
-        'fields' => array('phone' => NULL),
-      ),
-      'civicrm_note' => array(
+        'fields' => ['phone' => NULL],
+      ],
+      'civicrm_note' => [
         'id' => 'entity_id',
         'entity_table' => 'civicrm_contact',
-        'fields' => array(
+        'fields' => [
           'subject' => NULL,
           'note' => NULL,
-        ),
-      ),
-      'file' => array(
+        ],
+      ],
+      'file' => [
         'xparent_table' => 'civicrm_contact',
-      ),
+      ],
       'sql' => $contactSQL,
       'final' => $final,
-    );
+    ];
 
     // get the custom data info
     $this->fillCustomInfo($tables,

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
  * $Id$
  *
@@ -95,6 +79,7 @@ class CRM_Core_Transaction {
   /**
    * Whether commit() has been called on this instance
    * of CRM_Core_Transaction
+   * @var bool
    */
   private $_pseudoCommitted = FALSE;
 
@@ -147,7 +132,7 @@ class CRM_Core_Transaction {
   /**
    * @param $flag
    */
-  static public function rollbackIfFalse($flag) {
+  public static function rollbackIfFalse($flag) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
     if ($flag === FALSE && $frame !== NULL) {
       $frame->setRollbackOnly();
@@ -203,7 +188,7 @@ class CRM_Core_Transaction {
    * callstack will not wind-down normally -- e.g. before
    * a call to exit().
    */
-  static public function forceRollbackIfEnabled() {
+  public static function forceRollbackIfEnabled() {
     if (\Civi\Core\Transaction\Manager::singleton()->getFrame() !== NULL) {
       \Civi\Core\Transaction\Manager::singleton()->forceRollback();
     }
@@ -212,7 +197,7 @@ class CRM_Core_Transaction {
   /**
    * @return bool
    */
-  static public function willCommit() {
+  public static function willCommit() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
     return ($frame === NULL) ? TRUE : !$frame->isRollbackOnly();
   }
@@ -220,7 +205,7 @@ class CRM_Core_Transaction {
   /**
    * Determine whether there is a pending transaction.
    */
-  static public function isActive() {
+  public static function isActive() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
     return ($frame !== NULL);
   }
@@ -246,7 +231,7 @@ class CRM_Core_Transaction {
    *          See php manual call_user_func_array for details.
    * @param int $id
    */
-  static public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
+  public static function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
     $frame->addCallback($phase, $callback, $params, $id);
   }

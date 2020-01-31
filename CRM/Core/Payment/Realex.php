@@ -42,7 +42,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
 
   protected $_mode = NULL;
 
-  protected $_params = array();
+  protected $_params = [];
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -147,7 +147,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
       return self::error(9002, ts('Could not initiate connection to payment gateway'));
     }
 
-    curl_setopt($submit, CURLOPT_HTTPHEADER, array('SOAPAction: ""'));
+    curl_setopt($submit, CURLOPT_HTTPHEADER, ['SOAPAction: ""']);
     curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($submit, CURLOPT_TIMEOUT, 60);
     curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
@@ -204,12 +204,12 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
 
     // FIXME: We are using the trxn_result_code column to store all these extra details since there
     // seems to be nowhere else to put them. This is THE WRONG THING TO DO!
-    $extras = array(
+    $extras = [
       'authcode' => $response['AUTHCODE'],
       'batch_id' => $response['BATCHID'],
       'message' => $response['MESSAGE'],
       'trxn_result_code' => $response['RESULT'],
-    );
+    ];
 
     $params['trxn_id'] = $response['PASREF'];
     $params['trxn_result_code'] = serialize($extras);
@@ -230,8 +230,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *   An array of the result with following keys:
    */
   public function xml_parse_into_assoc($xml) {
-    $input = array();
-    $result = array();
+    $input = [];
+    $result = [];
 
     $result['#error'] = FALSE;
     $result['#return'] = NULL;
@@ -250,11 +250,11 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
       }
       else {
         $result['#error'] = ts('Error parsing XML result - error code = %1 at line %2 char %3',
-          array(
+          [
             1 => xml_get_error_code($xmlparser),
             2 => xml_get_current_line_number($xmlparser),
             3 => xml_get_current_column_number($xmlparser),
-          )
+          ]
         );
       }
     }
@@ -269,8 +269,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @return array
    */
   public function _xml_parse($input, $depth = 1) {
-    $output = array();
-    $children = array();
+    $output = [];
+    $children = [];
 
     foreach ($input as $data) {
       if ($data['level'] == $depth) {
@@ -280,7 +280,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
             break;
 
           case 'open':
-            $children = array();
+            $children = [];
             break;
 
           case 'close':
@@ -475,7 +475,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *   the error message if any
    */
   public function checkConfig() {
-    $error = array();
+    $error = [];
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('Merchant ID is not set for this payment processor');
     }

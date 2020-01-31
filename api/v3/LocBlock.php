@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -41,10 +25,11 @@
  *   API result array.
  *
  * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_loc_block_create($params) {
-  $entities = array();
-  $any_mandatory = array(
+  $entities = [];
+  $any_mandatory = [
     'address',
     'address_id',
     'phone',
@@ -53,14 +38,14 @@ function civicrm_api3_loc_block_create($params) {
     'im_id',
     'email',
     'email_id',
-  );
+  ];
   civicrm_api3_verify_one_mandatory($params, NULL, $any_mandatory);
   // Call the appropriate api to create entities if any are passed in the params.
   // This is basically chaining but in reverse - we create the sub-entities first
   // because chaining does not work in reverse, or with keys like 'email_2'.
-  $items = array('address', 'email', 'phone', 'im');
+  $items = ['address', 'email', 'phone', 'im'];
   foreach ($items as $item) {
-    foreach (array('', '_2') as $suf) {
+    foreach (['', '_2'] as $suf) {
       $key = $item . $suf;
       if (!empty($params[$key]) && is_array($params[$key])) {
         $info = $params[$key];
@@ -82,11 +67,11 @@ function civicrm_api3_loc_block_create($params) {
   $dao->copyValues($params);
   $dao->save();
   if (!empty($dao->id)) {
-    $values = array($dao->id => $entities);
+    $values = [$dao->id => $entities];
     _civicrm_api3_object_to_array($dao, $values[$dao->id]);
     return civicrm_api3_create_success($values, $params, 'LocBlock', 'create', $dao);
   }
-  throw New API_Exception('Unable to create LocBlock. Please check your params.');
+  throw new API_Exception('Unable to create LocBlock. Please check your params.');
 }
 
 /**
@@ -105,15 +90,15 @@ function civicrm_api3_loc_block_get($params) {
   // This is a helper because api chaining does not work with a key like 'email_2'.
   if (!empty($options['return'])) {
     unset($params['return']);
-    $values = array();
-    $items = array('address', 'email', 'phone', 'im');
+    $values = [];
+    $items = ['address', 'email', 'phone', 'im'];
     $returnAll = !empty($options['return']['all']);
     foreach (_civicrm_api3_basic_get('CRM_Core_DAO_LocBlock', $params, FALSE) as $val) {
       foreach ($items as $item) {
-        foreach (array('', '_2') as $suf) {
+        foreach (['', '_2'] as $suf) {
           $key = $item . $suf;
           if (!empty($val[$key . '_id']) && ($returnAll || !empty($options['return'][$key]))) {
-            $val[$key] = civicrm_api($item, 'getsingle', array('version' => 3, 'id' => $val[$key . '_id']));
+            $val[$key] = civicrm_api($item, 'getsingle', ['version' => 3, 'id' => $val[$key . '_id']]);
           }
         }
       }

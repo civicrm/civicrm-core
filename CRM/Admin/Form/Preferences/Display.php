@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,7 +20,7 @@
  */
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
-  protected $_settings = array(
+  protected $_settings = [
     'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_edit_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -51,7 +35,11 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     'ajaxPopupsEnabled' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'display_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'sort_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-  );
+    'menubar_position' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'menubar_color' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'theme_backend' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'theme_frontend' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+  ];
 
   /**
    * Build the form object.
@@ -73,7 +61,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $nameFields = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 2');
     $this->assign('nameFields', $nameFields);
 
-    $this->addElement('hidden', 'contact_edit_preferences', NULL, array('id' => 'contact_edit_preferences'));
+    $this->addElement('hidden', 'contact_edit_preferences', NULL, ['id' => 'contact_edit_preferences']);
 
     $optionValues = CRM_Core_OptionGroup::values('user_dashboard_options', FALSE, FALSE, FALSE, NULL, 'name');
     $invoicesKey = array_search('Invoices / Credit Notes', $optionValues);

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -111,7 +95,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @return array
    *   the array of phone ids which are potential numbers
    */
-  public static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = array()) {
+  public static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = []) {
     if (!$id) {
       return NULL;
     }
@@ -140,25 +124,25 @@ LEFT JOIN civicrm_location_type ON ( civicrm_phone.location_type_id = civicrm_lo
 WHERE     civicrm_contact.id = %1 $cond
 ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
 
-    $params = array(
-      1 => array(
+    $params = [
+      1 => [
         $id,
         'Integer',
-      ),
-    );
+      ],
+    ];
 
-    $numbers = $values = array();
+    $numbers = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'id' => $dao->phone_id,
         'phone' => $dao->phone,
         'locationTypeId' => $dao->locationTypeId,
         'phoneTypeId' => $dao->phoneTypeId,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $numbers[$count++] = $values;
@@ -209,22 +193,22 @@ AND   ph.id IN (loc.phone_id, loc.phone_2_id)
 AND   ltype.id = ph.location_type_id
 ORDER BY ph.is_primary DESC, phone_id ASC ";
 
-    $params = array(
-      1 => array(
+    $params = [
+      1 => [
         $entityId,
         'Integer',
-      ),
-    );
-    $numbers = array();
+      ],
+    ];
+    $numbers = [];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
-      $numbers[$dao->phone_id] = array(
+      $numbers[$dao->phone_id] = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'id' => $dao->phone_id,
         'phone' => $dao->phone,
         'locationTypeId' => $dao->locationTypeId,
-      );
+      ];
     }
     return $numbers;
   }
@@ -242,17 +226,17 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
 
-    $tables = array(
+    $tables = [
       'civicrm_phone',
       'civicrm_mapping_field',
       'civicrm_uf_field',
-    );
-    $params = array(
-      1 => array(
+    ];
+    $params = [
+      1 => [
         $optionId,
         'Integer',
-      ),
-    );
+      ],
+    ];
 
     foreach ($tables as $tableName) {
       $query = "UPDATE `{$tableName}` SET `phone_type_id` = NULL WHERE `phone_type_id` = %1";

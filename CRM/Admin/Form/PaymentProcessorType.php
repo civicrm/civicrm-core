@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -42,104 +26,104 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   public function preProcess() {
     parent::preProcess();
 
-    $this->_fields = array(
-      array(
+    $this->_fields = [
+      [
         'name' => 'name',
         'label' => ts('Name'),
         'required' => TRUE,
-      ),
-      array(
+      ],
+      [
         'name' => 'title',
         'label' => ts('Title'),
         'required' => TRUE,
-      ),
-      array(
+      ],
+      [
         'name' => 'billing_mode',
         'label' => ts('Billing Mode'),
         'required' => TRUE,
         'rule' => 'positiveInteger',
         'msg' => ts('Enter a positive integer'),
-      ),
-      array(
+      ],
+      [
         'name' => 'description',
         'label' => ts('Description'),
-      ),
-      array(
+      ],
+      [
         'name' => 'user_name_label',
         'label' => ts('User Name Label'),
-      ),
-      array(
+      ],
+      [
         'name' => 'password_label',
         'label' => ts('Password Label'),
-      ),
-      array(
+      ],
+      [
         'name' => 'signature_label',
         'label' => ts('Signature Label'),
-      ),
-      array(
+      ],
+      [
         'name' => 'subject_label',
         'label' => ts('Subject Label'),
-      ),
-      array(
+      ],
+      [
         'name' => 'class_name',
         'label' => ts('PHP class name'),
         'required' => TRUE,
-      ),
-      array(
+      ],
+      [
         'name' => 'url_site_default',
         'label' => ts('Live Site URL'),
         'required' => TRUE,
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-      array(
+      ],
+      [
         'name' => 'url_api_default',
         'label' => ts('Live API URL'),
         'required' => FALSE,
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-      array(
+      ],
+      [
         'name' => 'url_recur_default',
         'label' => ts('Live Recurring Payments URL'),
         'required' => TRUE,
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-      array(
+      ],
+      [
         'name' => 'url_button_default',
         'label' => ts('Live Button URL'),
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-      array(
+      ],
+      [
         'name' => 'url_site_test_default',
         'label' => ts('Test Site URL'),
         'required' => TRUE,
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-      array(
+      ],
+      [
         'name' => 'url_api_test_default',
         'label' => ts('Test API URL'),
         'required' => FALSE,
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-      array(
+      ],
+      [
         'name' => 'url_recur_test_default',
         'label' => ts('Test Recurring Payments URL'),
         'required' => TRUE,
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-      array(
+      ],
+      [
         'name' => 'url_button_test_default',
         'label' => ts('Test Button URL'),
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-    );
+      ],
+    ];
   }
 
   /**
@@ -176,7 +160,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (!$this->_id) {
       $defaults['is_active'] = $defaults['is_default'] = 1;

@@ -23,11 +23,11 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    *   1) membership_type_id => 1
    */
   public function testConvertEntityFieldSingleValue() {
-    $formValues = array('membership_type_id' => 2);
-    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, array('membership_type_id'));
-    $this->assertEquals(array('membership_type_id', '=', 2, 0, 0), $params[0]);
+    $formValues = ['membership_type_id' => 2];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
+    $this->assertEquals(['membership_type_id', '=', 2, 0, 0], $params[0]);
     $obj = new CRM_Contact_BAO_Query($params);
-    $this->assertEquals(array('civicrm_membership.membership_type_id = 2'), $obj->_where[0]);
+    $this->assertEquals(['civicrm_membership.membership_type_id = 2'], $obj->_where[0]);
   }
 
   /**
@@ -39,11 +39,11 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    * The last of these is the format used prior to converting membership_type_id to an entity reference field.
    */
   public function testConvertEntityFieldMultipleValueEntityRef() {
-    $formValues = array('membership_type_id' => '1,2');
-    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, array('membership_type_id'));
-    $this->assertEquals(array('membership_type_id', 'IN', array(1, 2), 0, 0), $params[0]);
+    $formValues = ['membership_type_id' => '1,2'];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
+    $this->assertEquals(['membership_type_id', 'IN', [1, 2], 0, 0], $params[0]);
     $obj = new CRM_Contact_BAO_Query($params);
-    $this->assertEquals(array('civicrm_membership.membership_type_id IN ("1", "2")'), $obj->_where[0]);
+    $this->assertEquals(['civicrm_membership.membership_type_id IN ("1", "2")'], $obj->_where[0]);
   }
 
   /**
@@ -56,11 +56,11 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    * be used by pre-existing smart groups.
    */
   public function testConvertEntityFieldMultipleValueLegacy() {
-    $formValues = array('membership_type_id' => array(1, 2));
-    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, array('membership_type_id'));
-    $this->assertEquals(array('membership_type_id', 'IN', array(1, 2), 0, 0), $params[0]);
+    $formValues = ['membership_type_id' => [1, 2]];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
+    $this->assertEquals(['membership_type_id', 'IN', [1, 2], 0, 0], $params[0]);
     $obj = new CRM_Contact_BAO_Query($params);
-    $this->assertEquals(array('civicrm_membership.membership_type_id IN ("1", "2")'), $obj->_where[0]);
+    $this->assertEquals(['civicrm_membership.membership_type_id IN ("1", "2")'], $obj->_where[0]);
   }
 
   /**
@@ -71,13 +71,13 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    * The convertFormValues function should cope with this until such time as we can rationalise that.
    */
   public function testConvertEntityFieldMultipleValueEntityRefDoubleRun() {
-    $formValues = array('membership_type_id' => '1,2');
-    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, array('membership_type_id'));
-    $this->assertEquals(array('membership_type_id', 'IN', array(1, 2), 0, 0), $params[0]);
-    $params = CRM_Contact_BAO_Query::convertFormValues($params, 0, FALSE, NULL, array('membership_type_id'));
-    $this->assertEquals(array('membership_type_id', 'IN', array(1, 2), 0, 0), $params[0]);
+    $formValues = ['membership_type_id' => '1,2'];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
+    $this->assertEquals(['membership_type_id', 'IN', [1, 2], 0, 0], $params[0]);
+    $params = CRM_Contact_BAO_Query::convertFormValues($params, 0, FALSE, NULL, ['membership_type_id']);
+    $this->assertEquals(['membership_type_id', 'IN', [1, 2], 0, 0], $params[0]);
     $obj = new CRM_Contact_BAO_Query($params);
-    $this->assertEquals(array('civicrm_membership.membership_type_id IN ("1", "2")'), $obj->_where[0]);
+    $this->assertEquals(['civicrm_membership.membership_type_id IN ("1", "2")'], $obj->_where[0]);
   }
 
 }

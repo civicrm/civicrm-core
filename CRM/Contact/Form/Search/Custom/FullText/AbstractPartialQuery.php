@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
@@ -85,15 +69,15 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *   A temporary table into which we can write a list of all matching IDs.
    * @param string $detailTable
    *   A table into which we can write details about a page worth of matches.
-   * @param array|NULL $queryLimit overall limit (applied when building $entityIDTableName)
+   * @param array|null $queryLimit overall limit (applied when building $entityIDTableName)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
-   * @param array|NULL $detailLimit final limit (applied when building $detailTable)
+   * @param array|null $detailLimit final limit (applied when building $detailTable)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @return array
    *   keys: match-descriptor
    *   - count: int
    */
-  public abstract function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
+  abstract public function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
 
   /**
    * @return bool
@@ -121,10 +105,10 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (!array_key_exists($dao->table_name, $tables)) {
-        $tables[$dao->table_name] = array(
+        $tables[$dao->table_name] = [
           'id' => 'entity_id',
-          'fields' => array(),
-        );
+          'fields' => [],
+        ];
       }
       $tables[$dao->table_name]['fields'][$dao->column_name] = NULL;
     }
@@ -175,15 +159,15 @@ $sqlStatement
             continue;
           }
 
-          $query = $tableValues + array(
+          $query = $tableValues + [
             'text' => CRM_Utils_QueryFormatter::singleton()
-            ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
-          );
+              ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
+          ];
           list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
           $files = $searcher->search($query, $intLimit, $intOffset);
-          $matches = array();
+          $matches = [];
           foreach ($files as $file) {
-            $matches[] = array('entity_id' => $file['xparent_id']);
+            $matches[] = ['entity_id' => $file['xparent_id']];
           }
           if ($matches) {
             $insertSql = CRM_Utils_SQL_Insert::into($entityIDTableName)->usingReplace()->rows($matches)->toSQL();
@@ -191,8 +175,10 @@ $sqlStatement
           }
         }
         else {
-          $fullTextFields = array(); // array (string $sqlColumnName)
-          $clauses = array(); // array (string $sqlExpression)
+          // array (string $sqlColumnName)
+          $fullTextFields = [];
+          // array (string $sqlExpression)
+          $clauses = [];
 
           foreach ($tableValues['fields'] as $fieldName => $fieldType) {
             if ($fieldType == 'Int') {
@@ -242,10 +228,10 @@ GROUP BY {$tableValues['id']}
       }
     }
 
-    return array(
+    return [
       'count' => CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM {$entityIDTableName}"),
       'files' => $files,
-    );
+    ];
   }
 
   /**
@@ -277,16 +263,16 @@ GROUP BY {$tableValues['id']}
       return;
     }
 
-    $filesIndex = CRM_Utils_Array::index(array('xparent_id', 'file_id'), $files);
+    $filesIndex = CRM_Utils_Array::index(['xparent_id', 'file_id'], $files);
     // ex: $filesIndex[$xparent_id][$file_id] = array(...the file record...);
 
     $dao = CRM_Core_DAO::executeQuery("
       SELECT distinct {$parentIdColumn}
       FROM {$toTable}
       WHERE table_name = %1
-    ", array(
-      1 => array($this->getName(), 'String'),
-    ));
+    ", [
+      1 => [$this->getName(), 'String'],
+    ]);
     while ($dao->fetch()) {
       if (empty($filesIndex[$dao->{$parentIdColumn}])) {
         continue;
@@ -295,11 +281,11 @@ GROUP BY {$tableValues['id']}
       CRM_Core_DAO::executeQuery("UPDATE {$toTable}
         SET file_ids = %1
         WHERE table_name = %2 AND {$parentIdColumn} = %3
-      ", array(
-        1 => array(implode(',', array_keys($filesIndex[$dao->{$parentIdColumn}])), 'String'),
-        2 => array($this->getName(), 'String'),
-        3 => array($dao->{$parentIdColumn}, 'Int'),
-      ));
+      ", [
+        1 => [implode(',', array_keys($filesIndex[$dao->{$parentIdColumn}])), 'String'],
+        2 => [$this->getName(), 'String'],
+        3 => [$dao->{$parentIdColumn}, 'Int'],
+      ]);
     }
   }
 
@@ -338,7 +324,7 @@ GROUP BY {$tableValues['id']}
     if (!$intOffset) {
       $intOffset = 0;
     }
-    return array($intLimit, $intOffset);
+    return [$intLimit, $intOffset];
   }
 
 }

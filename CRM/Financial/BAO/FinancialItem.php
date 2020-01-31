@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
@@ -89,7 +73,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     elseif ($contribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
       $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
-    $params = array(
+    $params = [
       'transaction_date' => CRM_Utils_Date::isoToMysql($contribution->receive_date),
       'contact_id' => $contribution->contact_id,
       'amount' => $lineItem->line_total,
@@ -98,7 +82,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       'entity_id' => $lineItem->id,
       'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . $lineItem->label,
       'status_id' => $itemStatus,
-    );
+    ];
 
     if ($taxTrxnID) {
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -161,15 +145,15 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $financialtrxnIDS = CRM_Utils_Array::value('id', $trxnIds);
     if (!empty($financialtrxnIDS)) {
       if (!is_array($financialtrxnIDS)) {
-        $financialtrxnIDS = array($financialtrxnIDS);
+        $financialtrxnIDS = [$financialtrxnIDS];
       }
       foreach ($financialtrxnIDS as $tID) {
-        $entity_financial_trxn_params = array(
+        $entity_financial_trxn_params = [
           'entity_table' => "civicrm_financial_item",
           'entity_id' => $financialItem->id,
           'financial_trxn_id' => $tID,
           'amount' => $params['amount'],
-        );
+        ];
         if (!empty($ids['entityFinancialTrxnId'])) {
           $entity_financial_trxn_params['id'] = $ids['entityFinancialTrxnId'];
         }
@@ -220,13 +204,13 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     }
     $financialItem->find();
     while ($financialItem->fetch()) {
-      $financialItems[$financialItem->id] = array(
+      $financialItems[$financialItem->id] = [
         'id' => $financialItem->id,
         'entity_table' => $financialItem->entity_table,
         'entity_id' => $financialItem->entity_id,
         'financial_trxn_id' => $financialItem->financial_trxn_id,
         'amount' => $financialItem->amount,
-      );
+      ];
     }
     if (!empty($financialItems)) {
       return $financialItems;
@@ -289,14 +273,14 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
    * @return array
    */
   public static function getPreviousFinancialItem($entityId) {
-    $params = array(
+    $params = [
       'entity_id' => $entityId,
       'entity_table' => 'civicrm_line_item',
-      'options' => array('limit' => 1, 'sort' => 'id DESC'),
-    );
-    $salesTaxFinancialAccounts = civicrm_api3('FinancialAccount', 'get', array('is_tax' => 1));
+      'options' => ['limit' => 1, 'sort' => 'id DESC'],
+    ];
+    $salesTaxFinancialAccounts = civicrm_api3('FinancialAccount', 'get', ['is_tax' => 1]);
     if ($salesTaxFinancialAccounts['count']) {
-      $params['financial_account_id'] = array('NOT IN' => array_keys($salesTaxFinancialAccounts['values']));
+      $params['financial_account_id'] = ['NOT IN' => array_keys($salesTaxFinancialAccounts['values'])];
     }
     return civicrm_api3('FinancialItem', 'getsingle', $params);
   }

@@ -68,7 +68,7 @@ trait Api3DocTrait {
    *   Name for this example file (CamelCase) - if omitted the action name will be substituted.
    */
   private function documentMe($entity, $action, $params, $result, $testFunction, $testFile, $description = "", $exampleName = NULL) {
-    if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
+    if ($params['version'] != 3 || (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG)) {
       return;
     }
     $entity = _civicrm_api_get_camel_name($entity);
@@ -78,13 +78,13 @@ trait Api3DocTrait {
       // Attempt to convert lowercase action name to CamelCase.
       // This is clunky/imperfect due to the convention of all lowercase actions.
       $exampleName = \CRM_Utils_String::convertStringToCamel($action);
-      $knownPrefixes = array(
+      $knownPrefixes = [
         'Get',
         'Set',
         'Create',
         'Update',
         'Send',
-      );
+      ];
       foreach ($knownPrefixes as $prefix) {
         if (strpos($exampleName, $prefix) === 0 && $prefix != $exampleName) {
           $exampleName[strlen($prefix)] = strtoupper($exampleName[strlen($prefix)]);
@@ -97,7 +97,7 @@ trait Api3DocTrait {
       unset($params['version']);
     }
     // Format multiline description as array
-    $desc = array();
+    $desc = [];
     if (is_string($description) && strlen($description)) {
       foreach (explode("\n", $description) as $line) {
         $desc[] = trim($line);
@@ -123,8 +123,10 @@ trait Api3DocTrait {
       if (!is_dir($civicrm_root . "/api/v3/examples/$entity")) {
         mkdir($civicrm_root . "/api/v3/examples/$entity");
       }
-      $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.php", "w+b");
-      fwrite($f, $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl'));
+      $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.ex.php", "w+b");
+      $contents = $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl');
+      $contents = \CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
+      fwrite($f, $contents);
       fclose($f);
     }
   }
@@ -139,7 +141,7 @@ trait Api3DocTrait {
     if (!is_array($result)) {
       return;
     }
-    $fieldsToChange = array(
+    $fieldsToChange = [
       'hash' => '67eac7789eaee00',
       'modified_date' => '2012-11-14 16:02:35',
       'created_date' => '2013-07-28 08:49:19',
@@ -154,9 +156,9 @@ trait Api3DocTrait {
       'end_date' => '2013-08-04 00:00:00',
       'event_end_date' => '2013-08-04 00:00:00',
       'decision_date' => '20130805000000',
-    );
+    ];
 
-    $keysToUnset = array('xdebug', 'undefined_fields');
+    $keysToUnset = ['xdebug', 'undefined_fields'];
     foreach ($keysToUnset as $unwantedKey) {
       if (isset($result[$unwantedKey])) {
         unset($result[$unwantedKey]);

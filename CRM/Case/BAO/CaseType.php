@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,7 +25,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Takes an associative array and creates a Case Type object.
@@ -102,7 +86,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
   }
 
-
   /**
    * Format / convert submitted array to xml for case type definition
    *
@@ -160,7 +143,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
               }
               break;
 
-            case 'sequence': // passthrough
+            // passthrough
+            case 'sequence':
             case 'timeline':
               if ($setVal) {
                 $xmlFile .= "<{$index}>true</{$index}>\n";
@@ -183,14 +167,27 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       foreach ($definition['caseRoles'] as $values) {
         $xmlFile .= "<RelationshipType>\n";
         foreach ($values as $key => $value) {
-          $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
+          $xmlFile .= "<{$key}>" . ($key == 'groups' ? implode(',', array_map(['\CRM_Case_BAO_CaseType', 'encodeXmlString'], (array) $value)) : self::encodeXmlString($value)) . "</{$key}>\n";
         }
         $xmlFile .= "</RelationshipType>\n";
       }
       $xmlFile .= "</CaseRoles>\n";
     }
 
+    if (array_key_exists('restrictActivityAsgmtToCmsUser', $definition)) {
+      $xmlFile .= "<RestrictActivityAsgmtToCmsUser>" . $definition['restrictActivityAsgmtToCmsUser'] . "</RestrictActivityAsgmtToCmsUser>\n";
+    }
+
+    if (!empty($definition['activityAsgmtGrps'])) {
+      $xmlFile .= "<ActivityAsgmtGrps>\n";
+      foreach ((array) $definition['activityAsgmtGrps'] as $value) {
+        $xmlFile .= "<Group>$value</Group>\n";
+      }
+      $xmlFile .= "</ActivityAsgmtGrps>\n";
+    }
+
     $xmlFile .= '</CaseType>';
+
     return $xmlFile;
   }
 
@@ -206,7 +203,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   protected static function encodeXmlString($str) {
     // PHP 5.4: return htmlspecialchars($str, ENT_XML1, 'UTF-8')
-    return htmlspecialchars($str);
+    if (is_scalar($str)) {
+      return htmlspecialchars($str);
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**
@@ -220,15 +222,29 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   public static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
-    $definition = array();
+    $definition = [];
 
     if (isset($xml->forkable)) {
       $definition['forkable'] = (int) $xml->forkable;
     }
 
+    if (isset($xml->RestrictActivityAsgmtToCmsUser)) {
+      $definition['restrictActivityAsgmtToCmsUser'] = (int) $xml->RestrictActivityAsgmtToCmsUser;
+    }
+
+    if (isset($xml->ActivityAsgmtGrps)) {
+      $definition['activityAsgmtGrps'] = (array) $xml->ActivityAsgmtGrps->Group;
+      // Backwards compat - convert group ids to group names if ids are supplied
+      if (array_filter($definition['activityAsgmtGrps'], ['\CRM_Utils_Rule', 'integer']) === $definition['activityAsgmtGrps']) {
+        foreach ($definition['activityAsgmtGrps'] as $idx => $group) {
+          $definition['activityAsgmtGrps'][$idx] = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_Group', $group);
+        }
+      }
+    }
+
     // set activity types
     if (isset($xml->ActivityTypes)) {
-      $definition['activityTypes'] = array();
+      $definition['activityTypes'] = [];
       foreach ($xml->ActivityTypes->ActivityType as $activityTypeXML) {
         $definition['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
       }
@@ -241,12 +257,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     // set activity sets
     if (isset($xml->ActivitySets)) {
-      $definition['activitySets'] = array();
-      $definition['timelineActivityTypes'] = array();
+      $definition['activitySets'] = [];
+      $definition['timelineActivityTypes'] = [];
 
       foreach ($xml->ActivitySets->ActivitySet as $activitySetXML) {
         // parse basic properties
-        $activitySet = array();
+        $activitySet = [];
         $activitySet['name'] = (string) $activitySetXML->name;
         $activitySet['label'] = (string) $activitySetXML->label;
         if ('true' == (string) $activitySetXML->timeline) {
@@ -257,7 +273,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
         }
 
         if (isset($activitySetXML->ActivityTypes)) {
-          $activitySet['activityTypes'] = array();
+          $activitySet['activityTypes'] = [];
           foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
             $activityType = json_decode(json_encode($activityTypeXML), TRUE);
             $activitySet['activityTypes'][] = $activityType;
@@ -272,9 +288,13 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     // set case roles
     if (isset($xml->CaseRoles)) {
-      $definition['caseRoles'] = array();
+      $definition['caseRoles'] = [];
       foreach ($xml->CaseRoles->RelationshipType as $caseRoleXml) {
-        $definition['caseRoles'][] = json_decode(json_encode($caseRoleXml), TRUE);
+        $caseRole = json_decode(json_encode($caseRoleXml), TRUE);
+        if (!empty($caseRole['groups'])) {
+          $caseRole['groups'] = explode(',', $caseRole['groups']);
+        }
+        $definition['caseRoles'][] = $caseRole;
       }
     }
 
@@ -372,7 +392,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $refCounts = $caseType->getReferenceCounts();
     $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
     if ($total) {
-      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", array(1 => $total)));
+      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", [1 => $total]));
     }
     $result = $caseType->delete();
     CRM_Case_XMLRepository::singleton(TRUE);

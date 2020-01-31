@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_Base {
 
@@ -95,7 +79,7 @@ class CRM_Contact_Form_Search_Custom_Base {
       return $sql;
     }
 
-    return CRM_Core_DAO::composeQuery($sql, CRM_Core_DAO::$_nullArray);
+    return CRM_Core_DAO::composeQuery($sql);
   }
 
   /**
@@ -153,7 +137,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $formValues
    */
   public static function includeContactIDs(&$sql, &$formValues) {
-    $contactIDs = array();
+    $contactIDs = [];
     foreach ($formValues as $id => $value) {
       if ($value &&
         substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -200,17 +184,17 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @throws Exception
    */
   public function validateUserSQL(&$sql, $onlyWhere = FALSE) {
-    $includeStrings = array('contact_a');
-    $excludeStrings = array('insert', 'delete', 'update');
+    $includeStrings = ['contact_a'];
+    $excludeStrings = ['insert', 'delete', 'update'];
 
     if (!$onlyWhere) {
-      $includeStrings += array('select', 'from', 'where', 'civicrm_contact');
+      $includeStrings += ['select', 'from', 'where', 'civicrm_contact'];
     }
 
     foreach ($includeStrings as $string) {
       if (stripos($sql, $string) === FALSE) {
         CRM_Core_Error::fatal(ts('Could not find \'%1\' string in SQL clause.',
-          array(1 => $string)
+          [1 => $string]
         ));
       }
     }
@@ -218,7 +202,7 @@ class CRM_Contact_Form_Search_Custom_Base {
     foreach ($excludeStrings as $string) {
       if (preg_match('/(\s' . $string . ')|(' . $string . '\s)/i', $sql)) {
         CRM_Core_Error::fatal(ts('Found illegal \'%1\' string in SQL clause.',
-          array(1 => $string)
+          [1 => $string]
         ));
       }
     }

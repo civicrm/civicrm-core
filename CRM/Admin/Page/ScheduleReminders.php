@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -43,7 +27,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -64,30 +48,30 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
   public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/scheduleReminders',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Schedule Reminders'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Label Format'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Label Format'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/scheduleReminders',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Schedule Reminders'),
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$_links;
@@ -129,12 +113,14 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    * Browse all Scheduled Reminders settings.
    *
    * @param null $action
+   *
+   * @throws \CRM_Core_Exception
    */
   public function browse($action = NULL) {
     //CRM-16777: Do not permit access to user, for page 'Administer->Communication->Schedule Reminder',
     //when do not have 'administer CiviCRM' permission.
     if (!CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     // Get list of configured reminders
@@ -153,7 +139,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
         $format['action'] = CRM_Core_Action::formLink(
           self::links(),
           $action,
-          array('id' => $format['id']),
+          ['id' => $format['id']],
           ts('more'),
           FALSE,
           'actionSchedule.manage.action',

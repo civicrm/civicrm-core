@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -33,7 +17,7 @@ namespace Civi\Core\Transaction;
  * and any nested frames are SQL savepoints (SAVEPOINT foo/ROLLBACK TO SAVEPOINT).
  *
  * @package Civi
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class Frame {
 
@@ -45,17 +29,23 @@ class Frame {
   private $dao;
 
   /**
-   * @var string|null e.g. "BEGIN" or "SAVEPOINT foo"
+   * The statement used to start this transaction - e.g. "BEGIN" or "SAVEPOINT foo"
+   *
+   * @var string|null
    */
   private $beginStmt;
 
   /**
-   * @var string|null e.g. "COMMIT"
+   * The statement used to commit this transaction - e.g. "COMMIT"
+   *
+   * @var string|null
    */
   private $commitStmt;
 
   /**
-   * @var string|null e.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo"
+   * The statement used to rollback this transaction - e.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo"
+   *
+   * @var string|null
    */
   private $rollbackStmt;
 
@@ -83,12 +73,12 @@ class Frame {
     $this->commitStmt = $commitStmt;
     $this->rollbackStmt = $rollbackStmt;
 
-    $this->callbacks = array(
-      \CRM_Core_Transaction::PHASE_PRE_COMMIT => array(),
-      \CRM_Core_Transaction::PHASE_POST_COMMIT => array(),
-      \CRM_Core_Transaction::PHASE_PRE_ROLLBACK => array(),
-      \CRM_Core_Transaction::PHASE_POST_ROLLBACK => array(),
-    );
+    $this->callbacks = [
+      \CRM_Core_Transaction::PHASE_PRE_COMMIT => [],
+      \CRM_Core_Transaction::PHASE_POST_COMMIT => [],
+      \CRM_Core_Transaction::PHASE_PRE_ROLLBACK => [],
+      \CRM_Core_Transaction::PHASE_POST_ROLLBACK => [],
+    ];
   }
 
   public function inc() {
@@ -186,16 +176,16 @@ class Frame {
    */
   public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     if ($id) {
-      $this->callbacks[$phase][$id] = array(
+      $this->callbacks[$phase][$id] = [
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params)),
-      );
+        'parameters' => (is_array($params) ? $params : [$params]),
+      ];
     }
     else {
-      $this->callbacks[$phase][] = array(
+      $this->callbacks[$phase][] = [
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params)),
-      );
+        'parameters' => (is_array($params) ? $params : [$params]),
+      ];
     }
   }
 

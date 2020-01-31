@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-activity-selector-{$context}">
@@ -29,6 +13,7 @@
     {ts}Filter by Activity{/ts}</a>
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
+      <form><!-- form element is here to fool the datepicker widget -->
       <table class="no-border form-layout-compressed activity-search-options">
         <tr>
           <td class="crm-contact-form-block-activity_type_filter_id crm-inline-edit-field">
@@ -37,12 +22,15 @@
           <td class="crm-contact-form-block-activity_type_exclude_filter_id crm-inline-edit-field">
             {$form.activity_type_exclude_filter_id.label}<br /> {$form.activity_type_exclude_filter_id.html|crmAddClass:medium}
           </td>
-          {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high' label='<label>Date</label>'}
+          <td>
+            {include file="CRM/Core/DatePickerRange.tpl" fieldName="activity_date_time"}
+          </td>
           <td class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
             <label>{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
           </td>
         </tr>
       </table>
+      </form>
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
   <table class="contact-activity-selector-{$context} crm-ajax-table" style="width: 100%;">
@@ -53,7 +41,7 @@
       <th data-data="source_contact_name" class="crm-contact-activity-source_contact">{ts}Added By{/ts}</th>
       <th data-data="target_contact_name" data-orderable="false" class="crm-contact-activity-target_contact">{ts}With{/ts}</th>
       <th data-data="assignee_contact_name" data-orderable="false" class="crm-contact-activity-assignee_contact">{ts}Assigned{/ts}</th>
-      <th data-data="activity_date_time" class="crm-contact-activity-activity_date">{ts}Date{/ts}</th>
+      <th data-data="activity_date_time" class="crm-contact-activity-activity_date_time">{ts}Date{/ts}</th>
       <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" cell-data-refresh="true" class="crm-contact-activity-activity_status">{ts}Status{/ts}</th>
       <th data-data="links" data-orderable="false" class="crm-contact-activity-links">&nbsp;</th>
     </tr>
@@ -71,9 +59,9 @@
               var status_id = $('.crm-activity-selector-' + context + ' select#status_id').val() || [];
               d.activity_type_id = $('.crm-activity-selector-' + context + ' select#activity_type_filter_id').val(),
               d.activity_type_exclude_id = $('.crm-activity-selector-' + context + ' select#activity_type_exclude_filter_id').val(),
-              d.activity_date_relative = $('select#activity_date_relative').val(),
-              d.activity_date_low = $('#activity_date_low').val(),
-              d.activity_date_high = $('#activity_date_high').val(),
+              d.activity_date_time_relative = $('select#activity_date_time_relative').val(),
+              d.activity_date_time_low = $('#activity_date_time_low').val(),
+              d.activity_date_time_high = $('#activity_date_time_high').val(),
               d.activity_status_id = status_id.join(',')
             }
           }

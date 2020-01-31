@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -92,7 +76,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   /**
    * Custom group id
    *
-   * @int
+   * @var int
    */
   public $_groupID;
 
@@ -135,7 +119,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupID);
         $mode = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
         $mode = ucfirst($mode);
-        CRM_Utils_System::setTitle(ts('%1 %2 Record', array(1 => $mode, 2 => $groupTitle)));
+        CRM_Utils_System::setTitle(ts('%1 %2 Record', [1 => $mode, 2 => $groupTitle]));
 
         if (!empty($_POST['hidden_custom'])) {
           $this->assign('postedInfo', TRUE);
@@ -177,23 +161,22 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         if ($isMultiple) {
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $saveButtonName = $this->_copyValueId ? ts('Save a Copy') : ts('Save');
-          $this->addButtons(array(
-              array(
-                'type' => 'upload',
-                'name' => $saveButtonName,
-                'isDefault' => TRUE,
-              ),
-              array(
-                'type' => 'upload',
-                'name' => ts('Save and New'),
-                'subName' => 'new',
-              ),
-              array(
-                'type' => 'cancel',
-                'name' => ts('Cancel'),
-              ),
-            )
-          );
+          $this->addButtons([
+            [
+              'type' => 'upload',
+              'name' => $saveButtonName,
+              'isDefault' => TRUE,
+            ],
+            [
+              'type' => 'upload',
+              'name' => ts('Save and New'),
+              'subName' => 'new',
+            ],
+            [
+              'type' => 'cancel',
+              'name' => ts('Cancel'),
+            ],
+          ]);
         }
       }
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -205,18 +188,17 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc
-    $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -234,7 +216,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           NULL,
           $this->_entityId,
           $this->_groupID,
-          array(),
+          [],
           NULL,
           TRUE,
           NULL,
@@ -242,7 +224,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           TRUE,
           $this->_copyValueId
         );
-        $valueIdDefaults = array();
+        $valueIdDefaults = [];
         $groupTreeValueId = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_copyValueId, $this);
         CRM_Core_BAO_CustomGroup::setDefaults($groupTreeValueId, $valueIdDefaults, FALSE, FALSE, $this->get('action'));
         $tableId = $groupTreeValueId[$this->_groupID]['table_id'];
@@ -280,7 +262,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
     $this->assign('customValueCount', $customValueCount);
 
-    $defaults = array();
+    $defaults = [];
     return $defaults;
   }
 

@@ -12,14 +12,14 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  public $basicPages = array();
+  public $basicPages = [];
 
   /**
    * A place to hold the counts of hook invocations.
    *
    * @var array
    */
-  public $hookCount = array();
+  public $hookCount = [];
 
   /**
    * Classes that should be skipped
@@ -32,7 +32,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  public $skip = array(
+  public $skip = [
     'CRM_Contact_Page_DedupeFind',
     'CRM_Mailing_Page_Report',
     'CRM_Financial_Page_BatchTransaction',
@@ -42,7 +42,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
     'CRM_Admin_Page_LabelFormats',
     // This is a page with no corresponding form:
     'CRM_Admin_Page_EventTemplate',
-  );
+  ];
 
   /**
    * Set up the list of pages to evaluate by going through the menu.
@@ -67,15 +67,15 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
    * Make sure form hooks are only invoked once.
    */
   public function testFormsCallBuildFormOnce() {
-    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_buildForm', array($this, 'onBuildForm'));
-    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_preProcess', array($this, 'onPreProcess'));
-    $_REQUEST = array('action' => 'add');
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_buildForm', [$this, 'onBuildForm']);
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_preProcess', [$this, 'onPreProcess']);
+    $_REQUEST = ['action' => 'add'];
     foreach ($this->basicPages as $pageName) {
       // Reset the counters
-      $this->hookCount = array(
-        'buildForm' => array(),
-        'preProcess' => array(),
-      );
+      $this->hookCount = [
+        'buildForm' => [],
+        'preProcess' => [],
+      ];
       $page = new $pageName();
       ob_start();
       $page->run();
@@ -107,11 +107,11 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
    * Make sure pageRun hook is only invoked once.
    */
   public function testPagesCallPageRunOnce() {
-    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pageRun', array($this, 'onPageRun'));
-    $_REQUEST = array('action' => 'browse');
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pageRun', [$this, 'onPageRun']);
+    $_REQUEST = ['action' => 'browse'];
     foreach ($this->basicPages as $pageName) {
       // Reset the counters
-      $this->hookCount = array('pageRun' => array());
+      $this->hookCount = ['pageRun' => []];
       $page = new $pageName();
       ob_start();
       $page->run();

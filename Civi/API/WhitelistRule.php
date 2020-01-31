@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 namespace Civi\API;
@@ -48,7 +32,7 @@ namespace Civi\API;
  */
 class WhitelistRule {
 
-  static $IGNORE_FIELDS = array(
+  public static $IGNORE_FIELDS = [
     'check_permissions',
     'debug',
     'offset',
@@ -61,7 +45,7 @@ class WhitelistRule {
     'sequential',
     'sort',
     'version',
-  );
+  ];
 
   /**
    * Create a batch of rules from an array.
@@ -70,7 +54,7 @@ class WhitelistRule {
    * @return array
    */
   public static function createAll($rules) {
-    $whitelist = array();
+    $whitelist = [];
     foreach ($rules as $rule) {
       $whitelist[] = new WhitelistRule($rule);
     }
@@ -126,7 +110,7 @@ class WhitelistRule {
       $this->actions = '*';
     }
     else {
-      $this->actions = array();
+      $this->actions = [];
       foreach ((array) $ruleSpec['actions'] as $action) {
         $this->actions[] = Request::normalizeActionName($action, $ruleSpec['version']);
       }
@@ -197,7 +181,7 @@ class WhitelistRule {
         // Kind'a silly we need to (re(re))parse here for each rule; would be more
         // performant if pre-parsed by Request::create().
         $options = _civicrm_api3_get_options_from_params($apiRequest['params'], TRUE, $apiRequest['entity'], 'get');
-        $return = \CRM_Utils_Array::value('return', $options, array());
+        $return = \CRM_Utils_Array::value('return', $options, []);
         $activatedFields = array_merge($activatedFields, array_keys($return));
       }
 
@@ -267,7 +251,7 @@ class WhitelistRule {
    *   List of acceptable keys.
    */
   protected function filterFields($keys) {
-    $r = array();
+    $r = [];
     foreach ($keys as $key) {
       if (in_array($key, $this->fields)) {
         $r[] = $key;

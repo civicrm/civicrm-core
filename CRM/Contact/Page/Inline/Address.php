@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -47,11 +31,11 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $addressId = CRM_Utils_Request::retrieve('aid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, $_REQUEST);
 
-    $address = array();
+    $address = [];
     if ($addressId > 0) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']);
 
-      $entityBlock = array('id' => $addressId);
+      $entityBlock = ['id' => $addressId];
       $address = CRM_Core_BAO_Address::getValues($entityBlock, FALSE, 'id');
       if (!empty($address)) {
         foreach ($address as $key => & $value) {
@@ -65,16 +49,16 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
 
     if (!empty($currentAddressBlock['address'][$locBlockNo])) {
       // get contact name of shared contact names
-      $sharedAddresses = array();
+      $sharedAddresses = [];
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($currentAddressBlock['address']);
       foreach ($currentAddressBlock['address'] as $key => $addressValue) {
         if (!empty($addressValue['master_id']) &&
           !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']
         ) {
-          $sharedAddresses[$key]['shared_address_display'] = array(
+          $sharedAddresses[$key]['shared_address_display'] = [
             'address' => $addressValue['display'],
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
-          );
+          ];
         }
       }
       $idValue = $currentAddressBlock['address'][$locBlockNo]['id'];
@@ -95,7 +79,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $contactId;
     $contact->find(TRUE);
-    $privacy = array();
+    $privacy = [];
     foreach (CRM_Contact_BAO_Contact::$_commPrefs as $name) {
       if (isset($contact->$name)) {
         $privacy[$name] = $contact->$name;
