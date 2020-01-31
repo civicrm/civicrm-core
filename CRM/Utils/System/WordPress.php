@@ -417,8 +417,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     elseif (defined('ICL_LANGUAGE_CODE')) {
       $language = ICL_LANGUAGE_CODE;
     }
-
-    // TODO: set language variable for others WordPress plugin
+    // Wordpress "standard" single language mode
+    // We still have to check if the function exists as it may not during bootstrap
+    elseif (function_exists('get_locale')) {
+      $language = get_locale();
+    }
 
     if (!empty($language)) {
       return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
