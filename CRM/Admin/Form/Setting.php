@@ -34,12 +34,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   public function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = [];
-      $formArray = ['Component', 'Localization'];
-      $formMode = FALSE;
-      if (in_array($this->_name, $formArray)) {
-        $formMode = TRUE;
-      }
-
       $this->setDefaultsForMetadataDefinedFields();
 
       // @todo these should be retrievable from the above function.
@@ -54,6 +48,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
