@@ -32,7 +32,7 @@ class MockV4ReflectionBase {
   /**
    * This is the foo property.
    *
-   * In general, you can do nothing with it.
+   *  - In general, you can do nothing with it.
    *
    * @var array
    */

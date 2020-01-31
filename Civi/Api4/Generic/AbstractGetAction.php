@@ -24,7 +24,7 @@ namespace Civi\Api4\Generic;
 use Civi\Api4\Utils\SelectUtil;
 
 /**
- * Base class for all "Get" api actions.
+ * Base class for all `Get` api actions.
  *
  * @package Civi\Api4\Generic
  *
@@ -34,12 +34,12 @@ use Civi\Api4\Utils\SelectUtil;
 abstract class AbstractGetAction extends AbstractQueryAction {
 
   /**
-   * Fields to return. Defaults to all fields `["*"]`.
+   * Fields to return for each $ENTITY. Defaults to all fields `[*]`.
    *
    * Use the * wildcard by itself to select all available fields, or use it to match similarly-named fields.
    * E.g. `is_*` will match fields named is_primary, is_active, etc.
    *
-   * Set to `["row_count"]` to return only the number of items found.
+   * Set to `["row_count"]` to return only the number of $ENTITYs found.
    *
    * @var array
    */

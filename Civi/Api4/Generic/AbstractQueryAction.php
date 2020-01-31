@@ -22,7 +22,7 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for all actions that need to fetch records (Get, Update, Delete, etc)
+ * Base class for all actions that need to fetch records (`Get`, `Update`, `Delete`, etc.).
  *
  * @package Civi\Api4\Generic
  *
@@ -38,27 +38,29 @@ namespace Civi\Api4\Generic;
 abstract class AbstractQueryAction extends AbstractAction {
 
   /**
-   * Criteria for selecting items.
+   * Criteria for selecting $ENTITYs.
    *
-   * $example->addWhere('contact_type', 'IN', array('Individual', 'Household'))
-   *
+   * ```php
+   * $example->addWhere('contact_type', 'IN', ['Individual', 'Household'])
+   * ```
    * @var array
    */
   protected $where = [];
 
   /**
-   * Array of field(s) to use in ordering the results
+   * Array of field(s) to use in ordering the results.
    *
    * Defaults to id ASC
    *
+   * ```php
    * $example->addOrderBy('sort_name', 'ASC')
-   *
+   * ```
    * @var array
    */
   protected $orderBy = [];
 
   /**
-   * Maximum number of results to return.
+   * Maximum number of $ENTITYs to return.
    *
    * Defaults to unlimited.
    *
@@ -70,9 +72,9 @@ abstract class AbstractQueryAction extends AbstractAction {
   protected $limit = 0;
 
   /**
-   * Zero-based index of first result to return.
+   * Zero-based index of first $ENTITY to return.
    *
-   * Defaults to "0" - first record.
+   * Defaults to "0" - first $ENTITY found.
    *
    * @var int
    */

@@ -22,7 +22,7 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for all "Create" api actions.
+ * Base class for all `Create` api actions.
  *
  * @method $this setValues(array $values) Set all field values from an array of key => value pairs.
  * @method array getValues() Get field values.
@@ -32,7 +32,7 @@ namespace Civi\Api4\Generic;
 abstract class AbstractCreateAction extends AbstractAction {
 
   /**
-   * Field values to set
+   * Field values to set for the new $ENTITY.
    *
    * @var array
    */

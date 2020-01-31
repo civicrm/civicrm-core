@@ -36,14 +36,14 @@ class ReflectionUtilsTest extends UnitTestCase {
   public function testGetDocBlockForClass() {
     $grandChild = new MockV4ReflectionGrandchild();
     $reflection = new \ReflectionClass($grandChild);
-    $doc = ReflectionUtils::getCodeDocs($reflection);
+    $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['$ENTITY' => "Test"]);
 
     $this->assertEquals(TRUE, $doc['internal']);
-    $this->assertEquals('Grandchild class', $doc['description']);
+    $this->assertEquals('Grandchild class for Test, with a 2-line description!', $doc['description']);
 
-    $expectedComment = 'This is an extended description.
+    $expectedComment = 'This is an extended comment.
 
-There is a line break in this description.
+  There is a line break in this comment.
 
 This is the base class.';
 
@@ -59,7 +59,7 @@ This is the base class.';
     $doc = ReflectionUtils::getCodeDocs($reflection->getProperty('foo'), 'Property');
 
     $this->assertEquals('This is the foo property.', $doc['description']);
-    $this->assertEquals("In the child class, foo has been barred.\n\nIn general, you can do nothing with it.", $doc['comment']);
+    $this->assertEquals("In the child class, foo has been barred.\n\n - In general, you can do nothing with it.", $doc['comment']);
   }
 
   public function docBlockExamples() {

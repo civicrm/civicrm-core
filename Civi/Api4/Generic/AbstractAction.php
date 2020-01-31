@@ -270,10 +270,19 @@ abstract class AbstractAction implements \ArrayAccess {
   public function getParamInfo($param = NULL) {
     if (!isset($this->_paramInfo)) {
       $defaults = $this->getParamDefaults();
+      $vars = [
+        '$ENTITY' => $this->getEntityName(),
+        '$ACTION' => $this->getActionName(),
+      ];
+      // For actions like "getFields" and "getActions" they are not getting the entity itself.
+      // So generic docs will make more sense like this:
+      if (substr($vars['$ACTION'], 0, 3) === 'get' && substr($vars['$ACTION'], -1) === 's') {
+        $vars['$ENTITY'] = lcfirst(substr($vars['$ACTION'], 3, -1));
+      }
       foreach ($this->reflect()->getProperties(\ReflectionProperty::IS_PROTECTED) as $property) {
         $name = $property->getName();
         if ($name != 'version' && $name[0] != '_') {
-          $this->_paramInfo[$name] = ReflectionUtils::getCodeDocs($property, 'Property');
+          $this->_paramInfo[$name] = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
           $this->_paramInfo[$name]['default'] = $defaults[$name];
         }
       }

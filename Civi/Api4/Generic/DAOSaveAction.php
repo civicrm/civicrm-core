@@ -22,11 +22,11 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Create or update one or more records.
+ * Create or update one or more $ENTITYs.
  *
- * If creating more than one record with similar values, use the "defaults" param.
+ * If creating more than one $ENTITY with similar values, use the `defaults` param.
  *
- * Set "reload" if you need the api to return complete records.
+ * Set `reload` if you need the api to return complete records for each saved $ENTITY.
  */
 class DAOSaveAction extends AbstractSaveAction {
   use Traits\DAOActionTrait;

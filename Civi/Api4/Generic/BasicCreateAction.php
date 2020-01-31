@@ -24,9 +24,10 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * Create a new object from supplied values.
+ * Create a new $ENTITY from supplied values.
  *
- * This function will create 1 new object. It cannot be used to update existing objects. Use the Update or Replace actions for that.
+ * This action will create 1 new $ENTITY.
+ * It cannot be used to update existing $ENTITYs; use the `Update` or `Replace` actions for that.
  */
 class BasicCreateAction extends AbstractCreateAction {
 
