@@ -275,15 +275,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     //Get workflow id of event_offline receipt.
     $workflowId = $this->callAPISuccess('OptionValue', 'get', [
-      'return' => ["id"],
-      'option_group_id' => "msg_tpl_workflow_event",
-      'name' => "event_offline_receipt",
+      'return' => ['id'],
+      'option_group_id' => 'msg_tpl_workflow_event',
+      'name' => 'event_offline_receipt',
     ]);
 
     //Modify html to contain event_type_id token.
     $result = $this->callAPISuccess('MessageTemplate', 'get', [
       'sequential' => 1,
-      'return' => ["id", "msg_html"],
+      'return' => ['id', 'msg_html'],
       'workflow_id' => $workflowId['id'],
       'is_default' => 1,
     ]);
@@ -340,13 +340,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_single = TRUE;
     $form->_contactID = $form->_contactId = $contactID;
     $form->setCustomDataTypes();
-    $form->_fromEmails = [
-      'from_email_id' => ['abc@gmail.com' => 1],
-    ];
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
       $form->_bltID = 5;
       $form->_isPaidEvent = TRUE;
+      CRM_Event_Form_EventFees::preProcess($form);
       $form->buildEventFeeForm($form);
     }
     return $form;
@@ -516,6 +514,91 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     // Api doesn't retrieve it & we don't much want to change that as we want to feature freeze BAO_Query.
     $this->assertEquals($futureDate . ' 00:00:00', CRM_Core_DAO::singleValueQuery("SELECT revenue_recognition_date FROM civicrm_contribution WHERE id = {$contribution['id']}"));
+  }
+
+  /**
+   * Test submitting a partially paid event registration.
+   *
+   * In this case the participant status is selected as 'partially paid' and
+   * a contribution is created for the full amount with a payment equal to the entered amount.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isQuickConfig
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmitPartialPayment($isQuickConfig) {
+    $form = $this->getForm(['is_monetary' => 1]);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
+
+    $submitParams = [
+      'hidden_feeblock' => '1',
+      'hidden_eventFullMsg' => '',
+      'priceSetId' => $this->getPriceSetID(),
+      $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
+      'check_number' => '879',
+      'record_contribution' => '1',
+      'financial_type_id' => '4',
+      'receive_date' => '2020-01-31 00:51:00',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'trxn_id' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'total_amount' => '20',
+      'send_receipt' => '1',
+      'from_email_address' => key($form->_fromEmails['from_email_id']),
+      'receipt_text' => 'Contact the Development Department if you need to make any changes to your registration.',
+      'hidden_custom' => '1',
+      'hidden_custom_group_count' => ['' => 1],
+      'custom_4_-1' => '',
+      'contact_id' => $form->_contactID,
+      'event_id' => $form->_eventId,
+      'campaign_id' => '',
+      'register_date' => '2020-01-31 00:50:00',
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Partially paid'),
+      'source' => 'I wrote this',
+      'note' => 'I wrote a note',
+      'MAX_FILE_SIZE' => '33554432',
+    ];
+    $form->submit($submitParams);
+  }
+
+  /**
+   * Get the id of the configured price set.
+   *
+   * @return int
+   */
+  protected function getPriceSetID() {
+    return (int) $this->_ids['price_set'];
+  }
+
+  /**
+   * Get the price field id that has been created for the test.
+   *
+   * @return int
+   */
+  protected function getPriceFieldID() {
+    return (int) $this->_ids['price_field'][0];
+  }
+
+  /**
+   * Get the array key for the configured price field.
+   *
+   * @return string
+   */
+  protected function getPriceFieldKey(): string {
+    return 'price_' . $this->getPriceFieldID();
+  }
+
+  /**
+   * Get the price field value id that has been created for the test.
+   *
+   * @return int
+   */
+  protected function getPriceFieldValueID(): int {
+    return (int) $this->_ids['price_field_value'][1];
   }
 
 }
