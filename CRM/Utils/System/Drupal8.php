@@ -162,8 +162,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     // And if we are given an email address, let's check to see if it already exists.
-    if (!empty($params[$emailName]) || !empty($params['mail'])) {
-      $key = (!empty($params[$emailName])) ? $emailName : 'mail';
+    if (!empty($params['mail'])) {
+      $mail = $params['mail'];
 
       $user = entity_create('user');
       $user->setEmail($params[$key]);
