@@ -1009,6 +1009,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *   Name-value pair for an event.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function eventCreate($params = []) {
     // if no contact was passed, make up a dummy event creator
@@ -1050,12 +1051,16 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $options
    *
+   * @param string $key
+   *   Index for storing event ID in ids array.
+   *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected function eventCreatePaid($params, $options = [['name' => 'hundy', 'amount' => 100]]) {
+  protected function eventCreatePaid($params, $options = [['name' => 'hundy', 'amount' => 100]], $key = 'event') {
     $event = $this->eventCreate($params);
+    $this->ids['event'][$key] = (int) $event['id'];
     $this->priceSetID = $this->ids['PriceSet'][] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->priceSetID);
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->priceSetID, TRUE, FALSE);
