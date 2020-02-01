@@ -5,7 +5,8 @@ var cj = CRM.$ = jQuery;
 CRM._ = _;
 
 /**
- * Short-named function for string translation, defined in global scope so it's available everywhere.
+ * Short-named function for string translation, defined in global scope so it's
+ * available everywhere.
  *
  * @param text string for translating
  * @param params object key:value of additional parameters
