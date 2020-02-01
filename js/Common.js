@@ -5,8 +5,7 @@ var cj = CRM.$ = jQuery;
 CRM._ = _;
 
 /**
- * Short-named function for string translation, defined in global scope so it's
- * available everywhere.
+ * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
  * @param text string for translating
  * @param params object key:value of additional parameters
@@ -38,16 +37,15 @@ function ts(text, params) {
 /* jshint ignore:start */
 
 /**
- *  This function is called by default at the bottom of template files which
- * have forms that have conditionally displayed/hidden sections and elements.
- * The PHP is responsible for generating a list of 'blocks to show' and 'blocks
- * to hide' and the template passes these parameters to this function.
+ *  This function is called by default at the bottom of template files which have forms that have
+ *  conditionally displayed/hidden sections and elements. The PHP is responsible for generating
+ *  a list of 'blocks to show' and 'blocks to hide' and the template passes these parameters to
+ *  this function.
  *
  * @deprecated
  * @param  showBlocks Array of element Id's to be displayed
  * @param  hideBlocks Array of element Id's to be hidden
- * @param elementType Value to set display style to for showBlocks (e.g.
- *   'block' or 'table-row' or ...)
+ * @param elementType Value to set display style to for showBlocks (e.g. 'block' or 'table-row' or ...)
  */
 function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   if (elementType == null) {
@@ -82,20 +80,16 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
 }
 
 /**
- *  This function is called when we need to show or hide a related form element
- * (target_element) based on the value (trigger_value) of another form field
- * (trigger_field).
+ *  This function is called when we need to show or hide a related form element (target_element)
+ *  based on the value (trigger_value) of another form field (trigger_field).
  *
  * @deprecated
  * @param  trigger_field_id     HTML id of field whose onchange is the trigger
- * @param  trigger_value        List of integers - option value(s) which
- *   trigger show-element action for target_field
+ * @param  trigger_value        List of integers - option value(s) which trigger show-element action for target_field
  * @param  target_element_id    HTML id of element to be shown or hidden
- * @param  target_element_type  Type of element to be shown or hidden ('block'
- *   or 'table-row')
+ * @param  target_element_type  Type of element to be shown or hidden ('block' or 'table-row')
  * @param  field_type           Type of element radio/select
- * @param  invert               Boolean - if true, we HIDE target on value
- *   match; if false, we SHOW target on value match
+ * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
   var target, j;
@@ -181,8 +175,7 @@ function submitOnce(obj, formId, procText) {
 /**
  * Function to show / hide the row in optionFields
  * @deprecated
- * @param index string, element whose innerHTML is to hide else will show the
- *   hidden row.
+ * @param index string, element whose innerHTML is to hide else will show the hidden row.
  */
 function showHideRow(index) {
   if (index) {
@@ -268,14 +261,11 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * Populate a select list, overwriting the existing options except for the
-   * placeholder.
+   * Populate a select list, overwriting the existing options except for the placeholder.
    * @param select jquery selector - 1 or more select elements
    * @param options array in format returned by api.getoptions
-   * @param placeholder string|bool - new placeholder or false (default) to
-   *   keep the old one
-   * @param value string|array - will silently update the element with new
-   *   value without triggering change
+   * @param placeholder string|bool - new placeholder or false (default) to keep the old one
+   * @param value string|array - will silently update the element with new value without triggering change
    */
   CRM.utils.setOptions = function(select, options, placeholder, value) {
     $(select).each(function() {
@@ -365,8 +355,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * This provides defaults for ui.dialog which either need to be calculated or
-   * are different from global defaults
+   * This provides defaults for ui.dialog which either need to be calculated or are different from global defaults
    *
    * @param settings
    * @returns {*}
@@ -1494,12 +1483,10 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * Client-side currency formatting
+   * Clientside currency formatting
    * @param number value
-   * @param [optional] boolean onlyNumber - if true, we return formatted amount
-   *   without currency sign
-   * @param [optional] string format - currency representation of the number
-   *   1234.56
+   * @param [optional] boolean onlyNumber - if true, we return formatted amount without currency sign
+   * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */
   var currencyTemplate;
@@ -1525,12 +1512,11 @@ if (!CRM.vars) CRM.vars = {};
     separator = result[1];
     decimal = precision ? result[2] : false;
     sign = (value < 0) ? '-' : '';
-    // extracting the absolute value of the integer part of the number and
-    // converting to string
+    //extracting the absolute value of the integer part of the number and converting to string
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (precision ? decimal + Math.abs(value - i).toFixed(precision).slice(2) : '');
-    if (onlyNumber) {
+    if ( onlyNumber ) {
       return result;
     }
     switch (precision) {
@@ -1652,7 +1638,7 @@ if (!CRM.vars) CRM.vars = {};
     return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
       return entityMap[s];
     });
-  };
+  }
 
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
   $.ajaxPrefilter(function(s) {
