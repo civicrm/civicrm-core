@@ -7,7 +7,17 @@ use Civi\Api4\Generic\BasicBatchAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
- * User-configurable forms
+ * User-configurable forms.
+ *
+ * Afform stands for *The Affable Administrative Angular Form Framework*.
+ *
+ * This API provides actions for
+ *   1. **_Managing_ forms:**
+ *      The `create`, `get`, `save`, `update`, & `revert` actions read/write form html & json files.
+ *   2. **_Using_ forms:**
+ *      The `prefill` and `submit` actions are used for preparing forms and processing submissions.
+ *
+ * @see https://lab.civicrm.org/extensions/afform
  * @package Civi\Api4
  */
 class Afform extends AbstractEntity {
