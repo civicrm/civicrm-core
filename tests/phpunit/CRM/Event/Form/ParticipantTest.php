@@ -340,11 +340,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $event = $this->eventCreate($eventParams);
     }
 
-    $contactID = $this->individualCreate();
+    $this->ids['contact']['event'] = (int) $this->individualCreate();
     /** @var CRM_Event_Form_Participant $form */
     $form = $this->getFormObject('CRM_Event_Form_Participant');
     $form->_single = TRUE;
-    $form->_contactID = $form->_contactId = $contactID;
+    $form->_contactID = $form->_contactId = $this->ids['contact']['event'];
     $form->setCustomDataTypes();
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
@@ -547,7 +547,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param bool $isQuickConfig
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPartialPayment($isQuickConfig) {
     $mut = new CiviMailUtils($this, TRUE);
@@ -573,7 +572,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'hidden_custom' => '1',
       'hidden_custom_group_count' => ['' => 1],
       'custom_4_-1' => '',
-      'contact_id' => $form->_contactID,
+      'contact_id' => $this->getContactID(),
       'event_id' => $this->getEventID(),
       'campaign_id' => '',
       'register_date' => '2020-01-31 00:50:00',
@@ -584,9 +583,77 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'MAX_FILE_SIZE' => '33554432',
     ];
     $form->submit($submitParams);
+    $this->assertPartialPaymentResult($isQuickConfig, $mut);
+  }
+
+  /**
+   * Test submitting a partially paid event registration, recording a pending contribution.
+   *
+   * This tests
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isQuickConfig
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmitPendingPartiallyPaidAddPayment($isQuickConfig) {
+    $mut = new CiviMailUtils($this, TRUE);
+    $form = $this->getForm(['is_monetary' => 1]);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
+    $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $submitParams = $this->getRecordContributionParams('Partially paid', $form);
+    $form->submit($submitParams);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->callAPISuccessGetValue('Contribution', ['return' => 'id']),
+      'total_amount'  => 20,
+      'check_number' => 879,
+      'payment_instrument_id' => $paymentInstrumentID,
+    ]);
+    $this->assertPartialPaymentResult($isQuickConfig, $mut);
+  }
+
+  /**
+   * Test submitting a partially paid event registration, recording a pending contribution.
+   *
+   * This tests
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isQuickConfig
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitPendingAddPayment($isQuickConfig) {
+    $mut = new CiviMailUtils($this, TRUE);
+    $form = $this->getForm(['is_monetary' => 1]);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
+    $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $submitParams = $this->getRecordContributionParams('Pending from pay later', 'Pending');
+    // Create the pending contribution for the full amount to be paid.
+    $submitParams['total_amount'] = 1550.55;
+    $form->submit($submitParams);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->callAPISuccessGetValue('Contribution', ['return' => 'id']),
+      'total_amount'  => 20,
+      'check_number' => 879,
+      'payment_instrument_id' => $paymentInstrumentID,
+    ]);
+    $this->assertPartialPaymentResult($isQuickConfig, $mut, FALSE);
+  }
+
+  /**
+   * @param bool $isQuickConfig
+   * @param \CiviMailUtils $mut
+   * @param bool $isAmountPaidOnForm
+   *   Was the amount paid entered on the form (if so this should be on the receipt)
+   */
+  protected function assertPartialPaymentResult($isQuickConfig, CiviMailUtils $mut, $isAmountPaidOnForm = TRUE) {
+    $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $expected = [
-      'contact_id' => $form->_contactID,
+      'contact_id' => $this->getContactID(),
       'total_amount' => '1550.55',
       'fee_amount' => '0.00',
       'net_amount' => '1550.55',
@@ -602,7 +669,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertAttributesEquals([
-      'contact_id' => $form->_contactID,
+      'contact_id' => $this->getContactID(),
       'event_title' => 'Annual CiviCRM meet',
       'participant_fee_level' => [0 => 'big - 1'],
       'participant_fee_amount' => '1550.55',
@@ -646,7 +713,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $financialItem = $this->callAPISuccessGetSingle('FinancialItem', []);
     $this->assertAttributesEquals([
       'description' => 'big',
-      'contact_id' => $form->_contactID,
+      'contact_id' => $this->getContactID(),
       'amount' => 1550.55,
       'currency' => 'USD',
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Unpaid'),
@@ -664,7 +731,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Annual CiviCRM meet',
       'Registered Email',
       $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
-      'Total Paid: $ 20.00',
+      $isAmountPaidOnForm ? 'Total Paid: $ 20.00' : ' ',
       'Balance: $ 1,530.55',
       'Financial Type: Event Fee',
       'Paid By: Check',
@@ -709,12 +776,62 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get the parameters for recording a contribution.
+   *
+   * @param string $participantStatus
+   * @param string $contributionStatus
+   *
+   * @return array
+   */
+  protected function getRecordContributionParams($participantStatus, $contributionStatus): array {
+    $submitParams = [
+      'hidden_feeblock' => '1',
+      'hidden_eventFullMsg' => '',
+      'priceSetId' => $this->getPriceSetID(),
+      $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
+      'check_number' => '879',
+      'record_contribution' => '1',
+      'financial_type_id' => '4',
+      'receive_date' => '2020-01-31 00:51:00',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'trxn_id' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatus),
+      'total_amount' => '20',
+      'send_receipt' => '1',
+      'from_email_address' => $this->getFromEmailAddress(),
+      'receipt_text' => 'Contact the Development Department if you need to make any changes to your registration.',
+      'hidden_custom' => '1',
+      'hidden_custom_group_count' => ['' => 1],
+      'custom_4_-1' => '',
+      'contact_id' => $this->getContactID(),
+      'event_id' => $this->getEventID(),
+      'campaign_id' => '',
+      'register_date' => '2020-01-31 00:50:00',
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $participantStatus),
+      'source' => 'I wrote this',
+      'note' => 'I wrote a note',
+      'MAX_FILE_SIZE' => '33554432',
+    ];
+    return $submitParams;
+  }
+
+  /**
    * Get the id of the created event.
    *
    * @return int
    */
   protected function getEventID(): int {
     return $this->ids['event']['event'];
+  }
+
+  /**
+   * Get created contact ID.
+   *
+   * @return int
+   */
+  protected function getContactID(): int {
+    return $this->ids['contact']['event'];
   }
 
 }

@@ -150,6 +150,13 @@ class CRM_Financial_BAO_Payment {
     }
     elseif ($contributionStatus === 'Pending' && $params['total_amount'] > 0) {
       self::updateContributionStatus($contribution['id'], 'Partially Paid');
+      $participantPayments = civicrm_api3('ParticipantPayment', 'get', [
+        'contribution_id' => $contribution['id'],
+        'participant_id.status_id' => ['IN' => ['Pending from pay later', 'Pending from incomplete transaction']],
+      ])['values'];
+      foreach ($participantPayments as $participantPayment) {
+        civicrm_api3('Participant', 'create', ['id' => $participantPayment['participant_id'], 'status_id' => 'Partially paid']);
+      }
     }
     elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
       // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
