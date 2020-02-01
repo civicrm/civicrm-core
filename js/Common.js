@@ -971,7 +971,7 @@ if (!CRM.vars) CRM.vars = {};
       });
     })
     .on('dialogopen', function(e) {
-      var $el = $(e.target);
+      const $el = $(e.target);
       $('body').addClass('ui-dialog-open');
       // Modal dialogs should disable scrollbars
       if ($el.dialog('option', 'modal')) {
@@ -1517,7 +1517,7 @@ if (!CRM.vars) CRM.vars = {};
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (precision ? decimal + Math.abs(value - i).toFixed(precision).slice(2) : '');
-    if (onlyNumber) {
+    if ( onlyNumber ) {
       return result;
     }
     switch (precision) {
@@ -1620,6 +1620,25 @@ if (!CRM.vars) CRM.vars = {};
      b = parseInt(hexcolor.substr(4, 2), 16),
      yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
+  };
+
+  // based on https://github.com/janl/mustache.js/blob/master/mustache.js
+  // If you feel the need to use this function, consider whether assembling HTML
+  // via DOM might be a cleaner approach rather than using string concatenation.
+  CRM.utils.escapeHtml = function(string) {
+    var entityMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '/': '&#x2F;',
+      '`': '&#x60;',
+      '=': '&#x3D;'
+    };
+    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
+      return entityMap[s];
+    });
   };
 
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
