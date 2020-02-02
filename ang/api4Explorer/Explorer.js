@@ -36,7 +36,7 @@
     };
     marked.setOptions({highlight: prettyPrintOne});
     var getMetaParams = {},
-      objectParams = {orderBy: 'ASC', values: '', chain: ['Entity', '', '{}']},
+      objectParams = {orderBy: 'ASC', values: '', defaults: '', chain: ['Entity', '', '{}']},
       docs = CRM.vars.api4.docs,
       helpTitle = '',
       helpContent = {};
@@ -212,13 +212,15 @@
       return info;
     };
 
-    $scope.valuesFields = function() {
-      var fields = _.cloneDeep($scope.action === 'getFields' ? getFieldList($scope.params.action || 'get') : $scope.fields);
-      // Disable fields that are already in use
-      _.each($scope.params.values || [], function(val) {
-        (_.findWhere(fields, {id: val[0]}) || {}).disabled = true;
-      });
-      return {results: fields};
+    $scope.fieldList = function(param) {
+      return function() {
+        var fields = _.cloneDeep($scope.action === 'getFields' ? getFieldList($scope.params.action || 'get') : $scope.fields);
+        // Disable fields that are already in use
+        _.each($scope.params[param] || [], function(val) {
+          (_.findWhere(fields, {id: val[0]}) || {}).disabled = true;
+        });
+        return {results: fields};
+      };
     };
 
     $scope.formatSelect2Item = function(row) {
@@ -232,7 +234,7 @@
     };
 
     $scope.isSpecial = function(name) {
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'orderBy', 'chain'];
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain'];
       return _.contains(specialParams, name);
     };
 
@@ -488,8 +490,10 @@
                 code.oop += "\n  ->addWhere(" + phpFormat(clause).slice(1, -1) + ")";
               }
             });
-          } else if (key === 'select' && isSelectRowCount) {
-            code.oop += "\n  ->selectRowCount()";
+          } else if (key === 'select') {
+            code.oop += "\n  ";
+            // addSelect() is a variadic function & can take multiple arguments; selectRowCount() is a shortcut for addSelect('row_count')
+            code.oop += isSelectRowCount ? '->selectRowCount()' : '->addSelect(' + phpFormat(param).slice(1, -1) + ')';
           } else {
             code.oop += "\n  ->set" + ucfirst(key) + '(' + phpFormat(param, 4) + ')';
           }
