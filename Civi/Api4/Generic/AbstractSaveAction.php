@@ -22,7 +22,7 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for all "Save" api actions.
+ * Base class for all `Save` api actions.
  *
  * @method $this setRecords(array $records) Set array of records to be saved.
  * @method array getRecords()
@@ -36,9 +36,9 @@ namespace Civi\Api4\Generic;
 abstract class AbstractSaveAction extends AbstractAction {
 
   /**
-   * Array of records.
+   * Array of $ENTITYs to save.
    *
-   * Should be in the same format as returned by Get.
+   * Should be in the same format as returned by `Get`.
    *
    * @var array
    * @required
@@ -48,18 +48,18 @@ abstract class AbstractSaveAction extends AbstractAction {
   /**
    * Array of default values.
    *
-   * These defaults will be applied to all records unless they specify otherwise.
+   * These defaults will be applied to all $ENTITYs unless they specify otherwise.
    *
    * @var array
    */
   protected $defaults = [];
 
   /**
-   * Reload records after saving.
+   * Reload $ENTITYs after saving.
    *
-   * By default this api typically returns partial records containing only the fields
-   * that were updated. Set reload to TRUE to do an additional lookup after saving
-   * to return complete records.
+   * By default this action typically returns partial records containing only the fields
+   * that were updated. Set `reload` to `true` to do an additional lookup after saving
+   * to return complete values for every $ENTITY.
    *
    * @var bool
    */

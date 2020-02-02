@@ -25,11 +25,11 @@ use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\ActionUtil;
 
 /**
- * Create or update one or more records.
+ * $ACTION one or more $ENTITYs.
  *
- * If creating more than one record with similar values, use the "defaults" param.
+ * If saving more than one new $ENTITY with similar values, use the `defaults` parameter.
  *
- * Set "reload" if you need the api to return complete records.
+ * Set `reload` if you need the api to return complete $ENTITY records.
  */
 class BasicSaveAction extends AbstractSaveAction {
 

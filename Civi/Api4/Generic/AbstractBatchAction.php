@@ -31,7 +31,7 @@ namespace Civi\Api4\Generic;
 abstract class AbstractBatchAction extends AbstractQueryAction {
 
   /**
-   * Criteria for selecting items to process.
+   * Criteria for selecting $ENTITYs to process.
    *
    * @var array
    * @required

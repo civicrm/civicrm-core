@@ -22,11 +22,12 @@
 namespace api\v4\Mock;
 
 /**
- * Grandchild class
+ * Grandchild class for $ENTITY,
+ * with a 2-line description!
  *
- * This is an extended description.
+ * This is an extended comment.
  *
- * There is a line break in this description.
+ *   There is a line break in this comment.
  *
  * @inheritdoc
  */

@@ -20,11 +20,16 @@ class ReflectionUtils {
    * @param \Reflector|\ReflectionClass $reflection
    * @param string $type
    *   If we are not reflecting the class itself, specify "Method", "Property", etc.
-   *
+   * @param array $vars
+   *   Variable substitutions to perform in the docblock
    * @return array
    */
-  public static function getCodeDocs($reflection, $type = NULL) {
-    $docs = self::parseDocBlock($reflection->getDocComment());
+  public static function getCodeDocs($reflection, $type = NULL, $vars = []) {
+    $comment = $reflection->getDocComment();
+    if ($vars) {
+      $comment = str_replace(array_keys($vars), array_values($vars), $comment);
+    }
+    $docs = self::parseDocBlock($comment);
 
     // Recurse into parent functions
     if (isset($docs['inheritDoc']) || isset($docs['inheritdoc'])) {
@@ -47,7 +52,7 @@ class ReflectionUtils {
       }
       if ($newReflection) {
         // Mix in
-        $additionalDocs = self::getCodeDocs($newReflection, $type);
+        $additionalDocs = self::getCodeDocs($newReflection, $type, $vars);
         if (!empty($docs['comment']) && !empty($additionalDocs['comment'])) {
           $docs['comment'] .= "\n\n" . $additionalDocs['comment'];
         }
@@ -108,19 +113,26 @@ class ReflectionUtils {
         $info['params'][$param]['comment'] .= $line . "\n";
       }
       elseif ($num == 1) {
-        $info['description'] = $line;
+        $info['description'] = ucfirst($line);
       }
       elseif (!$line) {
         if (isset($info['comment'])) {
           $info['comment'] .= "\n";
         }
+        else {
+          $info['comment'] = NULL;
+        }
+      }
+      // For multi-line description.
+      elseif (count($info) === 1 && isset($info['description']) && substr($info['description'], -1) !== '.') {
+        $info['description'] .= ' ' . $line;
       }
       else {
         $info['comment'] = isset($info['comment']) ? "{$info['comment']}\n$line" : $line;
       }
     }
     if (isset($info['comment'])) {
-      $info['comment'] = trim($info['comment']);
+      $info['comment'] = rtrim($info['comment']);
     }
     return $info;
   }

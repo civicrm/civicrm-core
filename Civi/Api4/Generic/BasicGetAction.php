@@ -24,9 +24,9 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * Retrieve items based on criteria specified in the 'where' param.
+ * Retrieve $ENTITYs based on criteria specified in the `where` parameter.
  *
- * Use the 'select' param to determine which fields are returned, defaults to *.
+ * Use the `select` param to determine which fields are returned, defaults to `[*]`.
  */
 class BasicGetAction extends AbstractGetAction {
   use Traits\ArrayQueryActionTrait;

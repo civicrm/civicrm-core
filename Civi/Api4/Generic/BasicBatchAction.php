@@ -24,12 +24,9 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * Basic action for deleting or performing some other task with a set of records.  Ex:
+ * $ACTION one or more $ENTITYs.
  *
- * $myAction = new BasicBatchAction('Entity', 'action', function($item) {
- *   // Do something with $item
- *   $return $item;
- * });
+ * $ENTITYs are selected based on criteria specified in `where` parameter (required).
  *
  * @package Civi\Api4\Generic
  */
@@ -44,6 +41,13 @@ class BasicBatchAction extends AbstractBatchAction {
 
   /**
    * BasicBatchAction constructor.
+   *
+   * ```php
+   * $myAction = new BasicBatchAction($entityName, $actionName, function($item) {
+   *   // Do something with $item
+   *   $return $item;
+   * });
+   * ```
    *
    * @param string $entityName
    * @param string $actionName

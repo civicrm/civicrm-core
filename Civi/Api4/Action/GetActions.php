@@ -27,7 +27,9 @@ use Civi\Api4\Utils\ActionUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
- * Get actions for an entity with a list of accepted params
+ * Get all API actions for the $ENTITY entity.
+ *
+ * Includes a list of accepted parameters for each action, descriptions and other documentation.
  */
 class GetActions extends BasicGetAction {
 
@@ -86,13 +88,18 @@ class GetActions extends BasicGetAction {
         if (is_object($action)) {
           $this->_actions[$actionName] = ['name' => $actionName];
           if ($this->_isFieldSelected('description', 'comment', 'see')) {
+            $vars = ['$ENTITY' => $this->getEntityName(), '$ACTION' => $actionName];
             // Docblock from action class
-            $actionDocs = ReflectionUtils::getCodeDocs($action->reflect());
+            $actionDocs = ReflectionUtils::getCodeDocs($action->reflect(), NULL, $vars);
             unset($actionDocs['method']);
             // Docblock from action factory function in entity class. This takes precedence since most action classes are generic.
             if ($method) {
-              $methodDocs = ReflectionUtils::getCodeDocs($method, 'Method');
-              $actionDocs = $methodDocs + $actionDocs;
+              $methodDocs = ReflectionUtils::getCodeDocs($method, 'Method', $vars);
+              // Allow method doc to inherit class doc
+              if (strpos($method->getDocComment(), '@inheritDoc') !== FALSE && !empty($methodDocs['comment']) && !empty($actionDocs['comment'])) {
+                $methodDocs['comment'] .= "\n\n" . $actionDocs['comment'];
+              }
+              $actionDocs = array_filter($methodDocs) + $actionDocs;
             }
             $this->_actions[$actionName] += $actionDocs;
           }

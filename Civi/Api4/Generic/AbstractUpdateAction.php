@@ -22,7 +22,7 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for all "Update" api actions
+ * Base class for all `Update` api actions
  *
  * @method $this setValues(array $values) Set all field values from an array of key => value pairs.
  * @method array getValues() Get field values.
@@ -42,10 +42,10 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   protected $values = [];
 
   /**
-   * Reload objects after saving.
+   * Reload $ENTITYs after saving.
    *
-   * Setting to TRUE will load complete records and return them as the api result.
-   * If FALSE the api usually returns only the fields specified to be updated.
+   * Setting to `true` will load complete records and return them as the api result.
+   * If `false` the api usually returns only the fields specified to be updated.
    *
    * @var bool
    */
@@ -61,7 +61,8 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   }
 
   /**
-   * Add an item to the values array
+   * Add an item to the values array.
+   *
    * @param string $fieldName
    * @param mixed $value
    * @return $this

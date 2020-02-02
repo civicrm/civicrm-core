@@ -159,17 +159,30 @@
         $scope.helpContent = helpContent;
       } else {
         $scope.helpTitle = title;
-        $scope.helpContent = convertMarkdown(content);
+        $scope.helpContent = formatHelp(content);
       }
     };
 
     // Sets the static help text (which gets overridden by mousing over other elements)
     function setHelp(title, content) {
       $scope.helpTitle = helpTitle = title;
-      $scope.helpContent = helpContent = convertMarkdown(content);
+      $scope.helpContent = helpContent = formatHelp(content);
     }
 
-    function convertMarkdown(rawContent) {
+    // Convert plain-text help to markdown; replace variables and format links
+    function formatHelp(rawContent) {
+      function formatRefs(see) {
+        _.each(see, function(ref, idx) {
+          var match = ref.match(/^\\Civi\\Api4\\([a-zA-Z]+)$/);
+          if (match) {
+            ref = '#/explorer/' + match[1];
+          }
+          if (ref[0] === '\\') {
+            ref = 'https://github.com/civicrm/civicrm-core/blob/master' + ref.replace(/\\/i, '/') + '.php';
+          }
+          see[idx] = '<a target="' + (ref[0] === '#' ? '_self' : '_blank') + '" href="' + ref + '">' + see[idx] + '</a>';
+        });
+      }
       var formatted = _.cloneDeep(rawContent);
       if (formatted.description) {
         formatted.description = marked(formatted.description);
@@ -177,20 +190,9 @@
       if (formatted.comment) {
         formatted.comment = marked(formatted.comment);
       }
+      formatRefs(formatted.see);
       return formatted;
     }
-
-    // Format the href for a @see help annotation
-    $scope.formatRef = function(see) {
-      var match = see.match(/^\\Civi\\Api4\\([a-zA-Z]+)$/);
-      if (match) {
-        return '#/explorer/' + match[1];
-      }
-      if (see[0] === '\\') {
-        return 'https://github.com/civicrm/civicrm-core/blob/master' + see.replace(/\\/i, '/') + '.php';
-      }
-      return see;
-    };
 
     $scope.fieldHelp = function(fieldName) {
       var field = getField(fieldName, $scope.entity, $scope.action);

@@ -120,9 +120,7 @@
           <div ng-if="helpContent.see">
             <strong>See:</strong>
             <ul>
-              <li ng-repeat="ref in helpContent.see">
-                <a target="{{ formatRef(ref)[0] === '#' ? '_self' : '_blank'}}" ng-href="{{ formatRef(ref) }}">{{ ref }}</a>
-              </li>
+              <li ng-repeat="ref in helpContent.see" ng-bind-html="ref"> </li>
             </ul>
           </div>
         </div>

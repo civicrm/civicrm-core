@@ -25,11 +25,18 @@ use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\ActionUtil;
 
 /**
- * Given a set of records, will appropriately update the database.
+ * Replaces an existing set of $ENTITYs with a new one.
  *
- * @method $this setRecords(array $records) Array of records.
+ * This will select a group of existing $ENTITYs based on the `where` parameter.
+ * Each will be compared with the $ENTITYs passed in as `records`:
+ *
+ *  - $ENTITYs in `records` that don't already exist will be created.
+ *  - Existing $ENTITYs that are included in `records` will be updated.
+ *  - Existing $ENTITYs that are omitted from `records` will be deleted.
+ *
+ * @method $this setRecords(array $records) Set array of records.
  * @method array getRecords()
- * @method $this setDefaults(array $defaults) Array of defaults.
+ * @method $this setDefaults(array $defaults) Set array of defaults.
  * @method array getDefaults()
  * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
  * @method bool getReload()
@@ -37,9 +44,9 @@ use Civi\Api4\Utils\ActionUtil;
 class BasicReplaceAction extends AbstractBatchAction {
 
   /**
-   * Array of records.
+   * Array of $ENTITY records.
    *
-   * Should be in the same format as returned by Get.
+   * Should be in the same format as returned by `Get`.
    *
    * @var array
    * @required
@@ -49,18 +56,21 @@ class BasicReplaceAction extends AbstractBatchAction {
   /**
    * Array of default values.
    *
-   * Will be merged into $records before saving.
+   * Will be merged into `records` before saving.
+   *
+   * **Note:** Values from the `where` clause that use the `=` operator are _also_ saved into each record;
+   * those do not need to be repeated here.
    *
    * @var array
    */
   protected $defaults = [];
 
   /**
-   * Reload records after saving.
+   * Reload $ENTITYs after saving.
    *
-   * By default this api typically returns partial records containing only the fields
-   * that were updated. Set reload to TRUE to do an additional lookup after saving
-   * to return complete records.
+   * By default this action typically returns partial records containing only the fields
+   * that were updated. Set `reload` to `true` to do an additional lookup after saving
+   * to return complete values for every $ENTITY.
    *
    * @var bool
    */
