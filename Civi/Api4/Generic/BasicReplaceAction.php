@@ -56,9 +56,11 @@ class BasicReplaceAction extends AbstractBatchAction {
   /**
    * Array of default values.
    *
-   * Will be merged into `records` before saving.
+   * These defaults will be merged into every $ENTITY in `records` before saving.
+   * Values set in `records` will override these defaults if set in both places,
+   * but updating existing $ENTITYs will overwrite current values with these defaults.
    *
-   * **Note:** Values from the `where` clause that use the `=` operator are _also_ saved into each record;
+   * **Note:** Values from the `where` clause that use the `=` operator are _also_ treated as default values;
    * those do not need to be repeated here.
    *
    * @var array

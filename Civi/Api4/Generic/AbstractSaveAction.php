@@ -48,7 +48,9 @@ abstract class AbstractSaveAction extends AbstractAction {
   /**
    * Array of default values.
    *
-   * These defaults will be applied to all $ENTITYs unless they specify otherwise.
+   * These defaults will be merged into every $ENTITY in `records` before saving.
+   * Values set in `records` will override these defaults if set in both places,
+   * but updating existing $ENTITYs will overwrite current values with these defaults.
    *
    * @var array
    */
