@@ -1645,12 +1645,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Function tests that financial records are added when Pending Contribution is Canceled.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionCancelPending() {
-    // Enable & disable invoicing just to standardise the credit note id setting.
-    // Longer term we want to separate that setting from 'taxAndInvoicing'.
-    // and / or remove from core.
-    $this->enableTaxAndInvoicing();
+    Civi::settings()->set('credit_notes_prefix', 'CN_');
     $contribParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -1675,7 +1674,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialTrxn($contribution, 'cancelPending', NULL, $checkTrxnDate);
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
     $this->assertEquals('CN_1', $contribution['values'][$contribution['id']]['creditnote_id']);
-    $this->disableTaxAndInvoicing();
   }
 
   /**
