@@ -22,9 +22,9 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Delete one or more $ENTITYs.
+ * Delete one or more $ENTITIES.
  *
- * $ENTITYs are deleted based on criteria specified in `where` parameter (required).
+ * $ENTITIES are deleted based on criteria specified in `where` parameter (required).
  */
 class DAODeleteAction extends AbstractBatchAction {
   use Traits\DAOActionTrait;

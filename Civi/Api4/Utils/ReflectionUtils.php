@@ -26,8 +26,9 @@ class ReflectionUtils {
    */
   public static function getCodeDocs($reflection, $type = NULL, $vars = []) {
     $comment = $reflection->getDocComment();
-    if ($vars) {
-      $comment = str_replace(array_keys($vars), array_values($vars), $comment);
+    foreach ($vars as $key => $val) {
+      $comment = str_replace('$' . strtoupper(\CRM_Utils_String::pluralize($key)), \CRM_Utils_String::pluralize($val), $comment);
+      $comment = str_replace('$' . strtoupper($key), $val, $comment);
     }
     $docs = self::parseDocBlock($comment);
 

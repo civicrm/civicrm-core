@@ -36,7 +36,7 @@ namespace Civi\Api4\Generic;
 abstract class AbstractSaveAction extends AbstractAction {
 
   /**
-   * Array of $ENTITYs to save.
+   * Array of $ENTITIES to save.
    *
    * Should be in the same format as returned by `Get`.
    *
@@ -50,14 +50,14 @@ abstract class AbstractSaveAction extends AbstractAction {
    *
    * These defaults will be merged into every $ENTITY in `records` before saving.
    * Values set in `records` will override these defaults if set in both places,
-   * but updating existing $ENTITYs will overwrite current values with these defaults.
+   * but updating existing $ENTITIES will overwrite current values with these defaults.
    *
    * @var array
    */
   protected $defaults = [];
 
   /**
-   * Reload $ENTITYs after saving.
+   * Reload $ENTITIES after saving.
    *
    * By default this action typically returns partial records containing only the fields
    * that were updated. Set `reload` to `true` to do an additional lookup after saving

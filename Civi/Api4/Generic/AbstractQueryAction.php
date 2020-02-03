@@ -38,7 +38,7 @@ namespace Civi\Api4\Generic;
 abstract class AbstractQueryAction extends AbstractAction {
 
   /**
-   * Criteria for selecting $ENTITYs.
+   * Criteria for selecting $ENTITIES.
    *
    * ```php
    * $example->addWhere('contact_type', 'IN', ['Individual', 'Household'])
@@ -60,7 +60,7 @@ abstract class AbstractQueryAction extends AbstractAction {
   protected $orderBy = [];
 
   /**
-   * Maximum number of $ENTITYs to return.
+   * Maximum number of $ENTITIES to return.
    *
    * Defaults to unlimited.
    *

@@ -27,7 +27,7 @@ use Civi\API\Exception\NotImplementedException;
  * Create a new $ENTITY from supplied values.
  *
  * This action will create 1 new $ENTITY.
- * It cannot be used to update existing $ENTITYs; use the `Update` or `Replace` actions for that.
+ * It cannot be used to update existing $ENTITIES; use the `Update` or `Replace` actions for that.
  */
 class BasicCreateAction extends AbstractCreateAction {
 

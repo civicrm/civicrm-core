@@ -39,7 +39,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * Use the * wildcard by itself to select all available fields, or use it to match similarly-named fields.
    * E.g. `is_*` will match fields named is_primary, is_active, etc.
    *
-   * Set to `["row_count"]` to return only the number of $ENTITYs found.
+   * Set to `["row_count"]` to return only the number of $ENTITIES found.
    *
    * @var array
    */

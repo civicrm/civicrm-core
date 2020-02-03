@@ -24,9 +24,9 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * $ACTION one or more $ENTITYs.
+ * $ACTION one or more $ENTITIES.
  *
- * $ENTITYs are selected based on criteria specified in `where` parameter (required).
+ * $ENTITIES are selected based on criteria specified in `where` parameter (required).
  *
  * @package Civi\Api4\Generic
  */

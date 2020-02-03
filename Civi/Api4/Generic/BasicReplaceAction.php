@@ -24,14 +24,14 @@ namespace Civi\Api4\Generic;
 use Civi\Api4\Utils\ActionUtil;
 
 /**
- * Replaces an existing set of $ENTITYs with a new one.
+ * Replaces an existing set of $ENTITIES with a new one.
  *
- * This will select a group of existing $ENTITYs based on the `where` parameter.
- * Each will be compared with the $ENTITYs passed in as `records`:
+ * This will select a group of existing $ENTITIES based on the `where` parameter.
+ * Each will be compared with the $ENTITIES passed in as `records`:
  *
- *  - $ENTITYs in `records` that don't already exist will be created.
- *  - Existing $ENTITYs that are included in `records` will be updated.
- *  - Existing $ENTITYs that are omitted from `records` will be deleted.
+ *  - $ENTITIES in `records` that don't already exist will be created.
+ *  - Existing $ENTITIES that are included in `records` will be updated.
+ *  - Existing $ENTITIES that are omitted from `records` will be deleted.
  *
  * @method $this setRecords(array $records) Set array of records.
  * @method array getRecords()
@@ -57,7 +57,7 @@ class BasicReplaceAction extends AbstractBatchAction {
    *
    * These defaults will be merged into every $ENTITY in `records` before saving.
    * Values set in `records` will override these defaults if set in both places,
-   * but updating existing $ENTITYs will overwrite current values with these defaults.
+   * but updating existing $ENTITIES will overwrite current values with these defaults.
    *
    * **Note:** Values from the `where` clause that use the `=` operator are _also_ treated as default values;
    * those do not need to be repeated here.
@@ -67,7 +67,7 @@ class BasicReplaceAction extends AbstractBatchAction {
   protected $defaults = [];
 
   /**
-   * Reload $ENTITYs after saving.
+   * Reload $ENTITIES after saving.
    *
    * By default this action typically returns partial records containing only the fields
    * that were updated. Set `reload` to `true` to do an additional lookup after saving

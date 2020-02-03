@@ -22,7 +22,7 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Retrieve $ENTITYs based on criteria specified in the `where` parameter.
+ * Retrieve $ENTITIES based on criteria specified in the `where` parameter.
  *
  * Use the `select` param to determine which fields are returned, defaults to `[*]`.
  *
