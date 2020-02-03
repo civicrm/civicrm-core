@@ -21,7 +21,6 @@
 
 namespace Civi\Api4\Generic;
 
-use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\ActionUtil;
 
 /**
@@ -101,36 +100,13 @@ class BasicReplaceAction extends AbstractBatchAction {
     $idField = $this->getSelect()[0];
     $toDelete = array_diff_key(array_column($items, NULL, $idField), array_flip(array_filter(\CRM_Utils_Array::collect($idField, $this->records))));
 
-    // Try to delegate to the Save action
-    try {
-      $saveAction = ActionUtil::getAction($this->getEntityName(), 'save');
-      $saveAction
-        ->setCheckPermissions($this->getCheckPermissions())
-        ->setReload($this->reload)
-        ->setRecords($this->records)
-        ->setDefaults($this->defaults);
-      $result->exchangeArray((array) $saveAction->execute());
-    }
-    // Fall back on Create/Update if Save doesn't exist
-    catch (NotImplementedException $e) {
-      foreach ($this->records as $record) {
-        $record += $this->defaults;
-        if (!empty($record[$idField])) {
-          $result[] = civicrm_api4($this->getEntityName(), 'update', [
-            'reload' => $this->reload,
-            'where' => [[$idField, '=', $record[$idField]]],
-            'values' => $record,
-            'checkPermissions' => $this->getCheckPermissions(),
-          ])->first();
-        }
-        else {
-          $result[] = civicrm_api4($this->getEntityName(), 'create', [
-            'values' => $record,
-            'checkPermissions' => $this->getCheckPermissions(),
-          ])->first();
-        }
-      }
-    }
+    $saveAction = ActionUtil::getAction($this->getEntityName(), 'save');
+    $saveAction
+      ->setCheckPermissions($this->getCheckPermissions())
+      ->setReload($this->reload)
+      ->setRecords($this->records)
+      ->setDefaults($this->defaults);
+    $result->exchangeArray((array) $saveAction->execute());
 
     if ($toDelete) {
       $result->deleted = (array) civicrm_api4($this->getEntityName(), 'delete', [
