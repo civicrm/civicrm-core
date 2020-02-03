@@ -400,6 +400,16 @@ WHERE     cpf.price_set_id = %1";
       $query .= " AND 0 ";
     }
     $query .= " GROUP BY s.id";
+    $dao = CRM_Core_DAO::executeQuery("SELECT @@GLOBAL.sql_mode as foo");
+    $dao->fetch();
+    if (function_exists('watchdog')) {
+      watchdog('abc', "GLOBAL SQL MODE: {$dao->foo}");
+    }
+    $dao = CRM_Core_DAO::executeQuery("SELECT @@SESSION.sql_mode as foo");
+    $dao->fetch();
+    if (function_exists('watchdog')) {
+      watchdog('abc', "SESSION SQL MODE: {$dao->foo}");
+    }
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $priceSets[$dao->id] = $dao->$column;
