@@ -161,6 +161,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   Array of arrays as would be passed into create
    * @param array $defaults
    *  Default parameters to be be merged into each of the params.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function bulkSave($bulkParams, $defaults = []) {
     $addedColumns = $sql = $tables = $customFields = [];

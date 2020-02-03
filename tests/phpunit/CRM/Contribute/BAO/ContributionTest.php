@@ -683,7 +683,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     // want to deprecate & remove & the test relies on bad data asa starting point.
     // End goal is the Order.create->Payment.create flow.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_financial_trxn WHERE entity_table = "civicrm_financial_item"');
-    CRM_Contribute_BAO_Contribution::addPayments([$contribution]);
+    CRM_Contribute_BAO_Contribution::addPayments($contribution);
     $this->checkItemValues($contribution);
   }
 
