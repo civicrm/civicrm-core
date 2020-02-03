@@ -835,7 +835,7 @@ class CRM_Extension_Manager {
    * @param array $keys extensionKey
    * @param string $process one of: install|uninstall|enable|disable|installing|uninstalling|enabling|disabling
    */
-  protected function addProcess(array $keys, string $process) :void {
+  protected function addProcess(array $keys, string $process) {
     foreach ($keys as $key) {
       $this->processes[$key][] = $process;
     }
@@ -846,7 +846,7 @@ class CRM_Extension_Manager {
    *
    * @param array $keys extensionKey
    */
-  protected function popProcess(array $keys) :void {
+  protected function popProcess(array $keys) {
     foreach ($keys as $key) {
       if (!empty($this->process[$key])) {
         array_pop($this->process[$key]);
