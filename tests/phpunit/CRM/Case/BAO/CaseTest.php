@@ -127,6 +127,12 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * @param $caseCount
    */
   private function assertCasesOfUser($loggedInUser, $caseId, $caseCount) {
+    $dao = CRM_Core_DAO::executeQuery("SELECT @@GLOBAL.sql_mode as foo");
+    $dao->fetch();
+    echo "\nGLOBAL SQL MODE: {$dao->foo}\n";
+    $dao = CRM_Core_DAO::executeQuery("SELECT @@SESSION.sql_mode as foo");
+    $dao->fetch();
+    echo "\nSESSION SQL MODE: {$dao->foo}\n";
     $summary = CRM_Case_BAO_Case::getCasesSummary(FALSE);
     $upcomingCases = CRM_Case_BAO_Case::getCases(FALSE, [], 'dashboard', TRUE);
     $caseRoles = CRM_Case_BAO_Case::getCaseRoles($loggedInUser, $caseId);
