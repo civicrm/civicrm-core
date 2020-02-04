@@ -4,6 +4,7 @@ namespace Civi\Test;
 
 use Civi\API\Exception\NotImplementedException;
 
+require_once 'api/v3/utils.php';
 /**
  * Class Api3TestTrait
  * @package Civi\Test
