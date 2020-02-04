@@ -25,7 +25,7 @@ class CRM_Upgrade_Incremental_General {
   /**
    * The recommended PHP version.
    */
-  const RECOMMENDED_PHP_VER = '7.2';
+  const RECOMMENDED_PHP_VER = '7.3';
 
   /**
    * The previous recommended PHP version.
