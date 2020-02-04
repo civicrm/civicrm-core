@@ -100,7 +100,7 @@ WHERE  r.mailing_id = %1
       $limitString = "LIMIT 0, $totalLimit";
     }
     $temporaryTable = CRM_Utils_SQL_TempTable::build()
-      ->setCategory('srcmailing' . $sourceMailingId)
+      ->setCategory('sr' . $sourceMailingId)
       ->setMemory()
       ->createWithColumns("mailing_recipient_id int unsigned, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id)");
     $temporaryTableName = $temporaryTable->getName();
