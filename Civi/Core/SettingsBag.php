@@ -423,6 +423,8 @@ class SettingsBag {
    */
   public static function getContributionInvoiceSettingKeys(): array {
     $convertedKeys = [
+      // credit_notes_prefix is no longer core but leave it here for a few releases.
+      // it can be removed when we deprecate some others.
       'credit_notes_prefix' => 'credit_notes_prefix',
       'invoice_prefix' => 'invoice_prefix',
       'due_date' => 'invoice_due_date',

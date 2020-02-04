@@ -24,6 +24,7 @@ dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
 dm_install_drupal "$SRC/drupal" "$TRG/drupal"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
+dm_install_cvext sequentialcreditnotes "$TRG/ext/sequentialcreditnotes"
 
 # gen tarball
 cd $TRG/..

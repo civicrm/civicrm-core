@@ -1649,7 +1649,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionCancelPending() {
-    Civi::settings()->set('credit_notes_prefix', 'CN_');
     $contribParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -1673,7 +1672,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'cancelPending', NULL, $checkTrxnDate);
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
-    $this->assertEquals('CN_1', $contribution['values'][$contribution['id']]['creditnote_id']);
   }
 
   /**

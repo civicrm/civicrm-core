@@ -24,6 +24,7 @@ dm_install_vendor "$SRC/vendor" "$TRG/civicrm/civicrm/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/civicrm/civicrm/bower_components"
 dm_install_wordpress "$SRC/WordPress" "$TRG/civicrm"
 dm_install_cvext com.iatspayments.civicrm "$TRG/civicrm/civicrm/ext/iatspayments"
+dm_install_cvext sequentialcreditnotes "$TRG/ext/sequentialcreditnotes"
 
 # gen tarball
 cd $TRG

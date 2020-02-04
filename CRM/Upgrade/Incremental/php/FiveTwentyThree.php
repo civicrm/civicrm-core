@@ -36,6 +36,8 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
           2 => 'https://lab.civicrm.org/dev/core/issues/1387',
         ]);
       }
+      $preUpgradeMessage .= '<br/>' . ts('The code to create sequential credit notes when contributions are refunded has been moved to an extension.') .
+        ts('This extension has been enabled. If this feature is not important to you your performance will be improved by disabling it on the extension screen');
     }
   }
 
@@ -88,6 +90,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
     if (!$this->hasConfigBackendData()) {
       $this->addTask('Drop column "civicrm_domain.config_backend"', 'dropColumn', 'civicrm_domain', 'config_backend');
     }
+    $this->addTask('Install sequential creditnote extension', 'installCreditNotes');
   }
 
   /**
@@ -165,6 +168,22 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
   private function hasConfigBackendData() {
     return CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend')
     && CRM_Core_DAO::singleValueQuery('SELECT count(*) c FROM `civicrm_domain` WHERE config_backend IS NOT NULL') > 0;
+  }
+
+  /**
+   * Install sequentialCreditNotes extension.
+   *
+   * This extension is being moved from core functionality to an extension.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function installCreditNotes(CRM_Queue_TaskContext $ctx) {
+    civicrm_api3('Extension', 'install', ['sequentialcreditnotes']);
+    return TRUE;
   }
 
 }

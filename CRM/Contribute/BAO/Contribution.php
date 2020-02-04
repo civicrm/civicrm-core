@@ -130,21 +130,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-
       if (empty($params['invoice_number']) && CRM_Invoicing_Utils::isInvoicingEnabled()) {
         $nextContributionID = CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(id) + 1, 1) FROM civicrm_contribution");
         $params['invoice_number'] = self::getInvoiceNumber($nextContributionID);
       }
     }
 
-    //if contribution is created with cancelled or refunded status, add credit note id
-    // do the same for chargeback - this entered the code 'accidentally' but moving it to here
-    // as part of cleanup maintains consistency.
-    if (self::isContributionStatusNegative(CRM_Utils_Array::value('contribution_status_id', $params))) {
-      if (empty($params['creditnote_id'])) {
-        $params['creditnote_id'] = self::createCreditNoteId();
-      }
-    }
     $contributionStatusID = $params['contribution_status_id'] ?? NULL;
     if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $contributionStatusID) === 'Partially paid' && empty($params['is_post_payment_create'])) {
       CRM_Core_Error::deprecatedFunctionWarning('Setting status to partially paid other than by using Payment.create is deprecated and unreliable');
@@ -4686,31 +4677,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // If we are still empty fall back to the domain or logged in user information.
     return CRM_Core_BAO_Domain::getDefaultReceiptFrom();
-  }
-
-  /**
-   * Generate credit note id with next avaible number
-   *
-   * @return string
-   *   Credit Note Id.
-   *
-   * @throws \CiviCRM_API3_Exception
-   */
-  public static function createCreditNoteId() {
-
-    $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution WHERE creditnote_id IS NOT NULL");
-    $creditNoteId = NULL;
-
-    do {
-      $creditNoteNum++;
-      $creditNoteId = Civi::settings()->get('credit_notes_prefix') . '' . $creditNoteNum;
-      $result = civicrm_api3('Contribution', 'getcount', [
-        'sequential' => 1,
-        'creditnote_id' => $creditNoteId,
-      ]);
-    } while ($result > 0);
-
-    return $creditNoteId;
   }
 
   /**

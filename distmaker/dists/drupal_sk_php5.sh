@@ -24,6 +24,7 @@ dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
 dm_install_drupal "$SRC/drupal" "$TRG/drupal"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
+dm_install_cvext sequentialcreditnotes "$TRG/ext/sequentialcreditnotes"
 
 # delete packages that distributions on Drupal.org repalce if present
 # also delete stuff that we dont really use and should not be included
