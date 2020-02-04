@@ -36,9 +36,10 @@ class CRM_Utils_XML {
       $oldLibXMLErrors = libxml_use_internal_errors();
       libxml_use_internal_errors(TRUE);
 
-      $xml = simplexml_load_file($file,
-        'SimpleXMLElement', LIBXML_NOCDATA
-      );
+      // Note that under obscure circumstances calling simplexml_load_file
+      // hit https://bugs.php.net/bug.php?id=62577
+      $string = file_get_contents($file);
+      $xml = simplexml_load_string($string, 'SimpleXMLElement', LIBXML_NOCDATA);
       if ($xml === FALSE) {
         $error = self::formatErrors(libxml_get_errors());
       }
