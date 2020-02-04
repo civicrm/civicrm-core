@@ -113,7 +113,7 @@ class Api4SelectQuery extends SelectQuery {
     $results = [];
     $sql = $this->query->toSQL();
     if (is_array($this->debugOutput)) {
-      $this->debugOutput['main_sql'] = $sql;
+      $this->debugOutput['sql'][] = $sql;
     }
     $query = \CRM_Core_DAO::executeQuery($sql);
 

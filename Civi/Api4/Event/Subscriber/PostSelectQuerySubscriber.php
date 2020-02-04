@@ -245,7 +245,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
     $sql = $newSelect . substr($sql, strpos($sql, "\nFROM"));
 
     if (is_array($query->debugOutput)) {
-      $query->debugOutput['join_sql'][] = $sql;
+      $query->debugOutput['sql'][] = $sql;
     }
 
     $relatedResults = [];
