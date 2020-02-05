@@ -42,7 +42,7 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   protected $values = [];
 
   /**
-   * Reload $ENTITYs after saving.
+   * Reload $ENTITIES after saving.
    *
    * Setting to `true` will load complete records and return them as the api result.
    * If `false` the api usually returns only the fields specified to be updated.

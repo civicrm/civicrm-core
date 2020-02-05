@@ -36,7 +36,7 @@ class ReflectionUtilsTest extends UnitTestCase {
   public function testGetDocBlockForClass() {
     $grandChild = new MockV4ReflectionGrandchild();
     $reflection = new \ReflectionClass($grandChild);
-    $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['$ENTITY' => "Test"]);
+    $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => "Test"]);
 
     $this->assertEquals(TRUE, $doc['internal']);
     $this->assertEquals('Grandchild class for Test, with a 2-line description!', $doc['description']);

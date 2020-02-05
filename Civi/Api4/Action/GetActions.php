@@ -88,7 +88,7 @@ class GetActions extends BasicGetAction {
         if (is_object($action)) {
           $this->_actions[$actionName] = ['name' => $actionName];
           if ($this->_isFieldSelected('description', 'comment', 'see')) {
-            $vars = ['$ENTITY' => $this->getEntityName(), '$ACTION' => $actionName];
+            $vars = ['entity' => $this->getEntityName(), 'action' => $actionName];
             // Docblock from action class
             $actionDocs = ReflectionUtils::getCodeDocs($action->reflect(), NULL, $vars);
             unset($actionDocs['method']);

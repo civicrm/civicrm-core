@@ -132,7 +132,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   private function addDocs(&$entity) {
     $reflection = new \ReflectionClass("\\Civi\\Api4\\" . $entity['name']);
-    $entity += ReflectionUtils::getCodeDocs($reflection, NULL, ['$ENTITY' => $entity['name']]);
+    $entity += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $entity['name']]);
     unset($entity['package'], $entity['method']);
   }
 

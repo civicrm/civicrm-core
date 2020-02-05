@@ -25,7 +25,7 @@ use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\ActionUtil;
 
 /**
- * $ACTION one or more $ENTITYs.
+ * $ACTION one or more $ENTITIES.
  *
  * If saving more than one new $ENTITY with similar values, use the `defaults` parameter.
  *

@@ -22,7 +22,7 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Create or update one or more $ENTITYs.
+ * Create or update one or more $ENTITIES.
  *
  * If creating more than one $ENTITY with similar values, use the `defaults` param.
  *

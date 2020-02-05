@@ -253,8 +253,12 @@
     };
 
     $scope.isSelectRowCount = function() {
-      return $scope.params && $scope.params.select && $scope.params.select.length === 1 && $scope.params.select[0] === 'row_count';
+      return isSelectRowCount($scope.params);
     };
+
+    function isSelectRowCount(params) {
+      return params && params.select && params.select.length === 1 && params.select[0] === 'row_count';
+    }
 
     function getEntity(entityName) {
       return _.findWhere(schema, {name: entityName || $scope.entity});
@@ -435,10 +439,9 @@
         }
         var results = lcfirst(_.isNumber(index) ? result : pluralize(result)),
           paramCount = _.size(params),
-          isSelectRowCount = params.select && params.select.length === 1 && params.select[0] === 'row_count',
           i = 0;
 
-        if (isSelectRowCount) {
+        if (isSelectRowCount(params)) {
           results = result + 'Count';
         }
 
@@ -472,36 +475,8 @@
         code.php += ");";
 
         // Write oop code
-        if (entity.substr(0, 7) !== 'Custom_') {
-          code.oop = '$' + results + " = \\Civi\\Api4\\" + entity + '::' + action + '()';
-        } else {
-          code.oop = '$' + results + " = \\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "')";
-        }
-        _.each(params, function(param, key) {
-          var val = '';
-          if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {
-            _.each(param, function(item, index) {
-              val = phpFormat(index) + ', ' + phpFormat(item, 4);
-              code.oop += "\n  ->add" + ucfirst(key).replace(/s$/, '') + '(' + val + ')';
-            });
-          } else if (key === 'where') {
-            _.each(param, function (clause) {
-              if (clause[0] === 'AND' || clause[0] === 'OR' || clause[0] === 'NOT') {
-                code.oop += "\n  ->addClause(" + phpFormat(clause[0]) + ", " + phpFormat(clause[1]).slice(1, -1) + ')';
-              } else {
-                code.oop += "\n  ->addWhere(" + phpFormat(clause).slice(1, -1) + ")";
-              }
-            });
-          } else if (key === 'select') {
-            code.oop += "\n  ";
-            // addSelect() is a variadic function & can take multiple arguments; selectRowCount() is a shortcut for addSelect('row_count')
-            code.oop += isSelectRowCount ? '->selectRowCount()' : '->addSelect(' + phpFormat(param).slice(1, -1) + ')';
-          } else {
-            code.oop += "\n  ->set" + ucfirst(key) + '(' + phpFormat(param, 4) + ')';
-          }
-        });
-        code.oop += "\n  ->execute()";
-        if (isSelectRowCount) {
+        code.oop = '$' + results + " = " + formatOOP(entity, action, params, 2) + "\n  ->execute()";
+        if (isSelectRowCount(params)) {
           code.oop += "\n  ->count()";
         } else if (_.isNumber(index)) {
           code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
@@ -514,7 +489,7 @@
           }
         }
         code.oop += ";\n";
-        if (!_.isNumber(index) && !isSelectRowCount) {
+        if (!_.isNumber(index) && !isSelectRowCount(params)) {
           code.oop += "foreach ($" + results + ' as $' + ((_.isString(index) && index) ? index + ' => $' : '') + result + ') {\n  // do something\n}';
         }
 
@@ -526,6 +501,47 @@
           style.code = code[style.name] ? prettyPrintOne(code[style.name]) : '';
         });
       });
+    }
+
+    // Format oop params
+    function formatOOP(entity, action, params, indent) {
+      var code = '',
+        newLine = "\n" + _.repeat(' ', indent);
+      if (entity.substr(0, 7) !== 'Custom_') {
+        code = "\\Civi\\Api4\\" + entity + '::' + action + '()';
+      } else {
+        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "')";
+      }
+      _.each(params, function(param, key) {
+        var val = '';
+        if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {
+          _.each(param, function(item, index) {
+            val = phpFormat(index) + ', ' + phpFormat(item, 2 + indent);
+            code += newLine + "->add" + ucfirst(key).replace(/s$/, '') + '(' + val + ')';
+          });
+        } else if (key === 'where') {
+          _.each(param, function (clause) {
+            if (clause[0] === 'AND' || clause[0] === 'OR' || clause[0] === 'NOT') {
+              code += newLine + "->addClause(" + phpFormat(clause[0]) + ", " + phpFormat(clause[1]).slice(1, -1) + ')';
+            } else {
+              code += newLine + "->addWhere(" + phpFormat(clause).slice(1, -1) + ")";
+            }
+          });
+        } else if (key === 'select') {
+          code += newLine;
+          // addSelect() is a variadic function & can take multiple arguments; selectRowCount() is a shortcut for addSelect('row_count')
+          code += isSelectRowCount(params) ? '->selectRowCount()' : '->addSelect(' + phpFormat(param).slice(1, -1) + ')';
+        } else if (key === 'chain') {
+          _.each(param, function(chain, name) {
+            code += newLine + "->addChain('" + name + "', " + formatOOP(chain[0], chain[1], chain[2], 2 + indent);
+            code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
+          });
+        }
+        else {
+          code += newLine + "->set" + ucfirst(key) + '(' + phpFormat(param, 2 + indent) + ')';
+        }
+      });
+      return code;
     }
 
     function isInt(value) {

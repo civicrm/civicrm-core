@@ -21,18 +21,17 @@
 
 namespace Civi\Api4\Generic;
 
-use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\ActionUtil;
 
 /**
- * Replaces an existing set of $ENTITYs with a new one.
+ * Replaces an existing set of $ENTITIES with a new one.
  *
- * This will select a group of existing $ENTITYs based on the `where` parameter.
- * Each will be compared with the $ENTITYs passed in as `records`:
+ * This will select a group of existing $ENTITIES based on the `where` parameter.
+ * Each will be compared with the $ENTITIES passed in as `records`:
  *
- *  - $ENTITYs in `records` that don't already exist will be created.
- *  - Existing $ENTITYs that are included in `records` will be updated.
- *  - Existing $ENTITYs that are omitted from `records` will be deleted.
+ *  - $ENTITIES in `records` that don't already exist will be created.
+ *  - Existing $ENTITIES that are included in `records` will be updated.
+ *  - Existing $ENTITIES that are omitted from `records` will be deleted.
  *
  * @method $this setRecords(array $records) Set array of records.
  * @method array getRecords()
@@ -56,9 +55,11 @@ class BasicReplaceAction extends AbstractBatchAction {
   /**
    * Array of default values.
    *
-   * Will be merged into `records` before saving.
+   * These defaults will be merged into every $ENTITY in `records` before saving.
+   * Values set in `records` will override these defaults if set in both places,
+   * but updating existing $ENTITIES will overwrite current values with these defaults.
    *
-   * **Note:** Values from the `where` clause that use the `=` operator are _also_ saved into each record;
+   * **Note:** Values from the `where` clause that use the `=` operator are _also_ treated as default values;
    * those do not need to be repeated here.
    *
    * @var array
@@ -66,7 +67,7 @@ class BasicReplaceAction extends AbstractBatchAction {
   protected $defaults = [];
 
   /**
-   * Reload $ENTITYs after saving.
+   * Reload $ENTITIES after saving.
    *
    * By default this action typically returns partial records containing only the fields
    * that were updated. Set `reload` to `true` to do an additional lookup after saving
@@ -99,36 +100,13 @@ class BasicReplaceAction extends AbstractBatchAction {
     $idField = $this->getSelect()[0];
     $toDelete = array_diff_key(array_column($items, NULL, $idField), array_flip(array_filter(\CRM_Utils_Array::collect($idField, $this->records))));
 
-    // Try to delegate to the Save action
-    try {
-      $saveAction = ActionUtil::getAction($this->getEntityName(), 'save');
-      $saveAction
-        ->setCheckPermissions($this->getCheckPermissions())
-        ->setReload($this->reload)
-        ->setRecords($this->records)
-        ->setDefaults($this->defaults);
-      $result->exchangeArray((array) $saveAction->execute());
-    }
-    // Fall back on Create/Update if Save doesn't exist
-    catch (NotImplementedException $e) {
-      foreach ($this->records as $record) {
-        $record += $this->defaults;
-        if (!empty($record[$idField])) {
-          $result[] = civicrm_api4($this->getEntityName(), 'update', [
-            'reload' => $this->reload,
-            'where' => [[$idField, '=', $record[$idField]]],
-            'values' => $record,
-            'checkPermissions' => $this->getCheckPermissions(),
-          ])->first();
-        }
-        else {
-          $result[] = civicrm_api4($this->getEntityName(), 'create', [
-            'values' => $record,
-            'checkPermissions' => $this->getCheckPermissions(),
-          ])->first();
-        }
-      }
-    }
+    $saveAction = ActionUtil::getAction($this->getEntityName(), 'save');
+    $saveAction
+      ->setCheckPermissions($this->getCheckPermissions())
+      ->setReload($this->reload)
+      ->setRecords($this->records)
+      ->setDefaults($this->defaults);
+    $result->exchangeArray((array) $saveAction->execute());
 
     if ($toDelete) {
       $result->deleted = (array) civicrm_api4($this->getEntityName(), 'delete', [

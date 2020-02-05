@@ -952,4 +952,23 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * Returns the plural form of an English word.
+   *
+   * @param string $str
+   * @return string
+   */
+  public static function pluralize($str) {
+    switch (substr($str, -1)) {
+      case 's':
+        return $str . 'es';
+
+      case 'y':
+        return substr($str, 0, -1) . 'ies';
+
+      default:
+        return $str . 's';
+    }
+  }
+
 }
