@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78720e4ea4f746b3244c8275f05d6d1b",
+    "content-hash": "1802a4c8eb543bd4acbb33b1672b2b12",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -504,6 +504,7 @@
                 "mimetype",
                 "php"
             ],
+            "abandoned": true,
             "time": "2017-03-23T02:05:33+00:00"
         },
         {
@@ -1524,16 +1525,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.0",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
                 "shasum": ""
             },
             "require": {
@@ -1542,7 +1543,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.1.x-dev"
                 }
             },
             "autoload": {
@@ -1567,7 +1568,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-11-20T15:27:04+00:00"
+            "time": "2019-11-01T11:05:21+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -2244,9 +2245,7 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
             },
             "require": {
                 "php": ">=5.3.0"
@@ -2372,6 +2371,7 @@
                 "escaper",
                 "zf2"
             ],
+            "abandoned": "laminas/laminas-escaper",
             "time": "2015-05-07T14:55:31+00:00"
         },
         {
@@ -2444,12 +2444,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Mail.git",
-                "reference": "b60e9a543f6c3d9a9ec74452d4ff5736a1c63a77"
+                "reference": "4dc71ccbcc8b67951a2efe47d3fcc2aeaa7f530d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/b60e9a543f6c3d9a9ec74452d4ff5736a1c63a77",
-                "reference": "b60e9a543f6c3d9a9ec74452d4ff5736a1c63a77",
+                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/4dc71ccbcc8b67951a2efe47d3fcc2aeaa7f530d",
+                "reference": "4dc71ccbcc8b67951a2efe47d3fcc2aeaa7f530d",
                 "shasum": ""
             },
             "require": {
@@ -2460,9 +2460,7 @@
             },
             "type": "library",
             "extra": {
-                "patches_applied": {
-                    "CiviCRM Custom Patches for ZetaCompoents mail": "tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
-                }
+                "patches_applied": []
             },
             "autoload": {
                 "classmap": [
@@ -2505,18 +2503,18 @@
                     "name": "Alexandru Stanoi"
                 },
                 {
-                    "name": "Christian Michel"
-                },
-                {
                     "name": "Sinisa Dukaric"
                 },
                 {
                     "name": "Mikko Koppanen"
+                },
+                {
+                    "name": "Christian Michel"
                 }
             ],
             "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2019-02-13T11:33:09+00:00"
+            "time": "2020-01-17T11:18:01+00:00"
         }
     ],
     "packages-dev": [
