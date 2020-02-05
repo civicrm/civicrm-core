@@ -10,8 +10,8 @@
 <div class="crm-block crm-form-block crm-search-form-block">
   <table class="form-layout">
     <tr>
-       <td>{$form.name.label} {help id="id-mailing_name"}<br />
-        {$form.name.html|crmAddClass:big}
+       <td>{$form.mailing_name.label} {help id="id-mailing_name"}<br />
+        {$form.mailing_name.html|crmAddClass:big}
       </td>
     </tr>
     <tr>
@@ -26,9 +26,9 @@
           {$form.is_archived.html}
         </div>
       </td>
-      {if $form.status}
+      {if $form.mailing_job_status}
          <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
-           {$form.status.html|crmAddClass:big}
+           {$form.mailing_job_status.html|crmAddClass:big}
         </td>
       {/if}
     </tr>

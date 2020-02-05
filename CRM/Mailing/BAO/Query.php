@@ -122,7 +122,7 @@ class CRM_Mailing_BAO_Query {
    * rather than a static function.
    */
   public static function getSearchFieldMetadata() {
-    $fields = ['name', 'mailing_job_start_date', 'status', 'is_archived'];
+    $fields = ['mailing_name', 'mailing_job_start_date', 'mailing_job_status', 'is_archived'];
     $metadata = civicrm_api3('Mailing', 'getfields', [])['values'];
     $metadata = array_merge($metadata, civicrm_api3('MailingJob', 'getfields', [])['values']);
     return array_intersect_key($metadata, array_flip($fields));
@@ -415,7 +415,9 @@ class CRM_Mailing_BAO_Query {
       'Running' => 'Running',
       'Canceled' => 'Canceled',
     ];
-    $form->addElement('select', 'mailing_job_status', ts('Mailing Job Status'), $mailingJobStatuses, FALSE);
+    $form->add('select', 'mailing_job_status', ts('Mailing Job Status'), $mailingJobStatuses, FALSE,
+      ['id' => 'mailing_job_status', 'multiple' => 'multiple', 'class' => 'crm-select2']
+    );
 
     $mailingBounceTypes = CRM_Core_PseudoConstant::get(
       'CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id',

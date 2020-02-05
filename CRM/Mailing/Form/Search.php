@@ -74,7 +74,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = $statusVals = [];
+    $defaults = [];
     $parent = $this->controller->getParent();
 
     if ($this->_force) {
@@ -85,13 +85,12 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
         $defaults['status_unscheduled'] = 1;
       }
       if ($parent->get('scheduled')) {
-        $statusVals = array_keys(CRM_Core_SelectValues::getMailingJobStatus());
+        $defaults['mailing_job_status'] = array_keys(CRM_Core_SelectValues::getMailingJobStatus());
         $defaults['is_archived'] = 0;
       }
       if ($parent->get('archived')) {
         $defaults['is_archived'] = 1;
       }
-      $defaults['status'] = $statusVals;
 
       if ($parent->_sms) {
         $defaults['sms'] = 1;
@@ -116,13 +115,6 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
     elseif (!empty($params['mailing_high'])) {
       $params['mailing_high'] .= ' ' . '23:59:59';
     }
-
-    $specialParams = ['name', 'status'];
-    $changeNames = [
-      'name' => 'mailing_name',
-      'status' => 'mailing_job_status',
-    ];
-    CRM_Contact_BAO_Query::processSpecialFormValue($params, $specialParams, $changeNames);
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
