@@ -405,7 +405,7 @@ class CRM_Extension_Manager {
         case self::STATUS_UNINSTALLED:
           // ok, nothing to do
           // Remove the 'disable' process as we're not doing that.
-          $this - popProcess([$key]);
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_UNKNOWN:
@@ -418,7 +418,7 @@ class CRM_Extension_Manager {
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
-    $this - popProcess($keys);
+    $this->popProcess($keys);
   }
 
   /**
