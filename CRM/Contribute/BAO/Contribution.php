@@ -1107,6 +1107,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id)) {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
+      if (empty($params['contribution']->creditnote_id)) {
+        // This is always set in the Contribution::create function.
+        CRM_Core_Error::deprecatedFunctionWarning('Logic says this line is never reached & can be removed');
+        $creditNoteId = self::createCreditNoteId();
+        CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
+      }
     }
     elseif (($previousContributionStatus == 'Pending'
         && $params['prevContribution']->is_pay_later) || $previousContributionStatus == 'In Progress'
@@ -1118,6 +1124,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
         $params['trxnParams']['to_financial_account_id'] = $arAccountId;
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
+        if (empty($params['contribution']->creditnote_id)) {
+          // This is always set in the Contribution::create function.
+          CRM_Core_Error::deprecatedFunctionWarning('Logic says this line is never reached & can be removed');
+          $creditNoteId = self::createCreditNoteId();
+          CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
+        }
       }
       else {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
