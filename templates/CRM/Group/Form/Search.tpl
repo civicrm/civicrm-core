@@ -99,12 +99,10 @@
         "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
         "data": function (d) {
 
-          var groupTypes = ($('.crm-group-search-form-block #group_type_search_1').prop('checked')) ? '1' : '';
-          if (groupTypes) {
-            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? groupTypes + ',2' : groupTypes;
-          } else {
-            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? '2' : '';
-          }
+          var groupTypes = '';
+          $('input[id*="group_type_search_"]:checked').each(function(e) {
+            groupTypes += $(this).attr('id').replace(/group_type_search_/, groupTypes == '' ? '' : ',');
+          });
 
           var groupStatus = ($('.crm-group-search-form-block #group_status_1').prop('checked')) ? 1 : '';
           if (groupStatus) {
