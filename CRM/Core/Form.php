@@ -1536,9 +1536,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // Core field - get metadata.
-    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
-    $fieldSpec = $fieldSpec['values'];
-    $fieldSpecLabel = $fieldSpec['html']['label'] ?? CRM_Utils_Array::value('title', $fieldSpec);
+    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props)['values'];
+    $dataType = $fieldSpec['type'];
+    $fieldSpecLabel = isset($fieldSpec['html']['label']) ? $fieldSpec['html']['label'] : CRM_Utils_Array::value('title', $fieldSpec);
     $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
 
     $widget = $props['type'] ?? $fieldSpec['html']['type'];
@@ -1554,7 +1554,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'Radio',
     ]));
 
-    if ($isSelect) {
+    if ($isSelect && $dataType != CRM_Utils_Type::T_BOOLEAN) {
       // Fetch options from the api unless passed explicitly.
       if (isset($props['options'])) {
         $options = $props['options'];
@@ -1627,6 +1627,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         unset($props['separator']);
         if (!isset($props['allowClear'])) {
           $props['allowClear'] = !$required;
+        }
+        if ($dataType == CRM_Utils_Type::T_BOOLEAN) {
+          return $this->addYesNo($name, $label, $props['allowClear'], $required, $props);
         }
         return $this->addRadio($name, $label, $options, $props, $separator, $required);
 
