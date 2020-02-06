@@ -186,7 +186,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($mailing->replyto_email, $h, $b);
+      CRM_Utils_Mail::mailerSend($mailer, $mailing->replyto_email, $h, $b);
       unset($errorScope);
     }
   }

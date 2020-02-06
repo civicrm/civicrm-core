@@ -261,7 +261,7 @@ SELECT     civicrm_email.id as email_id
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($email, $h, $b);
+      CRM_Utils_Mail::mailerSend($mailer, $email, $h, $b);
       unset($errorScope);
     }
   }

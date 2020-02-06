@@ -168,7 +168,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         $mailer = Mail::factory($mailerName, $params);
 
         $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-        $result = $mailer->send($toEmail, $headers, $message);
+        $result = CRM_Utils_Mail::mailerSend($mailer, $toEmail, $headers, $message);
         unset($errorScope);
         if (defined('CIVICRM_MAIL_LOG') && defined('CIVICRM_MAIL_LOG_AND_SEND')) {
           $testMailStatusMsg .= '<br />' . ts('You have defined CIVICRM_MAIL_LOG_AND_SEND - mail will be logged.') . '<br /><br />';

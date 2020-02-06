@@ -129,6 +129,25 @@ class CRM_Utils_Mail {
   }
 
   /**
+   * Either log email when being sent and don't send it if specific defines are set or call the send function on the Mailer object
+   * @param object $mailer Mailer Object
+   * @param string $recipients Recipients of this email
+   * @param array $headers
+   * @param string $body
+   *
+   * @return bool|Object
+   */
+  public static function mailerSend($mailer, $recipients, $headers, $body) {
+    if (defined('CIVICRM_MAIL_LOG')) {
+      CRM_Utils_Mail::logger($recipients, $headers, $body);
+      if (!defined('CIVICRM_MAIL_LOG_AND_SEND') && !defined('CIVICRM_MAIL_LOG_AND SEND')) {
+        return TRUE;
+      }
+    }
+    return $mailer->send($recipients, $headers, $body);
+  }
+
+  /**
    * Wrapper function to send mail in CiviCRM. Hooks are called from this function. The input parameter
    * is an associateive array which holds the values of field needed to send an email. These are:
    *
@@ -282,7 +301,7 @@ class CRM_Utils_Mail {
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $result = $mailer->send($to, $headers, $message);
+      $result = self::mailerSend($mailer, $to, $headers, $message);
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to

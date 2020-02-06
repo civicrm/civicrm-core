@@ -404,7 +404,7 @@ WHERE  email = %2
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($eq->email, $h, $b);
+      CRM_Utils_Mail::mailerSend($mailer, $eq->email, $h, $b);
       unset($errorScope);
     }
   }
