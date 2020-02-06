@@ -180,7 +180,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
     $checkPermission = [
       [
-        'administer CiviCRM',
+        'administer CiviCRM data',
         'manage event profiles',
       ],
     ];

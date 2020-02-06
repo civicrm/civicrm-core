@@ -119,9 +119,17 @@ class CRM_Core_Permission {
       }
       else {
         // This is an individual permission
-        $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permission, $userId);
-        // Call the permission_check hook to permit dynamic escalation (CRM-19256)
-        CRM_Utils_Hook::permission_check($permission, $granted, $contactId);
+        $impliedPermissions = self::getImpliedPermissionsFor($permission);
+        $impliedPermissions[] = $permission;
+        foreach ($impliedPermissions as $permissionOption) {
+          $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
+          // Call the permission_check hook to permit dynamic escalation (CRM-19256)
+          CRM_Utils_Hook::permission_check($permissionOption, $granted, $contactId);
+          if ($granted) {
+            break;
+          }
+        }
+
         if (
           !$granted
           && !($tempPerm && $tempPerm->check($permission))
@@ -893,9 +901,51 @@ class CRM_Core_Permission {
         $prefix . ts('send SMS'),
         ts('Send an SMS'),
       ],
+      'administer CiviCRM system' => [
+        'label' => $prefix . ts('administer CiviCRM System'),
+        'description' => ts('Perform all system administration tasks in CiviCRM:'),
+      ],
+      'administer CiviCRM data' => [
+        'label' => $prefix . ts('administer CiviCRM Data'),
+        'description' => ts('Perform all system administration tasks in CiviCRM:'),
+      ],
     ];
-
+    foreach (self::getImpliedPermissions() as $name => $includes) {
+      foreach ($includes as $permission) {
+        $permissions[$name][] = $permissions[$permission];
+      }
+    }
     return $permissions;
+  }
+
+  /**
+   * Get permissions implied by 'superset' permissions.
+   *
+   * @return array
+   */
+  public static function getImpliedPermissions() {
+    return [
+      'administer CiviCRM' => ['administer CiviCRM system', 'administer CiviCRM data'],
+      'administer CiviCRM data' => ['edit message templates', 'administer dedupe rules'],
+      'administer CiviCRM system' => ['edit api keys', 'edit system workflow message templates', 'administer payment processors'],
+    ];
+  }
+
+  /**
+   * Get any super-permissions that imply the given permission.
+   *
+   * @param string $permission
+   *
+   * @return array
+   */
+  public static function getImpliedPermissionsFor(string $permission) {
+    $return = [];
+    foreach (self::getImpliedPermissions() as $superPermission => $components) {
+      if (in_array($permission, $components, TRUE)) {
+        $return[$superPermission] = $superPermission;
+      }
+    }
+    return $return;
   }
 
   /**
