@@ -154,22 +154,27 @@ function calculateTotalFee() {
  * Display calculated amount.
  */
 function display(totalfee) {
+  // totalfee is monetary, round it to 2 decimal points so it can
+  // go as a float - CRM-13491
+  totalfee = Math.round(totalfee*100)/100;
+  var totalFormattedFee = CRM.formatMoney(totalfee);
+  cj('#pricevalue').html(totalFormattedFee);
 
-    // totalfee is monetary, round it to 2 decimal points so it can
-    // go as a float - CRM-13491
-    totalfee = Math.round(totalfee*100)/100;
-    var totalFormattedFee = CRM.formatMoney(totalfee);
-    cj('#pricevalue').html(totalFormattedFee);
+  cj('#total_amount').val( totalfee );
+  cj('#pricevalue').data('raw-total', totalfee).trigger('change');
 
-    cj('#total_amount').val( totalfee );
-    cj('#pricevalue').data('raw-total', totalfee).trigger('change');
+  if (totalfee < 0) {
+    cj('table#pricelabel').addClass('disabled');
+  }
+  else {
+    cj('table#pricelabel').removeClass('disabled');
+  }
 
-    ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
-    if (typeof skipPaymentMethod == 'function') {
-      // Advice to anyone who, like me, feels hatred towards this if construct ... if you remove the if you
-      // get an error on participant 2 of a event that requires approval & permits multiple registrants.
-      skipPaymentMethod();
-    }
+  if (typeof skipPaymentMethod == 'function') {
+    // Advice to anyone who, like me, feels hatred towards this if construct ... if you remove the if you
+    // get an error on participant 2 of a event that requires approval & permits multiple registrants.
+    skipPaymentMethod();
+  }
 }
 
 {/literal}
