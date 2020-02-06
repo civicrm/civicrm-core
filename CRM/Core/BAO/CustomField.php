@@ -738,7 +738,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       }
 
       // Add data for popup link. Normally this is handled by CRM_Core_Form->addSelect
-      $isSupportedWidget = in_array($widget, ['Select', 'Radio']);
       $canEditOptions = CRM_Core_Permission::check('administer CiviCRM');
       if ($field->option_group_id && !$search && $isSelect && $canEditOptions) {
         $customFieldAttributes += array(
