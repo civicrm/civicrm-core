@@ -87,15 +87,20 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSystemUTFMB8Conversion() {
-    $this->callAPISuccess('System', 'utf8conversion', []);
-    $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
-    $table->fetch();
-    $this->assertStringEndsWith('DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), '5.7', '>=')) {
+      $this->callAPISuccess('System', 'utf8conversion', []);
+      $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
+      $table->fetch();
+      $this->assertStringEndsWith('DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
 
-    $this->callAPISuccess('System', 'utf8conversion', ['is_revert' => 1]);
-    $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
-    $table->fetch();
-    $this->assertStringEndsWith('DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
+      $this->callAPISuccess('System', 'utf8conversion', ['is_revert' => 1]);
+      $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
+      $table->fetch();
+      $this->assertStringEndsWith('DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
+    }
+    else {
+      $this->markTestSkipped('MySQL Version does not support ut8mb4 testing');
+    }
   }
 
 }
