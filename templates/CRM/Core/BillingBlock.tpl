@@ -158,10 +158,18 @@
         });
       }
 
-
       // toggle show/hide
-      $('#billingcheckbox').click(function () {
-        if (this.checked) {
+      var billingCheckboxElement = $('#billingcheckbox');
+      billingCheckboxElement.click(function() {
+        billingCheckboxChanged(billingCheckboxElement);
+      });
+
+      billingCheckboxElement.change(function() {
+        billingCheckboxChanged(billingCheckboxElement);
+      });
+
+      function billingCheckboxChanged(billingCheckbox) {
+        if (billingCheckbox.prop('checked')) {
           if (!CRM.billing || CRM.billing.billingProfileIsHideable) {
             $('.billing_name_address-group').hide(200);
           }
@@ -180,7 +188,7 @@
         } else {
           $('.billing_name_address-group').show(200);
         }
-      });
+      }
 
       // remove spaces, dashes from credit card number
       $('#credit_card_number').change(function () {
