@@ -93,10 +93,9 @@
   {literal}
 
   var params = {
-    errorClass: 'crm-inline-error',
+    errorClass: 'crm-inline-error alert-danger',
     messages: {},
-    // TODO: remove after resolution of https://github.com/jzaefferer/jquery-validation/pull/1261
-    ignore: ":hidden, [readonly]"
+    ignore: ".select2-offscreen, [readonly], :hidden:not(.crm-select2)"
   };
 
   // use civicrm notifications when there are errors
