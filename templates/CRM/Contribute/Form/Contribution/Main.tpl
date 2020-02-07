@@ -397,11 +397,4 @@
   {/literal}
 </script>
 {/if}
-
-{* jQuery validate *}
-{* disabled because originally this caused problems with some credit cards.
-Likely it no longer has an problems but allowing conditional
- inclusion by extensions / payment processors for now in order to add in a conservative way *}
-{if $isJsValidate}
-  {include file="CRM/Form/validate.tpl"}
-{/if}
+{include file="CRM/Form/validate.tpl"}
