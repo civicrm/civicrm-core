@@ -123,6 +123,10 @@ class CRM_Utils_Mail {
     }
     else {
       $mailer = Mail::factory($driver, $params);
+      // Previously, CiviCRM bundled patches to change the behavior of these three classes. Use a decorator to avoid patching.
+      if ($mailer instanceof Mail_smtp || $mailer instanceof Mail_mail || $mailer instanceof  Mail_sendmail) {
+        $mailer = new CRM_Utils_Mail_LoggingMailer($mailer);
+      }
     }
     CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
     return $mailer;
