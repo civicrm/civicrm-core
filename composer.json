@@ -60,7 +60,7 @@
     "pear/validate_finance_creditcard": "dev-master",
     "civicrm/civicrm-cxn-rpc": "~0.19.01.08",
     "pear/auth_sasl": "1.1.0",
-    "pear/net_smtp": "1.6.*",
+    "pear/net_smtp": "1.9.*",
     "pear/net_socket": "1.0.*",
     "pear/mail": "^1.4",
     "civicrm/civicrm-setup": "~0.4.0",
@@ -241,6 +241,9 @@
         "Allow adding tests": "https://github.com/php-cache/integration-tests/commit/05f97174c09364dc10c084a38ba0cfd5124f4cec.patch",
         "Support PHPUnit 6+": "https://github.com/php-cache/integration-tests/commit/1ec7362962185df91d3d749bc3fa7e7b99cb9fc7.patch",
         "Add tests for binary data round trip": "https://github.com/php-cache/integration-tests/commit/89cd7068e83aa776774bfc44f6bcba858c085616.patch"
+      },
+      "pear/net_smtp": {
+        "Add in CiviCRM custom error message for CRM-8744": "tools/scripts/composer/patches/net-smtp-patch.patch"
       },
       "phpoffice/common": {
         "Fix handling of libxml_disable_entity_loader": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
