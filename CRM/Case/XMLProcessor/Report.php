@@ -443,7 +443,7 @@ WHERE      a.id = %1
 
     $activity['fields'][] = array(
       'label' => ts('Details'),
-      'value' => $this->redact(CRM_Utils_String::stripAlternatives($activityDAO->details)),
+      'value' => $this->redact(CRM_Utils_String::purifyHTML(CRM_Utils_String::stripAlternatives($activityDAO->details))),
       'type' => 'Memo',
     );
 
