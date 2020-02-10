@@ -8,6 +8,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+use Civi\Payment\PropertyBag;
 
 /**
  *
@@ -187,7 +188,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
    * Process the form submission.
    */
   public function postProcess() {
-    $status = $message = NULL;
+    $message = NULL;
     $cancelSubscription = TRUE;
     $params = $this->controller->exportValues($this->_name);
 
@@ -207,17 +208,16 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       // civicrm_contribution_recur.processor_id
       $cancelParams = ['subscriptionId' => $this->_subscriptionDetails->subscription_id];
       try {
-        $cancelSubscription = $this->_paymentProcessorObj->cancelSubscription($message, $cancelParams);
+        $propertyBag = new PropertyBag();
+        $propertyBag->setRecurProcessorID($this->_subscriptionDetails->subscription_id);
+        $message = $this->_paymentProcessorObj->doCancelRecurring($propertyBag)['message'];
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         CRM_Core_Error::statusBounce($e->getMessage());
       }
     }
 
-    if (is_a($cancelSubscription, 'CRM_Core_Error')) {
-      CRM_Core_Error::displaySessionError($cancelSubscription);
-    }
-    elseif ($cancelSubscription) {
+    if ($cancelSubscription) {
       try {
         civicrm_api3('ContributionRecur', 'cancel', [
           'id' => $this->_subscriptionDetails->recur_id,

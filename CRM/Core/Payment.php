@@ -1314,6 +1314,34 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Cancel a recurring subscription.
+   *
+   * Payment processor classes should override this rather than implementing cancelSubscription.
+   *
+   * A PaymentProcessorException should be thrown if the update of the contribution_recur
+   * record should not proceed (in many cases this function does nothing
+   * as the payment processor does not need to take any action & this should silently
+   * proceed. Note the form layer will only call this after calling
+   * $processor->supports('cancelRecurring');
+   *
+   * @param \Civi\Payment\PropertyBag $propertyBag
+   *
+   * @return array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doCancelRecurring(PropertyBag $propertyBag) {
+    if (method_exists($this, 'cancelSubscription')) {
+      $message = NULL;
+      if ($this->cancelSubscription($message, $propertyBag)) {
+        return ['message' => $message];
+      }
+      throw new PaymentProcessorException($message);
+    }
+    return ['message' => ts('Recurring contribution cancelled')];
+  }
+
+  /**
    * Refunds payment
    *
    * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
