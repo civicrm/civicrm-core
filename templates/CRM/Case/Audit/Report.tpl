@@ -19,60 +19,64 @@
 <div id="crm-container" class="crm-container">
 <h1>{$pageTitle}</h1>
 <div id="report-date">{$reportDate}</div>
-<h2>{ts}Case Summary{/ts}</h2>
-<table class="report-layout">
+{if $case}
+  <h2>{ts}Case Summary{/ts}</h2>
+  <table class="report-layout">
     <tr>
       <th class="reports-header">{ts}Client{/ts}</th>
       <th class="reports-header">{ts}Case Type{/ts}</th>
-         <th class="reports-header">{ts}Status{/ts}</th>
-        <th class="reports-header">{ts}Start Date{/ts}</th>
+      <th class="reports-header">{ts}Status{/ts}</th>
+      <th class="reports-header">{ts}Start Date{/ts}</th>
       <th class="reports-header">{ts}Case ID{/ts}</th>
     </tr>
     <tr>
-        <td class="crm-case-report-clientName">{$case.clientName}</td>
-        <td class="crm-case-report-caseType">{$case.caseType}</td>
-        <td class="crm-case-report-status">{$case.status}</td>
-        <td class="crm-case-report-start_date">{$case.start_date}</td>
-        <td class="crm-case-report-{$caseId}">{$caseId}</td>
+      <td class="crm-case-report-clientName">{$case.clientName}</td>
+      <td class="crm-case-report-caseType">{$case.caseType}</td>
+      <td class="crm-case-report-status">{$case.status}</td>
+      <td class="crm-case-report-start_date">{$case.start_date}</td>
+      <td class="crm-case-report-{$caseId}">{$caseId}</td>
     </tr>
-</table>
-<h2>{ts}Case Roles{/ts}</h2>
-<table class ="report-layout">
+  </table>
+{/if}
+
+{if $caseRelationships}
+  <h2>{ts}Case Roles{/ts}</h2>
+  <table class ="report-layout">
     <tr>
       <th class="reports-header">{ts}Case Role{/ts}</th>
       <th class="reports-header">{ts}Name{/ts}</th>
-         <th class="reports-header">{ts}Phone{/ts}</th>
-        <th class="reports-header">{ts}Email{/ts}</th>
+      <th class="reports-header">{ts}Phone{/ts}</th>
+      <th class="reports-header">{ts}Email{/ts}</th>
     </tr>
 
     {foreach from=$caseRelationships item=row key=relId}
-       <tr>
-          <td class="crm-case-report-caserelationships-relation">{$row.relation}</td>
-          <td class="crm-case-report-caserelationships-name">{$row.name}</td>
-          <td class="crm-case-report-caserelationships-phone">{$row.phone}</td>
-          <td class="crm-case-report-caserelationships-email">{$row.email}</td>
-       </tr>
+      <tr>
+        <td class="crm-case-report-caserelationships-relation">{$row.relation}</td>
+        <td class="crm-case-report-caserelationships-name">{$row.name}</td>
+        <td class="crm-case-report-caserelationships-phone">{$row.phone}</td>
+        <td class="crm-case-report-caserelationships-email">{$row.email}</td>
+      </tr>
     {/foreach}
     {foreach from=$caseRoles item=relName key=relTypeID}
-         {if $relTypeID neq 'client'}
-           <tr>
-               <td>{$relName}</td>
-               <td>{ts}(not assigned){/ts}</td>
-               <td></td>
-               <td></td>
-           </tr>
-         {else}
-           <tr>
-               <td class="crm-case-report-caseroles-role">{$relName.role}</td>
-               <td class="crm-case-report-caseroles-sort_name">{$relName.sort_name}</td>
-               <td class="crm-case-report-caseroles-phone">{$relName.phone}</td>
-               <td class="crm-case-report-caseroles-email">{$relName.email}</td>
-           </tr>
-         {/if}
-  {/foreach}
-</table>
-<br />
-
+      {if $relTypeID neq 'client'}
+        <tr>
+          <td>{$relName}</td>
+          <td>{ts}(not assigned){/ts}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      {else}
+        <tr>
+          <td class="crm-case-report-caseroles-role">{$relName.role}</td>
+          <td class="crm-case-report-caseroles-sort_name">{$relName.sort_name}</td>
+          <td class="crm-case-report-caseroles-phone">{$relName.phone}</td>
+          <td class="crm-case-report-caseroles-email">{$relName.email}</td>
+        </tr>
+      {/if}
+    {/foreach}
+  </table>
+  <br />
+{/if}
 {if $otherRelationships}
     <table  class ="report-layout">
          <tr>
@@ -124,29 +128,26 @@
   {/foreach}
 {/if}
 
-<h2>{ts}Case Activities{/ts}</h2>
-{foreach from=$activities item=activity key=key}
-  <table  class ="report-layout">
-       {foreach from=$activity item=field name=fieldloop}
-           <tr class="crm-case-report-activity-{$field.label}">
-             <th scope="row" class="label">{$field.label|escape}</th>
-             {if $field.label eq 'Activity Type' or $field.label eq 'Status'}
-                <td class="bold">{$field.value|escape}</td>
-             {elseif $field.label eq 'Details' or $field.label eq 'Subject'}
-                <td>{$field.value}</td>
-             {else}
-                <td>{$field.value|escape}</td>
-             {/if}
-           </tr>
-       {/foreach}
-  </table>
-  <br />
-{/foreach}
+{if $activities}
+  <h2>{ts}Case Activities{/ts}</h2>
+  {foreach from=$activities item=activity key=key}
+    <table  class ="report-layout">
+      {foreach from=$activity item=field name=fieldloop}
+        <tr class="crm-case-report-activity-{$field.label}">
+          <th scope="row" class="label">{$field.label|escape}</th>
+          {if $field.label eq 'Activity Type' or $field.label eq 'Status'}
+            <td class="bold">{$field.value|escape}</td>
+          {elseif $field.label eq 'Details' or $field.label eq 'Subject'}
+            <td>{$field.value}</td>
+          {else}
+            <td>{$field.value|escape}</td>
+          {/if}
+        </tr>
+      {/foreach}
+    </table>
+    <br />
+  {/foreach}
+{/if}
 </div>
 </body>
 </html>
-
-
-
-
-
