@@ -45,6 +45,8 @@ class CRM_Financial_BAO_Payment {
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
     $paymentTrxnParams['is_payment'] = 1;
+    // Really we should have a DB default.
+    $paymentTrxnParams['fee_amount'] = $paymentTrxnParams['fee_amount'] ?? 0;
 
     if (isset($paymentTrxnParams['payment_processor_id']) && empty($paymentTrxnParams['payment_processor_id'])) {
       // Don't pass 0 - ie the Pay Later processor as it is  a pseudo-processor.
@@ -148,6 +150,13 @@ class CRM_Financial_BAO_Payment {
     }
     elseif ($contributionStatus === 'Pending' && $params['total_amount'] > 0) {
       self::updateContributionStatus($contribution['id'], 'Partially Paid');
+      $participantPayments = civicrm_api3('ParticipantPayment', 'get', [
+        'contribution_id' => $contribution['id'],
+        'participant_id.status_id' => ['IN' => ['Pending from pay later', 'Pending from incomplete transaction']],
+      ])['values'];
+      foreach ($participantPayments as $participantPayment) {
+        civicrm_api3('Participant', 'create', ['id' => $participantPayment['participant_id'], 'status_id' => 'Partially paid']);
+      }
     }
     elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
       // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
