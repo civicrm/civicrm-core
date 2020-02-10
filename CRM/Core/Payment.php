@@ -443,6 +443,21 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does the processor work without an email address?
+   *
+   * The historic assumption is that all processors require an email address. This capability
+   * allows a processor to state it does not need to be provided with an email address.
+   * NB: when this was added (Feb 2020), the Manual processor class overrides this but
+   * the only use of the capability is in the webform_civicrm module.  It is not currently
+   * used in core but may be in future.
+   *
+   * @return bool
+   */
+  protected function supportsNoEmailProvided() {
+    return FALSE;
+  }
+
+  /**
    * Function to action pre-approval if supported
    *
    * @param array $params
