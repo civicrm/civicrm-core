@@ -145,8 +145,10 @@ function civicrm_api3_attachment_create($params) {
   }
   elseif (is_string($moveFile)) {
     // CRM-17432 Do not use rename() since it will break file permissions.
-    // Also avoid move_uplaoded_file() because the API can use options.move-file.
-    copy($moveFile, $path);
+    // Also avoid move_uploaded_file() because the API can use options.move-file.
+    if (!copy($moveFile, $path)) {
+      throw new API_Exception("Cannot copy uploaded file $moveFile to $path");
+    }
     unlink($moveFile);
   }
 
