@@ -68,7 +68,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
 
     if ($this->_coid) {
       if (CRM_Contribute_BAO_Contribution::isSubscriptionCancelled($this->_coid)) {
-        CRM_Core_Error::fatal(ts('The recurring contribution looks to have been cancelled already.'));
+        CRM_Core_Error::statusBounce(ts('The recurring contribution looks to have been cancelled already.'));
       }
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
 
