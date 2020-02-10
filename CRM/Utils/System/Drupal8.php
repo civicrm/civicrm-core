@@ -166,7 +166,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       $mail = $params['mail'];
 
       $user = entity_create('user');
-      $user->setEmail($params[$key]);
+      $user->setEmail($mail);
 
       // This checks for both email uniqueness.
       $violations = iterator_to_array($user->validate());
