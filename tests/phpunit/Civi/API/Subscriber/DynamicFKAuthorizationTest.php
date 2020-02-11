@@ -186,7 +186,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
-    $result = $this->kernel->run($entity, $action, $params);
+    $result = $this->kernel->runSafe($entity, $action, $params);
     $this->assertFalse((bool) $result['is_error'], print_r([
       '$entity' => $entity,
       '$action' => $action,
@@ -206,7 +206,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
-    $result = $this->kernel->run($entity, $action, $params);
+    $result = $this->kernel->runSafe($entity, $action, $params);
     $this->assertTrue((bool) $result['is_error'], print_r([
       '$entity' => $entity,
       '$action' => $action,
@@ -231,12 +231,12 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       'check_permissions' => 1,
     ];
     // run with permission check
-    $result = $this->kernel->run('FakeFile', 'create', $params);
+    $result = $this->kernel->runSafe('FakeFile', 'create', $params);
     $this->assertTrue((bool) $result['is_error'], 'Undelegated entity with check_permissions = 1 should fail');
     $this->assertRegExp('/Unrecognized target entity table \(civicrm_membership\)/', $result['error_message']);
     // repeat without permission check
     $params['check_permissions'] = 0;
-    $result = $this->kernel->run('FakeFile', 'create', $params);
+    $result = $this->kernel->runSafe('FakeFile', 'create', $params);
     $this->assertFalse((bool) $result['is_error'], 'Undelegated entity with check_permissions = 0 should succeed');
   }
 

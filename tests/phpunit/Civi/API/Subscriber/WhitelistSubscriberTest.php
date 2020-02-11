@@ -386,7 +386,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
 
     $apiRequest['params']['debug'] = 1;
     $apiRequest['params']['check_permissions'] = 'whitelist';
-    $result = $kernel->run($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
+    $result = $kernel->runSafe($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
 
     if ($expectSuccess) {
       $this->assertAPISuccess($result);

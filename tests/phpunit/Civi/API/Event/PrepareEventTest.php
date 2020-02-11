@@ -47,7 +47,7 @@ class PrepareEventTest extends \CiviUnitTestCase {
   public function testOnPrepare($onPrepare, $inputApiCall, $expectResult) {
     $this->dispatcher->addListener(Events::PREPARE, [$this, $onPrepare]);
     $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
-    $result = call_user_func_array([$this->kernel, 'run'], $inputApiCall);
+    $result = call_user_func_array([$this->kernel, 'runSafe'], $inputApiCall);
     $this->assertEquals($expectResult, $result['values']);
   }
 
