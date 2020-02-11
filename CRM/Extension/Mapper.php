@@ -257,7 +257,7 @@ class CRM_Extension_Mapper {
    * @param bool $fresh
    *   whether to forcibly reload extensions list from canonical store.
    * @return array
-   *   array(array('prefix' => $, 'file' => $))
+   *   array(array('prefix' => $, 'fullName' => $, 'filePath' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {
     if (!defined('CIVICRM_DSN')) {
@@ -265,11 +265,26 @@ class CRM_Extension_Mapper {
       return [];
     }
 
+    // The list of module files is cached in two tiers. The tiers are slightly
+    // different:
+    //
+    // 1. The persistent tier (cache) stores
+    // names WITHOUT absolute paths.
+    // 2. The ephemeral/thread-local tier (statics) stores names
+    // WITH absolute paths.
+    // Return static value instead of re-running query
+    if (isset(Civi::$statics[__CLASS__]['moduleExtensions']) && !$fresh) {
+      return Civi::$statics[__CLASS__]['moduleExtensions'];
+    }
+
     $moduleExtensions = NULL;
+
+    // Checked if it's stored in the persistent cache.
     if ($this->cache && !$fresh) {
       $moduleExtensions = $this->cache->get($this->cacheKey . '_moduleFiles');
     }
 
+    // If cache is empty we build it from database.
     if (!is_array($moduleExtensions)) {
       $compat = CRM_Extension_System::getCompatibilityInfo();
 
@@ -286,28 +301,36 @@ class CRM_Extension_Mapper {
         if (!empty($compat[$dao->full_name]['force-uninstall'])) {
           continue;
         }
-        try {
-          $moduleExtensions[] = [
-            'prefix' => $dao->file,
-            'filePath' => $this->keyToPath($dao->full_name),
-          ];
-        }
-        catch (CRM_Extension_Exception $e) {
-          // Putting a stub here provides more consistency
-          // in how getActiveModuleFiles when racing between
-          // dirty file-removals and cache-clears.
-          CRM_Core_Session::setStatus($e->getMessage(), '', 'error');
-          $moduleExtensions[] = [
-            'prefix' => $dao->file,
-            'filePath' => NULL,
-          ];
-        }
+        $moduleExtensions[] = [
+          'prefix' => $dao->file,
+          'fullName' => $dao->full_name,
+          'filePath' => NULL,
+        ];
       }
 
       if ($this->cache) {
         $this->cache->set($this->cacheKey . '_moduleFiles', $moduleExtensions);
       }
     }
+
+    // Since we're not caching the full path we add it now.
+    array_walk($moduleExtensions, function(&$value, $key) {
+      try {
+        if (!$value['filePath']) {
+          $value['filePath'] = $this->keyToPath($value['fullName']);
+        }
+      }
+      catch (CRM_Extension_Exception $e) {
+        // Putting a stub here provides more consistency
+        // in how getActiveModuleFiles when racing between
+        // dirty file-removals and cache-clears.
+        CRM_Core_Session::setStatus($e->getMessage(), '', 'error');
+        $value['filePath'] = NULL;
+      }
+    });
+
+    Civi::$statics[__CLASS__]['moduleExtensions'] = $moduleExtensions;
+
     return $moduleExtensions;
   }
 
