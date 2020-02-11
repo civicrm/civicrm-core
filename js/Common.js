@@ -404,6 +404,7 @@ if (!CRM.vars) CRM.vars = {};
       return $(this).each(function() {
         $(this)
           .removeClass('crm-ajax-select')
+          .off('.crmSelect2')
           .select2('destroy');
       });
     }
@@ -438,6 +439,13 @@ if (!CRM.vars) CRM.vars = {};
           return out;
         };
       }
+
+      // Use description as title for each option
+      $el.on('select2-loaded.crmSelect2', function() {
+        $('.crm-select2-row-description', '#select2-drop').each(function() {
+          $(this).closest('.select2-result-label').attr('title', $(this).text());
+        });
+      });
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
