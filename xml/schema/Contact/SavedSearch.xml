@@ -91,4 +91,20 @@
     <add>1.6</add>
     <drop>5.24</drop>
   </field>
+  <field>
+    <name>api_entity</name>
+    <type>varchar</type>
+    <title>Entity Name</title>
+    <length>255</length>
+    <comment>Entity name for API based search</comment>
+    <add>5.24</add>
+  </field>
+  <field>
+    <name>api_params</name>
+    <type>text</type>
+    <title>API Parameters</title>
+    <comment>Parameters for API based search</comment>
+    <serialize>JSON</serialize>
+    <add>5.24</add>
+  </field>
 </table>

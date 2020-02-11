@@ -46,12 +46,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
   /**
    * Upgrade function.
    *
@@ -61,6 +55,12 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Install sequential creditnote extension', 'installCreditNotes');
     $this->addTask('Drop obsolete columns from saved_search table', 'dropSavedSearchColumns');
+    $this->addTask('Smart groups: Add api_entity column to civicrm_saved_search', 'addColumn',
+      'civicrm_saved_search', 'api_entity', "varchar(255) DEFAULT NULL COMMENT 'Entity name for API based search'"
+    );
+    $this->addTask('Smart groups: Add api_params column to civicrm_saved_search', 'addColumn',
+      'civicrm_saved_search', 'api_params', "text DEFAULT NULL COMMENT 'Parameters for API based search'"
+    );
   }
 
   /**
