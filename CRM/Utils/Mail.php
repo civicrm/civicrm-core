@@ -279,7 +279,10 @@ class CRM_Utils_Mail {
     // * All other mailers require that all be recipients be listed in the $to array AND that
     //   the Bcc must not be present in $header as otherwise it will be shown to all recipients
     // ref: https://pear.php.net/bugs/bug.php?id=8047, full thread and answer [2011-04-19 20:48 UTC]
-    if (get_class($mailer) != "Mail_mail") {
+    // TODO: Refactor this quirk-handler as another filter in FilteredPearMailer. But that would merit review of impact on universe.
+    $driver = ($mailer instanceof CRM_Utils_Mail_FilteredPearMailer) ? $mailer->getDriver() : NULL;
+    $isPhpMail = (get_class($mailer) === "Mail_mail" || $driver === 'mail');
+    if (!$isPhpMail) {
       // get emails from headers, since these are
       // combination of name and email addresses.
       if (!empty($headers['Cc'])) {
