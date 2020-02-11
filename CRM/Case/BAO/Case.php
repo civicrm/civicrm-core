@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+
 /**
  * This class contains the functions for Case Management.
  */
@@ -284,7 +285,7 @@ WHERE civicrm_case.id = %1";
    *
    * @param int $activityId
    *
-   * @return int, case ID
+   * @return int|null, case ID
    */
   public static function getCaseIdByActivityId($activityId) {
     $originalId = CRM_Core_DAO::singleValueQuery(
