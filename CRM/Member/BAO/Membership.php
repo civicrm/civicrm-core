@@ -641,6 +641,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       CRM_Activity_BAO_Activity::deleteActivity($params);
     }
     self::deleteMembershipPayment($membershipId, $preserveContrib);
+    CRM_Price_BAO_LineItem::deleteLineItems($membershipId, 'civicrm_membership');
 
     $results = $membership->delete();
     $transaction->commit();
@@ -2227,7 +2228,7 @@ WHERE      civicrm_membership.is_test = 0
       self::processOverriddenUntilDateMembership($dao1);
     }
 
-    $query = $baseQuery . " AND (civicrm_membership.is_override = 0 OR civicrm_membership.is_override IS NULL) 
+    $query = $baseQuery . " AND (civicrm_membership.is_override = 0 OR civicrm_membership.is_override IS NULL)
      AND civicrm_membership.status_id NOT IN (%1, %2, %3, %4)
      AND civicrm_membership.owner_membership_id IS NULL ";
     $params = [
