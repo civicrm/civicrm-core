@@ -679,7 +679,7 @@ if (!CRM.vars) CRM.vars = {};
       '</div>' +
       '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
-      markup += '<p>' + _.escape(text) + '</p>';
+      markup += '<p>' + _.escape(text) + '</p> ';
     });
     markup += '</div></div></div>';
     return markup;
