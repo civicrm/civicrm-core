@@ -21,8 +21,6 @@
 
 namespace Civi\Api4\Generic;
 
-use Civi\Api4\Utils\ActionUtil;
-
 /**
  * Replaces an existing set of $ENTITIES with a new one.
  *
@@ -100,7 +98,7 @@ class BasicReplaceAction extends AbstractBatchAction {
     $idField = $this->getSelect()[0];
     $toDelete = array_diff_key(array_column($items, NULL, $idField), array_flip(array_filter(\CRM_Utils_Array::collect($idField, $this->records))));
 
-    $saveAction = ActionUtil::getAction($this->getEntityName(), 'save');
+    $saveAction = \Civi\API\Request::create($this->getEntityName(), 'save', ['version' => 4]);
     $saveAction
       ->setCheckPermissions($this->getCheckPermissions())
       ->setReload($this->reload)
