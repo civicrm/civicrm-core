@@ -1638,7 +1638,7 @@ if (!CRM.vars) CRM.vars = {};
     return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
       return entityMap[s];
     });
-  }
+  };
 
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
   $.ajaxPrefilter(function(s) {
