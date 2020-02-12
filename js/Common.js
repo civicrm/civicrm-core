@@ -355,8 +355,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * This provides defaults for ui.dialog which either need to be calculated or
-   * are different from global defaults
+   * This provides defaults for ui.dialog which either need to be calculated or are different from global defaults
    *
    * @param settings
    * @returns {*}
@@ -972,7 +971,7 @@ if (!CRM.vars) CRM.vars = {};
       });
     })
     .on('dialogopen', function(e) {
-      const $el = $(e.target);
+      var $el = $(e.target);
       $('body').addClass('ui-dialog-open');
       // Modal dialogs should disable scrollbars
       if ($el.dialog('option', 'modal')) {
@@ -1484,12 +1483,10 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * Client-side currency formatting
+   * Clientside currency formatting
    * @param number value
-   * @param [optional] boolean onlyNumber - if true, we return formatted amount
-   *   without currency sign
-   * @param [optional] string format - currency representation of the number
-   *   1234.56
+   * @param [optional] boolean onlyNumber - if true, we return formatted amount without currency sign
+   * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */
   var currencyTemplate;
@@ -1622,25 +1619,6 @@ if (!CRM.vars) CRM.vars = {};
      b = parseInt(hexcolor.substr(4, 2), 16),
      yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
-  };
-
-  // based on https://github.com/janl/mustache.js/blob/master/mustache.js
-  // If you feel the need to use this function, consider whether assembling HTML
-  // via DOM might be a cleaner approach rather than using string concatenation.
-  CRM.utils.escapeHtml = function(string) {
-    var entityMap = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;',
-      '/': '&#x2F;',
-      '`': '&#x60;',
-      '=': '&#x3D;'
-    };
-    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
-      return entityMap[s];
-    });
   };
 
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
