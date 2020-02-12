@@ -37,10 +37,10 @@ function ts(text, params) {
 /* jshint ignore:start */
 
 /**
- *  This function is called by default at the bottom of template files which
- * have forms that have conditionally displayed/hidden sections and elements.
- * The PHP is responsible for generating a list of 'blocks to show' and 'blocks
- * to hide' and the template passes these parameters to this function.
+ *  This function is called by default at the bottom of template files which have forms that have
+ *  conditionally displayed/hidden sections and elements. The PHP is responsible for generating
+ *  a list of 'blocks to show' and 'blocks to hide' and the template passes these parameters to
+ *  this function.
  *
  * @deprecated
  * @param  showBlocks Array of element Id's to be displayed
