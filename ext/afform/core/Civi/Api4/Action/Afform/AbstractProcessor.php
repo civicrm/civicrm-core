@@ -101,14 +101,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   public static function fieldExists($entityName, $fieldName) {
     if (empty(\Civi::$statics[__CLASS__][__FUNCTION__][$entityName])) {
-      $getFields = \Civi\Api4\Utils\ActionUtil::getAction($entityName, 'getFields');
-      $getFields->setCheckPermissions(FALSE);
-      $getFields->setAction('create');
-      $getFields->addSelect('name');
-      if (property_exists($getFields, 'includeCustom')) {
-        $getFields->setIncludeCustom(FALSE);
-      }
-      \Civi::$statics[__CLASS__][__FUNCTION__][$entityName] = $getFields->execute()->column('name');
+      $fields = civicrm_api4($entityName, 'getFields', [
+        'checkPermissions' => FALSE,
+        'action' => 'create',
+        'select' => ['name'],
+        'includeCustom' => FALSE,
+      ]);
+      \Civi::$statics[__CLASS__][__FUNCTION__][$entityName] = $fields->column('name');
     }
     return in_array($fieldName, \Civi::$statics[__CLASS__][__FUNCTION__][$entityName]);
   }
