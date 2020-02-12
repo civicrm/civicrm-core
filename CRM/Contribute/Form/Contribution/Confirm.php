@@ -282,10 +282,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_params['tax_amount'] = $this->get('tax_amount');
     $this->_useForMember = $this->get('useForMember');
 
-    if (isset($this->_params['credit_card_exp_date'])) {
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-    }
+    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
 
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 

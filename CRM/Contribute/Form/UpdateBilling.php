@@ -200,11 +200,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     }
     $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
     $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
-    $processorParams['month'] = $processorParams['credit_card_exp_date']['M'];
-    $processorParams['year'] = $processorParams['credit_card_exp_date']['Y'];
+    $processorParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($processorParams);
+    $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
     $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
     $processorParams['amount'] = $this->_subscriptionDetails->amount;
-    $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
+    $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo('', $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
     }
@@ -333,10 +333,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
       $tplParams['contact'] = array('display_name' => $donorDisplayName);
 
-      $date = CRM_Utils_Date::format($processorParams['credit_card_exp_date']);
-      $tplParams['credit_card_exp_date'] = CRM_Utils_Date::mysqlToIso($date);
-      $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard($processorParams['credit_card_number']);
-      $tplParams['credit_card_type'] = $processorParams['credit_card_type'];
+      $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
 
       $sendTemplateParams = array(
         'groupName' => $this->_subscriptionDetails->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',

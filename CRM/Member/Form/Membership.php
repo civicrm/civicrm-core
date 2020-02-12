@@ -958,13 +958,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $form->_bltID
       ));
 
-      $date = CRM_Utils_Date::format($form->_params['credit_card_exp_date']);
-      $date = CRM_Utils_Date::mysqlToIso($date);
-      $form->assign('credit_card_exp_date', $date);
-      $form->assign('credit_card_number',
-        CRM_Utils_System::mungeCreditCard($form->_params['credit_card_number'])
-      );
-      $form->assign('credit_card_type', $form->_params['credit_card_type']);
+      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($form->_params);
+      $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+
       $form->assign('contributeMode', 'direct');
       $form->assign('isAmountzero', 0);
       $form->assign('is_pay_later', 0);
