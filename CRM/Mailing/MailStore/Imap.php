@@ -56,7 +56,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
       'uidReferencing' => TRUE,
     ];
     $this->_transport = new ezcMailImapTransport($host, NULL, $options);
-    if (useXOAUTH2) {
+    if ($useXOAUTH2) {
       $this->_transport->authenticate($username, $password, ezcMailImapTransport::AUTH_XOAUTH2);
     }
     else {
