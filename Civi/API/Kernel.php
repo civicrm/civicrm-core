@@ -44,20 +44,20 @@ class Kernel {
   }
 
   /**
-   * @deprecated
    * @param string $entity
-   *   Type of entities to deal with.
+   *   Name of entity: e.g. Contact, Activity, Event
    * @param string $action
-   *   Create, get, delete or some special action name.
+   *   Name of action: e.g. create, get, delete
    * @param array $params
    *   Array to be passed to API function.
-   * @param mixed $extra
-   *   Unused/deprecated.
+   *
    * @return array|int
+   * @throws \API_Exception
    * @see runSafe
+   * @deprecated
    */
-  public function run($entity, $action, $params, $extra = NULL) {
-    return $this->runSafe($entity, $action, $params, $extra);
+  public function run($entity, $action, $params) {
+    return $this->runSafe($entity, $action, $params);
   }
 
   /**
@@ -65,19 +65,17 @@ class Kernel {
    * normal format.
    *
    * @param string $entity
-   *   Type of entities to deal with.
+   *   Name of entity: e.g. Contact, Activity, Event
    * @param string $action
-   *   Create, get, delete or some special action name.
+   *   Name of action: e.g. create, get, delete
    * @param array $params
    *   Array to be passed to API function.
-   * @param mixed $extra
-   *   Unused/deprecated.
    *
    * @return array|int
    * @throws \API_Exception
    */
-  public function runSafe($entity, $action, $params, $extra = NULL) {
-    $apiRequest = Request::create($entity, $action, $params, $extra);
+  public function runSafe($entity, $action, $params) {
+    $apiRequest = Request::create($entity, $action, $params);
 
     try {
       $apiResponse = $this->runRequest($apiRequest);
@@ -109,16 +107,14 @@ class Kernel {
    *   Create, get, delete or some special action name.
    * @param array $params
    *   Array to be passed to function.
-   * @param mixed $extra
-   *   Unused/deprecated.
    *
    * @return bool
    *   TRUE if authorization would succeed.
    * @throws \Exception
    */
-  public function runAuthorize($entity, $action, $params, $extra = NULL) {
+  public function runAuthorize($entity, $action, $params) {
     $apiProvider = NULL;
-    $apiRequest = Request::create($entity, $action, $params, $extra);
+    $apiRequest = Request::create($entity, $action, $params);
 
     try {
       $this->boot($apiRequest);

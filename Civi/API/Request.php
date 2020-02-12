@@ -26,8 +26,6 @@ class Request {
    *   API action name.
    * @param array $params
    *   API parameters.
-   * @param mixed $extra
-   *   Who knows? ...
    *
    * @throws \API_Exception
    * @return array
@@ -36,13 +34,12 @@ class Request {
    *   - entity: string
    *   - action: string
    *   - params: array (string $key => mixed $value) [deprecated in v4]
-   *   - extra: unspecified
    *   - fields: NULL|array (string $key => array $fieldSpec)
    *   - options: \CRM_Utils_OptionBag derived from params [v4-only]
    *   - data: \CRM_Utils_OptionBag derived from params [v4-only]
    *   - chains: unspecified derived from params [v4-only]
    */
-  public static function create($entity, $action, $params, $extra = NULL) {
+  public static function create($entity, $action, $params) {
     $version = \CRM_Utils_Array::value('version', $params);
     switch ($version) {
       default:
@@ -50,10 +47,9 @@ class Request {
         $apiRequest['id'] = self::$nextId++;
         $apiRequest['version'] = (int) $version;
         $apiRequest['params'] = $params;
-        $apiRequest['extra'] = $extra;
         $apiRequest['fields'] = NULL;
-        $apiRequest['entity'] = self::normalizeEntityName($entity, $apiRequest['version']);
-        $apiRequest['action'] = self::normalizeActionName($action, $apiRequest['version']);
+        $apiRequest['entity'] = self::normalizeEntityName($entity);
+        $apiRequest['action'] = self::normalizeActionName($action);
         return $apiRequest;
 
       case 4:
@@ -79,10 +75,9 @@ class Request {
    * APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
    *
    * @param string $entity
-   * @param int $version
    * @return string
    */
-  public static function normalizeEntityName($entity, $version) {
+  public static function normalizeEntityName($entity) {
     return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
   }
 
@@ -95,7 +90,7 @@ class Request {
    * @param $version
    * @return string
    */
-  public static function normalizeActionName($action, $version) {
+  public static function normalizeActionName($action) {
     return strtolower(\CRM_Utils_String::munge($action));
   }
 

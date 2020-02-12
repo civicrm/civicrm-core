@@ -230,7 +230,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
         'id' => $entityId,
       ];
 
-      $result = $self->kernel->run($entity, $self->getDelegatedAction($action), $params);
+      $result = $self->kernel->runSafe($entity, $self->getDelegatedAction($action), $params);
       if ($result['is_error'] || empty($result['values'])) {
         $exception = new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)", [
           'cause' => $result,
