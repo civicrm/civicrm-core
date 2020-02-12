@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
@@ -112,6 +96,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * Get where clause.
    *
    * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function where(&$query) {
     self::initializeAnySoftCreditClause($query);
@@ -122,18 +109,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       if (substr($query->_params[$id][0], 0, 13) == 'contribution_' || substr($query->_params[$id][0], 0, 10) == 'financial_'  || substr($query->_params[$id][0], 0, 8) == 'payment_') {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
-        }
-        // CRM-12065
-        if (
-          $query->_params[$id][0] == 'contribution_type_id' ||
-          $query->_params[$id][0] == 'contribution_type'
-        ) {
-          CRM_Core_Session::setStatus(
-            ts('The contribution type criteria is now obsolete, please update your smart group'),
-            '',
-            'alert'
-          );
-          continue;
         }
 
         self::whereClauseSingle($query->_params[$id], $query);
@@ -482,12 +457,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         //all other elements are handle in this case
         $fldName = substr($name, 13);
         if (!isset($fields[$fldName])) {
-          // CRM-12597
-          CRM_Core_Session::setStatus(ts(
-              'We did not recognize the search field: %1. Please check and fix your contribution related smart groups.',
-              [1 => $fldName]
-            )
-          );
           return;
         }
         $whereTable = $fields[$fldName];
@@ -495,7 +464,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
           $value = trim($value);
         }
 
-        $dataType = "String";
+        $dataType = 'String';
         if (!empty($whereTable['type'])) {
           $dataType = CRM_Utils_Type::typeToString($whereTable['type']);
         }
@@ -917,13 +886,14 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'invoice_number',
       'receive_date',
       'contribution_cancel_date',
+      'contribution_page_id',
     ];
     $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
   }
 
   /**
-   * Add all the elements shared between contribute search and advnaced search.
+   * Add all the elements shared between contribute search and advanced search.
    *
    * @param \CRM_Contribute_Form_Search $form
    *
@@ -958,12 +928,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => $financialTypes]
     );
 
-    $form->add('select', 'contribution_page_id',
-      ts('Contribution Page'),
-      CRM_Contribute_PseudoConstant::contributionPage(),
-      FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]
-    );
-
     // use contribution_payment_instrument_id instead of payment_instrument_id
     // Contribution Edit form (pop-up on contribution/Contact(display Result as Contribution) open on search form),
     // then payment method change action not working properly because of same html ID present two time on one page
@@ -976,7 +940,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       ts('Personal Campaign Page'),
       CRM_Contribute_PseudoConstant::pcPage(), FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]);
 
-    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
+    $statusValues = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search');
     $form->add('select', 'contribution_status_id',
       ts('Contribution Status'), $statusValues,
       FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']

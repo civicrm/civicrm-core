@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -31,7 +15,7 @@
  * All DAO classes should inherit from this class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 if (!defined('DB_DSN_MODE')) {
@@ -260,6 +244,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $fieldDef
    * @param int $counter
    *   The globally-unique ID of the test object.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     $dbName = $fieldDef['name'];
@@ -320,9 +306,8 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_TIME:
-          CRM_Core_Error::fatal("T_TIME shouldn't be used.");
-          //$object->$dbName='000000';
-          //break;
+          throw new CRM_Core_Exception('T_TIME shouldn\'t be used.');
+
         case CRM_Utils_Type::T_CCNUM:
           $this->$dbName = '4111 1111 1111 1111';
           break;
@@ -929,6 +914,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return bool
    *   true if constraint exists, false otherwise
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function checkConstraintExists($tableName, $constraint) {
     static $show = [];
@@ -938,7 +925,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
       if (!$dao->fetch()) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('query failed');
       }
 
       $show[$tableName] = $dao->Create_Table;
@@ -952,7 +939,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param array $tables
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    *
    * @return bool
    *   true if CONSTRAINT keyword exists, false otherwise
@@ -965,7 +952,7 @@ class CRM_Core_DAO extends DB_DataObject {
         $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
         if (!$dao->fetch()) {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Show create table failed.');
         }
 
         $show[$tableName] = $dao->Create_Table;
@@ -991,6 +978,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return bool
    *   true if in format, false otherwise
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function checkFKConstraintInFormat($tableName, $columnName) {
     static $show = [];
@@ -1000,7 +989,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $dao = CRM_Core_DAO::executeQuery($query);
 
       if (!$dao->fetch()) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('query failed');
       }
 
       $show[$tableName] = $dao->Create_Table;
@@ -1061,6 +1050,18 @@ LIKE %1
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $result = $dao->fetch() ? TRUE : FALSE;
     return $result;
+  }
+
+  /**
+   * Check if a given table has data.
+   *
+   * @param string $tableName
+   * @return bool
+   *   TRUE if $tableName has at least one record.
+   */
+  public static function checkTableHasData($tableName) {
+    $c = CRM_Core_DAO::singleValueQuery(sprintf('SELECT count(*) c FROM `%s`', $tableName));
+    return $c > 0;
   }
 
   /**
@@ -1183,6 +1184,8 @@ FROM   civicrm_domain
    *
    * @return string|null
    *   Value of $returnColumn in the retrieved record
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
     if (
@@ -1192,7 +1195,7 @@ FROM   civicrm_domain
       // adding this here since developers forget to check for an id
       // or for the 'null' (which is a bad DAO kludge)
       // and hence we get the first value in the db
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('getFieldValue failed');
     }
 
     self::$_dbColumnValueCache = self::$_dbColumnValueCache ?? [];
@@ -1512,7 +1515,7 @@ FROM   civicrm_domain
    * @param bool $abort
    *
    * @return string
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function composeQuery($query, $params = [], $abort = TRUE) {
     $tr = [];
@@ -1550,7 +1553,7 @@ FROM   civicrm_domain
           $tr['%' . $key] = $item[0];
         }
         elseif ($abort) {
-          CRM_Core_Error::fatal("{$item[0]} is not of type {$item[1]}");
+          throw new CRM_Core_Exception("{$item[0]} is not of type {$item[1]}");
         }
       }
     }
@@ -1858,7 +1861,7 @@ SELECT contact_id
   /**
    * Drop all CiviCRM tables.
    *
-   * @throws \CRM_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function dropAllTables() {
 
@@ -2116,6 +2119,7 @@ SELECT contact_id
    * @see CRM_Utils_SQL_TempTable
    */
   public static function createTempTableName($prefix = 'civicrm', $addRandomString = TRUE, $string = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Utils_SQL_TempTable interface to create temporary tables');
     $tableName = $prefix . "_temp";
 
     if ($addRandomString) {
@@ -2463,7 +2467,7 @@ SELECT contact_id
    * @param array $fields
    */
   public static function appendPseudoConstantsToFields(&$fields) {
-    foreach ($fields as $field) {
+    foreach ($fields as $fieldUniqueName => $field) {
       if (!empty($field['pseudoconstant'])) {
         $pseudoConstant = $field['pseudoconstant'];
         if (!empty($pseudoConstant['optionGroupName'])) {
@@ -2471,7 +2475,7 @@ SELECT contact_id
             'title' => CRM_Core_BAO_OptionGroup::getTitleByName($pseudoConstant['optionGroupName']),
             'name' => $pseudoConstant['optionGroupName'],
             'data_type' => CRM_Utils_Type::T_STRING,
-            'is_pseudofield_for' => $field['name'],
+            'is_pseudofield_for' => $fieldUniqueName,
           ];
         }
         // We restrict to id + name + FK as we are extending this a bit, but cautiously.

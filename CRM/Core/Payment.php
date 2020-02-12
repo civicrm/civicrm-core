@@ -1,32 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 use Civi\Payment\System;
 use Civi\Payment\Exception\PaymentProcessorException;
+use Civi\Payment\PropertyBag;
 
 /**
  * Class CRM_Core_Payment.
@@ -81,7 +66,7 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_END = 'END';
 
   /**
-   * @var object
+   * @var array
    */
   protected $_paymentProcessor;
 
@@ -150,6 +135,63 @@ abstract class CRM_Core_Payment {
   protected $backOffice = FALSE;
 
   /**
+   * This is only needed during the transitional phase. In future you should
+   * pass your own PropertyBag into the method you're calling.
+   *
+   * New code should NOT use $this->propertyBag.
+   *
+   * @var Civi\Payment\PropertyBag
+   */
+  protected $propertyBag;
+
+  /**
+   * Return the payment instrument ID to use.
+   *
+   * Note:
+   * We normally SHOULD be returning the payment instrument of the payment processor.
+   * However there is an outstanding case where this needs overriding, which is
+   * when using CRM_Core_Payment_Manual which uses the pseudoprocessor (id = 0).
+   *
+   * i.e. If you're writing a Payment Processor you should NOT be using
+   * setPaymentInstrumentID() at all.
+   *
+   * @todo
+   * Ideally this exception-to-the-rule should be handled outside of this class
+   * i.e. this class's getPaymentInstrumentID method should return it from the
+   * payment processor and CRM_Core_Payment_Manual could override it to provide 0.
+   *
+   * @return int
+   */
+  public function getPaymentInstrumentID() {
+    return isset($this->paymentInstrumentID)
+      ? $this->paymentInstrumentID
+      : (int) ($this->_paymentProcessor['payment_instrument_id'] ?? 0);
+  }
+
+  /**
+   * Getter for the id Payment Processor ID.
+   *
+   * @return int
+   */
+  public function getID() {
+    return (int) $this->_paymentProcessor['id'];
+  }
+
+  /**
+   * @deprecated Set payment Instrument id - see note on getPaymentInstrumentID.
+   *
+   * By default we actually ignore the form value. The manual processor takes
+   * it more seriously.
+   *
+   * @param int $paymentInstrumentID
+   */
+  public function setPaymentInstrumentID($paymentInstrumentID) {
+    $this->paymentInstrumentID = (int) $paymentInstrumentID;
+    // See note on getPaymentInstrumentID().
+    return $this->getPaymentInstrumentID();
+  }
+
+  /**
    * @return bool
    */
   public function isBackOffice() {
@@ -163,26 +205,6 @@ abstract class CRM_Core_Payment {
    */
   public function setBackOffice($isBackOffice) {
     $this->backOffice = $isBackOffice;
-  }
-
-  /**
-   * Get payment instrument id.
-   *
-   * @return int
-   */
-  public function getPaymentInstrumentID() {
-    return $this->paymentInstrumentID ? $this->paymentInstrumentID : $this->_paymentProcessor['payment_instrument_id'];
-  }
-
-  /**
-   * Set payment Instrument id.
-   *
-   * By default we actually ignore the form value. The manual processor takes it more seriously.
-   *
-   * @param int $paymentInstrumentID
-   */
-  public function setPaymentInstrumentID($paymentInstrumentID) {
-    $this->paymentInstrumentID = $this->_paymentProcessor['payment_instrument_id'];
   }
 
   /**
@@ -248,8 +270,6 @@ abstract class CRM_Core_Payment {
    * @todo move to factory class \Civi\Payment\System (or similar)
    *
    * @param array $params
-   *
-   * @return mixed
    */
   public static function logPaymentNotification($params) {
     $message = 'payment_notification ';
@@ -678,6 +698,8 @@ abstract class CRM_Core_Payment {
    * Get the metadata of all the fields configured for this processor.
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function getAllFields() {
     $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
@@ -1051,28 +1073,32 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get the currency for the transaction.
+   * Get the currency for the transaction from the params.
    *
-   * Handle any inconsistency about how it is passed in here.
+   * Legacy wrapper. Better for a method to work on its own PropertyBag.
+   *
+   * This code now uses PropertyBag to allow for old inputs like currencyID.
    *
    * @param $params
    *
    * @return string
    */
-  protected function getCurrency($params) {
-    return CRM_Utils_Array::value('currencyID', $params, CRM_Utils_Array::value('currency', $params));
+  protected function getCurrency($params = []) {
+    $localPropertyBag = new PropertyBag();
+    $localPropertyBag->mergeLegacyInputParams($params);
+    return $localPropertyBag->getCurrency();
   }
 
   /**
-   * Get the currency for the transaction.
+   * Legacy. Better for a method to work on its own PropertyBag,
+   * but also, this function does not do very much.
    *
-   * Handle any inconsistency about how it is passed in here.
-   *
-   * @param $params
+   * @param array $params
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  protected function getAmount($params) {
+  protected function getAmount($params = []) {
     return CRM_Utils_Money::format($params['amount'], NULL, NULL, TRUE);
   }
 
@@ -1211,6 +1237,23 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Processors may need to inspect, validate, cast and copy data that is
+   * specific to this Payment Processor from the input array to custom fields
+   * on the PropertyBag.
+   *
+   * @param Civi\Payment\PropertyBag $propertyBag
+   * @param array $params
+   * @param string $component
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function extractCustomPropertiesForDoPayment(PropertyBag $propertyBag, array $params, $component = 'contribute') {
+    // example
+    // (validation and casting goes first)
+    // $propertyBag->setCustomProperty('myprocessor_customPropertyName', $value);
+  }
+
+  /**
    * Process payment - this function wraps around both doTransferCheckout and doDirectPayment.
    * Any processor that still implements the deprecated doTransferCheckout() or doDirectPayment() should be updated to use doPayment().
    *
@@ -1225,7 +1268,7 @@ abstract class CRM_Core_Payment {
    *  For the current status see: https://lab.civicrm.org/dev/financial/issues/53
    * If we DO have a contribution ID, then the payment processor can (and should) update parameters on the contribution record as necessary.
    *
-   * @param array $params
+   * @param array|PropertyBag $params
    *
    * @param string $component
    *
@@ -1620,32 +1663,20 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    *
    * @return string
    */
-  protected function getPaymentDescription($params, $length = 24) {
+  protected function getPaymentDescription($params = [], $length = 24) {
+    $propertyBag = PropertyBag::cast($params);
     $parts = [
-      'contactID',
-      'contributionID',
-      'description',
-      'billing_first_name',
-      'billing_last_name',
+      $propertyBag->getter('contactID', TRUE),
+      $propertyBag->getter('contributionID', TRUE),
+      $propertyBag->getter('description', TRUE) ?: ($propertyBag->getter('isRecur', TRUE) ? ts('Recurring payment') : NULL),
+      $propertyBag->getter('billing_first_name', TRUE),
+      $propertyBag->getter('billing_last_name', TRUE),
     ];
-    $validParts = [];
-    if (isset($params['description'])) {
-      $uninformativeStrings = [
-        ts('Online Event Registration: '),
-        ts('Online Contribution: '),
-      ];
-      $params['description'] = str_replace($uninformativeStrings, '', $params['description']);
-    }
-    foreach ($parts as $part) {
-      if ((!empty($params[$part]))) {
-        $validParts[] = $params[$part];
-      }
-    }
-    return substr(implode('-', $validParts), 0, $length);
+    return substr(implode('-', array_filter($parts)), 0, $length);
   }
 
   /**
-   * Checks if backoffice recurring edit is allowed
+   * Checks if back-office recurring edit is allowed
    *
    * @return bool
    */

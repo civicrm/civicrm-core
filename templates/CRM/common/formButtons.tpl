@@ -1,33 +1,36 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
-{* Loops through $form.buttons.html array and assigns separate spans with classes to allow theming
-   by button and name. crmBtnType grabs type keyword from button name (e.g. 'upload', 'next', 'back', 'cancel') so
-   types of buttons can be styled differently via css. *}
 {crmRegion name='form-buttons'}
+{* Loops through $linkButtons and assigns html "a" (link) buttons to the template. Used for additional entity functions such as "Move to Case" or "Renew Membership" *}
+{if $linkButtons}
+  {foreach from=$linkButtons item=linkButton}
+    {if $linkButton.accesskey}
+      {capture assign=accessKey}accesskey="{$linkButton.accessKey}"{/capture}
+    {else}{assign var="accessKey" value=""}
+    {/if}
+    {if $linkButton.icon}
+      {capture assign=icon}<i class="crm-i {$linkButton.icon}"></i> {/capture}
+    {else}{assign var="icon" value=""}
+    {/if}
+    {if $linkButton.ref}
+      {capture assign=linkname}name="{$linkButton.ref}"{/capture}
+    {else}{capture assign=linkname}name="{$linkButton.name}"{/capture}
+    {/if}
+    <a class="button" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {$linkButton.extra}><span>{$icon}{$linkButton.title}</span></a>
+  {/foreach}
+{/if}
+
+{* Loops through $form.buttons.html array and assigns separate spans with classes to allow theming by button and name.
+ * crmBtnType grabs type keyword from button name (e.g. 'upload', 'next', 'back', 'cancel') so types of buttons can be styled differently via css.
+ *}
 {foreach from=$form.buttons item=button key=key name=btns}
   {if $key|substring:0:4 EQ '_qf_'}
     {if $location}

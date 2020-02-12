@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -45,15 +29,16 @@ class SpecFormatter {
   /**
    * @param FieldSpec[] $fields
    * @param bool $includeFieldOptions
+   * @param array $values
    *
    * @return array
    */
-  public static function specToArray($fields, $includeFieldOptions = FALSE) {
+  public static function specToArray($fields, $includeFieldOptions = FALSE, $values = []) {
     $fieldArray = [];
 
     foreach ($fields as $field) {
       if ($includeFieldOptions) {
-        $field->getOptions();
+        $field->getOptions($values);
       }
       $fieldArray[$field->getName()] = $field->toArray();
     }
@@ -82,6 +67,8 @@ class SpecFormatter {
       $field->setCustomFieldId(ArrayHelper::value('id', $data));
       $field->setCustomGroupName($data['custom_group.name']);
       $field->setTitle(ArrayHelper::value('label', $data));
+      $field->setHelpPre(ArrayHelper::value('help_pre', $data));
+      $field->setHelpPost(ArrayHelper::value('help_post', $data));
       $field->setOptions(self::customFieldHasOptions($data));
       if (\CRM_Core_BAO_CustomField::isSerialized($data)) {
         $field->setSerialize(\CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND);
@@ -161,41 +148,6 @@ class SpecFormatter {
     $inputAttrs = ArrayHelper::value('html', $data, []);
     unset($inputAttrs['type']);
 
-    if (!$inputType) {
-      // If no html type is set, guess
-      switch ($dataTypeName) {
-        case 'Int':
-          $inputType = 'Number';
-          $inputAttrs['min'] = 0;
-          break;
-
-        case 'Text':
-          $inputType = ArrayHelper::value('type', $data) === \CRM_Utils_Type::T_LONGTEXT ? 'TextArea' : 'Text';
-          break;
-
-        case 'Timestamp':
-          $inputType = 'Date';
-          $inputAttrs['time'] = TRUE;
-          break;
-
-        case 'Date':
-          $inputAttrs['time'] = FALSE;
-          break;
-
-        case 'Time':
-          $inputType = 'Date';
-          $inputAttrs['time'] = TRUE;
-          $inputAttrs['date'] = FALSE;
-          break;
-
-        default:
-          $map = [
-            'Email' => 'Email',
-            'Boolean' => 'Checkbox',
-          ];
-          $inputType = ArrayHelper::value($dataTypeName, $map, 'Text');
-      }
-    }
     if (strstr($inputType, 'Multi-Select') || ($inputType == 'Select' && !empty($data['serialize']))) {
       $inputAttrs['multiple'] = TRUE;
       $inputType = 'Select';

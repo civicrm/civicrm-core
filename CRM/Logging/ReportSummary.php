@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  */
 class CRM_Logging_ReportSummary extends CRM_Report_Form {
@@ -354,9 +338,9 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     }
 
     // temp table to hold all altered contact-ids
-    $sql = "CREATE TEMPORARY TABLE civicrm_temp_civireport_logsummary ( {$tempColumns} ) ENGINE=HEAP";
-    CRM_Core_DAO::executeQuery($sql);
-    $this->addToDeveloperTab($sql);
+    $this->temporaryTable = CRM_Utils_SQL_TempTable::build()->setCategory('logsummary')->setMemory()->createwithColumns($tempColumns);
+    $this->addToDeveloperTab($this->temporaryTable->getCreateSql());
+    $this->temporaryTableName = $this->temporaryTable->getName();
 
     $logTypes = CRM_Utils_Array::value('log_type_value', $this->_params);
     unset($this->_params['log_type_value']);
@@ -383,7 +367,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
         $this->currentLogTable = $entity;
         $sql = $this->buildQuery(FALSE);
         $sql = str_replace("entity_log_civireport.log_type as", "'{$entity}' as", $sql);
-        $sql = "INSERT IGNORE INTO civicrm_temp_civireport_logsummary {$sql}";
+        $sql = "INSERT IGNORE INTO {$this->temporaryTableName} {$sql}";
         CRM_Core_DAO::disableFullGroupByMode();
         CRM_Core_DAO::executeQuery($sql);
         CRM_Core_DAO::reenableFullGroupByMode();
@@ -395,7 +379,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
 
     // add computed log_type column so that we can do a group by after that, which will help
     // alterDisplay() counts sync with pager counts
-    $sql = "SELECT DISTINCT log_type FROM civicrm_temp_civireport_logsummary";
+    $sql = "SELECT DISTINCT log_type FROM {$this->temporaryTableName}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->addToDeveloperTab($sql);
     $replaceWith = [];
@@ -412,11 +396,11 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
       }
     }
 
-    $sql = "ALTER TABLE civicrm_temp_civireport_logsummary ADD COLUMN log_civicrm_entity_log_type_label varchar(64)";
+    $sql = "ALTER TABLE {$this->temporaryTableName} ADD COLUMN log_civicrm_entity_log_type_label varchar(64)";
     CRM_Core_DAO::executeQuery($sql);
     $this->addToDeveloperTab($sql);
     foreach ($replaceWith as $type => $in) {
-      $sql = "UPDATE civicrm_temp_civireport_logsummary SET log_civicrm_entity_log_type_label='{$type}', log_date=log_date WHERE log_type IN('$in')";
+      $sql = "UPDATE {$this->temporaryTableName} SET log_civicrm_entity_log_type_label='{$type}', log_date=log_date WHERE log_type IN('$in')";
       CRM_Core_DAO::executeQuery($sql);
       $this->addToDeveloperTab($sql);
     }
@@ -448,7 +432,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     $this->limit();
     $this->orderBy();
     $sql = "{$this->_select}
-FROM civicrm_temp_civireport_logsummary entity_log_civireport
+FROM {$this->temporaryTableName} entity_log_civireport
 WHERE {$this->logTypeTableClause}
 GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civicrm_entity_log_conn_id, log_civicrm_entity_log_user_id, log_civicrm_entity_altered_contact_id, log_civicrm_entity_log_grouping
 {$this->_orderBy}
@@ -471,7 +455,7 @@ GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civ
   public function buildRows($sql, &$rows) {
     parent::buildRows($sql, $rows);
     // Clean up the temp table - mostly for the unit test.
-    CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civicrm_temp_civireport_logsummary');
+    $this->temporaryTable->drop();
   }
 
 }

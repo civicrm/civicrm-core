@@ -1,25 +1,9 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 5                                                  |
--- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2019                                |
--- +--------------------------------------------------------------------+
--- | This file is a part of CiviCRM.                                    |
+-- | Copyright CiviCRM LLC. All rights reserved.                        |
 -- |                                                                    |
--- | CiviCRM is free software; you can copy, modify, and distribute it  |
--- | under the terms of the GNU Affero General Public License           |
--- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
--- |                                                                    |
--- | CiviCRM is distributed in the hope that it will be useful, but     |
--- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
--- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
--- | See the GNU Affero General Public License for more details.        |
--- |                                                                    |
--- | You should have received a copy of the GNU Affero General Public   |
--- | License and the CiviCRM Licensing Exception along                  |
--- | with this program; if not, contact CiviCRM LLC                     |
--- | at info[AT]civicrm[DOT]org. If you have questions about the        |
--- | GNU Affero General Public License or the licensing of CiviCRM,     |
--- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- | This work is published under the GNU AGPLv3 license with some      |
+-- | permitted exceptions and without any warranty. For full license    |
+-- | and copyright information, see https://civicrm.org/licensing       |
 -- +--------------------------------------------------------------------+
 --
 -- Generated from schema.tpl
@@ -28,27 +12,11 @@
 
 
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 5                                                  |
--- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2019                                |
--- +--------------------------------------------------------------------+
--- | This file is a part of CiviCRM.                                    |
+-- | Copyright CiviCRM LLC. All rights reserved.                        |
 -- |                                                                    |
--- | CiviCRM is free software; you can copy, modify, and distribute it  |
--- | under the terms of the GNU Affero General Public License           |
--- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
--- |                                                                    |
--- | CiviCRM is distributed in the hope that it will be useful, but     |
--- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
--- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
--- | See the GNU Affero General Public License for more details.        |
--- |                                                                    |
--- | You should have received a copy of the GNU Affero General Public   |
--- | License and the CiviCRM Licensing Exception along                  |
--- | with this program; if not, contact CiviCRM LLC                     |
--- | at info[AT]civicrm[DOT]org. If you have questions about the        |
--- | GNU Affero General Public License or the licensing of CiviCRM,     |
--- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- | This work is published under the GNU AGPLv3 license with some      |
+-- | permitted exceptions and without any warranty. For full license    |
+-- | and copyright information, see https://civicrm.org/licensing       |
 -- +--------------------------------------------------------------------+
 --
 -- Generated from drop.tpl
@@ -202,7 +170,6 @@ DROP TABLE IF EXISTS `civicrm_acl`;
 DROP TABLE IF EXISTS `civicrm_recurring_entity`;
 DROP TABLE IF EXISTS `civicrm_action_mapping`;
 DROP TABLE IF EXISTS `civicrm_prevnext_cache`;
-DROP TABLE IF EXISTS `civicrm_persistent`;
 DROP TABLE IF EXISTS `civicrm_component`;
 DROP TABLE IF EXISTS `civicrm_worldregion`;
 DROP TABLE IF EXISTS `civicrm_system_log`;
@@ -480,28 +447,6 @@ CREATE TABLE `civicrm_component` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Component ID',
      `name` varchar(64) NOT NULL   COMMENT 'Name of the component.',
      `namespace` varchar(128)    COMMENT 'Path to components main directory in a form of a class namespace.' 
-,
-        PRIMARY KEY (`id`)
- 
- 
- 
-)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
-
--- /*******************************************************
--- *
--- * civicrm_persistent
--- *
--- * DB Template Customization strings
--- *
--- *******************************************************/
-CREATE TABLE `civicrm_persistent` (
-
-
-     `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Persistent Record Id',
-     `context` varchar(255) NOT NULL   COMMENT 'Context for which name data pair is to be stored',
-     `name` varchar(255) NOT NULL   COMMENT 'Name of Context',
-     `data` longtext    COMMENT 'data associated with name',
-     `is_config` tinyint NOT NULL  DEFAULT 0 COMMENT 'Config Settings' 
 ,
         PRIMARY KEY (`id`)
  
@@ -1141,16 +1086,16 @@ CREATE TABLE `civicrm_payment_processor_type` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Payment Processor Type ID',
-     `name` varchar(64)    COMMENT 'Payment Processor Name.',
-     `title` varchar(127)    COMMENT 'Payment Processor Name.',
+     `name` varchar(64) NOT NULL   COMMENT 'Payment Processor Name.',
+     `title` varchar(127) NOT NULL   COMMENT 'Payment Processor Type Title.',
      `description` varchar(255)    COMMENT 'Payment Processor Description.',
-     `is_active` tinyint    COMMENT 'Is this processor active?',
-     `is_default` tinyint    COMMENT 'Is this processor the default?',
+     `is_active` tinyint   DEFAULT 1 COMMENT 'Is this processor active?',
+     `is_default` tinyint   DEFAULT 0 COMMENT 'Is this processor the default?',
      `user_name_label` varchar(255)    ,
      `password_label` varchar(255)    ,
      `signature_label` varchar(255)    ,
      `subject_label` varchar(255)    ,
-     `class_name` varchar(255)    ,
+     `class_name` varchar(255) NOT NULL   ,
      `url_site_default` varchar(255)    ,
      `url_api_default` varchar(255)    ,
      `url_recur_default` varchar(255)    ,
@@ -2640,6 +2585,9 @@ CREATE TABLE `civicrm_acl_cache` (
     ,     INDEX `index_acl_id`(
         acl_id
   )
+  ,     INDEX `index_modified_date`(
+        modified_date
+  )
   
 ,          CONSTRAINT FK_civicrm_acl_cache_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_acl_cache_acl_id FOREIGN KEY (`acl_id`) REFERENCES `civicrm_acl`(`id`) ON DELETE CASCADE  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
@@ -2878,7 +2826,8 @@ CREATE TABLE `civicrm_contribution_page` (
      `currency` varchar(3)   DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
      `campaign_id` int unsigned    COMMENT 'The campaign for which we are collecting contributions with this page.',
      `is_share` tinyint   DEFAULT 1 COMMENT 'Can people share the contribution page through social media?',
-     `is_billing_required` tinyint   DEFAULT 0 COMMENT 'if true - billing block is required for online contribution page' 
+     `is_billing_required` tinyint   DEFAULT 0 COMMENT 'if true - billing block is required for online contribution page',
+     `frontend_title` varchar(255)   DEFAULT NULL COMMENT 'Contribution Page Public title' 
 ,
         PRIMARY KEY (`id`)
  
@@ -2991,10 +2940,10 @@ CREATE TABLE `civicrm_payment_processor` (
      `name` varchar(64)    COMMENT 'Payment Processor Name.',
      `title` varchar(127)    COMMENT 'Payment Processor Descriptive Name.',
      `description` varchar(255)    COMMENT 'Payment Processor Description.',
-     `payment_processor_type_id` int unsigned    ,
-     `is_active` tinyint    COMMENT 'Is this processor active?',
-     `is_default` tinyint    COMMENT 'Is this processor the default?',
-     `is_test` tinyint    COMMENT 'Is this processor for a test site?',
+     `payment_processor_type_id` int unsigned NOT NULL   ,
+     `is_active` tinyint   DEFAULT 1 COMMENT 'Is this processor active?',
+     `is_default` tinyint   DEFAULT 0 COMMENT 'Is this processor the default?',
+     `is_test` tinyint   DEFAULT 0 COMMENT 'Is this processor for a test site?',
      `user_name` varchar(255)    ,
      `password` varchar(255)    ,
      `signature` text    ,
@@ -4163,7 +4112,8 @@ CREATE TABLE `civicrm_financial_trxn` (
      `payment_instrument_id` int unsigned    COMMENT 'FK to payment_instrument option group values',
      `card_type_id` int unsigned    COMMENT 'FK to accept_creditcard option group values',
      `check_number` varchar(255)    COMMENT 'Check number',
-     `pan_truncation` varchar(4)    COMMENT 'Last 4 digits of credit card' 
+     `pan_truncation` varchar(4)    COMMENT 'Last 4 digits of credit card',
+     `order_reference` varchar(255)    COMMENT 'Payment Processor external order reference' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4614,7 +4564,8 @@ CREATE TABLE `civicrm_contribution` (
      `campaign_id` int unsigned    COMMENT 'The campaign for which this contribution has been triggered.',
      `creditnote_id` varchar(255)    COMMENT 'unique credit note id, system generated or passed in',
      `tax_amount` decimal(20,2)    COMMENT 'Total tax amount of this contribution.',
-     `revenue_recognition_date` datetime    COMMENT 'Stores the date when revenue should be recognized.' 
+     `revenue_recognition_date` datetime    COMMENT 'Stores the date when revenue should be recognized.',
+     `is_template` tinyint   DEFAULT 0 COMMENT 'Shows this is a template for recurring contributions.' 
 ,
         PRIMARY KEY (`id`)
  

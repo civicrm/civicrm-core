@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -39,6 +23,13 @@
 class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
   public static $_signableFields = ['entityTable', 'entityID', 'fileID'];
+
+  /**
+   * If there is no setting configured on the admin screens, maximum number
+   * of attachments to try to process when given a list of attachments to
+   * process.
+   */
+  const DEFAULT_MAX_ATTACHMENTS_BACKEND = 100;
 
   /**
    * Takes an associative array and creates a File object.
@@ -596,24 +587,37 @@ AND       CEF.entity_id    = %2";
    * @param int $entityID
    */
   public static function processAttachment(&$params, $entityTable, $entityID) {
-    $numAttachments = Civi::settings()->get('max_attachments');
+    $numAttachments = Civi::settings()->get('max_attachments_backend') ?? self::DEFAULT_MAX_ATTACHMENTS_BACKEND;
 
     for ($i = 1; $i <= $numAttachments; $i++) {
-      if (
-        isset($params["attachFile_$i"]) &&
-        is_array($params["attachFile_$i"])
-      ) {
-        self::filePostProcess(
-          $params["attachFile_$i"]['location'],
-          NULL,
-          $entityTable,
-          $entityID,
-          NULL,
-          TRUE,
-          $params["attachFile_$i"],
-          "attachFile_$i",
-          $params["attachFile_$i"]['type']
-        );
+      if (isset($params["attachFile_$i"])) {
+        /**
+         * Moved the second condition into its own if block to avoid changing
+         * how it works if there happens to be an entry that is not an array,
+         * since we now might exit loop early via newly added break below.
+         */
+        if (is_array($params["attachFile_$i"])) {
+          self::filePostProcess(
+            $params["attachFile_$i"]['location'],
+            NULL,
+            $entityTable,
+            $entityID,
+            NULL,
+            TRUE,
+            $params["attachFile_$i"],
+            "attachFile_$i",
+            $params["attachFile_$i"]['type']
+          );
+        }
+      }
+      else {
+        /**
+         * No point looping 100 times if there aren't any more.
+         * This assumes the array is continuous and doesn't skip array keys,
+         * but (a) where would it be doing that, and (b) it would have caused
+         * problems before anyway if there were skipped keys.
+         */
+        break;
       }
     }
   }

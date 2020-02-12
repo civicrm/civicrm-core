@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  */
 
 /**
@@ -387,7 +371,27 @@ return [
     'title' => ts('Maximum Attachments'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Maximum number of files (documents, images, etc.) which can be attached to emails or activities.'),
+    'description' => ts('Maximum number of files (documents, images, etc.) which can be attached to emails or activities. This setting applies to UI forms and limits the number of fields available on the form.'),
+    'help_text' => NULL,
+  ],
+  'max_attachments_backend' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'max_attachments_backend',
+    'legacy_key' => 'maxAttachmentsBackend',
+    'type' => 'Integer',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => [
+      'size' => 2,
+      'maxlength' => 8,
+    ],
+    'default' => CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND,
+    'add' => '5.20',
+    'title' => ts('Maximum Attachments For Backend Processes'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Maximum number of files (documents, images, etc.) which can be processed during backend processing such as automated inbound email processing. This should be a big number higher than the other Maximum Attachments setting above. This setting here merely provides an upper limit to prevent attacks that might overload the server.'),
     'help_text' => NULL,
   ],
   'maxFileSize' => [

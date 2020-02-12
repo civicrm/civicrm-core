@@ -60,4 +60,9 @@
     <comment>When was this cache entry last modified</comment>
     <add>1.6</add>
   </field>
+  <index>
+    <name>index_modified_date</name>
+    <fieldName>modified_date</fieldName>
+    <add>5.22</add>
+  </index>
 </table>

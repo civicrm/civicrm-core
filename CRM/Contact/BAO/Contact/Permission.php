@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_Contact_Permission {
 
@@ -208,12 +192,12 @@ WHERE contact_a.id = %1 AND $permission
   }
 
   /**
-   * Fill the acl contact cache for this contact id if empty.
+   * Fill the acl contact cache for this ACLed contact id if empty.
    *
-   * @param int $userID
+   * @param int $userID - contact_id of the ACLed user
    * @param int|string $type the type of operation (view|edit)
-   * @param bool $force
-   *   Should we force a recompute.
+   * @param bool $force - Should we force a recompute.
+   *
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     // FIXME: maybe find a better way of keeping track of this. @eileen pointed out
@@ -274,7 +258,6 @@ AND    $operationClause
     $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID, FALSE, FALSE, TRUE);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
-
     /* Ends up something like this:
     CREATE TEMPORARY TABLE civicrm_temp_acl_contact_cache1310 (SELECT DISTINCT 2960 as user_id, contact_a.id as contact_id, 'View' as operation
     FROM civicrm_contact contact_a  LEFT JOIN civicrm_group_contact_cache `civicrm_group_contact_cache-ACL` ON contact_a.id = `civicrm_group_contact_cache-ACL`.contact_id
@@ -287,10 +270,10 @@ AND    $operationClause
     WHERE    $permission
     AND ac.user_id IS NULL
     ";*/
-    $useTempTable = self::getUseTemporaryTable();
     $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
          $from
 WHERE    $permission";
+    $useTempTable = self::getUseTemporaryTable();
     if ($useTempTable) {
       $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
       $tempTable = $aclContactsTempTable->getName();
@@ -302,6 +285,7 @@ WHERE    $permission";
     else {
       CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
     }
+
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
     if (CRM_Core_Permission::check('edit my contact') ||

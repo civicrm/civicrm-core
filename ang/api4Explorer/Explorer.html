@@ -74,7 +74,7 @@
             <legend>values<span class="crm-marker" ng-if="availableParams.values.required"> *</span></legend>
             <div class="api4-input form-inline" ng-repeat="clause in params.values" ng-mouseenter="help('value: ' + clause[0], fieldHelp(clause[0]))" ng-mouseleave="help('values', availableParams.values)">
               <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: valuesFields, allowClear: true, placeholder: 'Field'}" />
-              <input class="form-control" ng-model="clause[1]" api4-exp-value="{field: clause[0]}" />
+              <input class="form-control" ng-model="clause[1]" api4-exp-value="{field: clause[0], action: action === 'getFields' ? params.action || 'get' : action}" />
             </div>
             <div class="api4-input form-inline">
               <input class="collapsible-optgroups form-control" ng-model="controls.values" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: valuesFields}" placeholder="Add value" />

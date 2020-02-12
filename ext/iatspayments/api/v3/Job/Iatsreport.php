@@ -65,9 +65,9 @@ function civicrm_api3_job_iatsreport($params) {
   }
   // CRM_Core_Error::debug_var('Payment Processors', $payment_processors);
   // get the settings: TODO allow more detailed configuration of which transactions to import?
-  $iats_settings = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_settings');
+  $iats_settings = Civi::settings()->get('iats_settings');
   // I also use the setttings to keep track of the last time I imported journal data from iATS.
-  $iats_journal = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_journal');
+  $iats_journal = Civi::settings()->get('iats_journal');
   foreach (array('quick', 'recur', 'series') as $setting) {
     $import[$setting] = empty($iats_settings['import_' . $setting]) ? 0 : 1;
   }
@@ -186,7 +186,7 @@ function civicrm_api3_job_iatsreport($params) {
       }
     }
   }
-  CRM_Core_BAO_Setting::setItem($iats_journal, 'iATS Payments Extension', 'iats_journal');
+  Civi::settings()->set('iats_journal', $iats_journal);
   // watchdog('civicrm_iatspayments_com', 'found: <pre>!found</pre>', array('!found' => print_r($processed,TRUE)), WATCHDOG_NOTICE);
   $message = '';
   foreach ($processed as $user_name => $p) {

@@ -858,12 +858,12 @@ class CRM_Iats_iATSServiceRequest {
    *
    */
   public static function iats_extension_version($reset = 0) {
-    $version = $reset ? '' : CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_extension_version');
+    $version = $reset ? '' : Civi::settings()->get('iats_extension_version');
     if (empty($version)) {
       $xmlfile = CRM_Core_Resources::singleton()->getPath('com.iatspayments.civicrm', 'info.xml');
       $myxml = simplexml_load_file($xmlfile);
       $version = (string) $myxml->version;
-      CRM_Core_BAO_Setting::setItem($version, 'iATS Payments Extension', 'iats_extension_version');
+      Civi::settings()->set('iats_extension_version', $version);
     }
     return $version;
   }

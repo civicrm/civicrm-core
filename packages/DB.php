@@ -192,12 +192,12 @@ define('DB_ERROR_INVALID_VIEW', -100);
  * Database lock timeout exceeded.
  */
 define('DB_ERROR_LOCK_TIMEOUT', -30);
+
 /**
  * Database deadlock encountered.
  */
 define('DB_ERROR_DEADLOCK', -31);
 /**#@-*/
-
 
 // }}}
 // {{{ prepared statement-related

@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -86,29 +70,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('hookDiscount', $this->_params[0]['discount']);
     }
 
-    if (!$this->preProcessExpress()) {
-      //process only primary participant params.
-      $registerParams = $this->_params[0];
-      if (isset($registerParams["billing_state_province_id-{$this->_bltID}"])
-        && $registerParams["billing_state_province_id-{$this->_bltID}"]
-      ) {
-        $registerParams["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($registerParams["billing_state_province_id-{$this->_bltID}"]);
-      }
-
-      if (isset($registerParams["billing_country_id-{$this->_bltID}"]) && $registerParams["billing_country_id-{$this->_bltID}"]) {
-        $registerParams["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($registerParams["billing_country_id-{$this->_bltID}"]);
-      }
-      if (isset($registerParams['credit_card_exp_date'])) {
-        $registerParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($registerParams);
-        $registerParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($registerParams);
-      }
-      if ($this->_values['event']['is_monetary']) {
-        $registerParams['ip_address'] = CRM_Utils_System::ipAddress();
-        $registerParams['currencyID'] = $this->_params[0]['currencyID'];
-      }
-      //assign back primary participant params.
-      $this->_params[0] = $registerParams;
-    }
+    $this->preProcessExpress();
 
     if ($this->_values['event']['is_monetary']) {
       $this->_params[0]['invoiceID'] = $this->get('invoiceID');
@@ -403,6 +365,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     $now = date('YmdHis');
@@ -471,7 +436,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $payment = $registerByID = $primaryCurrencyID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
-    $this->participantIDS = [];
     $fields = [];
     foreach ($params as $key => $value) {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
@@ -673,7 +637,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $this->assign('register_date', $registerDate);
 
-      $this->confirmPostProcess($contactID, $contribution, $payment);
+      $this->confirmPostProcess($contactID, $contribution);
     }
 
     //handle if no additional participant.
@@ -743,6 +707,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $isTest = TRUE;
     }
 
+    $primaryParticipant = $this->get('primaryParticipant');
+
+    if (empty($primaryParticipant['participantID'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('This line is not logically reachable.');
+      $primaryParticipant['participantID'] = $registerByID;
+    }
+    //otherwise send mail Confirmation/Receipt
+    $primaryContactId = $this->get('primaryContactId');
+
     // for Transfer checkout.
     // The concept of contributeMode is deprecated.
     if (($this->_contributeMode == 'checkout' ||
@@ -751,12 +724,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       !$this->_allowWaitlist && !$this->_requireApproval &&
       $this->_totalAmount > 0
     ) {
-
-      $primaryParticipant = $this->get('primaryParticipant');
-
-      if (empty($primaryParticipant['participantID'])) {
-        $primaryParticipant['participantID'] = $registerByID;
-      }
 
       //build an array of custom profile and assigning it to template
       $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $isTest);
@@ -832,8 +799,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     else {
-      //otherwise send mail Confirmation/Receipt
-      $primaryContactId = $this->get('primaryContactId');
 
       //build an array of cId/pId of participants
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID,
@@ -926,7 +891,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_values['params']['isRequireApproval'] = $this->_requireApproval;
 
         //send mail to primary as well as additional participants.
-        $this->assign('contactID', $contactId);
         CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
       }
     }
@@ -1195,13 +1159,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     //get email primary first if exist
-    $subscribtionEmail = ['email' => CRM_Utils_Array::value('email-Primary', $params)];
-    if (!$subscribtionEmail['email']) {
-      $subscribtionEmail['email'] = CRM_Utils_Array::value("email-{$form->_bltID}", $params);
+    $subscriptionEmail = ['email' => CRM_Utils_Array::value('email-Primary', $params)];
+    if (!$subscriptionEmail['email']) {
+      $subscriptionEmail['email'] = CRM_Utils_Array::value("email-{$form->_bltID}", $params);
     }
     // subscribing contact to groups
-    if (!empty($subscribeGroupIds) && $subscribtionEmail['email']) {
-      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscribtionEmail, $contactID);
+    if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {
+      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscriptionEmail, $contactID);
     }
 
     return $contactID;
@@ -1323,7 +1287,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   private function processPayment($payment, $value) {
     try {
-      $result = $payment->doPayment($value, 'event');
+      $params = $this->prepareParamsForPaymentProcessor($value);
+      $result = $payment->doPayment($params, 'event');
       return [$result, $value];
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {

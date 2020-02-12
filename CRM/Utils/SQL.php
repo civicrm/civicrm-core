@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * Just another collection of static utils functions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_SQL {
 
@@ -120,35 +104,15 @@ class CRM_Utils_SQL {
   }
 
   /**
-   * Is the Database set up to handle acceents.
-   * @warning This function was introduced in attempt to determine the reason why the test getInternationalStrings was failing on ubu1604 but passing on ubu1204-5
-   * This function should not be used as the basis of further work as the reasoning is not perfact and is giving false failures.
-   * @return bool
-   */
-  public static function supportStorageOfAccents() {
-    $charSetDB = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE 'character_set_database'")->fetchAll();
-    $charSet = $charSetDB[0]['Value'];
-    if ($charSet == 'utf8') {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Does the DB version support mutliple locks per
    *
    * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
-   *
-   * As an interim measure we ALSO require CIVICRM_SUPPORT_MULTIPLE_LOCKS to be defined.
    *
    * This is a conservative measure to introduce the change which we expect to deprecate later.
    *
    * @todo we only check mariadb & mysql right now but maybe can add percona.
    */
   public static function supportsMultipleLocks() {
-    if (!defined('CIVICRM_SUPPORT_MULTIPLE_LOCKS')) {
-      return FALSE;
-    }
     static $isSupportLocks = NULL;
     if (!isset($isSupportLocks)) {
       $version = self::getDatabaseVersion();

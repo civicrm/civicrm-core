@@ -27,7 +27,7 @@ class Schema {
     $tables = $pdo->query($query);
     $result = [];
     foreach ($tables as $table) {
-      $result[] = $table['table_name'];
+      $result[] = isset($table['TABLE_NAME']) ? $table['TABLE_NAME'] : $table['table_name'];
     }
     return $result;
   }

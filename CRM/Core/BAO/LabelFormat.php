@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -246,12 +246,13 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return int
    *   Group ID (null if Group ID doesn't exist)
+   * @throws \CRM_Core_Exception
    */
   private static function _getGid($name = 'label_format') {
     if (!isset(self::$_gid[$name]) || !self::$_gid[$name]) {
       self::$_gid[$name] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $name, 'id', 'name');
       if (!self::$_gid[$name]) {
-        CRM_Core_Error::fatal(ts('Label Format Option Group not found in database.'));
+        throw new CRM_Core_Exception(ts('Label Format Option Group not found in database.'));
       }
     }
     return self::$_gid[$name];
@@ -266,6 +267,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   (reference)   List of Label Formats
+   * @throws \CRM_Core_Exception
    */
   public static function addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
@@ -283,8 +285,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   (reference)   label format list
+   * @throws \CRM_Core_Exception
    */
-  public static function &getList($namesOnly = FALSE, $groupName = 'label_format') {
+  public static function getList($namesOnly = FALSE, $groupName = 'label_format') {
     static $list = [];
     if (self::_getGid($groupName)) {
       // get saved label formats from Option Value table
@@ -313,6 +316,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   Name/value pairs containing the default Label Format values.
+   * @throws \CRM_Core_Exception
    */
   public static function &getDefaultValues($groupName = 'label_format') {
     $params = ['is_active' => 1, 'is_default' => 1];
@@ -339,6 +343,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   (reference) associative array of name/value pairs
+   * @throws \CRM_Core_Exception
    */
   public static function &getLabelFormat($field, $val, $groupName = 'label_format') {
     $params = ['is_active' => 1, $field => $val];
@@ -359,6 +364,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   (reference) associative array of name/value pairs
+   * @throws \CRM_Core_Exception
    */
   public static function &getByName($name) {
     return self::getLabelFormat('name', $name);
@@ -374,6 +380,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   (reference) associative array of name/value pairs
+   * @throws \CRM_Core_Exception
    */
   public static function &getById($id, $groupName = 'label_format') {
     return self::getLabelFormat('id', $id, $groupName);
@@ -423,6 +430,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param string $groupName
    *
    * @return CRM_Core_DAO_OptionValue
+   * @throws \CRM_Core_Exception
    */
   public static function retrieve(&$params, &$values, $groupName = 'label_format') {
     $optionValue = new CRM_Core_DAO_OptionValue();
@@ -465,6 +473,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   Id of the database record (null = new record).
    * @param string $groupName
    *   Group name of the label format.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function saveLabelFormat(&$values, $id = NULL, $groupName = 'label_format') {
     // get the Option Group ID for Label Formats (create one if it doesn't exist)
@@ -532,6 +542,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   ID of the label format to be deleted.
    * @param string $groupName
    *   Group name.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function del($id, $groupName) {
     if ($id) {
@@ -546,7 +558,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
         }
       }
     }
-    CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+    throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
   }
 
 }

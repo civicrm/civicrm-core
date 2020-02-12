@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -294,7 +278,7 @@ WHERE li.contribution_id = %1";
         'financial_type' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $dao->financial_type_id),
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
-        'tax_amount' => $dao->tax_amount,
+        'tax_amount' => (float) $dao->tax_amount,
         'price_set_id' => $dao->price_set_id,
       ];
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
@@ -382,7 +366,7 @@ WHERE li.contribution_id = %1";
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
-        'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid]),
+        'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid], 0),
         'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $options[$oid]),
       ];
 
@@ -426,7 +410,8 @@ WHERE li.contribution_id = %1";
    *
    * @param bool $update
    *
-   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
     if (!$entityId || !is_array($lineItem)
@@ -669,6 +654,7 @@ WHERE li.contribution_id = %1";
    * @param $feeBlock
    * @param array $lineItems
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function changeFeeSelections(
     $params,
@@ -814,18 +800,20 @@ WHERE li.contribution_id = %1";
       $totalFinancialAmount = $this->checkFinancialItemTotalAmountByLineItemID($updateFinancialItemInfoValues['entity_id']);
       unset($updateFinancialItemInfoValues['id']);
       unset($updateFinancialItemInfoValues['created_date']);
+      $previousLineItem = $previousLineItems[$updateFinancialItemInfoValues['entity_id']];
 
       // if not submitted and difference is not 0 make it negative
       if ((empty($lineItemsToUpdate) || (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel) &&
           $totalFinancialAmount == $updateFinancialItemInfoValues['amount'])
         ) && $updateFinancialItemInfoValues['amount'] > 0
       ) {
+
         // INSERT negative financial_items
         $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
         // reverse the related financial trxn too
         $updateFinancialItemInfoValues['financialTrxn'] = $this->getRelatedCancelFinancialTrxn($previousFinancialItemID);
         if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
-          $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
+          $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItem['tax_amount']);
           $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
         }
         // INSERT negative financial_items for tax amount
@@ -842,8 +830,9 @@ WHERE li.contribution_id = %1";
         if ($amountChangeOnTextLineItem !== (float) 0) {
           // calculate the amount difference, considered as financial item amount
           $updateFinancialItemInfoValues['amount'] = $amountChangeOnTextLineItem;
-          if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
-            $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'];
+          if ($previousLineItem['tax_amount']
+            && $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] !== 0.00) {
+            $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItem['tax_amount'];
             $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
           }
           $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
@@ -1046,12 +1035,11 @@ WHERE li.contribution_id = %1";
         'entity_id' => $entityID,
         'contribution_id' => $contributionID,
       ]);
-      $financialTypeChangeTrxnID = $this->addFinancialItemsOnLineItemChange($trxnID, $lineParams, $updatedContribution);
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
       CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnArray);
-      if (isset($lineObj->tax_amount)) {
+      if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
         CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnArray);
       }
     }
@@ -1185,7 +1173,7 @@ WHERE li.contribution_id = %1";
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
   protected function _recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
-    $paidAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
+    $paidAmount = (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
     $balanceAmt = $updatedAmount - $paidAmount;
 
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1194,26 +1182,21 @@ WHERE li.contribution_id = %1";
     $completedStatusId = array_search('Completed', $contributionStatuses);
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
-    $adjustedTrxn = $skip = FALSE;
+    $adjustedTrxn = FALSE;
     if ($balanceAmt) {
-      if ($balanceAmt > 0 && $paidAmount != 0) {
-        $contributionStatusVal = $partiallyPaidStatusId;
-      }
-      elseif ($balanceAmt < 0 && $paidAmount != 0) {
-        $contributionStatusVal = $pendingRefundStatusId;
-      }
-      elseif ($paidAmount == 0) {
+      if ($paidAmount === 0.0) {
         //skip updating the contribution status if no payment is made
-        $skip = TRUE;
         $updatedContributionDAO->cancel_date = 'null';
         $updatedContributionDAO->cancel_reason = NULL;
       }
+      else {
+        $updatedContributionDAO->contribution_status_id = $balanceAmt > 0 ? $partiallyPaidStatusId : $pendingRefundStatusId;
+      }
+
       // update contribution status and total amount without trigger financial code
       // as this is handled in current BAO function used for change selection
       $updatedContributionDAO->id = $contributionId;
-      if (!$skip) {
-        $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
-      }
+
       $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
       $updatedContributionDAO->fee_amount = 0;
       $updatedContributionDAO->tax_amount = $taxAmount;
@@ -1246,46 +1229,6 @@ WHERE li.contribution_id = %1";
     }
 
     return $adjustedTrxn;
-  }
-
-  /**
-   * Add financial items to reflect line item change.
-   *
-   * @param bool $isCreateAdditionalFinancialTrxn
-   * @param array $lineParams
-   * @param \CRM_Contribute_BAO_Contribution $updatedContribution
-   */
-  protected function addFinancialItemsOnLineItemChange($isCreateAdditionalFinancialTrxn, $lineParams, $updatedContribution) {
-    $tempFinancialTrxnID = NULL;
-    // don't add financial item for cancelled line item
-    if ($lineParams['qty'] == 0) {
-      return NULL;
-    }
-    elseif ($isCreateAdditionalFinancialTrxn) {
-      // This routine & the return below is super uncomfortable.
-      // I have refactored to here and it is hit from
-      // testSubmitUnpaidPriceChangeWhileStillPending
-      // but I'm still skeptical it's not covered elsewhere.
-      // original comment : add financial item if ONLY financial type is changed
-      if ($lineParams['financial_type_id'] != $updatedContribution->financial_type_id) {
-        $changedFinancialTypeID = (int) $lineParams['financial_type_id'];
-        $adjustedTrxnValues = [
-          'from_financial_account_id' => NULL,
-          'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($updatedContribution->payment_instrument_id),
-          'total_amount' => $lineParams['line_total'],
-          'net_amount' => $lineParams['line_total'],
-          'status_id' => $updatedContribution->contribution_status_id,
-          'payment_instrument_id' => $updatedContribution->payment_instrument_id,
-          'contribution_id' => $updatedContribution->id,
-          'is_payment' => TRUE,
-          // since balance is 0, which means contribution is completed
-          'trxn_date' => date('YmdHis'),
-          'currency' => $updatedContribution->currency,
-        ];
-        $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
-        return $adjustedTrxn->id;
-      }
-    }
   }
 
   /**

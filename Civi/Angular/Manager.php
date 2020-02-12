@@ -226,7 +226,9 @@ class Manager {
    */
   public function getRawPartials($name) {
     $module = $this->getModule($name);
-    $result = [];
+    $result = !empty($module['partialsCallback'])
+      ? \Civi\Core\Resolver::singleton()->call($module['partialsCallback'], [$name, $module])
+      : [];
     if (isset($module['partials'])) {
       foreach ($module['partials'] as $partialDir) {
         $partialDir = $this->res->getPath($module['ext']) . '/' . $partialDir;

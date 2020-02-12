@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -103,9 +87,11 @@ function civicrm_api3_payment_delete($params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
  * @return array
  *   Api result array
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_payment_cancel($params) {
   $eftParams = [
@@ -118,6 +104,7 @@ function civicrm_api3_payment_cancel($params) {
     'total_amount' => -$entity['amount'],
     'contribution_id' => $entity['entity_id'],
     'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, 'now'),
+    'cancelled_payment_id' => $params['id'],
   ];
 
   foreach (['trxn_id', 'payment_instrument_id'] as $permittedParam) {
@@ -142,6 +129,19 @@ function civicrm_api3_payment_cancel($params) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_create($params) {
+  if (empty($params['skipCleanMoney'])) {
+    foreach (['total_amount', 'net_amount', 'fee_amount'] as $field) {
+      if (isset($params[$field])) {
+        $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
+      }
+    }
+  }
+  if (!empty($params['payment_processor'])) {
+    // I can't find evidence this is passed in - I was gonna just remove it but decided to deprecate  as I see getToFinancialAccount
+    // also anticipates it.
+    CRM_Core_Error::deprecatedFunctionWarning('passing payment_processor is deprecated - use payment_processor_id');
+    $params['payment_processor_id'] = $params['payment_processor'];
+  }
   // Check if it is an update
   if (!empty($params['id'])) {
     $amount = $params['total_amount'];
@@ -200,8 +200,10 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'api.aliases' => ['payment_id'],
     ],
     'trxn_date' => [
-      'title' => ts('Cancel Date'),
+      'title' => ts('Payment Date'),
       'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+      'api.default' => 'now',
+      'api.required' => TRUE,
     ],
     'is_send_contribution_notification' => [
       'title' => ts('Send out notifications based on contribution status change?'),
@@ -320,20 +322,20 @@ function _civicrm_api3_payment_create_spec(&$params) {
 function _civicrm_api3_payment_get_spec(&$params) {
   $params = [
     'contribution_id' => [
-      'title' => 'Contribution ID',
+      'title' => ts('Contribution ID'),
       'type' => CRM_Utils_Type::T_INT,
     ],
     'entity_table' => [
-      'title' => 'Entity Table',
+      'title' => ts('Entity Table'),
       'api.default' => 'civicrm_contribution',
     ],
     'entity_id' => [
-      'title' => 'Entity ID',
+      'title' => ts('Entity ID'),
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['contribution_id'],
     ],
     'trxn_id' => [
-      'title' => 'Transaction ID',
+      'title' => ts('Transaction ID'),
       'type' => CRM_Utils_Type::T_STRING,
     ],
     'trxn_date' => [
@@ -435,5 +437,11 @@ function _civicrm_api3_payment_sendconfirmation_spec(&$params) {
   $params['from_email_address'] = [
     'title' => ts('From email; an email string or the id of a valid email'),
     'type' => CRM_Utils_Type::T_STRING,
+  ];
+  $params['is_send_contribution_notification'] = [
+    'title' => ts('Send any event or contribution confirmations triggered by this payment'),
+    'description' => ts('If this payment completes a contribution it may mean receipts will go out according to busines logic if thie is set to TRUE'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => 0,
   ];
 }

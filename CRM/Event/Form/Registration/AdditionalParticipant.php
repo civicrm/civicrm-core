@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -174,41 +158,18 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     $button = substr($this->controller->getButtonName(), -4);
 
-    $this->add('hidden', 'scriptFee', NULL);
-    $this->add('hidden', 'scriptArray', NULL);
-
     if ($this->_values['event']['is_monetary']) {
       CRM_Event_Form_Registration_Register::buildAmount($this);
     }
-    $first_name = $last_name = NULL;
-    $pre = $post = [];
-    foreach ([
-      'pre',
-      'post',
-    ] as $keys) {
+
+    //Add pre and post profiles on the form.
+    foreach (['pre', 'post'] as $keys) {
       if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
         $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys));
-        $$keys = CRM_Core_BAO_UFGroup::getFields($this->_values['additional_custom_' . $keys . '_id']);
-      }
-      foreach ([
-        'first_name',
-        'last_name',
-      ] as $name) {
-        if (array_key_exists($name, $$keys) &&
-          CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
-        ) {
-          $$name = 1;
-        }
       }
     }
 
-    $required = ($button == 'skip' ||
-      $this->_values['event']['allow_same_participant_emails'] == 1 &&
-      ($first_name && $last_name)
-    ) ? FALSE : TRUE;
-
     //add buttons
-    $js = NULL;
     if ($this->isLastParticipant(TRUE) && empty($this->_values['event']['is_monetary'])) {
       $this->submitOnce = TRUE;
     }

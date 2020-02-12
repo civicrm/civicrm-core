@@ -64,11 +64,11 @@
     <title>Processor Description</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>Payment Processor Description.</comment>
-    <add>1.8</add>
     <html>
       <type>Text</type>
     </html>
+    <comment>Payment Processor Description.</comment>
+    <add>1.8</add>
   </field>
   <field>
     <name>payment_processor_type</name>
@@ -87,6 +87,7 @@
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
+    <required>true</required>
     <length>10</length>
     <add>4.3</add>
   </field>
@@ -102,6 +103,7 @@
     <type>boolean</type>
     <comment>Is this processor active?</comment>
     <add>1.8</add>
+    <default>1</default>
   </field>
   <field>
     <name>is_default</name>
@@ -109,6 +111,7 @@
     <type>boolean</type>
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
+    <default>0</default>
   </field>
   <field>
     <name>is_test</name>
@@ -116,6 +119,7 @@
     <type>boolean</type>
     <comment>Is this processor for a test site?</comment>
     <add>1.8</add>
+    <default>0</default>
   </field>
   <index>
     <name>UI_name_test_domain_id</name>

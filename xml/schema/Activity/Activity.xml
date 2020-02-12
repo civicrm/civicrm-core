@@ -58,7 +58,7 @@
   </index>
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type ID</title>
+    <title>Activity Type</title>
     <import>true</import>
     <type>int unsigned</type>
     <required>true</required>
@@ -167,7 +167,7 @@
     <comment>Planned or actual duration of activity expressed in minutes. Conglomerate of former duration_hours and duration_minutes.</comment>
     <add>2.0</add>
     <html>
-      <type>Text</type>
+      <type>Number</type>
     </html>
   </field>
   <field>
@@ -187,7 +187,7 @@
   <field>
     <name>phone_id</name>
     <type>int unsigned</type>
-    <title>Phone (called) ID</title>
+    <title>Phone (called)</title>
     <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
     <add>2.0</add>
     <html>
@@ -262,6 +262,8 @@
     <name>priority_id</name>
     <type>int unsigned</type>
     <title>Priority</title>
+    <export>true</export>
+    <import>true</import>
     <comment>ID of the priority given to this activity. Foreign key to civicrm_option_value.</comment>
     <add>2.0</add>
     <pseudoconstant>
@@ -295,7 +297,7 @@
     <headerPattern>/(is.)?test(.activity)?/i</headerPattern>
     <add>2.0</add>
     <html>
-      <type>Select</type>
+      <type>CheckBox</type>
     </html>
   </field>
   <field>
@@ -347,9 +349,6 @@
     <import>true</import>
     <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
     <add>2.2</add>
-    <html>
-      <type>CheckBox</type>
-    </html>
   </field>
   <index>
     <name>index_is_current_revision</name>
@@ -383,9 +382,6 @@
     <title>Result</title>
     <length>255</length>
     <comment>Currently being used to store result id for survey activity, FK to option value.</comment>
-    <html>
-      <type>Text</type>
-    </html>
     <add>3.3</add>
   </field>
   <field>
@@ -398,7 +394,7 @@
     <headerPattern>/(activity.)?(trash|deleted)/i</headerPattern>
     <add>2.2</add>
     <html>
-      <type>Text</type>
+      <type>CheckBox</type>
     </html>
   </field>
   <index>
@@ -420,7 +416,7 @@
     </pseudoconstant>
     <add>3.4</add>
     <html>
-      <type>CheckBox</type>
+      <type>Select</type>
     </html>
   </field>
   <foreignKey>
@@ -449,9 +445,6 @@
     <title>Order</title>
     <type>int</type>
     <add>4.1</add>
-    <html>
-      <type>Text</type>
-    </html>
   </field>
   <field>
     <name>is_star</name>
@@ -462,6 +455,9 @@
     <comment>Activity marked as favorite.</comment>
     <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>
     <add>4.7</add>
+    <html>
+      <type>Checkbox</type>
+    </html>
   </field>
   <field>
     <name>created_date</name>

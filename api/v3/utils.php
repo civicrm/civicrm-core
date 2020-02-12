@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -49,6 +33,8 @@ function _civicrm_api3_initialize() {
  *   String DAO to check for required fields (create functions only).
  * @param array $keyoptions
  *   List of required fields options. One of the options is required.
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions = []) {
   $keys = [[]];
@@ -109,7 +95,7 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = [], $ve
     }
   }
   if (!empty($unmatched)) {
-    throw new API_Exception("Mandatory key(s) missing from params array: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
+    throw new API_Exception('Mandatory key(s) missing from params array: ' . implode(", ", $unmatched), 'mandatory_missing', ["fields" => $unmatched]);
   }
 }
 
@@ -128,7 +114,7 @@ function civicrm_api3_create_error($msg, $data = []) {
   // we will show sql to privileged user only (not sure of a specific
   // security hole here but seems sensible - perhaps should apply to the trace as well?)
   if (isset($data['sql'])) {
-    if (CRM_Core_Permission::check('Administer CiviCRM') || CIVICRM_UF == 'UnitTests') {
+    if (CRM_Core_Permission::check('Administer CiviCRM') || CIVICRM_UF === 'UnitTests') {
       // Isn't this redundant?
       $data['debug_information'] = $data['sql'];
     }
@@ -156,6 +142,7 @@ function civicrm_api3_create_error($msg, $data = []) {
  *   - this param is currently used for legacy behaviour support
  *
  * @return array
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, $action = NULL, &$dao = NULL, $extraReturnValues = []) {
   $result = [];
@@ -164,10 +151,10 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
   $entity = _civicrm_api_get_camel_name($entity);
   $result['is_error'] = 0;
   //lets set the ['id'] field if it's not set & we know what the entity is
-  if (is_array($values) && $entity && $action != 'getfields') {
+  if (is_array($values) && $entity && $action !== 'getfields') {
     foreach ($values as $key => $item) {
-      if (empty($item['id']) && !empty($item[$lowercase_entity . "_id"])) {
-        $values[$key]['id'] = $item[$lowercase_entity . "_id"];
+      if (empty($item['id']) && !empty($item[$lowercase_entity . '_id'])) {
+        $values[$key]['id'] = $item[$lowercase_entity . '_id'];
       }
       if (!empty($item['financial_type_id'])) {
         // 4.3 legacy handling.
@@ -185,10 +172,10 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
   }
 
   if (is_array($params) && !empty($params['debug'])) {
-    if (is_string($action) && $action != 'getfields') {
+    if (is_string($action) && $action !== 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', ['version' => 3, 'action' => $action] + $params);
     }
-    elseif ($action != 'getfields') {
+    elseif ($action !== 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', ['version' => 3] + $params);
     }
     else {
@@ -196,7 +183,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
     }
 
     $allFields = [];
-    if ($action != 'getfields' && is_array($apiFields) && is_array(CRM_Utils_Array::value('values', $apiFields))) {
+    if ($action !== 'getfields' && is_array($apiFields) && is_array(CRM_Utils_Array::value('values', $apiFields))) {
       $allFields = array_keys($apiFields['values']);
     }
     $paramFields = array_keys($params);
@@ -228,7 +215,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
     $result['count'] = (int) count($values);
 
     // Convert value-separated strings to array
-    if ($action != 'getfields') {
+    if ($action !== 'getfields') {
       _civicrm_api3_separate_values($values);
     }
 
@@ -263,16 +250,16 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
   // Report deprecations.
   $deprecated = _civicrm_api3_deprecation_check($entity, $result);
   // Always report "setvalue" action as deprecated.
-  if (!is_string($deprecated) && ($action == 'getactions' || $action == 'setvalue')) {
+  if (!is_string($deprecated) && ($action === 'getactions' || $action === 'setvalue')) {
     $deprecated = ((array) $deprecated) + ['setvalue' => 'The "setvalue" action is deprecated. Use "create" with an id instead.'];
   }
   // Always report "update" action as deprecated.
-  if (!is_string($deprecated) && ($action == 'getactions' || $action == 'update')) {
+  if (!is_string($deprecated) && ($action === 'getactions' || $action === 'update')) {
     $deprecated = ((array) $deprecated) + ['update' => 'The "update" action is deprecated. Use "create" with an id instead.'];
   }
   if ($deprecated) {
     // Metadata-level deprecations or wholesale entity deprecations.
-    if ($entity == 'Entity' || $action == 'getactions' || is_string($deprecated)) {
+    if ($entity === 'Entity' || $action === 'getactions' || is_string($deprecated)) {
       $result['deprecated'] = $deprecated;
     }
     // Action-specific deprecations
@@ -318,33 +305,33 @@ function _civicrm_api3_get_DAO($name) {
 
   $name = _civicrm_api_get_camel_name($name);
 
-  if ($name == 'Individual' || $name == 'Household' || $name == 'Organization') {
+  if ($name === 'Individual' || $name === 'Household' || $name === 'Organization') {
     $name = 'Contact';
   }
 
   // hack to deal with incorrectly named BAO/DAO - see CRM-10859
 
   // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingEventQueue
-  if ($name == 'MailingEventQueue') {
+  if ($name === 'MailingEventQueue') {
     return 'CRM_Mailing_Event_DAO_Queue';
   }
   // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingRecipients
   // but am not confident mailing_recipients is tested so have not tackled.
-  if ($name == 'MailingRecipients') {
+  if ($name === 'MailingRecipients') {
     return 'CRM_Mailing_DAO_Recipients';
   }
   // FIXME: DAO should be renamed CRM_ACL_DAO_AclRole
-  if ($name == 'AclRole') {
+  if ($name === 'AclRole') {
     return 'CRM_ACL_DAO_EntityRole';
   }
   // FIXME: DAO should be renamed CRM_SMS_DAO_SmsProvider
   // But this would impact SMS extensions so need to coordinate
   // Probably best approach is to migrate them to use the api and decouple them from core BAOs
-  if ($name == 'SmsProvider') {
+  if ($name === 'SmsProvider') {
     return 'CRM_SMS_DAO_Provider';
   }
   // FIXME: DAO names should follow CamelCase convention
-  if ($name == 'Im' || $name == 'Acl' || $name == 'Pcp') {
+  if ($name === 'Im' || $name === 'Acl' || $name === 'Pcp') {
     $name = strtoupper($name);
   }
   $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
@@ -357,7 +344,7 @@ function _civicrm_api3_get_DAO($name) {
     include_once "api/v3/$name.php";
   }
 
-  $daoFn = "_civicrm_api3_" . _civicrm_api_get_entity_name_from_camel($name) . "_DAO";
+  $daoFn = '_civicrm_api3_' . _civicrm_api_get_entity_name_from_camel($name) . '_DAO';
   if (function_exists($daoFn)) {
     return $daoFn();
   }
@@ -377,7 +364,7 @@ function _civicrm_api3_get_DAO($name) {
  */
 function _civicrm_api3_get_BAO($name) {
   // FIXME: DAO should be renamed CRM_Badge_DAO_BadgeLayout
-  if ($name == 'PrintLabel') {
+  if ($name === 'PrintLabel') {
     return 'CRM_Badge_BAO_Layout';
   }
   if ($name === 'Order') {
@@ -416,7 +403,7 @@ function _civicrm_api3_separate_values(&$values) {
     }
     elseif (is_string($value)) {
       // This is to honor the way case API was originally written.
-      if ($key == 'case_type_id') {
+      if ($key === 'case_type_id') {
         $value = trim(str_replace($sp, ',', $value), ',');
       }
       elseif (strpos($value, $sp) !== FALSE) {
@@ -842,8 +829,8 @@ function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $e
       $sort = array_map('trim', explode(',', $sort));
     }
     foreach ($sort as $s) {
-      if ($s == '(1)' || CRM_Utils_Rule::mysqlOrderBy($s)) {
-        if ($entity && $action == 'get') {
+      if ($s === '(1)' || CRM_Utils_Rule::mysqlOrderBy($s)) {
+        if ($entity && $action === 'get') {
           switch (trim(strtolower($s))) {
             case 'id':
             case 'id desc':
@@ -876,10 +863,10 @@ function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $e
     'version', 'prettyprint', 'check_permissions', 'sequential',
   ];
   foreach ($params as $n => $v) {
-    if (substr($n, 0, 7) == 'return.') {
+    if (substr($n, 0, 7) === 'return.') {
       $legacyreturnProperties[substr($n, 7)] = $v;
     }
-    elseif ($n == 'id') {
+    elseif ($n === 'id') {
       $inputParams[$lowercase_entity . '_id'] = $v;
     }
     elseif (in_array($n, $otherVars)) {
@@ -904,6 +891,9 @@ function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $e
  * @param object $dao
  *   DAO object.
  * @param $entity
+ *
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
 
@@ -970,8 +960,6 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 /**
  * Converts an DAO object to an array.
  *
- * @deprecated - DAO based retrieval is being phased out.
- *
  * @param CRM_Core_DAO $dao
  *   Object to convert.
  * @param array $params
@@ -980,6 +968,11 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
  * @param bool $autoFind
  *
  * @return array
+ *
+ * @throws \API_Exception
+ *
+ * @deprecated - DAO based retrieval is being phased out.
+ *
  */
 function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, $entity = "", $autoFind = TRUE) {
   $result = [];
@@ -1023,13 +1016,15 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
  *
  * We currently retrieve all custom fields or none at this level so if we know the entity
  * && it can take custom fields & there is the string 'custom' in their return request we get them all, they are filtered on the way out
- * @todo filter so only required fields are queried
  *
  * @param string $entity
  *   Entity name in CamelCase.
  * @param array $params
  *
  * @return bool
+ * @throws \API_Exception
+ *
+ * @todo filter so only required fields are queried
  */
 function _civicrm_api3_custom_fields_are_required($entity, $params) {
   if (!array_key_exists($entity, CRM_Core_BAO_CustomQuery::$extendsMap)) {
@@ -1379,13 +1374,15 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  *
  * @return array
  *   API result array
+ *
  * @throws API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
+ * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_basic_delete($bao_name, &$params) {
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
   _civicrm_api3_check_edit_permissions($bao_name, ['id' => $params['id']]);
-  $args = array(&$params['id']);
+  $args = [&$params['id']];
   if (method_exists($bao_name, 'del')) {
     $dao = new $bao_name();
     $dao->id = $params['id'];
@@ -1434,6 +1431,8 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *   E.g. membership_type_id where custom data doesn't apply to all membership types.
  * @param string $subName
  *   Subtype of entity.
+ *
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
   $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity,
@@ -1464,7 +1463,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
       $returnArray[$key] = $val;
 
       // Shim to restore legacy behavior of ContactReference custom fields
-      if (!empty($fieldInfo[$id]) && $fieldInfo[$id]['data_type'] == 'ContactReference') {
+      if (!empty($fieldInfo[$id]) && $fieldInfo[$id]['data_type'] === 'ContactReference') {
         $returnArray['custom_' . $id . '_id'] = $returnArray[$key . '_id'] = $val;
         $returnArray['custom_' . $id] = $returnArray[$key] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $val, 'sort_name');
       }
@@ -1474,11 +1473,13 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
 
 /**
  * Used by the Validate API.
+ *
  * @param string $entity
  * @param string $action
  * @param array $params
  *
  * @return array $errors
+ * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_validate($entity, $action, $params) {
   $errors = [];
@@ -1489,8 +1490,8 @@ function _civicrm_api3_validate($entity, $action, $params) {
   foreach ($fields as $values) {
     if (!empty($values['api.required']) && empty($params[$values['name']])) {
       $errors[$values['name']] = [
-        'message' => "Mandatory key(s) missing from params array: " . $values['name'],
-        'code' => "mandatory_missing",
+        'message' => 'Mandatory key(s) missing from params array: ' . $values['name'],
+        'code' => 'mandatory_missing',
       ];
     }
   }
@@ -1555,7 +1556,7 @@ function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $p
 
       foreach ((array) $fieldValue as $fieldvalue) {
         if (!CRM_Utils_Rule::money($fieldvalue) && !empty($fieldvalue)) {
-          throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
+          throw new Exception($fieldName . ' is  not a valid amount: ' . $params[$fieldName]);
         }
       }
       break;
@@ -1655,7 +1656,7 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
     if (!empty($fieldInfo['FKClassName'])) {
       if (!empty($params[$fieldName])) {
         foreach ((array) $params[$fieldName] as $fieldValue) {
-          _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo);
+          _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, $entity);
         }
       }
       elseif (!empty($fieldInfo['required'])) {
@@ -1747,16 +1748,21 @@ function _civicrm_api3_getValidDate($dateValue, $fieldName, $fieldType) {
  *
  * @param mixed $fieldValue
  * @param string $fieldName
- *   Uniquename of field being checked.
+ *   Unique name of field being checked.
  * @param array $fieldInfo
  *   Array of fields from getfields function.
+ * @param string $entity
  *
  * @throws \API_Exception
  */
-function _civicrm_api3_validate_constraint(&$fieldValue, &$fieldName, &$fieldInfo) {
+function _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, $entity) {
   $daoName = $fieldInfo['FKClassName'];
+  $fieldInfo = [$fieldName => $fieldInfo];
+  $params = [$fieldName => $fieldValue];
+  _civicrm_api3_validate_fields($entity, NULL, $params, $fieldInfo);
+  /* @var CRM_Core_DAO $dao*/
   $dao = new $daoName();
-  $dao->id = $fieldValue;
+  $dao->id = $params[$fieldName];
   $dao->selectAdd();
   $dao->selectAdd('id');
   if (!$dao->find()) {
@@ -2562,10 +2568,13 @@ function _civicrm_api3_check_edit_permissions($bao_name, $params) {
 
 /**
  * Check if an entity has been modified since the last known modified_date
+ *
  * @param string $modifiedDate Last knowm modified_date
  * @param int $id Id of record to check
  * @param string $entity API Entity
+ *
  * @return bool
+ * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_compare_timestamps($modifiedDate, $id, $entity) {
   $currentDbInfo = civicrm_api3($entity, 'getsingle', ['id' => $id]);

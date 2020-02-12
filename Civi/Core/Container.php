@@ -214,7 +214,7 @@ class Container {
       throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
     }
     foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
-      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE);
+      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE)->setPublic(TRUE);
     }
 
     // Expose legacy singletons as services in the container.
@@ -433,8 +433,7 @@ class Container {
        FROM civicrm_custom_field fld
        INNER JOIN civicrm_custom_group grp ON fld.custom_group_id = grp.id
        WHERE fld.data_type = "File"
-      ',
-      ['civicrm_activity', 'civicrm_mailing', 'civicrm_contact', 'civicrm_grant']
+      '
     ));
 
     $kernel->setApiProviders([

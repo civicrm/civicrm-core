@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * machine. Each form can also operate in various modes
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'HTML/QuickForm/Page.php';
@@ -862,8 +846,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $params = array_merge($params, $addressParams);
     }
 
-    // @fixme it would be really nice to have a comment here so I had a clue why we are setting $fields[$name] = 1
-    // Also how does relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()
+    // How does this relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()?
     $nameFields = ['first_name', 'middle_name', 'last_name'];
     foreach ($nameFields as $name) {
       if (array_key_exists("billing_$name", $params)) {
@@ -871,6 +854,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $params['preserveDBName'] = TRUE;
       }
     }
+
+    // For legacy reasons we set these creditcard expiry fields if present
+    if (isset($params['credit_card_exp_date'])) {
+      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
+      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
+    }
+
+    // Assign IP address parameter
+    $params['ip_address'] = CRM_Utils_System::ipAddress();
+
     return $params;
   }
 
@@ -1639,6 +1632,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addRadio($name, $label, $options, $props, NULL, $required);
 
       case 'CheckBox':
+        if ($context === 'search') {
+          $this->addYesNo($name, $label, TRUE, FALSE, $props);
+          return;
+        }
         $text = isset($props['text']) ? $props['text'] : NULL;
         unset($props['text']);
         return $this->addElement('checkbox', $name, $label, $text, $props);
@@ -2239,10 +2236,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * that small pieces of duplication are not being refactored into separate functions because their only shared parent
    * is this form. Inserting a class FrontEndForm.php between the contribution & event & this class would allow functions like this
    * and a dozen other small ones to be refactored into a shared parent with the reduction of much code duplication
-   *
-   * @param $onlinePaymentProcessorEnabled
    */
-  public function addCIDZeroOptions($onlinePaymentProcessorEnabled) {
+  public function addCIDZeroOptions() {
     $this->assign('nocid', TRUE);
     $profiles = [];
     if ($this->_values['custom_pre_id']) {
@@ -2251,9 +2246,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($this->_values['custom_post_id']) {
       $profiles = array_merge($profiles, (array) $this->_values['custom_post_id']);
     }
-    if ($onlinePaymentProcessorEnabled) {
-      $profiles[] = 'billing';
-    }
+    $profiles[] = 'billing';
     if (!empty($this->_values)) {
       $this->addAutoSelector($profiles);
     }

@@ -147,6 +147,8 @@ trait Api3TestTrait {
    *   better or worse )
    *
    * @return array|int
+   *
+   * @throws \CRM_Core_Exception
    */
   public function callAPISuccess($entity, $action, $params = [], $checkAgainst = NULL) {
     $params = array_merge([

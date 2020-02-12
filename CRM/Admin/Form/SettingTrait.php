@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -126,9 +110,11 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
+   * This is public so we can retrieve the filter name via hooks etc. and apply conditional logic (eg. loading javascript conditionals).
+   *
    * @return string
    */
-  protected function getSettingPageFilter() {
+  public function getSettingPageFilter() {
     if (!isset($this->_filter)) {
       // Get the last URL component without modifying the urlPath property.
       $urlPath = array_values($this->urlPath);
@@ -249,6 +235,10 @@ trait CRM_Admin_Form_SettingTrait {
         if ($setting == 'max_attachments') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
+        }
+        if ($setting == 'max_attachments_backend') {
+          //temp hack @todo fix to get from metadata
+          $this->addRule('max_attachments_backend', ts('Value should be a positive number'), 'positiveInteger');
         }
         if ($setting == 'maxFileSize') {
           //temp hack

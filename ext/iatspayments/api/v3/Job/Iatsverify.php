@@ -68,7 +68,7 @@ function _civicrm_api3_job_iatsverify_spec(&$spec) {
  */
 function civicrm_api3_job_iatsverify($params) {
 
-  $settings = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_settings');
+  $settings = Civi::settings()->get('iats_settings');
   $receipt_recurring = $settings['receipt_recurring'];
   define('IATS_VERIFY_DAYS', 30);
   // I've added an extra 2 days when getting candidates from CiviCRM to be sure i've got them all.
@@ -107,8 +107,8 @@ function civicrm_api3_job_iatsverify($params) {
   }
   // use these two settings to see if it's worth checking their respective
   // journal tables.
-  $iats_journal_date = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_journal');
-  $iats_faps_journal_date = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_faps_journal');
+  $iats_journal_date = Civi::settings()->get('iats_journal');
+  $iats_faps_journal_date = Civi::settings()->get('iats_faps_journal');
   $message = '';
   try {
     $contributions = civicrm_api3('Contribution', 'get', $select_params);
