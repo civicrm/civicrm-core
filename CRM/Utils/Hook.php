@@ -160,7 +160,7 @@ abstract class CRM_Utils_Hook {
     // Instead of not calling any hooks we only call those we know to be frequently important - if a particular extension wanted
     // to avoid this they could do an early return on CRM_Core_Config::singleton()->isUpgradeMode
     // Futther discussion is happening at https://lab.civicrm.org/dev/core/issues/1460
-    $upgradeFriendlyHooks = ['civicrm_alterSettingsFolders', 'civicrm_alterSettingsMetaData', 'civicrm_triggerInfo', 'civicrm_alterLogTables', 'civicrm_container', 'civicrm_permission'];
+    $upgradeFriendlyHooks = ['civicrm_alterSettingsFolders', 'civicrm_alterSettingsMetaData', 'civicrm_triggerInfo', 'civicrm_alterLogTables', 'civicrm_container', 'civicrm_permission', 'civicrm_managed'];
     if (CRM_Core_Config::singleton()->isUpgradeMode() && !in_array($fnSuffix, $upgradeFriendlyHooks)) {
       return;
     }
