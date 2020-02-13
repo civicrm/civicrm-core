@@ -65,7 +65,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     try {
       // Call multiple
       if (empty($this->urlPath[3])) {
-        $calls = CRM_Utils_Request::retrieve('calls', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST', TRUE);
+        $calls = CRM_Utils_Request::retrieve('calls', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
         $calls = json_decode($calls, TRUE);
         $response = [];
         foreach ($calls as $index => $call) {

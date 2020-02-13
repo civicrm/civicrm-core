@@ -24,10 +24,12 @@ class CRM_Contact_Page_Inline_CommunicationPreferences extends CRM_Core_Page {
    * Run the page.
    *
    * This method is called after the page is created.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     // get the emails for this contact
-    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
+    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
     $params = ['id' => $contactId];
 
