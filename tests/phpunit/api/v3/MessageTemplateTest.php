@@ -64,6 +64,26 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test cloning of message templates.
+   */
+  public function testClone() {
+    $main = $this->createTestEntity();
+    $clone = $this->callAPIAndDocument('MessageTemplate', 'clone', ['id' => $main['id']], __FUNCTION__, __FILE__);
+
+    $mainTemplate = $main['values'][$main['id']];
+    $cloneTemplate = $clone['values'][$clone['id']];
+
+    //Verify if values are equal.
+    $this->assertEquals($mainTemplate['msg_title'] . " - Copy", $cloneTemplate['msg_title']);
+    $this->assertEquals($mainTemplate['msg_subject'], $cloneTemplate['msg_subject']);
+    $this->assertEquals($mainTemplate['msg_text'], $cloneTemplate['msg_text']);
+    $this->assertEquals($mainTemplate['msg_html'], $cloneTemplate['msg_html']);
+    $this->assertEquals($mainTemplate['is_active'], $cloneTemplate['is_active']);
+    $this->assertEquals(0, $cloneTemplate['is_default']);
+    $this->assertEquals(0, $cloneTemplate['is_reserved']);
+  }
+
+  /**
    * Check the delete function succeeds.
    */
   public function testDelete() {
