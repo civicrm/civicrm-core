@@ -75,14 +75,16 @@ class Kernel {
    * @throws \API_Exception
    */
   public function runSafe($entity, $action, $params) {
-    $apiRequest = Request::create($entity, $action, $params);
-
+    $apiRequest = [];
     try {
+      $apiRequest = Request::create($entity, $action, $params);
       $apiResponse = $this->runRequest($apiRequest);
       return $this->formatResult($apiRequest, $apiResponse);
     }
     catch (\Exception $e) {
-      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest, $this));
+      if ($apiRequest) {
+        $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest, $this));
+      }
 
       if ($e instanceof \PEAR_Exception) {
         $err = $this->formatPearException($e, $apiRequest);

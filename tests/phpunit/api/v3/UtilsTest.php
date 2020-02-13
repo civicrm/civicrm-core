@@ -95,6 +95,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    *   TRUE or FALSE depending on the outcome of the authorization check
    */
   public function runPermissionCheck($entity, $action, $params, $throws = FALSE) {
+    $params['version'] = 3;
     $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $kernel = new \Civi\API\Kernel($dispatcher);

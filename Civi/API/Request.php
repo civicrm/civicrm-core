@@ -31,7 +31,7 @@ class Request {
    * @return \Civi\Api4\Generic\AbstractAction|array
    */
   public static function create(string $entity, string $action, array $params) {
-    switch ($params['version']) {
+    switch ($params['version'] ?? NULL) {
       case 3:
         return [
           'id' => self::$nextId++,
@@ -61,7 +61,7 @@ class Request {
         return $apiRequest;
 
       default:
-        throw new \Civi\API\Exception\NotImplementedException("CiviCRM API version {$params['version']} not found.");
+        throw new \Civi\API\Exception\NotImplementedException("Unknown api version");
     }
   }
 

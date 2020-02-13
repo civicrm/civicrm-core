@@ -81,6 +81,9 @@ function civicrm_api3_contact_create($params) {
 
   if (empty($params['contact_type']) && $contactID) {
     $params['contact_type'] = CRM_Contact_BAO_Contact::getContactType($contactID);
+    if (!$params['contact_type']) {
+      throw new API_Exception('Contact id ' . $contactID . ' not found.');
+    }
   }
 
   if (!isset($params['contact_sub_type']) && $contactID) {
