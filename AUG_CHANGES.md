@@ -9,3 +9,5 @@ This file documents all the changes made on top of core 5.22 by Australian Green
 | 0ad6579    | Add in `settings_location.php` file                                                                              | Not going to be fixed in Core                                    |
 | d7a9675    | Update composer.json and remove composer.lock as is required for composer in docker                              | Not going to be fixed local changes needed to support AUG docker |
 | b99343a    | dev/core/#273: Set doNotSms To False When Phone Number Is Given                                                  | Need to check against core pr to determine if still needed       |
+| f3152ba    | dev/drupal#98 Fix masquerade issue caused by drupal update change                                                | Looks like it will be coming with CiviCRM 5.23                   |
+| 06f34a9    | dev/core#1489 Include hook_civicrm_managed into the list of upgrade friendly hooks                               | Looks to be merged soon, possibly prior to CiviCRM 5.23          |
