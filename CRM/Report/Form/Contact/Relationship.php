@@ -311,6 +311,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Start Date'),
             'name' => 'start_date',
           ],
+          'end_date' => [
+            'title' => ts('End Date'),
+            'name' => 'end_date',
+          ],
         ],
         'grouping' => 'relation-fields',
       ],
