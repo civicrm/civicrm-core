@@ -13,7 +13,7 @@
       {/if}
       <table class="crm-info-panel">
         <tr>
-            <td class="label">{ts}Added By{/ts}</td><td class="view-value">{$values.source_contact}</td>
+            <td class="label">{ts}Added by{/ts}</td><td class="view-value">{$values.source_contact}</td>
         </tr>
        {if $values.target_contact_value}
            <tr>

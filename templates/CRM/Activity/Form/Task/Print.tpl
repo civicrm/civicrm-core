@@ -20,7 +20,7 @@
   <tr class="columnheader">
     <td>{ts}Type{/ts}</td>
     <td>{ts}Subject{/ts}</td>
-    <td>{ts}Added By{/ts}</td>
+    <td>{ts}Added by{/ts}</td>
     <td>{ts}With{/ts}</td>
     <td>{ts}Assigned to{/ts}</td>
     <td>{ts}Date{/ts}</td>
