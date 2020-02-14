@@ -1357,7 +1357,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'id' => $otherId,
       'return' => ['created_date'],
     ])['created_date'];
-    if ($otherCreatedDate < $mainCreatedDate) {
+    if ($otherCreatedDate < $mainCreatedDate && !empty($otherCreatedDate)) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET created_date = %1 WHERE id = %2", [
         1 => [$otherCreatedDate, 'String'],
         2 => [$mainId, 'Positive'],
