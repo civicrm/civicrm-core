@@ -2020,6 +2020,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contactID
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   protected function processFormSubmission($contactID) {
     if (!isset($this->_params['payment_processor_id'])) {
