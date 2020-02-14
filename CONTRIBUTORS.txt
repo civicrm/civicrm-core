@@ -46,6 +46,7 @@ Fuzion - Jitendra Purohit, Luke Stewart
 Hossein Amin
 Giant Rabbit - Peter Haight
 Giovanni Dalmas
+GMVCO Databases - Craig Almond, Jade Gaunt
 Greenpeace Central and Eastern Europe - Patrick Figel
 Guillaume Rischard
 iXiam - César Ramos, Luciano Spiegel, Vangelis Pantazis
