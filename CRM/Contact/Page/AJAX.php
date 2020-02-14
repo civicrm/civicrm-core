@@ -346,111 +346,51 @@ class CRM_Contact_Page_AJAX {
    *  Function to get email address of a contact.
    */
   public static function getContactEmail() {
-    if (!empty($_REQUEST['contact_id'])) {
-      $contactID = CRM_Utils_Type::escape($_REQUEST['contact_id'], 'Positive');
-      if (!CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
-        return;
+    $queryStrings = [];
+    $name = CRM_Utils_Array::value('name', $_GET);
+    if ($name) {
+      $name = CRM_Utils_Type::escape($name, 'String');
+      $wildCard = Civi::settings()->get('includeWildCardInName') ? '%' : '';
+      foreach (['cc.sort_name', 'ce.email'] as $column) {
+        $queryStrings[] = "{$column} LIKE '{$wildCard}{$name}%'";
       }
-      list($displayName,
-        $userEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+      $result = [];
+      $rowCount = Civi::settings()->get('search_autocomplete_count');
 
-      CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
-      if ($userEmail) {
-        echo $userEmail;
+      // add acl clause here
+      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      if ($aclWhere) {
+        $aclWhere = "AND {$aclWhere}";
       }
-    }
-    else {
-      $noemail = CRM_Utils_Array::value('noemail', $_GET);
-      $queryString = NULL;
-      $name = CRM_Utils_Array::value('name', $_GET);
-      if ($name) {
-        $name = CRM_Utils_Type::escape($name, 'String');
-        if ($noemail) {
-          $queryString = " cc.sort_name LIKE '%$name%'";
-        }
-        else {
-          $queryString = " ( cc.sort_name LIKE '%$name%' OR ce.email LIKE '%$name%' ) ";
-        }
-      }
-      else {
-        $cid = CRM_Utils_Array::value('cid', $_GET);
-        if ($cid) {
-          //check cid for integer
-          $contIDS = explode(',', $cid);
-          foreach ($contIDS as $contID) {
-            CRM_Utils_Type::escape($contID, 'Integer');
-          }
-          $queryString = " cc.id IN ( $cid )";
-        }
-      }
-
-      if ($queryString) {
-        $result = [];
-        $offset = CRM_Utils_Array::value('offset', $_GET, 0);
-        $rowCount = Civi::settings()->get('search_autocomplete_count');
-
-        $offset = CRM_Utils_Type::escape($offset, 'Int');
-
-        // add acl clause here
-        list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
-        if ($aclWhere) {
-          $aclWhere = " AND $aclWhere";
-        }
-        if ($noemail) {
-          $query = "
-SELECT sort_name name, cc.id
-FROM civicrm_contact cc
-     {$aclFrom}
-WHERE cc.is_deceased = 0 AND {$queryString}
-      {$aclWhere}
-LIMIT {$offset}, {$rowCount}
-";
-
-          // send query to hook to be modified if needed
-          CRM_Utils_Hook::contactListQuery($query,
-            $name,
-            CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
-            CRM_Utils_Request::retrieve('cid', 'Positive')
-          );
-
-          $dao = CRM_Core_DAO::executeQuery($query);
-          while ($dao->fetch()) {
-            $result[] = [
-              'id' => $dao->id,
-              'text' => $dao->name,
-            ];
-          }
-        }
-        else {
-          $query = "
+      foreach ($queryStrings as &$queryString) {
+        $queryString = "(
 SELECT sort_name name, ce.email, cc.id
 FROM   civicrm_email ce INNER JOIN civicrm_contact cc ON cc.id = ce.contact_id
        {$aclFrom}
 WHERE  ce.on_hold = 0 AND cc.is_deceased = 0 AND cc.do_not_email = 0 AND {$queryString}
        {$aclWhere}
-LIMIT {$offset}, {$rowCount}
-";
-
-          // send query to hook to be modified if needed
-          CRM_Utils_Hook::contactListQuery($query,
-            $name,
-            CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
-            CRM_Utils_Request::retrieve('cid', 'Positive')
-          );
-
-          $dao = CRM_Core_DAO::executeQuery($query);
-
-          while ($dao->fetch()) {
-            //working here
-            $result[] = [
-              'text' => '"' . $dao->name . '" <' . $dao->email . '>',
-              'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
-            ];
-          }
-        }
-        CRM_Utils_JSON::output($result);
+LIMIT {$rowCount}
+)";
       }
+      $query = implode(' UNION ', $queryStrings) . " LIMIT {$rowCount}";
+
+      // send query to hook to be modified if needed
+      CRM_Utils_Hook::contactListQuery($query,
+        $name,
+        CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
+        CRM_Utils_Request::retrieve('cid', 'Positive')
+      );
+
+      $dao = CRM_Core_DAO::executeQuery($query);
+
+      while ($dao->fetch()) {
+        //working here
+        $result[] = [
+          'text' => '"' . $dao->name . '" <' . $dao->email . '>',
+          'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
+        ];
+      }
+      CRM_Utils_JSON::output($result);
     }
     CRM_Utils_System::civiExit();
   }
