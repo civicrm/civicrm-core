@@ -27,9 +27,6 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
     $this->assign('id', $this->_id);
     $this->assign('context', $this->_context);
     $this->assign('component', $this->_component);
-    if ($this->_component != 'event') {
-      $this->assign('hideButtonLinks', TRUE);
-    }
   }
 
   public function browse() {
