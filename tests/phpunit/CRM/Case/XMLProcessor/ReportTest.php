@@ -72,6 +72,60 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
   }
 
   /**
+   * This is similar to testGetCaseReport but test with a timeline that
+   * does have Meeting in it.
+   */
+  public function testGetCaseReportWithMeetingInTimeline() {
+    $client_id = $this->individualCreate([
+      'first_name' => 'Casey',
+      'middle_name' => '',
+      'last_name' => 'Reportee',
+      'prefix_id' => NULL,
+      'suffix_id' => NULL,
+    ]);
+    $caseObj = $this->createCase($client_id, $this->_loggedInUser);
+    $case_id = $caseObj->id;
+
+    // Now update the timeline so it has Meeting in it.
+    $this->addMeetingToTimeline();
+
+    // Add a meeting activity to the case.
+    $meetingTypeId = $this->callAPISuccess('OptionValue', 'getsingle', [
+      'return' => ["value"],
+      'option_group_id' => 'activity_type',
+      'name' => 'Meeting',
+    ]);
+    $this->callAPISuccess('activity', 'create', [
+      'case_id' => $case_id,
+      'activity_type_id' => $meetingTypeId['value'],
+      'activity_date_time' => '20191114123456',
+      'subject' => 'Test Meeting',
+      'source_contact_id' => $this->_loggedInUser,
+      'target_contact_id' => $client_id,
+    ]);
+
+    $caseReportParams = [
+      'is_redact' => FALSE,
+      'include_activities' => 1,
+    ];
+
+    // run the thing we're testing and get the output vars
+    $template = CRM_Case_XMLProcessor_Report::populateCaseReportTemplate($client_id, $case_id, 'standard_timeline', $caseReportParams, $this->report);
+    $assigned_vars = $template->get_template_vars();
+
+    // We don't want to run all the data in the dataprovider but we know
+    // in this case it should be the same as the second one in the
+    // dataprovider so we can reuse it.
+    $expected = $this->caseReportDataProvider()[1][1];
+    $this->updateExpectedBecauseDataProviderEvaluatesBeforeEverything($expected, $client_id, $case_id);
+
+    foreach ($expected as $key => $value) {
+      // does the assigned template var match the expected value?
+      $this->assertEquals($value, $assigned_vars[$key], "$key does not match" . print_r($assigned_vars[$key], TRUE));
+    }
+  }
+
+  /**
    * Data provider for testGetCaseReport
    * @return array
    */
@@ -80,7 +134,9 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       [
         // activity set name
         'standard_timeline',
-        // some expected assigned vars of CRM_Core_Smarty template
+        // Some expected assigned vars of CRM_Core_Smarty template.
+        // In particular we shouldn't have meeting in the output since it's
+        // not in the timeline.
         [
           'case' => [
             'clientName' => 'Casey Reportee',
@@ -219,7 +275,8 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       [
         // activity set name is blank here, meaning don't filter the activities
         '',
-        // some expected assigned vars of CRM_Core_Smarty template
+        // Some expected assigned vars of CRM_Core_Smarty template.
+        // In particular now we will have Meeting in the output.
         [
           'case' => [
             'clientName' => 'Casey Reportee',
@@ -478,6 +535,22 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
     $caseType = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $this->caseTypeId]);
     $newActivitySet = array_slice($caseType['definition']['activitySets'][0]['activityTypes'], 0, 2);
     $caseType['definition']['activitySets'][0]['activityTypes'] = $newActivitySet;
+    $this->callAPISuccess('CaseType', 'create', $caseType);
+  }
+
+  /**
+   * Add Meeting to the standard timeline.
+   */
+  private function addMeetingToTimeline() {
+    $caseType = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $this->caseTypeId]);
+    $activityTypes = $caseType['definition']['activitySets'][0]['activityTypes'];
+    // Make a copy of the second activity type and change the type.
+    $activityType = $activityTypes[1];
+    $activityType['name'] = 'Meeting';
+    $activityType['label'] = 'Meeting';
+
+    $activityTypes[] = $activityType;
+    $caseType['definition']['activitySets'][0]['activityTypes'] = $activityTypes;
     $this->callAPISuccess('CaseType', 'create', $caseType);
   }
 
