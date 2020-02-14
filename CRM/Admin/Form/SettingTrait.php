@@ -176,7 +176,7 @@ trait CRM_Admin_Form_SettingTrait {
         }
 
         //Load input as readonly whose values are overridden in civicrm.settings.php.
-        if (Civi::settings()->getMandatory($setting)) {
+        if (Civi::settings()->getMandatory($setting) !== NULL) {
           $props['html_attributes']['readonly'] = TRUE;
           $this->includesReadOnlyFields = TRUE;
         }
@@ -224,7 +224,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, $props['title'], $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, $props['title'], [1 => 'Yes', 0 => 'No'], NULL, '&nbsp;&nbsp;');
+          $this->addRadio($setting, $props['title'], [1 => 'Yes', 0 => 'No'], CRM_Utils_Array::value('html_attributes', $props), '&nbsp;&nbsp;');
         }
         elseif ($add === 'add') {
           $this->add($props['html_type'], $setting, $props['title'], $options);
