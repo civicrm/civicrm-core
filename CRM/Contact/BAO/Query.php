@@ -1791,6 +1791,10 @@ class CRM_Contact_BAO_Query {
       (substr($values[0], 0, 10) === 'financial_') ||
       (substr($values[0], 0, 8) === 'payment_') ||
       (substr($values[0], 0, 11) === 'membership_')
+      // temporary fix for regression https://lab.civicrm.org/dev/core/issues/1551
+      //  ideally the metadata would allow  this field to be parsed below & the special handling would not
+      // be needed.
+      || $values[0] === 'mailing_id'
     ) {
       return;
     }
