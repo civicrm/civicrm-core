@@ -236,9 +236,11 @@ class CRM_Extension_Mapper {
    *
    * @return string
    *   url for resources in this extension
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function keyToUrl($key) {
-    if ($key == 'civicrm') {
+    if ($key === 'civicrm') {
       // CRM-12130 Workaround: If the domain's config_backend is NULL at the start of the request,
       // then the Mapper is wrongly constructed with an empty value for $this->civicrmUrl.
       if (empty($this->civicrmUrl)) {
@@ -339,6 +341,8 @@ class CRM_Extension_Mapper {
    *
    * @return array
    *   (string $extKey => string $baseUrl)
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getActiveModuleUrls() {
     // TODO optimization/caching
@@ -347,7 +351,12 @@ class CRM_Extension_Mapper {
     foreach ($this->getModules() as $module) {
       /** @var $module CRM_Core_Module */
       if ($module->is_active) {
-        $urls[$module->name] = $this->keyToUrl($module->name);
+        try {
+          $urls[$module->name] = $this->keyToUrl($module->name);
+        }
+        catch (CRM_Extension_Exception_MissingException $e) {
+          CRM_Core_Session::setStatus(ts('An enabled extension is missing from the extensions directory') . ':' . $module->name);
+        }
       }
     }
     return $urls;
