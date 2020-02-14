@@ -48,6 +48,16 @@ class CRM_Contribute_BAO_Contribution_Utils {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
+    if (!$isRecur) {
+      // https://lab.civicrm.org/dev/core/issues/1588
+      // This is not a recurring payment. Therefore the following will not be
+      // needed, but may still cause validation to fail, so we remove them.
+      //
+      // @todo We should be moving to setting the expected parameters on a
+      // PropertyBag instead of chucking them all in an array.
+      unset($paymentParams['frequency_interval'], $paymentParams['frequency_unit']);
+    }
+
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
