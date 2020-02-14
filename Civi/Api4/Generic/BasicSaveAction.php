@@ -22,7 +22,6 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
-use Civi\Api4\Utils\ActionUtil;
 
 /**
  * $ACTION one or more $ENTITIES.
@@ -68,7 +67,7 @@ class BasicSaveAction extends AbstractSaveAction {
     }
     if ($this->reload) {
       /** @var BasicGetAction $get */
-      $get = ActionUtil::getAction($this->getEntityName(), 'get');
+      $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
       $get
         ->setCheckPermissions($this->getCheckPermissions())
         ->addWhere($this->getIdField(), 'IN', (array) $result->column($this->getIdField()));

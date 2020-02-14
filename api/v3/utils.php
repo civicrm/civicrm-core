@@ -171,7 +171,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
     }
   }
 
-  if (is_array($params) && !empty($params['debug'])) {
+  if (is_array($params) && $entity && !empty($params['debug'])) {
     if (is_string($action) && $action !== 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', ['version' => 3, 'action' => $action] + $params);
     }

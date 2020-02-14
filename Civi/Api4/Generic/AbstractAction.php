@@ -21,7 +21,6 @@
 namespace Civi\Api4\Generic;
 
 use Civi\Api4\Utils\ReflectionUtils;
-use Civi\Api4\Utils\ActionUtil;
 
 /**
  * Base class for all api actions.
@@ -424,15 +423,14 @@ abstract class AbstractAction implements \ArrayAccess {
    */
   public function entityFields() {
     if (!$this->_entityFields) {
-      $getFields = ActionUtil::getAction($this->getEntityName(), 'getFields');
+      $getFields = \Civi\API\Request::create($this->getEntityName(), 'getFields', [
+        'version' => 4,
+        'checkPermissions' => $this->checkPermissions,
+        'action' => $this->getActionName(),
+        'includeCustom' => FALSE,
+      ]);
       $result = new Result();
-      if (method_exists($this, 'getBaoName')) {
-        $getFields->setIncludeCustom(FALSE);
-      }
-      $getFields
-        ->setCheckPermissions($this->checkPermissions)
-        ->setAction($this->getActionName())
-        ->_run($result);
+      $getFields->_run($result);
       $this->_entityFields = (array) $result->indexBy('name');
     }
     return $this->_entityFields;

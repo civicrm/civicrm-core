@@ -25,7 +25,6 @@ use Civi\Api4\Service\Spec\SpecFormatter;
 
 /**
  * @inheritDoc
- * @method $this setIncludeCustom(bool $value)
  * @method bool getIncludeCustom()
  */
 class DAOGetFieldsAction extends BasicGetFieldsAction {
