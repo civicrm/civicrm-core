@@ -120,13 +120,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_action;
 
   /**
-   * Role Id.
-   *
-   * @var int
-   */
-  protected $_roleId = NULL;
-
-  /**
    * Event Type Id.
    *
    * @var int
@@ -417,7 +410,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->_id) {
       // assign participant id to the template
       $this->assign('participantId', $this->_id);
-      $this->_roleId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'role_id');
     }
 
     // when fee amount is included in form
