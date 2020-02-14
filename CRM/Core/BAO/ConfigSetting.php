@@ -263,8 +263,7 @@ class CRM_Core_BAO_ConfigSetting {
       'Boolean',
       CRM_Core_DAO::$_nullArray,
       FALSE,
-      FALSE,
-      'REQUEST'
+      FALSE
     );
     if ($config->userSystem->is_drupal &&
       $resetSessionTable
