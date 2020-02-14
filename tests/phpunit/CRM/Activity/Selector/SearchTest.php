@@ -55,7 +55,7 @@ class CRM_Activity_Selector_SearchTest extends CiviUnitTestCase {
         'name' => 'source_contact',
         'sort' => 'source_contact',
         'direction' => 4,
-        'title' => 'Added By',
+        'title' => 'Added by',
       ],
       5 => [
         'name' => 'activity_status',

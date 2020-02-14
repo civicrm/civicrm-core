@@ -48,7 +48,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     parent::preProcess();
 
     // Get the contact read only fields to display.
-    $readOnlyFields = array_merge(['sort_name' => ts('Added By'), 'target_sort_name' => ts('With Contact')],
+    $readOnlyFields = array_merge(['sort_name' => ts('Added by'), 'target_sort_name' => ts('With Contact')],
       CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_autocomplete_options',
         TRUE, NULL, FALSE, 'name', TRUE

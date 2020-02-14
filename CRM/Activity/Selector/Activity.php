@@ -508,7 +508,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('Added By'),
+          'name' => ts('Added by'),
           'sort' => 'source_contact_name',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],

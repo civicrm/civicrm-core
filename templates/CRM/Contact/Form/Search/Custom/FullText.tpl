@@ -84,7 +84,7 @@
           <th>{ts}Type{/ts}</th>
           <th>{ts}Subject{/ts}</th>
           <th>{ts}Details{/ts}</th>
-          <th class='link'>{ts}Added By{/ts}</th>
+          <th class='link'>{ts}Added by{/ts}</th>
           <th class='link'>{ts}With{/ts}</th>
           <th class='link'>{ts}Assignee{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}

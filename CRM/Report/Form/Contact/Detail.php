@@ -342,7 +342,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Activity_DAO_ActivityContact',
         'fields' => [
           'source_contact_id' => [
-            'title' => ts('Added By'),
+            'title' => ts('Added by'),
             'name' => 'contact_id',
             'default' => TRUE,
           ],
