@@ -31,8 +31,28 @@
  */
 class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
-  private $basicTokens;
-  private $customFieldTokens;
+  use CRM_Core_TokenTrait;
+
+  /**
+   * @return string
+   */
+  private function getEntityName(): string {
+    return 'activity';
+  }
+
+  /**
+   * @return string
+   */
+  private function getEntityTableName(): string {
+    return 'civicrm_activity';
+  }
+
+  /**
+   * @return string
+   */
+  private function getEntityContextSchema(): string {
+    return 'activityId';
+  }
 
   /**
    * Mapping from tokenName to api return field
@@ -48,54 +68,10 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   ];
 
   /**
-   * CRM_Activity_Tokens constructor.
-   */
-  public function __construct() {
-    parent::__construct('activity', array_merge(
-      $this->getBasicTokens(),
-      $this->getCustomFieldTokens()
-    ));
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return in_array('activityId', $processor->context['schema']) ||
-      (!empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_activity');
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getActiveTokens(\Civi\Token\Event\TokenValueEvent $e) {
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (!isset($messageTokens[$this->entity])) {
-      return NULL;
-    }
-
-    $activeTokens = [];
-    // if message token contains '_\d+_', then treat as '_N_'
-    foreach ($messageTokens[$this->entity] as $msgToken) {
-      if (array_key_exists($msgToken, $this->tokenNames)) {
-        $activeTokens[] = $msgToken;
-      }
-      else {
-        $altToken = preg_replace('/_\d+_/', '_N_', $msgToken);
-        if (array_key_exists($altToken, $this->tokenNames)) {
-          $activeTokens[] = $msgToken;
-        }
-      }
-    }
-    return array_unique($activeTokens);
-  }
-
-  /**
    * @inheritDoc
    */
   public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
-    if ($e->mapping->getEntity() !== 'civicrm_activity') {
+    if ($e->mapping->getEntity() !== $this->getEntityTableName()) {
       return;
     }
 
@@ -106,43 +82,21 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   }
 
   /**
-   * Find the fields that we need to get to construct the tokens requested.
-   * @param  array $tokens list of tokens
-   * @return array         list of fields needed to generate those tokens
-   */
-  public function getReturnFields($tokens) {
-    // Make sure we always return something
-    $fields = ['id'];
-
-    foreach (array_intersect($tokens,
-      array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()))
-      ) as $token) {
-      if (isset(self::$fieldMapping[$token])) {
-        $fields = array_merge($fields, self::$fieldMapping[$token]);
-      }
-      else {
-        $fields[] = $token;
-      }
-    }
-    return array_unique($fields);
-  }
-
-  /**
    * @inheritDoc
    */
   public function prefetch(\Civi\Token\Event\TokenValueEvent $e) {
-    // Find all the activity IDs
-    $activityIds
+    // Find all the entity IDs
+    $entityIds
       = $e->getTokenProcessor()->getContextValues('actionSearchResult', 'entityID')
-      + $e->getTokenProcessor()->getContextValues('activityId');
+      + $e->getTokenProcessor()->getContextValues($this->getEntityContextSchema());
 
-    if (!$activityIds) {
-      return;
+    if (!$entityIds) {
+      return NULL;
     }
 
     // Get data on all activities for basic and customfield tokens
     $activities = civicrm_api3('Activity', 'get', [
-      'id' => ['IN' => $activityIds],
+      'id' => ['IN' => $entityIds],
       'options' => ['limit' => 0],
       'return' => self::getReturnFields($this->activeTokens),
     ]);
@@ -176,9 +130,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     ];
 
     // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
-    $activityId = isset($row->context['actionSearchResult']->entityID)
-      ? $row->context['actionSearchResult']->entityID
-      : $row->context['activityId'];
+    $activityId = $row->context['actionSearchResult']->entityID ?? $row->context[$this->getEntityContextSchema()];
 
     $activity = (object) $prefetch['activity'][$activityId];
 
@@ -241,17 +193,6 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       }
     }
     return $this->basicTokens;
-  }
-
-  /**
-   * Get the tokens for custom fields
-   * @return array token name => token label
-   */
-  protected function getCustomFieldTokens() {
-    if (!isset($this->customFieldTokens)) {
-      $this->customFieldTokens = \CRM_Utils_Token::getCustomFieldTokens('Activity');
-    }
-    return $this->customFieldTokens;
   }
 
 }
