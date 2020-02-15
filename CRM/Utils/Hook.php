@@ -796,6 +796,7 @@ abstract class CRM_Utils_Hook {
    * @deprecated Use tabset() instead.
    */
   public static function tabs(&$tabs, $contactID) {
+    CRM_Core_Error::deprecatedFunctionWarning('hook_civicrm_tabset instead');
     return self::singleton()->invoke(['tabs', 'contactID'], $tabs, $contactID,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_tabs'
     );
