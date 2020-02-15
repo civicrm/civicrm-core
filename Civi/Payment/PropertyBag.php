@@ -22,7 +22,9 @@ use CRM_Core_PseudoConstant;
  */
 class PropertyBag implements \ArrayAccess {
   /**
-   * @var array - see legacyWarning */
+   * @var array
+   * - see legacyWarning
+   */
   public static $legacyWarnings = [];
 
   protected $props = ['default' => []];
