@@ -43,6 +43,8 @@ interface CRM_Extension_Container_Interface {
    *
    * @param string $key
    *   Fully-qualified extension name.
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getResUrl($key);
 
