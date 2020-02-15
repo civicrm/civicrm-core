@@ -8,7 +8,7 @@ function civicrm_webtest_enable() {
   
   // If Backdrop
   if (function_exists('config_get')) {
-    $anonymous = 'Anonymous';
+    $anonymous = 'anonymous';
   }
 
   user_role_grant_permissions($anonymous, [
