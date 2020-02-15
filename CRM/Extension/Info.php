@@ -45,6 +45,12 @@ class CRM_Extension_Info {
   public $requires = [];
 
   /**
+   * @var array
+   *   List of strings (tag-names).
+   */
+  public $tags = [];
+
+  /**
    * Load extension info an XML file.
    *
    * @param $file
@@ -153,6 +159,12 @@ class CRM_Extension_Info {
             'prefix' => (string) $psr4->attributes()->prefix,
             'path' => (string) $psr4->attributes()->path,
           ];
+        }
+      }
+      elseif ($attr === 'tags') {
+        $this->tags = [];
+        foreach ($val->tag as $tag) {
+          $this->tags[] = (string) $tag;
         }
       }
       elseif ($attr === 'requires') {

@@ -72,7 +72,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   public function testExtensionGet() {
     $result = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
     $testExtensionResult = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.paymenttest']);
-    $this->assertNotNull($result['values'][$testExtensionResult['id']]['typeInfo']);
+    $ext = $result['values'][$testExtensionResult['id']];
+    $this->assertNotNull($ext['typeInfo']);
+    $this->assertEquals(['mock'], $ext['tags']);
     $this->assertTrue($result['count'] >= 6);
   }
 

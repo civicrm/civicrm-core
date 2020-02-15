@@ -389,6 +389,42 @@ class CRM_Extension_Mapper {
   }
 
   /**
+   * Get a list of extensions which match a given tag.
+   *
+   * @param string $tag
+   *   Ex: 'foo'
+   * @return array
+   *   Array(string $key).
+   *   Ex: array("org.foo.bar").
+   */
+  public function getKeysByTag($tag) {
+    $allTags = $this->getAllTags();
+    return $allTags[$tag] ?? [];
+  }
+
+  /**
+   * Get a list of extension tags.
+   *
+   * @return array
+   *   Ex: ['form-building' => ['org.civicrm.afform-gui', 'org.civicrm.afform-html']]
+   */
+  public function getAllTags() {
+    $tags = Civi::cache('short')->get('extension_tags', NULL);
+    if ($tags !== NULL) {
+      return $tags;
+    }
+
+    $tags = [];
+    $allInfos = $this->getAllInfos();
+    foreach ($allInfos as $key => $info) {
+      foreach ($info->tags as $tag) {
+        $tags[$tag][] = $key;
+      }
+    }
+    return $tags;
+  }
+
+  /**
    * @return array
    *   Ex: $result['org.civicrm.foobar'] = new CRM_Extension_Info(...).
    * @throws \CRM_Extension_Exception
