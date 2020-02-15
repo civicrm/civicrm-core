@@ -286,7 +286,7 @@ class CRM_Core_DAO_AllCoreTables {
       foreach ($fields as $name => $field) {
         if (!empty($field['export'])) {
           if ($prefix) {
-            $exports[$labelName] = & $fields[$name];
+            $exports["{$labelName}_{$name}"] = & $fields[$name];
           }
           else {
             $exports[$name] = & $fields[$name];
