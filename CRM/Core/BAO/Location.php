@@ -286,57 +286,6 @@ WHERE e.id = %1";
   }
 
   /**
-   * Copy or update location block.
-   *
-   * @param int $locBlockId
-   *   Location block id.
-   * @param int $updateLocBlockId
-   *   Update location block id.
-   *
-   * @return int
-   *   newly created/updated location block id.
-   */
-  public static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function which will be removed');
-    //get the location info.
-    $defaults = $updateValues = [];
-    $locBlock = ['id' => $locBlockId];
-    CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_LocBlock', $locBlock, $defaults);
-
-    if ($updateLocBlockId) {
-      //get the location info for update.
-      $copyLocationParams = ['id' => $updateLocBlockId];
-      CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_LocBlock', $copyLocationParams, $updateValues);
-      foreach ($updateValues as $key => $value) {
-        if ($key != 'id') {
-          $copyLocationParams[$key] = 'null';
-        }
-      }
-    }
-
-    //copy all location blocks (email, phone, address, etc)
-    foreach ($defaults as $key => $value) {
-      if ($key != 'id') {
-        $tbl = explode("_", $key);
-        $name = ucfirst($tbl[0]);
-        $updateParams = NULL;
-        if ($updateId = CRM_Utils_Array::value($key, $updateValues)) {
-          $updateParams = ['id' => $updateId];
-        }
-
-        $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_' . $name, ['id' => $value], $updateParams);
-        $copyLocationParams[$key] = $copy->id;
-      }
-    }
-
-    $copyLocation = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_LocBlock',
-      ['id' => $locBlock['id']],
-      $copyLocationParams
-    );
-    return $copyLocation->id;
-  }
-
-  /**
    * Make sure contact should have only one primary block, CRM-5051.
    *
    * @param int $contactId
