@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f545c6e46af52039ade0c29ca8fe41e5",
+    "content-hash": "705221f636824b774ef9fb35f3bfc987",
     "packages": [
         {
             "name": "cache/integration-tests",
@@ -34,6 +34,13 @@
                 "tedivm/stash": "dev-master"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Allow adding tests": "https://github.com/php-cache/integration-tests/commit/05f97174c09364dc10c084a38ba0cfd5124f4cec.patch",
+                    "Support PHPUnit 6+": "https://github.com/php-cache/integration-tests/commit/1ec7362962185df91d3d749bc3fa7e7b99cb9fc7.patch",
+                    "Add tests for binary data round trip": "https://github.com/php-cache/integration-tests/commit/89cd7068e83aa776774bfc44f6bcba858c085616.patch"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Cache\\IntegrationTests\\": "src/"
@@ -985,22 +992,22 @@
         },
         {
             "name": "pear/net_smtp",
-            "version": "1.6.3",
+            "version": "1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_SMTP.git",
-                "reference": "7b6240761adf6ee245098e238a25d5c35650d82c"
+                "reference": "f7fbc5808bfeba87c38e02ea4acc5243ffc9524e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/7b6240761adf6ee245098e238a25d5c35650d82c",
-                "reference": "7b6240761adf6ee245098e238a25d5c35650d82c",
+                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/f7fbc5808bfeba87c38e02ea4acc5243ffc9524e",
+                "reference": "f7fbc5808bfeba87c38e02ea4acc5243ffc9524e",
                 "shasum": ""
             },
             "require": {
-                "pear/net_socket": "*",
-                "pear/pear_exception": "*",
-                "php": ">=4.0.5"
+                "pear/net_socket": "@stable",
+                "pear/pear-core-minimal": "@stable",
+                "php": ">=5.4.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "*"
@@ -1009,6 +1016,11 @@
                 "pear/auth_sasl": "Install optionally via your project's composer.json"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Net": "./"
@@ -1019,13 +1031,13 @@
                 "./"
             ],
             "license": [
-                "PHP License"
+                "BSD-2-Clause"
             ],
             "authors": [
                 {
                     "name": "Jon Parise",
                     "email": "jon@php.net",
-                    "homepage": "http://www.indelible.org",
+                    "homepage": "https://www.indelible.org",
                     "role": "Lead"
                 },
                 {
@@ -1035,13 +1047,13 @@
                 }
             ],
             "description": "An implementation of the SMTP protocol",
-            "homepage": "http://pear.github.io/Net_SMTP/",
+            "homepage": "https://pear.github.io/Net_SMTP/",
             "keywords": [
                 "email",
                 "mail",
                 "smtp"
             ],
-            "time": "2015-08-02T17:20:17+00:00"
+            "time": "2019-11-30T23:40:31+00:00"
         },
         {
             "name": "pear/net_socket",
