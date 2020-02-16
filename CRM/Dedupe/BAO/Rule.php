@@ -41,6 +41,9 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    *
    * @return string
    *   SQL query performing the search
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function sql() {
     if ($this->params &&
@@ -126,7 +129,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
           $id = 'entity_id';
         }
         else {
-          CRM_Core_Error::fatal("Unsupported rule_table for civicrm_dedupe_rule.id of {$this->id}");
+          throw new CRM_Core_Exception("Unsupported rule_table for civicrm_dedupe_rule.id of {$this->id}");
         }
         break;
     }
