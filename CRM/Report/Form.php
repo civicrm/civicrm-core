@@ -5890,13 +5890,27 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
               switch ($this->_params['group_bys_freq'][$fieldName]) {
                 case 'FISCALYEAR':
                   $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = self::fiscalYearOffset($field['dbAlias']);
+                  break;
 
                 case 'YEAR':
-                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = " {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = " YEAR({$field['dbAlias']})";
+                  break;
 
-                default:
-                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = "EXTRACT(YEAR_{$this->_params['group_bys_freq'][$fieldName]} FROM {$field['dbAlias']})";
+                case 'QUARTER':
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = "YEAR({$field['dbAlias']}), QUARTER({$field['dbAlias']})";
+                  break;
 
+                case 'YEARWEEK':
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = "YEARWEEK({$field['dbAlias']})";
+                  break;
+
+                case 'MONTH':
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = "EXTRACT(YEAR_MONTH FROM {$field['dbAlias']})";
+                  break;
+
+                case 'DATE':
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = "DATE({$field['dbAlias']})";
+                  break;
               }
             }
             else {

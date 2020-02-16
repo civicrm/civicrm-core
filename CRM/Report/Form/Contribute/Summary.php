@@ -50,11 +50,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   protected $groupFilterNotOptimised = FALSE;
 
   /**
-   * Indicate that report is not fully FGB compliant.
+   * Use the generic (but flawed) handling to implement full group by.
+   *
+   * Note that because we are calling the parent group by function we set this to FALSE.
+   * The parent group by function adds things to the group by in order to make the mysql pass
+   * but can create incorrect results in the process.
    *
    * @var bool
    */
-  public $optimisedForOnlyFullGroupBy;
+  public $optimisedForOnlyFullGroupBy = FALSE;
 
   /**
    * Class constructor.
@@ -517,59 +521,27 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    * Set group by clause.
    */
   public function groupBy() {
-    $this->_groupBy = "";
-    $groupByColumns = [];
-    $append = FALSE;
+    parent::groupBy();
+
+    $isGroupByFrequency = !empty($this->_params['group_bys_freq']);
+
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys'])
     ) {
-      foreach ($this->_columns as $tableName => $table) {
-        if (array_key_exists('group_bys', $table)) {
-          foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
-              if (!empty($field['chart'])) {
-                $this->assign('chartSupported', TRUE);
-              }
-
-              if (!empty($table['group_bys'][$fieldName]['frequency']) &&
-                !empty($this->_params['group_bys_freq'][$fieldName])
-              ) {
-
-                $append = "YEAR({$field['dbAlias']});;";
-                if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
-                  ['year']
-                )) {
-                  $append = '';
-                }
-                if ($this->_params['group_bys_freq'][$fieldName] == 'FISCALYEAR') {
-                  $groupByColumns[] = self::fiscalYearOffset($field['dbAlias']);
-                }
-                else {
-                  $groupByColumns[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
-                }
-                $append = TRUE;
-              }
-              else {
-                $groupByColumns[] = $field['dbAlias'];
-              }
-            }
-          }
-        }
-      }
 
       if (!empty($this->_statFields) &&
-        (($append && count($groupByColumns) <= 1) || (!$append)) &&
+        (($isGroupByFrequency && count($this->_groupByArray) <= 1) || (!$isGroupByFrequency)) &&
         !$this->_having
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
       $groupBy = [];
-      foreach ($groupByColumns as $key => $val) {
+      foreach ($this->_groupByArray as $key => $val) {
         if (strpos($val, ';;') !== FALSE) {
           $groupBy = array_merge($groupBy, explode(';;', $val));
         }
         else {
-          $groupBy[] = $groupByColumns[$key];
+          $groupBy[] = $this->_groupByArray[$key];
         }
       }
       $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
@@ -602,18 +574,18 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    * @param array $rows
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $softCredit = CRM_Utils_Array::value('soft_amount', $this->_params['fields']);
     $onlySoftCredit = $softCredit && !CRM_Utils_Array::value('total_amount', $this->_params['fields']);
-    if (empty($this->_groupBy)) {
-      $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
+    if (!isset($this->_groupByArray['civicrm_contribution_currency'])) {
+      $this->_groupByArray['civicrm_contribution_currency'] = 'currency';
     }
-    else {
-      $group = "\n {$this->_groupBy}, {$this->_aliases['civicrm_contribution']}.currency";
-    }
+    $group = ' GROUP BY ' . implode(', ', $this->_groupByArray);
 
     $this->from('contribution');
     if ($softCredit) {
