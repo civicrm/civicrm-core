@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f545c6e46af52039ade0c29ca8fe41e5",
+    "content-hash": "705221f636824b774ef9fb35f3bfc987",
     "packages": [
         {
             "name": "cache/integration-tests",
@@ -34,6 +34,13 @@
                 "tedivm/stash": "dev-master"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Allow adding tests": "https://github.com/php-cache/integration-tests/commit/05f97174c09364dc10c084a38ba0cfd5124f4cec.patch",
+                    "Support PHPUnit 6+": "https://github.com/php-cache/integration-tests/commit/1ec7362962185df91d3d749bc3fa7e7b99cb9fc7.patch",
+                    "Add tests for binary data round trip": "https://github.com/php-cache/integration-tests/commit/89cd7068e83aa776774bfc44f6bcba858c085616.patch"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Cache\\IntegrationTests\\": "src/"
@@ -1011,7 +1018,7 @@
             "type": "library",
             "extra": {
                 "patches_applied": {
-                    "Add in CiviCRM custom error message for CRM-8744": "tools/scripts/composer/patches/net-smtp-patch.patch"
+                    "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
                 }
             },
             "autoload": {
@@ -2410,9 +2417,7 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
             },
             "require": {
                 "php": ">=5.3.0"
