@@ -6,6 +6,7 @@
  */
 class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
   /**
    * IDs of created contacts.
    *
@@ -31,6 +32,10 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     if ($this->groupID) {
       $this->callAPISuccess('group', 'delete', ['id' => $this->groupID]);
     }
+    $this->quickCleanup(['civicrm_contact'], TRUE);
+    CRM_Core_DAO::executeQuery("DELETE r FROM civicrm_dedupe_rule_group rg INNER JOIN civicrm_dedupe_rule r ON rg.id = r.dedupe_rule_group_id WHERE rg.is_reserved = 0 AND used = 'General'");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_dedupe_rule_group WHERE is_reserved = 0 AND used = 'General'");
+
     parent::tearDown();
   }
 
@@ -88,15 +93,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   public function testCustomRule() {
     $this->setupForGroupDedupe();
 
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
-      'contact_type' => 'Individual',
-      'threshold' => 8,
-      'used' => 'General',
-      'name' => 'TestRule',
-      'title' => 'TestRule',
-      'is_reserved' => 0,
-    ]);
-    $rules = [];
+    $ruleGroup = $this->createRuleGroup();
     foreach (['birth_date', 'first_name', 'last_name'] as $field) {
       $rules[$field] = $this->callAPISuccess('Rule', 'create', [
         'dedupe_rule_group_id' => $ruleGroup['id'],
@@ -109,6 +106,25 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->assertEquals(count($foundDupes), 4);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
 
+  }
+
+  /**
+   * Test that we do not get a fatal error when our rule group is a custom date field.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCustomRuleCustomDateField() {
+
+    $ruleGroup = $this->createRuleGroup();
+    $this->createCustomGroupWithFieldOfType([], 'date');
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => $this->getCustomGroupTable(),
+      'rule_weight' => 4,
+      'rule_field' => $this->getCustomFieldColumnName('date'),
+    ]);
+
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
   }
 
   /**
@@ -173,15 +189,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   public function testInclusiveRule() {
     $this->setupForGroupDedupe();
 
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
-      'contact_type' => 'Individual',
-      'threshold' => 8,
-      'used' => 'General',
-      'name' => 'TestRule',
-      'title' => 'TestRule',
-      'is_reserved' => 0,
-    ]);
-    $rules = [];
+    $ruleGroup = $this->createRuleGroup();
     foreach (['first_name', 'last_name'] as $field) {
       $rules[$field] = $this->callAPISuccess('Rule', 'create', [
         'dedupe_rule_group_id' => $ruleGroup['id'],
@@ -422,6 +430,22 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
     // verify that all contacts have been created separately
     $this->assertEquals(count($this->contactIDs), 7, 'Check for number of contacts.');
+  }
+
+  /**
+   * @return array|int
+   * @throws \CRM_Core_Exception
+   */
+  protected function createRuleGroup() {
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 8,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+    return $ruleGroup;
   }
 
 }
