@@ -58,15 +58,13 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     // full matches, respectively)
     $where = [];
     $on = ["SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})"];
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($this->rule_table));
-    $fields = civicrm_api3($entity, 'getfields', ['action' => 'create'])['values'];
 
     $innerJoinClauses = [
       "t1.{$this->rule_field} IS NOT NULL",
       "t2.{$this->rule_field} IS NOT NULL",
       "t1.{$this->rule_field} = t2.{$this->rule_field}",
     ];
-    if ($fields[$this->rule_field]['type'] === CRM_Utils_Type::T_DATE) {
+    if ($this->getFieldType($this->rule_field) === CRM_Utils_Type::T_DATE) {
       $innerJoinClauses[] = "t1.{$this->rule_field} > '1000-01-01'";
       $innerJoinClauses[] = "t2.{$this->rule_field} > '1000-01-01'";
     }
@@ -236,6 +234,28 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     }
 
     return $exception->find(TRUE) ? FALSE : TRUE;
+  }
+
+  /**
+   * Get the specification for the given field.
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getFieldType($fieldName) {
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($this->rule_table));
+    if (!$entity) {
+      // This means we have stored a custom field rather than an entity name in rule_table, figure out the entity.
+      $entity = civicrm_api3('CustomGroup', 'getvalue', ['table_name' => $this->rule_table, 'return' => 'extends']);
+      if (in_array($entity, ['Individual', 'Household', 'Organization'])) {
+        $entity = 'Contact';
+      }
+      $fieldName = 'custom_' . civicrm_api3('CustomField', 'getvalue', ['column_name' => $fieldName, 'return' => 'id']);
+    }
+    $fields = civicrm_api3($entity, 'getfields', ['action' => 'create'])['values'];
+    return $fields[$fieldName]['type'];
   }
 
 }
