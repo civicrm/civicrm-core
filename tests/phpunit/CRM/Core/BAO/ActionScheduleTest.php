@@ -1178,7 +1178,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ]);
 
     // create smart group which will contain all Male contacts
-    $smartGroupParams = ['formValues' => ['gender_id' => 1]];
+    $smartGroupParams = ['form_values' => ['gender_id' => 1]];
     $smartGroupID = $this->smartGroupCreate(
       $smartGroupParams,
       [

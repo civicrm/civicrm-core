@@ -4407,7 +4407,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
 
     $ssParams = [
-      'formValues' => [
+      'form_values' => [
         // Child of
         'display_relationship_type' => $rtype1['id'] . '_a_b',
         'sort_name' => 'Adams',
