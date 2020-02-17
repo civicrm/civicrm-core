@@ -38,7 +38,7 @@ class CRM_Dedupe_Finder {
    * @return array
    *   Array of (cid1, cid2, weight) dupe triples
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public static function dupes($rgid, $cids = [], $checkPermissions = TRUE) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
@@ -152,7 +152,8 @@ class CRM_Dedupe_Finder {
    *
    * @return array
    *   array of (cid1, cid2, weight) dupe triples
-   * @throws \CiviCRM_API3_Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function dupesInGroup($rgid, $gid, $searchLimit = 0) {
     $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, TRUE, $searchLimit));
@@ -263,7 +264,7 @@ class CRM_Dedupe_Finder {
     $supportedFields = CRM_Dedupe_BAO_RuleGroup::supportedFields($ctype);
     if (is_array($supportedFields)) {
       foreach ($supportedFields as $table => $fields) {
-        if ($table == 'civicrm_address') {
+        if ($table === 'civicrm_address') {
           // for matching on civicrm_address fields, we also need the location_type_id
           $fields['location_type_id'] = '';
           // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
