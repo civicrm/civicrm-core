@@ -180,6 +180,41 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test phone is included if it is part of dedupe rule.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPhoneMatchOnContact() {
+    // Update existing unsupervised rule, change to general.
+    $unsupervisedRuleGroup = $this->callApiSuccess('RuleGroup', 'getsingle', [
+      'used' => 'Unsupervised',
+      'contact_type' => 'Individual',
+    ]);
+    $this->callApiSuccess('RuleGroup', 'create', [
+      'id' => $unsupervisedRuleGroup['id'],
+      'used' => 'General',
+    ]);
+
+    // Create new unsupervised rule with Phone field.
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'Unsupervised',
+      'name' => 'MatchingPhone',
+      'title' => 'Matching Phone',
+      'is_reserved' => 0,
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => 'civicrm_phone',
+      'rule_weight' => 10,
+      'rule_field' => 'phone_numeric',
+    ]);
+    $fields = CRM_Contribute_BAO_Contribution::importableFields();
+    $this->assertTrue(array_key_exists('phone', $fields));
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
