@@ -17,20 +17,45 @@
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
   /**
+   * Contact ID.
+   *
+   * @var int
+   */
+  protected $contactID;
+
+  /**
    * Set up.
    *
    * @throws \CRM_Core_Exception
    */
   public function setUp() {
     parent::setUp();
-    $this->_contactId = $this->individualCreate();
+    $this->contactID = $this->individualCreate();
     $event = $this->eventCreate();
     $this->_eventId = $event['id'];
   }
 
+  /**
+   * Cleanup after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
     $this->eventDelete($this->_eventId);
     $this->quickCleanUpFinancialEntities();
+  }
+
+  /**
+   * Check that all tests that have created payments have created them with the right financial entities.
+   *
+   * Ideally this would be on CiviUnitTestCase but many classes would still fail. Also, it might
+   * be good if it only ran on tests that created at least one contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
+    $this->validateAllContributions();
   }
 
   /**
@@ -72,7 +97,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
         'role_id' => 1,
         'status_id' => 14,
         'source' => 'Event_' . $this->_eventId,
-        'contact_id' => $this->_contactId,
+        'contact_id' => $this->contactID,
         'note' => 'Note added for Event_' . $this->_eventId,
         'fee_level' => 'Price_Field - 55',
       ],
@@ -86,7 +111,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
         'source' => 'Fall Fundraiser Dinner: Offline registration',
         'currency' => 'USD',
         'receipt_date' => 'today',
-        'contact_id' => $this->_contactId,
+        'contact_id' => $this->contactID,
         'financial_type_id' => 4,
         'payment_instrument_id' => 4,
         'contribution_status_id' => 'Pending',
@@ -103,7 +128,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     return [
       'participant' => $participant,
-      'contribution' => $contribution['values'][$contribution['id']],
+      'contribution' => $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]),
       'lineItem' => $lineItems,
       'params' => $tempParams,
       'feeBlock' => $feeBlock,
@@ -138,9 +163,9 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     // check payment info
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($result['participant']['id'], 'event');
-    $this->assertEquals($feeAmt, round($paymentInfo['total']), 'Total amount recorded is not correct');
+    $this->assertEquals($feeAmt, $this->callAPISuccessGetValue('Contribution', ['return' => 'total_amount', 'id' => $contributionID]), 'Total amount recorded is not correct');
     $this->assertEquals($amtPaid, round($paymentInfo['paid']), 'Amount paid is not correct');
-    $this->assertEquals($feeAmt, round($paymentInfo['balance']), 'Balance amount is not proper');
+    $this->assertEquals($feeAmt, CRM_Contribute_BAO_Contribution::getContributionBalance($contributionID), 'Balance is not correct');
     $this->assertEquals('Pending Label**', $paymentInfo['contribution_status'], 'Contribution status is not correct');
 
     // make additional payment via 'Record Payment' form
@@ -159,11 +184,11 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $form->testSubmit($submitParams);
 
     // check payment info again and see if the payment is completed
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($result['participant']['id'], 'event');
-    $this->assertEquals(round($paymentInfo['total']), $feeAmt, 'Total amount recorded is not proper');
-    $this->assertEquals(round($paymentInfo['paid']), $feeAmt, 'Amount paid is not proper');
-    $this->assertEquals(round($paymentInfo['balance']), 0, 'Balance amount is not proper');
-    $this->assertEquals($paymentInfo['contribution_status'], 'Completed', 'Contribution status is not proper');
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID]);
+    $this->assertEquals($feeAmt, $contribution['total_amount'], 'Total amount recorded is not proper');
+    $this->assertEquals($feeAmt, CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionID), 'Amount paid is not correct');
+    $this->assertEquals(CRM_Contribute_BAO_Contribution::getContributionBalance($contributionID), 0, 'Balance amount is not proper');
+    $this->assertEquals('Completed', $contribution['contribution_status'], 'Contribution status is not correct');
 
     $this->callAPISuccess('OptionValue', 'delete', ['id' => $paymentInstrumentID]);
   }
@@ -175,19 +200,18 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    */
   public function testAddPartialPayment() {
     $feeAmt = 100;
-    $amtPaid = 60;
-    $balance = $feeAmt - $amtPaid;
+    $amtPaid = (float) 60;
+    $balance = (float) 40;
     $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($result['participant']['id'], 'event');
+    $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($result['contribution']['id']);
+    $contributionBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($result['contribution']['id']);
 
-    // amount checking
-    $this->assertEquals($feeAmt, round($paymentInfo['total']), 'Total amount recorded is not correct');
-    $this->assertEquals(round($paymentInfo['paid']), $amtPaid, 'Amount paid is not correct');
-    $this->assertEquals(round($paymentInfo['balance']), $balance, 'Balance amount is not correct');
+    $this->assertEquals($feeAmt, $this->callAPISuccess('Contribution', 'getvalue', ['return' => 'total_amount', 'id' => $result['contribution']['id']]), 'Total amount recorded is not correct');
+    $this->assertEquals($amtPaid, $amountPaid, 'Amount paid is not correct');
+    $this->assertEquals($balance, $contributionBalance, 'Balance is not correct');
 
-    // @todo fix Payment.create so it transitions appropriately & uncomment here.
-    // $this->assertEquals('Partially Paid', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $result['contribution']['contribution_status_id']));
-    // $this->assertEquals('Partially Paid', CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Participant', 'participant_status_id', $result['participant']['participant_status_id']));
+    $this->assertEquals('Partially paid', $result['contribution']['contribution_status']);
+    $this->assertEquals('Partially paid', $result['participant']['participant_status']);
   }
 
   /**
