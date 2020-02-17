@@ -1262,32 +1262,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_contactIds[] = $this->_contactId;
     }
     else {
-      $participants = [];
-      if ($this->_single) {
-        if ($params['role_id']) {
-          $params['role_id'] = $roleIdWithSeparator;
-        }
-        else {
-          $params['role_id'] = 'NULL';
-        }
-        $participants[] = CRM_Event_BAO_Participant::create($params);
-      }
-      else {
-        foreach ($this->_contactIds as $contactID) {
-          $commonParams = $params;
-          $commonParams['contact_id'] = $contactID;
-          if ($commonParams['role_id']) {
-            $commonParams['role_id'] = $commonParams['role_id'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
-          }
-          else {
-            $commonParams['role_id'] = 'NULL';
-          }
-          $participants[] = CRM_Event_BAO_Participant::create($commonParams);
-        }
-      }
-
       if ($this->_single) {
         $this->_contactIds[] = $this->_contactId;
+      }
+      $participants = [];
+      foreach ($this->_contactIds as $contactID) {
+        $commonParams = $params;
+        $commonParams['contact_id'] = $contactID;
+        $participants[] = CRM_Event_BAO_Participant::create($commonParams);
       }
 
       $contributions = [];
