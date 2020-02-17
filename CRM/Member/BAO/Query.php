@@ -154,6 +154,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
     $fields = self::getFields();
 
     switch ($name) {
+      case 'membership_join_date':
       case 'member_join_date_low':
       case 'member_join_date_high':
         Civi::log()->warning(
