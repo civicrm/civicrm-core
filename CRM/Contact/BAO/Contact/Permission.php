@@ -270,19 +270,18 @@ AND    $operationClause
     WHERE    $permission
     AND ac.user_id IS NULL
     ";*/
-    $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
-         $from
-WHERE    $permission";
+    $sql = " $from WHERE    $permission";
     $useTempTable = self::getUseTemporaryTable();
     if ($useTempTable) {
       $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
       $tempTable = $aclContactsTempTable->getName();
-      $aclContactsTempTable->createWithColumns('user_id int, contact_id int, operation varchar(255), UNIQUE UI_user_contact_operation (user_id,contact_id,operation)');
-      CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (user_id, contact_id, operation) {$sql}");
-      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT user_id, contact_id, operation FROM {$tempTable}");
+      $aclContactsTempTable->createWithColumns('contact_id int, UNIQUE INDEX UI_contact (contact_id)');
+      CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (contact_id) SELECT DISTINCT contact_a.id {$sql}");
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT {$userID}, contact_id, '{$operation}' FROM {$tempTable}");
       $aclContactsTempTable->drop();
     }
     else {
+      $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation" . $sql;
       CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
     }
 
