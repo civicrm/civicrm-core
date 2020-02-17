@@ -54,7 +54,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
           'label' => ts('Pay Now'),
           'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
             'reset' => 1,
-            'id' => CRM_Invoicing_Utils::getDefaultPaymentPage(),
+            'id' => Civi::settings()->get('default_invoice_page'),
             'ccid' => $row['contribution_id'],
             'cs' => $this->getUserChecksum(),
             'cid' => $row['contact_id'],
