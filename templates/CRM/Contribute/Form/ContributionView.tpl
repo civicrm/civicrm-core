@@ -65,6 +65,14 @@
     <td class="label">{ts}Financial Type{/ts}</td>
     <td>{$financial_type}{if $is_test} {ts}(test){/ts} {/if}</td>
   </tr>
+  <tr>
+    <td class="label">{ts}Source{/ts}</td>
+    <td>{$source}</td>
+  </tr>
+  <tr>
+    <td class="label">{ts}Received{/ts}</td>
+    <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
+  </tr>
   {if $displayLineItems}
     <tr>
       <td class="label">{ts}Contribution Amount{/ts}</td>
@@ -120,10 +128,6 @@
       <td>{$revenue_recognition_date|crmDate:"%B, %Y"}</td>
     </tr>
   {/if}
-  <tr>
-    <td class="label">{ts}Received{/ts}</td>
-    <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
-  </tr>
   {if $to_financial_account }
     <tr>
       <td class="label">{ts}Received Into{/ts}</td>
@@ -165,10 +169,6 @@
       <td>{$check_number}</td>
     </tr>
   {/if}
-  <tr>
-    <td class="label">{ts}Source{/ts}</td>
-    <td>{$source}</td>
-  </tr>
 
   {if $campaign}
     <tr>
