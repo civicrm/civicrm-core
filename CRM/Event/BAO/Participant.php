@@ -970,6 +970,21 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
+   * Get the ID of the default (first) participant role
+   *
+   * @return int
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getDefaultRoleID() {
+    return (int) civicrm_api3('OptionValue', 'getvalue', [
+      'return' => 'value',
+      'option_group_id' => 'participant_role',
+      'is_active' => 1,
+      'options' => ['limit' => 1, 'sort' => 'is_default DESC'],
+    ]);
+  }
+
+  /**
    * Get the additional participant ids.
    *
    * @param int $primaryParticipantId
