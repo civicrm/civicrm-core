@@ -657,8 +657,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           if ($contactId = $row['civicrm_contact_id']) {
             if ($rowNum == 0) {
               $pcid = $contactId;
-              $fAmt = $row['first_donation_first_donation_amount'];
-              $fDate = $row['first_donation_first_donation_date'];
+              $fAmt = $row['first_donation_first_donation_amount'] ?? '';
+              $fDate = $row['first_donation_first_donation_date'] ?? '';
             }
             else {
               if ($pcid == $contactId) {
@@ -667,8 +667,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
                 $pcid = $contactId;
               }
               else {
-                $fAmt = $row['first_donation_first_donation_amount'];
-                $fDate = $row['first_donation_first_donation_date'];
+                $fAmt = $row['first_donation_first_donation_amount'] ?? '';
+                $fDate = $row['first_donation_first_donation_date'] ?? '';
                 $pcid = $contactId;
               }
             }
