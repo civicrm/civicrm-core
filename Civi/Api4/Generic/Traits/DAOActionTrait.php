@@ -186,7 +186,7 @@ trait DAOActionTrait {
     \CRM_Utils_Hook::pre($hook, $this->getEntityName(), $params['id'] ?? NULL, $params);
     /** @var \CRM_Core_DAO $instance */
     $instance = new $baoName();
-    $instance->copyValues($params, TRUE);
+    $instance->copyValues($params);
     $instance->save();
     \CRM_Utils_Hook::post($hook, $this->getEntityName(), $instance->id, $instance);
 

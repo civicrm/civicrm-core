@@ -641,28 +641,21 @@ class CRM_Core_DAO extends DB_DataObject {
    * that belong to this object and initialize the object with said values
    *
    * @param array $params
-   *   (reference ) associative array of name/value pairs.
-   * @param bool $serializeArrays
-   *   Should arrays that are passed in be serialised according to the metadata.
-   *   Eventually this should be always true / gone, but in the interests of caution
-   *   it is being grandfathered in. In general an array is not valid on the DAO
-   *   but there may be instances where this function is called & then some handling
-   *   takes place on the would-be array.
+   *   Array of name/value pairs to save.
    *
    * @return bool
    *   Did we copy all null values into the object
    */
-  public function copyValues(&$params, $serializeArrays = FALSE) {
-    $fields = $this->fields();
+  public function copyValues($params) {
     $allNull = TRUE;
-    foreach ($fields as $name => $value) {
-      $dbName = $value['name'];
+    foreach ($this->fields() as $uniqueName => $field) {
+      $dbName = $field['name'];
       if (array_key_exists($dbName, $params)) {
-        $pValue = $params[$dbName];
+        $value = $params[$dbName];
         $exists = TRUE;
       }
-      elseif (array_key_exists($name, $params)) {
-        $pValue = $params[$name];
+      elseif (array_key_exists($uniqueName, $params)) {
+        $value = $params[$uniqueName];
         $exists = TRUE;
       }
       else {
@@ -671,26 +664,21 @@ class CRM_Core_DAO extends DB_DataObject {
 
       // if there is no value then make the variable NULL
       if ($exists) {
-        if ($pValue === '') {
+        if ($value === '') {
           $this->$dbName = 'null';
         }
-        elseif ($serializeArrays && is_array($pValue) && !empty($value['serialize'])) {
-          $this->$dbName = CRM_Core_DAO::serializeField($pValue, $value['serialize']);
+        elseif (is_array($value) && !empty($field['serialize'])) {
+          $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
           $allNull = FALSE;
         }
         else {
-          if (!$serializeArrays && is_array($pValue) && !empty($value['serialize'])) {
-            Civi::log()->warning(ts('use copyParams to serialize arrays (' . __CLASS__ . '.' . $name . ')'), ['civi.tag' => 'deprecated']);
-          }
-          $maxLength = CRM_Utils_Array::value('maxlength', $value);
-          if (!is_array($pValue) && $maxLength && mb_strlen($pValue) > $maxLength
-            && empty($value['pseudoconstant'])
-          ) {
-            Civi::log()->warning(ts('A string for field $dbName has been truncated. The original string was %1', [CRM_Utils_Type::escape($pValue, 'String')]));
+          $maxLength = CRM_Utils_Array::value('maxlength', $field);
+          if (!is_array($value) && $maxLength && mb_strlen($value) > $maxLength && empty($field['pseudoconstant'])) {
+            Civi::log()->warning(ts('A string for field $dbName has been truncated. The original string was %1', [CRM_Utils_Type::escape($value, 'String')]));
             // The string is too long - what to do what to do? Well losing data is generally bad so lets' truncate
-            $pValue = CRM_Utils_String::ellipsify($pValue, $maxLength);
+            $value = CRM_Utils_String::ellipsify($value, $maxLength);
           }
-          $this->$dbName = $pValue;
+          $this->$dbName = $value;
           $allNull = FALSE;
         }
       }

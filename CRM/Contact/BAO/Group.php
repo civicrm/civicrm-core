@@ -401,7 +401,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
     }
     $group = new CRM_Contact_BAO_Group();
-    $group->copyValues($params, TRUE);
+    $group->copyValues($params);
 
     if (empty($params['id']) &&
       !$nameParam
