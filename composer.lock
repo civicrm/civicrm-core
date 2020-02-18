@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "50e07f942de796516f50da3b20ce018b",
+    "content-hash": "7eef3494b6480d6dcb1bea4a73375960",
     "packages": [
         {
             "name": "cache/integration-tests",
@@ -166,16 +166,16 @@
         },
         {
             "name": "civicrm/composer-downloads-plugin",
-            "version": "v2.0.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/composer-downloads-plugin.git",
-                "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d"
+                "reference": "8722bc7d547315be39397a3078bb51ee053ca269"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
-                "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
+                "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/8722bc7d547315be39397a3078bb51ee053ca269",
+                "reference": "8722bc7d547315be39397a3078bb51ee053ca269",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 }
             ],
             "description": "Composer plugin for downloading additional files within any composer package.",
-            "time": "2019-08-22T10:56:51+00:00"
+            "time": "2019-08-28T00:33:51+00:00"
         },
         {
             "name": "cweagans/composer-patches",
@@ -2380,9 +2380,7 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
             },
             "require": {
                 "php": ">=5.3.0"
@@ -2413,6 +2411,56 @@
                 "recurrence",
                 "time"
             ]
+        },
+        {
+            "name": "typo3/phar-stream-wrapper",
+            "version": "v3.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TYPO3/phar-stream-wrapper.git",
+                "reference": "e0c1b495cfac064f4f5c4bcb6bf67bb7f345ed04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TYPO3/phar-stream-wrapper/zipball/e0c1b495cfac064f4f5c4bcb6bf67bb7f345ed04",
+                "reference": "e0c1b495cfac064f4f5c4bcb6bf67bb7f345ed04",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.0"
+            },
+            "require-dev": {
+                "ext-xdebug": "*",
+                "phpunit/phpunit": "^6.5"
+            },
+            "suggest": {
+                "ext-fileinfo": "For PHP builtin file type guessing, otherwise uses internal processing"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "v3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TYPO3\\PharStreamWrapper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Interceptors for PHP's native phar:// stream handling",
+            "homepage": "https://typo3.org/",
+            "keywords": [
+                "phar",
+                "php",
+                "security",
+                "stream-wrapper"
+            ],
+            "time": "2019-12-10T11:53:27+00:00"
         },
         {
             "name": "xkerman/restricted-unserialize",
