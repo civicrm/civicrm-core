@@ -153,6 +153,32 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
     list($name, $op, $value, $grouping) = $values;
     $fields = self::getFields();
 
+    $quoteValue = NULL;
+
+    if (!empty($value) && !is_array($value)) {
+      $quoteValue = "\"$value\"";
+    }
+
+    $fieldAliases = self::getLegacySupportedFields();
+
+    $fieldName = $name = self::getFieldName($values);
+    $qillName = $name;
+    if (in_array($name, $fieldAliases)) {
+      $qillName = array_search($name, $fieldAliases);
+    }
+    $pseudoExtraParam = [];
+    $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
+    $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_membership');
+    $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
+    if ($dataType === 'Timestamp' || $dataType === 'Date') {
+      $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
+      $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
+      $query->dateQueryBuilder($values,
+        $tableName, $fieldName, $fieldSpec['name'], $title
+      );
+      return;
+    }
+
     switch ($name) {
       case 'member_join_date_low':
       case 'member_join_date_high':
@@ -167,7 +193,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
-      case 'membership_start_date':
       case 'member_start_date_low':
       case 'member_start_date_high':
         Civi::log()->warning(
@@ -181,7 +206,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
-      case 'membership_end_date':
       case 'member_end_date_low':
       case 'member_end_date_high':
         Civi::log()->warning(
