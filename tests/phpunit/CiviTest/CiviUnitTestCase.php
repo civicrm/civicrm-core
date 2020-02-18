@@ -1289,10 +1289,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int
    */
   public function smartGroupCreate($smartGroupParams = [], $groupParams = [], $contactType = 'Household') {
-    $smartGroupParams = array_merge([
-      'formValues' => ['contact_type' => ['IN' => [$contactType]]],
-    ],
-      $smartGroupParams);
+    $smartGroupParams = array_merge(['form_values' => ['contact_type' => ['IN' => [$contactType]]]], $smartGroupParams);
     $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
 
     $groupParams['saved_search_id'] = $savedSearch->id;

@@ -96,7 +96,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Payment',
       'Order',
       //work fine in local
-      'SavedSearch',
       'Logging',
     ];
     $this->toBeImplemented['delete'] = [
@@ -723,15 +722,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportInstance' => [
         // View mode is part of the navigation which is not retrieved by the api.
         'cant_return' => ['view_mode'],
-      ],
-      'SavedSearch' => [
-        // I think the fields below are generated based on form_values.
-        'cant_update' => [
-          'search_custom_id',
-          'where_clause',
-          'select_tables',
-          'where_tables',
-        ],
       ],
       'StatusPreference' => [
         'break_return' => [
