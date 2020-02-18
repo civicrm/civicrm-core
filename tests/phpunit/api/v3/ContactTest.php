@@ -4415,14 +4415,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ];
     $g1ID = $this->smartGroupCreate($ssParams, ['name' => uniqid(), 'title' => uniqid()]);
     $ssParams = [
-      'formValues' => [
+      'form_values' => [
         // Household Member of
         'display_relationship_type' => $rtype2['id'] . '_a_b',
       ],
     ];
     $g2ID = $this->smartGroupCreate($ssParams, ['name' => uniqid(), 'title' => uniqid()]);
     $ssParams = [
-      'formValues' => [
+      'form_values' => [
         // Household Member is
         'display_relationship_type' => $rtype2['id'] . '_b_a',
       ],
@@ -4430,12 +4430,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // the reverse of g2 which adds another layer for overlap at related contact filter
     $g3ID = $this->smartGroupCreate($ssParams, ['name' => uniqid(), 'title' => uniqid()]);
     CRM_Contact_BAO_GroupContactCache::loadAll();
-    $g1Contacts = $this->callAPISuccess('contact', 'get', ['group' => $g1ID]);
-    $g2Contacts = $this->callAPISuccess('contact', 'get', ['group' => $g2ID]);
-    $g3Contacts = $this->callAPISuccess('contact', 'get', ['group' => $g3ID]);
-    $this->assertTrue($g1Contacts['count'] == 1);
-    $this->assertTrue($g2Contacts['count'] == 2);
-    $this->assertTrue($g3Contacts['count'] == 1);
+    $this->callAPISuccessGetCount('contact', ['group' => $g1ID], 1);
+    $this->callAPISuccessGetCount('contact', ['group' => $g2ID], 2);
+    $this->callAPISuccessGetCount('contact', ['group' => $g3ID], 1);
   }
 
   /**
