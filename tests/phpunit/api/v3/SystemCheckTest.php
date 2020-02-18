@@ -20,9 +20,6 @@
  * @group headless
  */
 class api_v3_SystemCheckTest extends CiviUnitTestCase {
-  protected $_contactID;
-  protected $_locationType;
-  protected $_params;
 
   public function setUp() {
     parent::setUp();
@@ -31,44 +28,32 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Ensure that without any StatusPreference set, checkDefaultMailbox shows up.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSystemCheckBasic($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPISuccess('System', 'check', []);
-    foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-    }
-    $this->assertEquals($testedCheck['severity_id'], '3', ' in line ' . __LINE__);
+    $this->runStatusCheck([], ['severity_id' => 3]);
   }
 
   /**
    * Permanently hushed items should never show up.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testSystemCheckHushForever($version) {
     $this->_apiversion = $version;
-    $this->_params = [
+    $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
-    ];
-    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', []);
-    foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-      else {
-        $testedCheck = [];
-      }
-    }
-    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
+    ], ['is_visible' => 0]);
   }
 
   /**
@@ -77,6 +62,8 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIsInactive($version) {
     $this->_apiversion = $version;
@@ -103,152 +90,123 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   public function testSystemCheckHushFuture($version) {
     $this->_apiversion = $version;
     $tomorrow = new DateTime('tomorrow');
-    $this->_params = [
+    $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
       'hush_until' => $tomorrow->format('Y-m-d'),
-    ];
-    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', []);
-    foreach ($result['values'] as $check) {
-      if ($check['name'] === 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-      else {
-        $testedCheck = [];
-      }
-    }
-    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
+    ], ['is_visible' => 0]);
   }
 
   /**
    * Items hushed through today should show up.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testSystemCheckHushToday($version) {
     $this->_apiversion = $version;
     $today = new DateTime('today');
-    $this->_params = [
+    $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
       'hush_until' => $today->format('Y-m-d'),
-    ];
-    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', []);
-    foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-      else {
-        $testedCheck = [];
-      }
-    }
-    $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
+    ], ['is_visible' => 1]);
   }
 
   /**
    * Items hushed through yesterday should show up.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSystemCheckHushYesterday($version) {
     $this->_apiversion = $version;
     $yesterday = new DateTime('yesterday');
-    $this->_params = [
+    $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
       'hush_until' => $yesterday->format('Y-m-d'),
-    ];
-    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', []);
-    foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-      else {
-        $testedCheck = [];
-      }
-    }
-    $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
+    ], ['is_visible' => 1]);
   }
 
   /**
    * Items hushed above current severity should be hidden.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSystemCheckHushAboveSeverity($version) {
     $this->_apiversion = $version;
-    $this->_params = [
+    $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 4,
-    ];
-    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', []);
-    foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-      else {
-        $testedCheck = [];
-      }
-    }
-    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
+    ], ['is_visible' => 0]);
   }
 
   /**
    * Items hushed at current severity should be hidden.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSystemCheckHushAtSeverity($version) {
     $this->_apiversion = $version;
-    $this->_params = [
+    $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 3,
-    ];
-    $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check');
-    foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-      else {
-        $testedCheck = [];
-      }
-    }
-    $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
+    ], ['is_visible' => 0]);
   }
 
   /**
    * Items hushed below current severity should be shown.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testSystemCheckHushBelowSeverity($version) {
     $this->_apiversion = $version;
-    $this->_params = [
+    $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 2,
-    ];
-    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    ], ['is_visible' => 1]);
+  }
+
+  /**
+   * Run check and assert result is as expected.
+   *
+   * @param array $params
+   *   Values to update the status check with.
+   * @param array $expected
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function runStatusCheck($params, $expected) {
+    if (!empty($params)) {
+      $this->callAPISuccess('StatusPreference', 'create', $params);
+    }
     $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
-        $testedCheck = $check;
-        break;
-      }
-      else {
-        $testedCheck = [];
+      if ($check['name'] === 'checkDefaultMailbox') {
+        foreach ($expected as $key => $value) {
+          $this->assertEquals($check[$key], $value);
+        }
+        return;
       }
     }
-    $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
+    throw new CRM_Core_Exception('checkDefaultMailbox not in results');
   }
 
 }
