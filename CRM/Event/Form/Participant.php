@@ -1879,6 +1879,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
       if (isset($params['priceSetId'])) {
+        CRM_Core_Error::deprecatedFunctionWarning('It seems this line is never hit & can go.');
         $lineItem[0] = CRM_Price_BAO_LineItem::getLineItems($this->_id);
       }
       //also add additional participant's fee level/priceset
