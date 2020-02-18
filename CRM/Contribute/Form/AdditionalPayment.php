@@ -335,6 +335,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $trxnsData['is_send_contribution_notification'] = FALSE;
     $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
 
+    // M61 added debug 
+    watchdog('php', '<pre>paymentcreate:' . print_r($trxnsData, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
+
     if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_contributionId]);
       if ($membershipPaymentCount) {

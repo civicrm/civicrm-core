@@ -83,8 +83,9 @@
       <div class="header-dark">
         {ts}Contribution Information{/ts}{if $display_name} &ndash; {$display_name}{/if}
       </div>
-      {assign var="totalAmount" value=$pendingAmount}
+      {assign var="totalAmount" value=$contribution_total}
       {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+      <div class="content bold">{ts}Balance Due{/ts}: {$pendingAmount|crmMoney}</div>
     {else}
       <div class="display-block">
         <td class="label">{$form.total_amount.label}</td>
