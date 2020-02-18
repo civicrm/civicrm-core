@@ -2205,9 +2205,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function getParticipantValue($fieldName) {
     if (!$this->participantRecord) {
-      $this->participantRecord = civicrm_api3('Participant', 'get', ['id' => $this->_id]);
+      $this->participantRecord = civicrm_api3('Participant', 'getsingle', ['id' => $this->_id]);
     }
-    return $this->participantRecord[$fieldName];
+    return $this->participantRecord[$fieldName] ?? $this->participantRecord['participant_' . $fieldName];
   }
 
   /**
