@@ -132,7 +132,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Domain', CRM_Utils_Array::value('id', $params), $params);
     $domain = new CRM_Core_DAO_Domain();
-    $domain->copyValues($params, TRUE);
+    $domain->copyValues($params);
     $domain->save();
     CRM_Utils_Hook::post($hook, 'Domain', $domain->id, $domain);
     return $domain;

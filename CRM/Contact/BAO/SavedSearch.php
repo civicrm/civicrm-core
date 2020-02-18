@@ -336,7 +336,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    */
   public static function create(&$params) {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();
-    $savedSearch->copyValues($params, TRUE);
+    $savedSearch->copyValues($params);
     $savedSearch->save();
 
     return $savedSearch;

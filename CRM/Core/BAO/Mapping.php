@@ -1194,7 +1194,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             'column_number' => $colCnt,
           ], $v);
           $saveMappingField = new CRM_Core_DAO_MappingField();
-          $saveMappingField->copyValues($saveMappingParams, TRUE);
+          $saveMappingField->copyValues($saveMappingParams);
           $saveMappingField->save();
           $colCnt++;
         }
