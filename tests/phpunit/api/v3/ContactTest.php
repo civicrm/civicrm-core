@@ -3440,6 +3440,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that getquick doesn't work with field_name=api_key
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetQuickApiKey() {
+    $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'email' => 'apiuser@example.com',
+      'api_key' => 'hunter2',
+    ]);
+    $result = $this->callAPIFailure('Contact', 'getquick', [
+      'name' => '%',
+      'field_name' => 'api_key',
+    ], 'Illegal value "api_key" for parameter "field_name"');
+  }
+
+  /**
    * Set up some sample data for testing quicksearch.
    */
   public function getQuickSearchSampleData() {
