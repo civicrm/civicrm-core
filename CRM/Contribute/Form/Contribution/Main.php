@@ -320,10 +320,18 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->add('text', 'total_amount', ts('Total Amount'), ['readonly' => TRUE], FALSE);
     }
     $pps = $this->getProcessors();
-
+    $optAttributes = [];
+    foreach ($pps as $ppKey => $ppval) {
+      if ($ppKey > 0) {
+        $optAttributes[$ppKey]['class'] = 'payment_processor_' . strtolower($this->_paymentProcessors[$ppKey]['payment_processor_type']);
+      }
+      else {
+        $optAttributes[$ppKey]['class'] = 'payment_processor_paylater';
+      }
+    }
     if (count($pps) > 1) {
       $this->addRadio('payment_processor_id', ts('Payment Method'), $pps,
-        NULL, "&nbsp;"
+        NULL, "&nbsp;", FALSE, $optAttributes
       );
     }
     elseif (!empty($pps)) {
