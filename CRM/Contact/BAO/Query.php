@@ -1791,6 +1791,10 @@ class CRM_Contact_BAO_Query {
       (substr($values[0], 0, 10) === 'financial_') ||
       (substr($values[0], 0, 8) === 'payment_') ||
       (substr($values[0], 0, 11) === 'membership_')
+      // temporary fix for regression https://lab.civicrm.org/dev/core/issues/1551
+      //  ideally the metadata would allow  this field to be parsed below & the special handling would not
+      // be needed.
+      || $values[0] === 'mailing_id'
     ) {
       return;
     }
@@ -4215,7 +4219,7 @@ WHERE  $smartGroupClause
         }
         $this->_qill[$grouping][] = 'Relationship Type(s) ' . $relQill . " $name";
       }
-      else {
+      elseif ($name) {
         $this->_qill[$grouping][] = $name;
       }
     }
@@ -7074,22 +7078,22 @@ AND   displayRelType.is_active = 1
       $secondWhere = str_replace('civicrm_contact.', 'contact_a.', $secondWhere);
     }
 
+    $this->_qill[$grouping][] = $this->getQillForRelativeDateRange($dates[0], $dates[1], $fieldSpec['title'], $filters[$value]);
+    if ($fieldName === 'relation_active_period_date') {
+      // Hack this to fix regression https://lab.civicrm.org/dev/core/issues/1592
+      // Not sure the  'right' fix.
+      $this->_where[$grouping] = [self::getRelationshipActivePeriodClauses($dates[0], $dates[1], TRUE)];
+      return;
+    }
+
     if (empty($dates[0])) {
       // ie. no start date we only have end date
       $this->_where[$grouping][] = $secondWhere . " <= '{$dates[1]}'";
-
-      $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("to %1", [
-        CRM_Utils_Date::customFormat($dates[1]),
-      ]) . ')';
     }
     elseif (empty($dates[1])) {
 
       // ie. no end date we only have start date
       $this->_where[$grouping][] = $where . " >= '{$dates[0]}'";
-
-      $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("from %1", [
-        CRM_Utils_Date::customFormat($dates[0]),
-      ]) . ')';
     }
     else {
       // we have start and end dates.
@@ -7099,11 +7103,6 @@ AND   displayRelType.is_active = 1
       else {
         $this->_where[$grouping][] = $where . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
       }
-
-      $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("between %1 and %2", [
-        CRM_Utils_Date::customFormat($dates[0]),
-        CRM_Utils_Date::customFormat($dates[1]),
-      ]) . ')';
     }
   }
 
@@ -7229,6 +7228,29 @@ AND   displayRelType.is_active = 1
     if (!isset($this->_whereTables[$fieldSpec['table_name']])) {
       $this->_whereTables[$fieldSpec['table_name']] = 1;
     }
+  }
+
+  /**
+   * Get the qill for the relative date range.
+   *
+   * @param string|null $from
+   * @param string|null $to
+   * @param string $fieldTitle
+   * @param string $relativeRange
+   *
+   * @return string
+   */
+  protected function getQillForRelativeDateRange($from, $to, string $fieldTitle, string $relativeRange): string {
+    if (!$from) {
+      return ts('%1 is ', [$fieldTitle]) . $relativeRange . ' (' . ts('to %1', [CRM_Utils_Date::customFormat($to)]) . ')';
+    }
+    if (!$to) {
+      return ts('%1 is ', [$fieldTitle]) . $relativeRange . ' (' . ts('from %1', [CRM_Utils_Date::customFormat($from)]) . ')';
+    }
+    return ts('%1 is ', [$fieldTitle]) . $relativeRange . ' (' . ts('between %1 and %2', [
+      CRM_Utils_Date::customFormat($from),
+      CRM_Utils_Date::customFormat($to),
+    ]) . ')';
   }
 
 }

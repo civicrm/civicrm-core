@@ -252,9 +252,9 @@ class PropertyBag implements \ArrayAccess {
    * @param array $data
    */
   public function mergeLegacyInputParams($data) {
-    $this->legacyWarning("We have merged input params into the property bag for now but please rewrite code to not use this.");
+    $this->legacyWarning('We have merged input params into the property bag for now but please rewrite code to not use this.');
     foreach ($data as $key => $value) {
-      if ($value !== NULL) {
+      if ($value !== NULL && $value !== '') {
         $this->offsetSet($key, $value);
       }
     }
