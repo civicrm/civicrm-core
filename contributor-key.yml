@@ -184,6 +184,9 @@
   name        : Borislav Zlatanov
   jira        : BorislavZlatanov
 
+- github      : borisson
+  name        : Joris Vercammen
+  
 - name        : Brian McFee
   jira        : brian
 
@@ -688,7 +691,7 @@
 - github      : JGaunt
   name        : Jade Gaunt
   organisation: GMCVO Databases
-  
+
 - github      : jgillmanjr
   name        : Jason Gillman Jr.
   organization: Liquid Web, Inc.
