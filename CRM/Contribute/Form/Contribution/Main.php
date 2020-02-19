@@ -1266,11 +1266,20 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
     //bounce if the contribution is not pending.
     if ((int) $paymentBalance <= 0) {
-      CRM_Core_Error::statusBounce(ts("Returning since contribution has already been handled."));
+      CRM_Core_Error::statusBounce(ts("This contribution is already fully paid."));
+    }
+    $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $this->_ccid));
+    if (in_array($contribution['contribution_status'], ['Pending', 'Partially Paid'])) {
+      $totalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'total_amount');
+      $this->assign('contribution_total', $contribution['total_amount']);
+      // M61 added debug
+      watchdog('php', '<pre>contribution_total_amount:' . print_r($totalAmount, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
     }
     if (!empty($paymentBalance)) {
       $this->_pendingAmount = $paymentBalance;
       $this->assign('pendingAmount', $this->_pendingAmount);
+      // M61 added debug
+      watchdog('php', '<pre>contribution_pendingAmount:' . print_r($paymentBalance, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
     }
 
     if ($taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount')) {

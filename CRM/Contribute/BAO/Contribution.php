@@ -368,6 +368,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \CiviCRM_API3_Exception
    */
   public static function calculateMissingAmountParams(&$params, $contributionID) {
+  watchdog('php', '<pre>BAO_contrib_calcAmount_1:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
     if (!$contributionID && !isset($params['fee_amount'])) {
       if (isset($params['total_amount']) && isset($params['net_amount'])) {
         $params['fee_amount'] = $params['total_amount'] - $params['net_amount'];
@@ -394,6 +395,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         }
       }
     }
+    watchdog('php', '<pre>BAO_contrib_calcAmount_2:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
   }
 
   /**
@@ -3504,6 +3506,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
         }
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+        watchdog('php', '<pre>balanceTrxnParams:' . print_r($balanceTrxnParams, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
       }
     }
 
@@ -4560,6 +4563,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     unset($contributionParams['financial_type_id']);
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
+    watchdog('php', '<pre>completeorder_contributionParams:' . print_r($contributionParams, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
+
     // Add new soft credit against current $contribution.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
@@ -5164,6 +5169,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     else {
       return self::getMultiplier($params['contribution']->contribution_status_id, $context) * ((float) $lineItemDetails['line_total']);
     }
+    watchdog('php', '<pre>BAO_FinItemAmountFromParams_params:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
+    watchdog('php', '<pre>BAO_FinItemAmountFromParams_lineitemdetails:' . print_r($lineItemDetails, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
   }
 
   /**

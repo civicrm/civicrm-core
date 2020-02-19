@@ -150,6 +150,9 @@ function civicrm_api3_payment_create($params) {
   }
   $trxn = CRM_Financial_BAO_Payment::create($params);
 
+  // M61 added debug 
+  watchdog('php', '<pre>paymentapi_params:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
+
   $values = [];
   _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
   return civicrm_api3_create_success($values, $params, 'Payment', 'create', $trxn);
