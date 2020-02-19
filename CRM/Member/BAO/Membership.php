@@ -1411,8 +1411,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       unset($params['reminder_date']);
       // unset the custom value ids
       if (is_array(CRM_Utils_Array::value('custom', $params))) {
-        foreach ($params['custom'] as $k => $v) {
-          unset($params['custom'][$k]['id']);
+        foreach ($params['custom'] as $k => $values) {
+          foreach ($values as $i => $value) {
+            unset($params['custom'][$k][$i]['id']);
+          }
         }
       }
       if (!isset($params['membership_type_id'])) {
