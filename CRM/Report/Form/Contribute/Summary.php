@@ -625,20 +625,39 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
 
     $contriQuery = "
-COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,
-SUM({$this->_aliases['civicrm_contribution']}.total_amount )          as civicrm_contribution_total_amount_sum,
-ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm_contribution_total_amount_avg,
-{$this->_aliases['civicrm_contribution']}.currency                    as currency
-{$this->_from} {$this->_where}";
+      COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,
+      SUM({$this->_aliases['civicrm_contribution']}.total_amount )          as civicrm_contribution_total_amount_sum,
+      ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm_contribution_total_amount_avg,
+      {$this->_aliases['civicrm_contribution']}.currency                    as currency
+      {$this->_from} {$this->_where}
+    ";
 
     if ($softCredit) {
-      $select = "
-COUNT({$this->_aliases['civicrm_contribution_soft']}.amount )        as civicrm_contribution_soft_soft_amount_count,
-SUM({$this->_aliases['civicrm_contribution_soft']}.amount )          as civicrm_contribution_soft_soft_amount_sum,
-ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_contribution_soft_soft_amount_avg";
-      $contriQuery = "{$select}, {$contriQuery}";
-      $softSQL = "SELECT {$select}, {$this->_aliases['civicrm_contribution']}.currency as currency
-      {$this->_from} {$this->_where} {$group} {$this->_having}";
+      $selectOnlySoftCredit = "
+        COUNT({$this->_aliases['civicrm_contribution_soft']}.amount )        as civicrm_contribution_soft_soft_amount_count,
+        SUM({$this->_aliases['civicrm_contribution_soft']}.amount )          as civicrm_contribution_soft_soft_amount_sum,
+        ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_contribution_soft_soft_amount_avg,
+      ";
+
+      $selectWithSoftCredit = "
+        COUNT({$this->_aliases['civicrm_contribution_soft']}.amount )        as civicrm_contribution_soft_soft_amount_count,
+        SUM({$this->_aliases['civicrm_contribution_soft']}.amount )          as civicrm_contribution_soft_soft_amount_sum,
+        ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_contribution_soft_soft_amount_avg,
+        COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,
+        SUM({$this->_aliases['civicrm_contribution']}.total_amount )          as civicrm_contribution_total_amount_sum,
+        ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm_contribution_total_amount_avg,
+      ";
+
+      if ($softCredit && $onlySoftCredit) {
+        $contriQuery = "{$selectOnlySoftCredit} {$contriQuery}";
+        $softSQL = "SELECT {$selectOnlySoftCredit} {$this->_aliases['civicrm_contribution']}.currency as currency
+        {$this->_from} {$this->_where} {$group} {$this->_having}";
+      }
+      elseif ($softCredit && !$onlySoftCredit) {
+        $contriQuery = "{$selectOnlySoftCredit} {$contriQuery}";
+        $softSQL = "SELECT {$selectWithSoftCredit} {$this->_aliases['civicrm_contribution']}.currency as currency
+        {$this->_from} {$this->_where} {$group} {$this->_having}";
+      }
     }
 
     $contriSQL = "SELECT {$contriQuery} {$group} {$this->_having}";
