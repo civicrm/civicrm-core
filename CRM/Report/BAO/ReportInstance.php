@@ -61,7 +61,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     $instance = new CRM_Report_DAO_ReportInstance();
-    $instance->copyValues($params, TRUE);
+    $instance->copyValues($params);
 
     if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
       $instance->permission = 'null';

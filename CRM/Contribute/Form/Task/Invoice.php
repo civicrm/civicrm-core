@@ -268,14 +268,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
 
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
-        if (is_null($contribution->creditnote_id)) {
-          CRM_Core_Error::deprecatedFunctionWarning('This it the wrong place to add a credit note id since the id is added when the status is changed in the Contribution::Create function- hopefully it is never hit');
-          $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
-          CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
-        }
-        else {
-          $creditNoteId = $contribution->creditnote_id;
-        }
+        $creditNoteId = $contribution->creditnote_id;
       }
       if (!$contribution->invoice_number) {
         $contribution->invoice_number = CRM_Contribute_BAO_Contribution::getInvoiceNumber($contribution->id);
@@ -286,24 +279,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $invoiceDate = date("F j, Y");
       $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $prefixValue['due_date'] . "" . $prefixValue['due_date_period']));
 
-      $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribID);
-
-      $resultPayments = civicrm_api3('Payment', 'get', [
-        'sequential' => 1,
-        'contribution_id' => $contribID,
-      ]);
-      $amountPaid = 0;
-      foreach ($resultPayments['values'] as $singlePayment) {
-        // Only count payments that have been (status =) completed.
-        if ($singlePayment['status_id'] == 1) {
-          $amountPaid += $singlePayment['total_amount'];
-        }
-      }
+      $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
       $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate
       $dataArray = [];
       $subTotal = 0;
+      $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribID);
       foreach ($lineItem as $taxRate) {
         if (isset($dataArray[(string) $taxRate['tax_rate']])) {
           $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
@@ -324,15 +306,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           'title',
           'confirm_from_name',
           'confirm_from_email',
-          'cc_confirm',
-          'bcc_confirm',
         ];
         CRM_Core_DAO::commonRetrieveAll($daoName, 'id', $pageId, $mailDetails, $mailElements);
         $values['title'] = CRM_Utils_Array::value('title', $mailDetails[$contribution->_relatedObjects['event']->id]);
         $values['confirm_from_name'] = CRM_Utils_Array::value('confirm_from_name', $mailDetails[$contribution->_relatedObjects['event']->id]);
         $values['confirm_from_email'] = CRM_Utils_Array::value('confirm_from_email', $mailDetails[$contribution->_relatedObjects['event']->id]);
-        $values['cc_confirm'] = CRM_Utils_Array::value('cc_confirm', $mailDetails[$contribution->_relatedObjects['event']->id]);
-        $values['bcc_confirm'] = CRM_Utils_Array::value('bcc_confirm', $mailDetails[$contribution->_relatedObjects['event']->id]);
 
         $title = CRM_Utils_Array::value('title', $mailDetails[$contribution->_relatedObjects['event']->id]);
       }

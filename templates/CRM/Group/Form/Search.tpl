@@ -99,12 +99,10 @@
         "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
         "data": function (d) {
 
-          var groupTypes = ($('.crm-group-search-form-block #group_type_search_1').prop('checked')) ? '1' : '';
-          if (groupTypes) {
-            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? groupTypes + ',2' : groupTypes;
-          } else {
-            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? '2' : '';
-          }
+          var groupTypes = '';
+          $('input[id*="group_type_search_"]:checked').each(function(e) {
+            groupTypes += $(this).attr('id').replace(/group_type_search_/, groupTypes == '' ? '' : ',');
+          });
 
           var groupStatus = ($('.crm-group-search-form-block #group_status_1').prop('checked')) ? 1 : '';
           if (groupStatus) {
@@ -213,7 +211,15 @@
             "success": function(response){
               var appendHTML = '';
               $.each( response.data, function( i, val ) {
-                appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="crm-entity parent_is_'+parent_id+' crm-row-child">';
+                val.row_classes = [
+                  'crm-entity',
+                  'parent_is_' + parent_id,
+                  'crm-row-child'
+                ];
+                if ('DT_RowClass' in val) {
+                  val.row_classes = val.row_classes.concat(val.DT_RowClass.split(' ').filter((item) => val.row_classes.indexOf(item) < 0));
+                }
+                appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="' + val.row_classes.join(' ') + '">';
                 if ( val.is_parent ) {
                   appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div></td>';
                 }

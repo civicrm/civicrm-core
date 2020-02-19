@@ -290,7 +290,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       }
       else {
         $groupIDs[$i] = $this->smartGroupCreate([
-          'formValues' => ['last_name' => (($i == 6) ? 'smart5' : 'smart' . $i)],
+          'form_values' => ['last_name' => (($i == 6) ? 'smart5' : 'smart' . $i)],
         ], $params);
       }
     }
@@ -458,7 +458,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Setup
     $smartGroupParams = [
-      'formValues' => ['contact_type' => ['IN' => ['Individual']]],
+      'form_values' => ['contact_type' => ['IN' => ['Individual']]],
     ];
     $group = $this->smartGroupCreate($smartGroupParams);
     $sms_provider = $this->callAPISuccess('SmsProvider', 'create', [

@@ -459,7 +459,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
             'id' => $row['activity_id'],
             'cid' => $this->_contactId,
             'cxt' => $this->_context,
-            'caseid' => CRM_Utils_Array::value('case_id', $row),
+            'caseid' => isset($row['case_id']) ? current($row['case_id']) : NULL,
           ],
           ts('more'),
           FALSE,
@@ -508,7 +508,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('Added By'),
+          'name' => ts('Added by'),
           'sort' => 'source_contact_name',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],

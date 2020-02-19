@@ -372,19 +372,12 @@ WHERE  contribution_id = {$id}
     }
     $this->_processors = [];
     foreach ($this->_paymentProcessors as $id => $processor) {
-      // @todo review this. The inclusion of this IF was to address test processors being incorrectly loaded.
-      // However the function $this->getValidProcessors() is expected to only return the processors relevant
-      // to the mode (using the actual id - ie. the id of the test processor for the test processor).
-      // for some reason there was a need to filter here per commit history - but this indicates a problem
-      // somewhere else.
-      if ($processor['is_test'] == ($this->_mode == 'test')) {
-        $this->_processors[$id] = $processor['name'];
-        if (!empty($processor['description'])) {
-          $this->_processors[$id] .= ' : ' . $processor['description'];
-        }
-        if ($processor['is_recur']) {
-          $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
-        }
+      $this->_processors[$id] = $processor['name'];
+      if (!empty($processor['description'])) {
+        $this->_processors[$id] .= ' : ' . $processor['description'];
+      }
+      if ($processor['is_recur']) {
+        $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
       }
     }
     // CRM-21002: pass the default payment processor ID whose credit card type icons should be populated first

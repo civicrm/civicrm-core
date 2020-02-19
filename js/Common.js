@@ -404,6 +404,7 @@ if (!CRM.vars) CRM.vars = {};
       return $(this).each(function() {
         $(this)
           .removeClass('crm-ajax-select')
+          .off('.crmSelect2')
           .select2('destroy');
       });
     }
@@ -438,6 +439,13 @@ if (!CRM.vars) CRM.vars = {};
           return out;
         };
       }
+
+      // Use description as title for each option
+      $el.on('select2-loaded.crmSelect2', function() {
+        $('.crm-select2-row-description', '#select2-drop').each(function() {
+          $(this).closest('.select2-result-label').attr('title', $(this).text());
+        });
+      });
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
@@ -671,7 +679,7 @@ if (!CRM.vars) CRM.vars = {};
       '</div>' +
       '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
-      markup += '<p>' + _.escape(text) + '</p>';
+      markup += '<p>' + _.escape(text) + '</p> ';
     });
     markup += '</div></div></div>';
     return markup;
@@ -1483,27 +1491,42 @@ if (!CRM.vars) CRM.vars = {};
    */
   var currencyTemplate;
   CRM.formatMoney = function(value, onlyNumber, format) {
-    var decimal, separator, sign, i, j, result;
+    var precision, decimal, separator, sign, i, j, result;
     if (value === 'init' && format) {
       currencyTemplate = format;
       return;
     }
     format = format || currencyTemplate;
-    result = /1(.?)234(.?)56/.exec(format);
-    if (result === null) {
+    if ((result = /1(.?)234(.?)56/.exec(format)) !== null) { // If value is formatted to 2 decimals
+      precision = 2;
+    }
+    else if ((result = /1(.?)234(.?)6/.exec(format)) !== null) { // If value is formatted to 1 decimal
+      precision = 1;
+    }
+    else if ((result = /1(.?)235/.exec(format)) !== null) { // If value is formatted to zero decimals
+      precision = false;
+    }
+    else {
       return 'Invalid format passed to CRM.formatMoney';
     }
     separator = result[1];
-    decimal = result[2];
+    decimal = precision ? result[2] : false;
     sign = (value < 0) ? '-' : '';
     //extracting the absolute value of the integer part of the number and converting to string
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
-    result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
-    if ( onlyNumber ) {
+    result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (precision ? decimal + Math.abs(value - i).toFixed(precision).slice(2) : '');
+    if (onlyNumber) {
       return result;
     }
-    return format.replace(/1.*234.*56/, result);
+    switch (precision) {
+      case 2:
+        return format.replace(/1.*234.*56/, result);
+      case 1:
+        return format.replace(/1.*234.*6/, result);
+      case false:
+        return format.replace(/1.*235/, result);
+    }
   };
 
   CRM.angRequires = function(name) {
@@ -1597,25 +1620,6 @@ if (!CRM.vars) CRM.vars = {};
      yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
   };
-
-  // based on https://github.com/janl/mustache.js/blob/master/mustache.js
-  // If you feel the need to use this function, consider whether assembling HTML
-  // via DOM might be a cleaner approach rather than using string concatenation.
-  CRM.utils.escapeHtml = function(string) {
-    var entityMap = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;',
-      '/': '&#x2F;',
-      '`': '&#x60;',
-      '=': '&#x3D;'
-    };
-    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
-      return entityMap[s];
-    });
-  }
 
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
   $.ajaxPrefilter(function(s) {

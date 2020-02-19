@@ -776,10 +776,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws \CRM_Core_Exception
    */
   protected function assignPaymentProcessor($isPayLaterEnabled) {
-    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(
-      [ucfirst($this->_mode) . 'Mode'],
-      $this->_paymentProcessorIDs
-    );
+    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors([ucfirst($this->_mode) . 'Mode'], $this->_paymentProcessorIDs);
     if ($isPayLaterEnabled) {
       $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
     }
@@ -1150,17 +1147,29 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $attributes
    * @param null $separator
    * @param bool $required
+   * @param array $optionAttributes - Option specific attributes
    *
    * @return HTML_QuickForm_group
    */
-  public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE) {
+  public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE, $optionAttributes = []) {
     $options = [];
     $attributes = $attributes ? $attributes : [];
     $allowClear = !empty($attributes['allowClear']);
     unset($attributes['allowClear']);
     $attributes['id_suffix'] = $name;
     foreach ($values as $key => $var) {
-      $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
+      $optAttributes = $attributes;
+      if (!empty($optionAttributes[$key])) {
+        foreach ($optionAttributes[$key] as $optAttr => $optVal) {
+          if (!empty($optAttributes[$optAttr])) {
+            $optAttributes[$optAttr] .= ' ' . $optVal;
+          }
+          else {
+            $optAttributes[$optAttr] = $optVal;
+          }
+        }
+      }
+      $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $optAttributes);
     }
     $group = $this->addGroup($options, $name, $title, $separator);
 

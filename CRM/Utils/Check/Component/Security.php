@@ -71,7 +71,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           $url[] = $log_path[1];
           $log_url = implode($filePathMarker, $url);
           if ($this->fileExists($log_url)) {
-            $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
+            $docs_url = $this->createDocUrl('the-log-file-should-not-be-accessible');
             $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
               . '<br />' .
               '<a href="%2">Read more about this warning</a>';
@@ -124,7 +124,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
             . '<br />'
             . '<a href="%1">Read more about this warning</a>',
             [
-              1 => $this->createDocUrl('checkUploadsAreNotAccessible'),
+              1 => $this->createDocUrl('uploads-should-not-be-accessible'),
               2 => $privateDir,
               3 => $heuristicUrl,
             ]),
@@ -172,7 +172,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         $msg = 'Directory <a href="%1">%2</a> should not be browseable via the web.'
           . '<br />' .
           '<a href="%3">Read more about this warning</a>';
-        $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
+        $docs_url = $this->createDocUrl('directories-should-not-be-browsable');
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
           ts($msg, [1 => $publicDir, 2 => $publicDir, 3 => $docs_url]),
@@ -364,7 +364,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @return string
    */
   public function createDocUrl($topic) {
-    return CRM_Utils_System::getWikiBaseURL() . $topic;
+    return CRM_Utils_System::docURL2('sysadmin/setup/security#' . $topic, TRUE);
   }
 
   /**

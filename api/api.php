@@ -19,7 +19,7 @@
  *
  * @return array|int
  */
-function civicrm_api(string $entity = NULL, string $action, array $params, $extra = NULL) {
+function civicrm_api(string $entity, string $action, array $params, $extra = NULL) {
   return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params, $extra);
 }
 
@@ -61,7 +61,6 @@ function civicrm_api(string $entity = NULL, string $action, array $params, $extr
  * @throws \Civi\API\Exception\NotImplementedException
  */
 function civicrm_api4(string $entity, string $action, array $params = [], $index = NULL) {
-  $apiCall = \Civi\Api4\Utils\ActionUtil::getAction($entity, $action);
   $indexField = $index && is_string($index) && !CRM_Utils_Rule::integer($index) ? $index : NULL;
   $removeIndexField = FALSE;
 
@@ -70,10 +69,7 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
     $params['select'][] = $indexField;
     $removeIndexField = TRUE;
   }
-  foreach ($params as $name => $param) {
-    $setter = 'set' . ucfirst($name);
-    $apiCall->$setter($param);
-  }
+  $apiCall = \Civi\API\Request::create($entity, $action, ['version' => 4] + $params);
 
   if ($index && is_array($index)) {
     $indexCol = reset($index);

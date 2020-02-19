@@ -291,6 +291,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for deleted membership.'
     );
+    $this->assertDBNull('CRM_Price_BAO_LineItem', $membershipId, 'id',
+      'entity_id', 'Database check for deleted line item.'
+    );
     $this->contactDelete($contactId);
   }
 

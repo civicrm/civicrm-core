@@ -148,7 +148,11 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $localExtensionRows = [];
     $keys = array_keys($manager->getStatuses());
     sort($keys);
+    $hiddenExtensions = $mapper->getKeysByTag('hidden');
     foreach ($keys as $key) {
+      if (in_array($key, $hiddenExtensions)) {
+        continue;
+      }
       try {
         $obj = $mapper->keyToInfo($key);
       }
@@ -156,6 +160,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
         continue;
       }
+
+      $mapper = CRM_Extension_System::singleton()->getMapper();
 
       $row = self::createExtendedInfo($obj);
       $row['id'] = $obj->key;

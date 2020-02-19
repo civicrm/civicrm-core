@@ -121,7 +121,7 @@
           <td id="end-date-readonly">
               {$endDate|crmDate}
               <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
-                {ts}Over-ride end date{/ts}
+                {ts}Override end date{/ts}
               </a>
               {help id="override_end_date"}
           </td>

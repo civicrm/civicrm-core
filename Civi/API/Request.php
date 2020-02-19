@@ -26,51 +26,43 @@ class Request {
    *   API action name.
    * @param array $params
    *   API parameters.
-   * @param mixed $extra
-   *   Who knows? ...
    *
-   * @throws \API_Exception
-   * @return array
-   *   the request descriptor; keys:
-   *   - version: int
-   *   - entity: string
-   *   - action: string
-   *   - params: array (string $key => mixed $value) [deprecated in v4]
-   *   - extra: unspecified
-   *   - fields: NULL|array (string $key => array $fieldSpec)
-   *   - options: \CRM_Utils_OptionBag derived from params [v4-only]
-   *   - data: \CRM_Utils_OptionBag derived from params [v4-only]
-   *   - chains: unspecified derived from params [v4-only]
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @return \Civi\Api4\Generic\AbstractAction|array
    */
-  public static function create($entity, $action, $params, $extra = NULL) {
-    $version = \CRM_Utils_Array::value('version', $params);
-    switch ($version) {
-      default:
-        $apiRequest = [];
-        $apiRequest['id'] = self::$nextId++;
-        $apiRequest['version'] = (int) $version;
-        $apiRequest['params'] = $params;
-        $apiRequest['extra'] = $extra;
-        $apiRequest['fields'] = NULL;
-        $apiRequest['entity'] = self::normalizeEntityName($entity, $apiRequest['version']);
-        $apiRequest['action'] = self::normalizeActionName($action, $apiRequest['version']);
-        return $apiRequest;
+  public static function create(string $entity, string $action, array $params) {
+    switch ($params['version'] ?? NULL) {
+      case 3:
+        return [
+          'id' => self::$nextId++,
+          'version' => 3,
+          'params' => $params,
+          'fields' => NULL,
+          'entity' => self::normalizeEntityName($entity),
+          'action' => self::normalizeActionName($action),
+        ];
 
       case 4:
-        $callable = ["Civi\\Api4\\$entity", $action];
-        if (!is_callable($callable)) {
-          throw new Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
+        // For custom pseudo-entities
+        if (strpos($entity, 'Custom_') === 0) {
+          $apiRequest = \Civi\Api4\CustomValue::$action(substr($entity, 7));
         }
-        $apiCall = call_user_func($callable);
-        $apiRequest['id'] = self::$nextId++;
-        unset($params['version']);
+        else {
+          $callable = ["\\Civi\\Api4\\$entity", $action];
+          if (!is_callable($callable)) {
+            throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
+          }
+          $apiRequest = call_user_func($callable);
+        }
         foreach ($params as $name => $param) {
           $setter = 'set' . ucfirst($name);
-          $apiCall->$setter($param);
+          $apiRequest->$setter($param);
         }
-        return $apiCall;
-    }
+        return $apiRequest;
 
+      default:
+        throw new \Civi\API\Exception\NotImplementedException("Unknown api version");
+    }
   }
 
   /**
@@ -79,10 +71,9 @@ class Request {
    * APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
    *
    * @param string $entity
-   * @param int $version
    * @return string
    */
-  public static function normalizeEntityName($entity, $version) {
+  public static function normalizeEntityName($entity) {
     return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
   }
 
@@ -95,7 +86,7 @@ class Request {
    * @param $version
    * @return string
    */
-  public static function normalizeActionName($action, $version) {
+  public static function normalizeActionName($action) {
     return strtolower(\CRM_Utils_String::munge($action));
   }
 

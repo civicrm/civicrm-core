@@ -523,40 +523,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check credit note id creation
-   * when a contribution is cancelled or refunded
-   * createCreditNoteId();
-   */
-  public function testCreateCreditNoteId() {
-    $contactId = $this->individualCreate();
-
-    $param = [
-      'contact_id' => $contactId,
-      'currency' => 'USD',
-      'financial_type_id' => 1,
-      'contribution_status_id' => 3,
-      'payment_instrument_id' => 1,
-      'source' => 'STUDENT',
-      'receive_date' => '20080522000000',
-      'receipt_date' => '20080522000000',
-      'id' => NULL,
-      'non_deductible_amount' => 0.00,
-      'total_amount' => 300.00,
-      'fee_amount' => 5,
-      'net_amount' => 295,
-      'trxn_id' => '76ereeswww835',
-      'invoice_id' => '93ed39a9e9hd621bs0eafe3da82',
-      'thankyou_date' => '20080522',
-      'sequential' => TRUE,
-    ];
-
-    $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
-    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
-    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
-    $this->assertEquals($creditNoteId, $contribution['creditnote_id'], 'Check if credit note id is created correctly.');
-  }
-
-  /**
    * Create() method (create and update modes).
    */
   public function testIsPaymentFlag() {
@@ -670,21 +636,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $trxnArray['is_payment'] = 0;
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
-  }
-
-  /**
-   * addPayments() method (add and edit modes of participant).
-   *
-   * Add Payments is part of an old, flawed, code flow.
-   */
-  public function testAddPayments() {
-    $contribution = $this->addParticipantWithContribution();
-    // Delete existing financial_trxns. This is because we are testing a code flow we
-    // want to deprecate & remove & the test relies on bad data asa starting point.
-    // End goal is the Order.create->Payment.create flow.
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_financial_trxn WHERE entity_table = "civicrm_financial_item"');
-    CRM_Contribute_BAO_Contribution::addPayments($contribution);
-    $this->checkItemValues($contribution);
   }
 
   /**

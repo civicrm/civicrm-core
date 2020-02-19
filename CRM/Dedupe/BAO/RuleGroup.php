@@ -431,7 +431,11 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $ruleBao->find();
     $ruleFields = [];
     while ($ruleBao->fetch()) {
-      $ruleFields[$ruleBao->rule_field] = $ruleBao->rule_weight;
+      $field_name = $ruleBao->rule_field;
+      if ($field_name == 'phone_numeric') {
+        $field_name = 'phone';
+      }
+      $ruleFields[$field_name] = $ruleBao->rule_weight;
     }
 
     return [$ruleFields, $rgBao->threshold];

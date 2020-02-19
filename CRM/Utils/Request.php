@@ -88,10 +88,8 @@ class CRM_Utils_Request {
         break;
     }
 
-    if (isset($value) &&
-      (CRM_Utils_Type::validate($value, $type, $abort, $name) === NULL)
-    ) {
-      $value = NULL;
+    if (isset($value)) {
+      $value = CRM_Utils_Type::validate($value, $type, $abort, $name);
     }
 
     if (!isset($value) && $store) {

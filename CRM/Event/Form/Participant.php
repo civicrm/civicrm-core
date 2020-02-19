@@ -120,13 +120,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_action;
 
   /**
-   * Role Id.
-   *
-   * @var int
-   */
-  protected $_roleId = NULL;
-
-  /**
    * Event Type Id.
    *
    * @var int
@@ -225,6 +218,31 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @var array
    */
   protected $participantRecord;
+
+  /**
+   * Params for creating a payment to add to the contribution.
+   *
+   * @var array
+   */
+  protected $createPaymentParams = [];
+
+  /**
+   * Get params to create payments.
+   *
+   * @return array
+   */
+  public function getCreatePaymentParams(): array {
+    return $this->createPaymentParams;
+  }
+
+  /**
+   * Set params to create payments.
+   *
+   * @param array $createPaymentParams
+   */
+  public function setCreatePaymentParams(array $createPaymentParams) {
+    $this->createPaymentParams = $createPaymentParams;
+  }
 
   /**
    * Explicitly declare the entity api name.
@@ -392,7 +410,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->_id) {
       // assign participant id to the template
       $this->assign('participantId', $this->_id);
-      $this->_roleId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'role_id');
     }
 
     // when fee amount is included in form
@@ -1360,10 +1377,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           // CRM-13964 partial_payment_total
           if ($amountOwed > $params['total_amount']) {
             // the owed amount
-            $contributionParams['partial_payment_total'] = $amountOwed;
-            // the actual amount paid
-            $contributionParams['partial_amount_to_pay'] = $params['total_amount'];
-            $this->assign('balanceAmount', $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_to_pay']);
+            $contributionParams['total_amount'] = $amountOwed;
+            $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+            $this->assign('balanceAmount', $amountOwed - $params['total_amount']);
+            $this->storePaymentCreateParams($params);
           }
         }
 
@@ -1429,8 +1446,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
       foreach ($contributions as $contribution) {
-        if ('Partially paid' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id)) {
-          CRM_Contribute_BAO_Contribution::addPayments($contribution);
+        if (!empty($this->getCreatePaymentParams())) {
+          civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $contribution->id], $this->getCreatePaymentParams()));
         }
       }
     }
@@ -1467,7 +1484,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
 
-        $this->assign('totalAmount', $contributionParams['total_amount']);
+        $this->assign('totalAmount', $params['total_amount'] ?? $contributionParams['total_amount']);
         $this->assign('isPrimary', 1);
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
       }
@@ -1862,15 +1879,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
       if (isset($params['priceSetId'])) {
+        CRM_Core_Error::deprecatedFunctionWarning('It seems this line is never hit & can go.');
         $lineItem[0] = CRM_Price_BAO_LineItem::getLineItems($this->_id);
       }
       //also add additional participant's fee level/priceset
       if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
         $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
         $hasLineItems = CRM_Utils_Array::value('priceSetId', $params, FALSE);
-        $additionalParticipantDetails = CRM_Event_BAO_Participant::getFeeDetails($additionalIds,
-          $hasLineItems
-        );
+        $additionalParticipantDetails = $this->getFeeDetails($additionalIds, $hasLineItems);
       }
     }
     else {
@@ -2102,6 +2118,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return \CRM_Event_BAO_Participant
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function addParticipant(&$form, $params, $contactID) {
     $transaction = new CRM_Core_Transaction();
@@ -2114,7 +2131,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'status_id' => CRM_Utils_Array::value('participant_status',
         $params, 1
       ),
-      'role_id' => CRM_Utils_Array::value('participant_role_id', $params) ?: self::getDefaultRoleID(),
+      'role_id' => CRM_Utils_Array::value('participant_role_id', $params) ?: CRM_Event_BAO_Participant::getDefaultRoleID(),
       'register_date' => $params['register_date'],
       'source' => CRM_Utils_String::ellipsify(
         isset($params['participant_source']) ? CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
@@ -2204,9 +2221,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function getParticipantValue($fieldName) {
     if (!$this->participantRecord) {
-      $this->participantRecord = civicrm_api3('Participant', 'get', ['id' => $this->_id]);
+      $this->participantRecord = civicrm_api3('Participant', 'getsingle', ['id' => $this->_id]);
     }
-    return $this->participantRecord[$fieldName];
+    return $this->participantRecord[$fieldName] ?? $this->participantRecord['participant_' . $fieldName];
   }
 
   /**
@@ -2233,6 +2250,104 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     return '';
+  }
+
+  /**
+   * Store the parameters to create a payment, if approprite, on the form.
+   *
+   * @param array $params
+   *   Params as submitted.
+   */
+  protected function storePaymentCreateParams($params) {
+    if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
+      $this->setCreatePaymentParams([
+        'total_amount' => $params['total_amount'],
+        'is_send_contribution_notification' => FALSE,
+        'payment_instrument_id' => $params['payment_instrument_id'],
+        'trxn_date' => $params['receive_date'] ?? date('Y-m-d'),
+        'trxn_id' => $params['trxn_id'],
+        'pan_truncation' => $params['pan_truncation'] ?? '',
+        'card_type_id' => $params['card_type_id'] ?? '',
+        'check_number' => $params['check_number'] ?? '',
+        'skipCleanMoney' => TRUE,
+      ]);
+    }
+  }
+
+  /**
+   * Get the event fee info for given participant ids
+   * either from line item table / participant table.
+   *
+   * @param array $participantIds
+   *   Participant ids.
+   * @param bool $hasLineItems
+   *   Do fetch from line items.
+   *
+   * @return array
+   */
+  public function getFeeDetails($participantIds, $hasLineItems = FALSE) {
+    $feeDetails = [];
+    if (!is_array($participantIds) || empty($participantIds)) {
+      return $feeDetails;
+    }
+
+    $select = '
+SELECT  participant.id         as id,
+        participant.fee_level  as fee_level,
+        participant.fee_amount as fee_amount';
+    $from = 'FROM civicrm_participant participant';
+    if ($hasLineItems) {
+      $select .= ' ,
+lineItem.id          as lineId,
+lineItem.label       as label,
+lineItem.qty         as qty,
+lineItem.unit_price  as unit_price,
+lineItem.line_total  as line_total,
+field.label          as field_title,
+field.html_type      as html_type,
+field.id             as price_field_id,
+value.id             as price_field_value_id,
+value.description    as description,
+IF( value.count, value.count, 0 ) as participant_count';
+      $from .= "
+INNER JOIN civicrm_line_item lineItem      ON ( lineItem.entity_table = 'civicrm_participant'
+                                                AND lineItem.entity_id = participant.id )
+INNER JOIN civicrm_price_field field ON ( field.id = lineItem.price_field_id )
+INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_value_id )
+";
+    }
+    $where = 'WHERE participant.id IN ( ' . implode(', ', $participantIds) . ' )';
+    $query = "$select $from  $where";
+
+    $feeInfo = CRM_Core_DAO::executeQuery($query);
+    $feeProperties = ['fee_level', 'fee_amount'];
+    $lineProperties = [
+      'lineId',
+      'label',
+      'qty',
+      'unit_price',
+      'line_total',
+      'field_title',
+      'html_type',
+      'price_field_id',
+      'participant_count',
+      'price_field_value_id',
+      'description',
+    ];
+    while ($feeInfo->fetch()) {
+      if ($hasLineItems) {
+        foreach ($lineProperties as $property) {
+          $feeDetails[$feeInfo->id][$feeInfo->lineId][$property] = $feeInfo->$property;
+        }
+      }
+      else {
+        foreach ($feeProperties as $property) {
+          $feeDetails[$feeInfo->id][$property] = $feeInfo->$property;
+        }
+      }
+    }
+
+    return $feeDetails;
   }
 
 }

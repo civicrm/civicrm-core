@@ -13,7 +13,7 @@
     <thead>
       <tr>
         <th data-data="subject" class="crm-mailing-contact-subject">{ts}Subject{/ts}</th>
-        <th data-data="creator_name" class="crm-mailing-contact_created">{ts}Added By{/ts}</th>
+        <th data-data="creator_name" class="crm-mailing-contact_created">{ts}Added by{/ts}</th>
         <th data-data="recipients" data-orderable="false" class="crm-contact-activity_contact">{ts}Recipients{/ts}</th>
         <th data-data="start_date" class="crm-mailing-contact-date">{ts}Date{/ts}</th>
         <th data-data="openstats" data-orderable="false" class="crm-mailing_openstats">{ts}Opens/ Clicks{/ts}</th>

@@ -45,25 +45,17 @@
  */
 function civicrm_api3_saved_search_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, ['form_values', 'where_clause']);
-  // The create function of the dao expects a 'formValues' that is
-  // not serialized. The get function returns form_values, that is
-  // serialized.
-  // So for the create API, I guess it should work for serialized and
-  // unserialized form_values.
-
-  if (isset($params["form_values"])) {
-    if (is_array($params["form_values"])) {
-      $params["formValues"] = $params["form_values"];
-    }
-    else {
-      // Assume that form_values is serialized.
-      $params["formValues"] = \CRM_Utils_String::unserialize($params["form_values"]);
-    }
-  }
 
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'SavedSearch');
   _civicrm_api3_saved_search_result_cleanup($result);
   return $result;
+}
+
+/**
+ * @param array $fields
+ */
+function _civicrm_api3_saved_search_create_spec(&$fields) {
+  $fields['form_values']['api.aliases'][] = 'formValues';
 }
 
 /**

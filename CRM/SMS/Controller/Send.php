@@ -22,16 +22,16 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
    * @param string $title
    * @param bool|int $action
    * @param bool $modal
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal, NULL, FALSE, TRUE);
 
-    $mailingID = CRM_Utils_Request::retrieve('mid', 'String', $this, FALSE, NULL);
+    $mailingID = CRM_Utils_Request::retrieve('mid', 'String', $this);
 
     // also get the text and html file
-    $txtFile = CRM_Utils_Request::retrieve('txtFile', 'String',
-      CRM_Core_DAO::$_nullObject, FALSE, NULL
-    );
+    $txtFile = CRM_Utils_Request::retrieveValue('txtFile', 'String');
 
     $config = CRM_Core_Config::singleton();
     if ($txtFile &&

@@ -165,7 +165,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           'Subject' => $subject,
         ];
 
-        $mailer = Mail::factory($mailerName, $params);
+        $mailer = CRM_Utils_Mail::_createMailer($mailerName, $params);
 
         $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
         $result = $mailer->send($toEmail, $headers, $message);

@@ -171,7 +171,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
     }
   }
 
-  if (is_array($params) && !empty($params['debug'])) {
+  if (is_array($params) && $entity && !empty($params['debug'])) {
     if (is_string($action) && $action !== 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', ['version' => 3, 'action' => $action] + $params);
     }
@@ -1357,7 +1357,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
 
   CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
   $instance = new $dao_name();
-  $instance->copyValues($params, TRUE);
+  $instance->copyValues($params);
   $instance->save();
   CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 

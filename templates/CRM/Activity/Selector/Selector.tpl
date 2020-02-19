@@ -38,7 +38,7 @@
     <tr>
       <th data-data="activity_type" class="crm-contact-activity-activity_type">{ts}Type{/ts}</th>
       <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-contact-activity_subject">{ts}Subject{/ts}</th>
-      <th data-data="source_contact_name" class="crm-contact-activity-source_contact">{ts}Added By{/ts}</th>
+      <th data-data="source_contact_name" class="crm-contact-activity-source_contact">{ts}Added by{/ts}</th>
       <th data-data="target_contact_name" data-orderable="false" class="crm-contact-activity-target_contact">{ts}With{/ts}</th>
       <th data-data="assignee_contact_name" data-orderable="false" class="crm-contact-activity-assignee_contact">{ts}Assigned{/ts}</th>
       <th data-data="activity_date_time" class="crm-contact-activity-activity_date_time">{ts}Date{/ts}</th>

@@ -19,7 +19,7 @@
                 <tr class="columnheader">
                     <th>{ts}Type{/ts}</th>
                     <th>{ts}Subject{/ts}</th>
-                    <th>{ts}Added By{/ts}</th>
+                    <th>{ts}Added by{/ts}</th>
                     <th>{ts}With{/ts}</th>
                     <th>{ts}Date{/ts}</th>
                     <th>{ts}Status{/ts}</th>

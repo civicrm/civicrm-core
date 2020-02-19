@@ -401,7 +401,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
     }
     $group = new CRM_Contact_BAO_Group();
-    $group->copyValues($params, TRUE);
+    $group->copyValues($params);
 
     if (empty($params['id']) &&
       !$nameParam
@@ -515,7 +515,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       if (isset($ssParams['saved_search_id'])) {
         $ssParams['id'] = $ssParams['saved_search_id'];
       }
-
+      $params['form_values'] = $params['formValues'];
       $savedSearch = CRM_Contact_BAO_SavedSearch::create($params);
 
       $params['saved_search_id'] = $savedSearch->id;

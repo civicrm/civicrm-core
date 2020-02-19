@@ -379,8 +379,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   available processors
    */
   public static function getPaymentProcessors($capabilities = [], $ids = FALSE) {
-    $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : [];
     if (is_array($ids)) {
+      $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : [];
       $processors = self::getAllPaymentProcessors('all', FALSE, FALSE);
       if (in_array('TestMode', $capabilities)) {
         $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
