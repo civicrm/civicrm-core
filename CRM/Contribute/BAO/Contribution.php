@@ -368,10 +368,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \CiviCRM_API3_Exception
    */
   public static function calculateMissingAmountParams(&$params, $contributionID) {
-
-    // M61 added debug
-    watchdog('php', '<pre>BAO_contrib_calcAmount_1:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
-
+  watchdog('php', '<pre>BAO_contrib_calcAmount_1:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
     if (!$contributionID && !isset($params['fee_amount'])) {
       if (isset($params['total_amount']) && isset($params['net_amount'])) {
         $params['fee_amount'] = $params['total_amount'] - $params['net_amount'];
@@ -398,10 +395,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         }
       }
     }
-
-    // M61 added debug
     watchdog('php', '<pre>BAO_contrib_calcAmount_2:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
-
   }
 
   /**
@@ -3512,6 +3506,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
         }
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+        watchdog('php', '<pre>balanceTrxnParams:' . print_r($balanceTrxnParams, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
       }
     }
 
@@ -4568,7 +4563,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     unset($contributionParams['financial_type_id']);
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
-    // M61 added debug
     watchdog('php', '<pre>completeorder_contributionParams:' . print_r($contributionParams, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
 
     // Add new soft credit against current $contribution.
@@ -4780,10 +4774,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Core_Error::deprecatedFunctionWarning('passing payment_processor is deprecated - use payment_processor_id');
       $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
     }
-
-    // M61 added debug
-    watchdog('php', '<pre>balanceTrxnParams:' . print_r($balanceTrxnParams, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
-
     return CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
   }
 
@@ -4817,53 +4807,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-<<<<<<< HEAD
-=======
-   * Function to add payments for contribution
-   * for Partially Paid status
-   *
-   * @param array $contributions
-   * @param string $contributionStatusId
-   *
-   */
-  public static function addPayments($contributions, $contributionStatusId = NULL) {
-    // get financial trxn which is a payment
-    $ftSql = "SELECT ft.id, ft.total_amount
-      FROM civicrm_financial_trxn ft
-      INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
-      WHERE eft.entity_id = %1 AND ft.is_payment = 1 ORDER BY ft.id DESC LIMIT 1";
-    $contributionStatus = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-      'labelColumn' => 'name',
-    ]);
-    foreach ($contributions as $contribution) {
-      if (!($contributionStatus[$contribution->contribution_status_id] == 'Partially paid'
-        || CRM_Utils_Array::value($contributionStatusId, $contributionStatus) == 'Partially paid')
-      ) {
-        continue;
-      }
-      $ftDao = CRM_Core_DAO::executeQuery($ftSql, [
-        1 => [
-          $contribution->id,
-          'Integer',
-        ],
-      ]);
-      $ftDao->fetch();
-
-      // store financial item Proportionaly.
-      $trxnParams = [
-        'total_amount' => $ftDao->total_amount,
-        'contribution_id' => $contribution->id,
-      ];
-      self::assignProportionalLineItems($trxnParams, $ftDao->id, $contribution->total_amount);
-    }
-
-    // M61 added debug
-    watchdog('php', '<pre>BAO_addPayments:' . print_r($trxnParams, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
-
-  }
-
-  /**
->>>>>>> 1e65fc2e57... Enable Pay Now for partial paid contributions
    * Function use to store line item proportionally in in entity financial trxn table
    *
    * @param array $trxnParams
@@ -5226,11 +5169,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     else {
       return self::getMultiplier($params['contribution']->contribution_status_id, $context) * ((float) $lineItemDetails['line_total']);
     }
-
-    // M61 added debug
     watchdog('php', '<pre>BAO_FinItemAmountFromParams_params:' . print_r($params, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
     watchdog('php', '<pre>BAO_FinItemAmountFromParams_lineitemdetails:' . print_r($lineItemDetails, TRUE) . '</pre>', NULL, WATCHDOG_DEBUG);
-
   }
 
   /**
