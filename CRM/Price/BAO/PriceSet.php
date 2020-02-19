@@ -676,7 +676,7 @@ WHERE  id = %1";
         continue;
       }
 
-      list($params, $lineItem, $totalTax, $totalPrice) = self::getLine($params, $lineItem, $priceSetID, $field, $id, $totalPrice);
+      list($params, $lineItem, $totalTax, $totalPrice) = self::getLine($params, $lineItem, $priceSetID, $field, $id, $totalPrice, $totalTax);
     }
 
     $amount_level = [];
@@ -1485,12 +1485,10 @@ WHERE       ps.id = %1
    * @return array
    */
   public static function setLineItem($field, $lineItem, $optionValueId, &$totalTax) {
+    $taxAmount = $field['options'][$optionValueId]['tax_amount'];
     // Here we round - i.e. after multiplying by quantity
     if ($field['html_type'] == 'Text') {
-      $taxAmount = round($field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'], 2);
-    }
-    else {
-      $taxAmount = round($field['options'][$optionValueId]['tax_amount'], 2);
+      $taxAmount *= $lineItem[$optionValueId]['qty'];
     }
     $taxRate = $field['options'][$optionValueId]['tax_rate'];
     $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
@@ -1690,11 +1688,11 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param array $field
    * @param int $id
    * @param float $totalPrice
+   * @param float $totalTax
    *
    * @return array
    */
-  public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id, $totalPrice): array {
-    $totalTax = 0;
+  public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id, $totalPrice, $totalTax): array {
     switch ($field['html_type']) {
       case 'Text':
         $firstOption = reset($field['options']);
@@ -1707,7 +1705,7 @@ WHERE     ct.id = cp.financial_type_id AND
           if (array_key_exists($params['financial_type_id'], $taxRates)) {
             $field['options'][key($field['options'])]['tax_rate'] = $taxRates[$params['financial_type_id']];
             $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($field['options'][$optionValueId]['amount'], $field['options'][$optionValueId]['tax_rate']);
-            $field['options'][$optionValueId]['tax_amount'] = round($taxAmount['tax_amount'], 2);
+            $field['options'][$optionValueId]['tax_amount'] = $taxAmount['tax_amount'];
           }
         }
         if (!empty($field['options'][$optionValueId]['tax_rate'])) {

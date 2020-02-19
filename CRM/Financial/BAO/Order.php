@@ -234,7 +234,7 @@ class CRM_Financial_BAO_Order {
     foreach ($this->getPriceOptions() as $fieldID => $valueID) {
       $throwAwayArray = [];
       // @todo - still using getLine for now but better to bring it to this class & do a better job.
-      $lineItems[$valueID] = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID, 0)[1][$valueID];
+      $lineItems[$valueID] = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID, 0, 0)[1][$valueID];
     }
 
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
