@@ -211,7 +211,15 @@
             "success": function(response){
               var appendHTML = '';
               $.each( response.data, function( i, val ) {
-                appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="crm-entity parent_is_'+parent_id+' crm-row-child">';
+                val.row_classes = [
+                  'crm-entity',
+                  'parent_is_' + parent_id,
+                  'crm-row-child'
+                ];
+                if ('DT_RowClass' in val) {
+                  val.row_classes = val.row_classes.concat(val.DT_RowClass.split(' ').filter((item) => val.row_classes.indexOf(item) < 0));
+                }
+                appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="' + val.row_classes.join(' ') + '">';
                 if ( val.is_parent ) {
                   appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div></td>';
                 }
