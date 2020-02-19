@@ -23,7 +23,7 @@
     <li>{$accessKey}+<span>E</span> - {ts}Edit Contact (View Contact Summary Page){/ts}</li>
     <li>{$accessKey}+<span>S</span> - {ts}Save Button{/ts}</li>
     <li>{$accessKey}+<span>N</span> - {ts}Add a new record in each tab (Activities, Tags,..etc){/ts}</li>
-    <li>{$accessKey}+<span>M</span> - {ts}Open the CiviCRM menubar{/ts}</li>
+    <li>{$accessKey}+<span>M</span> - {ts}Find menu item...{/ts}</li>
     <li>{$accessKey}+<span>Q</span> - {ts}Quicksearch{/ts}</li>
   </ul>
   {literal}<style type="text/css">
