@@ -336,6 +336,7 @@ function _civicrm_api3_payment_get_spec(&$params) {
     ],
     'trxn_id' => [
       'title' => ts('Transaction ID'),
+      'description' => ts('Transaction id supplied by external processor. This may not be unique.'),
       'type' => CRM_Utils_Type::T_STRING,
     ],
     'trxn_date' => [
@@ -344,6 +345,7 @@ function _civicrm_api3_payment_get_spec(&$params) {
     ],
     'financial_trxn_id' => [
       'title' => ts('Payment ID'),
+      'description' => ts('The ID of the record in civicrm_financial_trxn'),
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['payment_id', 'id'],
     ],
