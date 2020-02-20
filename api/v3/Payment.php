@@ -27,43 +27,40 @@
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_get($params) {
-  $financialTrxn = [];
-  $limit = '';
-  if (isset($params['options']) && !empty($params['options']['limit'])) {
-    $limit = $params['options']['limit'] ?? NULL;
-  }
-  $params['options']['limit'] = 0;
-  if (isset($params['trxn_id'])) {
-    $params['financial_trxn_id.trxn_id'] = $params['trxn_id'];
-  }
-  $eftParams = $params;
-  unset($eftParams['return']);
-  // @todo - why do we fetch EFT params at all?
-  $eft = civicrm_api3('EntityFinancialTrxn', 'get', $eftParams);
-  if (!empty($eft['values'])) {
-    $eftIds = [];
-    foreach ($eft['values'] as $efts) {
-      if (empty($efts['financial_trxn_id'])) {
-        continue;
-      }
-      $eftIds[] = $efts['financial_trxn_id'];
-      $map[$efts['financial_trxn_id']] = $efts['entity_id'];
+  $params['is_payment'] = TRUE;
+  $contributionID = $params['entity_id'] ?? NULL;
+
+  // In order to support contribution id we need to do an extra lookup.
+  if ($contributionID) {
+    $eftParams = [
+      'entity_id' => $contributionID,
+      'entity_table' => 'civicrm_contribution',
+      'options' => ['limit' => 0],
+      'financial_trxn_id.is_payment' => 1,
+    ];
+    $eft = civicrm_api3('EntityFinancialTrxn', 'get', $eftParams)['values'];
+    if (empty($eft)) {
+      return civicrm_api3_create_success([], $params, 'Payment', 'get');
     }
-    if (!empty($eftIds)) {
-      $ftParams = [
-        'id' => ['IN' => $eftIds],
-        'is_payment' => 1,
-      ];
-      if ($limit) {
-        $ftParams['options']['limit'] = $limit;
-      }
-      $financialTrxn = civicrm_api3('FinancialTrxn', 'get', $ftParams);
-      foreach ($financialTrxn['values'] as &$values) {
-        $values['contribution_id'] = $map[$values['id']];
-      }
+    foreach ($eft as $entityFinancialTrxn) {
+      $params['financial_trxn_id']['IN'][] = $entityFinancialTrxn['financial_trxn_id'];
     }
   }
-  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $financialTrxn, []), $params, 'Payment', 'get');
+
+  $financialTrxn = civicrm_api3('FinancialTrxn', 'get', array_merge($params, ['sequential' => FALSE]))['values'];
+  if ($contributionID) {
+    foreach ($financialTrxn as &$values) {
+      $values['contribution_id'] = $contributionID;
+    }
+  }
+  elseif (!empty($financialTrxn)) {
+    $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', ['financial_trxn_id' => ['IN' => array_keys($financialTrxn)], 'entity_table' => 'civicrm_contribution', 'options' => ['limit' => 0]])['values'];
+    foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
+      $financialTrxn[$entityFinancialTrxn['financial_trxn_id']]['contribution_id'] = $entityFinancialTrxn['entity_id'];
+    }
+  }
+
+  return civicrm_api3_create_success($financialTrxn, $params, 'Payment', 'get');
 }
 
 /**
@@ -103,7 +100,7 @@ function civicrm_api3_payment_cancel($params) {
   $paymentParams = [
     'total_amount' => -$entity['amount'],
     'contribution_id' => $entity['entity_id'],
-    'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, 'now'),
+    'trxn_date' => $params['trxn_date'] ?? 'now',
     'cancelled_payment_id' => $params['id'],
   ];
 
@@ -324,10 +321,6 @@ function _civicrm_api3_payment_get_spec(&$params) {
     'contribution_id' => [
       'title' => ts('Contribution ID'),
       'type' => CRM_Utils_Type::T_INT,
-    ],
-    'entity_table' => [
-      'title' => ts('Entity Table'),
-      'api.default' => 'civicrm_contribution',
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),

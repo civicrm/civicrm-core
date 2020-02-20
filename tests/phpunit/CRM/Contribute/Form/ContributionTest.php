@@ -479,6 +479,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *  - 1 Contribution with status = Pending
    *  - 1 Line item
    *  - 1 civicrm_financial_item. This is linked to the line item and has a status of 3
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardInvalid() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -517,6 +520,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function creates a billing address if provided.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardWithBillingAddress() {
     $form = new CRM_Contribute_Form_Contribution();
