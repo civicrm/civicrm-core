@@ -448,7 +448,7 @@ class CRM_Core_I18n {
       if (isset($count) && isset($plural)) {
 
         if ($this->_phpgettext) {
-          $text = $this->_phpgettext->ngettext($text, $plural, $count);
+          $text = $this->_phpgettext->ngettext($text, $plural, (int) $count);
         }
         else {
           // if the locale's not set, we do ngettext work by hand
