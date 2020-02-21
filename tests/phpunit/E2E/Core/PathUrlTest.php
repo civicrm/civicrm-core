@@ -18,7 +18,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
    */
   public function testSystemRouter() {
     $this->assertUrlContentRegex(';class="CRM_Mailing_Form_Subscribe";',
-      \CRM_Utils_System::url('civicrm/mailing/subscribe', 'reset=1', TRUE, NULL, FALSE));
+      \CRM_Utils_System::url('civicrm/mailing/subscribe', 'reset=1', TRUE, NULL, FALSE, TRUE));
   }
 
   /**
