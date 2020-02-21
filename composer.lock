@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "582096c249c04484659162a3e90f7fbd",
+    "content-hash": "1d7326d2a6c77d454ded59d7faeb1f2a",
     "packages": [
         {
             "name": "cache/integration-tests",

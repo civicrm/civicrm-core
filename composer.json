@@ -161,6 +161,9 @@
       "ckeditor": {
         "url": "https://github.com/ckeditor/ckeditor-releases/archive/4.13.0.zip"
       },
+      "ckeditor5": {
+        "url": "https://download.cksource.com/CKEditor/CKEditor5/16.0.0/ckeditor5-build-classic-16.0.0.zip"
+      },
       "crossfilter-1.3.x": {
         "url": "https://github.com/crossfilter/crossfilter/archive/1.3.14.zip",
         "ignore": [".*", "node_modules", "bower_components", "src", "lib", "test", "component.json", "package.json", "index.js", "Makefile"]

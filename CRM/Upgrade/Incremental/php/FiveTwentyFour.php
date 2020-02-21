@@ -59,8 +59,30 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_24_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add CKEditor5 option', 'addCKEditor5');
     $this->addTask('Install sequential creditnote extension', 'installCreditNotes');
     $this->addTask('Drop obsolete columns from saved_searc table', 'dropSavedSearchColumns');
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function addCKEditor5(CRM_Queue_TaskContext $ctx) {
+    $existing = civicrm_api3('OptionValue', 'get', [
+      'option_group_id' => "wysiwyg_editor",
+      'name' => "CKEditor5",
+    ]);
+    if (empty($existing['count'])) {
+      civicrm_api3('OptionValue', 'create', [
+        'option_group_id' => "wysiwyg_editor",
+        'label' => "CKEditor5",
+      ]);
+    }
+    return TRUE;
   }
 
   /**
