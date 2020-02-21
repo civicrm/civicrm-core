@@ -1874,4 +1874,67 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     }
   }
 
+  /**
+   * Evaluate whether a participant record is eligible for self-service transfer/cancellation.  If so,
+   * return additional participant/event details.
+   *
+   * TODO: BAO-level functions shouldn't set a redirect, and it should be possible to return "false" to the
+   * calling function.  The next refactor will add a fourth param $errors, which can be passed by reference
+   * from the calling function.  Instead of redirecting, we will return the error.
+   * TODO: This function should always return FALSE when self-service has been disabled on an event.
+   * TODO: This function fails when the "hours until self-service" is greater than 24 or less than zero.
+   * @param int $participantId
+   * @param string $url
+   * @param bool $isBackOffice
+   */
+  public static function getSelfServiceEligibility($participantId, $url, $isBackOffice) {
+    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
+    $query = "
+      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id, ce.start_date, ce.title, cp.event_id
+      FROM civicrm_participant cp
+      LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
+      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
+      LEFT JOIN civicrm_event ce ON ce.id = cp.event_id
+      WHERE cp.id = {$participantId}";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $details['status']  = $dao->status;
+      $details['role'] = $dao->role;
+      $details['fee_level'] = trim($dao->fee_level, CRM_Core_DAO::VALUE_SEPARATOR);
+      $details['fee_amount'] = $dao->fee_amount;
+      $details['register_date'] = $dao->register_date;
+      $details['event_start_date'] = $dao->start_date;
+      $eventTitle = $dao->title;
+      $eventId = $dao->event_id;
+    }
+    //verify participant status is still Registered
+    if ($details['status'] != 'Registered') {
+      $status = "You cannot transfer or cancel your registration for " . $eventTitle . ' as you are not currently registered for this event.';
+      CRM_Core_Session::setStatus($status, ts('Sorry'), 'alert');
+      CRM_Utils_System::redirect($url);
+    }
+    $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $eventId;
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $time_limit  = $dao->time;
+      $start_date = $dao->start;
+    }
+    $start_time = new Datetime($start_date);
+    $timenow = new Datetime();
+    if (!$isBackOffice && !empty($start_time) && $start_time < $timenow) {
+      $status = ts('Registration for this event cannot be cancelled or transferred once the event has begun. Contact the event organizer if you have questions.');
+      CRM_Core_Error::statusBounce($status, $url, ts('Sorry'));
+    }
+    if (!$isBackOffice && !empty($time_limit) && $time_limit > 0) {
+      $interval = $timenow->diff($start_time);
+      $days = $interval->format('%d');
+      $hours   = $interval->format('%h');
+      if ($hours <= $time_limit && $days < 1) {
+        $status = ts("Registration for this event cannot be cancelled or transferred less than %1 hours prior to the event's start time. Contact the event organizer if you have questions.", [1 => $time_limit]);
+        CRM_Core_Error::statusBounce($status, $url, ts('Sorry'));
+      }
+    }
+    return $details;
+  }
+
 }
