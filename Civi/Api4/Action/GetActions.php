@@ -66,7 +66,7 @@ class GetActions extends BasicGetAction {
     if (is_dir($dir)) {
       foreach (glob("$dir/*.php") as $file) {
         $matches = [];
-        preg_match('/(\w*).php/', $file, $matches);
+        preg_match('/(\w*)\.php$/', $file, $matches);
         $actionName = array_pop($matches);
         $actionClass = new \ReflectionClass('\\Civi\\Api4\\Action\\' . $this->_entityName . '\\' . $actionName);
         if ($actionClass->isInstantiable() && $actionClass->isSubclassOf('\\Civi\\Api4\\Generic\\AbstractAction')) {

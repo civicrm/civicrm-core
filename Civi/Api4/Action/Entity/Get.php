@@ -58,7 +58,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       if (is_dir($dir)) {
         foreach (glob("$dir/*.php") as $file) {
           $matches = [];
-          preg_match('/(\w*).php/', $file, $matches);
+          preg_match('/(\w*)\.php$/', $file, $matches);
           if (
             (!$toGet || in_array($matches[1], $toGet))
             && is_a('\Civi\Api4\\' . $matches[1], '\Civi\Api4\Generic\AbstractEntity', TRUE)
