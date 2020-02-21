@@ -1284,6 +1284,100 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * Get transaction information about the contribution.
+   *
+   * @param int $contributionId
+   * @param int $financialTypeID
+   *
+   * @return mixed
+   */
+  protected static function getContributionTransactionInformation($contributionId, int $financialTypeID) {
+    $rows = [];
+    $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Expense Account is');
+
+    // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
+    $sql = "
+        SELECT GROUP_CONCAT(fa.`name`) as financial_account,
+          ft.total_amount,
+          ft.payment_instrument_id,
+          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, ft.currency, ft.pan_truncation, ft.card_type_id, ft.id
+
+        FROM civicrm_contribution con
+          LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
+          INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
+            AND ft.to_financial_account_id != %2
+          LEFT JOIN civicrm_entity_financial_trxn ef ON (ef.financial_trxn_id = ft.id AND ef.entity_table = 'civicrm_financial_item')
+          LEFT JOIN civicrm_financial_item fi ON fi.id = ef.entity_id
+          LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
+
+        WHERE con.id = %1 AND ft.is_payment = 1
+        GROUP BY ft.id";
+    $queryParams = [
+      1 => [$contributionId, 'Integer'],
+      2 => [$feeFinancialAccount, 'Integer'],
+    ];
+    $resultDAO = CRM_Core_DAO::executeQuery($sql, $queryParams);
+    $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
+
+    while ($resultDAO->fetch()) {
+      $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+      $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+      if ($resultDAO->card_type_id) {
+        $creditCardType = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $resultDAO->card_type_id);
+        $pantruncation = '';
+        if ($resultDAO->pan_truncation) {
+          $pantruncation = ": {$resultDAO->pan_truncation}";
+        }
+        $paidByLabel .= " ({$creditCardType}{$pantruncation})";
+      }
+
+      // show payment edit link only for payments done via backoffice form
+      $paymentEditLink = '';
+      if (empty($resultDAO->payment_processor_id) && CRM_Core_Permission::check('edit contributions')) {
+        $links = [
+          CRM_Core_Action::UPDATE => [
+            'name' => "<i class='crm-i fa-pencil'></i>",
+            'url' => 'civicrm/payment/edit',
+            'class' => 'medium-popup',
+            'qs' => "reset=1&id=%%id%%&contribution_id=%%contribution_id%%",
+            'title' => ts('Edit Payment'),
+          ],
+        ];
+        $paymentEditLink = CRM_Core_Action::formLink(
+          $links,
+          CRM_Core_Action::mask([CRM_Core_Permission::EDIT]),
+          [
+            'id' => $resultDAO->id,
+            'contribution_id' => $contributionId,
+          ],
+          ts('more'),
+          FALSE,
+          'Payment.edit.action',
+          'Payment',
+          $resultDAO->id
+        );
+      }
+
+      $val = [
+        'id' => $resultDAO->id,
+        'total_amount' => $resultDAO->total_amount,
+        'financial_type' => $resultDAO->financial_account,
+        'payment_instrument' => $paidByLabel,
+        'receive_date' => $resultDAO->trxn_date,
+        'trxn_id' => $resultDAO->trxn_id,
+        'status' => $statuses[$resultDAO->status_id],
+        'currency' => $resultDAO->currency,
+        'action' => $paymentEditLink,
+      ];
+      if ($paidByName == 'Check') {
+        $val['check_number'] = $resultDAO->check_number;
+      }
+      $rows[] = $val;
+    }
+    return $rows;
+  }
+
+  /**
    * @inheritDoc
    */
   public function addSelectWhereClause() {
@@ -4052,96 +4146,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $info['contribution_status'] = $contribution['contribution_status'];
     $info['currency'] = $contribution['currency'];
 
-    $financialTypeId = $contribution['financial_type_id'];
-    $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');
-
     $info['total'] = $total;
     $info['paid'] = $total - $paymentBalance;
     $info['balance'] = $paymentBalance;
     $info['id'] = $id;
     $info['component'] = $component;
-    $rows = [];
     if ($getTrxnInfo && $baseTrxnId) {
-      // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
-      $sql = "
-        SELECT GROUP_CONCAT(fa.`name`) as financial_account,
-          ft.total_amount,
-          ft.payment_instrument_id,
-          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, ft.currency, ft.pan_truncation, ft.card_type_id, ft.id
-
-        FROM civicrm_contribution con
-          LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
-          INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
-            AND ft.to_financial_account_id != %2
-          LEFT JOIN civicrm_entity_financial_trxn ef ON (ef.financial_trxn_id = ft.id AND ef.entity_table = 'civicrm_financial_item')
-          LEFT JOIN civicrm_financial_item fi ON fi.id = ef.entity_id
-          LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
-
-        WHERE con.id = %1 AND ft.is_payment = 1
-        GROUP BY ft.id";
-      $queryParams = [
-        1 => [$contributionId, 'Integer'],
-        2 => [$feeFinancialAccount, 'Integer'],
-      ];
-      $resultDAO = CRM_Core_DAO::executeQuery($sql, $queryParams);
-      $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
-
-      while ($resultDAO->fetch()) {
-        $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
-        $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
-        if ($resultDAO->card_type_id) {
-          $creditCardType = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $resultDAO->card_type_id);
-          $pantruncation = '';
-          if ($resultDAO->pan_truncation) {
-            $pantruncation = ": {$resultDAO->pan_truncation}";
-          }
-          $paidByLabel .= " ({$creditCardType}{$pantruncation})";
-        }
-
-        // show payment edit link only for payments done via backoffice form
-        $paymentEditLink = '';
-        if (empty($resultDAO->payment_processor_id) && CRM_Core_Permission::check('edit contributions')) {
-          $links = [
-            CRM_Core_Action::UPDATE => [
-              'name' => "<i class='crm-i fa-pencil'></i>",
-              'url' => 'civicrm/payment/edit',
-              'class' => 'medium-popup',
-              'qs' => "reset=1&id=%%id%%&contribution_id=%%contribution_id%%",
-              'title' => ts('Edit Payment'),
-            ],
-          ];
-          $paymentEditLink = CRM_Core_Action::formLink(
-            $links,
-            CRM_Core_Action::mask([CRM_Core_Permission::EDIT]),
-            [
-              'id' => $resultDAO->id,
-              'contribution_id' => $contributionId,
-            ],
-            ts('more'),
-            FALSE,
-            'Payment.edit.action',
-            'Payment',
-            $resultDAO->id
-          );
-        }
-
-        $val = [
-          'id' => $resultDAO->id,
-          'total_amount' => $resultDAO->total_amount,
-          'financial_type' => $resultDAO->financial_account,
-          'payment_instrument' => $paidByLabel,
-          'receive_date' => $resultDAO->trxn_date,
-          'trxn_id' => $resultDAO->trxn_id,
-          'status' => $statuses[$resultDAO->status_id],
-          'currency' => $resultDAO->currency,
-          'action' => $paymentEditLink,
-        ];
-        if ($paidByName == 'Check') {
-          $val['check_number'] = $resultDAO->check_number;
-        }
-        $rows[] = $val;
-      }
-      $info['transaction'] = $rows;
+      $info['transaction'] = self::getContributionTransactionInformation($contributionId, $contribution['financial_type_id']);
     }
 
     $info['payment_links'] = self::getContributionPaymentLinks($id, $paymentBalance, $info['contribution_status']);
