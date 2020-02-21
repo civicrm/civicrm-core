@@ -21,35 +21,14 @@
 class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
-   * Array for valid combinations of data_type & descriptions.
-   *
-   * @var array
-   */
-  public static $_dataType = NULL;
-
-  /**
-   * Array for valid combinations of data_type & html_type.
-   *
-   * @var array
-   */
-  public static $_dataToHtml = NULL;
-
-  /**
-   * Array to hold (formatted) fields for import
-   *
-   * @var array
-   */
-  public static $_importFields = NULL;
-
-  /**
    * Build and retrieve the list of data types and descriptions.
    *
    * @return array
    *   Data type => Description
    */
   public static function &dataType() {
-    if (!(self::$_dataType)) {
-      self::$_dataType = [
+    if (!isset(Civi::$statics[__CLASS__]['dataType'])) {
+      Civi::$statics[__CLASS__]['dataType'] = [
         'String' => ts('Alphanumeric'),
         'Int' => ts('Integer'),
         'Float' => ts('Number'),
@@ -64,7 +43,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'ContactReference' => ts('Contact Reference'),
       ];
     }
-    return self::$_dataType;
+    return Civi::$statics[__CLASS__]['dataType'];
   }
 
   /**
@@ -99,8 +78,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return array
    */
   public static function dataToHtml() {
-    if (!self::$_dataToHtml) {
-      self::$_dataToHtml = [
+    if (!isset(Civi::$statics[__CLASS__]['dataToHtml'])) {
+      Civi::$statics[__CLASS__]['dataToHtml'] = [
         [
           'Text' => 'Text',
           'Select' => 'Select',
@@ -122,7 +101,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         ['ContactReference' => 'Autocomplete-Select'],
       ];
     }
-    return self::$_dataToHtml;
+    return Civi::$statics[__CLASS__]['dataToHtml'];
   }
 
   /**
@@ -388,11 +367,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $cacheKey = md5($cacheKey);
     }
 
-    if (!self::$_importFields ||
-      CRM_Utils_Array::value($cacheKey, self::$_importFields) === NULL
+    if (!isset(Civi::$statics[__CLASS__]['importFields']) ||
+      CRM_Utils_Array::value($cacheKey, Civi::$statics[__CLASS__]['importFields']) === NULL
     ) {
-      if (!self::$_importFields) {
-        self::$_importFields = [];
+      if (!isset(Civi::$statics[__CLASS__]['importFields'])) {
+        Civi::$statics[__CLASS__]['importFields'] = [];
       }
 
       // check if we can retrieve from database cache
@@ -422,8 +401,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         if (!empty($customDataType) && empty($extends)) {
           // $customDataType specified a filter, but there is no corresponding SQL ($extends)
-          self::$_importFields[$cacheKey] = [];
-          return self::$_importFields[$cacheKey];
+          Civi::$statics[__CLASS__]['importFields'][$cacheKey] = [];
+          return Civi::$statics[__CLASS__]['importFields'][$cacheKey];
         }
 
         if ($onlyParent) {
@@ -543,10 +522,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         Civi::cache('fields')->set("custom importableFields $cacheKey", $fields);
       }
-      self::$_importFields[$cacheKey] = $fields;
+      Civi::$statics[__CLASS__]['importFields'][$cacheKey] = $fields;
     }
 
-    return self::$_importFields[$cacheKey];
+    return Civi::$statics[__CLASS__]['importFields'][$cacheKey];
   }
 
   /**
