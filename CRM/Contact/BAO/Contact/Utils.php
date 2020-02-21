@@ -821,6 +821,11 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       if (!empty($masterAddress->county_id) && empty($values['county_id'])) {
         $values['county_id'] = $masterAddress->county_id;
       }
+
+      // dev/core#1605 ensure state/province is copied
+      if (!empty($masterAddress->state_province_id) && empty($values['state_province_id'])) {
+        $values['state_province_id'] = $masterAddress->state_province_id;
+      }
     }
   }
 
