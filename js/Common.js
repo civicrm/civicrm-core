@@ -853,6 +853,10 @@ if (!CRM.vars) CRM.vars = {};
       var that = this,
         settings = $.extend({}, CRM.validate._defaults, CRM.validate.params);
       $(this).validate(settings);
+      // Default email validator accepts test@example but on test@example.org is valid (https://jqueryvalidation.org/jQuery.validator.methods/)
+      $.validator.methods.email = function( value, element ) {
+        return this.optional(element) || /[a-z]+@[a-z]+\.[a-z]+/.test(value);
+      };
       // Call any post-initialization callbacks
       if (CRM.validate.functions && CRM.validate.functions.length) {
         $.each(CRM.validate.functions, function(i, func) {
