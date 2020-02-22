@@ -486,6 +486,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test negative payment using create API.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRefundPayment() {
     $result = $this->callAPISuccess('Contribution', 'create', [
