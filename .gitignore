@@ -2,6 +2,7 @@
 *.bak
 .use-civicrm-setup
 /ext/
+!/ext/sequentialcreditnotes
 backdrop/
 bower_components
 CRM/Case/xml/configuration
