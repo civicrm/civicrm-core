@@ -30,6 +30,9 @@
       "PHPUnit_": ["packages/"],
       "Civi": "",
       "Civi\\": [".", "tests/phpunit/"]
+    },
+    "psr-4": {
+      "Civi\\": ["setup/src/"]
     }
   },
   "include-path": ["vendor/tecnickcom"],
@@ -63,7 +66,6 @@
     "pear/net_smtp": "1.9.*",
     "pear/net_socket": "1.0.*",
     "pear/mail": "^1.4",
-    "civicrm/civicrm-setup": "~0.4.0",
     "guzzlehttp/guzzle": "^6.3",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",

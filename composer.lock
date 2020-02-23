@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "705221f636824b774ef9fb35f3bfc987",
+    "content-hash": "582096c249c04484659162a3e90f7fbd",
     "packages": [
         {
             "name": "cache/integration-tests",
@@ -163,43 +163,6 @@
             ],
             "description": "RPC library for CiviConnect",
             "time": "2019-01-08T19:20:09+00:00"
-        },
-        {
-            "name": "civicrm/civicrm-setup",
-            "version": "v0.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/civicrm/civicrm-setup.git",
-                "reference": "8417d0c62b6e725ef7a49a75935995d0269cbbe8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-setup/zipball/8417d0c62b6e725ef7a49a75935995d0269cbbe8",
-                "reference": "8417d0c62b6e725ef7a49a75935995d0269cbbe8",
-                "shasum": ""
-            },
-            "require": {
-                "psr/log": "~1.0",
-                "symfony/event-dispatcher": "^2.6.13 || ~3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "civicrm-setup-autoload.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "CiviCRM LLC",
-                    "email": "info@civicrm.org"
-                }
-            ],
-            "description": "CiviCRM installation library",
-            "time": "2020-01-18T03:46:43+00:00"
         },
         {
             "name": "civicrm/composer-downloads-plugin",
