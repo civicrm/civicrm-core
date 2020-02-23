@@ -17,18 +17,18 @@ if (!defined('CIVI_SETUP')) {
       return preg_replace(';[^a-zA-Z0-9];', '', base64_encode($bits));
     };
 
-    if (!empty($e->getModel()->siteKey)) {
-      // skip
-    }
-    elseif (function_exists('random_bytes')) {
-      $e->getModel()->siteKey = $toAlphanum(random_bytes(32));
-    }
-    elseif (function_exists('openssl_random_pseudo_bytes')) {
-      $e->getModel()->siteKey = $toAlphanum(openssl_random_pseudo_bytes(32));
-    }
-    else {
-      throw new \RuntimeException("Failed to generate a random site key");
-    }
+  if (!empty($e->getModel()->siteKey)) {
+    // skip
+  }
+  elseif (function_exists('random_bytes')) {
+    $e->getModel()->siteKey = $toAlphanum(random_bytes(32));
+  }
+  elseif (function_exists('openssl_random_pseudo_bytes')) {
+    $e->getModel()->siteKey = $toAlphanum(openssl_random_pseudo_bytes(32));
+  }
+  else {
+    throw new \RuntimeException("Failed to generate a random site key");
+  }
 
     \Civi\Setup::log()->info(sprintf('[%s] Done %s', basename(__FILE__), 'installFiles'));
 

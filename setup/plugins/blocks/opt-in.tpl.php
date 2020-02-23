@@ -1,4 +1,5 @@
-<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n"); endif; ?>
+<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n");
+endif; ?>
 <h2 id="settings"><?php echo ts('Opt-in'); ?></h2>
 
 <p>

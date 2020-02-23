@@ -2,8 +2,6 @@
 namespace Civi\Setup\UI\Event;
 
 use Civi\Setup\Event\BaseSetupEvent;
-use Civi\Setup\Event\SetupControllerInterface;
-use Civi\Setup\UI\SetupController;
 
 /**
  * Create a web-based UI for handling the installation.
@@ -15,14 +13,14 @@ class UIConstructEvent extends BaseSetupEvent {
   protected $ctrl;
 
   /**
-   * @return SetupControllerInterface
+   * @return \Civi\Setup\Event\SetupControllerInterface
    */
   public function getCtrl() {
     return $this->ctrl;
   }
 
   /**
-   * @param SetupControllerInterface $ctrl
+   * @param \Civi\Setup\Event\SetupControllerInterface $ctrl
    */
   public function setCtrl($ctrl) {
     $this->ctrl = $ctrl;

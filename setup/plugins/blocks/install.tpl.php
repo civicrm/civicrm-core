@@ -1,4 +1,5 @@
-<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n"); endif; ?>
+<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n");
+endif; ?>
 <div class="action-box">
   <input id="install_button" type="submit" name="civisetup[action][Install]"
          value="<?php echo htmlentities(ts('Install CiviCRM')); ?>"

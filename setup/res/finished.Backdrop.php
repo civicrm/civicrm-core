@@ -29,7 +29,7 @@ $backdropURL .= "index.php?q=civicrm/admin/configtask&reset=1";
 $output .= "<li>" . ts("Backdrop user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(
   1 => "target='_blank' href='{$backdropPermissionsURL}'",
   2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'",
-  )) . "</li>";
+)) . "</li>";
 $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$backdropURL'")) . "</li>";
 $output .= $commonOutputMessage;
 $output .= '</ul>';

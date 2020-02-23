@@ -1,4 +1,5 @@
-<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n"); endif; ?>
+<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n");
+endif; ?>
 <h2><?php echo ts('Localization'); ?></h2>
 
 <p><?php echo ts('CiviCRM has been translated to many languages, thanks to its community of translators. By selecting another language, the installer may be available in that language. The initial configuration of the basic data will also be set to that language (ex: individual prefixes, suffixes, activity types, etc.). <a href="%1" target="%2">Learn more about using CiviCRM in other languages.</a>', array(1 => 'http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=88408149', 2 => '_blank')); ?></p>

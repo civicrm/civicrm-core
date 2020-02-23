@@ -18,7 +18,8 @@ if (!defined('CIVI_SETUP')) {
     \Civi\Setup::log()->info(sprintf('[%s] Register blocks', basename(__FILE__)));
 
     $e->getCtrl()->blocks['opt-in'] = array(
-      'is_active' => TRUE, // FIXME
+    // FIXME
+      'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'opt-in.tpl.php',
       'class' => 'if-no-errors',
       'weight' => 55,

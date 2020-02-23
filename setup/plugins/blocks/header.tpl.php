@@ -1,11 +1,12 @@
-<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n"); endif; ?>
+<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n");
+endif; ?>
 <div class="civicrm-setup-header">
-	<div class="title">
-		<h1><?php echo ts("Thanks for choosing CiviCRM. You're nearly there!"); ?><hr></h1>
-	</div>
-	<div class="civicrm-logo"><strong><?php echo ts('Version %1', array(1 => "{$civicrm_version} {$model->cms}")); ?></strong>
-	    <span><img src=<?php echo $installURLPath . "updated-logo.jpg"?> /></span>
-	 </div>
+    <div class="title">
+        <h1><?php echo ts("Thanks for choosing CiviCRM. You're nearly there!"); ?><hr></h1>
+    </div>
+    <div class="civicrm-logo"><strong><?php echo ts('Version %1', array(1 => "{$civicrm_version} {$model->cms}")); ?></strong>
+        <span><img src=<?php echo $installURLPath . "updated-logo.jpg"?> /></span>
+     </div>
 </div>
 <h2><?php echo ts("CiviCRM Installer"); ?></h2>
 

@@ -1,4 +1,5 @@
-<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n"); endif; ?>
+<?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n");
+endif; ?>
 <h2 id="environment"><?php echo ts('Environment'); ?></h2>
 
 <p>
