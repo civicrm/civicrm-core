@@ -204,6 +204,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts, TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, $primaryLocationOnly);
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
 
+    // $details[0] is an array of [ contactID => contactDetails ]
     // also get all token values
     CRM_Utils_Hook::tokenValues($details[0],
       $this->_contactIds,

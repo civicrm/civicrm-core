@@ -884,7 +884,7 @@ abstract class CRM_Utils_Hook {
    * tokens returned by the 'tokens' hook
    *
    * @param array $details
-   *   The array to store the token values indexed by contactIDs (unless it a single).
+   *   The array to store the token values indexed by contactIDs.
    * @param array $contactIDs
    *   An array of contactIDs.
    * @param int $jobID

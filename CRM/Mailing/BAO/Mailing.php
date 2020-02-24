@@ -1080,15 +1080,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     elseif ($contactId === 0) {
       //anonymous user
       $contact = [];
-      CRM_Utils_Hook::tokenValues($contact, $contactId, $job_id);
+      CRM_Utils_Hook::tokenValues($contact, [$contactId], $job_id);
     }
     else {
       $params = [['contact_id', '=', $contactId, 0, 0]];
       list($contact) = CRM_Contact_BAO_Query::apiQuery($params);
+      // $contact is an array of [ contactID => contactDetails ]
 
-      //CRM-4524
+      // also call the hook to get contact details
+      CRM_Utils_Hook::tokenValues($contact, [$contactId], $job_id);
+
+      // Don't send if contact doesn't exist
       $contact = reset($contact);
-
       if (!$contact || is_a($contact, 'CRM_Core_Error')) {
         CRM_Core_Error::debug_log_message(ts('CiviMail will not send email to a non-existent contact: %1',
           [1 => $contactId]
@@ -1098,9 +1101,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $res = NULL;
         return $res;
       }
-
-      // also call the hook to get contact details
-      CRM_Utils_Hook::tokenValues($contact, $contactId, $job_id);
     }
 
     $pTemplates = $this->getPreparedTemplates();
