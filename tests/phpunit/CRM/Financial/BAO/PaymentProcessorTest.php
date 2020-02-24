@@ -73,4 +73,19 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals([$liveProcessorID], array_keys($processors), 'Only the Live processor should be returned');
   }
 
+  /**
+   * Test the Manual processor supports 'NoEmailProvided'
+   */
+  public function testManualProcessorSupportsNoEmailProvided() {
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['NoEmailProvided']);
+    $found = FALSE;
+    foreach ($processors as $processor) {
+      if ($processor['class_name'] == 'Payment_Manual') {
+        $found = TRUE;
+        continue;
+      }
+    }
+    $this->assertTrue($found, 'The Manual payment processor should support "NoEmailProvided"');
+  }
+
 }

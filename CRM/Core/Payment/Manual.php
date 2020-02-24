@@ -206,6 +206,13 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
+   * Does the processor work without an email address?
+   */
+  protected function supportsNoEmailProvided() {
+    return TRUE;
+  }
+
+  /**
    * Submit a manual payment.
    *
    * @param array $params
