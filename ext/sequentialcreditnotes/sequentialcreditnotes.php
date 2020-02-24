@@ -16,10 +16,8 @@ function sequentialcreditnotes_civicrm_alterSettingsFolders(&$metaDataFolders = 
  * Add a creditnote_id if appropriate.
  *
  * If the contribution is created with cancelled or refunded status, add credit note id
- * do the same for chargeback - this entered the code 'accidentally' but moving it to here
- * as part of cleanup maintains consistency.
- *
- * Note that the
+ * do the same for chargeback
+ * - creditnotes for chargebacks entered the code 'accidentally' but since it did we maintain it.
  *
  * @param \CRM_Core_DAO $op
  * @param string $objectName
@@ -34,7 +32,7 @@ function sequentialcreditnotes_civicrm_pre($op, $objectName, $id, &$params) {
     $reversalStatuses = ['Cancelled', 'Chargeback', 'Refunded'];
     if (empty($params['creditnote_id']) && in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']), $reversalStatuses, TRUE)) {
       if ($id) {
-        $existing = Contribution::get()->addWhere('id', '=', (int) $id)->setSelect(['creditnote_id'])->execute()->first();
+        $existing = Contribution::get()->setCheckPermissions(FALSE)->addWhere('id', '=', (int) $id)->setSelect(['creditnote_id'])->execute()->first();
         if ($existing['creditnote_id']) {
           // Since we have it adding it makes is clearer.
           $params['creditnote_id'] = $existing['creditnote_id'];
