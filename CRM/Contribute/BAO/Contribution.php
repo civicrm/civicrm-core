@@ -525,7 +525,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'note' => $params['note'],
         'entity_id' => $contribution->id,
         'contact_id' => $session->get('userID'),
-        'modified_date' => date('Ymd'),
       ];
       if (!$noteParams['contact_id']) {
         $noteParams['contact_id'] = $params['contact_id'];

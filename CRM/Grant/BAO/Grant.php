@@ -241,7 +241,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
         'note' => $params['note'] = $params['note'] ? $params['note'] : "null",
         'entity_id' => $grant->id,
         'contact_id' => $id,
-        'modified_date' => date('Ymd'),
       ];
 
       CRM_Core_BAO_Note::add($noteParams, (array) CRM_Utils_Array::value('note', $ids));

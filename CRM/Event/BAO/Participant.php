@@ -238,7 +238,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
           'note' => $noteValue,
           'entity_id' => $participant->id,
           'contact_id' => $id,
-          'modified_date' => date('Ymd'),
         ];
         $noteIDs = [];
         if ($noteId) {
