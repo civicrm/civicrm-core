@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -357,13 +341,39 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       }
     }
 
-    // Disable inactive widgets
-    $dashletClause = $dashletIDs ? "dashboard_id NOT IN  (" . implode(',', $dashletIDs) . ")" : '(1)';
+    // Find dashlets in this domain.
+    $domainDashlets = civicrm_api3('Dashboard', 'get', [
+      'return' => array('id'),
+      'domain_id' => CRM_Core_Config::domainID(),
+      'options' => ['limit' => 0],
+    ]);
+
+    // Get the array of IDs.
+    $domainDashletIDs = [];
+    if ($domainDashlets['is_error'] == 0) {
+      $domainDashletIDs = CRM_Utils_Array::collect('id', $domainDashlets['values']);
+    }
+
+    // Restrict query to Dashlets in this domain.
+    $domainDashletClause = !empty($domainDashletIDs) ? "dashboard_id IN (" . implode(',', $domainDashletIDs) . ")" : '(1)';
+
+    // Target only those Dashlets which are inactive.
+    $dashletClause = $dashletIDs ? "dashboard_id NOT IN (" . implode(',', $dashletIDs) . ")" : '(1)';
+
+    // Build params.
+    $params = [
+      1 => [$contactID, 'Integer'],
+    ];
+
+    // Build query.
     $updateQuery = "UPDATE civicrm_dashboard_contact
                     SET is_active = 0
-                    WHERE $dashletClause AND contact_id = {$contactID}";
+                    WHERE $domainDashletClause
+                    AND $dashletClause
+                    AND contact_id = %1";
 
-    CRM_Core_DAO::executeQuery($updateQuery);
+    // Disable inactive widgets.
+    CRM_Core_DAO::executeQuery($updateQuery, $params);
   }
 
   /**

@@ -236,8 +236,6 @@ Net_SMTP                                  1.2.8
 Net_Socket                                1.0.6
 Net_Traceroute                            0.21
 Net_URL                                   1.0.14
-Net_UserAgent_Detect                      2.2.0
-Net_UserAgent_Mobile                      0.28.0
 Net_Whois                                 1.0
 Net_Wifi                                  0.1.0
 Numbers_Roman                             1.0.1

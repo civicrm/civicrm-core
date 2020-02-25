@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/configuring Payment Processors used by a particular site/domain.  *}
@@ -86,7 +70,7 @@
 {/if}
 {if $form.subject}
         <tr class="crm-paymentProcessor-form-block-subject">
-            <td class="label">{$form.subject.label}</td><td>{$form.subject.html}</td>
+            <td class="label">{$form.subject.label}</td><td>{$form.subject.html} {help id=$ppTypeName|cat:'-live-subject' title=$form.subject.label}</td>
         </tr>
 {/if}
         <tr class="crm-paymentProcessor-form-block-url_site">
@@ -127,7 +111,7 @@
 {/if}
 {if $form.test_subject}
         <tr class="crm-paymentProcessor-form-block-test_subject">
-            <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html}</td>
+            <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html} {help id=$ppTypeName|cat:'-test-subject' title=$form.test_subject.label}</td>
         </tr>
 {/if}
         <tr class="crm-paymentProcessor-form-block-test_url_site">

@@ -152,6 +152,7 @@ abstract class CRM_Utils_System_Base {
    *
    * @return array|bool
    *   [contactID, ufID, unique string] else false if no auth
+   * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     return FALSE;
@@ -179,9 +180,10 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Immediately stop script execution and display a 401 "Access Denied" page.
+   * @throws \CRM_Core_Exception
    */
   public function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
   /**

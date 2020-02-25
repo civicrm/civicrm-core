@@ -22,17 +22,16 @@ class CRM_Iats_Page_iATSAdmin extends CRM_Core_Page {
     $this->assign('currentTime', date('Y-m-d H:i:s'));
     $this->assign('jobLastRunWarning', '0');
     // Check if I've got any recurring contributions setup. In theory I should only worry about iATS, but it's a problem regardless ..
-    $params = array('version' => 3, 'sequential' => 1);
-    $result = civicrm_api('ContributionRecur', 'getcount', $params);
+    $result = civicrm_api3('ContributionRecur', 'getcount');
     if (!empty($result)) {
       $this->assign('jobLastRunWarning', '1');
-      $params['api_action'] = 'Iatsrecurringcontributions';
-      $job = civicrm_api('Job', 'getSingle', $params);
-      $last_run = isset($job['last_run']) ? strtotime($job['last_run']) : '';
-      $this->assign('jobLastRun', $job['last_run']);
+      $params = ['api_action' => 'Iatsrecurringcontributions', 'is_active' => 1, 'sequential' => 1, 'options' => ['sort' => 'last_run']];
+      $jobs = civicrm_api3('Job', 'get', $params);
+      $job_last_run = count($jobs['values']) > 0 ? strtotime($jobs['values'][0]['last_run']) : 0;
+      $this->assign('jobLastRun', ($job_last_run ? date('Y-m-d H:i:s', $job_last_run) : ''));
       $this->assign('jobOverdue', '');
-      $overdueHours  = (time() - $last_run) / (60 * 60);
-      if (24 < $overdueHours) {
+      $overdueHours  = (time() - $job_last_run) / (60 * 60);
+      if (36 < $overdueHours) {
         $this->assign('jobOverdue', $overdueHours);
       }
     }

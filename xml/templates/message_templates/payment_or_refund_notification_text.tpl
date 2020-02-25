@@ -1,8 +1,13 @@
 {if $emailGreeting}{$emailGreeting},
-{/if}{if $isRefund}
+{/if}
+
+{if $isRefund}
 {ts}A refund has been issued based on changes in your registration selections.{/ts}
 {else}
-{ts}A payment has been received.{/ts}
+{ts}Below you will find a receipt for this payment.{/ts}
+{/if}
+{if $paymentsComplete}
+{ts}Thank you for completing this payment.{/ts}
 {/if}
 
 {if $isRefund}
@@ -11,10 +16,8 @@
 {ts}Refund Details{/ts}
 
 ===============================================================================
-{ts}Total Fees{/ts}: {$totalAmount|crmMoney}
-{ts}You Paid{/ts}: {$totalPaid|crmMoney}
+{ts}This Refund Amount{/ts}: {$refundAmount|crmMoney}
 ------------------------------------------------------------------------------------
-{ts}Refund Amount{/ts}: {$refundAmount|crmMoney}
 
 {else}
 ===============================================================================
@@ -22,15 +25,8 @@
 {ts}Payment Details{/ts}
 
 ===============================================================================
-{ts}Total Fees{/ts}: {$totalAmount|crmMoney}
 {ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney}
 ------------------------------------------------------------------------------------
-{ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
-
-{if $paymentsComplete}
-
-{ts}Thank you for completing payment.{/ts}
-{/if}
 {/if}
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}
@@ -44,6 +40,17 @@
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
+
+===============================================================================
+
+{ts}Contribution Details{/ts}
+
+===============================================================================
+{ts}Total Fee{/ts}: {$totalAmount|crmMoney}
+{ts}Total Paid{/ts}: {$totalPaid|crmMoney}
+{ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
+
+
 {if $billingName || $address}
 
 ===============================================================================

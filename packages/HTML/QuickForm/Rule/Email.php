@@ -37,6 +37,25 @@ require_once 'HTML/QuickForm/Rule.php';
  */
 class HTML_QuickForm_Rule_Email extends HTML_QuickForm_Rule
 {
+
+    /**
+     * Compatibility layer for PHP versions running ICU 4.4, as the constant INTL_IDNA_VARIANT_UTS46
+     * is only available as of ICU 4.6.
+     *
+     * Please note: Once PHP 7.4 is the minimum requirement, this method will vanish without further notice
+     * as it is recommended to use the native method instead, when working against a clean environment.
+     *
+     * @param string $part.
+     * @return string|bool
+     */
+    private static function idn_to_ascii($part)
+    {
+        if (defined('INTL_IDNA_VARIANT_UTS46')) {
+            return idn_to_ascii($part, 0, INTL_IDNA_VARIANT_UTS46);
+        }
+        return idn_to_ascii($part);
+    }
+
     // switching to a better regex as per CRM-40
     // var $regex = '/^((\"[^\"\f\n\r\t\v\b]+\")|([\w\!\#\$\%\&\'\*\+\-\~\/\^\`\|\{\}]+(\.[\w\!\#\$\%\&\'\*\+\-\~\/\^\`\|\{\}]+)*))@((\[(((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9])))\])|(((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9])))|((([A-Za-z0-9\-])+\.)+[A-Za-z\-]+))$/';
     var $regex = '/^([a-zA-Z0-9&_?\/`!|#*$^%=~{}+\'-]+|"([\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7F]|\\[\x00-\x7F])*")(\.([a-zA-Z0-9&_?\/`!|#*$^%=~{}+\'-]+|"([\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7F]|\\[\x00-\x7F])*"))*@([a-zA-Z0-9&_?\/`!|#*$^%=~{}+\'-]+|\[([\x00-\x0C\x0E-\x5A\x5E-\x7F]|\\[\x00-\x7F])*\])(\.([a-zA-Z0-9&_?\/`!|#*$^%=~{}+\'-]+|\[([\x00-\x0C\x0E-\x5A\x5E-\x7F]|\\[\x00-\x7F])*\]))*$/';
@@ -55,7 +74,7 @@ class HTML_QuickForm_Rule_Email extends HTML_QuickForm_Rule
           if ($parts = explode('@', $email)) {
             if (sizeof($parts) == 2) {
               foreach ($parts as &$part) {
-                $part = idn_to_ascii($part);
+                $part = self::idn_to_ascii($part);
               }
               $email = implode('@', $parts);
             }

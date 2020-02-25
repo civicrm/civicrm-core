@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Mail/mime.php';
@@ -140,67 +124,58 @@ WHERE  email = %2
     $contact_id = $q->contact_id;
     $transaction = new CRM_Core_Transaction();
 
-    $do = new CRM_Core_DAO();
-    $mgObject = new CRM_Mailing_DAO_MailingGroup();
-    $mg = $mgObject->getTableName();
-    $jobObject = new CRM_Mailing_BAO_MailingJob();
-    $job = $jobObject->getTableName();
-    $mailingObject = new CRM_Mailing_BAO_Mailing();
-    $mailing = $mailingObject->getTableName();
-    $groupObject = new CRM_Contact_BAO_Group();
-    $group = $groupObject->getTableName();
-    $gcObject = new CRM_Contact_BAO_GroupContact();
-    $gc = $gcObject->getTableName();
-    $abObject = new CRM_Mailing_DAO_MailingAB();
-    $ab = $abObject->getTableName();
-
     $mailing_id = civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
-    $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id, 'entity_table', 'mailing_id');
 
-    // If $entity is null and $mailing_Type is either winner or experiment then we are deailing with an AB test
-    $abtest_types = ['experiment', 'winner'];
-    if (empty($entity) && in_array($mailing_type, $abtest_types)) {
-      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
-      $field = 'mailing_id_b';
-      if (empty($mailing_id_a)) {
-        $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_c');
-        $field = 'mailing_id_c';
+    $groupObject = new CRM_Contact_BAO_Group();
+    $groupTableName = $groupObject->getTableName();
+
+    $mailingObject = new CRM_Mailing_BAO_Mailing();
+    $mailingTableName = $mailingObject->getTableName();
+
+    // We need a mailing id that points to the mailing that defined the recipients.
+    // This is usually just the passed-in mailing_id, however in the case of AB
+    // tests, it's the variant 'A' one.
+    $relevant_mailing_id = $mailing_id;
+
+    // Special case for AB Tests:
+    if (in_array($mailing_type, ['experiement', 'winner'])) {
+      // The mailing belongs to an AB test.
+      // See if we can find an AB test where this is variant B.
+      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', mailing_id, 'mailing_id_a', 'mailing_id_b');
+      if (!empty($mailing_id_a)) {
+        // OK, we were given mailing B and we looked up variant A which is the relevant one.
+        $relevant_mailing_id = $mailing_id_a;
       }
-      $jobJoin = "INNER JOIN $ab ON $ab.mailing_id_a = $mg.mailing_id
-        INNER JOIN $job ON $job.mailing_id = $ab.$field";
-      $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id_a, 'entity_table', 'mailing_id');
-    }
-    else {
-      $jobJoin = "INNER JOIN  $job ON      $job.mailing_id = $mg.mailing_id";
+      else {
+        // No, it wasn't variant B, let's see if we can find an AB test where
+        // the given mailing was the winner (C).
+        $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_c');
+        if (!empty($mailing_id_a)) {
+          // OK, this was the winner and we looked up variant A which is the relevant one.
+          $relevant_mailing_id = $mailing_id_a;
+        }
+        // (otherwise we were passed in variant A so we already have the relevant_mailing_id correct already.)
+      }
     }
 
-    $groupClause = '';
-    if ($entity == $group) {
-      $groupClause = "AND $group.is_hidden = 0";
-    }
-
-    $do->query("
-            SELECT      $mg.entity_table as entity_table,
-                        $mg.entity_id as entity_id,
-                        $mg.group_type as group_type
-            FROM        $mg
-            $jobJoin
-            INNER JOIN  $entity
-                ON      $mg.entity_id = $entity.id
-            WHERE       $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer') . "
-                AND     $mg.group_type IN ('Include', 'Base') $groupClause"
-    );
-
-    // Make a list of groups and a list of prior mailings that received
-    // this mailing.
+    // Make a list of groups and a list of prior mailings that received this
+    // mailing.  Nb. the 'Base' group is called the 'Unsubscribe group' in the
+    // UI.
+    // Just to definitely make it SQL safe.
+    $relevant_mailing_id = (int) $relevant_mailing_id;
+    $do = CRM_Core_DAO::executeQuery(
+      "SELECT entity_table, entity_id, group_type
+        FROM civicrm_mailing_group
+       WHERE mailing_id = $relevant_mailing_id
+         AND group_type IN ('Include', 'Base')");
 
     $groups = [];
     $base_groups = [];
     $mailings = [];
 
     while ($do->fetch()) {
-      if ($do->entity_table == $group) {
+      if ($do->entity_table === $groupTableName) {
         if ($do->group_type == 'Base') {
           $base_groups[$do->entity_id] = NULL;
         }
@@ -208,7 +183,7 @@ WHERE  email = %2
           $groups[$do->entity_id] = NULL;
         }
       }
-      elseif ($do->entity_table == $mailing) {
+      elseif ($do->entity_table === $mailingTableName) {
         $mailings[] = $do->entity_id;
       }
     }
@@ -218,19 +193,19 @@ WHERE  email = %2
 
     while (!empty($mailings)) {
       $do = CRM_Core_DAO::executeQuery("
-                SELECT      $mg.entity_table as entity_table,
-                            $mg.entity_id as entity_id
-                FROM        civicrm_mailing_group $mg
-                WHERE       $mg.mailing_id IN (" . implode(', ', $mailings) . ")
-                    AND     $mg.group_type = 'Include'");
+                SELECT      entity_table as entity_table,
+                            entity_id as entity_id
+                FROM        civicrm_mailing_group
+                WHERE       mailing_id IN (" . implode(', ', $mailings) . ")
+                    AND     group_type = 'Include'");
 
       $mailings = [];
 
       while ($do->fetch()) {
-        if ($do->entity_table == $group) {
+        if ($do->entity_table === $groupTableName) {
           $groups[$do->entity_id] = TRUE;
         }
-        elseif ($do->entity_table == $mailing) {
+        elseif ($do->entity_table === $mailing) {
           $mailings[] = $do->entity_id;
         }
       }
@@ -249,24 +224,24 @@ WHERE  email = %2
     // base groups from search based mailings.
     $baseGroupClause = '';
     if (!empty($baseGroupIds)) {
-      $baseGroupClause = "OR  $group.id IN(" . implode(', ', $baseGroupIds) . ")";
+      $baseGroupClause = "OR  grp.id IN(" . implode(', ', $baseGroupIds) . ")";
     }
     $groupIdClause = '';
     if ($groupIds || $baseGroupIds) {
-      $groupIdClause = "AND $group.id IN (" . implode(', ', array_merge($groupIds, $baseGroupIds)) . ")";
+      $groupIdClause = "AND grp.id IN (" . implode(', ', array_merge($groupIds, $baseGroupIds)) . ")";
     }
     $do = CRM_Core_DAO::executeQuery("
-            SELECT      $group.id as group_id,
-                        $group.title as title,
-                        $group.description as description
-            FROM        civicrm_group $group
-            LEFT JOIN   civicrm_group_contact $gc
-                ON      $gc.group_id = $group.id
-            WHERE       $group.is_hidden = 0
+            SELECT      grp.id as group_id,
+                        grp.title as title,
+                        grp.description as description
+            FROM        civicrm_group grp
+            LEFT JOIN   civicrm_group_contact gc
+                ON      gc.group_id = grp.id
+            WHERE       grp.is_hidden = 0
                         $groupIdClause
-                AND     ($group.saved_search_id is not null
-                            OR  ($gc.contact_id = $contact_id
-                                AND $gc.status = 'Added')
+                AND     (grp.saved_search_id is not null
+                            OR  (gc.contact_id = $contact_id
+                                AND gc.status = 'Added')
                             $baseGroupClause
                         )");
 

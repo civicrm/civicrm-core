@@ -19,7 +19,7 @@
  *
  * @return array|int
  */
-function civicrm_api($entity, $action, $params, $extra = NULL) {
+function civicrm_api(string $entity = NULL, string $action, array $params, $extra = NULL) {
   return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params, $extra);
 }
 
@@ -37,7 +37,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
  * @throws \API_Exception
  * @throws \Civi\API\Exception\NotImplementedException
  */
-function civicrm_api4($entity, $action, $params = [], $index = NULL) {
+function civicrm_api4(string $entity, string $action, array $params = [], $index = NULL) {
   $apiCall = \Civi\Api4\Utils\ActionUtil::getAction($entity, $action);
   foreach ($params as $name => $param) {
     $setter = 'set' . ucfirst($name);
@@ -81,7 +81,7 @@ function civicrm_api4($entity, $action, $params = [], $index = NULL) {
  *
  * @return array
  */
-function civicrm_api3($entity, $action, $params = []) {
+function civicrm_api3(string $entity, string $action, array $params = []) {
   $params['version'] = 3;
   $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {

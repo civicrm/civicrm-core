@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 require_once 'Mail/mime.php';
 
@@ -190,13 +174,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     }
 
     // Create a temp table for contact exclusion.
-    $excludeTempTablename = "excluded_recipients_temp" . substr(sha1(rand()), 0, 4);
-    $includedTempTablename = "included_recipients_temp" . substr(sha1(rand()), 0, 4);
-    $mailingGroup->query(
-      "CREATE TEMPORARY TABLE $excludeTempTablename
-            (contact_id int primary key)
-            ENGINE=HEAP"
-    );
+    $excludeTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('exrecipient')->setMemory()->createWithColumns('contact_id int primary key');
+    $excludeTempTablename = $excludeTempTable->getName();
     // populate exclude temp-table with recipients to be excluded from the list
     //  on basis of selected recipients groups and/or previous mailing
     if (!empty($recipientsGroup['Exclude'])) {
@@ -237,11 +216,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $entityColumn = $isSMSmode ? 'phone_id' : 'email_id';
     $entityTable = $isSMSmode ? CRM_Core_DAO_Phone::getTableName() : CRM_Core_DAO_Email::getTableName();
     // Get all the group contacts we want to include.
-    $mailingGroup->query(
-      "CREATE TEMPORARY TABLE $includedTempTablename
-            (contact_id int primary key, $entityColumn int)
-            ENGINE=HEAP"
-    );
+    $includedTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('inrecipient')->setMemory()->createWithColumns('contact_id int primary key, ' . $entityColumn . ' int');
+    $includedTempTablename = $includedTempTable->getName();
 
     if ($isSMSmode) {
       $criteria = [
@@ -405,8 +381,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
     // Delete the temp table.
     $mailingGroup->reset();
-    $mailingGroup->query(" DROP TEMPORARY TABLE $excludeTempTablename ");
-    $mailingGroup->query(" DROP TEMPORARY TABLE $includedTempTablename ");
+    $excludeTempTable->drop();
+    $includedTempTable->drop();
 
     CRM_Utils_Hook::alterMailingRecipients($mailingObj, $criteria, 'post');
   }
@@ -1839,9 +1815,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $report['mailing'] = [];
     foreach (array_keys(self::fields()) as $field) {
-      if ($field == 'mailing_modified_date') {
-        $field = 'modified_date';
-      }
+      $field = self::fields()[$field]['name'];
       $report['mailing'][$field] = $mailing->$field;
     }
 
@@ -2254,7 +2228,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!in_array($id, $mailingIDs)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this mailing report'));
+      throw new CRM_Core_Exception(ts('You do not have permission to access this mailing report'));
     }
   }
 
@@ -2476,7 +2450,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function del($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing del function'));
     }
 
     CRM_Utils_Hook::pre('delete', 'Mailing', $id, CRM_Core_DAO::$_nullArray);
@@ -2506,7 +2480,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function delJob($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
     }
 
     \Civi::log('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead', ['civi.tag' => 'deprecated']);

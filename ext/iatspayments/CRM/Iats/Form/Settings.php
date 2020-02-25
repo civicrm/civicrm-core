@@ -109,7 +109,7 @@ class CRM_Iats_Form_Settings extends CRM_Core_Form {
       ),
     ));
 
-    $result = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_settings');
+    $result = Civi::settings()->get('iats_settings');
     $defaults = (empty($result)) ? array() : $result;
     if (empty($defaults['recurring_failure_threshhold'])) {
       $defaults['recurring_failure_threshhold'] = 3;
@@ -139,7 +139,7 @@ class CRM_Iats_Form_Settings extends CRM_Core_Form {
         unset($values[$key]);
       }
     }
-    CRM_Core_BAO_Setting::setItem($values, 'iATS Payments Extension', 'iats_settings');
+    Civi::settings()->set('iats_settings', $values);
     parent::postProcess();
   }
 

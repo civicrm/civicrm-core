@@ -259,6 +259,7 @@
     </pseudoconstant>
     <html>
       <type>ChainSelect</type>
+      <controlField>state_province_id</controlField>
     </html>
     <add>1.1</add>
   </field>
@@ -285,6 +286,7 @@
     <localize_context>province</localize_context>
     <html>
       <type>ChainSelect</type>
+      <controlField>country_id</controlField>
     </html>
     <add>1.1</add>
   </field>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_Contact_Utils {
 
@@ -45,6 +29,7 @@ class CRM_Contact_BAO_Contact_Utils {
    *   If profile overlay class should be added.
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
     static $imageInfo = [];
@@ -152,6 +137,7 @@ WHERE  id IN ( $idString )
    *
    * @return array
    *   ( $cs, $ts, $live )
+   * @throws \CRM_Core_Exception
    */
   public static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
     // return a warning message if we dont get a entityId
@@ -216,6 +202,8 @@ WHERE  id IN ( $idString )
    *
    * @return bool
    *   true if valid, else false
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function validChecksum($contactID, $inputCheck) {
 
@@ -252,6 +240,8 @@ WHERE  id IN ( $idString )
    * @param int $previousEmployerID
    * @param bool $newContact
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
     //if organization name is passed. CRM-15368,CRM-15547
@@ -282,7 +272,7 @@ WHERE  id IN ( $idString )
       // get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
       if (!$relTypeId) {
-        CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type 'Employee of'"));
+        throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
       }
 
       // create employee of relationship
@@ -328,6 +318,7 @@ WHERE  id IN ( $idString )
    * @param int $previousEmpID
    *
    * @throws CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = [];
@@ -380,7 +371,7 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
 SET contact_a.organization_name=contact_b.organization_name
 WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query);
   }
 
   /**
@@ -390,6 +381,9 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    *   Contact id ( mostly individual contact id).
    * @param int $employerId
    *   Contact id ( mostly organization contact id).
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
     $query = "UPDATE civicrm_contact
@@ -406,7 +400,7 @@ WHERE id={$contactId}; ";
       //get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
       if (!$relTypeId) {
-        CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type 'Employee of'"));
+        throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
       }
       $relMembershipParams['relationship_type_id'] = $relTypeId . '_a_b';
       $relMembershipParams['contact_check'][$employerId] = 1;
@@ -440,6 +434,7 @@ WHERE id={$contactId}; ";
    * @param string $title
    *   fieldset title.
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
     $form->assign('contact_type', $contactType);
@@ -918,7 +913,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     $allGreetings = CRM_Core_PseudoConstant::greeting($filter);
     $originalGreetingString = $greetingString = CRM_Utils_Array::value($valueID, $allGreetings);
     if (!$greetingString) {
-      CRM_Core_Error::fatal(ts('Incorrect greeting value id %1, or no default greeting for this contact type and greeting type.', [1 => $valueID]));
+      throw new CRM_Core_Exception(ts('Incorrect greeting value id %1, or no default greeting for this contact type and greeting type.', [1 => $valueID]));
     }
 
     // build return properties based on tokens
@@ -1135,7 +1130,9 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    *
    * @param int $contactId
    *   The hypothetical contact ID
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public static function isContactId($contactId) {
     if ($contactId) {

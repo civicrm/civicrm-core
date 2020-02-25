@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -141,9 +125,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Store an item in the setting table.
    *
-   * _setItem() is the common logic shared by setItem() and setItems().
-   *
-   * @param object $value
+   * @param $value
    *   (required) The value that will be serialized and stored.
    * @param string $group
    *   The group name of the item (deprecated).
@@ -156,6 +138,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   An optional ID to assign the creator to. If not set, retrieved from session.
    *
    * @param int $domainID
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated - refer docs https://docs.civicrm.org/dev/en/latest/framework/setting/
    */
   public static function setItem(
     $value,
@@ -166,6 +152,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $createdID = NULL,
     $domainID = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('refer docs for correct methods https://docs.civicrm.org/dev/en/latest/framework/setting/');
+
     /** @var \Civi\Core\SettingsManager $manager */
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
@@ -178,8 +166,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *  'name' setting's name
    *  'config_key' = the config key is different to the settings key - e.g. debug where there was a conflict
    *  'legacy_key' = rename from config or setting with this name
-   *
-   * _setItem() is the common logic shared by setItem() and setItems().
    *
    * @param array $params
    *   (required) An api formatted array of keys and values.
@@ -437,6 +423,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param bool $system
    * @param int $userID
    * @param string $keyField
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function setValueOption(
     $group,
@@ -446,6 +436,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $userID = NULL,
     $keyField = 'name'
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('refer docs for correct methods https://docs.civicrm.org/dev/en/latest/framework/setting/');
     if (empty($value)) {
       $optionValue = NULL;
     }

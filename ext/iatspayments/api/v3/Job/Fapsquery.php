@@ -65,9 +65,9 @@ function civicrm_api3_job_fapsquery($params) {
   }
   // CRM_Core_Error::debug_var('Payment Processors', $payment_processors);
   // get the settings: TODO allow more detailed configuration of which transactions to import?
-  $iats_settings = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_settings');
+  $iats_settings = Civi::settings()->get('iats_settings');
   // I also use the settings to keep track of the last time I imported journal data from iATS/FAPS.
-  $iats_faps_journal = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_faps_journal');
+  $iats_faps_journal = Civi::settings()->get('iats_faps_journal');
   /* initialize some values so I can report at the end */
   // count the number of records from each iats account analysed, and the number of each kind found ('action')
   $processed = array();
@@ -132,7 +132,7 @@ function civicrm_api3_job_fapsquery($params) {
   }
   // record the current date into the settings for next time.
   $iats_faps_journal = date('c'); // ISO 8601
-  CRM_Core_BAO_Setting::setItem($iats_faps_journal, 'iATS Payments Extension', 'iats_faps_journal');
+  Civi::settings()->set('iats_faps_journal', $iats_faps_journal);
   $message = '';
   foreach ($processed as $user_name => $p) {
     foreach ($p as $type_id => $count) {

@@ -123,16 +123,13 @@
  * Net_Curl                      1.2.5      BSD 3-cl.
  * Net_DIME                      1.0.1      BSD 3-cl.
  * Net_URL                       1.0.15     BSD 3-cl.
- * Net_UserAgent_Detect          2.5.1      PHP 2
  * Pager                         2.4.8      BSD 3-cl.
  * PEAR                          1.9.0      PHP 3.0
  * PHP_Beautifier                0.1.14     PHP 3.0
  * Services_Twilio               3.10.0     MIT
- * Structures_Graph              1.0.2      LGPL 2.1+
  * System_Command                1.0.6      PHP 2
  * Validate                      0.8.2      BSD 3-cl.
  * Validate_Finance              0.5.4      BSD 3-cl.
- * Validate_Finance_CreditCard   0.5.3      BSD 3-cl.      local changes
  * XML_RPC                       1.5.3      PHP 3
  * XML_Util                      1.2.1      BSD 3-cl.
  *
@@ -147,7 +144,6 @@
  * eZ Components  2009.1.2   BSD 3-cl.   http://ezcomponents.org/                                      local changes
  * html2text      0.9.1      GPL 3+      http://roundcube.net/download             copied from program/lib/Roundcube/rcube_html2text.php
  * reCAPTCHA      1.10       X11         http://recaptcha.net/
- * OpenFlashChart 2.0        LGPL        http://teethgrinder.co.uk/open-flash-chart-2/
  * Snappy         ??         X11         https://github.com/knplabs/snappy
  * Backbone       0.9.9      X11/MIT     http://backbonejs.org/
  * Backone Forms  c6920b3c89 X11/MIT     https://github.com/powmedia/backbone-forms

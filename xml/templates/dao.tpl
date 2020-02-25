@@ -1,7 +1,7 @@
 <?php
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  * Generated from {$table.sourceFile}
  * {$generated}
@@ -124,7 +124,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.export}
                       'export'    => {$field.export|strtoupper},
 {/if} {* field.export *}
-
+{if $field.contactType}
+                      'contactType' => {if $field.contactType == 'null'}NULL{else}'{$field.contactType}'{/if},
+{/if}
 {if $field.rule}
                       'rule'      => '{$field.rule}',
 {/if} {* field.rule *}

@@ -13,8 +13,8 @@ class CRM_Iats_Upgrader extends CRM_Iats_Upgrader_Base {
     try {
       $xmlfile = CRM_Core_Resources::singleton()->getPath('com.iatspayments.civicrm','info.xml');
       $myxml = simplexml_load_file($xmlfile);
-      $version = (string)$myxml->version;
-      CRM_Core_BAO_Setting::setItem($version, 'iATS Payments Extension', 'iats_extension_version');
+      $version = (string) $myxml->version;
+      Civi::settings()->set('iats_extension_version', $version);
     }
     catch (Exception $e) {
       // ignore
@@ -75,13 +75,13 @@ class CRM_Iats_Upgrader extends CRM_Iats_Upgrader_Base {
 
   public function upgrade_1_4_001() {
     // reset iATS Extension Version in the civicrm_setting table
-    CRM_Core_BAO_Setting::setItem(NULL, 'iATS Payments Extension', 'iats_extension_version');
+    Civi::settings()->set('iats_extension_version', NULL);
     return TRUE;
   }
 
   public function upgrade_1_5_000() {
     // reset iATS Extension Version in the civicrm_setting table
-    CRM_Core_BAO_Setting::setItem(NULL, 'iATS Payments Extension', 'iats_extension_version');
+    Civi::settings()->set('iats_extension_version', NULL);
     return TRUE;
   }
 

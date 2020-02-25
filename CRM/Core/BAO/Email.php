@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -70,6 +54,10 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Email', CRM_Utils_Array::value('id', $params), $params);
 
+    if (isset($params['is_bulkmail']) && $params['is_bulkmail'] === 'null') {
+      CRM_Core_Error::deprecatedFunctionWarning('It is not valid to set bulkmail to null, it is boolean');
+      $params['bulkmail'] = 0;
+    }
     $email = new CRM_Core_DAO_Email();
     $email->copyValues($params);
     if (!empty($email->email)) {
@@ -80,17 +68,17 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
 
     /*
      * since we're setting bulkmail for 1 of this contact's emails, first reset all their other emails to is_bulkmail false
-     *  We shouldn't not set the current email to false even though we
-     *  are about to reset it to avoid contaminating the changelog if logging is enabled
+     *  We shouldn't set the current email to false even though we
+     *  are about to reset it to avoid contaminating the changelog if logging is enabled.
      * (only 1 email address can have is_bulkmail = true)
      */
-    if ($email->is_bulkmail != 'null' && !empty($params['contact_id']) && !self::isMultipleBulkMail()) {
+    if ($email->is_bulkmail && !empty($params['contact_id']) && !self::isMultipleBulkMail()) {
       $sql = "
 UPDATE civicrm_email
 SET    is_bulkmail = 0
 WHERE  contact_id = {$params['contact_id']}
 ";
-      if ($hook == 'edit') {
+      if ($hook === 'edit') {
         $sql .= " AND id <> {$params['id']}";
       }
       CRM_Core_DAO::executeQuery($sql);

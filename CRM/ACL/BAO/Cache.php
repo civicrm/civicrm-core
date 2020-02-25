@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -39,7 +23,8 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
   public static $_cache = NULL;
 
   /**
-   * @param int $id
+   * Build an array of ACLs for a specific ACLed user
+   * @param int $id - contact_id of the ACLed user
    *
    * @return mixed
    */
@@ -91,8 +76,10 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
-   * @param array $cache
+   * Store ACLs for a specific user in the `civicrm_acl_cache` table
+   * @param int $id - contact_id of the ACLed user
+   * @param array $cache - key civicrm_acl.id - values is the details of the ACL.
+   *
    */
   public static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
@@ -109,7 +96,9 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
+   * Remove entries from civicrm_acl_cache for a specified ACLed user
+   * @param int $id - contact_id of the ACLed user
+   *
    */
   public static function deleteEntry($id) {
     if (self::$_cache &&
@@ -127,7 +116,9 @@ WHERE contact_id = %1
   }
 
   /**
-   * @param int $id
+   * Update ACL caches `civicrm_acl_cache` and `civicrm_acl_contact_cache for the specified ACLed user
+   * @param int $id - contact_id of ACLed user to update caches for.
+   *
    */
   public static function updateEntry($id) {
     // rebuilds civicrm_acl_cache
@@ -172,6 +163,15 @@ WHERE  modified_date IS NULL
     else {
       CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
     }
+  }
+
+  /**
+   * Remove Entries from `civicrm_acl_contact_cache` for a specific ACLed user
+   * @param int $userID - contact_id of the ACLed user
+   *
+   */
+  public static function deleteContactCacheEntry($userID) {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_acl_contact_cache WHERE user_id = %1", [1 => [$userID, 'Positive']]);
   }
 
 }

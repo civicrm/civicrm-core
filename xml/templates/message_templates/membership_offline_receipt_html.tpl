@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,15 +21,13 @@
 
   <tr>
    <td>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $formValues.receipt_text_signup}
      <p>{$formValues.receipt_text_signup|htmlize}</p>
     {elseif $formValues.receipt_text_renewal}
      <p>{$formValues.receipt_text_renewal|htmlize}</p>
     {else}
-     <p>{ts}Thank you for your support.{/ts}</p>
-    {/if}
-    {if ! $cancelled}
-     <p>{ts}Please print this receipt for your records.{/ts}</p>
+     <p>{ts}Thank you for this contribution.{/ts}</p>
     {/if}
    </td>
   </tr>
@@ -224,7 +222,7 @@
     <td>
      <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
 
-      {if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later }
+      {if $billingName}
        <tr>
         <th {$headerStyle}>
          {ts}Billing Name and Address{/ts}
@@ -238,7 +236,7 @@
        </tr>
       {/if}
 
-      {if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later}
+      {if $credit_card_type}
        <tr>
         <th {$headerStyle}>
          {ts}Credit Card Information{/ts}

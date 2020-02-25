@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -571,19 +555,13 @@ WHERE  id = %1";
    * This function is not really a BAO function so the location is misleading.
    *
    * @param CRM_Core_Form $form
-   * @param int $id
    *   Form entity id.
    * @param string $entityTable
    * @param bool $validOnly
    * @param int $priceSetId
    *   Price Set ID
-   *
-   * @return bool|false|int|null
    */
-  public static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
-    if (!$priceSetId) {
-      $priceSetId = self::getFor($entityTable, $id);
-    }
+  public static function initSet(&$form, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
 
     //check if price set is is_config
     if (is_numeric($priceSetId)) {
@@ -666,10 +644,7 @@ WHERE  id = %1";
       }
       $form->set('priceSetId', $form->_priceSetId);
       $form->set('priceSet', $form->_priceSet);
-
-      return $priceSetId;
     }
-    return FALSE;
   }
 
   /**
@@ -685,12 +660,9 @@ WHERE  id = %1";
    *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
    * @param $lineItem
    *   Line item array to be altered.
-   * @param string $component
-   *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
-   *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    * @param int $priceSetID
    */
-  public static function processAmount($fields, &$params, &$lineItem, $component = '', $priceSetID = NULL) {
+  public static function processAmount($fields, &$params, &$lineItem, $priceSetID = NULL) {
     // using price set
     $totalPrice = $totalTax = 0;
     // CRM-18701 Sometimes the amount in the price set is overridden by the amount on the form.
@@ -700,10 +672,6 @@ WHERE  id = %1";
     // set up (which allows a free form field).
     $amount_override = NULL;
 
-    if ($component) {
-      $autoRenew = [];
-      $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
-    }
     if ($priceSetID) {
       $priceFields = self::filterPriceFieldsFromParams($priceSetID, $params);
       if (count($priceFields) == 1) {
@@ -755,15 +723,6 @@ WHERE  id = %1";
             }
           }
           $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
-          if (
-            $component &&
-            // auto_renew exists and is empty in some workflows, which php treat as a 0
-            // and hence we explicitly check to see if auto_renew is numeric
-            isset($lineItem[$optionValueId]['auto_renew']) &&
-            is_numeric($lineItem[$optionValueId]['auto_renew'])
-          ) {
-            $autoRenew[$lineItem[$optionValueId]['auto_renew']] += $lineItem[$optionValueId]['line_total'];
-          }
           break;
 
         case 'Select':
@@ -775,13 +734,6 @@ WHERE  id = %1";
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
-          if (
-            $component &&
-            isset($lineItem[$optionValueId]['auto_renew']) &&
-            is_numeric($lineItem[$optionValueId]['auto_renew'])
-          ) {
-            $autoRenew[$lineItem[$optionValueId]['auto_renew']] += $lineItem[$optionValueId]['line_total'];
-          }
           break;
 
         case 'CheckBox':
@@ -792,13 +744,6 @@ WHERE  id = %1";
               $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);
             }
             $totalPrice += $lineItem[$optionId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionId]);
-            if (
-              $component &&
-              isset($lineItem[$optionId]['auto_renew']) &&
-              is_numeric($lineItem[$optionId]['auto_renew'])
-            ) {
-              $autoRenew[$lineItem[$optionId]['auto_renew']] += $lineItem[$optionId]['line_total'];
-            }
           }
           break;
       }
@@ -844,16 +789,6 @@ WHERE  id = %1";
 
     $params['amount'] = $totalPrice;
     $params['tax_amount'] = $totalTax;
-    if ($component) {
-      foreach ($autoRenew as $dontCare => $eachAmount) {
-        if (!$eachAmount) {
-          unset($autoRenew[$dontCare]);
-        }
-      }
-      if (count($autoRenew) > 1) {
-        $params['autoRenew'] = $autoRenew;
-      }
-    }
   }
 
   /**
@@ -1316,12 +1251,13 @@ WHERE  id = %1";
    *   The price set id.
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public static function checkPermission($sid) {
     if ($sid && self::eventPriceSetDomainID()) {
       $domain_id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $sid, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domain_id) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
     }
     return TRUE;

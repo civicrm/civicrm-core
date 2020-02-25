@@ -579,6 +579,25 @@ function _civicrm_event_data(&$data, $enabled) {
     'name' => 'register_date',
   ));
 
+  //BOOLEAN : IS test registration
+  $data['civicrm_participant']['is_test'] = array(
+    'title' => t('Test Registration?'),
+    'help' => t('Is this a test registration?'),
+    'field' => array(
+      'handler' => 'views_handler_field_boolean',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_boolean_operator',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   //BOOLEAN : IS SET TO PAY LATER
   $data['civicrm_participant']['is_pay_later'] = array(
     'title' => t('Is Pay Later'),

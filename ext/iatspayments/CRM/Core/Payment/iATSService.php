@@ -388,6 +388,10 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
         $request[$r] = htmlspecialchars($params[$p]);
       }
     }
+    // The "&" character is badly handled by the processor,
+    // so we sanitize it to "and"
+    $request['firstName'] = str_replace('&', ts('and'), $request['firstName']);
+    $request['lastName'] = str_replace('&', ts('and'), $request['lastName']);
     $request['creditCardExpiry'] = sprintf('%02d/%02d', $params['month'], ($params['year'] % 100));
     $request['total'] = sprintf('%01.2f', CRM_Utils_Rule::cleanMoney($params['amount']));
     // Place for ugly hacks.

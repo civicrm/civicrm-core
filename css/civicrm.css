@@ -1812,16 +1812,6 @@ input.crm-form-entityref {
 
 /* Set/alter ICONS */
 
-#crm-container div#printer-friendly {
-  float: right;
-  position: relative;
-  margin: -2em 0.5em 0 0;
-}
-/* For Joomla, margin 0 works correctly */
-#crm-container table#crm-content div#printer-friendly {
-  margin: 0;
-}
-
 #crm-container .order-icon {
   height: 15px;
   width: 10px;
@@ -2694,9 +2684,15 @@ div.crm-container form {
   width: 9em;
 }
 
-.crm-container input.dateplugin::placeholder,
-.crm-container input.crm-form-date::placeholder,
-.crm-container input.crm-form-time::placeholder {
+.crm-container input.crm-placeholder-icon::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
+}
+.crm-container input.crm-placeholder-icon::-ms-input-placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
+}
+.crm-container input.crm-placeholder-icon:-ms-input-placeholder {
   font-family: "FontAwesome";
   text-align: right;
 }
@@ -3659,9 +3655,11 @@ span.crm-status-icon {
 .crm-container.crm-public .select2-results {
   font-size: 14px;
 }
+.crm-container.crm-public .select2-container * {
+  box-sizing: content-box;
+}
 .crm-container.crm-public .select2-container .select2-choice {
   padding: 5px 5px 5px 8px;
-  height: 35px;
 }
 .crm-container.crm-public .select2-container-multi .select2-choices {
   padding: 4px;

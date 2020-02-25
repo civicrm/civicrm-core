@@ -76,7 +76,7 @@ Required vars: activitySet
           ui-jq="select2"
           ui-options="{dropdownAutoWidth: true}"
           ng-model="activity.default_assignee_relationship"
-          ng-options="option.value as option.label for option in defaultRelationshipTypeOptions"
+          ng-options="option.id as option.text for option in relationshipTypeOptions"
           required
         ></select>
       </p>

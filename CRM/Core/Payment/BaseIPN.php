@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -103,7 +87,15 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
-    // Check if the contribution exists
+    // make sure contact exists and is valid
+    $contact = new CRM_Contact_BAO_Contact();
+    $contact->id = $ids['contact'];
+    if (!$contact->find(TRUE)) {
+      CRM_Core_Error::debug_log_message("Could not find contact record: {$ids['contact']} in IPN request: " . print_r($input, TRUE));
+      echo "Failure: Could not find contact record: {$ids['contact']}<p>";
+      return FALSE;
+    }
+
     // make sure contribution exists and is valid
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
@@ -112,28 +104,6 @@ class CRM_Core_Payment_BaseIPN {
       echo "Failure: Could not find contribution record for {$contribution->id}<p>";
       return FALSE;
     }
-
-    // make sure contact exists and is valid
-    // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->id = $contribution->contact_id;
-    $contact->find(TRUE);
-    if ($contact->id != $ids['contact']) {
-      // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
-      CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
-      echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
-      $ids['contact'] = $contribution->contact_id;
-    }
-    if (!empty($ids['contributionRecur'])) {
-      $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
-      $contributionRecur->id = $ids['contributionRecur'];
-      if (!$contributionRecur->find(TRUE)) {
-        CRM_Core_Error::debug_log_message("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
-        echo "Failure: Could not find contribution recur record: {$ids['ContributionRecur']}<p>";
-        return FALSE;
-      }
-    }
-
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
 
@@ -487,15 +457,14 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $ids
    * @param array $objects
    * @param CRM_Core_Transaction $transaction
-   * @param bool $recur
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
+  public function completeTransaction(&$input, &$ids, &$objects, &$transaction) {
     $contribution = &$objects['contribution'];
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $recur, $contribution);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $contribution);
   }
 
   /**

@@ -354,7 +354,7 @@ function iats_civicrm_buildForm_CRM_Financial_Form_Payment(&$form) {
 
   // If enabled provide a way to set future contribution dates. 
   // Uses javascript to hide/reset unless they have recurring contributions checked.
-  $settings = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_settings');
+  $settings = Civi::settings()->get('iats_settings');
   if (!empty($settings['enable_public_future_recurring_start'])
     && $form->_paymentObject->supportsFutureRecurStartDate()
   ) {
@@ -478,7 +478,7 @@ function iats_civicrm_pre($op, $objectName, $objectId, &$params) {
   if (('ContributionRecur' == $objectName) && ('create' == $op || 'edit' == $op) && !empty($params['payment_processor_id'])) {
     if ($type = _iats_civicrm_is_iats($params['payment_processor_id'])) {
       if (!empty($params['next_sched_contribution_date'])) {
-        $settings = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_settings');
+        $settings = Civi::settings()->get('iats_settings');
         $allow_days = empty($settings['days']) ? array('-1') : $settings['days'];
         // Force one of the fixed days, and set the cycle_day at the same time.
         if (0 < max($allow_days)) {
@@ -500,7 +500,7 @@ function iats_civicrm_pre($op, $objectName, $objectId, &$params) {
 function iats_get_setting($key = NULL) {
   static $settings;
   if (empty($settings)) { 
-    $settings = CRM_Core_BAO_Setting::getItem('iATS Payments Extension', 'iats_settings');
+    $settings = Civi::settings()->get('iats_settings');
   }
   return empty($key) ?  $settings : (isset($settings[$key]) ? $settings[$key] : '');
 }

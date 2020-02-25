@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but   |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -92,28 +76,25 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       CRM_Utils_System::setTitle($title);
       return;
     }
-    $entityType = 'contribution';
     if ($this->_component == 'event') {
-      $entityType = 'participant';
       $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
-      $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
     }
     else {
       $this->_contributionId = $this->_id;
     }
 
-    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType);
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
+    $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
 
     $this->_amtPaid = $paymentDetails['paid'];
     $this->_amtTotal = $paymentDetails['total'];
 
-    if (!empty($paymentInfo['refund_due'])) {
-      $paymentAmt = $this->_refund = $paymentInfo['refund_due'];
+    if ($paymentAmt < 0) {
+      $this->_refund = $paymentAmt;
       $this->_paymentType = 'refund';
     }
-    elseif (!empty($paymentInfo['amount_owed'])) {
-      $paymentAmt = $this->_owed = $paymentInfo['amount_owed'];
+    elseif ($paymentAmt > 0) {
+      $this->_owed = $paymentAmt;
       $this->_paymentType = 'owed';
     }
     else {
@@ -260,11 +241,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
     }
 
-    $buttonName = $this->_refund ? 'Record Refund' : 'Record Payment';
+    $buttonName = $this->_refund ? ts('Record Refund') : ts('Record Payment');
     $this->addButtons([
       [
         'type' => 'upload',
-        'name' => ts('%1', [1 => $buttonName]),
+        'name' => $buttonName,
         'js' => $js,
         'isDefault' => TRUE,
       ],
@@ -288,7 +269,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    if ($self->_paymentType == 'owed' && $fields['total_amount'] > $self->_owed) {
+    if ($self->_paymentType == 'owed' && (int) $fields['total_amount'] > (int) $self->_owed) {
       $errors['total_amount'] = ts('Payment amount cannot be greater than owed amount');
     }
     if ($self->_paymentType == 'refund' && $fields['total_amount'] != abs($self->_refund)) {
@@ -341,6 +322,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard();
     }
 
+    // @todo we should clean $ on the form & pass in skipCleanMoney
     $trxnsData = $this->_params;
     if ($this->_paymentType == 'refund') {
       $trxnsData['total_amount'] = -$trxnsData['total_amount'];
@@ -391,8 +373,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->assign('displayName', $this->userDisplayName);
     }
 
-    $this->formatParamsForPaymentProcessor($this->_params);
-
     $this->_params['amount'] = $this->_params['total_amount'];
     // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
     // function to get correct amount level consistently. Remove setting of the amount level in
@@ -403,14 +383,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_params,
       $config->defaultCurrency
     );
-
-    if (!empty($this->_params['trxn_date'])) {
-      $this->_params['receive_date'] = $this->_params['trxn_date'];
-    }
-
-    if (empty($this->_params['receive_date'])) {
-      $this->_params['receive_date'] = date('YmdHis');
-    }
 
     if (empty($this->_params['invoice_id'])) {
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
@@ -454,16 +426,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         Civi::log()->error('Payment processor exception: ' . $e->getMessage());
         $urlParams = "action=add&cid={$this->_contactId}&id={$this->_contributionId}&component={$this->_component}&mode={$this->_mode}";
-        CRM_Core_Error::statusBounce(CRM_Utils_System::url($e->getMessage(), 'civicrm/payment/add', $urlParams));
+        CRM_Core_Error::statusBounce($e->getMessage(), CRM_Utils_System::url('civicrm/payment/add', $urlParams));
       }
     }
 
     if (!empty($result)) {
       $this->_params = array_merge($this->_params, $result);
-    }
-
-    if (empty($this->_params['receive_date'])) {
-      $this->_params['receive_date'] = $now;
     }
 
     $this->set('params', $this->_params);
@@ -498,18 +466,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
-      $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_contributionId, $entityType);
       $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
 
+      $paymentAmount = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
       $this->_amtPaid = $paymentDetails['paid'];
       $this->_amtTotal = $paymentDetails['total'];
 
-      if (!empty($paymentInfo['refund_due'])) {
-        $this->_refund = $paymentInfo['refund_due'];
+      if ($paymentAmount < 0) {
+        $this->_refund = $paymentAmount;
         $this->_paymentType = 'refund';
       }
-      elseif (!empty($paymentInfo['amount_owed'])) {
-        $this->_owed = $paymentInfo['amount_owed'];
+      elseif ($paymentAmount > 0) {
+        $this->_owed = $paymentAmount;
         $this->_paymentType = 'owed';
       }
     }

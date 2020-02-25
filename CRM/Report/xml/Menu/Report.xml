@@ -70,9 +70,4 @@
      <adminGroup>CiviReport</adminGroup>
      <icon>admin/small/report_list.gif</icon>
   </item>
-  <item>
-     <path>civicrm/report/chart</path>
-     <page_callback>CRM_Report_Form::uploadChartImage</page_callback>
-     <access_arguments>access CiviReport</access_arguments>
-  </item>
 </menu>

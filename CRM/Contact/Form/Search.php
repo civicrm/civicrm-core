@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -302,7 +286,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     self::setModeValues();
-    if (!array_key_exists($mode, self::$_modeValues)) {
+    // Note $mode might === FALSE because array_search above failed, e.g. for searchPane='location'
+    if (empty(self::$_modeValues[$mode])) {
       $mode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
 
@@ -652,6 +637,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'mailing_unsubscribe',
           'mailing_date_low',
           'mailing_date_high',
+          'mailing_job_start_date_low',
+          'mailing_job_start_date_high',
+          'mailing_job_start_date_relative',
         ] as $mailingFilter) {
           $type = 'String';
           if ($mailingFilter == 'mailing_id' &&
@@ -739,15 +727,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
        * values that potentially change the controller behavior. i.e. things
        * like totalCount etc
        */
-      $sortID = NULL;
-      if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-        $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-          $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-        );
-      }
       $controller = new CRM_Contact_Selector_Controller($selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
-        $sortID,
+        $this->getSortID(),
         CRM_Core_Action::VIEW, $this, CRM_Core_Selector_Controller::TRANSFER
       );
       $controller->setEmbedded(TRUE);
@@ -867,15 +849,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-      $sortID = NULL;
-      if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-        $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-          $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-        );
-      }
       $controller = new CRM_Contact_Selector_Controller($selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
-        $sortID,
+        $this->getSortID(),
         CRM_Core_Action::VIEW,
         $this,
         $output
@@ -903,15 +879,45 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Check Access for a component
+   * @param string $component
+   * @return bool
+   */
+  protected static function checkComponentAccess($component) {
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    if (!array_key_exists($component, $enabledComponents)) {
+      return FALSE;
+    }
+    return CRM_Core_Permission::access($component);
+  }
+
+  /**
    * Load metadata for fields on the form.
    *
    * @throws \CiviCRM_API3_Exception
    */
   protected function loadMetadata() {
-    // @todo - check what happens if the person does not have 'access civicontribute' - make sure they
     // can't by pass acls by passing search criteria in the url.
-    $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
-    $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
+    if (self::checkComponentAccess('CiviContribute')) {
+      $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviPledge')) {
+      $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviEvent')) {
+      $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviMember')) {
+      $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviGrant')) {
+      $this->addSearchFieldMetadata(['Grant' => CRM_Grant_BAO_Query::getSearchFieldMetadata()]);
+    }
+    if (self::checkComponentAccess('CiviCase')) {
+      $this->addSearchFieldMetadata(['Case' => CRM_Case_BAO_Query::getSearchFieldMetadata()]);
+    }
   }
 
 }

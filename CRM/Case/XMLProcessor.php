@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Case_XMLProcessor {
 
@@ -83,7 +67,7 @@ class CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  public function &allActivityTypes($indexName = TRUE, $all = FALSE) {
+  public static function &allActivityTypes($indexName = TRUE, $all = FALSE) {
     if (self::$activityTypes === NULL) {
       self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
     }
@@ -91,12 +75,10 @@ class CRM_Case_XMLProcessor {
   }
 
   /**
-   * Get all relationship type labels
-   *
-   * TODO: These should probably be names, but under legacy behavior this has
-   * been labels.
+   * Get all relationship type display labels (not machine names)
    *
    * @param bool $fromXML
+   *   TODO: This parameter is always FALSE now so no longer needed.
    *   Is this to be used for lookup of values from XML?
    *   Relationships are recorded in XML from the perspective of the non-client
    *   while relationships in the UI and everywhere else are from the
@@ -106,11 +88,24 @@ class CRM_Case_XMLProcessor {
    */
   public function &allRelationshipTypes($fromXML = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['reltypes'][$fromXML])) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
+      // Note this now includes disabled types too. The only place this
+      // function is being used is for comparison against a list, not
+      // displaying a dropdown list or something like that, so we need
+      // to include disabled.
+      $relationshipInfo = civicrm_api3('RelationshipType', 'get', [
+        'options' => ['limit' => 0],
+      ]);
 
       Civi::$statics[__CLASS__]['reltypes'][$fromXML] = [];
-      foreach ($relationshipInfo as $id => $info) {
+      foreach ($relationshipInfo['values'] as $id => $info) {
         Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_b_a'] = ($fromXML) ? $info['label_a_b'] : $info['label_b_a'];
+        /**
+         * Exclude if bidirectional
+         * (Why? I'm thinking this was for consistency with the dropdown
+         * in ang/crmCaseType.js where it would be needed to avoid seeing
+         * duplicates in the dropdown. Not sure if needed here but keeping
+         * as-is.)
+         */
         if ($info['label_b_a'] !== $info['label_a_b']) {
           Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_a_b'] = ($fromXML) ? $info['label_b_a'] : $info['label_a_b'];
         }

@@ -24,6 +24,8 @@ class Modules extends \CRM_Core_Page {
    * "civicrm/ajax/anulgar-modules" route).
    *
    * @deprecated
+   *
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     /**
@@ -56,7 +58,7 @@ class Modules extends \CRM_Core_Page {
         break;
 
       default:
-        \CRM_Core_Error::fatal("Unrecognized format");
+        throw new \CRM_Core_Exception("Unrecognized format");
     }
 
     \CRM_Utils_System::civiExit();

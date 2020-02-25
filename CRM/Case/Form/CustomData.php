@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -136,7 +120,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
       'subject' => $this->_customTitle . " : change data",
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'target_contact_id' => $this->_contactID,
-      'details' => json_encode($this->_defaults),
+      'details' => $this->formatCustomDataChangesForDetail($params),
       'activity_date_time' => date('YmdHis'),
     ];
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
@@ -148,6 +132,49 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
     $transaction->commit();
+  }
+
+  /**
+   * Format the custom data changes as [label]: [old value] => [new value]
+   *
+   * @param array $params New custom field values from form
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function formatCustomDataChangesForDetail($params) {
+    $formattedDetails = [];
+    foreach ($params as $customField => $newCustomValue) {
+      if (substr($customField, 0, 7) == 'custom_') {
+        if ($this->_defaults[$customField] == $newCustomValue) {
+          // Don't show values that did not change
+          continue;
+        }
+        // We need custom field ID from custom_XX_1
+        list($_, $customFieldId, $_) = explode('_', $customField);
+
+        if (!empty($customFieldId) && is_numeric($customFieldId)) {
+          // Got a custom field ID
+          $label = civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'label']);
+          $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
+            'custom_field_id' => $customFieldId,
+            'entity_id' => $this->_entityID,
+            'custom_field_value' => $this->_defaults[$customField],
+          ]);
+          $oldValue = $oldValue['values'][$customFieldId]['display'];
+          $newValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
+            'custom_field_id' => $customFieldId,
+            'entity_id' => $this->_entityID,
+            'custom_field_value' => $newCustomValue,
+          ]);
+          $newValue = $newValue['values'][$customFieldId]['display'];
+          $formattedDetails[] = $label . ': ' . $oldValue . ' => ' . $newValue;
+        }
+
+      }
+    }
+
+    return implode('<br/>', $formattedDetails);
   }
 
 }

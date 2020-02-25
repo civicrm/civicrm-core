@@ -5,58 +5,113 @@ Code Contributors for 5.x
 ************************************************
 
 CiviCRM - Coleman Watts, Tim Otten
-
-AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck
-Agileware - Francis Whittle, Justin Freeman, Pengyi Zhang
+a-n The Artists Information Company - William Mortada
+AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck, Tommy Bobo
+Agileware - Alok Patel, Francis Whittle, Justin Freeman, Pengyi Zhang
+Alexy Mikhailichenko
+Andrei Mondoc
 Andrew Thompson
-applicado
-Australian Greens - Seamus Lee
+Armadillo Sec Ltd - Daniel Compton
+Australian Greens - Andrew Cormick-Dockery, Seamus Lee
 Bastien Ho
 Blackfly Solutions - Alan Dixon
-Calibrate - Wannes De Roy
+Business & Code - Alain Benbassat
+Calbasi - Joan Cervan Andreu
+Calibrate - Wannes De Roy, Wouter Hechtermans
 Caltha - Tomasz Pietrzkowski
 CEDC - Laryn Kragt Bakker
+Centrale Organisatie van Voetbal Scheidsrechters (COVS) - Ed van Leeuwen
 Chris Burgess
-CiviCoop - Jaap Jansma
-CiviDesk - Sunil Pawar, Yashodha Chaku
+Christian Wach
+Circle Interactive - Dave Jenkins, Kirk Jackson, Martin Castle, Pradeep Nayak,
+    Reece Benson
+CiviCoop - Jaap Jansma, Klaas Eikelboom
+CiviDesk - Sunil Pawar, Sushant Paste, Yashodha Chaku
+CiviFirst - John Kirk
 CompuCorp - Camilo Rodriguez, Davi Alexandre, Debarshi Bhaumik, Michael Devery,
     Mukesh Ram, Omar Abu Hussein, René Olivo, Vinu Varshith Sekar
-Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
+Coop SymbioTIC - Guillaume Boudrias, Mathieu Lutfy, Samuel Vanhove
 Davis Media Access - Darrick Servis
+Deepak Srivastava
+Derek Lewis
+Digitalcourage - Detlev Sieber
+DignityUSA - Logan Bear
 Electronic Frontier Foundation - Mark Burdett
 eQuality Technology - Greg Rundlett
+Florian Kohrt
+Francesc Bassas i Bullich
+Frank J. Gómez
 Freeform Solutions - Herb van den Dool
-Fuzion - Jitendra Purohit
-Ginkgo Street Labs - Frank Gómez
+Fuzion - Jitendra Purohit, Luke Stewart
 Hossein Amin
-JMA Consulting - Joe Murray, Monish Deb
+Giant Rabbit - Peter Haight
+Giovanni Dalmas
+Greenpeace Central and Eastern Europe - Patrick Figel
+Guillaume Rischard
+iXiam - César Ramos, Luciano Spiegel, Vangelis Pantazis
+Jamie Tillman
+Jens Schuppe
+JMA Consulting - Edsel Lopez, Joe Murray, Monish Deb
 Johan Vervloet
 John Kingsnorth
+John Kyle Cronan
 Joinery - Allen Shaw
+Joost Fock
+Just Hope - Phil Morice Brubaker
 Kanzu Code - Carl Andrew Lema
+Ken West
+Kilakwa Associates - smaen123
 Kompetenzzentrum Technik-Diversity-Chancengleichheit - Niels Heinemann
+Korlon - Stuart Gaston
 Left Join Labs - Sean Madsen
+Lemniscus - Noah Miller
 Lighthouse Design and Consulting - Brian Shaughnessy
+Liquid Web, Inc. - Jason Gillman Jr.
 Łukasz Krutul
+Marcus J Wilson
+Mark Westergaard
 Megaphone Technology Consulting - Jon Goldberg
+MillerTech - Chamil Wijesooriya
+MJCO - Mikey O'Toole
 MJW Consulting - Matthew Wire
+Mountev Ltd
 myDropWizard - David Snopek
 Naomi Rosenberg
+Nicol Wistreich
 Olivier Tétard
+Onyemenam Ndubuisi
 OSSeed Technologies - Madhavi Malgaonkar
 Oxfam Germany - Thomas Schüttler, Yuliyana Liyana
-Pradeep Nayak
+Palante Technology Cooperative - Morgan Robinson
+PeaceWorks Technology Solutions - Martin Hansen
+PHD Computer Consultants - Chris Cant
 Progressive Technology Project - Jamie McClelland
+Ray Wright
 Richard van Oosterhout
 Romain Thouvenin
+Samson Alajede
+Selwyn Tang
+Semper IT - Karin Gerritsen
+Skvare - Mark Hanna
 Squiffle Consulting - Aidan Saunders
-Systopia - Björn Endres
+Stephen Palmstrom
+Steve Ellis
+Systopia - Björn Endres, Thomas Leichtfuss
 Tadpole Collective - Kevin Cristiano
+Tanya Bouman
+Team Expansion - Greg Harris
 Third Sector Design - Michael McAndrew
+Thomas Mannell
+Timbsoft Technologies - Tunbola Ogunwande
+Tiotsop Gerest
 Tom Bloor
-Wikimedia Foundation - Eileen McNaughton
+Veda Consulting - Mathavan Veeramuthu
+Wikimedia Foundation - Eileen McNaughton, Elliott Eggleston
 Wildsight - Lars Sanders-Green
 Will Long
+GitHub users 19ATF77, applicado, avall-llovera, JGaunt, marcineq, maynardsmith,
+    mmyriam, skherraz, tapash, yalh
+
 
 ************************************************
 Key Contributors and Sponsors for 4.7

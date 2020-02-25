@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be usefusul, but   |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -152,6 +136,11 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     return $defaults;
   }
 
+  /**
+   * Build form.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function buildQuickForm() {
 
     $statuses = CRM_Event_PseudoConstant::participantStatus();
@@ -168,7 +157,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     //retrieve custom information
     $this->_values = [];
-    CRM_Event_Form_Registration::initEventFee($this, $event['id']);
+
+    CRM_Event_Form_Registration::initEventFee($this, $event['id'], $this->_action !== CRM_Core_Action::UPDATE);
     CRM_Event_Form_Registration_Register::buildAmount($this, TRUE);
 
     if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $this->_values))) {
@@ -233,6 +223,12 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     return $errors;
   }
 
+  /**
+   * Post process form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
