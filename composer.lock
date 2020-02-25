@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "582096c249c04484659162a3e90f7fbd",
+    "content-hash": "d3e774ecb53f47ad1c02f3c570d4aabb",
     "packages": [
         {
             "name": "cache/integration-tests",
@@ -166,16 +166,16 @@
         },
         {
             "name": "civicrm/composer-downloads-plugin",
-            "version": "v2.0.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/composer-downloads-plugin.git",
-                "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d"
+                "reference": "8722bc7d547315be39397a3078bb51ee053ca269"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
-                "reference": "869b7a12f57b2d912f0ea77d5c33c1518b8de27d",
+                "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/8722bc7d547315be39397a3078bb51ee053ca269",
+                "reference": "8722bc7d547315be39397a3078bb51ee053ca269",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 }
             ],
             "description": "Composer plugin for downloading additional files within any composer package.",
-            "time": "2019-08-22T10:56:51+00:00"
+            "time": "2019-08-28T00:33:51+00:00"
         },
         {
             "name": "cweagans/composer-patches",
@@ -2380,7 +2380,9 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
+                "reference": null,
+                "shasum": null
             },
             "require": {
                 "php": ">=5.3.0"
