@@ -239,7 +239,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
 
       if (CRM_Core_Permission::access('CiviCase')) {
         self::$_tasks[self::ADD_TO_CASE] = array(
-          'title' => 'Add to case as role',
+          'title' => ts('Add to case as role'),
           'class' => 'CRM_Case_Form_AddToCaseAsRole',
           'result' => FALSE,
         );
