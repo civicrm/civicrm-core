@@ -22,7 +22,6 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Core_Form $form
-   * @param $activityIds
    *
    * @return void
    */
