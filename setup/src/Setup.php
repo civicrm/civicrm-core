@@ -41,6 +41,11 @@ class Setup {
    */
   protected $log;
 
+  /**
+   * @var string|null
+   */
+  protected $pendingAction = NULL;
+
   // ----- Static initialization -----
 
   /**
@@ -189,8 +194,18 @@ class Setup {
    * @return \Civi\Setup\Event\InstallFilesEvent
    */
   public function installFiles() {
-    $event = new InstallFilesEvent($this->getModel());
-    return $this->getDispatcher()->dispatch('civi.setup.installFiles', $event);
+    if ($this->pendingAction !== NULL) {
+      throw new InitException(sprintf("Cannot begin action %s. Already executing %s.", __FUNCTION__, $this->pendingAction));
+    }
+    $this->pendingAction = __FUNCTION__;
+
+    try {
+      $event = new InstallFilesEvent($this->getModel());
+      return $this->getDispatcher()->dispatch('civi.setup.installFiles', $event);
+    }
+    finally {
+      $this->pendingAction = NULL;
+    }
   }
 
   /**
@@ -199,8 +214,18 @@ class Setup {
    * @return \Civi\Setup\Event\InstallDatabaseEvent
    */
   public function installDatabase() {
-    $event = new InstallDatabaseEvent($this->getModel());
-    return $this->getDispatcher()->dispatch('civi.setup.installDatabase', $event);
+    if ($this->pendingAction !== NULL) {
+      throw new InitException(sprintf("Cannot begin action %s. Already executing %s.", __FUNCTION__, $this->pendingAction));
+    }
+    $this->pendingAction = __FUNCTION__;
+
+    try {
+      $event = new InstallDatabaseEvent($this->getModel());
+      return $this->getDispatcher()->dispatch('civi.setup.installDatabase', $event);
+    }
+    finally {
+      $this->pendingAction = NULL;
+    }
   }
 
   /**
@@ -209,8 +234,18 @@ class Setup {
    * @return \Civi\Setup\Event\UninstallFilesEvent
    */
   public function uninstallFiles() {
-    $event = new UninstallFilesEvent($this->getModel());
-    return $this->getDispatcher()->dispatch('civi.setup.uninstallFiles', $event);
+    if ($this->pendingAction !== NULL) {
+      throw new InitException(sprintf("Cannot begin action %s. Already executing %s.", __FUNCTION__, $this->pendingAction));
+    }
+    $this->pendingAction = __FUNCTION__;
+
+    try {
+      $event = new UninstallFilesEvent($this->getModel());
+      return $this->getDispatcher()->dispatch('civi.setup.uninstallFiles', $event);
+    }
+    finally {
+      $this->pendingAction = NULL;
+    }
   }
 
   /**
@@ -219,8 +254,18 @@ class Setup {
    * @return \Civi\Setup\Event\UninstallDatabaseEvent
    */
   public function uninstallDatabase() {
-    $event = new UninstallDatabaseEvent($this->getModel());
-    return $this->getDispatcher()->dispatch('civi.setup.uninstallDatabase', $event);
+    if ($this->pendingAction !== NULL) {
+      throw new InitException(sprintf("Cannot begin action %s. Already executing %s.", __FUNCTION__, $this->pendingAction));
+    }
+    $this->pendingAction = __FUNCTION__;
+
+    try {
+      $event = new UninstallDatabaseEvent($this->getModel());
+      return $this->getDispatcher()->dispatch('civi.setup.uninstallDatabase', $event);
+    }
+    finally {
+      $this->pendingAction = NULL;
+    }
   }
 
   /**
@@ -254,6 +299,15 @@ class Setup {
    */
   public function getLog() {
     return $this->log;
+  }
+
+  /**
+   * @return NULL|string
+   *   The name of a pending installation action, or NULL if none are active.
+   *   Ex: 'installDatabase', 'uninstallFiles'
+   */
+  public function getPendingAction() {
+    return $this->pendingAction;
   }
 
 }
