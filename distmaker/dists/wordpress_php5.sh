@@ -19,6 +19,7 @@ dm_reset_dirs "$TRG" "$TRG/civicrm/civicrm"
 cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.config.php
 dm_generate_version "$TRG/civicrm/civicrm/civicrm-version.php" Wordpress
 dm_install_core "$SRC" "$TRG/civicrm/civicrm"
+dm_install_coreext "$SRC" "$TRG/civicrm/civicrm" $(dm_core_exts)
 dm_install_packages "$SRC/packages" "$TRG/civicrm/civicrm/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/civicrm/civicrm/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/civicrm/civicrm/bower_components"
@@ -31,7 +32,7 @@ ${DM_ZIP:-zip} -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wordpress.zip *
 
 # gen wporg tarball
 touch "$TRG/civicrm/civicrm/.use-civicrm-setup"
-cp "$TRG/civicrm/civicrm/vendor/civicrm/civicrm-setup/plugins/blocks/opt-in.disabled.php" "$TRG/civicrm/civicrm/vendor/civicrm/civicrm-setup/plugins/blocks/opt-in.civi-setup.php"
+cp "$TRG/civicrm/civicrm/setup/plugins/blocks/opt-in.disabled.php" "$TRG/civicrm/civicrm/setup/plugins/blocks/opt-in.civi-setup.php"
 cd "$TRG"
 ${DM_ZIP:-zip} -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wporg.zip *
 
