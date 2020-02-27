@@ -15,12 +15,11 @@
  *   create, get, delete or some special action name.
  * @param array $params
  *   array to be passed to function
- * @param null $extra
  *
  * @return array|int
  */
-function civicrm_api(string $entity, string $action, array $params, $extra = NULL) {
-  return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params, $extra);
+function civicrm_api(string $entity, string $action, array $params) {
+  return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
 }
 
 /**
