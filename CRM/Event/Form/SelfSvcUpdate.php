@@ -137,52 +137,10 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_contact_email = $email;
 
     $details = CRM_Event_BAO_Participant::participantDetails($this->_participant_id);
-    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
     $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_participant_id, 'contribution_id', 'participant_id');
     $this->assign('contributionId', $contributionId);
-    $query = "
-      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id, civicrm_event.start_date
-      FROM civicrm_participant cp
-      LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
-      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
-      LEFT JOIN civicrm_event ON civicrm_event.id = cp.event_id
-      WHERE cp.id = {$this->_participant_id}";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $details['status']  = $dao->status;
-      $details['role'] = $dao->role;
-      $details['fee_level'] = trim($dao->fee_level, CRM_Core_DAO::VALUE_SEPARATOR);
-      $details['fee_amount'] = $dao->fee_amount;
-      $details['register_date'] = $dao->register_date;
-      $details['event_start_date'] = $dao->start_date;
-    }
-    //verify participant status is still Registered
-    if ($details['status'] !== 'Registered') {
-      $status = "You cannot transfer or cancel your registration for " . $this->_event_title . ' as you are not currently registered for this event.';
-      CRM_Core_Session::setStatus($status, ts('Sorry'), 'alert');
-      CRM_Utils_System::redirect($url);
-    }
-    $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $this->_event_id;
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $time_limit  = $dao->time;
-      $start_date = $dao->start;
-    }
-    $start_time = new Datetime($start_date);
-    $timenow = new Datetime();
-    if (!$this->isBackoffice && !empty($start_time) && $start_time < $timenow) {
-      $status = ts('Registration for this event cannot be cancelled or transferred once the event has begun. Contact the event organizer if you have questions.');
-      CRM_Core_Error::statusBounce($status, $url, ts('Sorry'));
-    }
-    if (!$this->isBackoffice && !empty($time_limit) && $time_limit > 0) {
-      $interval = $timenow->diff($start_time);
-      $days = $interval->format('%d');
-      $hours   = $interval->format('%h');
-      if ($hours <= $time_limit && $days < 1) {
-        $status = ts("Registration for this event cannot be cancelled or transferred less than %1 hours prior to the event's start time. Contact the event organizer if you have questions.", [1 => $time_limit]);
-        CRM_Core_Error::statusBounce($status, $url, ts('Sorry'));
-      }
-    }
+    $selfServiceDetails = CRM_Event_BAO_Participant::getSelfServiceEligibility($this->_participant_id, $url, $this->isBackoffice);
+    $details = array_merge($details, $selfServiceDetails);
     $this->assign('details', $details);
     $this->selfsvcupdateUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate', "reset=1&id={$this->_participant_id}&id=0");
     $this->selfsvcupdateText = ts('Update');

@@ -164,23 +164,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_contact_email = $email;
 
     $details = CRM_Event_BAO_Participant::participantDetails($this->_from_participant_id);
-    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
-    $query = "
-      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, civicrm_event.start_date
-      FROM civicrm_participant cp
-      LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
-      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
-      LEFT JOIN civicrm_event ON civicrm_event.id = cp.event_id
-      WHERE cp.id = {$this->_from_participant_id}";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $details['status']  = $dao->status;
-      $details['role'] = $dao->role;
-      $details['fee_level']   = $dao->fee_level;
-      $details['fee_amount'] = $dao->fee_amount;
-      $details['register_date'] = $dao->register_date;
-      $details['event_start_date'] = $dao->start_date;
-    }
+    $selfServiceDetails = CRM_Event_BAO_Participant::getSelfServiceEligibility($this->_from_participant_id, $url, $this->isBackoffice);
+    $details = array_merge($details, $selfServiceDetails);
     $this->assign('details', $details);
     //This participant row will be cancelled.  Get line item(s) to cancel
     $this->selfsvctransferUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate',
