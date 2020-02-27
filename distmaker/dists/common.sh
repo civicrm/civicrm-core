@@ -89,6 +89,26 @@ function dm_install_core() {
   set -e
 }
 
+## Copy built-in extensions
+## usage: dm_install_core <core_repo_path> <to_path> <ext-dirs...>
+function dm_install_coreext() {
+  local repo="$1"
+  local to="$2"
+  shift
+  shift
+
+  for relext in "$@" ; do
+    [ ! -d "$to/$relext" ] && mkdir -p "$to/$relext"
+    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/$relext/./" "$to/$relext/./"
+  done
+}
+
+## Get a list of default/core extension directories (space-delimited)
+## reldirs=$(dm_core_exts)
+function dm_core_exts() {
+  echo ext/sequentialcreditnotes
+}
+
 ## Copy all packages
 ## usage: dm_install_packages <packages_repo_path> <to_path>
 function dm_install_packages() {

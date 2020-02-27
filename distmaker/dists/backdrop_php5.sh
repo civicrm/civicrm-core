@@ -19,6 +19,7 @@ dm_reset_dirs "$TRG"
 cp $SRC/backdrop/civicrm.config.php.backdrop $TRG/civicrm.config.php
 dm_generate_version "$TRG/civicrm-version.php" Backdrop
 dm_install_core "$SRC" "$TRG"
+dm_install_coreext "$SRC" "$TRG" $(dm_core_exts)
 dm_install_packages "$SRC/packages" "$TRG/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
