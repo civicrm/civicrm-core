@@ -1188,19 +1188,6 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
             }
           }
         }
-        foreach (['select_tables', 'where_tables'] as $value) {
-          if (preg_match('/contribution_type/', $dao->$value)) {
-            $tempValue = unserialize($dao->$value);
-            if (array_key_exists('civicrm_contribution_type', $tempValue)) {
-              $tempValue['civicrm_financial_type'] = $tempValue['civicrm_contribution_type'];
-              unset($tempValue['civicrm_contribution_type']);
-            }
-            $saveDao->$value = serialize($tempValue);
-          }
-        }
-        if (preg_match('/contribution_type/', $dao->where_clause)) {
-          $saveDao->where_clause = preg_replace('/contribution_type/', 'financial_type', $dao->where_clause);
-        }
       }
       $saveDao->form_values = serialize($formValues);
 
