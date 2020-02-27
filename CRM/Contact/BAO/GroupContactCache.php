@@ -456,6 +456,8 @@ WHERE  id IN ( $groupIDs )
    *   The smart group that needs to be loaded.
    * @param bool $force
    *   Should we force a search through.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function load(&$group, $force = FALSE) {
     $groupID = $group->id;
@@ -483,59 +485,11 @@ WHERE  id IN ( $groupIDs )
         CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
       }
 
-      $returnProperties = [];
-      if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
-        $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-        $returnProperties = CRM_Core_BAO_Mapping::returnProperties($fv);
-      }
-
       if (isset($ssParams['customSearchID'])) {
-        // if custom search
-
-        // we split it up and store custom class
-        // so temp tables are not destroyed if they are used
-        // hence customClass is defined above at top of function
-        $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
-        $searchSQL = $customClass->contactIDs();
-        $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
-        if (!strstr($searchSQL, 'WHERE')) {
-          $searchSQL .= " WHERE ( 1 ) ";
-        }
-        $sql = [
-          'select' => substr($searchSQL, 0, strpos($searchSQL, 'FROM')),
-          'from' => substr($searchSQL, strpos($searchSQL, 'FROM')),
-        ];
+        $sql = self::getCustomSearchSQL($savedSearchID, $ssParams);
       }
       else {
-        $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-        // CRM-17075 using the formValues in this way imposes extra logic and complexity.
-        // we have the where_clause and where tables stored in the saved_search table
-        // and should use these rather than re-processing the form criteria (which over-works
-        // the link between the form layer & the query layer too).
-        // It's hard to think of when you would want to use anything other than return
-        // properties = array('contact_id' => 1) here as the point would appear to be to
-        // generate the list of contact ids in the group.
-        // @todo review this to use values in saved_search table (preferably for 4.8).
-        $query
-          = new CRM_Contact_BAO_Query(
-            $ssParams, $returnProperties, NULL,
-            FALSE, FALSE, 1,
-            TRUE, TRUE,
-            FALSE,
-            CRM_Utils_Array::value('display_relationship_type', $formValues),
-            CRM_Utils_Array::value('operator', $formValues, 'AND')
-          );
-        $query->_useDistinct = FALSE;
-        $query->_useGroupBy = FALSE;
-        $sqlParts = $query->getSearchSQLParts(
-            0, 0, NULL,
-            FALSE, FALSE,
-            FALSE, TRUE
-          );
-        $sql = [
-          'select' => $sqlParts['select'],
-          'from' => "{$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}",
-        ];
+        $sql = self::getQueryObjectSQL($savedSearchID, $ssParams);
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
       $sql['from'] .= " AND contact_a.id NOT IN (
@@ -773,6 +727,82 @@ ORDER BY   gc.contact_id, g.children
       WHERE id = %1", [
         1 => [$groupID, 'Positive'],
       ]);
+  }
+
+  /**
+   * Get sql from a custom search.
+   *
+   * @param int $savedSearchID
+   * @param array $ssParams
+   *
+   * @return array
+   * @throws \Exception
+   */
+  protected static function getCustomSearchSQL($savedSearchID, array $ssParams): array {
+    // if custom search
+
+    // we split it up and store custom class
+    // so temp tables are not destroyed if they are used
+    // hence customClass is defined above at top of function
+    $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
+    $searchSQL = $customClass->contactIDs();
+    $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
+    if (strpos($searchSQL, 'WHERE') === FALSE) {
+      $searchSQL .= " WHERE ( 1 ) ";
+    }
+    $sql = [
+      'select' => substr($searchSQL, 0, strpos($searchSQL, 'FROM')),
+      'from' => substr($searchSQL, strpos($searchSQL, 'FROM')),
+    ];
+    return $sql;
+  }
+
+  /**
+   * Get array of sql from a saved query object group.
+   *
+   * @param int $savedSearchID
+   * @param array $ssParams
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function getQueryObjectSQL($savedSearchID, array $ssParams): array {
+    $returnProperties = NULL;
+    if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
+      $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+      $returnProperties = CRM_Core_BAO_Mapping::returnProperties($fv);
+    }
+    $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+    // CRM-17075 using the formValues in this way imposes extra logic and complexity.
+    // we have the where_clause and where tables stored in the saved_search table
+    // and should use these rather than re-processing the form criteria (which over-works
+    // the link between the form layer & the query layer too).
+    // It's hard to think of when you would want to use anything other than return
+    // properties = array('contact_id' => 1) here as the point would appear to be to
+    // generate the list of contact ids in the group.
+    // @todo review this to use values in saved_search table (preferably for 4.8).
+    $query
+      = new CRM_Contact_BAO_Query(
+      $ssParams, $returnProperties, NULL,
+      FALSE, FALSE, 1,
+      TRUE, TRUE,
+      FALSE,
+      CRM_Utils_Array::value('display_relationship_type', $formValues),
+      CRM_Utils_Array::value('operator', $formValues, 'AND')
+    );
+    $query->_useDistinct = FALSE;
+    $query->_useGroupBy = FALSE;
+    $sqlParts = $query->getSearchSQLParts(
+      0, 0, NULL,
+      FALSE, FALSE,
+      FALSE, TRUE
+    );
+    $sql = [
+      'select' => $sqlParts['select'],
+      'from' => "{$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}",
+    ];
+    return $sql;
   }
 
 }
