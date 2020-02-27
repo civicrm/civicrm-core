@@ -21,6 +21,10 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   public function teardown() {
+    global $dbLocale;
+    if ($dbLocale) {
+      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    }
     $this->financialAccountDelete('Donations');
   }
 
@@ -89,9 +93,28 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method del()
+   * Data provider for testGitLabIssue1108
+   *
+   * First we run it without multiLingual mode, then with.
+   *
+   * This is because we test table names, which may have been translated in a
+   * multiLingual context.
+   *
    */
-  public function testDel() {
+  public function multiLingual() {
+    return [[0], [1]];
+  }
+
+  /**
+   * Check method del()
+   *
+   * @dataProvider multiLingual
+   */
+  public function testDel($isMultiLingual) {
+    if ($isMultiLingual) {
+      $this->enableMultilingual();
+      CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
+    }
     $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -100,10 +123,20 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $ids = [];
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
 
+    if ($isMultiLingual) {
+      global $dbLocale;
+      $dbLocale = '_fr_FR';
+    }
     CRM_Financial_BAO_FinancialType::del($financialType->id);
     $params = ['id' => $financialType->id];
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
+    $results = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_entity_financial_account WHERE entity_id = %1", [1 => [$financialType->id, 'Positive']])->fetchAll();
+    $this->assertEquals(empty($results), TRUE, 'Assert related entity financial account has been deleted as well');
+    if ($isMultiLingual) {
+      global $dbLocale;
+      $dbLocale = '_en_US';
+    }
   }
 
   /**
