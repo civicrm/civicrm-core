@@ -457,7 +457,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $insertCols = '';
     $insertQuery = "INSERT INTO {$this->_tempTableName} ( " . implode(',', array_merge(array_keys($this->_columnHeaders), array_keys($unselectedColumns))) . " )
 {$sql}";
+    CRM_Core_DAO::disableFullGroupByMode();
     CRM_Core_DAO::executeQuery($insertQuery);
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     // now build the query for duration sum
     $this->activityDurationFrom();
