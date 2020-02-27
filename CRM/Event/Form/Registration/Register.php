@@ -398,25 +398,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     if ($this->_values['event']['is_monetary']) {
-      $optAttributes = [];
-      foreach ($pps as $ppKey => $ppval) {
-        if ($ppKey > 0) {
-          $optAttributes[$ppKey]['class'] = 'payment_processor_' . strtolower($this->_paymentProcessors[$ppKey]['payment_processor_type']);
-        }
-        else {
-          $optAttributes[$ppKey]['class'] = 'payment_processor_paylater';
-        }
-      }
-      if (count($pps) > 1) {
-        $this->addRadio('payment_processor_id', ts('Payment Method'), $pps,
-          NULL, "&nbsp;", FALSE, $optAttributes
-        );
-      }
-      elseif (!empty($pps)) {
-        $ppKeys = array_keys($pps);
-        $currentPP = array_pop($ppKeys);
-        $this->addElement('hidden', 'payment_processor_id', $currentPP);
-      }
+      $this->addPaymentProcessorFieldsToForm();
     }
 
     $this->addElement('hidden', 'bypass_payment', NULL, ['id' => 'bypass_payment']);
