@@ -34,7 +34,7 @@ class Request {
     switch ($params['version'] ?? NULL) {
       case 3:
         return [
-          'id' => self::$nextId++,
+          'id' => self::getNextId(),
           'version' => 3,
           'params' => $params,
           'fields' => NULL,

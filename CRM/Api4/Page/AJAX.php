@@ -84,13 +84,23 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     }
     catch (Exception $e) {
       http_response_code(500);
-      $response = [
-        'error_code' => $e->getCode(),
-      ];
+      $response = [];
       if (CRM_Core_Permission::check('view debug output')) {
+        $response['error_code'] = $e->getCode();
         $response['error_message'] = $e->getMessage();
-        if (!empty($params['debug']) && \Civi::settings()->get('backtrace')) {
-          $response['debug']['backtrace'] = $e->getTrace();
+        if (!empty($params['debug'])) {
+          if (method_exists($e, 'getUserInfo')) {
+            $response['debug']['info'] = $e->getUserInfo();
+          }
+          $cause = method_exists($e, 'getCause') ? $e->getCause() : $e;
+          if ($cause instanceof \DB_Error) {
+            $response['debug']['db_error'] = \DB::errorMessage($cause->getCode());
+            $response['debug']['sql'][] = $cause->getDebugInfo();
+          }
+          if (\Civi::settings()->get('backtrace')) {
+            // Would prefer getTrace() but that causes json_encode to bomb
+            $response['debug']['backtrace'] = $e->getTraceAsString();
+          }
         }
       }
     }
