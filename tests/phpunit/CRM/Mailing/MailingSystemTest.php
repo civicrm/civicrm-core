@@ -160,6 +160,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     // (If this behaviour ever changes we throw an exception.)
     if ($isMultiLingual) {
       $this->enableMultilingual();
+      CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
     }
     $max_group_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_group");
     $max_mailing_id = 0;
@@ -295,6 +296,31 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     $this->assertNotEmpty($groups, "We should have received an array.");
     $this->assertEquals([$group_1], array_keys($groups),
       "We should have received an array with our group 1 in it.");
+
+    if ($isMultiLingual) {
+      global $dbLocale;
+      $dbLocale = '_fr_FR';
+      // Now test unsubscribe groups.
+      $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing(
+        $matches[1],
+        $matches[2],
+        $matches[3],
+        TRUE
+      );
+
+      // We expect that our group_1 was found.
+      $this->assertEquals(['groups' => [$group_1], 'baseGroups' => []], $found);
+
+      // We *should* get an array with just our $group_1 since this is the only group
+      // that we have included.
+      // $group_2 was only used to exclude people.
+      // $group_3 has nothing to do with this mailing and should not be there.
+      $this->assertNotEmpty($groups, "We should have received an array.");
+      $this->assertEquals([$group_1], array_keys($groups),
+        "We should have received an array with our group 1 in it.");
+      global $dbLocale;
+      $dbLocale = '_en_US';
+    }
   }
 
 }

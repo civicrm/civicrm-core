@@ -128,10 +128,8 @@ WHERE  email = %2
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
 
     $groupObject = new CRM_Contact_BAO_Group();
-    $groupTableName = $groupObject->getTableName();
 
     $mailingObject = new CRM_Mailing_BAO_Mailing();
-    $mailingTableName = $mailingObject->getTableName();
 
     // We need a mailing id that points to the mailing that defined the recipients.
     // This is usually just the passed-in mailing_id, however in the case of AB
@@ -175,7 +173,8 @@ WHERE  email = %2
     $mailings = [];
 
     while ($do->fetch()) {
-      if ($do->entity_table === $groupTableName) {
+      // @todo this is should be a temporary measure until we stop storing the translated table name in the database
+      if (substr($do->entity_table, 0, 13) === 'civicrm_group') {
         if ($do->group_type == 'Base') {
           $base_groups[$do->entity_id] = NULL;
         }
@@ -183,7 +182,8 @@ WHERE  email = %2
           $groups[$do->entity_id] = NULL;
         }
       }
-      elseif ($do->entity_table === $mailingTableName) {
+      elseif (substr($do->entity_table, 0, 15) === 'civicrm_mailing') {
+        // @todo this is should be a temporary measure until we stop storing the translated table name in the database
         $mailings[] = $do->entity_id;
       }
     }
@@ -202,10 +202,12 @@ WHERE  email = %2
       $mailings = [];
 
       while ($do->fetch()) {
-        if ($do->entity_table === $groupTableName) {
+        // @todo this is should be a temporary measure until we stop storing the translated table name in the database
+        if (substr($do->entity_table, 0, 13) === 'civicrm_group') {
           $groups[$do->entity_id] = TRUE;
         }
-        elseif ($do->entity_table === $mailing) {
+        elseif (substr($do->entity_table, 0, 15) === 'civicrm_mailing') {
+          // @todo this is should be a temporary measure until we stop storing the translated table name in the database
           $mailings[] = $do->entity_id;
         }
       }
