@@ -198,6 +198,10 @@ SELECT f.id, f.label, f.data_type,
     }
 
     foreach (array_keys($this->_ids) as $id) {
+      // Ignore any custom field ids within the ids array that are not present in the fields array.
+      if (empty($this->_fields[$id])) {
+        continue;
+      }
       $field = $this->_fields[$id];
 
       if ($this->_contactSearch && $field['search_table'] === 'contact_a') {
