@@ -37,15 +37,17 @@
  *
  * @param array $params
  *   Associative array of property name-value pairs to insert in new saved search.
- * @example SavedSearch/Create.php Std create example.
+ *
  * @return array
  *   api result array
  *   {@getfields saved_search_create}
+ *
+ * @throws \API_Exception
+ *
+ * @example SavedSearch/Create.php Std create example.
  * @access public
  */
 function civicrm_api3_saved_search_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, ['form_values', 'where_clause']);
-
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'SavedSearch');
   _civicrm_api3_saved_search_result_cleanup($result);
   return $result;
@@ -56,6 +58,7 @@ function civicrm_api3_saved_search_create($params) {
  */
 function _civicrm_api3_saved_search_create_spec(&$fields) {
   $fields['form_values']['api.aliases'][] = 'formValues';
+  $fields['form_values']['api.required'] = TRUE;
 }
 
 /**
@@ -64,10 +67,15 @@ function _civicrm_api3_saved_search_create_spec(&$fields) {
  * @param array $params
  *   Associative array of property name-value pairs. $params['id'] should be
  *   the ID of the saved search to be deleted.
- * @example SavedSearch/Delete.php Std delete example.
+ *
  * @return array
  *   api result array
  *   {@getfields saved_search_delete}
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ *
+ * @example SavedSearch/Delete.php Std delete example.
  * @access public
  */
 function civicrm_api3_saved_search_delete($params) {
