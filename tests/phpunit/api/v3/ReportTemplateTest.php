@@ -1056,6 +1056,44 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test we don't get a fatal grouping with various frequencies.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testActivitySummaryGroupByFrequency() {
+    $this->createContactsWithActivities();
+    foreach (['MONTH', 'YEARWEEK', 'QUARTER', 'YEAR'] as $frequency) {
+      $params = [
+        'report_id' => 'activitySummary',
+        'fields' => [
+          'activity_type_id' => 1,
+          'duration' => 1,
+          // id is "total activities", which is required by default(?)
+          'id' => 1,
+        ],
+        'group_bys' => ['activity_date_time' => 1],
+        'group_bys_freq' => ['activity_date_time' => $frequency],
+        'options' => ['metadata' => ['sql']],
+      ];
+      $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
+      $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
+      switch ($frequency) {
+        case 'YEAR':
+          // Year only contains one grouping.
+          // Also note the extra space.
+          $this->assertContains('GROUP BY  YEAR(activity_civireport.activity_date_time)', $rowsSql[1], "Failed for frequency $frequency");
+          $this->assertContains('GROUP BY  YEAR(activity_civireport.activity_date_time)', $statsSql[1], "Failed for frequency $frequency");
+          break;
+
+        default:
+          $this->assertContains("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $rowsSql[1], "Failed for frequency $frequency");
+          $this->assertContains("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $statsSql[1], "Failed for frequency $frequency");
+          break;
+      }
+    }
+  }
+
+  /**
    * Test activity details report - requiring all current fields to be output.
    */
   public function testActivityDetails() {
