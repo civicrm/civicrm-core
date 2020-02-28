@@ -178,7 +178,9 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    */
   public static function getTitleByName($name) {
     $groups = self::getTitlesByNames();
-    return $groups[$name];
+		
+		if(isset($groups[$name]))
+    	return $groups[$name];
   }
 
   /**
