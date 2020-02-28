@@ -1031,6 +1031,7 @@ SELECT  id
       unset($fields[$value['field_type']][$key]);
     }
 
+    CRM_Utils_Hook::alterUFFields($fields);
     return $fields;
   }
 
