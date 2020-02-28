@@ -186,6 +186,7 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
 
     $tokenProc->evaluate();
 
+    $this->assertNotEmpty($tokenProc->getRows());
     foreach ($tokenProc->getRows() as $tokenRow) {
       /** @var \Civi\Token\TokenRow $tokenRow */
       $html = $tokenRow->render('body_html');
