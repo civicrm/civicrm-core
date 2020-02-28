@@ -114,17 +114,19 @@
     </table>
 {/if}
 
-{if $caseCustomFields}
-  {foreach from=$caseCustomFields item=group}
-    <h2>{$group.title}</h2>
-      <table class ="report-layout">
-        {foreach from=$group.values item=row}
-          <tr>
-            <th class="label">{$row.label}</td>
-            <td class="crm-case-report-custom-field">{$row.value}</td>
-          </tr>
-        {/foreach}
-    </table>
+{if $viewCustomData}
+  {foreach from=$viewCustomData item=cd}
+    {foreach from=$cd item=group}
+      <h2>{$group.title}</h2>
+        <table class="report-layout">
+          {foreach from=$group.fields item=row}
+            <tr>
+              <th class="label">{$row.field_title}</td>
+              <td class="crm-case-report-custom-field">{$row.field_value}</td>
+            </tr>
+          {/foreach}
+      </table>
+    {/foreach}
   {/foreach}
 {/if}
 
