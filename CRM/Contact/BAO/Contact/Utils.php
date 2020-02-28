@@ -783,7 +783,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     // Normal update process will automatically create new address with submitted values
 
     // 1. loop through entire submitted address array
-    $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'master_id', 'add_relationship'];
+    $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'master_id', 'add_relationship', 'id', 'contact_id'];
     foreach ($address as & $values) {
       // 2. check if "Use another contact's address" is checked, if not continue
       // Additionally, if master_id is set (address was shared), set master_id to empty value.
@@ -802,24 +802,21 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       $masterAddress->id = CRM_Utils_Array::value('master_id', $values);
       $masterAddress->find(TRUE);
 
-      // 4. modify submitted params and update it with shared contact address
-      // make sure you preserve specific form values like location type, is_primary_ is_billing, master_id
-      // CRM-10336: Also empty any fields from the existing address block if they don't exist in master (otherwise they will persist)
+      // 4. CRM-10336: Empty all fields (execept the fields to skip)
       foreach ($values as $field => $submittedValue) {
+        if (!in_array($field, $skipFields)) {
+          $values[$field] = '';
+        }
+      }
+
+      // 5. update address params to match shared address
+      // make sure you preserve specific form values like location type, is_primary_ is_billing, master_id
+      foreach ($masterAddress as $field => $value) {
         if (!in_array($field, $skipFields)) {
           if (isset($masterAddress->$field)) {
             $values[$field] = $masterAddress->$field;
           }
-          else {
-            $values[$field] = '';
-          }
         }
-      }
-
-      //5. modify the params to include county_id if it exist in master contact.
-      // CRM-16152: This is a hack since QF does not submit disabled field.
-      if (!empty($masterAddress->county_id) && empty($values['county_id'])) {
-        $values['county_id'] = $masterAddress->county_id;
       }
     }
   }
