@@ -25,6 +25,9 @@ class CRM_Utils_JSON {
    * @param mixed $input
    */
   public static function output($input) {
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('civiExit called', $input);
+    }
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo json_encode($input);
     CRM_Utils_System::civiExit();
