@@ -21,6 +21,7 @@
 
 namespace api\v4\Action;
 
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use api\v4\UnitTestCase;
 
@@ -69,6 +70,45 @@ class NullValueTest extends UnitTestCase {
 
     $this->assertSame(NULL, $contact['last_name']);
     $this->assertSame('ILoveMy', $contact['display_name']);
+  }
+
+  public function testSaveWithReload() {
+    $contact = Contact::create()
+      ->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'Firsty')
+      ->addValue('last_name', 'Lasty')
+      ->execute()
+      ->first();
+
+    $activity = Activity::create()
+      ->setCheckPermissions(FALSE)
+      ->addValue('source_contact_id', $contact['id'])
+      ->addValue('activity_type_id', 1)
+      ->addValue('subject', 'hello')
+      ->execute()
+      ->first();
+
+    $this->assertEquals('hello', $activity['subject']);
+
+    $saved = Activity::save()
+      ->setCheckPermissions(FALSE)
+      ->addRecord(['id' => $activity['id'], 'subject' => NULL])
+      ->execute()
+      ->first();
+
+    $this->assertNull($saved['subject']);
+    $this->assertArrayNotHasKey('activity_date_time', $saved);
+
+    $saved = Activity::save()
+      ->setCheckPermissions(FALSE)
+      ->addRecord(['id' => $activity['id'], 'subject' => NULL])
+      ->setReload(TRUE)
+      ->execute()
+      ->first();
+
+    $this->assertNull($saved['subject']);
+    $this->assertArrayHasKey('activity_date_time', $saved);
+
   }
 
 }
