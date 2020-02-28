@@ -135,9 +135,9 @@
       {foreach from=$activity item=field name=fieldloop}
         <tr class="crm-case-report-activity-{$field.label}">
           <th scope="row" class="label">{$field.label|escape}</th>
-          {if $field.label eq 'Activity Type' or $field.label eq 'Status'}
+          {if $field.label eq ts('Activity Type') or $field.label eq ts('Status')}
             <td class="bold">{$field.value|escape}</td>
-          {elseif $field.label eq 'Details' or $field.label eq 'Subject'}
+          {elseif $field.label eq ts('Details') or $field.label eq ts('Subject')}
             <td>{$field.value}</td>
           {else}
             <td>{$field.value|escape}</td>
