@@ -47,19 +47,33 @@ trait DAOActionTrait {
   }
 
   /**
-   * Extract the true fields from a BAO
+   * Convert saved object to array
    *
-   * (Used by create and update actions)
-   * @param object $bao
+   * Used by create, update & save actions
+   *
+   * @param \CRM_Core_DAO $bao
+   * @param array $input
    * @return array
    */
-  public static function baoToArray($bao) {
-    $fields = $bao->fields();
+  public function baoToArray($bao, $input) {
+    $allFields = array_column($bao->fields(), 'name');
+    if (!empty($this->reload)) {
+      $inputFields = $allFields;
+      $bao->find(TRUE);
+    }
+    else {
+      $inputFields = array_keys($input);
+      // Convert 'null' input to true null
+      foreach ($input as $key => $val) {
+        if ($val === 'null') {
+          $bao->$key = NULL;
+        }
+      }
+    }
     $values = [];
-    foreach ($fields as $key => $field) {
-      $name = $field['name'];
-      if (property_exists($bao, $name)) {
-        $values[$name] = isset($bao->$name) ? $bao->$name : NULL;
+    foreach ($allFields as $field) {
+      if (isset($bao->$field) || in_array($field, $inputFields)) {
+        $values[$field] = $bao->$field ?? NULL;
       }
     }
     return $values;
@@ -160,14 +174,7 @@ trait DAOActionTrait {
         throw new \API_Exception($errMessage);
       }
 
-      if (!empty($this->reload) && is_a($createResult, 'CRM_Core_DAO')) {
-        $createResult->find(TRUE);
-      }
-
-      // trim back the junk and just get the array:
-      $resultArray = $this->baoToArray($createResult);
-
-      $result[] = $resultArray;
+      $result[] = $this->baoToArray($createResult, $item);
     }
     FormattingUtil::formatOutputValues($result, $this->entityFields(), $this->getEntityName());
     return $result;
