@@ -112,7 +112,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
   protected function addPaymentProcessorFieldsToForm() {
     $paymentProcessors = $this->getProcessors();
     $optAttributes = [];
-    foreach ($pamymentProcessors as $ppKey => $ppval) {
+    foreach ($paymentProcessors as $ppKey => $ppval) {
       if ($ppKey > 0) {
         $optAttributes[$ppKey]['class'] = 'payment_processor_' . strtolower($this->_paymentProcessors[$ppKey]['payment_processor_type']);
       }
