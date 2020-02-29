@@ -149,6 +149,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $transaction = new CRM_Core_Transaction();
+    $sqlWhereParams = $where = [];
     if (is_array(CRM_Utils_Array::value('source_record_id', $params))) {
       $sourceRecordIds = implode(',', $params['source_record_id']);
     }
@@ -156,18 +157,19 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $sourceRecordIds = CRM_Utils_Array::value('source_record_id', $params);
     }
 
+    if ($sourceRecordIds) {
+      $where[] = 'source_record_id IN ( %1 )';
+      $sqlWhereParams[1] = [$sourceRecordIds, 'CommaSeparatedIntegers'];
+    }
     $result = NULL;
     if (!$moveToTrash) {
       if (!isset($params['id'])) {
-        if (is_array($params['activity_type_id'])) {
-          $activityTypes = implode(',', $params['activity_type_id']);
+        if (!empty($params['activity_type_id'])) {
+          $where[] = 'activity_type_id IN ( %2 )';
+          $sqlWhereParams[2] = [implode(',', (array) $params['activity_type_id']), 'CommaSeparatedIntegers'];
         }
-        else {
-          $activityTypes = $params['activity_type_id'];
-        }
-
-        $query = "DELETE FROM civicrm_activity WHERE source_record_id IN ({$sourceRecordIds}) AND activity_type_id IN ( {$activityTypes} )";
-        $dao = CRM_Core_DAO::executeQuery($query);
+        $query = "DELETE FROM civicrm_activity WHERE " . implode(' AND ', $where);
+        $dao = CRM_Core_DAO::executeQuery($query, $sqlWhereParams);
       }
       else {
         $activity = new CRM_Activity_DAO_Activity();
@@ -178,8 +180,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $activity->case_id = CRM_Case_BAO_Case::getCaseIdByActivityId($activity->id);
 
         // CRM-13994 delete activity entity_tag
-        $query = "DELETE FROM civicrm_entity_tag WHERE entity_table = 'civicrm_activity' AND entity_id = {$activity->id}";
-        $dao = CRM_Core_DAO::executeQuery($query);
+        $query = "DELETE FROM civicrm_entity_tag WHERE entity_table = 'civicrm_activity' AND entity_id = %1";
+        $dao = CRM_Core_DAO::executeQuery($query, [1 => [$activity->id, 'Positive']]);
       }
     }
     else {

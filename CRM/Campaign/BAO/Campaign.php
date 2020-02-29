@@ -416,18 +416,12 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
       $queryParams[6] = ['%' . trim($params['description']) . '%', 'String'];
     }
     if (!empty($params['campaign_type_id'])) {
-      $typeId = $params['campaign_type_id'];
-      if (is_array($params['campaign_type_id'])) {
-        $typeId = implode(' , ', $params['campaign_type_id']);
-      }
-      $where[] = "( campaign.campaign_type_id IN ( {$typeId} ) )";
+      $where[] = "( campaign.campaign_type_id IN ( %7 ) )";
+      $queryParams[7] = [implode(',', (array) $params['campaign_type_id']), 'CommaSeparatedIntegers'];
     }
     if (!empty($params['status_id'])) {
-      $statusId = $params['status_id'];
-      if (is_array($params['status_id'])) {
-        $statusId = implode(' , ', $params['status_id']);
-      }
-      $where[] = "( campaign.status_id IN ( {$statusId} ) )";
+      $where[] = "( campaign.status_id IN ( %8 ) )";
+      $queryParams[8] = [implode(',', (array) $params['status_id']), 'CommaSeparatedIntegers'];
     }
     if (array_key_exists('is_active', $params)) {
       $active = "( campaign.is_active = 1 )";
