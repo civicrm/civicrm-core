@@ -490,7 +490,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
+   * Get the query mode (eg. CRM_Contact_BAO_Query::MODE_CASE)
    *
    * @return int
    */
