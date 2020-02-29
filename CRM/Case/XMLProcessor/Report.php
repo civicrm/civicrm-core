@@ -313,7 +313,8 @@ WHERE      a.id = %1
       }
 
       $activity['fields'][] = array(
-        'label' => 'Client',
+        'name' => 'Client',
+        'label' => ts('Client'),
         'value' => $this->redact($client),
         'type' => 'String',
       );
@@ -327,9 +328,11 @@ WHERE      a.id = %1
       // Maybe not the best solution.
       $targetNames = CRM_Activity_BAO_ActivityContact::getNames($activityDAO->id, $targetID);
       $processTarget = FALSE;
+      $name = 'With Contact(s)';
       $label = ts('With Contact(s)');
       if (in_array($activityTypeInfo['name'], array('Email', 'Inbound Email'))) {
         $processTarget = TRUE;
+        $name = 'Recipient';
         $label = ts('Recipient');
       }
       if (!$processTarget) {
@@ -359,6 +362,7 @@ WHERE      a.id = %1
         }
 
         $activity['fields'][] = array(
+          'name' => $name,
           'label' => $label,
           'value' => implode('; ', $targetRedacted),
           'type' => 'String',
@@ -368,13 +372,20 @@ WHERE      a.id = %1
 
     // Activity Type info is a special field
     $activity['fields'][] = array(
+      'name' => 'Activity Type',
       'label' => ts('Activity Type'),
       'value' => $activityTypeInfo['label'],
       'type' => 'String',
     );
 
     $activity['fields'][] = array(
+      'name' => 'Subject',
       'label' => ts('Subject'),
+      // TODO: Why is this being escaped at this point in the flow? Should
+      // this just be done in the tpl where all the other fields get escaped?
+      // Is anything depending on this currently or is it just a result of
+      // the see-sawing and some double-escaping that went back and forth
+      // for a few years?
       'value' => htmlspecialchars($this->redact($activityDAO->subject)),
       'type' => 'Memo',
     );
@@ -387,6 +398,7 @@ WHERE      a.id = %1
       );
     }
     $activity['fields'][] = array(
+      'name' => 'Created By',
       'label' => ts('Created By'),
       'value' => $this->redact($creator),
       'type' => 'String',
@@ -416,6 +428,7 @@ WHERE      a.id = %1
     }
 
     $activity['fields'][] = array(
+      'name' => 'Reported By',
       'label' => ts('Reported By'),
       'value' => $this->redact($reporter),
       'type' => 'String',
@@ -434,6 +447,7 @@ WHERE      a.id = %1
       }
       $assigneeContacts = implode(', ', $assignee_contact_names);
       $activity['fields'][] = array(
+        'name' => 'Assigned to',
         'label' => ts('Assigned to'),
         'value' => $assigneeContacts,
         'type' => 'String',
@@ -442,6 +456,7 @@ WHERE      a.id = %1
 
     if ($activityDAO->medium_id) {
       $activity['fields'][] = array(
+        'name' => 'Medium',
         'label' => ts('Medium'),
         'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'medium_id', $activityDAO->medium_id),
         'type' => 'String',
@@ -449,18 +464,21 @@ WHERE      a.id = %1
     }
 
     $activity['fields'][] = array(
+      'name' => 'Location',
       'label' => ts('Location'),
       'value' => $activityDAO->location,
       'type' => 'String',
     );
 
     $activity['fields'][] = array(
+      'name' => 'Date and Time',
       'label' => ts('Date and Time'),
       'value' => $activityDAO->activity_date_time,
       'type' => 'Date',
     );
 
     $activity['fields'][] = array(
+      'name' => 'Details',
       'label' => ts('Details'),
       'value' => $this->redact(CRM_Utils_String::stripAlternatives($activityDAO->details)),
       'type' => 'Memo',
@@ -469,12 +487,14 @@ WHERE      a.id = %1
     // Skip Duration field if empty (to avoid " minutes" output). Might want to do this for all fields at some point. dgg
     if ($activityDAO->duration) {
       $activity['fields'][] = array(
+        'name' => 'Duration',
         'label' => ts('Duration'),
         'value' => $activityDAO->duration . ' ' . ts('minutes'),
         'type' => 'Int',
       );
     }
     $activity['fields'][] = array(
+      'name' => 'Status',
       'label' => ts('Status'),
       'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_status_id',
         $activityDAO->status_id
@@ -483,6 +503,7 @@ WHERE      a.id = %1
     );
 
     $activity['fields'][] = array(
+      'name' => 'Priority',
       'label' => ts('Priority'),
       'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority_id',
         $activityDAO->priority_id

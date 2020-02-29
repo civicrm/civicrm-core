@@ -132,12 +132,14 @@
   <h2>{ts}Case Activities{/ts}</h2>
   {foreach from=$activities item=activity key=key}
     <table  class ="report-layout">
-      {foreach from=$activity item=field name=fieldloop}
-        <tr class="crm-case-report-activity-{$field.label}">
+      {foreach from=$activity item=field}
+        {* TODO: Using an unmunged field in the css class would have always been problematic? Since it sometimes has spaces. *}
+        <tr class="crm-case-report-activity-{$field.name}">
           <th scope="row" class="label">{$field.label|escape}</th>
-          {if $field.label eq 'Activity Type' or $field.label eq 'Status'}
+          {if $field.name eq 'Activity Type' or $field.name eq 'Status'}
             <td class="bold">{$field.value|escape}</td>
-          {elseif $field.label eq 'Details' or $field.label eq 'Subject'}
+          {* TODO: See note in CRM/Case/XMLProcessor/Report.php: Subject is already escaped in the php file so that's why it's not escaped here, but should that be reversed? *}
+          {elseif $field.name eq 'Details' or $field.name eq 'Subject'}
             <td>{$field.value}</td>
           {else}
             <td>{$field.value|escape}</td>
