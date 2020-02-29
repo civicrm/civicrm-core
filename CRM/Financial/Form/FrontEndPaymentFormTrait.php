@@ -125,7 +125,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
         NULL, "&nbsp;", FALSE, $optAttributes
       );
     }
-    elseif (!empty($paymentProcessorss)) {
+    elseif (!empty($paymentProcessors)) {
       $ppKeys = array_keys($paymentProcessors);
       $currentPP = array_pop($ppKeys);
       $this->addElement('hidden', 'payment_processor_id', $currentPP);
