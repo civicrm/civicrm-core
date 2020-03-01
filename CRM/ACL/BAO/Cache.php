@@ -116,20 +116,6 @@ WHERE contact_id = %1
   }
 
   /**
-   * Update ACL caches `civicrm_acl_cache` and `civicrm_acl_contact_cache for the specified ACLed user
-   * @param int $id - contact_id of ACLed user to update caches for.
-   *
-   */
-  public static function updateEntry($id) {
-    // rebuilds civicrm_acl_cache
-    self::deleteEntry($id);
-    self::build($id);
-
-    // rebuilds civicrm_acl_contact_cache
-    CRM_Contact_BAO_Contact_Permission::cache($id, CRM_Core_Permission::VIEW, TRUE);
-  }
-
-  /**
    * Deletes all the cache entries.
    */
   public static function resetCache() {
