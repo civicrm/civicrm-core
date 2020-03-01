@@ -155,14 +155,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @throws \CRM_Core_Exception
    */
-  protected static function getACLs($contact_id = NULL) {
+  protected static function getACLs(int $contact_id) {
     $results = [];
-
-    if (empty($contact_id)) {
-      return $results;
-    }
-
-    $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
 
     $rule = new CRM_ACL_BAO_ACL();
 
@@ -170,12 +164,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $contact = CRM_Contact_BAO_Contact::getTableName();
 
     $query = " SELECT acl.*
-     FROM $acl acl";
-
-    if (!empty($contact_id)) {
-      $query .= " WHERE   acl.entity_table   = '$contact'
-       AND acl.entity_id      = $contact_id";
-    }
+      FROM $acl acl
+      WHERE   acl.entity_table   = '$contact'
+      AND acl.entity_id      = $contact_id";
 
     $rule->query($query);
 
@@ -358,7 +349,9 @@ SELECT acl.*
     $result = [];
 
     /* First, the contact-specific ACLs, including ACL Roles */
-    $result += self::getACLs($contact_id);
+    if ($contact_id) {
+      $result += self::getACLs((int) $contact_id);
+    }
 
     /* Then, all ACLs granted through group membership */
     $result += self::getGroupACLs($contact_id, TRUE);
