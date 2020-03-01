@@ -24,6 +24,11 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_price_set</comment>
+    <pseudoconstant>
+      <table>civicrm_price_set</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>1.8</add>
   </field>
   <foreignKey>
@@ -224,4 +229,3 @@
     <drop>3.3</drop>
   </field>
 </table>
-
