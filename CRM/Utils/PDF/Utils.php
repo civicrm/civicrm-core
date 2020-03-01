@@ -121,6 +121,8 @@ class CRM_Utils_PDF_Utils {
    * @param $stationery_path
    */
   public static function _html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName, $stationery_path) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_PDF::_html2pdf_dompdf');
+    return self::_html2pdf_dompdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     // Documentation on the TCPDF library can be found at: http://www.tcpdf.org
     // This function also uses the FPDI library documented at: http://www.setasign.com/products/fpdi/about/
     // Syntax borrowed from https://github.com/jake-mw/CDNTaxReceipts/blob/master/cdntaxreceipts.functions.inc
