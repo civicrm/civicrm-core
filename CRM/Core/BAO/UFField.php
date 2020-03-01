@@ -1031,6 +1031,7 @@ SELECT  id
       unset($fields[$value['field_type']][$key]);
     }
 
+    // Allow extensions to alter the array of entity => fields permissible in a CiviCRM Profile.
     CRM_Utils_Hook::alterUFFields($fields);
     return $fields;
   }
