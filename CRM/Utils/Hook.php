@@ -2631,4 +2631,18 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * Allow extensions to modify the array of acceptable fields to be included on profiles
+   * @param array $fields
+   *   format is [Entity => array of DAO fields]
+   * @return mixed
+   */
+  public static function alterUFFields(&$fields) {
+    return self::singleton()->invoke(['fields'],
+      $fields, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterUFFields'
+    );
+  }
+
 }
