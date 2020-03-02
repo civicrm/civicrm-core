@@ -208,9 +208,17 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchParams($id) {
+    $savedSearch = \Civi\Api4\SavedSearch::get()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('id', '=', $id)
+      ->execute()
+      ->first();
+    if ($savedSearch['api_entity']) {
+      return $savedSearch;
+    }
     $fv = self::getFormValues($id);
     //check if the saved search has mapping id
-    if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'mapping_id')) {
+    if ($savedSearch['mapping_id']) {
       return CRM_Core_BAO_Mapping::formattedFields($fv);
     }
     elseif (!empty($fv['customSearchID'])) {

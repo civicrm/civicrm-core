@@ -84,11 +84,14 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Why walk when you can
+   * Builds final sql statement after all params are set.
    *
-   * @return array|int
+   * @return string
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function run() {
+  public function getSql() {
     $this->addJoins();
     $this->buildSelectFields();
     $this->buildWhereClause();
@@ -109,9 +112,17 @@ class Api4SelectQuery extends SelectQuery {
     if (!empty($this->limit) || !empty($this->offset)) {
       $this->query->limit($this->limit, $this->offset);
     }
+    return $this->query->toSQL();
+  }
 
+  /**
+   * Why walk when you can
+   *
+   * @return array|int
+   */
+  public function run() {
     $results = [];
-    $sql = $this->query->toSQL();
+    $sql = $this->getSql();
     if (is_array($this->debugOutput)) {
       $this->debugOutput['sql'][] = $sql;
     }
