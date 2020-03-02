@@ -17,7 +17,7 @@
   <releaseDate>2020-01-28</releaseDate>
   <version>1.0</version>
   <tags>
-    <tag>hidden</tag>
+    <tag>mgmt:hidden</tag>
   </tags>
   <develStage>stable</develStage>
   <compatibility>
