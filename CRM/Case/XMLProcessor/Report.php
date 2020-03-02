@@ -28,25 +28,6 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   public function __construct() {
   }
 
-  /**
-   * @param int $clientID
-   * @param int $caseID
-   * @param string $activitySetName
-   * @param array $params
-   *
-   * @return mixed
-   */
-  public function run($clientID, $caseID, $activitySetName, $params) {
-    $contents = self::getCaseReport($clientID,
-      $caseID,
-      $activitySetName,
-      $params,
-      $this
-    );
-
-    return CRM_Case_Audit_Audit::run($contents, $clientID, $caseID);
-  }
-
   public function getRedactionRules() {
     foreach (array(
       'redactionStringRules',
