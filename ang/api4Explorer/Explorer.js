@@ -681,6 +681,27 @@
       return docs.params[name];
     };
 
+    $scope.executeDoc = function() {
+      var doc = {
+        description: ts('Runs API call on the CiviCRM database.'),
+        comment: ts('Results and debugging info will be displayed below.')
+      };
+      if ($scope.action === 'delete') {
+        doc.WARNING = ts('This API call will be executed on the real database. Deleting data cannot be undone.');
+      }
+      else if ($scope.action && $scope.action.slice(0, 3) !== 'get') {
+        doc.WARNING = ts('This API call will be executed on the real database. It cannot be undone.');
+      }
+      return doc;
+    };
+
+    $scope.saveDoc = function() {
+      return {
+        description: ts('Save API call as a smart group.'),
+        comment: ts('Allows you to create a SavedSearch containing the WHERE clause of this API call.'),
+      };
+    };
+
     $scope.$watch('params', writeCode, true);
     $scope.$watch('index', writeCode);
     writeCode();
