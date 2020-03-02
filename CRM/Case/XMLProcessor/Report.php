@@ -963,7 +963,7 @@ LIMIT  1
       $params,
       $report
     );
-    $printReport = CRM_Case_Audit_Audit::run($contents, $clientID, $caseID, TRUE);
+    $printReport = CRM_Case_Audit_Audit::run($contents, $clientID, $caseID);
     echo $printReport;
     CRM_Utils_System::civiExit();
   }

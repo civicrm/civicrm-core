@@ -215,25 +215,20 @@ class CRM_Case_Audit_Audit {
    * @param string $xmlString
    * @param int $clientID
    * @param int $caseID
-   * @param bool $printReport
    *
    * @return mixed
    */
-  public static function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
+  public static function run($xmlString, $clientID, $caseID) {
     $audit = new CRM_Case_Audit_Audit($xmlString, 'audit.conf.xml');
-    $activities = $audit->getActivities($printReport);
+    $activities = $audit->getActivities(TRUE);
 
     $template = CRM_Core_Smarty::singleton();
     $template->assign_by_ref('activities', $activities);
 
-    if ($printReport) {
-      $reportDate = CRM_Utils_Date::customFormat(date('Y-m-d H:i'));
-      $template->assign('reportDate', $reportDate);
-      $contents = $template->fetch('CRM/Case/Audit/Report.tpl');
-    }
-    else {
-      $contents = $template->fetch('CRM/Case/Audit/Audit.tpl');
-    }
+    $reportDate = CRM_Utils_Date::customFormat(date('Y-m-d H:i'));
+    $template->assign('reportDate', $reportDate);
+    $contents = $template->fetch('CRM/Case/Audit/Report.tpl');
+
     return $contents;
   }
 
