@@ -72,8 +72,24 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
             'no_repeat' => TRUE,
           ],
+          'do_not_phone' => [
+            'title' => ts('Do Not Phone'),
+            'no_repeat' => TRUE,
+          ],
           'do_not_email' => [
             'title' => ts('Do Not Email'),
+            'no_repeat' => TRUE,
+          ],
+          'do_not_mail' => [
+            'title' => ts('Do Not Mail'),
+            'no_repeat' => TRUE,
+          ],
+          'do_not_sms' => [
+            'title' => ts('Do Not SMS'),
+            'no_repeat' => TRUE,
+          ],
+          'do_not_trade' => [
+            'title' => ts('Do Not Trade'),
             'no_repeat' => TRUE,
           ],
           'is_opt_out' => [
