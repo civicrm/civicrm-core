@@ -3092,7 +3092,7 @@ class CRM_Contact_BAO_Query {
       $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, $gccTableAlias, "contact_a", $op);
       if (!empty($groupContactCacheClause)) {
         if ($isNotOp) {
-          $groupIds = implode(',', (array) $smartGroupIDs);
+          $groupIds = CRM_Utils_Type::validate(implode(',', (array) $smartGroupIDs), 'CommaSeparatedIntegers');
           $gcTable = "civicrm_group_contact_{$this->_groupUniqueKey}";
           $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
           $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
@@ -4050,12 +4050,19 @@ WHERE  $smartGroupClause
   public function privacy(&$values) {
     list($name, $op, $value, $grouping) = $values;
     //fixed for profile search listing CRM-4633
+    if (is_array($value)) {
+      if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $op = key($value);
+        $value = $value[$op];
+      }
+    }
     if (strpbrk($value, "[")) {
       $value = "'{$value}'";
       $op = "!{$op}";
       $this->_where[$grouping][] = "contact_a.{$name} $op $value";
     }
     else {
+      CRM_Utils_Type::validate($value, 'Integer');
       $this->_where[$grouping][] = "contact_a.{$name} $op $value";
     }
     $field = CRM_Utils_Array::value($name, $this->_fields);
