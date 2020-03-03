@@ -1201,6 +1201,31 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Activity Details report has some whack-a-mole to fix when filtering on null/not null.
+   */
+  public function testActivityDetailsNullFilters() {
+    $this->createContactsWithActivities();
+    $params = [
+      'report_id' => 'activity',
+      'location_op' => 'nll',
+      'location_value' => '',
+    ];
+    $rowsWithoutLocation = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
+    $this->assertEmpty($rowsWithoutLocation);
+    $params['location_op'] = 'nnll';
+    $rowsWithLocation = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
+    $this->assertCount(1, $rowsWithLocation);
+    // Test for CRM-18356 - activity shouldn't appear if target contact filter is null.
+    $params = [
+      'report_id' => 'activity',
+      'contact_target_op' => 'nll',
+      'contact_target_value' => '',
+    ];
+    $rowsWithNullTarget = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
+    $this->assertEmpty($rowsWithNullTarget);
+  }
+
+  /**
    * Set up some activity data..... use some chars that challenge our utf handling.
    */
   public function createContactsWithActivities() {

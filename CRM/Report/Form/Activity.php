@@ -544,7 +544,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op && ($op != 'nnll' && $op != 'nll')) {
+            if ($op && !($fieldName == "contact_{$recordType}" && ($op != 'nnll' || $op != 'nll'))) {
               $clause = $this->whereClause($field,
                 $op,
                 CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
