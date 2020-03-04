@@ -37,7 +37,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.0';
+  const MIN_INSTALL_PHP_VER = '7.1';
 
   /**
    * Compute any messages which should be displayed before upgrade.

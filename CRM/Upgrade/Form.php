@@ -38,7 +38,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    *
    * Tip: Keep in sync with composer.json ("config => platform => php")
    */
-  const MINIMUM_PHP_VERSION = '7.0.0';
+  const MINIMUM_PHP_VERSION = '7.1.0';
 
   /**
    * @var \CRM_Core_Config
