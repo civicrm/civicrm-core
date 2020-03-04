@@ -60,7 +60,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
   public function upgrade_5_24_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Install sequential creditnote extension', 'installCreditNotes');
-    $this->addTask('Drop obsolete columns from saved_searc table', 'dropSavedSearchColumns');
+    $this->addTask('Drop obsolete columns from saved_search table', 'dropSavedSearchColumns');
   }
 
   /**
