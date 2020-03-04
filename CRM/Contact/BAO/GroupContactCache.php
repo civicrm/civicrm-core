@@ -267,23 +267,6 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * @deprecated function - the best function to call is
-   * CRM_Contact_BAO_Contact::updateContactCache at the moment, or api job.group_cache_flush
-   * to really force a flush.
-   *
-   * Remove this function altogether by mid 2018.
-   *
-   * However, if updating code outside core to use this (or any BAO function) it is recommended that
-   * you add an api call to lock in into our contract. Currently there is not really a supported
-   * method for non core functions.
-   */
-  public static function remove() {
-    Civi::log()
-      ->warning('Deprecated code. This function should not be called without groupIDs. Extensions can use the api job.group_cache_flush for a hard flush or add an api option for soft flush', ['civi.tag' => 'deprecated']);
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
-  }
-
-  /**
    * Function to clear group contact cache and reset the corresponding
    *  group's cache and refresh date
    *
