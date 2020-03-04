@@ -98,7 +98,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
       'option_group_id' => 'mail_protocol',
       'name' => 'IMAP_XOAUTH2',
       'label' => 'IMAP XOAUTH2',
-      'is_active' => TRUE,
+      'is_active' => FALSE,
     ]);
     return TRUE;
   }
