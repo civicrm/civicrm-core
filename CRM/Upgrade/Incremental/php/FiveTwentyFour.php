@@ -75,7 +75,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
    * @throws \CiviCRM_API3_Exception
    */
   public static function installCreditNotes(CRM_Queue_TaskContext $ctx) {
-    civicrm_api3('Extension', 'install', ['sequentialcreditnotes']);
+    civicrm_api3('Extension', 'install', ['keys' => 'sequentialcreditnotes']);
     return TRUE;
   }
 
