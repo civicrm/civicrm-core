@@ -41,7 +41,7 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
    * PDF Page Format ID.
    * @var int
    */
-  protected $_id = NULL;
+  public $_id = NULL;
 
   /**
    * Build the form object.

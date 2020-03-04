@@ -17,6 +17,13 @@
 trait CRM_Core_Form_EntityFormTrait {
 
   /**
+   * The id of the object being edited / created.
+   *
+   * @var int
+   */
+  public $_id;
+
+  /**
    * The entity subtype ID (eg. for Relationship / Activity)
    *
    * @var int
@@ -69,6 +76,15 @@ trait CRM_Core_Form_EntityFormTrait {
    */
   public function getEntityId() {
     return $this->_id;
+  }
+
+  /**
+   * Set the entity ID
+   *
+   * @param int $id The entity ID
+   */
+  public function setEntityId($id) {
+    $this->_id = $id;
   }
 
   /**

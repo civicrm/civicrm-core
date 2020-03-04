@@ -29,13 +29,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   protected $_gName;
 
   /**
-   * Id
-   *
-   * @var int
-   */
-  protected $_id;
-
-  /**
    * Action
    *
    * @var int

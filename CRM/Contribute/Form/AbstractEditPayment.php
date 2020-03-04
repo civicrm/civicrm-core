@@ -78,13 +78,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $_paymentObject;
 
   /**
-   * The id of the contribution that we are processing.
-   *
-   * @var int
-   */
-  public $_id;
-
-  /**
    * Entity that $this->_id relates to.
    *
    * If set the contact id is not required in the url.

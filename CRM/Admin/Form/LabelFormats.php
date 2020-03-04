@@ -41,7 +41,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
    * Label Format ID.
    * @var int
    */
-  protected $_id = NULL;
+  public $_id = NULL;
 
   /**
    * Group name, label format or name badge

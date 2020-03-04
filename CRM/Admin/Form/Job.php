@@ -19,7 +19,7 @@
  * Class for configuring jobs.
  */
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
-  protected $_id = NULL;
+  public $_id = NULL;
 
   public function preProcess() {
 

@@ -24,7 +24,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * Scheduled Reminder ID.
    * @var int
    */
-  protected $_id = NULL;
+  public $_id = NULL;
 
   public $_freqUnits;
 
