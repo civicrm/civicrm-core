@@ -200,7 +200,7 @@ function civicrm_error($result) {
  * @return string|null
  */
 function _civicrm_api_get_camel_name($entity) {
-  return is_string($entity) ? CRM_Utils_String::convertStringToCamel($entity) : NULL;
+  return is_string($entity) ? \Civi\API\Request::normalizeEntityName($entity) : NULL;
 }
 
 /**
