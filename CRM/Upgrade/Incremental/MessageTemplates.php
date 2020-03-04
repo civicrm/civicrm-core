@@ -208,6 +208,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'participant_confirm', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.24.alpha1',
+        'upgrade_descriptor' => ts('Layout fixes for the Contribution templates'),
+        'templates' => [
+          ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
+        ],
+      ],
 
     ];
   }

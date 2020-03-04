@@ -73,8 +73,8 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertContains('Due Date', $invoiceHTML[$contribution['id']]);
     $this->assertContains('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
 
-    $this->assertContains('AMOUNT DUE: </font></b></td>
-                  <td style = "padding-left:34px;text-align:right;"><b><font size = "1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
+    $this->assertContains('AMOUNT DUE:</font></b></td>
+                  <td style="text-align:right;"><b><font size="1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
 
   }
 
@@ -153,12 +153,12 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $order['id']]);
 
     foreach ($lineItems['values'] as $lineItem) {
-      $this->assertContains("<font size = \"1\">$ {$lineItem['line_total']}</font>", $invoiceHTML);
+      $this->assertContains("<font size=\"1\">$ {$lineItem['line_total']}</font>", $invoiceHTML);
     }
 
     $totalAmount = $this->formatMoneyInput($order['values'][$order['id']]['total_amount']);
     $this->assertContains("TOTAL USD</font></b></td>
-                <td style = \"padding-left:34px;text-align:right;\"><font size = \"1\">$ $totalAmount</font>", $invoiceHTML);
+                <td style=\"text-align:right;\"><font size=\"1\">$ $totalAmount</font>", $invoiceHTML);
 
   }
 
