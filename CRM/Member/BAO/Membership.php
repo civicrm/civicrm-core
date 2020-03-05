@@ -2669,4 +2669,105 @@ WHERE      civicrm_membership.is_test = 0
     $sqlQueries = array_merge($sqlQueries, $newSql);
   }
 
+  /**
+   * Update membership status to deceased.
+   * function return the status message for updated membership.
+   *
+   * @param array $deceasedParams
+   *  - contact id
+   *  - is_deceased
+   *  - deceased_date
+   *
+   * @param string $contactType
+   *
+   * @return null|string
+   *   $updateMembershipMsg string  status message for updated membership.
+   */
+  public static function updateMembershipStatus($deceasedParams, $contactType) {
+    $updateMembershipMsg = NULL;
+    $contactId = CRM_Utils_Array::value('contact_id', $deceasedParams);
+    $deceasedDate = CRM_Utils_Array::value('deceased_date', $deceasedParams);
+
+    // process to set membership status to deceased for both active/inactive membership
+    if ($contactId &&
+      $contactType === 'Individual' &&
+      !empty($deceasedParams['is_deceased'])
+    ) {
+
+      $session = CRM_Core_Session::singleton();
+      $userId = $session->get('userID');
+      if (!$userId) {
+        $userId = $contactId;
+      }
+
+      // get deceased status id
+      $allStatus = CRM_Member_PseudoConstant::membershipStatus();
+      $deceasedStatusId = array_search('Deceased', $allStatus);
+      if (!$deceasedStatusId) {
+        return $updateMembershipMsg;
+      }
+
+      $today = time();
+      if ($deceasedDate && strtotime($deceasedDate) > $today) {
+        return $updateMembershipMsg;
+      }
+
+      // get non deceased membership
+      $dao = new CRM_Member_DAO_Membership();
+      $dao->contact_id = $contactId;
+      $dao->whereAdd("status_id != $deceasedStatusId");
+      $dao->find();
+      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+      $allStatus = CRM_Member_PseudoConstant::membershipStatus();
+      $memCount = 0;
+      while ($dao->fetch()) {
+        // update status to deceased (for both active/inactive membership )
+        CRM_Core_DAO::setFieldValue('CRM_Member_DAO_Membership', $dao->id,
+          'status_id', $deceasedStatusId
+        );
+
+        // add membership log
+        $membershipLog = [
+          'membership_id' => $dao->id,
+          'status_id' => $deceasedStatusId,
+          'start_date' => CRM_Utils_Date::isoToMysql($dao->start_date),
+          'end_date' => CRM_Utils_Date::isoToMysql($dao->end_date),
+          'modified_id' => $userId,
+          'modified_date' => date('Ymd'),
+          'membership_type_id' => $dao->membership_type_id,
+          'max_related' => $dao->max_related,
+        ];
+
+        CRM_Member_BAO_MembershipLog::add($membershipLog);
+
+        //create activity when membership status is changed
+        $activityParam = [
+          'subject' => "Status changed from {$allStatus[$dao->status_id]} to {$allStatus[$deceasedStatusId]}",
+          'source_contact_id' => $userId,
+          'target_contact_id' => $dao->contact_id,
+          'source_record_id' => $dao->id,
+          'activity_type_id' => array_search('Change Membership Status', $activityTypes),
+          'status_id' => 2,
+          'version' => 3,
+          'priority_id' => 2,
+          'activity_date_time' => date('Y-m-d H:i:s'),
+          'is_auto' => 0,
+          'is_current_revision' => 1,
+          'is_deleted' => 0,
+        ];
+        $activityResult = civicrm_api('activity', 'create', $activityParam);
+
+        $memCount++;
+      }
+
+      // set status msg
+      if ($memCount) {
+        $updateMembershipMsg = ts("%1 Current membership(s) for this contact have been set to 'Deceased' status.",
+          [1 => $memCount]
+        );
+      }
+    }
+
+    return $updateMembershipMsg;
+  }
 }
