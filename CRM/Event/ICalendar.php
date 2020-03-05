@@ -10,18 +10,9 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class to generate various "icalendar" type event feeds
  */
-
-/**
- * ICalendar class
- *
- */
-class CRM_Event_Page_ICalendar extends CRM_Core_Page {
+class CRM_Event_ICalendar extends CRM_Core_Page {
 
   /**
    * Heart of the iCalendar data assignment process. The runner gets all the meta
@@ -29,41 +20,44 @@ class CRM_Event_Page_ICalendar extends CRM_Core_Page {
    * to the user. If gData param is passed on the URL, outputs gData XML format.
    * Else outputs iCalendar format per IETF RFC2445. Page param true means send
    * to browser as inline content. Else, we send .ics file as attachment.
-   *
-   * @return void
    */
   public function run() {
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
-    $type = CRM_Utils_Request::retrieve('type', 'Positive', $this, FALSE, 0);
-    $start = CRM_Utils_Request::retrieve('start', 'Positive', $this, FALSE, 0);
-    $end = CRM_Utils_Request::retrieve('end', 'Positive', $this, FALSE, 0);
-    $iCalPage = CRM_Utils_Request::retrieve('list', 'Positive', $this, FALSE, 0);
-    $gData = CRM_Utils_Request::retrieve('gData', 'Positive', $this, FALSE, 0);
-    $html = CRM_Utils_Request::retrieve('html', 'Positive', $this, FALSE, 0);
-    $rss = CRM_Utils_Request::retrieve('rss', 'Positive', $this, FALSE, 0);
+    $id = CRM_Utils_Request::retrieveValue('id', 'Positive', NULL, FALSE, 'GET');
+    $type = CRM_Utils_Request::retrieveValue('type', 'Positive', 0);
+    $start = CRM_Utils_Request::retrieveValue('start', 'Positive', 0);
+    $end = CRM_Utils_Request::retrieveValue('end', 'Positive', 0);
 
-    $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
-    $this->assign('events', $info);
-    $this->assign('timezone', @date_default_timezone_get());
+    // We used to handle the event list as a html page at civicrm/event/ical - redirect to the new URL if that was what we requested.
+    if (CRM_Utils_Request::retrieveValue('html', 'Positive', 0)) {
+      $urlParams = [
+        'reset' => 1,
+      ];
+      $id ? $urlParams['id'] = $id : NULL;
+      $type ? $urlParams['type'] = $type : NULL;
+      $start ? $urlParams['start'] = $start : NULL;
+      $end ? $urlParams['end'] = $end : NULL;
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/list', $urlParams, FALSE, NULL, FALSE, TRUE));
+    }
 
-    // Send data to the correct template for formatting (iCal vs. gData)
+    $iCalPage = CRM_Utils_Request::retrieveValue('list', 'Positive', 0);
+    $gData = CRM_Utils_Request::retrieveValue('gData', 'Positive', 0);
+    $rss = CRM_Utils_Request::retrieveValue('rss', 'Positive', 0);
+
     $template = CRM_Core_Smarty::singleton();
     $config = CRM_Core_Config::singleton();
+
+    $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
+    $template->assign('events', $info);
+    $template->assign('timezone', @date_default_timezone_get());
+
+    // Send data to the correct template for formatting (iCal vs. gData)
     if ($rss) {
       // rss 2.0 requires lower case dash delimited locale
-      $this->assign('rssLang', str_replace('_', '-', strtolower($config->lcMessages)));
+      $template->assign('rssLang', str_replace('_', '-', strtolower($config->lcMessages)));
       $calendar = $template->fetch('CRM/Core/Calendar/Rss.tpl');
     }
     elseif ($gData) {
       $calendar = $template->fetch('CRM/Core/Calendar/GData.tpl');
-    }
-    elseif ($html) {
-      // check if we're in shopping cart mode for events
-      $enable_cart = Civi::settings()->get('enable_cart');
-      if ($enable_cart) {
-        $this->assign('registration_links', TRUE);
-      }
-      return parent::run();
     }
     else {
       $calendar = $template->fetch('CRM/Core/Calendar/ICal.tpl');
