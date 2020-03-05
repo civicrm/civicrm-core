@@ -914,7 +914,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         'is_deceased' => CRM_Utils_Array::value('is_deceased', $params, FALSE),
         'deceased_date' => CRM_Utils_Array::value('deceased_date', $params, NULL),
       ];
-      $updateMembershipMsg = $this->updateMembershipStatus($deceasedParams);
+      $updateMembershipMsg = $this->updateMembershipStatus($deceasedParams, $this->_contactType);
     }
 
     // action is taken depending upon the mode
@@ -1399,19 +1399,23 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * function return the status message for updated membership.
    *
    * @param array $deceasedParams
-   *   having contact id and deceased value.
+   *  - contact id
+   *  - is_deceased
+   *  - deceased_date
+   *
+   * @param string $contactType
    *
    * @return null|string
    *   $updateMembershipMsg string  status message for updated membership.
    */
-  public function updateMembershipStatus($deceasedParams) {
+  public function updateMembershipStatus($deceasedParams, $contactType) {
     $updateMembershipMsg = NULL;
     $contactId = CRM_Utils_Array::value('contact_id', $deceasedParams);
     $deceasedDate = CRM_Utils_Array::value('deceased_date', $deceasedParams);
 
     // process to set membership status to deceased for both active/inactive membership
     if ($contactId &&
-      $this->_contactType == 'Individual' && !empty($deceasedParams['is_deceased'])
+      $contactType === 'Individual' && !empty($deceasedParams['is_deceased'])
     ) {
 
       $session = CRM_Core_Session::singleton();
