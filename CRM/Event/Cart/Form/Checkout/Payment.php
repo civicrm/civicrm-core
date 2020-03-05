@@ -202,23 +202,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $this->add('text', 'billing_contact_email', 'Billing Email', '', TRUE);
       $this->assign('collect_billing_email', TRUE);
     }
-    if (self::is_administrator()) {
-      $this->add('textarea', 'note', 'Note');
-      $this->add('text', 'source', 'Source', ['size' => 80]);
-      $instruments = [];
-      CRM_Core_OptionGroup::getAssoc('payment_instrument', $instruments, TRUE);
-      $options = [];
-      foreach ($instruments as $type) {
-        $options[] = $this->createElement('radio', NULL, '', $type['label'], $type['value']);
-      }
-      $this->addGroup($options, 'payment_type', ts("Alternative Payment Type"));
-      $this->add('text', 'check_number', ts('Check No.'), ['size' => 20]);
-      $this->addElement('checkbox', 'is_pending', ts('Create a pending registration'));
 
-      $this->assign('administrator', TRUE);
-    }
     $this->addButtons($buttons);
-
     $this->addFormRule(['CRM_Event_Cart_Form_Checkout_Payment', 'formRule'], $this);
 
     if ($this->payment_required) {
@@ -595,10 +580,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @throws Exception
    */
   public function record_contribution(&$mer_participant, &$params, $event) {
-    if (self::is_administrator() && !empty($params['payment_type'])) {
-      $params['payment_instrument_id'] = $params['payment_type'];
-    }
-
     if ($this->payer_contact_id) {
       $payer = $this->payer_contact_id;
     }
@@ -672,7 +653,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $default_country->find(TRUE);
     $defaults["billing_country_id-{$this->_bltID}"] = $default_country->id;
 
-    if (self::getContactID() && !self::is_administrator()) {
+    if (self::getContactID()) {
       $params = ['id' => self::getContactID()];
       $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 

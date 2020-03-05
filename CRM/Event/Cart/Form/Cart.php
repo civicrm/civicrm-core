@@ -97,15 +97,8 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   }
 
   /**
-   * @return bool
-   */
-  public static function is_administrator() {
-    global $user;
-    return CRM_Core_Permission::check('administer CiviCRM');
-  }
-
-  /**
-   * @return mixed
+   * @return int
+   * @throws \CRM_Core_Exception
    */
   public function getContactID() {
     $tempID = CRM_Utils_Request::retrieveValue('cid', 'Positive');

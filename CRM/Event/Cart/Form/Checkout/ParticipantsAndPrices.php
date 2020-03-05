@@ -195,7 +195,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     foreach ($this->cart->get_main_event_participants() as $participant) {
       $form = $participant->get_form();
       if (empty($participant->email)
-        && !CRM_Event_Cart_Form_Cart::is_administrator()
         && ($participant->get_participant_index() == 1)
         && ($this->cid != 0)
       ) {
