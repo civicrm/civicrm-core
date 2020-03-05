@@ -18,6 +18,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $pay_later_receipt;
 
   /**
+   * @var array
+   */
+  protected $_values = [];
+
+  /**
    * Register a participant.
    *
    * @param array $params
@@ -122,6 +127,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       if ($payment_processor_id === NULL && $event_in_cart->event->payment_processor !== NULL) {
         $payment_processor_id = $event_in_cart->event->payment_processor;
         $this->financial_type_id = $event_in_cart->event->financial_type_id;
+        $this->_values['currency'] = $event_in_cart->event->currency;
       }
       else {
         if ($event_in_cart->event->payment_processor !== NULL && $event_in_cart->event->payment_processor !== $payment_processor_id) {
@@ -141,28 +147,17 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       }
     }
 
-    if ($payment_processor_id == NULL) {
-      CRM_Core_Error::statusBounce(ts('A payment processor must be selected for this event registration page, or the event must be configured to give users the option to pay later (contact the site administrator for assistance).'));
-    }
-
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($payment_processor_id, $this->_mode);
-    $this->assign('paymentProcessor', $this->_paymentProcessor);
-
-    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, FALSE);
-
-    if ($can_pay_later || self::is_administrator()) {
-      $this->addElement('checkbox', 'is_pay_later',
-        $pay_later_text
-      );
-      $this->addElement('checkbox', 'payment_completed',
-        ts('Payment Completed')
-      );
+    if ($can_pay_later) {
+      $this->addElement('checkbox', 'is_pay_later', $pay_later_text);
+      $this->addElement('checkbox', 'payment_completed', ts('Payment Completed'));
       $this->assign('pay_later_instructions', $this->pay_later_receipt);
     }
-
-    // Event Cart does not support multiple payment processors
-    // so we cannot call $this->preProcessPaymentOptions();
-    CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessor['id']);
+    else {
+      $this->_paymentProcessorIDs = [$payment_processor_id];
+      $this->assignPaymentProcessor(FALSE);
+      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, FALSE);
+    }
+    $this->assign('currency', $this->getCurrency());
   }
 
   /**

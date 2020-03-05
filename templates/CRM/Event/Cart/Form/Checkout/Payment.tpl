@@ -88,6 +88,7 @@
       </td>
       <td class="total">
   &nbsp;{$total|crmMoney:$currency|string_format:"%10s"}
+        <input type="hidden" id="total_amount" value="{$total}">
       </td>
     </tr>
   </tfoot>
