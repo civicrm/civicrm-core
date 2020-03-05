@@ -462,20 +462,25 @@ WHERE  id IN ( $groupIDs )
     if ($savedSearchID) {
       $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
 
-      // rectify params to what proximity search expects if there is a value for prox_distance
-      // CRM-7021
-      if (!empty($ssParams)) {
-        CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
-      }
-
-      if (isset($ssParams['customSearchID'])) {
-        $sql = self::getCustomSearchSQL($savedSearchID, $ssParams);
+      if (!empty($ssParams['api_entity'])) {
+        $mainCol = 'a';
+        $sql = self::getApiSQL($savedSearchID, $ssParams);
       }
       else {
-        $sql = self::getQueryObjectSQL($savedSearchID, $ssParams);
+        $mainCol = 'contact_a';
+        // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
+        if (!empty($ssParams)) {
+          CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
+        }
+        if (isset($ssParams['customSearchID'])) {
+          $sql = self::getCustomSearchSQL($savedSearchID, $ssParams);
+        }
+        else {
+          $sql = self::getQueryObjectSQL($savedSearchID, $ssParams);
+        }
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
-      $sql['from'] .= " AND contact_a.id NOT IN (
+      $sql['from'] .= " AND $mainCol.id NOT IN (
                           SELECT contact_id FROM civicrm_group_contact
                           WHERE civicrm_group_contact.status = 'Removed'
                           AND   civicrm_group_contact.group_id = $groupID ) ";
@@ -710,6 +715,29 @@ ORDER BY   gc.contact_id, g.children
       WHERE id = %1", [
         1 => [$groupID, 'Positive'],
       ]);
+  }
+
+  /**
+   * @param $savedSearchID
+   * @param array $savedSearch
+   * @return array
+   * @throws API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @throws CRM_Core_Exception
+   */
+  protected static function getApiSQL($savedSearchID, array $savedSearch): array {
+    $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $savedSearch['api_params']);
+    $query = new \Civi\Api4\Query\Api4SelectQuery($api->getEntityName(), FALSE, $api->entityFields());
+    $query->select = ['id'];
+    $query->where = $api->getWhere();
+    $query->orderBy = $api->getOrderBy();
+    $query->limit = $api->getLimit();
+    $query->offset = $api->getOffset();
+    $sql = $query->getSql();
+    return [
+      'select' => substr($sql, 0, strpos($sql, 'FROM')),
+      'from' => substr($sql, strpos($sql, 'FROM')),
+    ];
   }
 
   /**

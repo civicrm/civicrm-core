@@ -20,7 +20,7 @@
     });
   });
 
-  angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4) {
+  angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4, dialogService) {
     var ts = $scope.ts = CRM.ts();
     $scope.entities = entities;
     $scope.actions = actions;
@@ -681,10 +681,81 @@
       return docs.params[name];
     };
 
+    $scope.executeDoc = function() {
+      var doc = {
+        description: ts('Runs API call on the CiviCRM database.'),
+        comment: ts('Results and debugging info will be displayed below.')
+      };
+      if ($scope.action === 'delete') {
+        doc.WARNING = ts('This API call will be executed on the real database. Deleting data cannot be undone.');
+      }
+      else if ($scope.action && $scope.action.slice(0, 3) !== 'get') {
+        doc.WARNING = ts('This API call will be executed on the real database. It cannot be undone.');
+      }
+      return doc;
+    };
+
+    $scope.saveDoc = function() {
+      return {
+        description: ts('Save API call as a smart group.'),
+        comment: ts('Allows you to create a SavedSearch containing the WHERE clause of this API call.'),
+      };
+    };
+
     $scope.$watch('params', writeCode, true);
     $scope.$watch('index', writeCode);
     writeCode();
 
+    $scope.save = function() {
+      var model = {
+        title: '',
+        id: null,
+        entity: $scope.entity,
+        params: JSON.parse(angular.toJson($scope.params))
+      };
+      model.params.version = 4;
+      delete model.params.select;
+      delete model.params.chain;
+      delete model.params.debug;
+      delete model.params.limit;
+      delete model.params.checkPermissions;
+      var options = CRM.utils.adjustDialogDefaults({
+        width: '500px',
+        autoOpen: false,
+        title: ts('Save smart group')
+      });
+      dialogService.open('saveSearchDialog', '~/api4Explorer/SaveSearch.html', model, options);
+    };
+  });
+
+  angular.module('api4Explorer').controller('SaveSearchCtrl', function($scope, crmApi4, dialogService) {
+    var ts = $scope.ts = CRM.ts(),
+      model = $scope.model;
+    $scope.$watch('model.id', function(id) {
+      if (id) {
+        model.description = $('#api-save-search-select-group').select2('data').extra.description;
+      }
+    });
+    $scope.cancel = function() {
+      dialogService.cancel('saveSearchDialog');
+    };
+    $scope.save = function() {
+      $('.ui-dialog:visible').block();
+      var group = model.id ? {id: model.id} : {title: model.title};
+      group.description = model.description;
+      group.saved_search_id = '$id';
+      var savedSearch = {
+        api_entity: model.entity,
+        api_params: model.params
+      };
+      if (group.id) {
+        savedSearch.id = $('#api-save-search-select-group').select2('data').extra.saved_search_id;
+      }
+      crmApi4('SavedSearch', 'save', {records: [savedSearch], chain: {group: ['Group', 'save', {'records': [group]}]}})
+        .then(function(result) {
+          dialogService.close('saveSearchDialog', result[0]);
+        });
+    };
   });
 
   angular.module('api4Explorer').directive('crmApi4WhereClause', function($timeout) {

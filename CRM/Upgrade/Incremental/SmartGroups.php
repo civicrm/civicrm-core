@@ -232,12 +232,11 @@ class CRM_Upgrade_Incremental_SmartGroups {
    * @return mixed
    */
   protected function getSearchesWithField($field) {
-    $savedSearches = civicrm_api3('SavedSearch', 'get', [
+    return civicrm_api3('SavedSearch', 'get', [
       'options' => ['limit' => 0],
       'form_values' => ['LIKE' => "%{$field}%"],
+      'return' => ['id', 'form_values'],
     ])['values'];
-    return $savedSearches;
-
   }
 
   /**
