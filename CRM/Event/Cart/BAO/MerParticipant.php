@@ -13,8 +13,20 @@
  * Class CRM_Event_Cart_BAO_MerParticipant
  */
 class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
+
+  /**
+   * @var string
+   */
   public $email = NULL;
+
+  /**
+   * @var int
+   */
   public $contribution_id = NULL;
+
+  /**
+   * @var \CRM_Event_Cart_BAO_Cart
+   */
   public $cart = NULL;
 
   /**
@@ -43,19 +55,14 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
       'contact_id' => $params['contact_id'],
       'event_id' => $params['event_id'],
       'cart_id' => $params['cart_id'],
-      //XXX
-      //'registered_by_id'  =>
-      //'discount_amount'   =>
-      //'fee_level'         => $params['fee_level'],
     ];
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
     if (is_a($participant, 'CRM_Core_Error')) {
-      CRM_Core_Error::fatal(ts('There was an error creating a cart participant'));
+      throw new CRM_Core_Exception(ts('There was an error creating a cart participant'));
     }
 
     $mer_participant = new CRM_Event_Cart_BAO_MerParticipant($participant);
-
     return $mer_participant;
   }
 

@@ -25,22 +25,16 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param CRM_Event_BAO_Event $event
    *
    * @return mixed
+   * @throws \CiviCRM_API3_Exception
    */
   public function registerParticipant($params, &$participant, $event) {
-    $transaction = new CRM_Core_Transaction();
-
-    // handle register date CRM-4320
-    $registerDate = date('YmdHis');
     $participantParams = [
       'id' => $participant->id,
       'event_id' => $event->id,
-      'register_date' => $registerDate,
+      'register_date' => date('YmdHis'),
       'source' => CRM_Utils_Array::value('participant_source', $params, $this->description),
-      //'fee_level'     => $participant->fee_level,
       'is_pay_later' => $this->is_pay_later,
       'fee_amount' => CRM_Utils_Array::value('amount', $params, 0),
-      //XXX why is this a ref to participant and not contact?:
-      //'registered_by_id' => $this->payer_contact_id,
       'fee_currency' => CRM_Utils_Array::value('currencyID', $params),
     ];
 
@@ -53,30 +47,17 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     else {
       $participant_status = 'Registered';
     }
-    $participant_statuses = CRM_Event_PseudoConstant::participantStatus();
-    $participantParams['status_id'] = array_search($participant_status, $participant_statuses);
-    $participant_status_label = CRM_Utils_Array::value($participantParams['status_id'], CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label'));
-    $participantParams['participant_status'] = $participant_status_label;
+    $participantParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $participant_status);
+    $participantParams['participant_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $participantParams['status_id']);
 
     $this->assign('isOnWaitlist', $participant->must_wait);
 
+    $participantParams['is_test'] = 0;
     if ($this->_action & CRM_Core_Action::PREVIEW || CRM_Utils_Array::value('mode', $params) == 'test') {
       $participantParams['is_test'] = 1;
     }
-    else {
-      $participantParams['is_test'] = 0;
-    }
 
-    if (self::is_administrator()) {
-      if (!empty($params['note'])) {
-        $note_params = [
-          'participant_id' => $participant->id,
-          'contact_id' => self::getContactID(),
-          'note' => $params['note'],
-        ];
-        CRM_Event_BAO_Participant::update_note($note_params);
-      }
-    }
+    $transaction = new CRM_Core_Transaction();
 
     $participant->copyValues($participantParams);
     $participant->save();
@@ -138,22 +119,25 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $pay_later_text = "";
     $this->pay_later_receipt = "";
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
-      if ($payment_processor_id == NULL && $event_in_cart->event->payment_processor != NULL) {
+      if ($payment_processor_id === NULL && $event_in_cart->event->payment_processor !== NULL) {
         $payment_processor_id = $event_in_cart->event->payment_processor;
         $this->financial_type_id = $event_in_cart->event->financial_type_id;
       }
       else {
-        if ($event_in_cart->event->payment_processor != NULL && $event_in_cart->event->payment_processor != $payment_processor_id) {
+        if ($event_in_cart->event->payment_processor !== NULL && $event_in_cart->event->payment_processor !== $payment_processor_id) {
           CRM_Core_Error::statusBounce(ts('When registering for multiple events all events must use the same payment processor. '));
         }
       }
-      if (!$event_in_cart->event->is_pay_later) {
+      if ($payment_processor_id) {
         $can_pay_later = FALSE;
       }
-      else {
+      elseif ($event_in_cart->event->is_pay_later) {
         //XXX
         $pay_later_text = $event_in_cart->event->pay_later_text;
         $this->pay_later_receipt = $event_in_cart->event->pay_later_receipt;
+      }
+      else {
+        CRM_Core_Error::statusBounce(ts('A payment processor must be selected for this event registration page, or the event must be configured to give users the option to pay later (contact the site administrator for assistance).'));
       }
     }
 
@@ -185,7 +169,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * Build QuickForm.
    */
   public function buildQuickForm() {
-
     $this->line_items = [];
     $this->sub_total = 0;
     $this->_price_values = $this->getValuesForPage('ParticipantsAndPrices');
@@ -207,13 +190,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $buttons = [];
     $buttons[] = [
       'name' => ts('Go Back'),
-      'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp',
       'type' => 'back',
     ];
     $buttons[] = [
       'isDefault' => TRUE,
       'name' => ts('Complete Transaction'),
-      'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
       'type' => 'next',
     ];
 
@@ -266,9 +247,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $price_set = $price_sets[$price_set_id];
       $price_set_amount = [];
       CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
-      $discountCode = $this->_price_values['discountcode'];
-      if (!empty($discountCode)) {
-        $ret = $this->apply_discount($discountCode, $price_set_amount, $cost, $event_in_cart->event_id);
+      if (!empty($this->_price_values['discountcode'])) {
+        $ret = $this->apply_discount($this->_price_values['discountcode'], $price_set_amount, $cost, $event_in_cart->event_id);
         if ($ret == FALSE) {
           $cost = $event_price_values['amount'];
         }
@@ -407,37 +387,21 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    *
    * @param array $fields
    * @param array $files
-   * @param CRM_Core_Form $self
+   * @param CRM_Core_Form $form
    *
    * @return array|bool
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $form) {
     $errors = [];
 
-    if ($self->payment_required && empty($self->_submitValues['is_pay_later'])) {
-      CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
+    if ($form->payment_required && empty($form->_submitValues['is_pay_later'])) {
+      CRM_Core_Form::validateMandatoryFields($form->_fields, $fields, $errors);
 
       // validate payment instrument values (e.g. credit card number)
-      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, NULL);
+      CRM_Core_Payment_Form::validatePaymentInstrument($form->_paymentProcessor['id'], $fields, $errors, NULL);
     }
 
     return empty($errors) ? TRUE : $errors;
-  }
-
-  /**
-   * Validate form.
-   *
-   * @todo this should surely go! Test & remove.
-   * @return bool
-   */
-  public function validate() {
-    if ($this->is_pay_later) {
-      $this->_fields['credit_card_number']['is_required'] = FALSE;
-      $this->_fields['cvv2']['is_required'] = FALSE;
-      $this->_fields['credit_card_exp_date']['is_required'] = FALSE;
-      $this->_fields['credit_card_type']['is_required'] = FALSE;
-    }
-    return parent::validate();
   }
 
   /**
@@ -454,12 +418,13 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * Post process form.
    */
   public function postProcess() {
-
-    $transaction = new CRM_Core_Transaction();
     $trxnDetails = NULL;
     $params = $this->_submitValues;
 
     $main_participants = $this->cart->get_main_event_participants();
+
+    $transaction = new CRM_Core_Transaction();
+
     foreach ($main_participants as $participant) {
       $defaults = [];
       $ids = ['contact_id' => $participant->contact_id];
@@ -470,7 +435,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $trxn_prefix = 'VR';
     if (array_key_exists('billing_contact_email', $params)) {
-      $this->payer_contact_id = self::find_or_create_contact($this->getContactID(), [
+      $this->payer_contact_id = self::find_or_create_contact([
         'email' => $params['billing_contact_email'],
         'first_name' => $params['billing_first_name'],
         'last_name' => $params['billing_last_name'],
@@ -700,10 +665,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @return array
    */
   public function setDefaultValues() {
-
     $defaults = parent::setDefaultValues();
 
-    $config = CRM_Core_Config::singleton();
     $default_country = new CRM_Core_DAO_Country();
     $default_country->iso_code = CRM_Core_BAO_Country::defaultContactCountry();
     $default_country->find(TRUE);
@@ -755,17 +718,18 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param int $event_id
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
   protected function apply_discount($discountCode, &$price_set_amount, &$cost, $event_id) {
-    //need better way to determine if cividiscount installed
-    $autoDiscount = [];
-    $sql = "select is_active from civicrm_extension where name like 'CiviDiscount%'";
-    $dao = CRM_Core_DAO::executeQuery($sql, '');
-    while ($dao->fetch()) {
-      if ($dao->is_active != '1') {
-        return FALSE;
-      }
+    $extensions = civicrm_api3('Extension', 'get', [
+      'full_name' => 'org.civicrm.module.cividiscount',
+    ]);
+    if (empty($extensions['id']) || ($extensions['values'][$extensions['id']]['status'] !== 'installed')) {
+      return FALSE;
     }
+
+    $autoDiscount = [];
+
     $discounted_priceset_ids = _cividiscount_get_discounted_priceset_ids();
     $discounts = _cividiscount_get_discounts();
 
@@ -801,7 +765,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       if ($discountValue['is_active'] == TRUE && ($discountValue['count_max'] == 0 || ($discountValue['count_max'] > $discountValue['count_use'])) && $active1 == TRUE && $active2 == TRUE && $event_match == TRUE) {
         foreach ($price_set_amount as $key => $price) {
           if (array_search($price['price_field_value_id'], $discounted_priceset_ids) != NULL) {
-            $discounted = _cividiscount_calc_discount($price['line_total'], $price['label'], $discountValue, $autoDiscount, "USD");
+            $discounted = _cividiscount_calc_discount($price['line_total'], $price['label'], $discountValue, $autoDiscount, $this->getCurrency());
             $price_set_amount[$key]['line_total'] = $discounted[0];
             $cost += $discounted[0];
             $price_set_amount[$key]['label'] = $discounted[1];
