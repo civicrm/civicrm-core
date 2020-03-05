@@ -82,6 +82,14 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
           'select' => ['minimumInputLength' => 0],
         ],
       ];
+      $this->components['pcp'] = [
+        'label' => ts("Personal Campaign Page"),
+        'select' => [
+          'key' => 'id',
+          'entity' => 'Pcp',
+          'select' => ['minimumInputLength' => 0],
+        ],
+      ];
     }
 
     if (in_array('CiviEvent', $config->enableComponents)) {
@@ -122,7 +130,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
       ],
       [
         'key' => 'mode',
-        'components' => ['contribution', 'event'],
+        'components' => ['contribution', 'pcp', 'event'],
         'options' => [
           'live' => ts('Live Mode'),
           'test' => ts('Test Drive'),
