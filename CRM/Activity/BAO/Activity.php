@@ -1859,6 +1859,7 @@ WHERE      activity.id IN ($activityIds)";
    *   $params  count of prior activities otherwise false.
    */
   public static function getPriorCount($activityID) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
     static $priorCounts = [];
 
     $activityID = CRM_Utils_Type::escape($activityID, 'Integer');
