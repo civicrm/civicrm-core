@@ -1171,7 +1171,7 @@ FROM   civicrm_domain
    * @param bool $force
    *   Skip use of the cache.
    *
-   * @return string|null
+   * @return string|int|null
    *   Value of $returnColumn in the retrieved record
    *
    * @throws \CRM_Core_Exception

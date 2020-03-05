@@ -618,7 +618,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @todo elaborate on what this does.
    *
-   * @param CRM_Core_DAO_Activity $activity
+   * @param CRM_Activity_DAO_Activity $activity
    * @param string $logMessage
    *
    * @return bool
@@ -1829,6 +1829,7 @@ WHERE      activity.id IN ($activityIds)";
    *
    * @return int
    *   Id of parent activity otherwise false.
+   * @throws \CRM_Core_Exception
    */
   public static function getParentActivity($activityId) {
     static $parentActivities = [];
@@ -1857,6 +1858,7 @@ WHERE      activity.id IN ($activityIds)";
    *
    * @return int
    *   $params  count of prior activities otherwise false.
+   * @throws \CRM_Core_Exception
    */
   public static function getPriorCount($activityID) {
     CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
@@ -1897,6 +1899,7 @@ AND id < {$activityID}
    *
    * @return array
    *   prior activities info.
+   * @throws \CRM_Core_Exception
    */
   public static function getPriorAcitivities($activityID, $onlyPriorRevisions = FALSE) {
     static $priorActivities = [];
@@ -1949,6 +1952,8 @@ AND cl.modified_id  = c.id
    *
    * @return int
    *   current activity id.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getLatestActivityId($activityID) {
     static $latestActivityIds = [];
@@ -1966,7 +1971,7 @@ AND cl.modified_id  = c.id
         $activityID = $originalID;
       }
       $params = [1 => [$activityID, 'Integer']];
-      $query = "SELECT id from civicrm_activity where original_id = %1 and is_current_revision = 1";
+      $query = 'SELECT id from civicrm_activity where original_id = %1 and is_current_revision = 1';
 
       $latestActivityIds[$activityID] = CRM_Core_DAO::singleValueQuery($query, $params);
     }
@@ -1982,6 +1987,8 @@ AND cl.modified_id  = c.id
    * @param array $params
    *
    * @return CRM_Activity_BAO_Activity|null|object
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function createFollowupActivity($activityId, $params) {
     if (!$activityId) {
@@ -2069,6 +2076,7 @@ AND cl.modified_id  = c.id
    * @param int $type
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getStatusesByType($type) {
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
@@ -2094,6 +2102,7 @@ AND cl.modified_id  = c.id
    * @param array $activity
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
   public static function isOverdue($activity) {
     return array_key_exists($activity['status_id'], self::getStatusesByType(self::INCOMPLETE)) && CRM_Utils_Date::overdue($activity['activity_date_time']);
