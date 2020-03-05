@@ -209,7 +209,7 @@
         "url": "https://github.com/components/jqueryui/archive/1.12.1.zip"
       },
       "jquery-validation": {
-        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.13.1.zip",
+        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.1.zip",
         "ignore": [".*", "node_modules", "bower_components", "test", "demo", "lib"]
       },
       "jstree": {
