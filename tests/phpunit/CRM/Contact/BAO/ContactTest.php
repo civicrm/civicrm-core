@@ -1637,4 +1637,47 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals([$contact->display_name, NULL, NULL, NULL], $result);
   }
 
+  /**
+   * dev/core#1605 State/province not copied on shared address
+   * 1. First, create contacts: A and B
+   * 2. Create an address for contact A
+   * 3. Use contact A's address for contact B's address
+   * ALL the address fields on address A should be copied to address B
+   */
+  public function testSharedAddressCopiesAllAddressFields() {
+    $contactIdA = $this->individualCreate([], 0);
+    $contactIdB = $this->individualCreate([], 1);
+
+    $addressParamsA = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+      'street_name' => 'Ambachtstraat',
+      'street_number' => '23',
+      'street_address' => 'Ambachtstraat 23',
+      'postal_code' => '6971 BN',
+      'country_id' => '1152',
+      'city' => 'Brummen',
+      'is_billing' => 1,
+      'state_province_id' => '3934',
+    ];
+    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+
+    $addressParamsB[1] = [
+      'contact_id' => $contactIdB,
+      'master_id' => $addAddressA->id,
+      'use_shared_address' => 1,
+    ];
+
+    CRM_Contact_BAO_Contact_Utils::processSharedAddress($addressParamsB);
+    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB[1], FALSE);
+
+    foreach ($addAddressA as $key => $value) {
+      if (!in_array($key, ['id', 'contact_id', 'master_id', 'is_primary', 'is_billing', 'location_type_id', 'manual_geo_code'])) {
+        $this->assertEquals($addAddressA->$key, $addAddressB->$key);
+      }
+    }
+  }
+
 }
