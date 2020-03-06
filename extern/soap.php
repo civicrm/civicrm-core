@@ -30,9 +30,9 @@ $crm_soap = new CRM_Utils_SoapServer();
 
 /* Cache the real UF, override it with the SOAP environment */
 
-$config = CRM_Core_Config::singleton();
+$civicrmConfig = CRM_Core_Config::singleton();
 
-$server->setClass('CRM_Utils_SoapServer', $config->userFrameworkClass);
+$server->setClass('CRM_Utils_SoapServer', $civicrmConfig->userFrameworkClass);
 
 $server->setPersistence(SOAP_PERSISTENCE_SESSION);
 
