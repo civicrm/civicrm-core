@@ -338,6 +338,8 @@ FROM   civicrm_prevnext_cache pn
   }
 
   /**
+   * @deprecated
+   *
    * @param array|string $entity_table
    * @param int $entity_id1
    * @param int $entity_id2
@@ -345,6 +347,7 @@ FROM   civicrm_prevnext_cache pn
    * @param string $data
    */
   public static function setItem($entity_table = NULL, $entity_id1 = NULL, $entity_id2 = NULL, $cacheKey = NULL, $data = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
     // If entity table is an array we are passing in an older format where this function only had 1 param $values. We put a deprecation warning.
     if (!empty($entity_table) && is_array($entity_table)) {
       Civi::log()->warning('Deprecated code path. Values should not be set this is going away in the future in favour of specific function params for each column.', array('civi.tag' => 'deprecated'));
