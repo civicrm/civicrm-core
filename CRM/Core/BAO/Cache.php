@@ -387,7 +387,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
     if ($prevNext) {
       // delete all PrevNext caches
-      CRM_Core_BAO_PrevNextCache::cleanupCache();
+      Civi::service('prevnext')->cleanup();
     }
 
     if ($table) {
