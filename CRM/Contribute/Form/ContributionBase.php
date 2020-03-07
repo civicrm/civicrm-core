@@ -481,7 +481,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     // check if billing block is required for pay later
-    if (CRM_Utils_Array::value('is_pay_later', $this->_values)) {
+    if (!empty($this->_values['is_pay_later'])) {
       $this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_required', $this->_values);
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
@@ -951,7 +951,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         $form->assign('fieldSetTitle', CRM_Core_BAO_UFGroup::getTitle($form->_values['onbehalf_profile_id']));
 
-        if (CRM_Utils_Array::value('is_for_organization', $form->_values)) {
+        if (!empty($form->_values['is_for_organization'])) {
           if ($form->_values['is_for_organization'] == 2) {
             $form->assign('onBehalfRequired', TRUE);
           }

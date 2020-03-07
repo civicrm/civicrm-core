@@ -132,7 +132,7 @@ class CRM_Activity_BAO_Query {
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('parent_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['parent_id'])) {
       $query->_tables['parent_id'] = 1;
       $query->_whereTables['parent_id'] = 1;
       $query->_element['parent_id'] = 1;

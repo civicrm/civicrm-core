@@ -28,14 +28,14 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
       $endDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['intervalDateColumns'][0];
 
       $recursion = new CRM_Core_BAO_RecurringEntity();
-      if (CRM_Utils_Array::value('dateColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
+      if (!empty(CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'])) {
         $recursion->dateColumns = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'];
       }
       $recursion->scheduleFormValues = $formValues;
       if (!empty($formValues['exclude_date_list'])) {
         $recursion->excludeDates = explode(',', $formValues['exclude_date_list']);
       }
-      if (CRM_Utils_Array::value('excludeDateRangeColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
+      if (!empty(CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['excludeDateRangeColumns'])) {
         $recursion->excludeDateRangeColumns = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['excludeDateRangeColumns'];
       }
 
@@ -52,7 +52,7 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
       }
 
       //Check if there is any enddate column defined to find out the interval between the two range
-      if (CRM_Utils_Array::value('intervalDateColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
+      if (!empty(CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['intervalDateColumns'])) {
         if ($endDate) {
           $interval = $recursion->getInterval($startDate, $endDate);
           $recursion->intervalDateColumns = [$endDateColumnName => $interval];

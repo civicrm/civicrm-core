@@ -1146,7 +1146,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public static function updateModeLinkedEntity($entityId, $linkedEntityTable, $mainEntityTable) {
     $result = [];
     if ($entityId && $linkedEntityTable && $mainEntityTable) {
-      if (CRM_Utils_Array::value($linkedEntityTable, self::$_tableDAOMapper)) {
+      if (!empty(self::$_tableDAOMapper[$linkedEntityTable])) {
         $dao = self::$_tableDAOMapper[$linkedEntityTable];
       }
       else {

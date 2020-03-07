@@ -788,7 +788,7 @@ class CRM_Contact_BAO_Query {
         elseif (isset($field['where'])) {
           list($tableName, $fieldName) = explode('.', $field['where'], 2);
           if (isset($tableName)) {
-            if (CRM_Utils_Array::value($tableName, self::$_dependencies)) {
+            if (!empty(self::$_dependencies[$tableName])) {
               $this->_tables['civicrm_address'] = 1;
               $this->_select['address_id'] = 'civicrm_address.id as address_id';
               $this->_element['address_id'] = 1;
@@ -4727,7 +4727,7 @@ civicrm_relationship.start_date > {$today}
       list($from, $to) = CRM_Utils_Date::getFromTo($values, NULL, NULL);
     }
     else {
-      if ($fieldName == $customFieldName . '_to' && CRM_Utils_Array::value($customFieldName . '_from', $formValues)) {
+      if ($fieldName == $customFieldName . '_to' && !empty($formValues[$customFieldName . '_from'])) {
         // Both to & from are set. We only need to acton one, choosing from.
         return;
       }
@@ -6554,15 +6554,15 @@ AND   displayRelType.is_active = 1
       return FALSE;
     }
 
-    if (!empty($pseudoConstant['optionGroupName']) && CRM_Utils_Array::value($pseudoConstant['optionGroupName'], $this->_returnProperties)) {
+    if (!empty($pseudoConstant['optionGroupName']) && !empty($this->_returnProperties[$pseudoConstant['optionGroupName']])) {
       return TRUE;
     }
-    if (CRM_Utils_Array::value($fieldName, $this->_returnProperties)) {
+    if (!empty($this->_returnProperties[$fieldName])) {
       return TRUE;
     }
     // Is this still required - the above goes off the unique name. Test with things like
     // communication_preferences & prefix_id.
-    if (CRM_Utils_Array::value($field['name'], $this->_returnProperties)) {
+    if (!empty($this->_returnProperties[$field['name']])) {
       return TRUE;
     }
     return FALSE;
