@@ -1442,7 +1442,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @return CRM_Mailing_DAO_Mailing
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('mailing_id', $ids));
+    $id = $params['id'] ?? $ids['mailing_id'] ?? NULL;
 
     if (empty($params['id']) && !empty($ids)) {
       \Civi::log('Parameter $ids is no longer used by Mailing::add. Use the api or just pass $params', ['civi.tag' => 'deprecated']);

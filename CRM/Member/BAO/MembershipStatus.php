@@ -105,7 +105,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return object
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipStatus', $ids));
+    $id = $params['id'] ?? $ids['membershipStatus'] ?? NULL;
     if (!$id) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
       //copy name to label when not passed.

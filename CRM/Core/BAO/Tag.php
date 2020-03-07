@@ -393,7 +393,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   object on success, otherwise null
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
+    $id = $params['id'] ?? $ids['tag'] ?? NULL;
     if (!$id && !self::dataExists($params)) {
       return NULL;
     }

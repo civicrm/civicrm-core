@@ -150,7 +150,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
         $note->contact_id = $params['entity_id'];
       }
     }
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+    $id = $params['id'] ?? $ids['id'] ?? NULL;
     if ($id) {
       $note->id = $id;
     }

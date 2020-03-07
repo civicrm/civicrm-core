@@ -62,7 +62,7 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
    * @return CRM_Mailing_BAO_MailingComponent
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+    $id = $params['id'] ?? $ids['id'] ?? NULL;
     $component = new CRM_Mailing_BAO_MailingComponent();
     if ($id) {
       $component->id = $id;

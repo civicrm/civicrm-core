@@ -31,7 +31,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    *   the partcipant payment record
    */
   public static function create(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+    $id = $params['id'] ?? $ids['id'] ?? NULL;
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'ParticipantPayment', $id, $params);
     }

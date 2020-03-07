@@ -154,7 +154,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @throws \CRM_Core_Exception
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('optionValue', $ids));
+    $id = $params['id'] ?? $ids['optionValue'] ?? NULL;
     // CRM-10921: do not reset attributes to default if this is an update
     //@todo consider if defaults are being set in the right place. 'dumb' defaults like
     // these would be usefully set @ the api layer so they are visible to api users
