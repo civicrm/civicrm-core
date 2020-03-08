@@ -4411,7 +4411,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'fields' => [
           'address_name' => [
             'title' => ts('Address Name'),
-            'default' => CRM_Utils_Array::value('name', $defaults, FALSE),
+            'default' => $defaults['name'] ?? FALSE,
             'name' => 'name',
           ],
         ],
@@ -4421,7 +4421,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     foreach ($defaultAddressFields as $fieldName => $fieldLabel) {
       $addressFields['civicrm_address']['fields'][$fieldName] = [
         'title' => $fieldLabel,
-        'default' => CRM_Utils_Array::value($fieldName, $defaults, FALSE),
+        'default' => $defaults[$fieldName] ?? FALSE,
       ];
     }
 

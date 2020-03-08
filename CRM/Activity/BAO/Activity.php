@@ -751,7 +751,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         'activity_id' => $activity['id'],
         'activity_date_time' => $activity['activity_date_time'] ?? NULL,
         'subject' => $activity['subject'] ?? NULL,
-        'assignee_contact_name' => CRM_Utils_Array::value('assignee_contact_sort_name', $activity, []),
+        'assignee_contact_name' => $activity['assignee_contact_sort_name'] ?? [],
         'source_contact_id' => $activity['source_contact_id'] ?? NULL,
         'source_contact_name' => $activity['source_contact_sort_name'] ?? NULL,
       ];

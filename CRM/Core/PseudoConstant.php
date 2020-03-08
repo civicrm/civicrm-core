@@ -232,7 +232,7 @@ class CRM_Core_PseudoConstant {
 
       // Merge params with schema defaults
       $params += [
-        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, []),
+        'condition' => $pseudoconstant['condition'] ?? [],
         'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
         'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
       ];

@@ -200,7 +200,7 @@ class CRM_Utils_Chart {
         'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
         'values' => $graph[0],
         'multiValues' => $graph,
-        'barKeys' => CRM_Utils_Array::value('barKeys', $rows, []),
+        'barKeys' => $rows['barKeys'] ?? [],
       ];
     }
 

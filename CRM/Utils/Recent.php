@@ -120,7 +120,7 @@ class CRM_Utils_Recent {
         'contact_id' => $contactId,
         'contactName' => $contactName,
         'subtype' => $others['subtype'] ?? NULL,
-        'isDeleted' => CRM_Utils_Array::value('isDeleted', $others, FALSE),
+        'isDeleted' => $others['isDeleted'] ?? FALSE,
         'image_url' => $others['imageUrl'] ?? NULL,
         'edit_url' => $others['editUrl'] ?? NULL,
         'delete_url' => $others['deleteUrl'] ?? NULL,

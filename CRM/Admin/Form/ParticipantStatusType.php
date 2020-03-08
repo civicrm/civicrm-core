@@ -89,8 +89,8 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
       'name' => $formValues['name'] ?? NULL,
       'label' => $formValues['label'] ?? NULL,
       'class' => $formValues['class'] ?? NULL,
-      'is_active' => CRM_Utils_Array::value('is_active', $formValues, FALSE),
-      'is_counted' => CRM_Utils_Array::value('is_counted', $formValues, FALSE),
+      'is_active' => $formValues['is_active'] ?? FALSE,
+      'is_counted' => $formValues['is_counted'] ?? FALSE,
       'weight' => $formValues['weight'] ?? NULL,
       'visibility_id' => $formValues['visibility_id'] ?? NULL,
     ];
