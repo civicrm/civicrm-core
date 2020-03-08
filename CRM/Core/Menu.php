@@ -502,6 +502,8 @@ class CRM_Core_Menu {
   /**
    * @param $menu
    * @param $path
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function fillComponentIds(&$menu, $path) {
     static $cache = array();
@@ -525,7 +527,7 @@ class CRM_Core_Menu {
       $menu[$path]['component_id'] = $cache[$compPath];
     }
     else {
-      if (CRM_Utils_Array::value('component', CRM_Utils_Array::value($compPath, $menu))) {
+      if (!empty($menu[$compPath]['component'])) {
         $componentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component',
           $menu[$compPath]['component'],
           'id', 'name'
