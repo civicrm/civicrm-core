@@ -1147,10 +1147,10 @@ WHERE civicrm_event.is_active = 1
         }
         $tplParams = array_merge($values, $participantParams, [
           'email' => $email,
-          'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
-          'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
+          'confirm_email_text' => $values['event']['confirm_email_text'] ?? NULL,
+          'isShowLocation' => $values['event']['is_show_location'] ?? NULL,
           // The concept of contributeMode is deprecated.
-          'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
+          'contributeMode' => $template->_tpl_vars['contributeMode'] ?? NULL,
           'customPre' => $profilePre[0],
           'customPre_grouptitle' => empty($profilePre[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $preProfileID)],
           'customPost' => $profilePost[0],
@@ -2212,8 +2212,8 @@ WHERE  ce.loc_block_id = $locBlockId";
 
         $fromEmailValues['from_email_id'][$eventEmailId] = htmlspecialchars($eventEmailId);
         $fromEmailId = [
-          'cc' => CRM_Utils_Array::value('cc_confirm', $eventEmail),
-          'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventEmail),
+          'cc' => $eventEmail['cc_confirm'] ?? NULL,
+          'bcc' => $eventEmail['bcc_confirm'] ?? NULL,
         ];
         $fromEmailValues = array_merge($fromEmailValues, $fromEmailId);
       }

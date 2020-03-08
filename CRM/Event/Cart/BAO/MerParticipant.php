@@ -49,7 +49,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    */
   public static function create(&$params) {
     $participantParams = [
-      'id' => CRM_Utils_Array::value('id', $params),
+      'id' => $params['id'] ?? NULL,
       'role_id' => self::get_attendee_role_id(),
       'status_id' => self::get_pending_in_cart_status_id(),
       'contact_id' => $params['contact_id'],

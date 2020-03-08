@@ -86,13 +86,13 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
     $formValues = $this->controller->exportValues($this->_name);
 
     $params = [
-      'name' => CRM_Utils_Array::value('name', $formValues),
-      'label' => CRM_Utils_Array::value('label', $formValues),
-      'class' => CRM_Utils_Array::value('class', $formValues),
+      'name' => $formValues['name'] ?? NULL,
+      'label' => $formValues['label'] ?? NULL,
+      'class' => $formValues['class'] ?? NULL,
       'is_active' => CRM_Utils_Array::value('is_active', $formValues, FALSE),
       'is_counted' => CRM_Utils_Array::value('is_counted', $formValues, FALSE),
-      'weight' => CRM_Utils_Array::value('weight', $formValues),
-      'visibility_id' => CRM_Utils_Array::value('visibility_id', $formValues),
+      'weight' => $formValues['weight'] ?? NULL,
+      'visibility_id' => $formValues['visibility_id'] ?? NULL,
     ];
 
     // make sure a malicious POST does not change these on reserved statuses

@@ -360,7 +360,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
             'entity_id' => $contact->id,
             'entity_table' => 'civicrm_contact',
             'note' => $note['note'],
-            'subject' => CRM_Utils_Array::value('subject', $note),
+            'subject' => $note['subject'] ?? NULL,
             'contact_id' => $contactId,
           ];
           CRM_Core_BAO_Note::add($noteParams);
@@ -377,7 +377,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
           'entity_id' => $contact->id,
           'entity_table' => 'civicrm_contact',
           'note' => $params['note'],
-          'subject' => CRM_Utils_Array::value('subject', $params),
+          'subject' => $params['subject'] ?? NULL,
           'contact_id' => $contactId,
         ];
         CRM_Core_BAO_Note::add($noteParams);
@@ -754,7 +754,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     //lookup value of email/postal greeting, addressee, CRM-4575
     foreach (self::$_greetingTypes as $greeting) {
       $filterCondition = [
-        'contact_type' => CRM_Utils_Array::value('contact_type', $defaults),
+        'contact_type' => $defaults['contact_type'] ?? NULL,
         'greeting_type' => $greeting,
       ];
       CRM_Utils_Array::lookupValue($defaults, $greeting,
@@ -3195,7 +3195,7 @@ AND       civicrm_openid.is_primary = 1";
           $contextMenu['primaryActions'][$key] = [
             'title' => $values['title'],
             'ref' => $values['ref'],
-            'class' => CRM_Utils_Array::value('class', $values),
+            'class' => $values['class'] ?? NULL,
             'key' => $values['key'],
           ];
           continue;
@@ -3205,9 +3205,9 @@ AND       civicrm_openid.is_primary = 1";
         $contextMenu['moreActions'][$values['weight']] = [
           'title' => $values['title'],
           'ref' => $values['ref'],
-          'href' => CRM_Utils_Array::value('href', $values),
-          'tab' => CRM_Utils_Array::value('tab', $values),
-          'class' => CRM_Utils_Array::value('class', $values),
+          'href' => $values['href'] ?? NULL,
+          'tab' => $values['tab'] ?? NULL,
+          'class' => $values['class'] ?? NULL,
           'key' => $values['key'],
         ];
       }
@@ -3222,10 +3222,10 @@ AND       civicrm_openid.is_primary = 1";
           $contextMenu['otherActions'][$value['weight']] = [
             'title' => $value['title'],
             'ref' => $value['ref'],
-            'href' => CRM_Utils_Array::value('href', $value),
-            'tab' => CRM_Utils_Array::value('tab', $value),
-            'class' => CRM_Utils_Array::value('class', $value),
-            'icon' => CRM_Utils_Array::value('icon', $value),
+            'href' => $value['href'] ?? NULL,
+            'tab' => $value['tab'] ?? NULL,
+            'class' => $value['class'] ?? NULL,
+            'icon' => $value['icon'] ?? NULL,
             'key' => $value['key'],
           ];
         }

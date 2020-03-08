@@ -462,8 +462,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'from' => $receiptFrom,
         'toName' => $participantName,
         'toEmail' => $toEmail,
-        'cc' => CRM_Utils_Array::value('cc_confirm', $eventDetails),
-        'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventDetails),
+        'cc' => $eventDetails['cc_confirm'] ?? NULL,
+        'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
       ];
       CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }

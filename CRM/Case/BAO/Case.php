@@ -1306,7 +1306,7 @@ HERESQL;
         [
           'groupName' => 'msg_tpl_workflow_case',
           'valueName' => 'case_activity',
-          'contactId' => CRM_Utils_Array::value('contact_id', $info),
+          'contactId' => $info['contact_id'] ?? NULL,
           'tplParams' => $tplParams,
           'from' => $receiptFrom,
           'toName' => $displayName,

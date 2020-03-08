@@ -256,7 +256,7 @@ function _angularex_civix_insert_navigation_menu(&$menu, $path, $item, $parentId
     $navId++;
     $menu[$navId] = [
       'attributes' => array_merge($item, [
-        'label' => CRM_Utils_Array::value('name', $item),
+        'label' => $item['name'] ?? NULL,
         'active' => 1,
         'parentID' => $parentId,
         'navID' => $navId,

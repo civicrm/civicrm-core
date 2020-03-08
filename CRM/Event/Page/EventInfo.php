@@ -297,8 +297,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $params = [
       'contact_id' => $session->get('userID'),
-      'event_id' => CRM_Utils_Array::value('id', $values['event']),
-      'role_id' => CRM_Utils_Array::value('default_role_id', $values['event']),
+      'event_id' => $values['event']['id'] ?? NULL,
+      'role_id' => $values['event']['default_role_id'] ?? NULL,
     ];
 
     if ($eventFullMessage && ($noFullMsg == 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {

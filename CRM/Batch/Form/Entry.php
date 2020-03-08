@@ -789,8 +789,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
 
           $formDates = [
-            'end_date' => CRM_Utils_Array::value('membership_end_date', $value),
-            'start_date' => CRM_Utils_Array::value('membership_start_date', $value),
+            'end_date' => $value['membership_end_date'] ?? NULL,
+            'start_date' => $value['membership_start_date'] ?? NULL,
           ];
           $membershipSource = CRM_Utils_Array::value('source', $value);
           list($membership) = CRM_Member_BAO_Membership::processMembership(

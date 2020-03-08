@@ -246,7 +246,7 @@ function civicrm_api3_system_get($params) {
         'exampleUrl' => CRM_Utils_System::url('civicrm/example', NULL, TRUE, NULL, FALSE),
       ],
       'http' => [
-        'software' => CRM_Utils_Array::value('SERVER_SOFTWARE', $_SERVER),
+        'software' => $_SERVER['SERVER_SOFTWARE'] ?? NULL,
         'forwarded' => !empty($_SERVER['HTTP_X_FORWARDED_FOR']) || !empty($_SERVER['X_FORWARDED_PROTO']),
         'port' => (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == 80 || $_SERVER['SERVER_PORT'] == 443) ? 'Standard' : 'Nonstandard',
       ],

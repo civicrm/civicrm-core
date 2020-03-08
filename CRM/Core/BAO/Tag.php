@@ -333,10 +333,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $allTags[$id] = [
         'text' => $tag['name'],
         'id' => $id,
-        'description' => CRM_Utils_Array::value('description', $tag),
-        'parent_id' => CRM_Utils_Array::value('parent_id', $tag),
-        'used_for' => CRM_Utils_Array::value('used_for', $tag),
-        'color' => CRM_Utils_Array::value('color', $tag),
+        'description' => $tag['description'] ?? NULL,
+        'parent_id' => $tag['parent_id'] ?? NULL,
+        'used_for' => $tag['used_for'] ?? NULL,
+        'color' => $tag['color'] ?? NULL,
       ];
       if (!$allowSelectingNonSelectable && empty($tag['is_selectable'])) {
         $allTags[$id]['disabled'] = TRUE;

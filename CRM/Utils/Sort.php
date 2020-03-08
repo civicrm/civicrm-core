@@ -106,7 +106,7 @@ class CRM_Utils_Sort {
     foreach ($vars as $weight => $value) {
       $this->_vars[$weight] = [
         'name' => CRM_Utils_Type::validate($value['sort'], 'MysqlColumnNameOrAlias'),
-        'direction' => CRM_Utils_Array::value('direction', $value),
+        'direction' => $value['direction'] ?? NULL,
         'title' => $value['name'],
       ];
     }

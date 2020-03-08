@@ -1126,14 +1126,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->set('is_deductible', TRUE);
     }
     $contributionParams = [
-      'id' => CRM_Utils_Array::value('contribution_id', $this->_params),
+      'id' => $this->_params['contribution_id'] ?? NULL,
       'contact_id' => $contactID,
       'line_item' => $lineItem,
       'is_test' => $isTest,
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_params),
-      'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
+      'campaign_id' => $this->_params['campaign_id'] ?? NULL,
+      'contribution_page_id' => $this->_params['contribution_page_id'] ?? NULL,
       'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-      'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $this->_params),
+      'thankyou_date' => $this->_params['thankyou_date'] ?? NULL,
     ];
     $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
 
@@ -1178,9 +1178,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'trxn_id' => $result['trxn_id'],
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
-              'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-              'card_type_id' => CRM_Utils_Array::value('card_type_id', $paymentParams),
-              'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $paymentParams),
+              'fee_amount' => $result['fee_amount'] ?? NULL,
+              'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+              'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
               'is_email_receipt' => FALSE,
             ]);
             // This has now been set to 1 in the DB - declare it here also

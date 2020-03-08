@@ -74,8 +74,8 @@ class CRM_Activity_BAO_ActivityType {
       $displayLabels = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $activity_type_id, 'label');
 
       $this->_activityType = [
-        'machineName' => CRM_Utils_Array::value($activity_type_id, $machineNames),
-        'displayLabel' => CRM_Utils_Array::value($activity_type_id, $displayLabels),
+        'machineName' => $machineNames[$activity_type_id] ?? NULL,
+        'displayLabel' => $displayLabels[$activity_type_id] ?? NULL,
         'id' => $activity_type_id,
       ];
     }

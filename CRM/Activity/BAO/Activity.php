@@ -749,11 +749,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     foreach ($result as $id => $activity) {
       $activities[$id] = [
         'activity_id' => $activity['id'],
-        'activity_date_time' => CRM_Utils_Array::value('activity_date_time', $activity),
-        'subject' => CRM_Utils_Array::value('subject', $activity),
+        'activity_date_time' => $activity['activity_date_time'] ?? NULL,
+        'subject' => $activity['subject'] ?? NULL,
         'assignee_contact_name' => CRM_Utils_Array::value('assignee_contact_sort_name', $activity, []),
-        'source_contact_id' => CRM_Utils_Array::value('source_contact_id', $activity),
-        'source_contact_name' => CRM_Utils_Array::value('source_contact_sort_name', $activity),
+        'source_contact_id' => $activity['source_contact_id'] ?? NULL,
+        'source_contact_name' => $activity['source_contact_sort_name'] ?? NULL,
       ];
       $activities[$id]['activity_type_name'] = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
       $activities[$id]['activity_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
@@ -2458,8 +2458,8 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
       'is_deleted' => 0,
       'is_current_revision' => 1,
       'is_test' => 0,
-      'contact_id' => CRM_Utils_Array::value('contact_id', $params),
-      'activity_date_time' => CRM_Utils_Array::value('activity_date_time', $params),
+      'contact_id' => $params['contact_id'] ?? NULL,
+      'activity_date_time' => $params['activity_date_time'] ?? NULL,
       'check_permissions' => 1,
       'options' => [
         'offset' => CRM_Utils_Array::value('offset', $params, 0),

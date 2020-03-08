@@ -207,9 +207,9 @@ class CRM_Contribute_Form_AdditionalInfo {
     //CRM-11106
     if ($premiumID == NULL || $isDeleted) {
       $premiumParams = [
-        'cost' => CRM_Utils_Array::value('cost', $productDetails),
-        'currency' => CRM_Utils_Array::value('currency', $productDetails),
-        'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $productDetails),
+        'cost' => $productDetails['cost'] ?? NULL,
+        'currency' => $productDetails['currency'] ?? NULL,
+        'financial_type_id' => $productDetails['financial_type_id'] ?? NULL,
         'contributionId' => $contributionID,
       ];
       if ($isDeleted) {

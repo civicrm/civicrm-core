@@ -150,7 +150,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     $params = [
       'id' => $this->_id,
       'payment_instrument_id' => $this->_submitValues['payment_instrument_id'],
-      'trxn_id' => CRM_Utils_Array::value('trxn_id', $this->_submitValues),
+      'trxn_id' => $this->_submitValues['trxn_id'] ?? NULL,
       'trxn_date' => CRM_Utils_Array::value('trxn_date', $this->_submitValues, date('YmdHis')),
     ];
 

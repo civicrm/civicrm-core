@@ -685,7 +685,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
                   'label' => ts('Other Amount'),
                   'price_set_id' => $priceSetId,
                   'html_type' => 'Text',
-                  'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $this->_values),
+                  'financial_type_id' => $this->_values['financial_type_id'] ?? NULL,
                   'is_display_amounts' => 0,
                   'weight' => 3,
                 ];

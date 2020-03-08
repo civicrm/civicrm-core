@@ -312,7 +312,7 @@ class CRM_Core_BAO_Block {
       }
       $contactFields = [
         'contact_id' => $contactId,
-        'location_type_id' => CRM_Utils_Array::value('location_type_id', $value),
+        'location_type_id' => $value['location_type_id'] ?? NULL,
       ];
 
       $contactFields['is_primary'] = 0;

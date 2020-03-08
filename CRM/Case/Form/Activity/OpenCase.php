@@ -303,10 +303,10 @@ class CRM_Case_Form_Activity_OpenCase {
       'subject' => $params['activity_subject'],
       'location' => $params['location'],
       'activity_date_time' => $params['start_date'],
-      'duration' => CRM_Utils_Array::value('duration', $params),
+      'duration' => $params['duration'] ?? NULL,
       'medium_id' => $params['medium_id'],
       'details' => $params['activity_details'],
-      'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
+      'relationship_end_date' => $params['end_date'] ?? NULL,
     ];
 
     if (array_key_exists('custom', $params) && is_array($params['custom'])) {

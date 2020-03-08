@@ -145,7 +145,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           'is_active' => 1,
           'is_default' => !empty($defaultArray[$params['option_weight'][$index]]) ? $defaultArray[$params['option_weight'][$index]] : 0,
           'membership_num_terms' => NULL,
-          'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $params),
+          'non_deductible_amount' => $params['non_deductible_amount'] ?? NULL,
           'visibility_id' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_visibility_id', $params), self::getVisibilityOptionID('public')),
         ];
 

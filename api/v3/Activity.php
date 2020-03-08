@@ -689,9 +689,9 @@ function civicrm_api3_activity_delete($params) {
  */
 function _civicrm_api3_activity_check_params(&$params) {
   $activityIds = [
-    'activity' => CRM_Utils_Array::value('id', $params),
-    'parent' => CRM_Utils_Array::value('parent_id', $params),
-    'original' => CRM_Utils_Array::value('original_id', $params),
+    'activity' => $params['id'] ?? NULL,
+    'parent' => $params['parent_id'] ?? NULL,
+    'original' => $params['original_id'] ?? NULL,
   ];
 
   foreach ($activityIds as $id => $value) {

@@ -348,8 +348,8 @@ WHERE ceft.entity_id = %1";
         'to_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $toFinancialAccountType),
         'from_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $fromFinancialAccountType),
         'trxn_date' => date('YmdHis'),
-        'total_amount' => !empty($params['cost']) ? $params['cost'] : 0,
-        'currency' => CRM_Utils_Array::value('currency', $params),
+        'total_amount' => $params['cost'] ?? 0,
+        'currency' => $params['currency'] ?? NULL,
         'status_id' => array_search('Completed', $contributionStatuses),
         'entity_table' => 'civicrm_contribution',
         'entity_id' => $params['contributionId'],
@@ -364,9 +364,9 @@ WHERE ceft.entity_id = %1";
       $productDetails = [];
       CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
       $params = [
-        'cost' => CRM_Utils_Array::value('cost', $productDetails),
-        'currency' => CRM_Utils_Array::value('currency', $productDetails),
-        'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $productDetails),
+        'cost' => $productDetails['cost'] ?? NULL,
+        'currency' => $productDetails['currency'] ?? NULL,
+        'financial_type_id' => $productDetails['financial_type_id'] ?? NULL,
         'contributionId' => $params['oldPremium']['contribution_id'],
         'isDeleted' => TRUE,
       ];

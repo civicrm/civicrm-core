@@ -219,7 +219,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
-        'end_date' => CRM_Utils_Array::value('relationship_end_date', $params),
+        'end_date' => $params['relationship_end_date'] ?? NULL,
       ];
 
       if (substr($relationshipType, -4) == '_b_a') {
@@ -451,10 +451,10 @@ AND        a.is_deleted = 0
         'subject' => !empty($params['subject']) ? $params['subject'] : $activityTypeName,
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
-        'medium_id' => CRM_Utils_Array::value('medium_id', $params),
-        'location' => CRM_Utils_Array::value('location', $params),
-        'details' => CRM_Utils_Array::value('details', $params),
-        'duration' => CRM_Utils_Array::value('duration', $params),
+        'medium_id' => $params['medium_id'] ?? NULL,
+        'location' => $params['location'] ?? NULL,
+        'details' => $params['details'] ?? NULL,
+        'duration' => $params['duration'] ?? NULL,
         'weight' => $orderVal,
       ];
     }

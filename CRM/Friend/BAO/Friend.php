@@ -119,7 +119,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       'details' => $params['suggested_message'],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'is_test' => $params['is_test'],
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
+      'campaign_id' => $params['campaign_id'] ?? NULL,
     ];
 
     // activity creation
