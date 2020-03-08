@@ -1645,7 +1645,7 @@ UPDATE  civicrm_participant
       $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     }
 
-    if (CRM_Utils_Array::value($participantStatuses[$oldStatusId], self::$_statusTransitionsRules) &&
+    if (!empty(self::$_statusTransitionsRules[$participantStatuses[$oldStatusId]]) &&
       in_array($participantStatuses[$newStatusId], self::$_statusTransitionsRules[$participantStatuses[$oldStatusId]])
     ) {
       $additionalParticipantIds = self::getAdditionalParticipantIds($participantId, TRUE, $oldStatusId);

@@ -168,7 +168,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         'soft_credit_type_id' => $params['soft_credit_type_id'],
       ];
 
-      if (CRM_Utils_Array::value('is_email_receipt', $form->_values)) {
+      if (!empty($form->_values['is_email_receipt'])) {
         $form->_values['honor'] = [
           'soft_credit_type' => CRM_Utils_Array::value(
             $params['soft_credit_type_id'],

@@ -1384,7 +1384,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
 
-        if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
+        if (!empty($this->_params['tax_amount'])) {
           $contributionParams['tax_amount'] = $this->_params['tax_amount'];
         }
 

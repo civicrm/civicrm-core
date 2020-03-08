@@ -125,7 +125,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
     $index = $cond ? $cond : 'No Condition';
     $index = "{$index}_{$retColumn}";
-    if (!CRM_Utils_Array::value($index, self::$participantStatus)) {
+    if (empty(self::$participantStatus[$index])) {
       self::$participantStatus[$index] = [];
       CRM_Core_PseudoConstant::populate(self::$participantStatus[$index],
         'CRM_Event_DAO_ParticipantStatusType',
@@ -182,7 +182,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
     $index = $cond ? $cond : 'No Condition';
-    if (!CRM_Utils_Array::value($index, self::$participantRole)) {
+    if (empty(self::$participantRole[$index])) {
       self::$participantRole[$index] = [];
 
       $condition = NULL;

@@ -654,7 +654,7 @@ class CRM_Core_PseudoConstant {
    *   array reference of all State/Provinces.
    */
   public static function &stateProvince($id = FALSE, $limit = TRUE) {
-    if (($id && !CRM_Utils_Array::value($id, self::$stateProvince)) || !self::$stateProvince || !$id) {
+    if (($id && empty(self::$stateProvince[$id])) || !self::$stateProvince || !$id) {
       $whereClause = FALSE;
       if ($limit) {
         $countryIsoCodes = self::countryIsoCode();
@@ -791,7 +791,7 @@ WHERE  id = %1";
    *   array reference of all countries.
    */
   public static function country($id = FALSE, $applyLimit = TRUE) {
-    if (($id && !CRM_Utils_Array::value($id, self::$country)) || !self::$country || !$id) {
+    if (($id && empty(self::$country[$id])) || !self::$country || !$id) {
 
       $config = CRM_Core_Config::singleton();
       $limitCodes = [];
@@ -1151,7 +1151,7 @@ WHERE  id = %1";
     if (empty(self::$paymentProcessorType[$cacheKey])) {
       self::populate(self::$paymentProcessorType[$cacheKey], 'CRM_Financial_DAO_PaymentProcessorType', $all, $return, 'is_active', NULL, "is_default, $return", 'id');
     }
-    if ($id && CRM_Utils_Array::value($id, self::$paymentProcessorType[$cacheKey])) {
+    if ($id && !empty(self::$paymentProcessorType[$cacheKey][$id])) {
       return self::$paymentProcessorType[$cacheKey][$id];
     }
     return self::$paymentProcessorType[$cacheKey];
@@ -1398,7 +1398,7 @@ WHERE  id = %1
       $index .= '_' . $contactType;
     }
 
-    if (!CRM_Utils_Array::value($index, Civi::$statics[__CLASS__]['greeting'])) {
+    if (empty(Civi::$statics[__CLASS__]['greeting'][$index])) {
       $filterCondition = NULL;
       if ($contactType) {
         $filterVal = 'v.filter =';

@@ -357,7 +357,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $this->_ufGroup = (array) $dao;
       }
 
-      if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
+      if (empty($this->_ufGroup['is_active'])) {
         CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', [
           1 => $this->_gid,
         ]));

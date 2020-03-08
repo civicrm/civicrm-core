@@ -475,7 +475,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $isCancelSupported = FALSE,
     $isUpdateBilling = FALSE
   ) {
-    if (!CRM_Utils_Array::value('view', self::$_links)) {
+    if (empty(self::$_links['view'])) {
       self::$_links['view'] = [
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
@@ -486,7 +486,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       ];
     }
 
-    if (!CRM_Utils_Array::value('all', self::$_links)) {
+    if (empty(self::$_links['all'])) {
       $extraLinks = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),

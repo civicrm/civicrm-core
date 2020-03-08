@@ -106,7 +106,7 @@ class CRM_Mailing_BAO_Query {
       }
     }
 
-    if (CRM_Utils_Array::value('mailing_campaign_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['mailing_campaign_id'])) {
       $query->_select['mailing_campaign_id'] = 'civicrm_mailing.campaign_id as mailing_campaign_id';
       $query->_element['mailing_campaign_id'] = 1;
       $query->_tables['civicrm_campaign'] = 1;

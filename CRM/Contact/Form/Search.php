@@ -546,7 +546,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     // assign context to drive the template display, make sure context is valid
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
-    if (!CRM_Utils_Array::value($this->_context, self::validContext())) {
+    if (!array_key_exists($this->_context, self::validContext())) {
       $this->_context = 'search';
     }
     $this->set('context', $this->_context);

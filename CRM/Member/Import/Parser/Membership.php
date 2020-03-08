@@ -670,7 +670,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           break;
 
         case 'membership_type_id':
-          if (!CRM_Utils_Array::value($value, CRM_Member_PseudoConstant::membershipType())) {
+          if (!array_key_exists($value, CRM_Member_PseudoConstant::membershipType())) {
             throw new Exception('Invalid Membership Type Id');
           }
           $values[$key] = $value;
