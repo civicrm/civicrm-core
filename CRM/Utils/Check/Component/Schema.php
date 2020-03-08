@@ -106,7 +106,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         continue;
       }
       foreach ($group['form_values'] as $formValues) {
-        if (substr($formValues[0], 0, 7) == 'custom_') {
+        if (isset($formValues[0]) && (substr($formValues[0], 0, 7) == 'custom_')) {
           list(, $customFieldID) = explode('custom_', $formValues[0]);
           if (!in_array($customFieldID, $customFieldIds)) {
             $problematicSG[CRM_Contact_BAO_SavedSearch::getName($group['id'], 'id')] = [
