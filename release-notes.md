@@ -17,6 +17,17 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.23.0
 
+Released April 1, 2020
+
+- **[Synopsis](release-notes/5.24.0.md#synopsis)**
+- **[Features](release-notes/5.24.0.md#features)**
+- **[Bugs resolved](release-notes/5.24.0.md#bugs)**
+- **[Miscellany](release-notes/5.24.0.md#misc)**
+- **[Credits](release-notes/5.24.0.md#credits)**
+- **[Feedback](release-notes/5.24.0.md#feedback)**
+
+## CiviCRM 5.23.0
+
 Released March 4, 2020
 
 - **[Synopsis](release-notes/5.23.0.md#synopsis)**
