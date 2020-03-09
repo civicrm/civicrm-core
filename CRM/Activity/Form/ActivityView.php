@@ -54,12 +54,8 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $params = ['id' => $activityId];
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
-    // Set activity type name and description to template.
-    list($activityTypeName, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
-
-    // activityTypeName - dev/core#1116-unknown-if-ok
-    // It seems like activityTypeName is no longer used? Description is still used though. See PR notes for more details.
-    $this->assign('activityTypeName', $activityTypeName);
+    // Send activity type description to template.
+    list(, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
     $this->assign('activityTypeDescription', $activityTypeDescription);
 
     if (!empty($defaults['mailingId'])) {
