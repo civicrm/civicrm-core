@@ -551,6 +551,9 @@ abstract class CRM_Core_Payment {
    *   Only explicitly supported contexts are handled without error.
    *   Currently supported:
    *   - contributionPageRecurringHelp (params: is_recur_installments, is_email_receipt)
+   *   - contributionPageContinueText (params: amount, is_payment_to_existing)
+   *   - cancelRecurDetailText (params: mode, amount, currency, frequency_interval, frequency_unit, installments, {membershipType|only if mode=auto_renew})
+   *   - cancelRecurNotSupportedText
    *
    * @param array $params
    *   Parameters for the field, context specific.
@@ -589,6 +592,30 @@ abstract class CRM_Core_Payment {
           return ts('To complete this transaction, click the <strong>Make Payment</strong> button below.');
         }
         return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
+
+      case 'cancelRecurDetailText':
+        if ($params['mode'] === 'auto_renew') {
+          return ts('Click the button below if you want to cancel the auto-renewal option for your %1 membership. This will not cancel your membership. However you will need to arrange payment for renewal when your membership expires.',
+            [1 => $params['membershipType']]
+          );
+        }
+        else {
+          $text = ts('Recurring Contribution Details: %1 every %2 %3', [
+            1 => CRM_Utils_Money::format($params['amount'], $params['currency']),
+            2 => $params['frequency_interval'],
+            3 => $params['frequency_unit'],
+          ]);
+          if (!empty($params['installments'])) {
+            $text .= ' ' . ts('for %1 installments', [1 => $params['installments']]) . '.';
+          }
+          $text = "<strong>{$text}</strong><div class='content'>";
+          $text .= ts('Click the button below to cancel this commitment and stop future transactions. This does not affect contributions which have already been completed.');
+          $text .= '</div>';
+          return $text;
+        }
+
+      case 'cancelRecurNotSupportedText':
+        return ts('Automatic cancellation is not supported for this payment processor. You or the contributor will need to manually cancel this recurring contribution using the payment processor website.');
 
     }
     CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
