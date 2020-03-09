@@ -304,6 +304,24 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
 
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
+    // Add the pay-later pseudo-processor.
+    $processors['values'][0] = [
+      'id' => 0,
+      'payment_processor_type_id' => 0,
+      // This shouldn't be required but there are still some processors hacked into core with nasty 'if's.
+      'api.payment_processor_type.getsingle' => ['name' => 'Manual'],
+      'class_name' => 'Payment_Manual',
+      'name' => 'pay_later',
+      'billing_mode' => '',
+      'is_default' => 0,
+      'payment_instrument_id' => key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1')),
+      // Making this optionally recur would give lots of options -but it should
+      // be a row in the payment processor table before we do that.
+      'is_recur' => FALSE,
+      'is_test' => FALSE,
+      'domain_id' => CRM_Core_Config::domainID(),
+      'is_active' => 1,
+    ];
     foreach ($processors['values'] as $processor) {
       $fieldsToProvide = [
         'id',
@@ -333,24 +351,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
       $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processors['values'][$processor['id']]);
     }
-
-    // Add the pay-later pseudo-processor.
-    $processors['values'][0] = [
-      'object' => new CRM_Core_Payment_Manual(),
-      'id' => 0,
-      'payment_processor_type_id' => 0,
-      // This shouldn't be required but there are still some processors hacked into core with nasty 'if's.
-      'payment_processor_type' => 'Manual',
-      'class_name' => 'Payment_Manual',
-      'name' => 'pay_later',
-      'billing_mode' => '',
-      'is_default' => 0,
-      'payment_instrument_id' => key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1')),
-      // Making this optionally recur would give lots of options -but it should
-      // be a row in the payment processor table before we do that.
-      'is_recur' => FALSE,
-      'is_test' => FALSE,
-    ];
 
     CRM_Utils_Cache::singleton()->set($cacheKey, $processors['values']);
 
