@@ -8,6 +8,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   private $allowedContactsACL = [];
 
+  /**
+   * Set up for test.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->prepareForACLs();
@@ -17,6 +22,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Clean up after tests.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown() {
     $tablesToTruncate = [
@@ -34,6 +42,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test case for create() method.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreate() {
     $contactId = $this->individualCreate();
@@ -73,6 +83,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test case for getContactActivity() method.
    *
    * getContactActivity() method get activities detail for given target contact id.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetContactActivity() {
     $contactId = $this->individualCreate();

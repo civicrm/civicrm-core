@@ -85,7 +85,7 @@ class CRM_Core_PseudoConstant {
    * RelationshipType
    * @var array
    */
-  private static $relationshipType;
+  private static $relationshipType = [];
 
   /**
    * Civicrm groups that are not smart groups
@@ -1006,9 +1006,9 @@ WHERE  id = %1";
    * @return array
    *   array reference of all relationship types.
    */
-  public static function &relationshipType($valueColumnName = 'label', $reset = FALSE, $isActive = 1) {
+  public static function relationshipType($valueColumnName = 'label', $reset = FALSE, $isActive = 1) {
     $cacheKey = $valueColumnName . '::' . $isActive;
-    if (!CRM_Utils_Array::value($cacheKey, self::$relationshipType) || $reset) {
+    if (!isset(self::$relationshipType[$cacheKey]) || $reset) {
       self::$relationshipType[$cacheKey] = [];
 
       //now we have name/label columns CRM-3336
