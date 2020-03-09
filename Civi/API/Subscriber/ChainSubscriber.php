@@ -54,7 +54,7 @@ class ChainSubscriber implements EventSubscriberInterface {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] < 4) {
       $result = $event->getResponse();
-      if (!is_array($result) || ($result['is_error'] ?? 0) == 0) {
+      if (is_array($result) && empty($result['is_error'])) {
         $this->callNestedApi($event->getApiKernel(), $apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
         $event->setResponse($result);
       }
