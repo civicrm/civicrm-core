@@ -42,6 +42,11 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Optional parent id for this tag.</comment>
+    <pseudoconstant>
+      <table>civicrm_tag</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>1.1</add>
   </field>
   <field>
