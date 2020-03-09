@@ -12,10 +12,10 @@
 namespace Civi\Core\DAO\Event;
 
 /**
- * Class PostUpdate
+ * Class PreDelete
  * @package Civi\Core\DAO\Event
  */
-class PostUpdate extends \Symfony\Component\EventDispatcher\Event {
+class PreUpdate extends \Symfony\Component\EventDispatcher\Event {
 
   /**
    * @var \CRM_Core_DAO
@@ -23,17 +23,10 @@ class PostUpdate extends \Symfony\Component\EventDispatcher\Event {
   public $object;
 
   /**
-   * @var mixed
-   */
-  public $result;
-
-  /**
    * @param $object
-   * @param $result
    */
-  public function __construct($object, $result) {
+  public function __construct($object) {
     $this->object = $object;
-    $this->result = $result;
   }
 
 }

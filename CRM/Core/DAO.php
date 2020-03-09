@@ -543,19 +543,29 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function save($hook = TRUE) {
     if (!empty($this->id)) {
-      $this->update();
+      if ($hook) {
+        $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        \Civi::service('dispatcher')->dispatch("civi.dao.preUpdate", $preEvent);
+      }
+
+      $result = $this->update();
 
       if ($hook) {
-        $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+        $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
         \Civi::service('dispatcher')->dispatch("civi.dao.postUpdate", $event);
       }
       $this->clearDbColumnValueCache();
     }
     else {
-      $this->insert();
+      if ($hook) {
+        $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        \Civi::service('dispatcher')->dispatch("civi.dao.preInsert", $preEvent);
+      }
+
+      $result = $this->insert();
 
       if ($hook) {
-        $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+        $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
         \Civi::service('dispatcher')->dispatch("civi.dao.postInsert", $event);
       }
     }
