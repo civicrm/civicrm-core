@@ -1102,7 +1102,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     elseif (($previousContributionStatus == 'Pending'
         && $params['prevContribution']->is_pay_later) || $previousContributionStatus == 'In Progress'
     ) {
-      $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
+      $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
       $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
 
       if ($currentContributionStatus == 'Cancelled') {
@@ -5557,7 +5557,7 @@ LIMIT 1;";
     }
 
     $params = $trxnParams;
-    $financialTypeID = CRM_Utils_Array::value('financial_type_id', $contributionParams) ? $contributionParams['financial_type_id'] : $contributionParams['prevContribution']->financial_type_id;
+    $financialTypeID = !empty($contributionParams['financial_type_id']) ? $contributionParams['financial_type_id'] : $contributionParams['prevContribution']->financial_type_id;
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
     $params['to_financial_account_id'] = $arAccountId;
     $params['status_id'] = array_search('Pending', $contributionStatuses);

@@ -911,7 +911,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // minimums with the payment processor minimums. This would lead to fields like 'postal_code'
     // only being on the form if either the admin has configured it as wanted or the processor
     // requires it.
-    $this->assign('billing_profile_id', (CRM_Utils_Array::value('is_billing_required', $this->_values) ? 'billing' : ''));
+    $this->assign('billing_profile_id', (!empty($this->_values['is_billing_required']) ? 'billing' : ''));
   }
 
   /**
