@@ -929,7 +929,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected function handlePreApproval(&$params) {
     try {
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      $params['component'] = 'contribute';
+      $params['component'] = $params['component'] ?? 'contribute';
       $result = $payment->doPreApproval($params);
       if (empty($result)) {
         // This could happen, for example, when paypal looks at the button value & decides it is not paypal express.
