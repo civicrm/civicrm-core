@@ -250,7 +250,7 @@ class CRM_Core_Session {
       $session =& $this->_session[$this->_key][$prefix];
     }
 
-    return CRM_Utils_Array::value($name, $session);
+    return $session[$name] ?? NULL;
   }
 
   /**

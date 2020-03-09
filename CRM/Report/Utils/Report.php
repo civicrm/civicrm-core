@@ -99,7 +99,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
       $params = [1 => [$path, 'String']];
       $valId[$path] = CRM_Core_DAO::singleValueQuery($sql, $params);
     }
-    return CRM_Utils_Array::value($path, $valId);
+    return $valId[$path] ?? NULL;
   }
 
   /**

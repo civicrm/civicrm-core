@@ -792,7 +792,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     if (!$lookup) {
       $lookup = CRM_Contact_BAO_Relationship::buildOptions("is_permission_a_b");
     };
-    return CRM_Utils_Array::value($key, $lookup);
+    return $lookup[$key] ?? NULL;
   }
 
   /**

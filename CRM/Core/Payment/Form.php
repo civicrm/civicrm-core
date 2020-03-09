@@ -375,7 +375,7 @@ class CRM_Core_Payment_Form {
       return $month;
     }
 
-    return CRM_Utils_Array::value('m', $src['credit_card_exp_date']);
+    return $src['credit_card_exp_date']['m'] ?? NULL;
   }
 
   /**
@@ -388,7 +388,7 @@ class CRM_Core_Payment_Form {
    * @return int
    */
   public static function getCreditCardExpirationYear($src) {
-    return CRM_Utils_Array::value('Y', $src['credit_card_exp_date']);
+    return $src['credit_card_exp_date']['Y'] ?? NULL;
   }
 
   /**

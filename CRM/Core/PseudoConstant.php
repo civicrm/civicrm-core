@@ -397,7 +397,7 @@ class CRM_Core_PseudoConstant {
     if ($values === FALSE) {
       return FALSE;
     }
-    return CRM_Utils_Array::value($key, $values);
+    return $values[$key] ?? NULL;
   }
 
   /**
@@ -417,7 +417,7 @@ class CRM_Core_PseudoConstant {
     if ($values === FALSE) {
       return FALSE;
     }
-    return CRM_Utils_Array::value($key, $values);
+    return $values[$key] ?? NULL;
   }
 
   /**
@@ -1478,7 +1478,7 @@ WHERE  id = %1
       self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition);
     }
     if ($id) {
-      return CRM_Utils_Array::value($id, self::$accountOptionValues[$cacheKey]);
+      return self::$accountOptionValues[$cacheKey][$id] ?? NULL;
     }
 
     return self::$accountOptionValues[$cacheKey];
