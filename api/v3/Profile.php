@@ -608,13 +608,13 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
 }
 
 /**
- * @param $a
- * @param $b
+ * @param array $a
+ * @param array $b
  *
  * @return bool
  */
 function _civicrm_api3_order_by_weight($a, $b) {
-  return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
+  return ($b['weight'] ?? 0) < ($a['weight'] ?? 0);
 }
 
 /**
@@ -731,7 +731,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
   }
   //special case on membership & contribution - can't see how to handle in a generic way
   if (in_array($entity, ['membership', 'contribution'])) {
-    $values['send_receipt'] = ['title' => 'Send Receipt', 'type' => (int) 16];
+    $values['send_receipt'] = ['title' => 'Send Receipt', 'type' => 16];
   }
   return $values;
 }
