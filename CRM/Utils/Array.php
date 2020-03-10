@@ -39,7 +39,8 @@ class CRM_Utils_Array {
       return array_key_exists($key, $list) ? $list[$key] : $default;
     }
     if ($list instanceof ArrayAccess) {
-      return $list[$key] ?? $default;
+      // ArrayAccess requires offsetExists is implemented for the equivalent to array_key_exists.
+      return $list->offsetExists($key) ? $list[$key] : $default;
     }
     // @todo - eliminate these from core & uncomment this line.
     // CRM_Core_Error::deprecatedFunctionWarning('You have passed an invalid parameter for the "list"');
