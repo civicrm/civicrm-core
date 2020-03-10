@@ -192,6 +192,15 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
+   * Test retrieves using CRM_Utils_Array::value still work.
+   */
+  public function testUtilsArray() {
+    $propertyBag = new PropertyBag();
+    $propertyBag->setContactID(123);
+    $this->assertEquals(123, \CRM_Utils_Array::value('contact_id', $propertyBag));
+  }
+
+  /**
    *
    * Data provider for testOtherParams
    *
