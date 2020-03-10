@@ -399,6 +399,14 @@ trait Api3TestTrait {
           unset($options['return'][$name]);
         }
       }
+
+      if ($name === 'option_group_id' && isset($v3Params[$name]) && !is_numeric($v3Params[$name])) {
+        // This is a per field hack (bad) but we can't solve everything at once
+        // & a cleverer way turned out to be too much for this round.
+        // Being in the test class it's tested....
+        $v3Params['option_group.name'] = $v3Params['option_group_id'];
+        unset($v3Params['option_group_id']);
+      }
     }
 
     switch ($v3Action) {

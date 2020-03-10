@@ -971,4 +971,18 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * Generic check as to whether any tokens are in the given string.
+   *
+   * It might be a smarty token OR a CiviCRM token. In both cases the
+   * absence of a '{' indicates no token is present.
+   *
+   * @param string $string
+   *
+   * @return bool
+   */
+  public static function stringContainsTokens(string $string) {
+    return strpos($string, '{') !== FALSE;
+  }
+
 }

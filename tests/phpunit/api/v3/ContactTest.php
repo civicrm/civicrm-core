@@ -118,6 +118,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testAddCreateIndividual($version) {
     $this->_apiversion = $version;
@@ -144,6 +146,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that it is possible to prevent cache clearing via option.
    *
    * Cache clearing is bypassed if 'options' => array('do_not_reset_cache' => 1 is used.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateIndividualNoCacheClear() {
 
@@ -4284,19 +4288,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that creating a contact with various contact greetings works.
-   * V3 Only.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGreetingsCreate() {
+  public function testContactGreetingsCreate($version) {
+    $this->_apiversion = $version;
+    // Api v4 takes a return parameter like postal_greeting_display which matches the field.
+    // v3 has a customised parameter 'postal_greeting'. The v4 parameter is more correct so
+    // we will not change it to match v3. The keyString value allows the test to support both.
+    $keyString = $version === 4 ? '_display' : '';
+
     $contact = $this->callAPISuccess('Contact', 'create', ['first_name' => 'Alan', 'last_name' => 'MouseMouse', 'contact_type' => 'Individual']);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting']);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting' . $keyString]);
     $this->assertEquals('Dear Alan', $contact['postal_greeting_display']);
 
     $contact = $this->callAPISuccess('Contact', 'create', ['id' => $contact['id'], 'postal_greeting_id' => 2]);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting']);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting' . $keyString]);
     $this->assertEquals('Dear Alan MouseMouse', $contact['postal_greeting_display']);
 
     $contact = $this->callAPISuccess('Contact', 'create', ['organization_name' => 'Alan\'s Show', 'contact_type' => 'Organization']);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting, addressee, email_greeting']);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => "postal_greeting{$keyString}, addressee{$keyString}, email_greeting{$keyString}"]);
     $this->assertEquals('', $contact['postal_greeting_display']);
     $this->assertEquals('', $contact['email_greeting_display']);
     $this->assertEquals('Alan\'s Show', $contact['addressee_display']);
@@ -4304,8 +4318,20 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that creating a contact with various contact greetings works.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGreetingsCreateWithCustomField() {
+  public function testContactGreetingsCreateWithCustomField($version) {
+    $this->_apiversion = $version;
+    // Api v4 takes a return parameter like postal_greeting_display which matches the field.
+    // v3 has a customised parameter 'postal_greeting'. The v4 parameter is more correct so
+    // we will not change it to match v3. The keyString value allows the test to support both.
+    $keyString = $version === 4 ? '_display' : '';
+
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $contact = $this->callAPISuccess('Contact', 'create', ['first_name' => 'Alan', 'contact_type' => 'Individual', 'custom_' . $ids['custom_field_id'] => 'Mice']);
 
@@ -4319,18 +4345,49 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // Update contact & see if postal greeting now reflects the new string.
     $this->callAPISuccess('Contact', 'create', ['id' => $contact['id'], 'last_name' => 'MouseyMousey']);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting']);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting' . $keyString]);
     $this->assertEquals('Dear Alan Mice', $contact['postal_greeting_display']);
 
     // Set contact to have no postal greeting & check it is correct.
     $this->callAPISuccess('Contact', 'create', ['id' => $contact['id'], 'postal_greeting_id' => 'null']);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting']);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting' . $keyString]);
     $this->assertEquals('', $contact['postal_greeting_display']);
 
     //Cleanup
     $this->callAPISuccess('OptionValue', 'create', ['id' => $postalOption['id'], 'name' => 'Dear {contact.first_name}']);
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
+   * Test that smarty variables are parsed if they exist in the greeting template.
+   *
+   * In this test we have both a Civi token & a Smarty token and we check both are processed.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
+   */
+  public function testGreetingParseSmarty($version) {
+    $this->_apiversion = $version;
+    // Api v4 takes a return parameter like postal_greeting_display which matches the field.
+    // v3 has a customised parameter 'postal_greeting'. The v4 parameter is more correct so
+    // we will not change it to match v3. The keyString value allows the test to support both.
+    $keyString = $version === 4 ? '_display' : '';
+    $postalOption = $this->callAPISuccessGetSingle('OptionValue', ['option_group_id' => 'postal_greeting', 'filter' => 1, 'is_default' => 1]);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $postalOption['id'],
+      'name' => "Dear {contact.first_name} {if \'{contact.first_name}\' === \'Tim\'}The Wise{/if}",
+      'label' => "Dear {contact.first_name} {if '{contact.first_name}' === 'Tim'} The Wise{/if}",
+    ]);
+    $contactID = $this->individualCreate();
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'return' => 'postal_greeting' . $keyString]);
+    $this->assertEquals('Dear Anthony', $contact['postal_greeting_display']);
+
+    $this->callAPISuccess('Contact', 'create', ['id' => $contactID, 'first_name' => 'Tim']);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'return' => 'postal_greeting' . $keyString]);
+    $this->assertEquals('Dear Tim The Wise', $contact['postal_greeting_display']);
   }
 
   /**

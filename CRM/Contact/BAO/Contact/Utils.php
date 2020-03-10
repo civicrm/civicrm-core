@@ -1117,7 +1117,10 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    */
   public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
-
+    if (!CRM_Utils_String::stringContainsTokens($templateString)) {
+      // Skip expensive smarty processing.
+      return;
+    }
     $smarty = CRM_Core_Smarty::singleton();
     $templateString = $smarty->fetch("string:$templateString");
   }
