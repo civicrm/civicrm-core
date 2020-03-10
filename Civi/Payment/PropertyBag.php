@@ -106,8 +106,8 @@ class PropertyBag implements \ArrayAccess {
    * @return bool TRUE if we have that value (on our default store)
    */
   public function offsetExists ($offset): bool {
-    $prop = $this->handleLegacyPropNames($offset);
-    return isset($this->props['default'][$prop]);
+    $prop = $this->handleLegacyPropNames($offset, TRUE);
+    return $prop && isset($this->props['default'][$prop]);
   }
 
   /**
@@ -199,16 +199,21 @@ class PropertyBag implements \ArrayAccess {
 
   /**
    * @param string $prop
+   * @param bool $silent if TRUE return NULL instead of throwing an exception. This is because offsetExists should be safe and not throw exceptions.
    * @return string canonical name.
    * @throws \InvalidArgumentException if prop name not known.
    */
-  protected function handleLegacyPropNames($prop) {
+  protected function handleLegacyPropNames($prop, $silent = FALSE) {
     $newName = static::$propMap[$prop] ?? NULL;
     if ($newName === TRUE) {
       // Good, modern name.
       return $prop;
     }
     if ($newName === NULL) {
+      if ($silent) {
+        // Only for use by offsetExists
+        return;
+      }
       throw new \InvalidArgumentException("Unknown property '$prop'.");
     }
     // Remaining case is legacy name that's been translated.
