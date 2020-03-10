@@ -15,39 +15,39 @@ class PathsTest extends \CiviUnitTestCase {
     // Ensure that various permutations of `$civicrm_paths`, `Civi::paths()->getPath()`
     // and `Civi::paths()->getUrl()` work as expected.
 
-    // Trailing-slash configurations -- these all worked before current patch
+    // Trailing-slash configurations
 
-    $exs[] = ['te.st', 'path', '/var/www/files/', '[te.st]/foo/bar', '/var/www/files/foo/bar'];
-    $exs[] = ['te.st', 'path', '/var/www/files/', '[te.st]/foo/', '/var/www/files/foo/'];
-    $exs[] = ['te.st', 'path', '/var/www/files/', '[te.st]/foo', '/var/www/files/foo'];
-    $exs[] = ['te.st', 'path', '/var/www/files/', '[te.st]/.', '/var/www/files/'];
+    $exs['ap1'] = ['te.st', 'path', '/var/www/files/', '[te.st]/foo/bar', '/var/www/files/foo/bar'];
+    $exs['ap2'] = ['te.st', 'path', '/var/www/files/', '[te.st]/foo/', '/var/www/files/foo/'];
+    $exs['ap3'] = ['te.st', 'path', '/var/www/files/', '[te.st]/foo', '/var/www/files/foo'];
+    $exs['ap4'] = ['te.st', 'path', '/var/www/files/', '[te.st]/.', '/var/www/files/'];
 
-    $exs[] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/foo/bar', 'http://example.com/files/foo/bar'];
-    $exs[] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/foo/', 'http://example.com/files/foo/'];
-    $exs[] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/foo', 'http://example.com/files/foo'];
-    $exs[] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/.', 'http://example.com/files/'];
+    $exs['au1'] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/foo/bar', 'http://example.com/files/foo/bar'];
+    $exs['au2'] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/foo/', 'http://example.com/files/foo/'];
+    $exs['au3'] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/foo', 'http://example.com/files/foo'];
+    $exs['au4'] = ['te.st', 'url', 'http://example.com/files/', '[te.st]/.', 'http://example.com/files/'];
 
-    $exs[] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/foo/bar', 'http://example.com:8080/foo/bar'];
-    $exs[] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/foo/', 'http://example.com:8080/foo/'];
-    $exs[] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/foo', 'http://example.com:8080/foo'];
-    $exs[] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/.', 'http://example.com:8080/'];
+    $exs['au18'] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/foo/bar', 'http://example.com:8080/foo/bar'];
+    $exs['au28'] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/foo/', 'http://example.com:8080/foo/'];
+    $exs['au38'] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/foo', 'http://example.com:8080/foo'];
+    $exs['au48'] = ['te.st', 'url', 'http://example.com:8080/', '[te.st]/.', 'http://example.com:8080/'];
 
-    // Trimmed-slash configurations -- some of these worked before, and some misbehaved. Now fixed.
+    // Trimmed-slash configurations
 
-    $exs[] = ['te.st', 'path', '/var/www/files', '[te.st]/foo/bar', '/var/www/files/foo/bar'];
-    $exs[] = ['te.st', 'path', '/var/www/files', '[te.st]/foo/', '/var/www/files/foo/'];
-    $exs[] = ['te.st', 'path', '/var/www/files', '[te.st]/foo', '/var/www/files/foo'];
-    $exs[] = ['te.st', 'path', '/var/www/files', '[te.st]/.', '/var/www/files/'];
+    $exs['bp1'] = ['te.st', 'path', '/var/www/files', '[te.st]/foo/bar', '/var/www/files/foo/bar'];
+    $exs['bp2'] = ['te.st', 'path', '/var/www/files', '[te.st]/foo/', '/var/www/files/foo/'];
+    $exs['bp3'] = ['te.st', 'path', '/var/www/files', '[te.st]/foo', '/var/www/files/foo'];
+    $exs['bp4'] = ['te.st', 'path', '/var/www/files', '[te.st]/.', '/var/www/files/'];
 
-    $exs[] = ['te.st', 'url', 'http://example.com/files', '[te.st]/foo/bar', 'http://example.com/files/foo/bar'];
-    $exs[] = ['te.st', 'url', 'http://example.com/files', '[te.st]/foo/', 'http://example.com/files/foo/'];
-    $exs[] = ['te.st', 'url', 'http://example.com/files', '[te.st]/foo', 'http://example.com/files/foo'];
-    $exs[] = ['te.st', 'url', 'http://example.com/files', '[te.st]/.', 'http://example.com/files/'];
+    $exs['bu1'] = ['te.st', 'url', 'http://example.com/files', '[te.st]/foo/bar', 'http://example.com/files/foo/bar'];
+    $exs['bu2'] = ['te.st', 'url', 'http://example.com/files', '[te.st]/foo/', 'http://example.com/files/foo/'];
+    $exs['bu3'] = ['te.st', 'url', 'http://example.com/files', '[te.st]/foo', 'http://example.com/files/foo'];
+    $exs['bu4'] = ['te.st', 'url', 'http://example.com/files', '[te.st]/.', 'http://example.com/files/'];
 
-    $exs[] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/foo/bar', 'http://example.com:8080/foo/bar'];
-    $exs[] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/foo/', 'http://example.com:8080/foo/'];
-    $exs[] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/foo', 'http://example.com:8080/foo'];
-    $exs[] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/.', 'http://example.com:8080/'];
+    $exs['bu18'] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/foo/bar', 'http://example.com:8080/foo/bar'];
+    $exs['bu28'] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/foo/', 'http://example.com:8080/foo/'];
+    $exs['bu38'] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/foo', 'http://example.com:8080/foo'];
+    $exs['bu48'] = ['te.st', 'url', 'http://example.com:8080', '[te.st]/.', 'http://example.com:8080/'];
 
     return $exs;
   }
@@ -71,7 +71,7 @@ class PathsTest extends \CiviUnitTestCase {
     });
 
     $actualValue = call_user_func([$paths, $func], $inputExpr);
-    $this->assertEquals($expectValue, $actualValue);
+    $this->assertEquals($expectValue, $actualValue, "Evaluate $func(\"$inputExpr\") given ([$varName] = \"$varValue\")");
 
     unset($civicrm_paths[$varName][$varType]);
   }
