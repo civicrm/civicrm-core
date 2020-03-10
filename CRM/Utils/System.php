@@ -1278,7 +1278,7 @@ class CRM_Utils_System {
    *   The previous page URL
    */
   public static function refererPath() {
-    return CRM_Utils_Array::value('HTTP_REFERER', $_SERVER);
+    return $_SERVER['HTTP_REFERER'] ?? NULL;
   }
 
   /**

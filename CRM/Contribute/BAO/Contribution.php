@@ -5008,7 +5008,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public static function checkContributeSettings($name) {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-    return CRM_Utils_Array::value($name, $contributeSettings);
+    return $contributeSettings[$name] ?? NULL;
   }
 
   /**

@@ -63,7 +63,7 @@ class CRM_Core_Component {
   public static function get($name, $attribute = NULL) {
     $comp = CRM_Utils_Array::value($name, self::_info());
     if ($attribute) {
-      return CRM_Utils_Array::value($attribute, $comp->info);
+      return $comp->info[$attribute] ?? NULL;
     }
     return $comp;
   }

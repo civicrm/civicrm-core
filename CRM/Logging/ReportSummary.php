@@ -280,7 +280,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
         if (array_key_exists('options', $this->_logTables[$entity]['bracket_info']) &&
           $entityID
         ) {
-          return CRM_Utils_Array::value($entityID, $this->_logTables[$entity]['bracket_info']['options']);
+          return $this->_logTables[$entity]['bracket_info']['options'][$entityID] ?? NULL;
         }
       }
     }

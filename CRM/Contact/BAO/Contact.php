@@ -3620,7 +3620,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   public static function isFieldHasLocationType($fieldTitle) {
     foreach (CRM_Contact_BAO_Contact::importableFields() as $key => $field) {
       if ($field['title'] === $fieldTitle) {
-        return CRM_Utils_Array::value('hasLocationType', $field);
+        return $field['hasLocationType'] ?? NULL;
       }
     }
     return FALSE;

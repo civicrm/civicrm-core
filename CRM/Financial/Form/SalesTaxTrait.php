@@ -41,7 +41,7 @@ trait CRM_Financial_Form_SalesTaxTrait {
     if (!$invoicing) {
       return '';
     }
-    return CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    return $invoiceSettings['tax_term'] ?? NULL;
   }
 
   /**

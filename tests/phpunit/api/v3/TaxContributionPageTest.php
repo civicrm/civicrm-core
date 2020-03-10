@@ -501,7 +501,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     $result = [];
     CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
-    return CRM_Utils_Array::value('financial_account_id', $result);
+    return $result['financial_account_id'] ?? NULL;
   }
 
   /**

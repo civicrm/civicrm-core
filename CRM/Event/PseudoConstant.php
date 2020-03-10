@@ -298,7 +298,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
       );
     }
     if ($id) {
-      return CRM_Utils_Array::value($id, self::$pcPage);
+      return self::$pcPage[$id] ?? NULL;
     }
     return self::$pcPage;
   }
