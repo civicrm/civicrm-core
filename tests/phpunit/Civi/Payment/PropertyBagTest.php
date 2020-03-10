@@ -198,6 +198,9 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
     $this->assertEquals(123, \CRM_Utils_Array::value('contact_id', $propertyBag));
+
+    // Test that using utils array value to get a nonexistent property returns the default.
+    $this->assertEquals(456, \CRM_Utils_Array::value('ISawAManWhoWasntThere', $propertyBag, 456));
   }
 
   /**
