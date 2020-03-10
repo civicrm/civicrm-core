@@ -67,6 +67,7 @@ class PropertyBag implements \ArrayAccess {
     'frequency_interval'          => 'recurFrequencyInterval',
     'recurFrequencyUnit'          => TRUE,
     'frequency_unit'              => 'recurFrequencyUnit',
+    'subscriptionId'              => 'recurProcessorID',
     'recurProcessorID'            => TRUE,
     'transactionID'               => TRUE,
     'transaction_id'              => 'transactionID',
