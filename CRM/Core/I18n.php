@@ -282,7 +282,7 @@ class CRM_Core_I18n {
    * @return string
    */
   public static function getResourceDir() {
-    return \Civi::paths()->getPath('[civicrm.l10n]/.');
+    return CRM_Utils_File::addTrailingSlash(\Civi::paths()->getPath('[civicrm.l10n]/.'));
   }
 
   /**
