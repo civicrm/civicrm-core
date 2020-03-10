@@ -985,4 +985,49 @@ class CRM_Utils_String {
     return strpos($string, '{') !== FALSE;
   }
 
+  /**
+   * Parse a string through smarty without creating a smarty template file per string.
+   *
+   * This function is for swapping out any smarty tokens that appear in a string
+   * and are not re-used much if at all. For example parsing a contact's greeting
+   * does not need to be cached are there are some minor security / data privacy benefits
+   * to not caching them per file. We also save disk space, reduce I/O and disk clearing time.
+   *
+   * Doing this is cleaning in Smarty3 which we are alas not using
+   * https://www.smarty.net/docs/en/resources.string.tpl
+   *
+   * However, it highlights that smarty-eval is not evil-eval and still have the security applied.
+   *
+   * In order to replicate that in Smarty2 I'm using {eval} per
+   * https://www.smarty.net/docsv2/en/language.function.eval.tpl#id2820446
+   * From the above:
+   * - Evaluated variables are treated the same as templates. They follow the same escapement and security features just as if they were templates.
+   * - Evaluated variables are compiled on every invocation, the compiled versions are not saved! However if you have caching enabled, the output
+   *   will be cached with the rest of the template.
+   *
+   * Our set up does not have caching enabled and my testing suggests this still works fine with it
+   * enabled so turning it off before running this is out of caution based on the above.
+   *
+   * When this function is run only one template file is created (for the eval) tag no matter how
+   * many times it is run. This compares to it otherwise creating one file for every parsed string.
+   *
+   * @param string $templateString
+   *
+   * @return string
+   */
+  public static function parseOneOffStringThroughSmarty($templateString) {
+    if (!CRM_Utils_String::stringContainsTokens($templateString)) {
+      // Skip expensive smarty processing.
+      return $templateString;
+    }
+    $smarty = CRM_Core_Smarty::singleton();
+    $cachingValue = $smarty->caching;
+    $smarty->caching = 0;
+    $smarty->assign('smartySingleUseString', $templateString);
+    $templateString = $smarty->fetch('string:{eval var=$smartySingleUseString}');
+    $smarty->caching = $cachingValue;
+    $smarty->assign('smartySingleUseString', NULL);
+    return $templateString;
+  }
+
 }
