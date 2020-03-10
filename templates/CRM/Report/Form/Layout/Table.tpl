@@ -136,7 +136,11 @@
                 {foreach from=$columnHeaders item=header key=field}
                     <td class="report-label">
                         {if $header.type eq 1024}
-                            {$grandStat.$field|crmMoney}
+                            {if $currencyColumn}
+                                {$grandStat.$field|crmMoney:$row.$currencyColumn}
+                            {else}
+                                {$grandStat.$field|crmMoney}
+                            {/if}
                         {else}
                             {$grandStat.$field}
                         {/if}
