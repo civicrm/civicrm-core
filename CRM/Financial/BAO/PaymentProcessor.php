@@ -335,7 +335,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         }
       }
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
-      $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processor);
+      $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processors['values'][$processor['id']]);
     }
 
     // Add the pay-later pseudo-processor.
