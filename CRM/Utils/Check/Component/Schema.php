@@ -89,15 +89,29 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check that no smart groups exist that contain deleted custom fields.
+   *
    * @return array
    */
   public function checkSmartGroupCustomFieldCriteria() {
     $messages = $problematicSG = [];
     $customFieldIds = array_keys(CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE));
-    $smartGroups = civicrm_api3('SavedSearch', 'get', [
-      'sequential' => 1,
-      'options' => ['limit' => 0],
-    ]);
+    try {
+      $smartGroups = civicrm_api3('SavedSearch', 'get', [
+        'sequential' => 1,
+        'options' => ['limit' => 0],
+      ]);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The smart group check was unable to run. This is likely to because a database upgrade is pending.'),
+        ts('Smart Group check did not run'),
+        \Psr\Log\LogLevel::INFO,
+        'fa-server'
+      );
+      return $messages;
+    }
     if (empty($smartGroups['values'])) {
       return $messages;
     }
@@ -106,9 +120,9 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         continue;
       }
       foreach ($group['form_values'] as $formValues) {
-        if (isset($formValues[0]) && (substr($formValues[0], 0, 7) == 'custom_')) {
+        if (isset($formValues[0]) && (strpos($formValues[0], 'custom_') === 0)) {
           list(, $customFieldID) = explode('custom_', $formValues[0]);
-          if (!in_array($customFieldID, $customFieldIds)) {
+          if (!in_array($customFieldID, $customFieldIds, TRUE)) {
             $problematicSG[CRM_Contact_BAO_SavedSearch::getName($group['id'], 'id')] = [
               'title' => CRM_Contact_BAO_SavedSearch::getName($group['id'], 'title'),
               'cfid' => $customFieldID,
@@ -135,7 +149,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
               2 => $customField['label'],
             ]);
           }
-          catch (Exception $e) {
+          catch (CiviCRM_API3_Exception $e) {
             $fieldName = ' <span style="color:red"> - Deleted - </span> ';
           }
         }
