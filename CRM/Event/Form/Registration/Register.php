@@ -475,7 +475,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $buttonLabel = ts('Register');
       }
       else {
-        $buttonLabel = ts('Continue');
+        $buttonLabel = ts('Review your registration');
       }
 
       $this->addButtons([
