@@ -30,7 +30,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_MessageTemplate
+   * @return CRM_Core_DAO_MessageTemplate
    */
   public static function retrieve(&$params, &$defaults) {
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
@@ -65,6 +65,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    *
    * @return object
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function add(&$params) {
     // System Workflow Templates have a specific wodkflow_id in them but normal user end message templates don't
@@ -88,7 +90,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           if (!empty($params['workflow_id']) && !CRM_Core_Permission::check('edit system workflow message templates')) {
             throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
           }
-          elseif (!CRM_Core_Permission::check('edit user-driven message templates')) {
+          if (!CRM_Core_Permission::check('edit user-driven message templates')) {
             throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $userWorkflowPermissionDeniedMessage]));
           }
         }
@@ -129,11 +131,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * Delete the Message Templates.
    *
    * @param int $messageTemplatesID
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function del($messageTemplatesID) {
     // make sure messageTemplatesID is an integer
     if (!CRM_Utils_Rule::positiveInteger($messageTemplatesID)) {
-      CRM_Core_Error::fatal(ts('Invalid Message template'));
+      throw new CRM_Core_Exception(ts('Invalid Message template'));
     }
 
     // Set mailing msg template col to NULL
@@ -158,7 +162,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @param bool $isSMS
    *
-   * @return object
+   * @return array
    */
   public static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
     $msgTpls = [];
@@ -185,6 +189,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param $from
    *
    * @return bool|NULL
+   * @throws \CRM_Core_Exception
    */
   public static function sendReminder($contactId, $email, $messageTemplateID, $from) {
 
@@ -301,6 +306,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * Revert a message template to its default subject+text+HTML state.
    *
    * @param int $id id of the template
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function revert($id) {
     $diverted = new CRM_Core_BAO_MessageTemplate();
@@ -308,7 +315,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $diverted->find(1);
 
     if ($diverted->N != 1) {
-      CRM_Core_Error::fatal(ts('Did not find a message template with id of %1.', [1 => $id]));
+      throw new CRM_Core_Exception(ts('Did not find a message template with id of %1.', [1 => $id]));
     }
 
     $orig = new CRM_Core_BAO_MessageTemplate();
@@ -317,7 +324,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $orig->find(1);
 
     if ($orig->N != 1) {
-      CRM_Core_Error::fatal(ts('Message template with id of %1 does not have a default to revert to.', [1 => $id]));
+      throw new CRM_Core_Exception(ts('Message template with id of %1 does not have a default to revert to.', [1 => $id]));
     }
 
     $diverted->msg_subject = $orig->msg_subject;
@@ -335,6 +342,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @return array
    *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
+   * @throws \CRM_Core_Exception
    */
   public static function sendTemplate($params) {
     $defaults = [
@@ -381,7 +389,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       ) &&
       !$params['messageTemplateID']
     ) {
-      CRM_Core_Error::fatal(ts("Message template's option group and/or option value or ID missing."));
+      throw new CRM_Core_Exception(ts("Message template's option group and/or option value or ID missing."));
     }
 
     if ($params['messageTemplateID']) {
@@ -405,14 +413,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
     if (!$dao->N) {
       if ($params['messageTemplateID']) {
-        CRM_Core_Error::fatal(ts('No such message template: id=%1.', [1 => $params['messageTemplateID']]));
+        throw new CRM_Core_Exception(ts('No such message template: id=%1.', [1 => $params['messageTemplateID']]));
       }
-      else {
-        CRM_Core_Error::fatal(ts('No such message template: option group %1, option value %2.', [
-          1 => $params['groupName'],
-          2 => $params['valueName'],
-        ]));
-      }
+      throw new CRM_Core_Exception(ts('No such message template: option group %1, option value %2.', [
+        1 => $params['groupName'],
+        2 => $params['valueName'],
+      ]));
     }
 
     $mailContent = [
@@ -545,11 +551,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
       $prefs = array_pop($contact);
 
-      if (isset($prefs['preferred_mail_format']) and $prefs['preferred_mail_format'] == 'HTML') {
+      if (isset($prefs['preferred_mail_format']) and $prefs['preferred_mail_format'] === 'HTML') {
         $params['text'] = NULL;
       }
 
-      if (isset($prefs['preferred_mail_format']) and $prefs['preferred_mail_format'] == 'Text') {
+      if (isset($prefs['preferred_mail_format']) and $prefs['preferred_mail_format'] === 'Text') {
         $params['html'] = NULL;
       }
 
