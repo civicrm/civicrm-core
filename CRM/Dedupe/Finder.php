@@ -348,12 +348,12 @@ class CRM_Dedupe_Finder {
         'canMerge' => TRUE,
       ];
 
-      $data = CRM_Core_DAO::escapeString(serialize($row));
       CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
-        ('civicrm_contact', %1, %2, %3, '{$data}')", [
+        ('civicrm_contact', %1, %2, %3, %4)", [
           1 => [$dstID, 'Integer'],
           2 => [$srcID, 'Integer'],
           3 => [$cacheKeyString, 'String'],
+          4 => [serialize($row), 'String'],
         ]
       );
     }

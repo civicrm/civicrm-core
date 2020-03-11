@@ -775,10 +775,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'merged' => (int) $merged,
       'skipped' => (int) $skipped,
     ];
-    $data = serialize($data);
 
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
-        ('civicrm_contact', 0, 0, %1, '{$data}')", [1 => [$cacheKeyString . '_stats', 'String']]);
+        ('civicrm_contact', 0, 0, %1, %2)", [1 => [$cacheKeyString . '_stats', 'String'], 2 => [serialize($data), 'String']]);
   }
 
   /**
