@@ -195,7 +195,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     foreach ($this->cart->get_main_event_participants() as $participant) {
       $form = $participant->get_form();
       if (empty($participant->email)
-        && !CRM_Event_Cart_Form_Cart::is_administrator()
         && ($participant->get_participant_index() == 1)
         && ($this->cid != 0)
       ) {
@@ -210,7 +209,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         && $participant->contact_id == self::getContactID()
       ) {
         $participant->email = NULL;
-        $participant->contact_id = self::find_or_create_contact($this->getContactID());
+        $participant->contact_id = self::find_or_create_contact();
       }
       $defaults += $form->setDefaultValues();
       //Set price defaults if any
@@ -258,7 +257,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           $contact_id = $email_to_contact_id[$fields['email']];
         }
         else {
-          $contact_id = self::find_or_create_contact($this->getContactID(), $fields);
+          $contact_id = self::find_or_create_contact($fields);
           $email_to_contact_id[$fields['email']] = $contact_id;
         }
 
