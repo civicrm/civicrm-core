@@ -210,18 +210,23 @@ class Paths {
    * @return mixed|string
    */
   public function getPath($value) {
+    if ($value === NULL || $value === FALSE || $value === '') {
+      return FALSE;
+    }
+
     $defaultContainer = self::DEFAULT_PATH;
     if ($value && $value{0} == '[' && preg_match(';^\[([a-zA-Z0-9\._]+)\]/(.*);', $value, $matches)) {
       $defaultContainer = $matches[1];
       $value = $matches[2];
     }
-    if (empty($value)) {
-      return FALSE;
-    }
-    if ($value === '.') {
+
+    $isDot = $value === '.';
+    if ($isDot) {
       $value = '';
     }
-    return \CRM_Utils_File::absoluteDirectory($value, $this->getVariable($defaultContainer, 'path'));
+
+    $result = \CRM_Utils_File::absoluteDirectory($value, $this->getVariable($defaultContainer, 'path'));
+    return $isDot ? rtrim($result, '/' . DIRECTORY_SEPARATOR) : $result;
   }
 
   /**
@@ -229,6 +234,14 @@ class Paths {
    *
    * @param string $value
    *   The file path. The path may begin with a variable, e.g. "[civicrm.files]/upload".
+   *
+   *   This function was designed for locating files under a given tree, and the
+   *   the result for a straight variable expressions ("[foo.bar]") was not
+   *   originally defined. You may wish to use one of these:
+   *
+   *   - getVariable('foo.bar', 'url') => Lookup variable by itself
+   *   - getUrl('[foo.bar]/') => Get the variable (normalized with a trailing "/").
+   *   - getUrl('[foo.bar]/.') => Get the variable (normalized without a trailing "/").
    * @param string $preferFormat
    *   The preferred format ('absolute', 'relative').
    *   The result data may not meet the preference -- if the setting
@@ -236,26 +249,26 @@ class Paths {
    *   absolute (regardless of preference).
    * @param bool|NULL $ssl
    *   NULL to autodetect. TRUE to force to SSL.
-   * @return mixed|string
+   * @return FALSE|string
+   *   The URL for $value (string), or FALSE if the $value is not specified.
    */
   public function getUrl($value, $preferFormat = 'relative', $ssl = NULL) {
+    if ($value === NULL || $value === FALSE || $value === '') {
+      return FALSE;
+    }
+
     $defaultContainer = self::DEFAULT_URL;
     if ($value && $value{0} == '[' && preg_match(';^\[([a-zA-Z0-9\._]+)\](/(.*))$;', $value, $matches)) {
       $defaultContainer = $matches[1];
-      $value = empty($matches[3]) ? '.' : $matches[3];
+      $value = $matches[3];
     }
 
-    if (empty($value)) {
-      return FALSE;
-    }
-    if ($value === '.') {
-      $value = '';
-    }
-    if (substr($value, 0, 4) == 'http') {
+    $isDot = $value === '.';
+    if (substr($value, 0, 5) === 'http:' || substr($value, 0, 6) === 'https:') {
       return $value;
     }
 
-    $value = $this->getVariable($defaultContainer, 'url') . $value;
+    $value = rtrim($this->getVariable($defaultContainer, 'url'), '/') . ($isDot ? '' : "/$value");
 
     if ($preferFormat === 'relative') {
       $parsed = parse_url($value);

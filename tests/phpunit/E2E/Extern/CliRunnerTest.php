@@ -101,7 +101,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
 
     $ufrUrl = $this->callRunnerJson($r, 'CRM_Core_Config::singleton()->userFrameworkResourceURL');
     $crmUrl = $this->callRunnerJson($r, 'Civi::paths()->getUrl("[civicrm.root]/.")');
-    $this->assertEquals($crmUrl, $ufrUrl);
+    $this->assertEquals(rtrim($crmUrl, '/'), rtrim($ufrUrl, '/'));
   }
 
   /**

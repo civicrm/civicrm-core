@@ -88,4 +88,32 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     $this->assertRegexp($expectContentRegex, $content);
   }
 
+  /**
+   * @link https://lab.civicrm.org/dev/core/issues/1637
+   */
+  public function testGetUrl_WpAdmin() {
+    $config = \CRM_Core_Config::singleton();
+    if ($config->userFramework !== 'WordPress') {
+      $this->markTestSkipped('This test only applies to WP sites.');
+    }
+
+    // NOTE: For backend admin forms (eg `civicrm/contribute`) on WP, it doesn't matter
+    // if cleanURL's are enabled. Those are always be dirty URLs.
+
+    // WORKAROUND: There's some issue where the URL gets a diff value in WP E2E env
+    // than in normal WP env. The `cv url` command seems to behave more
+    // representatively, though this technique is harder to inspect with xdebug.
+    $url = cv('url civicrm/contribute?reset=1');
+    // $url = \CRM_Utils_System::url('civicrm/contribute', 'reset=1', TRUE, NULL, FALSE);
+
+    $parts = parse_url($url);
+    parse_str($parts['query'], $queryParts);
+    $this->assertEquals('CiviCRM', $queryParts['page']);
+    $this->assertEquals('civicrm/contribute', $queryParts['q']);
+    $this->assertEquals('1', $queryParts['reset']);
+
+    // As an E2E test for wp-demo, this assertion is specifically valid for wp-demo.
+    $this->assertEquals('/wp-admin/admin.php', $parts['path']);
+  }
+
 }
