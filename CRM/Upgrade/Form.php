@@ -34,7 +34,9 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
    *
-   * As of Civi 5.16, using PHP 5.x will lead to a hard crash during bootstrap.
+   * As of CiviCRM 5.25, this is left as 7.0.0 for the time being in order to
+   * not block stragglers from upgrading.  As soon as this is found to cause a
+   * hard crash, or at the end of 2020 at the latest, this should be increased.
    *
    * Tip: Keep in sync with composer.json ("config => platform => php")
    */
