@@ -829,6 +829,22 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test weird characters don't mess with merge & cause a fatal.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testNoErrorOnOdd() {
+    $this->individualCreate();
+    $this->individualCreate(['first_name' => 'Gerrit%0a%2e%0a']);
+    $this->callAPISuccess('Job', 'process_batch_merge', []);
+
+    $this->individualCreate();
+    $this->individualCreate(['first_name' => '[foo\\bar\'baz']);
+    $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $this->callAPISuccessGetSingle('Contact', ['first_name' => '[foo\\bar\'baz']);
+  }
+
+  /**
    * Test the batch merge does not create duplicate emails.
    *
    * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
