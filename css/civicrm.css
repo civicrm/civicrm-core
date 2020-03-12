@@ -258,7 +258,7 @@ input.crm-form-entityref {
 .crm-container select.crm-form-select,
 .crm-container select.crm-form-date {
   background-repeat: repeat;
-  background-color: transparent;
+  background-color: #fff;
   border: 1px solid #aaa;
   color: #444;
   height: 2.2em;
