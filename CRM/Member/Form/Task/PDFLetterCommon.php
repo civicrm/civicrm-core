@@ -71,7 +71,9 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
         $skipDeceased,
         NULL,
         $messageToken,
-        'CRM_Contribution_Form_Task_PDFLetterCommon'
+        'CRM_Member_Form_Task_PDFLetterCommon',
+        NULL,
+        $membershipID
       );
 
       $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contacts[$contactId], TRUE, $messageToken);
