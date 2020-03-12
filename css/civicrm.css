@@ -257,7 +257,8 @@ input.crm-form-entityref {
 /* Style civi form inputs to match select2 */
 .crm-container select.crm-form-select,
 .crm-container select.crm-form-date {
-  background: #fff no-repeat;
+  background-repeat: repeat;
+  background-color: transparent;
   border: 1px solid #aaa;
   color: #444;
   height: 2.2em;
@@ -268,7 +269,6 @@ input.crm-form-entityref {
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
   background-image: linear-gradient(top, #fff 0%, #eee 50%);
-  line-height: 0;
   -webkit-appearance: listbox;
   background-size: auto;
 }
