@@ -70,6 +70,11 @@
     <title>Discount Name</title>
     <type>int unsigned</type>
     <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_price_set</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <export>true</export>
     <comment>FK to civicrm_price_set</comment>
     <add>4.3</add>
