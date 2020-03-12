@@ -17,7 +17,7 @@ class CRM_Upgrade_FormTest extends CiviUnitTestCase {
     $composerJson = json_decode(file_get_contents($composerJsonPath), 1);
     $composerJsonRequirePhp = preg_replace(';[~^];', '', $composerJson['require']['php']);
     $actualMajorMinor = preg_replace(';^[\^]*(\d+\.\d+)\..*$;', '\1', $composerJsonRequirePhp);
-    $expectMajorMinor = preg_replace(';^[\^]*(\d+\.\d+)\..*$;', '\1', \CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER);
+    $expectMajorMinor = preg_replace(';^(\d+\.\d+)\..*$;', '\1', \CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER);
     $this->assertEquals($expectMajorMinor, $actualMajorMinor, "The PHP version requirements in CRM_Upgrade_Form ($expectMajorMinor) and composer.json ($actualMajorMinor) should specify same major+minor versions.");
   }
 

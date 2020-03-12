@@ -24,20 +24,25 @@ class CRM_Upgrade_Incremental_General {
 
   /**
    * The recommended PHP version.
+   *
+   * The point release will be dropped in recommendations unless it's .1 or
+   * higher.
    */
-  const RECOMMENDED_PHP_VER = '7.3';
+  const RECOMMENDED_PHP_VER = '7.3.0';
 
   /**
-   * The previous recommended PHP version.
+   * The minimum recommended PHP version.
+   *
+   * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '7.2';
+  const MIN_RECOMMENDED_PHP_VER = '7.2.0';
 
   /**
    * The minimum PHP version required to install Civi.
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.1';
+  const MIN_INSTALL_PHP_VER = '7.1.0';
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -54,7 +59,7 @@ class CRM_Upgrade_Incremental_General {
       $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend PHP version %3.', [
         1 => $latestVer,
         2 => self::MIN_RECOMMENDED_PHP_VER,
-        3 => self::RECOMMENDED_PHP_VER,
+        3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', self::RECOMMENDED_PHP_VER),
       ]);
       $preUpgradeMessage .= '</p>';
     }
