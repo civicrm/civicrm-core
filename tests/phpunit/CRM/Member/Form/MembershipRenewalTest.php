@@ -59,43 +59,51 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   protected $mut;
 
   /**
+   * @var int
+   */
+  private $financialTypeID;
+
+  /**
    * Test setup for every test.
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp() {
     parent::setUp();
 
     $this->_individualId = $this->individualCreate();
     $this->_paymentProcessorID = $this->processorCreate();
+    $this->financialTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues');
 
     $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/data.xml');
-    $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', [
+    $this->membershipTypeAnnualFixedID = $this->callAPISuccess('membership_type', 'create', [
       'domain_id' => 1,
-      'name' => "AnnualFixed",
+      'name' => 'AnnualFixed',
       'member_of_contact_id' => 23,
-      'duration_unit' => "year",
+      'duration_unit' => 'year',
       'duration_interval' => 1,
-      'period_type' => "fixed",
-      'fixed_period_start_day' => "101",
-      'fixed_period_rollover_day' => "1231",
+      'period_type' => 'fixed',
+      'fixed_period_start_day' => '101',
+      'fixed_period_rollover_day' => '1231',
       'relationship_type_id' => 20,
-      'financial_type_id' => 2,
-    ]);
-    $this->membershipTypeAnnualFixedID = $membershipTypeAnnualFixed['id'];
-    $membership = $this->callAPISuccess('Membership', 'create', [
+      'financial_type_id' => $this->financialTypeID,
+    ])['id'];
+
+    $this->_membershipID = $this->callAPISuccess('Membership', 'create', [
       'contact_id' => $this->_individualId,
       'membership_type_id' => $this->membershipTypeAnnualFixedID,
-    ]);
-    $this->_membershipID = $membership['id'];
+    ])['id'];
 
-    $instruments = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
-    $this->paymentInstruments = $instruments['values'];
+    $this->paymentInstruments = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id'])['values'];
   }
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->validateAllPayments();
@@ -118,6 +126,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit() {
     $form = $this->getForm();
@@ -196,6 +207,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecur() {
     $form = $this->getForm();
@@ -289,6 +301,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecurCompleteInstant() {
     $form = $this->getForm();
@@ -400,6 +415,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPayLater() {
     $form = $this->getForm(NULL);
@@ -437,7 +453,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 2,
-      'return' => ["tax_amount", "trxn_id"],
+      'return' => ['tax_amount', 'trxn_id'],
     ]);
     $this->assertEquals($contribution['trxn_id'], 777);
     $this->assertEquals($contribution['tax_amount'], NULL);
@@ -453,6 +469,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPayLaterWithBilling() {
     $form = $this->getForm(NULL);
@@ -514,6 +531,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitComplete() {
     $form = $this->getForm(NULL);
@@ -572,6 +592,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @param string $mode
    *
    * @return \CRM_Member_Form_MembershipRenewal
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function getForm($mode = 'test') {
     $form = new CRM_Member_Form_MembershipRenewal();
@@ -590,7 +613,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @return array
    */
   protected function getBaseSubmitParams() {
-    $params = [
+    return [
       'cid' => $this->_individualId,
       'price_set_id' => 0,
       'join_date' => date('m/d/Y', time()),
@@ -627,7 +650,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
     ];
-    return $params;
   }
 
 }
