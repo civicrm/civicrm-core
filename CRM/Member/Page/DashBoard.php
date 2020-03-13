@@ -168,9 +168,9 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     foreach ($membershipSummary as $typeID => $details) {
       if (!$isCurrentMonth) {
         $membershipSummary[$typeID]['total']['total']['url'] = CRM_Utils_System::url('civicrm/member/search',
-          "reset=1&force=1&start=&end=$ymd&status=$status&type=$typeID"
+          "reset=1&force=1&start=&end=$ymd&status=$status&membership_type_id=$typeID"
         );
-        $membershipSummary[$typeID]['total_owner']['total_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&start=&end=$ymd&status=$status&type=$typeID&owner=1");
+        $membershipSummary[$typeID]['total_owner']['total_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&start=&end=$ymd&status=$status&membership_type_id=$typeID&owner=1");
       }
       else {
         $membershipSummary[$typeID]['total']['total']['url'] = CRM_Utils_System::url('civicrm/member/search',
@@ -178,11 +178,11 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
         );
         $membershipSummary[$typeID]['total_owner']['total_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1");
       }
-      $membershipSummary[$typeID]['current']['total']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&type=$typeID");
-      $membershipSummary[$typeID]['current_owner']['current_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&type=$typeID&owner=1");
+      $membershipSummary[$typeID]['current']['total']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&membership_type_id=$typeID");
+      $membershipSummary[$typeID]['current_owner']['current_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&membership_type_id=$typeID&owner=1");
     }
 
-    $totalCount = array();
+    $totalCount = [];
 
     $newCountPreMonth = $newCountMonth = $newCountYear = 0;
     $renewCountPreMonth = $renewCountMonth = $renewCountYear = 0;
