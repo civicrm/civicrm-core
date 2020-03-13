@@ -122,7 +122,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         ) {
           // we'll need to fix tests to handle this
           // CRM-7925
-          CRM_Core_Error::fatal(ts('The Contact Sub Type does not match the Contact type for this record'));
+          throw new CRM_Core_Exception(ts('The Contact Sub Type does not match the Contact type for this record'));
         }
         $params['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
       }
@@ -295,12 +295,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $transaction = new CRM_Core_Transaction();
 
     $contact = self::add($params);
-    if (!$contact) {
-      // Not dying here is stupid, since we get into weird situation and into a bug that
-      // is impossible to figure out for the user or for us
-      // CRM-7925
-      CRM_Core_Error::fatal();
-    }
 
     $params['contact_id'] = $contact->id;
 
