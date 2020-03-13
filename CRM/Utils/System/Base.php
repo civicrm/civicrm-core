@@ -668,7 +668,13 @@ abstract class CRM_Utils_System_Base {
     }
 
     if ($config->userFramework == 'Joomla') {
-      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
+      // For Joomla CiviCRM Core files always live within the admistrator folder and $base_url is different on the frontend compared to the backend.
+      if (strpos($baseURL, 'administrator') === FALSE) {
+        $userFrameworkResourceURL = $baseURL . "administrator/components/com_civicrm/civicrm/";
+      }
+      else {
+        $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
+      }
     }
     elseif ($config->userFramework == 'WordPress') {
       $userFrameworkResourceURL = CIVICRM_PLUGIN_URL . "civicrm/";
