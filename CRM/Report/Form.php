@@ -45,11 +45,10 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_templateID;
 
   /**
-   * The report title
+   * @todo Document this variable.
    *
-   * @var string
+   * @var boolean
    */
-  protected $_title;
   protected $_noFields = FALSE;
 
   /**
@@ -596,20 +595,8 @@ class CRM_Report_Form extends CRM_Core_Form {
     if ($this->_id) {
       $this->assign('instanceId', $this->_id);
       $params = ['id' => $this->_id];
-      $this->_instanceValues = [];
-      CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_ReportInstance',
-        $params,
-        $this->_instanceValues
-      );
-      if (empty($this->_instanceValues)) {
-        CRM_Core_Error::fatal("Report could not be loaded.");
-      }
-      $this->_title = $this->_instanceValues['title'];
-      if (!empty($this->_instanceValues['permission']) &&
-        (!(CRM_Core_Permission::check($this->_instanceValues['permission']) ||
-          CRM_Core_Permission::check('administer Reports')
-        ))
-      ) {
+
+      if (!CRM_Report_Utils_Report::isInstancePermissioned($this->_id)) {
         CRM_Utils_System::permissionDenied();
         CRM_Utils_System::civiExit();
       }
