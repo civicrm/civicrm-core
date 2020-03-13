@@ -879,4 +879,41 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     ];
   }
 
+  /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason we take the hard way.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+    $baseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+    if (CRM_Utils_System::isSSL()) {
+      $baseURL = str_replace('http://', 'https://', $baseURL);
+    }
+
+    // For Joomla CiviCRM Core files always live within the admistrator folder and $base_url is different on the frontend compared to the backend.
+    if (strpos($baseURL, 'administrator') === FALSE) {
+      $userFrameworkResourceURL = $baseURL . "administrator/components/com_civicrm/civicrm/";
+    }
+    else {
+      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
+    }
+
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    ];
+  }
+
 }
