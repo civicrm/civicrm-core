@@ -910,9 +910,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if (isset($params['contact_id'])) {
       // process membership status for deceased contact
       $deceasedParams = [
-        'contact_id' => CRM_Utils_Array::value('contact_id', $params),
-        'is_deceased' => CRM_Utils_Array::value('is_deceased', $params, FALSE),
-        'deceased_date' => CRM_Utils_Array::value('deceased_date', $params, NULL),
+        'contact_id' => $params['contact_id'] ?? NULL,
+        'is_deceased' => $params['is_deceased'] ?? FALSE,
+        'deceased_date' => $params['deceased_date'] ?? NULL,
       ];
       $updateMembershipMsg = CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $this->_contactType);
     }

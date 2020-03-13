@@ -939,9 +939,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'currency' => $params['currencyID'],
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
-      'card_type_id' => CRM_Utils_Array::value('card_type_id', $params),
-      'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),
+      'campaign_id' => $params['campaign_id'] ?? NULL,
+      'card_type_id' => $params['card_type_id'] ?? NULL,
+      'pan_truncation' => $params['pan_truncation'] ?? NULL,
     ];
 
     if ($paymentProcessor) {
@@ -951,7 +951,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if (!$pending && $result) {
       $contribParams += [
-        'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+        'fee_amount' => $result['fee_amount'] ?? NULL,
         'trxn_id' => $result['trxn_id'],
         'receipt_date' => $receiptDate,
       ];

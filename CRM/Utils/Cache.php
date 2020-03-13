@@ -190,7 +190,7 @@ class CRM_Utils_Cache {
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
             return new CRM_Utils_Cache_SqlGroup([
               'group' => $params['name'],
-              'prefetch' => CRM_Utils_Array::value('prefetch', $params, FALSE),
+              'prefetch' => $params['prefetch'] ?? FALSE,
             ]);
           }
           break;

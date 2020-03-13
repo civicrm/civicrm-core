@@ -283,10 +283,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     try {
       // A payment notification update could have come in at any time. Check at the last minute.
       $contributionStatusID = civicrm_api3('Contribution', 'getvalue', [
-        'id' => CRM_Utils_Array::value('contributionID', $params),
+        'id' => $params['contributionID'] ?? NULL,
         'return' => 'contribution_status_id',
         'is_test'   => ($this->_mode == 'test') ? 1 : 0,
-        'invoice_id' => CRM_Utils_Array::value('invoiceID', $params),
+        'invoice_id' => $params['invoiceID'] ?? NULL,
       ]);
       if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID) === 'Pending'
         && !empty($params['payment_processor_id'])

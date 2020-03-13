@@ -939,7 +939,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         't3' => ucfirst(substr($params['frequency_unit'], 0, 1)),
         'src' => 1,
         'sra' => 1,
-        'srt' => CRM_Utils_Array::value('installments', $params),
+        'srt' => $params['installments'] ?? NULL,
         'no_note' => 1,
         'modify' => 0,
       ];

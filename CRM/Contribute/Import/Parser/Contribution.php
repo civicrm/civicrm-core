@@ -266,9 +266,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
       if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['contribution_id'])) {
         $dupeIds = [
-          'id' => CRM_Utils_Array::value('contribution_id', $paramValues),
-          'trxn_id' => CRM_Utils_Array::value('trxn_id', $paramValues),
-          'invoice_id' => CRM_Utils_Array::value('invoice_id', $paramValues),
+          'id' => $paramValues['contribution_id'] ?? NULL,
+          'trxn_id' => $paramValues['trxn_id'] ?? NULL,
+          'invoice_id' => $paramValues['invoice_id'] ?? NULL,
         ];
 
         $ids['contribution'] = CRM_Contribute_BAO_Contribution::checkDuplicateIds($dupeIds);

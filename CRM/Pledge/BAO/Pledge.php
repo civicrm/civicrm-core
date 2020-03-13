@@ -524,14 +524,14 @@ GROUP BY  currency
             $contributionParams, $contributionStatus, $returnProperties
           );
           $contributionValue = array(
-            'status' => CRM_Utils_Array::value('contribution_status_id', $contributionStatus),
-            'receive_date' => CRM_Utils_Array::value('receive_date', $contributionStatus),
+            'status' => $contributionStatus['contribution_status_id'] ?? NULL,
+            'receive_date' => $contributionStatus['receive_date'] ?? NULL,
           );
         }
         $payments[$payID] = array_merge($contributionValue,
           array(
-            'amount' => CRM_Utils_Array::value('scheduled_amount', $values),
-            'due_date' => CRM_Utils_Array::value('scheduled_date', $values),
+            'amount' => $values['scheduled_amount'] ?? NULL,
+            'due_date' => $values['scheduled_date'] ?? NULL,
           )
         );
 
@@ -683,7 +683,7 @@ GROUP BY  currency
         'is_test' => $params['is_test'],
         'status_id' => 2,
         'details' => $details,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
+        'campaign_id' => $params['campaign_id'] ?? NULL,
       );
 
       // lets insert assignee record.

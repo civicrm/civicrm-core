@@ -386,7 +386,7 @@ function _sequentialcreditnotes_civix_insert_navigation_menu(&$menu, $path, $ite
   if (empty($path)) {
     $menu[] = [
       'attributes' => array_merge([
-        'label'      => CRM_Utils_Array::value('name', $item),
+        'label'      => $item['name'] ?? NULL,
         'active'     => 1,
       ], $item),
     ];

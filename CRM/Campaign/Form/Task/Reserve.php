@@ -237,7 +237,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
         'activity_date_time' => date('YmdHis'),
         'status_id' => $statusHeld,
         'skipRecentView' => 1,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_surveyDetails),
+        'campaign_id' => $this->_surveyDetails['campaign_id'] ?? NULL,
       ];
       $activity = CRM_Activity_BAO_Activity::create($activityParams);
       if ($activity->id) {

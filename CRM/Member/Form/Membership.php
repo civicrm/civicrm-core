@@ -510,12 +510,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // - set the payment information block
       // - set the max related block
       $allMembershipInfo[$key] = [
-        'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
+        'financial_type_id' => $values['financial_type_id'] ?? NULL,
         'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
         'total_amount_numeric' => $totalAmount,
-        'auto_renew' => CRM_Utils_Array::value('auto_renew', $values),
+        'auto_renew' => $values['auto_renew'] ?? NULL,
         'has_related' => isset($values['relationship_type_id']),
-        'max_related' => CRM_Utils_Array::value('max_related', $values),
+        'max_related' => $values['max_related'] ?? NULL,
       ];
     }
 
@@ -1374,10 +1374,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             'contact_id' => $this->_contributorContactID,
             'line_item' => $lineItem,
             'is_test' => $isTest,
-            'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams),
-            'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $formValues),
+            'campaign_id' => $paymentParams['campaign_id'] ?? NULL,
+            'contribution_page_id' => $formValues['contribution_page_id'] ?? NULL,
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-            'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $paymentParams),
+            'thankyou_date' => $paymentParams['thankyou_date'] ?? NULL,
             'payment_instrument_id' => $paymentInstrumentID,
           ],
           $financialType,

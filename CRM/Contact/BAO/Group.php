@@ -695,8 +695,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         'title' => "Hidden Smart Group {$ssId}",
         'is_active' => CRM_Utils_Array::value('is_active', $params, 1),
         'is_hidden' => CRM_Utils_Array::value('is_hidden', $params, 1),
-        'group_type' => CRM_Utils_Array::value('group_type', $params),
-        'visibility' => CRM_Utils_Array::value('visibility', $params),
+        'group_type' => $params['group_type'] ?? NULL,
+        'visibility' => $params['visibility'] ?? NULL,
         'saved_search_id' => $ssId,
       ];
 

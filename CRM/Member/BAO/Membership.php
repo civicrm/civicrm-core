@@ -2052,7 +2052,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       'price_sets' => $priceSets,
       'fields' => $fields,
       'price_fields' => [
-        'price_' . $fieldID => CRM_Utils_Array::value('id', $results),
+        'price_' . $fieldID => $results['id'] ?? NULL,
       ],
     ];
     return $returnParams;

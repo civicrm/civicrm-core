@@ -515,10 +515,10 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
     $profileFields[$profileID][$fieldName] = array_merge([
       'api.required' => $field['is_required'],
       'title' => $field['label'],
-      'help_pre' => CRM_Utils_Array::value('help_pre', $field),
-      'help_post' => CRM_Utils_Array::value('help_post', $field),
+      'help_pre' => $field['help_pre'] ?? NULL,
+      'help_post' => $field['help_post'] ?? NULL,
       'entity' => $entity,
-      'weight' => CRM_Utils_Array::value('weight', $field),
+      'weight' => $field['weight'] ?? NULL,
     ], $aliasArray);
 
     $ufFieldTaleFieldName = $field['field_name'];

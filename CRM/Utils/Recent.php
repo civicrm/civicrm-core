@@ -119,11 +119,11 @@ class CRM_Utils_Recent {
         'type' => $type,
         'contact_id' => $contactId,
         'contactName' => $contactName,
-        'subtype' => CRM_Utils_Array::value('subtype', $others),
-        'isDeleted' => CRM_Utils_Array::value('isDeleted', $others, FALSE),
-        'image_url' => CRM_Utils_Array::value('imageUrl', $others),
-        'edit_url' => CRM_Utils_Array::value('editUrl', $others),
-        'delete_url' => CRM_Utils_Array::value('deleteUrl', $others),
+        'subtype' => $others['subtype'] ?? NULL,
+        'isDeleted' => $others['isDeleted'] ?? FALSE,
+        'image_url' => $others['imageUrl'] ?? NULL,
+        'edit_url' => $others['editUrl'] ?? NULL,
+        'delete_url' => $others['deleteUrl'] ?? NULL,
       ]
     );
 

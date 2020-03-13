@@ -61,7 +61,7 @@ function civicrm_api3_domain_get($params) {
         $domain['domain_phone'] = [
           'phone_type' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id',
             CRM_Utils_Array::value('phone_type_id', $values['location']['phone'][1])),
-          'phone' => CRM_Utils_Array::value('phone', $values['location']['phone'][1]),
+          'phone' => $values['location']['phone'][1]['phone'] ?? NULL,
         ];
       }
 

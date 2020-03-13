@@ -346,18 +346,18 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
       $tplParams = [
         'email' => $email,
-        'receiptFromEmail' => CRM_Utils_Array::value('receipt_from_email', $values),
+        'receiptFromEmail' => $values['receipt_from_email'] ?? NULL,
         'contactID' => $contactID,
         'displayName' => $displayName,
-        'contributionID' => CRM_Utils_Array::value('contribution_id', $values),
-        'contributionOtherID' => CRM_Utils_Array::value('contribution_other_id', $values),
+        'contributionID' => $values['contribution_id'] ?? NULL,
+        'contributionOtherID' => $values['contribution_other_id'] ?? NULL,
         // CRM-5095
-        'lineItem' => CRM_Utils_Array::value('lineItem', $values),
+        'lineItem' => $values['lineItem'] ?? NULL,
         // CRM-5095
-        'priceSetID' => CRM_Utils_Array::value('priceSetID', $values),
+        'priceSetID' => $values['priceSetID'] ?? NULL,
         'title' => $title,
-        'isShare' => CRM_Utils_Array::value('is_share', $values),
-        'thankyou_title' => CRM_Utils_Array::value('thankyou_title', $values),
+        'isShare' => $values['is_share'] ?? NULL,
+        'thankyou_title' => $values['thankyou_title'] ?? NULL,
         'customPre' => $values['customPre'],
         'customPre_grouptitle' => $values['customPre_grouptitle'],
         'customPost' => $values['customPost'],
@@ -367,9 +367,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'amount' => $values['amount'],
         'is_pay_later' => $values['is_pay_later'],
         'receipt_date' => !$values['receipt_date'] ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
-        'pay_later_receipt' => CRM_Utils_Array::value('pay_later_receipt', $values),
-        'honor_block_is_active' => CRM_Utils_Array::value('honor_block_is_active', $values),
-        'contributionStatus' => CRM_Utils_Array::value('contribution_status', $values),
+        'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,
+        'honor_block_is_active' => $values['honor_block_is_active'] ?? NULL,
+        'contributionStatus' => $values['contribution_status'] ?? NULL,
       ];
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {

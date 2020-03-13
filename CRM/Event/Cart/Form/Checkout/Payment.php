@@ -40,7 +40,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'source' => CRM_Utils_Array::value('participant_source', $params, $this->description),
       'is_pay_later' => $this->is_pay_later,
       'fee_amount' => CRM_Utils_Array::value('amount', $params, 0),
-      'fee_currency' => CRM_Utils_Array::value('currencyID', $params),
+      'fee_currency' => $params['currencyID'] ?? NULL,
     ];
 
     if ($participant->must_wait) {
@@ -559,7 +559,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $trxnDetails = [
       'trxn_id' => $result['trxn_id'],
       'trxn_date' => $result['now'],
-      'currency' => CRM_Utils_Array::value('currencyID', $result),
+      'currency' => $result['currencyID'] ?? NULL,
     ];
     return $trxnDetails;
   }
@@ -594,12 +594,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'net_amount' => $params['amount'],
       'invoice_id' => "{$params['invoiceID']}-{$this->sub_trxn_index}",
       'trxn_id' => "{$params['trxn_id']}-{$this->sub_trxn_index}",
-      'currency' => CRM_Utils_Array::value('currencyID', $params),
+      'currency' => $params['currencyID'] ?? NULL,
       'source' => $event->title,
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       'contribution_status_id' => $params['contribution_status_id'],
       'payment_instrument_id' => $params['payment_instrument_id'],
-      'check_number' => CRM_Utils_Array::value('check_number', $params),
+      'check_number' => $params['check_number'] ?? NULL,
       'skipLineItem' => 1,
     ];
 

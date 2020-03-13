@@ -145,19 +145,19 @@ function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
   // Initialize XML processor with $params
   $xmlProcessor = new CRM_Case_XMLProcessor_Process();
   $xmlProcessorParams = [
-    'clientID' => CRM_Utils_Array::value('contact_id', $params),
-    'creatorID' => CRM_Utils_Array::value('creator_id', $params),
+    'clientID' => $params['contact_id'] ?? NULL,
+    'creatorID' => $params['creator_id'] ?? NULL,
     'standardTimeline' => 1,
     'activityTypeName' => 'Open Case',
-    'caseID' => CRM_Utils_Array::value('id', $params),
-    'subject' => CRM_Utils_Array::value('subject', $params),
-    'location' => CRM_Utils_Array::value('location', $params),
-    'activity_date_time' => CRM_Utils_Array::value('start_date', $params),
-    'duration' => CRM_Utils_Array::value('duration', $params),
-    'medium_id' => CRM_Utils_Array::value('medium_id', $params),
-    'details' => CRM_Utils_Array::value('details', $params),
+    'caseID' => $params['id'] ?? NULL,
+    'subject' => $params['subject'] ?? NULL,
+    'location' => $params['location'] ?? NULL,
+    'activity_date_time' => $params['start_date'] ?? NULL,
+    'duration' => $params['duration'] ?? NULL,
+    'medium_id' => $params['medium_id'] ?? NULL,
+    'details' => $params['details'] ?? NULL,
     'custom' => [],
-    'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
+    'relationship_end_date' => $params['end_date'] ?? NULL,
   ];
 
   // Do it! :-D

@@ -275,7 +275,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     //Now check DB for location elements.
     $searchParams = [
-      'id' => CRM_Utils_Array::value('address_id', $locElementIds),
+      'id' => $locElementIds['address_id'] ?? NULL,
       'location_type_id' => 1,
       'is_primary' => 1,
     ];
@@ -294,7 +294,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
     $searchParams = [
-      'id' => CRM_Utils_Array::value('email_id', $locElementIds),
+      'id' => $locElementIds['email_id'] ?? NULL,
       'location_type_id' => 1,
       'is_primary' => 1,
     ];
@@ -302,7 +302,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
     $searchParams = [
-      'id' => CRM_Utils_Array::value('phone_id', $locElementIds),
+      'id' => $locElementIds['phone_id'] ?? NULL,
       'location_type_id' => 1,
       'is_primary' => 1,
       'phone_type_id' => 1,
@@ -311,7 +311,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     $searchParams = [
-      'id' => CRM_Utils_Array::value('phone_2_id', $locElementIds),
+      'id' => $locElementIds['phone_2_id'] ?? NULL,
       'location_type_id' => 1,
       'phone_type_id' => 2,
     ];
@@ -319,7 +319,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     $searchParams = [
-      'id' => CRM_Utils_Array::value('im_id', $locElementIds),
+      'id' => $locElementIds['im_id'] ?? NULL,
       'location_type_id' => 1,
       'is_primary' => 1,
     ];

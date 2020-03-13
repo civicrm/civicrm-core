@@ -395,8 +395,8 @@ class CRM_Utils_Date {
       }
 
       $date = [
-        '%b' => CRM_Utils_Array::value($month, $abbrMonths),
-        '%B' => CRM_Utils_Array::value($month, $fullMonths),
+        '%b' => $abbrMonths[$month] ?? NULL,
+        '%B' => $fullMonths[$month] ?? NULL,
         '%d' => $day > 9 ? $day : '0' . $day,
         '%e' => $day > 9 ? $day : ' ' . $day,
         '%E' => $day,

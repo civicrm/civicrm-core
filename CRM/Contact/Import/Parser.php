@@ -1026,7 +1026,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     if (isset($values['email_greeting'])) {
       if (!empty($params['email_greeting_id'])) {
         $emailGreetingFilter = [
-          'contact_type' => CRM_Utils_Array::value('contact_type', $params),
+          'contact_type' => $params['contact_type'] ?? NULL,
           'greeting_type' => 'email_greeting',
         ];
         $emailGreetings = CRM_Core_PseudoConstant::greeting($emailGreetingFilter);
@@ -1042,7 +1042,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     if (isset($values['postal_greeting'])) {
       if (!empty($params['postal_greeting_id'])) {
         $postalGreetingFilter = [
-          'contact_type' => CRM_Utils_Array::value('contact_type', $params),
+          'contact_type' => $params['contact_type'] ?? NULL,
           'greeting_type' => 'postal_greeting',
         ];
         $postalGreetings = CRM_Core_PseudoConstant::greeting($postalGreetingFilter);
@@ -1057,7 +1057,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     if (isset($values['addressee'])) {
       if (!empty($params['addressee_id'])) {
         $addresseeFilter = [
-          'contact_type' => CRM_Utils_Array::value('contact_type', $params),
+          'contact_type' => $params['contact_type'] ?? NULL,
           'greeting_type' => 'addressee',
         ];
         $addressee = CRM_Core_PseudoConstant::addressee($addresseeFilter);

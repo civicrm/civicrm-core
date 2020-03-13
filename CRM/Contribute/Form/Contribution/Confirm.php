@@ -156,8 +156,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contributionParams = [
       'financial_type_id' => $financialTypeID,
       'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
-      'tax_amount' => CRM_Utils_Array::value('tax_amount', $params),
-      'amount_level' => CRM_Utils_Array::value('amount_level', $params),
+      'tax_amount' => $params['tax_amount'] ?? NULL,
+      'amount_level' => $params['amount_level'] ?? NULL,
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
@@ -806,7 +806,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params = [
         'product_id' => $premiumParams['selectProduct'],
         'contribution_id' => $contribution->id,
-        'product_option' => CRM_Utils_Array::value('options_' . $premiumParams['selectProduct'], $premiumParams),
+        'product_option' => $premiumParams['options_' . $premiumParams['selectProduct']] ?? NULL,
         'quantity' => 1,
         'start_date' => CRM_Utils_Date::customFormat($startDate, '%Y%m%d'),
         'end_date' => CRM_Utils_Date::customFormat($endDate, '%Y%m%d'),
@@ -2478,13 +2478,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       try {
         civicrm_api3('contribution', 'completetransaction', [
           'id' => $contributionID,
-          'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+          'trxn_id' => $result['trxn_id'] ?? NULL,
           'payment_processor_id' => CRM_Utils_Array::value('payment_processor_id', $result, $this->_paymentProcessor['id']),
           'is_transactional' => FALSE,
-          'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-          'receive_date' => CRM_Utils_Array::value('receive_date', $result),
-          'card_type_id' => CRM_Utils_Array::value('card_type_id', $result),
-          'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $result),
+          'fee_amount' => $result['fee_amount'] ?? NULL,
+          'receive_date' => $result['receive_date'] ?? NULL,
+          'card_type_id' => $result['card_type_id'] ?? NULL,
+          'pan_truncation' => $result['pan_truncation'] ?? NULL,
         ]);
       }
       catch (CiviCRM_API3_Exception $e) {

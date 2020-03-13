@@ -229,7 +229,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
         foreach ($overduePayments as $id => $payment) {
           $label = ts("%1 - due on %2 (overdue)", array(
             1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment), CRM_Utils_Array::value('scheduled_amount_currency', $payment)),
-            2 => CRM_Utils_Array::value('scheduled_date', $payment),
+            2 => $payment['scheduled_date'] ?? NULL,
           ));
           $paymentID = CRM_Utils_Array::value('id', $payment);
           $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $payment)));
@@ -239,7 +239,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       if (!empty($nextPayment)) {
         $label = ts("%1 - due on %2", array(
           1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment), CRM_Utils_Array::value('scheduled_amount_currency', $nextPayment)),
-          2 => CRM_Utils_Array::value('scheduled_date', $nextPayment),
+          2 => $nextPayment['scheduled_date'] ?? NULL,
         ));
         $paymentID = CRM_Utils_Array::value('id', $nextPayment);
         $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)));

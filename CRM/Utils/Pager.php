@@ -83,10 +83,10 @@ class CRM_Utils_Pager extends Pager_Sliding {
       'last' => $this->getLastPageLink(),
       'currentPage' => $this->getCurrentPageID(),
       'numPages' => $this->numPages(),
-      'csvString' => CRM_Utils_Array::value('csvString', $params),
-      'status' => CRM_Utils_Array::value('status', $params),
-      'buttonTop' => CRM_Utils_Array::value('buttonTop', $params),
-      'buttonBottom' => CRM_Utils_Array::value('buttonBottom', $params),
+      'csvString' => $params['csvString'] ?? NULL,
+      'status' => $params['status'] ?? NULL,
+      'buttonTop' => $params['buttonTop'] ?? NULL,
+      'buttonBottom' => $params['buttonBottom'] ?? NULL,
       'currentLocation' => $this->getCurrentLocation(),
     ];
 

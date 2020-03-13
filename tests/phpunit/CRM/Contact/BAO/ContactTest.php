@@ -328,7 +328,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'is_primary' => 1,
     ];
     $compareParams = [
-      'street_address' => CRM_Utils_Array::value('street_address', $params['address'][1]),
+      'street_address' => $params['address'][1]['street_address'] ?? NULL,
       'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1',
         $params['address'][1]
       ),
@@ -338,14 +338,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3',
         $params['address'][1]
       ),
-      'city' => CRM_Utils_Array::value('city', $params['address'][1]),
-      'postal_code' => CRM_Utils_Array::value('postal_code', $params['address'][1]),
-      'country_id' => CRM_Utils_Array::value('country_id', $params['address'][1]),
+      'city' => $params['address'][1]['city'] ?? NULL,
+      'postal_code' => $params['address'][1]['postal_code'] ?? NULL,
+      'country_id' => $params['address'][1]['country_id'] ?? NULL,
       'state_province_id' => CRM_Utils_Array::value('state_province_id',
         $params['address'][1]
       ),
-      'geo_code_1' => CRM_Utils_Array::value('geo_code_1', $params['address'][1]),
-      'geo_code_2' => CRM_Utils_Array::value('geo_code_2', $params['address'][1]),
+      'geo_code_1' => $params['address'][1]['geo_code_1'] ?? NULL,
+      'geo_code_2' => $params['address'][1]['geo_code_2'] ?? NULL,
     ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
@@ -359,8 +359,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     //Now check DB for IM
     $compareParams = [
-      'name' => CRM_Utils_Array::value('name', $params['im'][1]),
-      'provider_id' => CRM_Utils_Array::value('provider_id', $params['im'][1]),
+      'name' => $params['im'][1]['name'] ?? NULL,
+      'provider_id' => $params['im'][1]['provider_id'] ?? NULL,
     ];
     $this->assertDBCompareValues('CRM_Core_DAO_IM', $searchParams, $compareParams);
 
@@ -369,7 +369,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][1]),
+      'phone_type_id' => $params['phone'][1]['phone_type_id'] ?? NULL,
     ];
     $compareParams = ['phone' => CRM_Utils_Array::value('phone', $params['phone'][1])];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
@@ -378,7 +378,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][2]),
+      'phone_type_id' => $params['phone'][2]['phone_type_id'] ?? NULL,
     ];
     $compareParams = ['phone' => CRM_Utils_Array::value('phone', $params['phone'][2])];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
@@ -838,16 +838,16 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'is_primary' => 1,
     ];
     $compareParams = [
-      'street_address' => CRM_Utils_Array::value('street_address-Primary', $profileParams),
-      'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1-Primary', $profileParams),
-      'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2-Primary', $profileParams),
-      'supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3-Primary', $profileParams),
-      'city' => CRM_Utils_Array::value('city-Primary', $profileParams),
-      'postal_code' => CRM_Utils_Array::value('postal_code-Primary', $profileParams),
-      'country_id' => CRM_Utils_Array::value('country-Primary', $profileParams),
-      'state_province_id' => CRM_Utils_Array::value('state_province-Primary', $profileParams),
-      'geo_code_1' => CRM_Utils_Array::value('geo_code_1-Primary', $profileParams),
-      'geo_code_2' => CRM_Utils_Array::value('geo_code_2-Primary', $profileParams),
+      'street_address' => $profileParams['street_address-Primary'] ?? NULL,
+      'supplemental_address_1' => $profileParams['supplemental_address_1-Primary'] ?? NULL,
+      'supplemental_address_2' => $profileParams['supplemental_address_2-Primary'] ?? NULL,
+      'supplemental_address_3' => $profileParams['supplemental_address_3-Primary'] ?? NULL,
+      'city' => $profileParams['city-Primary'] ?? NULL,
+      'postal_code' => $profileParams['postal_code-Primary'] ?? NULL,
+      'country_id' => $profileParams['country-Primary'] ?? NULL,
+      'state_province_id' => $profileParams['state_province-Primary'] ?? NULL,
+      'geo_code_1' => $profileParams['geo_code_1-Primary'] ?? NULL,
+      'geo_code_2' => $profileParams['geo_code_2-Primary'] ?? NULL,
     ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
@@ -857,8 +857,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     //Now check DB for IM
     $compareParams = [
-      'name' => CRM_Utils_Array::value('im-Primary', $profileParams),
-      'provider_id' => CRM_Utils_Array::value('im-Primary-provider_id', $profileParams),
+      'name' => $profileParams['im-Primary'] ?? NULL,
+      'provider_id' => $profileParams['im-Primary-provider_id'] ?? NULL,
     ];
     $this->assertDBCompareValues('CRM_Core_DAO_IM', $searchParams, $compareParams);
 
@@ -875,7 +875,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][2]),
+      'phone_type_id' => $params['phone'][2]['phone_type_id'] ?? NULL,
     ];
     $compareParams = ['phone' => CRM_Utils_Array::value('phone-Primary-2', $profileParams)];
 
@@ -1044,16 +1044,16 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'is_primary' => 1,
     ];
     $compareParams = [
-      'street_address' => CRM_Utils_Array::value('street_address-Primary', $updatePfParams),
-      'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1-Primary', $updatePfParams),
-      'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2-Primary', $updatePfParams),
-      'supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3-Primary', $updatePfParams),
-      'city' => CRM_Utils_Array::value('city-Primary', $updatePfParams),
-      'postal_code' => CRM_Utils_Array::value('postal_code-Primary', $updatePfParams),
-      'country_id' => CRM_Utils_Array::value('country-Primary', $updatePfParams),
-      'state_province_id' => CRM_Utils_Array::value('state_province-Primary', $updatePfParams),
-      'geo_code_1' => CRM_Utils_Array::value('geo_code_1-Primary', $updatePfParams),
-      'geo_code_2' => CRM_Utils_Array::value('geo_code_2-Primary', $updatePfParams),
+      'street_address' => $updatePfParams['street_address-Primary'] ?? NULL,
+      'supplemental_address_1' => $updatePfParams['supplemental_address_1-Primary'] ?? NULL,
+      'supplemental_address_2' => $updatePfParams['supplemental_address_2-Primary'] ?? NULL,
+      'supplemental_address_3' => $updatePfParams['supplemental_address_3-Primary'] ?? NULL,
+      'city' => $updatePfParams['city-Primary'] ?? NULL,
+      'postal_code' => $updatePfParams['postal_code-Primary'] ?? NULL,
+      'country_id' => $updatePfParams['country-Primary'] ?? NULL,
+      'state_province_id' => $updatePfParams['state_province-Primary'] ?? NULL,
+      'geo_code_1' => $updatePfParams['geo_code_1-Primary'] ?? NULL,
+      'geo_code_2' => $updatePfParams['geo_code_2-Primary'] ?? NULL,
     ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
@@ -1063,8 +1063,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     //Now check DB for IM
     $compareParams = [
-      'name' => CRM_Utils_Array::value('im-Primary', $updatePfParams),
-      'provider_id' => CRM_Utils_Array::value('im-Primary-provider_id', $updatePfParams),
+      'name' => $updatePfParams['im-Primary'] ?? NULL,
+      'provider_id' => $updatePfParams['im-Primary-provider_id'] ?? NULL,
     ];
     $this->assertDBCompareValues('CRM_Core_DAO_IM', $searchParams, $compareParams);
 
@@ -1081,7 +1081,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][2]),
+      'phone_type_id' => $params['phone'][2]['phone_type_id'] ?? NULL,
     ];
     $compareParams = ['phone' => CRM_Utils_Array::value('phone-Primary-2', $updatePfParams)];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
@@ -1615,7 +1615,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'is_primary' => 1,
     ];
     $compareParams = [
-      'street_address' => CRM_Utils_Array::value('street_address-Primary', $updatePfParams),
+      'street_address' => $updatePfParams['street_address-Primary'] ?? NULL,
     ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 

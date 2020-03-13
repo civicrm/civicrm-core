@@ -1592,9 +1592,9 @@ function civicrm_api3_contact_duplicatecheck($params) {
     return civicrm_api3('Contact', 'get', [
       'return' => $params['return'],
       'id' => ['IN' => $dupes],
-      'options' => CRM_Utils_Array::value('options', $params),
-      'sequential' => CRM_Utils_Array::value('sequential', $params),
-      'check_permissions' => CRM_Utils_Array::value('check_permissions', $params),
+      'options' => $params['options'] ?? NULL,
+      'sequential' => $params['sequential'] ?? NULL,
+      'check_permissions' => $params['check_permissions'] ?? NULL,
     ]);
   }
   foreach ($dupes as $dupe) {

@@ -509,7 +509,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
       $this->_columnHeaders['case_activity_all_dates'] = [
         'title' => $this->_caseDetailExtra['case_activity_all_dates']['title'] . ": {$this->caseActivityTypes[$activityType]}",
-        'type' => CRM_Utils_Array::value('type', $this->_caseDetailExtra['case_activity_all_dates']),
+        'type' => $this->_caseDetailExtra['case_activity_all_dates']['type'] ?? NULL,
       ];
     }
 

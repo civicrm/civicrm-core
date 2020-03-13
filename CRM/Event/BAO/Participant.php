@@ -1465,8 +1465,8 @@ UPDATE  civicrm_participant
             'domain' => $domainValues,
             'participant' => $participantValues,
             'event' => $eventDetails,
-            'paidEvent' => CRM_Utils_Array::value('is_monetary', $eventDetails),
-            'isShowLocation' => CRM_Utils_Array::value('is_show_location', $eventDetails),
+            'paidEvent' => $eventDetails['is_monetary'] ?? NULL,
+            'isShowLocation' => $eventDetails['is_show_location'] ?? NULL,
             'isAdditional' => $participantValues['registered_by_id'],
             'isExpired' => $mailType == 'Expired',
             'isConfirm' => $mailType == 'Confirm',
@@ -1475,8 +1475,8 @@ UPDATE  civicrm_participant
           'from' => $receiptFrom,
           'toName' => $participantName,
           'toEmail' => $toEmail,
-          'cc' => CRM_Utils_Array::value('cc_confirm', $eventDetails),
-          'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventDetails),
+          'cc' => $eventDetails['cc_confirm'] ?? NULL,
+          'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
         ]
       );
 
