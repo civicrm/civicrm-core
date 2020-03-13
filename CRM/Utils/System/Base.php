@@ -667,13 +667,9 @@ abstract class CRM_Utils_System_Base {
       $baseURL = str_replace('http://', 'https://', $baseURL);
     }
 
-    if ($config->userFramework == 'Joomla') {
-      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      $userFrameworkResourceURL = CIVICRM_PLUGIN_URL . "civicrm/";
-    }
-    elseif ($this->is_drupal) {
+    // @todo this function is only called / code is only reached when is_drupal is true - move this to the drupal classes
+    // and don't implement here.
+    if ($this->is_drupal) {
       // Drupal setting
       // check and see if we are installed in sites/all (for D5 and above)
       // we dont use checkURL since drupal generates an error page and throws
