@@ -28,17 +28,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-
-    $outBoundOption = [
-      CRM_Mailing_Config::OUTBOUND_OPTION_MAIL => ts('mail()'),
-      CRM_Mailing_Config::OUTBOUND_OPTION_SMTP => ts('SMTP'),
-      CRM_Mailing_Config::OUTBOUND_OPTION_SENDMAIL => ts('Sendmail'),
-      CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED => ts('Disable Outbound Email'),
-      CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB => ts('Redirect to Database'),
-    ];
-    $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
-
-    $props = array();
+    $props = [];
     $settings = Civi::settings()->getMandatory('mailing_backend') ?? [];
     //Load input as readonly whose values are overridden in civicrm.settings.php.
     foreach ($settings as $setting => $value) {
@@ -47,6 +37,15 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         $setStatus = TRUE;
       }
     }
+
+    $outBoundOption = [
+      CRM_Mailing_Config::OUTBOUND_OPTION_MAIL => ts('mail()'),
+      CRM_Mailing_Config::OUTBOUND_OPTION_SMTP => ts('SMTP'),
+      CRM_Mailing_Config::OUTBOUND_OPTION_SENDMAIL => ts('Sendmail'),
+      CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED => ts('Disable Outbound Email'),
+      CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB => ts('Redirect to Database'),
+    ];
+    $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption, $props['outBound_option'] ?? []);
 
     CRM_Utils_System::setTitle(ts('Settings - Outbound Mail'));
     $this->add('text', 'sendmail_path', ts('Sendmail Path'));
