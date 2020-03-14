@@ -1430,10 +1430,6 @@ Expires: ',
       $financialItems_sum += $financialItem['amount'];
     }
     $this->assertEquals($contribution['total_amount'], $financialItems_sum);
-
-    // reset the price options static variable so not leave any dummy data, that might hamper other unit tests
-    \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
-    $this->disableTaxAndInvoicing();
   }
 
   /**
@@ -1451,7 +1447,7 @@ Expires: ',
     $this->createLoggedInUser();
     $membershipTypeAnnualRolling = $this->callAPISuccess('membership_type', 'create', [
       'domain_id' => 1,
-      'name' => "AnnualRollingNew",
+      'name' => 'AnnualRollingNew',
       'member_of_contact_id' => 23,
       'duration_unit' => "year",
       'minimum_fee' => 50,

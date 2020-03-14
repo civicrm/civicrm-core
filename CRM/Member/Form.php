@@ -453,9 +453,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $priceSetID = CRM_Utils_Array::value('price_set_id', $params);
     if (!$priceSetID) {
       $priceSetDetails = self::getPriceSetDetails($params);
-      return key($priceSetDetails);
+      return (int) key($priceSetDetails);
     }
-    return $priceSetID;
+    return (int) $priceSetID;
   }
 
   /**

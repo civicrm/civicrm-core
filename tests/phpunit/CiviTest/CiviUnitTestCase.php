@@ -3040,18 +3040,20 @@ VALUES
 
   /**
    * Enable Tax and Invoicing
+   *
+   * @throws \CRM_Core_Exception
    */
-  protected function disableTaxAndInvoicing($params = []) {
+  protected function disableTaxAndInvoicing() {
+    $accounts = $this->callAPISuccess('EntityFinancialAccount', 'get', ['account_relationship' => 'Sales Tax Account is'])['values'];
+    foreach ($accounts as $account) {
+      $this->callAPISuccess('EntityFinancialAccount', 'delete', ['id' => $account['id']]);
+      $this->callAPISuccess('FinancialAccount', 'delete', ['id' => $account['financial_account_id']]);
+    }
+
     if (!empty(\Civi::$statics['CRM_Core_PseudoConstant']) && isset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates'])) {
       unset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates']);
     }
-    // Enable component contribute setting
-    $contributeSetting = array_merge($params,
-      [
-        'invoicing' => 0,
-      ]
-    );
-    return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+    return Civi::settings()->set('invoicing', FALSE);
   }
 
   /**
