@@ -18,9 +18,11 @@
 /**
  * This class generates form components for Financial Type
  */
-class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
+class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
 
   use CRM_Core_Form_EntityFormTrait;
+
+  protected $_BAOName = 'CRM_Financial_BAO_FinancialType';
 
   /**
    * Fields for the entity to be assigned to the template.
@@ -98,9 +100,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    self::buildQuickEntityForm();
+    $this->buildQuickEntityForm();
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -114,6 +118,8 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -148,11 +154,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
           1 => $params['name'],
         ];
         $financialAccounts = civicrm_api3('EntityFinancialAccount', 'get', [
-          'return' => ["financial_account_id.name"],
-          'entity_table' => "civicrm_financial_type",
+          'return' => ['financial_account_id.name'],
+          'entity_table' => 'civicrm_financial_type',
           'entity_id' => $financialType['id'],
           'options' => ['sort' => "id"],
-          'account_relationship' => ['!=' => "Income Account is"],
+          'account_relationship' => ['!=' => 'Income Account is'],
         ]);
         if (!empty($financialAccounts['values'])) {
           foreach ($financialAccounts['values'] as $financialAccount) {
@@ -169,6 +175,21 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
     }
+  }
+
+  /**
+   * Set default values for the form. MobileProvider that in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @return array
+   */
+  public function setDefaultValues() {
+    $defaults = $this->getEntityDefaults();
+
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $defaults['is_active'] = 1;
+    }
+    return $defaults;
   }
 
 }
