@@ -13,6 +13,10 @@
  * The extension manager handles installing, disabling enabling, and
  * uninstalling extensions.
  *
+ * You should obtain a singleton of this class via
+ *
+ * $manager = CRM_Extension_Manager::singleton()->getManager();
+ *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
@@ -93,6 +97,34 @@ class CRM_Extension_Manager {
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $statuses;
+
+  /**
+   * Live process(es) per extension.
+   *
+   * @var array
+   *
+   * Format is: {
+   *   extensionKey => [
+   *    ['operation' => 'install|enable|uninstall|disable', 'phase' => 'queued|live|completed'
+   *     ...
+   *   ],
+   *   ...
+   * }
+   *
+   * The inner array is a stack, so the most recent current operation is the
+   * last entry. As this manager handles multiple extensions at once, here's
+   * the flow for an install operation.
+   *
+   * $manager->install(['ext1', 'ext2']);
+   *
+   * 0. {}
+   * 1. { ext1: ['install'], ext2: ['install'] }
+   * 2. { ext1: ['install', 'installing'], ext2: ['install'] }
+   * 3. { ext1: ['install'], ext2: ['install', 'installing'] }
+   * 4. { ext1: ['install'], ext2: ['install'] }
+   * 5. {}
+   */
+  protected $processes = [];
 
   /**
    * Class constructor.
@@ -201,9 +233,10 @@ class CRM_Extension_Manager {
    *
    * @param string|array $keys
    *   One or more extension keys.
+   * @param string $mode install|enable
    * @throws CRM_Extension_Exception
    */
-  public function install($keys) {
+  public function install($keys, $mode = 'install') {
     $keys = (array) $keys;
     $origStatuses = $this->getStatuses();
 
@@ -221,6 +254,9 @@ class CRM_Extension_Manager {
       throw new CRM_Extension_Exception('Cannot install incompatible extension: ' . implode(', ', $incompatible));
     }
 
+    // Keep state for these operations.
+    $this->addProcess($keys, $mode);
+
     foreach ($keys as $key) {
       /** @var CRM_Extension_Info $info */
       /** @var CRM_Extension_Manager_Base $typeManager */
@@ -228,11 +264,17 @@ class CRM_Extension_Manager {
 
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
-          // ok, nothing to do
+          // ok, nothing to do. As such the status of this process is no longer
+          // 'install' install was the intent, which might have resulted in
+          // changes but these changes will not be happening, so processes that
+          // are sensitive to installs (like the managed entities reconcile
+          // operation) should not assume that these changes have happened.
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_DISABLED:
           // re-enable it
+          $this->addProcess([$key], 'enabling');
           $typeManager->onPreEnable($info);
           $this->_setExtensionActive($info, 1);
           $typeManager->onPostEnable($info);
@@ -241,10 +283,13 @@ class CRM_Extension_Manager {
           // later extensions to access classes from earlier extensions.
           $this->statuses = NULL;
           $this->mapper->refresh();
+
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_UNINSTALLED:
           // install anew
+          $this->addProcess([$key], 'installing');
           $typeManager->onPreInstall($info);
           $this->_createExtensionEntry($info);
           $typeManager->onPostInstall($info);
@@ -253,6 +298,8 @@ class CRM_Extension_Manager {
           // later extensions to access classes from earlier extensions.
           $this->statuses = NULL;
           $this->mapper->refresh();
+
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_UNKNOWN:
@@ -264,6 +311,7 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+
     $schema = new CRM_Logging_Schema();
     $schema->fixSchemaDifferences();
 
@@ -282,7 +330,9 @@ class CRM_Extension_Manager {
 
         case self::STATUS_UNINSTALLED:
           // install anew
+          $this->addProcess([$key], 'installing');
           $typeManager->onPostPostInstall($info);
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_UNKNOWN:
@@ -291,6 +341,8 @@ class CRM_Extension_Manager {
       }
     }
 
+    // All processes for these keys
+    $this->popProcess($keys);
   }
 
   /**
@@ -301,7 +353,7 @@ class CRM_Extension_Manager {
    * @throws CRM_Extension_Exception
    */
   public function enable($keys) {
-    $this->install($keys);
+    $this->install($keys, 'enable');
   }
 
   /**
@@ -326,14 +378,18 @@ class CRM_Extension_Manager {
       throw new CRM_Extension_Exception_DependencyException("Cannot disable extension due to dependencies. Consider disabling all these: " . implode(',', $disableRequirements));
     }
 
+    $this->addProcess($keys, 'disable');
+
     foreach ($keys as $key) {
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
+          $this->addProcess([$key], 'disabling');
           // throws Exception
           list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
           $typeManager->onPreDisable($info);
           $this->_setExtensionActive($info, 0);
           $typeManager->onPostDisable($info);
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_INSTALLED_MISSING:
@@ -348,6 +404,8 @@ class CRM_Extension_Manager {
         case self::STATUS_DISABLED_MISSING:
         case self::STATUS_UNINSTALLED:
           // ok, nothing to do
+          // Remove the 'disable' process as we're not doing that.
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_UNKNOWN:
@@ -359,6 +417,8 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+
+    $this->popProcess($keys);
   }
 
   /**
@@ -375,6 +435,8 @@ class CRM_Extension_Manager {
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
 
+    $this->addProcess($keys, 'uninstall');
+
     foreach ($keys as $key) {
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
@@ -382,6 +444,7 @@ class CRM_Extension_Manager {
           throw new CRM_Extension_Exception("Cannot uninstall extension; disable it first: $key");
 
         case self::STATUS_DISABLED:
+          $this->addProcess([$key], 'uninstalling');
           // throws Exception
           list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
           $typeManager->onPreUninstall($info);
@@ -399,6 +462,8 @@ class CRM_Extension_Manager {
 
         case self::STATUS_UNINSTALLED:
           // ok, nothing to do
+          // remove the 'uninstall' process since we're not doing that.
+          $this->popProcess([$key]);
           break;
 
         case self::STATUS_UNKNOWN:
@@ -410,6 +475,7 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    $this->popProcess($keys);
   }
 
   /**
@@ -489,6 +555,34 @@ class CRM_Extension_Manager {
     // and, indirectly, defaultContainer
     $this->fullContainer->refresh();
     $this->mapper->refresh();
+  }
+
+  /**
+   * Return current processes for given extension.
+   *
+   * @param String $key extension key
+   *
+   * @return array
+   */
+  public function getActiveProcesses(string $key) :Array {
+    return $this->processes[$key] ?? [];
+  }
+
+  /**
+   * Determine if the extension specified is currently involved in an install
+   * or enable process. Just sugar code to make things more readable.
+   *
+   * @param String $key extension key
+   *
+   * @return bool
+   */
+  public function extensionIsBeingInstalledOrEnabled($key) :bool {
+    foreach ($this->getActiveProcesses($key) as $process) {
+      if (in_array($process, ['install', 'installing', 'enable', 'enabling'])) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   // ----------------------
@@ -712,6 +806,15 @@ class CRM_Extension_Manager {
   }
 
   /**
+   * Provides way to set processes property for phpunit tests - not for general use.
+   *
+   * @param $processes
+   */
+  public function setProcessesForTesting(array $processes) {
+    $this->processes = $processes;
+  }
+
+  /**
    * @param $infos
    * @param $filterStatuses
    * @return array
@@ -724,6 +827,31 @@ class CRM_Extension_Manager {
       }
     }
     return $matches;
+  }
+
+  /**
+   * Add a process to the stacks for the extensions.
+   *
+   * @param array $keys extensionKey
+   * @param string $process one of: install|uninstall|enable|disable|installing|uninstalling|enabling|disabling
+   */
+  protected function addProcess(array $keys, string $process) {
+    foreach ($keys as $key) {
+      $this->processes[$key][] = $process;
+    }
+  }
+
+  /**
+   * Pop the top op from the stacks for the extensions.
+   *
+   * @param array $keys extensionKey
+   */
+  protected function popProcess(array $keys) {
+    foreach ($keys as $key) {
+      if (!empty($this->process[$key])) {
+        array_pop($this->process[$key]);
+      }
+    }
   }
 
 }
