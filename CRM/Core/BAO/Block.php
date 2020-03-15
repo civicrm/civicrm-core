@@ -399,7 +399,7 @@ class CRM_Core_BAO_Block {
     }
 
     // contact_id in params might be empty or the string 'null' so cast to integer
-    $contactId = (int) CRM_Utils_Array::value('contact_id', $params);
+    $contactId = (int) ($params['contact_id'] ?? 0);
     // If id is set & we haven't been passed a contact_id, retrieve it
     if (!empty($params['id']) && !isset($params['contact_id'])) {
       $entity = new $class();

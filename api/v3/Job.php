@@ -678,7 +678,7 @@ function civicrm_api3_job_group_rebuild($params) {
     throw new API_Exception('Could not acquire lock, another GroupRebuild process is running');
   }
 
-  $limit = CRM_Utils_Array::value('limit', $params, 0);
+  $limit = $params['limit'] ?? 0;
 
   CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $limit);
   $lock->release();

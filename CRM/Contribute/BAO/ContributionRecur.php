@@ -181,7 +181,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       'id' => $recurID,
       'return' => ['payment_processor_id'],
     ]);
-    return (int) CRM_Utils_Array::value('payment_processor_id', $recur, 0);
+    return (int) ($recur['payment_processor_id'] ?? 0);
   }
 
   /**

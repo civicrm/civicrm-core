@@ -421,7 +421,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
-      $eventId = (int) CRM_Utils_Array::value('event_id', $_POST);
+      $eventId = (int) ($_POST['event_id'] ?? 0);
       // Custom data of type participant role
       // Note: Some earlier commits imply $_POST['role_id'] could be a comma separated string,
       //       not sure if that ever really happens

@@ -412,7 +412,7 @@ class CRM_Contact_Form_Search_Criteria {
       'street_unit' => [ts('Apt/Unit/Suite'), $attributes['street_unit'], NULL, NULL],
     ];
 
-    $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', $addressOptions, 0);
+    $parseStreetAddress = $addressOptions['street_address_parsing'] ?? 0;
     $form->assign('parseStreetAddress', $parseStreetAddress);
     foreach ($elements as $name => $v) {
       list($title, $attributes, $select, $multiSelect) = $v;

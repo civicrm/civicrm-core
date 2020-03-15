@@ -858,7 +858,7 @@ function civicrm_api3_contact_getquick($params) {
   }
   $actualSelectElements = implode(', ', $actualSelectElements);
   $from = implode(' ', $from);
-  $limit = (int) CRM_Utils_Array::value('limit', $params);
+  $limit = (int) ($params['limit'] ?? 0);
   $limit = $limit > 0 ? $limit : Civi::settings()->get('search_autocomplete_count');
 
   // add acl clause here

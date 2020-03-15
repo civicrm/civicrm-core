@@ -205,7 +205,7 @@ class CRM_Utils_Chart {
     }
 
     // rotate the x labels.
-    $chartData['xLabelAngle'] = CRM_Utils_Array::value('xLabelAngle', $rows, 0);
+    $chartData['xLabelAngle'] = $rows['xLabelAngle'] ?? 0;
     if (!empty($rows['tip'])) {
       $chartData['tip'] = $rows['tip'];
     }
