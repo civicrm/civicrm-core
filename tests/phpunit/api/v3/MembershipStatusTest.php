@@ -137,6 +137,25 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that after checking the person as 'Deceased', the Membership is also 'Deceased' both through inline and normal edit.
+   */
+  public function testDeceasedMembershipInline() {
+    $contactID = $this->individualCreate();
+    $params = [
+      'contact_id' => $contactID,
+      'membership_type_id' => $this->_membershipTypeID,
+      'join_date' => '2006-01-21',
+      'start_date' => '2006-01-21',
+      'end_date' => '2006-12-21',
+      'status_id' => $this->_membershipStatusID,
+    ];
+    $this->callApiSuccess('membership', 'create', $params);
+    $this->callApiSuccess('contact', 'create', ['id' => $contactID, 'is_deceased' => 1]);
+    $membership = $this->callApiSuccessGetSingle('membership', ['contact_id' => $contactID]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased'), $membership['status_id']);
+  }
+
+  /**
    * Test that trying to delete membership status while membership still exists creates error.
    */
   public function testDeleteWithMembershipError() {
