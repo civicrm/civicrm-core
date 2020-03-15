@@ -18,7 +18,7 @@
 /**
  * This class generates form components for Financial Type Account
  */
-class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
+class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
 
   /**
    * The financial type id saved to the session for an update.
@@ -102,6 +102,28 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ],
+      ]);
+    }
+    else {
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+    }
     $this->setPageTitle(ts('Financial Type Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -169,22 +191,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       TRUE
     );
 
-    $this->addButtons([
-      [
-        'type' => 'next',
-        'name' => ts('Save'),
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'next',
-        'name' => ts('Save and New'),
-        'subName' => 'new',
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
-    ]);
     $this->addFormRule(['CRM_Financial_Form_FinancialTypeAccount', 'formRule'], $this);
   }
 
