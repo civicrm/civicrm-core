@@ -505,6 +505,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       'membership_join_date',
       'membership_start_date',
       'membership_end_date',
+      'membership_type_id',
     ];
     $metadata = civicrm_api3('Membership', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
@@ -514,6 +515,8 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
    * Build the search form.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Membership' => self::getSearchFieldMetadata()]);
@@ -523,13 +526,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       'id' => 'membership_status_id',
       'multiple' => 'multiple',
       'class' => 'crm-select2',
-    ]);
-
-    $form->addEntityRef('membership_type_id', ts('Membership Type'), [
-      'entity' => 'MembershipType',
-      'multiple' => TRUE,
-      'placeholder' => ts('- any -'),
-      'select' => ['minimumInputLength' => 0],
     ]);
 
     $form->addElement('text', 'member_source', ts('Source'));

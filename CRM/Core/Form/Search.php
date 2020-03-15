@@ -202,6 +202,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
           if (isset($fields[$fieldName]['unique_title'])) {
             $props['label'] = $fields[$fieldName]['unique_title'];
           }
+          elseif (isset($fields[$fieldName]['html']['label'])) {
+            $props['label'] = $fields[$fieldName]['html']['label'];
+          }
           elseif (isset($fields[$fieldName]['title'])) {
             $props['label'] = $fields[$fieldName]['title'];
           }
