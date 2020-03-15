@@ -12,26 +12,51 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    * So no assertions required.
    *
    * @param string $classname
+   * @param callable $additionalSetup
+   *   Function that performs some additional setup steps specific to the form
+   *
    * @dataProvider formClassList
    */
-  public function testOpeningForms(string $classname) {
+  public function testOpeningForms(string $classname, callable $additionalSetup) {
     $form = $this->getFormObject($classname);
+
+    // call the callable parameter we were passed in
+    $additionalSetup($form);
+
+    // typical quickform/smarty flow
     $form->preProcess();
     $form->buildQuickForm();
     $form->setDefaultValues();
-    $form->assign('action', CRM_Core_Action::UPDATE);
+    $form->assign('action', $form->_action ?? CRM_Core_Action::UPDATE);
     $form->getTemplate()->fetch($form->getTemplateFileName());
   }
 
   /**
    * Dataprovider for testOpeningForms().
-   * TODO: Add more forms! Use a descriptive array key so when it fails
-   * it will make it clearer what form it is, although you'll see the class
-   * anyway.
+   * TODO: Add more forms!
+   *
+   * @return array
+   *   See first one below for description.
    */
   public function formClassList() {
     return [
-      'Add New Tag' => ['CRM_Tag_Form_Edit'],
+      // Array key is descriptive term to make it clearer which form it is when it fails.
+      'Add New Tag' => [
+        // classname
+        'CRM_Tag_Form_Edit',
+        // Function that performs some class-specific additional setup steps.
+        // If there's a lot of complex steps then that suggests it should have
+        // its own test elsewhere and doesn't fit well here.
+        function(CRM_Core_Form $form) {},
+      ],
+      'Assign Account to Financial Type' => [
+        'CRM_Financial_Form_FinancialTypeAccount',
+        function(CRM_Core_Form $form) {
+          $form->set('id', 1);
+          $form->set('aid', 1);
+          $form->_action = CRM_Core_Action::ADD;
+        },
+      ],
     ];
   }
 
