@@ -421,13 +421,15 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       self::unsetProtectedFields($contacts);
     }
 
-    // Edit Membership Status
-    $deceasedParams = [
-      'contact_id' => CRM_Utils_Array::value('contact_id', $params),
-      'is_deceased' => CRM_Utils_Array::value('is_deceased', $params, FALSE),
-      'deceased_date' => CRM_Utils_Array::value('deceased_date', $params, NULL),
-    ];
-    CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $params['contact_type']);
+    if (!empty($params['is_deceased'])) {
+      // Edit Membership Status
+      $deceasedParams = [
+        'contact_id' => $contact->id,
+        'is_deceased' => $params['is_deceased'],
+        'deceased_date' => $params['deceased_date'] ?? NULL,
+      ];
+      CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $params['contact_type']);
+    }
 
     return $contact;
   }

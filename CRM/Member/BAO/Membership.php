@@ -2680,8 +2680,8 @@ WHERE      civicrm_membership.is_test = 0
    */
   public static function updateMembershipStatus($deceasedParams, $contactType) {
     $updateMembershipMsg = NULL;
-    $contactId = $deceasedParams['contact_id'] ?? NULL;
-    $deceasedDate = $deceasedParams['deceased_date'] ?? NULL;
+    $contactId = $deceasedParams['contact_id'];
+    $deceasedDate = $deceasedParams['deceased_date'];
 
     // process to set membership status to deceased for both active/inactive membership
     if ($contactId &&
@@ -2689,11 +2689,7 @@ WHERE      civicrm_membership.is_test = 0
       !empty($deceasedParams['is_deceased'])
     ) {
 
-      $session = CRM_Core_Session::singleton();
-      $userId = $session->get('userID');
-      if (!$userId) {
-        $userId = $contactId;
-      }
+      $userId = CRM_Core_Session::getLoggedInContactID() ?: $contactId;
 
       // get deceased status id
       $allStatus = CRM_Member_PseudoConstant::membershipStatus();
@@ -2750,16 +2746,16 @@ WHERE      civicrm_membership.is_test = 0
           'is_current_revision' => 1,
           'is_deleted' => 0,
         ];
-        $activityResult = civicrm_api('activity', 'create', $activityParam);
+        civicrm_api('activity', 'create', $activityParam);
 
         $memCount++;
       }
 
       // set status msg
       if ($memCount) {
-        $updateMembershipMsg = ts("%1 Current membership(s) for this contact have been set to 'Deceased' status.",
+        CRM_Core_Session::setStatus(ts("%1 Current membership(s) for this contact have been set to 'Deceased' status.",
           [1 => $memCount]
-        );
+        ));
       }
     }
     return $updateMembershipMsg;
