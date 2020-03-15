@@ -68,7 +68,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'title');
     }
 
-    $form->addField('case_type_id', ['context' => 'create', 'entity' => 'Case']);
+    $form->addField('case_type_id', ['context' => 'create', 'entity' => 'Case'], TRUE);
 
     // timeline
     $form->addYesNo('is_reset_timeline', ts('Reset Case Timeline?'), NULL, TRUE);
