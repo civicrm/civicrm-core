@@ -413,7 +413,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'case_activity_is_auto':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_activity.is_auto", $op, $value, 'Boolean');
-        $query->_qill[$grouping][] = ts("Activity Auto Genrated %1 '%2'", [1 => $op, 2 => $value]);
+        $query->_qill[$grouping][] = ts("Activity Auto Generated %1 '%2'", [1 => $op, 2 => $value]);
         $query->_tables['case_activity'] = $query->_whereTables['case_activity'] = 1;
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
