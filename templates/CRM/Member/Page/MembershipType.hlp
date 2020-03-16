@@ -47,8 +47,8 @@
 <p>
 <strong>{ts}EXAMPLES{/ts}</strong><br />
 <ul>
-<li>{ts}<strong>Fixed Membership Period - 1 Year Duration:</strong> Fixed period start date is set to January 1. A person signs up for membership on February 15th, 2008. Their membership start date is set to January 1, 2008 - and the end date is December 31, 2008.{/ts}</li>
-<li>{ts}<strong>Fixed Membership - 3 Months Duration:</strong> A person signs up on February 15th, 2008. Their membership start date is set to February 1, 2008 - and the end date is April 30, 2008.{/ts}</li>
-<li>{ts}<strong>Rolling Membership Period - 1 Year Duration:</strong> A person signs up on February 15th, 2008. Their membership start date is February 15th, 2008 - and the end date is February 14th, 2009.{/ts}</li>
+<li>{ts}<strong>Fixed Membership Period - 1 Year Duration:</strong> Fixed period start date is set to January 1. A person signs up for membership on February 15th, 2020. Their membership start date is set to January 1, 2020 - and the end date is December 31, 2020.{/ts}</li>
+<li>{ts}<strong>Fixed Membership - 3 Months Duration:</strong> A person signs up on February 15th, 2020. Their membership start date is set to February 1, 2020 - and the end date is April 30, 2020.{/ts}</li>
+<li>{ts}<strong>Rolling Membership Period - 1 Year Duration:</strong> A person signs up on February 15th, 2020. Their membership start date is February 15th, 2020 - and the end date is February 14th, 2021.{/ts}</li>
 </ul>
 {/htxt}
