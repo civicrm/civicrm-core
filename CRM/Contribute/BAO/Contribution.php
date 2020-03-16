@@ -4087,13 +4087,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Get list of payments displayed by Contribute_Page_PaymentInfo.
    *
    * @param int $id
-   * @param $component
+   * @param string $component
    * @param bool $getTrxnInfo
-   * @param bool $usingLineTotal
    *
    * @return mixed
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function getPaymentInfo($id, $component = 'contribution', $getTrxnInfo = FALSE, $usingLineTotal = FALSE) {
+  public static function getPaymentInfo($id, $component = 'contribution', $getTrxnInfo = FALSE) {
     // @todo deprecate passing in component - always call with contribution.
     if ($component == 'event') {
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'contribution_id', 'participant_id');
@@ -4115,19 +4117,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $contributionId = $id;
     }
 
-    $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
-    $baseTrxnId = !empty($total['trxn_id']) ? $total['trxn_id'] : NULL;
+    // The balance used to be calculated this way - we really want to remove this 'oldCalculation'
+    // but need to unpick the whole trxn_id it's returning first.
+    $oldCalculation = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
+    $baseTrxnId = !empty($oldCalculation['trxn_id']) ? $oldCalculation['trxn_id'] : NULL;
     if (!$baseTrxnId) {
       $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
       $baseTrxnId = $baseTrxnId['financialTrxnId'];
     }
-    if (empty($total['total_amount']) || $usingLineTotal) {
-      $total = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
-    }
-    else {
-      $baseTrxnId = $total['trxn_id'];
-      $total = $total['total_amount'];
-    }
+    $total = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
 
     $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionId, $total);
 
