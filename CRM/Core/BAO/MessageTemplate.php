@@ -87,10 +87,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           }
         }
         else {
-          if (!empty($params['workflow_id']) && !CRM_Core_Permission::check('edit system workflow message templates')) {
-            throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
+          if (!empty($params['workflow_id'])) {
+            if (!CRM_Core_Permission::check('edit system workflow message templates')) {
+              throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
+            }
           }
-          if (!CRM_Core_Permission::check('edit user-driven message templates')) {
+          elseif (!CRM_Core_Permission::check('edit user-driven message templates')) {
             throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $userWorkflowPermissionDeniedMessage]));
           }
         }
