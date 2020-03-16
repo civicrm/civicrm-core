@@ -193,7 +193,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
   public $msg_template_id;
 
   /**
-   * Should we overrite VERP address in Reply-To
+   * Should we overwrite VERP address in Reply-To
    *
    * @var bool
    */
@@ -709,7 +709,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'name' => 'override_verp',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Override Verp'),
-          'description' => ts('Should we overrite VERP address in Reply-To'),
+          'description' => ts('Should we overwrite VERP address in Reply-To'),
           'where' => 'civicrm_mailing.override_verp',
           'default' => '0',
           'table_name' => 'civicrm_mailing',
