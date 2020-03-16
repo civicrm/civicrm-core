@@ -1036,7 +1036,7 @@ function civicrm_api3_contact_getquick($params) {
   while ($dao->fetch()) {
     $t = ['id' => $dao->id];
     foreach ($as as $k) {
-      $t[$k] = isset($dao->$k) ? $dao->$k : '';
+      $t[$k] = $dao->$k ?? '';
     }
     $t['data'] = $dao->data;
     // Replace keys with values when displaying fields from an option list
@@ -1570,7 +1570,7 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
         $data['description'][] = implode(' ', $address);
       }
       if (!empty($request['image_field'])) {
-        $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
+        $data['image'] = $row[$request['image_field']] ?? '';
       }
       else {
         $data['icon_class'] = $row['contact_type'];

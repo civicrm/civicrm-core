@@ -140,7 +140,7 @@ class CRM_Custom_Form_CustomData {
     }
 
     $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
-    $getCachedTree = isset($form->_getCachedTree) ? $form->_getCachedTree : TRUE;
+    $getCachedTree = $form->_getCachedTree ?? TRUE;
 
     $subType = $form->_subType;
     if (!is_array($subType) && strstr($subType, CRM_Core_DAO::VALUE_SEPARATOR)) {

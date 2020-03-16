@@ -111,7 +111,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    */
   public function __construct($from, $options = []) {
     $this->from = $from;
-    $this->mode = isset($options['mode']) ? $options['mode'] : self::INTERPOLATE_AUTO;
+    $this->mode = $options['mode'] ?? self::INTERPOLATE_AUTO;
   }
 
   /**

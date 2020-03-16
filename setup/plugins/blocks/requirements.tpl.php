@@ -37,7 +37,7 @@ uasort($msgs, function($a, $b) {
   <?php foreach ($msgs as $msg):?>
   <tr class="<?php echo 'reqSeverity-' . $msg['severity']; ?>">
     <td><?php echo htmlentities($_tpl_block['severity_labels'][$msg['severity']]); ?></td>
-    <td><?php echo htmlentities(isset($_tpl_block['section_labels'][$msg['section']]) ? $_tpl_block['section_labels'][$msg['section']] : $msg['section']); ?></td>
+    <td><?php echo htmlentities($_tpl_block['section_labels'][$msg['section']] ?? $msg['section']); ?></td>
     <td><?php echo htmlentities($msg['name']); ?></td>
     <td><?php echo htmlentities($msg['message']); ?></td>
   </tr>

@@ -45,7 +45,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->assign('dataValues', $this->_dataValues);
 
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-    $this->_onDuplicate = $this->get('onDuplicate', isset($onDuplicate) ? $onDuplicate : "");
+    $this->_onDuplicate = $this->get('onDuplicate', $onDuplicate ?? "");
 
     $highlightedFields = array();
     if ($skipColumnHeader) {
@@ -455,9 +455,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $updateMappingFields->column_number = $i;
 
         $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-        $id = isset($mapperKeyParts[0]) ? $mapperKeyParts[0] : NULL;
-        $first = isset($mapperKeyParts[1]) ? $mapperKeyParts[1] : NULL;
-        $second = isset($mapperKeyParts[2]) ? $mapperKeyParts[2] : NULL;
+        $id = $mapperKeyParts[0] ?? NULL;
+        $first = $mapperKeyParts[1] ?? NULL;
+        $second = $mapperKeyParts[2] ?? NULL;
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
       }
@@ -479,9 +479,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $saveMappingFields->column_number = $i;
 
         $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-        $id = isset($mapperKeyParts[0]) ? $mapperKeyParts[0] : NULL;
-        $first = isset($mapperKeyParts[1]) ? $mapperKeyParts[1] : NULL;
-        $second = isset($mapperKeyParts[2]) ? $mapperKeyParts[2] : NULL;
+        $id = $mapperKeyParts[0] ?? NULL;
+        $first = $mapperKeyParts[1] ?? NULL;
+        $second = $mapperKeyParts[2] ?? NULL;
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();
       }

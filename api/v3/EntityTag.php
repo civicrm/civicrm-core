@@ -159,7 +159,7 @@ function civicrm_api3_entity_tag_replace($params) {
     // Lookup pre-existing records
     $preexisting = civicrm_api3('entity_tag', 'get', $baseParams);
     $preexisting = array_column($preexisting['values'], 'tag_id');
-    $toAdd = isset($params['tag_id']) ? $params['tag_id'] : array_column($params['values'], 'tag_id');
+    $toAdd = $params['tag_id'] ?? array_column($params['values'], 'tag_id');
     $toRemove = array_diff($preexisting, $toAdd);
 
     $result = [];

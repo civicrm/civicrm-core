@@ -144,7 +144,7 @@ class SpecFormatter {
    * @param string $dataTypeName
    */
   public static function setInputTypeAndAttrs(FieldSpec &$fieldSpec, $data, $dataTypeName) {
-    $inputType = isset($data['html']['type']) ? $data['html']['type'] : ArrayHelper::value('html_type', $data);
+    $inputType = $data['html']['type'] ?? ArrayHelper::value('html_type', $data);
     $inputAttrs = ArrayHelper::value('html', $data, []);
     unset($inputAttrs['type']);
 

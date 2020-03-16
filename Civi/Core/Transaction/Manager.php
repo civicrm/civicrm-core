@@ -129,7 +129,7 @@ class Manager {
    * @return \Civi\Core\Transaction\Frame
    */
   public function getFrame() {
-    return isset($this->frames[0]) ? $this->frames[0] : NULL;
+    return $this->frames[0] ?? NULL;
   }
 
   /**

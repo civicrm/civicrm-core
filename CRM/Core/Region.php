@@ -191,7 +191,7 @@ class CRM_Core_Region {
           break;
 
         case 'callback':
-          $args = isset($snippet['arguments']) ? $snippet['arguments'] : array(&$snippet, &$html);
+          $args = $snippet['arguments'] ?? array(&$snippet, &$html);
           $html .= call_user_func_array($snippet['callback'], $args);
           break;
 

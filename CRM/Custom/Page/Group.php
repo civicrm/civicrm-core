@@ -296,7 +296,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
               }
             }
             else {
-              $colValue = $colValue ? ($colValue . (isset($subTypes[$type][$sub]) ? ', ' . $subTypes[$type][$sub] : '')) : (isset($subTypes[$type][$sub]) ? $subTypes[$type][$sub] : '');
+              $colValue = $colValue ? ($colValue . (isset($subTypes[$type][$sub]) ? ', ' . $subTypes[$type][$sub] : '')) : ($subTypes[$type][$sub] ?? '');
             }
           }
         }

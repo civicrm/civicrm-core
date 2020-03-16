@@ -1554,7 +1554,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           //add dataArray in the receipts in ADD and UPDATE condition
           $dataArray = [];
           if ($this->_action & CRM_Core_Action::ADD) {
-            $line = isset($lineItem[0]) ? $lineItem[0] : [];
+            $line = $lineItem[0] ?? [];
           }
           elseif ($this->_action & CRM_Core_Action::UPDATE) {
             $line = $this->_values['line_items'];

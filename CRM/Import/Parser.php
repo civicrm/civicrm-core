@@ -335,7 +335,7 @@ abstract class CRM_Import_Parser {
       file_put_contents($statusFile, $contents);
     }
     else {
-      $rowCount = isset($this->_rowCount) ? $this->_rowCount : $this->_lineCount;
+      $rowCount = $this->_rowCount ?? $this->_lineCount;
       $currTimestamp = time();
       $totalTime = ($currTimestamp - $startTimestamp);
       $time = ($currTimestamp - $prevTimestamp);

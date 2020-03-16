@@ -108,9 +108,9 @@ trait ArrayQueryActionTrait {
     if (!is_array($condition)) {
       throw new NotImplementedException('Unexpected where syntax; expecting array.');
     }
-    $value = isset($row[$condition[0]]) ? $row[$condition[0]] : NULL;
+    $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
-    $expected = isset($condition[2]) ? $condition[2] : NULL;
+    $expected = $condition[2] ?? NULL;
     switch ($operator) {
       case '=':
       case '!=':

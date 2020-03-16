@@ -237,7 +237,7 @@ class CRM_Utils_VersionCheck {
       $this->stats['extensions'][] = [
         'name' => $dao->full_name,
         'enabled' => $dao->is_active,
-        'version' => isset($info->version) ? $info->version : NULL,
+        'version' => $info->version ?? NULL,
       ];
     }
   }

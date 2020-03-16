@@ -621,7 +621,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     foreach ($backend as $propertyName => $propertyValue) {
       if (isset($mappings[$propertyName][0]) && preg_match('/^setting/', $mappings[$propertyName][0])) {
         // $mapping format: $propertyName => Array(0 => $type, 1 => $setting|NULL).
-        $settingName = isset($mappings[$propertyName][1]) ? $mappings[$propertyName][1] : $propertyName;
+        $settingName = $mappings[$propertyName][1] ?? $propertyName;
         $settings[$settingName] = $propertyValue;
       }
     }

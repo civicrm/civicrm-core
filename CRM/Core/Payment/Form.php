@@ -100,7 +100,7 @@ class CRM_Core_Payment_Form {
   protected static function addCommonFields(&$form, $paymentFields) {
     $requiredPaymentFields = $paymentFieldsMetadata = [];
     foreach ($paymentFields as $name => $field) {
-      $field['extra'] = isset($field['extra']) ? $field['extra'] : NULL;
+      $field['extra'] = $field['extra'] ?? NULL;
       if ($field['htmlType'] == 'chainSelect') {
         $form->addChainSelect($field['name'], ['required' => FALSE]);
       }

@@ -836,9 +836,9 @@ class CRM_Utils_String {
    */
   public static function simpleParseUrl($url) {
     $parts = parse_url($url);
-    $host = isset($parts['host']) ? $parts['host'] : '';
+    $host = $parts['host'] ?? '';
     $port = isset($parts['port']) ? ':' . $parts['port'] : '';
-    $path = isset($parts['path']) ? $parts['path'] : '';
+    $path = $parts['path'] ?? '';
     $query = isset($parts['query']) ? '?' . $parts['query'] : '';
     return [
       'host+port' => "$host$port",

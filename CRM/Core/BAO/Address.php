@@ -121,7 +121,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   public static function add(&$params, $fixAddress = FALSE) {
 
     $address = new CRM_Core_DAO_Address();
-    $checkPermissions = isset($params['check_permissions']) ? $params['check_permissions'] : TRUE;
+    $checkPermissions = $params['check_permissions'] ?? TRUE;
 
     // fixAddress mode to be done
     if ($fixAddress) {
@@ -548,12 +548,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       'supplemental_address_2' => $this->supplemental_address_2,
       'supplemental_address_3' => $this->supplemental_address_3,
       'city' => $this->city,
-      'state_province_name' => isset($this->state_name) ? $this->state_name : "",
-      'state_province' => isset($this->state) ? $this->state : "",
-      'postal_code' => isset($this->postal_code) ? $this->postal_code : "",
-      'postal_code_suffix' => isset($this->postal_code_suffix) ? $this->postal_code_suffix : "",
-      'country' => isset($this->country) ? $this->country : "",
-      'world_region' => isset($this->world_region) ? $this->world_region : "",
+      'state_province_name' => $this->state_name ?? "",
+      'state_province' => $this->state ?? "",
+      'postal_code' => $this->postal_code ?? "",
+      'postal_code_suffix' => $this->postal_code_suffix ?? "",
+      'country' => $this->country ?? "",
+      'world_region' => $this->world_region ?? "",
     ];
 
     if (isset($this->county_id) && $this->county_id) {
@@ -1033,7 +1033,7 @@ SELECT is_primary,
     }
 
     // Default to TRUE if not set to maintain api backward compatibility.
-    $createRelationship = isset($params['add_relationship']) ? $params['add_relationship'] : TRUE;
+    $createRelationship = $params['add_relationship'] ?? TRUE;
 
     // unset contact id
     $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'contact_id'];

@@ -841,7 +841,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $addCaptcha[$field['group_id']] = $field['add_captcha'];
       }
 
-      if (($name == 'email-Primary') || ($name == 'email-' . isset($primaryLocationType) ? $primaryLocationType : "")) {
+      if (($name == 'email-Primary') || ($name == 'email-' . $primaryLocationType ?? "")) {
         $emailPresent = TRUE;
         $this->_mail = $name;
       }

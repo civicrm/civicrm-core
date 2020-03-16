@@ -73,7 +73,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         $fName = $fieldName;
       }
 
-      $groupID = isset($form->_grid) ? $form->_grid : NULL;
+      $groupID = $form->_grid ?? NULL;
       if ($groupID && $visibility) {
         $ids = [$groupID => $groupID];
       }

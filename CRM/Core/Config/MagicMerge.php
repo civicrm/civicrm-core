@@ -224,7 +224,7 @@ class CRM_Core_Config_MagicMerge {
     }
 
     $type = $this->map[$k][0];
-    $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
+    $name = $this->map[$k][1] ?? $k;
 
     switch ($type) {
       case 'setting':
@@ -358,7 +358,7 @@ class CRM_Core_Config_MagicMerge {
     }
     unset($this->cache[$k]);
     $type = $this->map[$k][0];
-    $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
+    $name = $this->map[$k][1] ?? $k;
 
     switch ($type) {
       case 'setting':

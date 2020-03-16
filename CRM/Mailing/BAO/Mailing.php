@@ -1523,7 +1523,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   public static function create(&$params, $ids = []) {
 
     if (empty($params['id']) && (array_filter($ids) !== [])) {
-      $params['id'] = isset($ids['mailing_id']) ? $ids['mailing_id'] : $ids['id'];
+      $params['id'] = $ids['mailing_id'] ?? $ids['id'];
       \Civi::log('Parameter $ids is no longer used by Mailing::create. Use the api or just pass $params', ['civi.tag' => 'deprecated']);
     }
 

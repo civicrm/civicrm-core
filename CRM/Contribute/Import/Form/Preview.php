@@ -109,7 +109,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
       if (isset($mapper[$key][0]) && $mapper[$key][0] == 'soft_credit' && isset($mapper[$key])) {
-        $mapperSoftCredit[$key] = isset($mapper[$key][1]) ? $mapper[$key][1] : '';
+        $mapperSoftCredit[$key] = $mapper[$key][1] ?? '';
         $mapperSoftCreditType[$key] = $mapperSoftCreditType[$key]['value'];
       }
       else {

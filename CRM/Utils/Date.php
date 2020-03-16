@@ -1093,7 +1093,7 @@ class CRM_Utils_Date {
     $from['H'] = $from['i'] = $from['s'] = 0;
     $relativeTermParts = explode('_', $relativeTerm);
     $relativeTermPrefix = $relativeTermParts[0];
-    $relativeTermSuffix = isset($relativeTermParts[1]) ? $relativeTermParts[1] : '';
+    $relativeTermSuffix = $relativeTermParts[1] ?? '';
 
     switch ($unit) {
       case 'year':

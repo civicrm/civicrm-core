@@ -184,7 +184,7 @@ AND civicrm_contact.id IN $idString ";
       $location['displayAddress'] = str_replace('<br />', ', ', addslashes($address));
       $location['url'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->contact_id);
       $location['location_type'] = $dao->location_type;
-      $location['image'] = CRM_Contact_BAO_Contact_Utils::getImage(isset($dao->contact_sub_type) ? $dao->contact_sub_type : $dao->contact_type, $imageUrlOnly, $dao->contact_id
+      $location['image'] = CRM_Contact_BAO_Contact_Utils::getImage($dao->contact_sub_type ?? $dao->contact_type, $imageUrlOnly, $dao->contact_id
       );
       $locations[] = $location;
     }

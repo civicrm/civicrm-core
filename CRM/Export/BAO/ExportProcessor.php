@@ -518,7 +518,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   public function getRelationshipValue($relationshipType, $contactID, $field) {
-    return isset($this->relatedContactValues[$relationshipType][$contactID][$field]) ? $this->relatedContactValues[$relationshipType][$contactID][$field] : '';
+    return $this->relatedContactValues[$relationshipType][$contactID][$field] ?? '';
   }
 
   /**

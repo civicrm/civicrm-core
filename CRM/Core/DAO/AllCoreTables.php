@@ -45,8 +45,8 @@ class CRM_Core_DAO_AllCoreTables {
         $entityType['name'],
         $entityType['class'],
         $entityType['table'],
-        isset($entityType['fields_callback']) ? $entityType['fields_callback'] : NULL,
-        isset($entityType['links_callback']) ? $entityType['links_callback'] : NULL
+        $entityType['fields_callback'] ?? NULL,
+        $entityType['links_callback'] ?? NULL
       );
     }
 

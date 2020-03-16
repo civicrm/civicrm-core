@@ -870,17 +870,17 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @return array
    */
   protected static function loadSavedMapping($mappingLocation, int $x, int $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, array $specialFields, $mappingPhoneType, array $defaults, array $noneArray, $mappingImProvider, $mappingOperator, $mappingValue) {
-    $locationId = isset($mappingLocation[$x][$i]) ? $mappingLocation[$x][$i] : 0;
+    $locationId = $mappingLocation[$x][$i] ?? 0;
     if (isset($mappingName[$x][$i])) {
       if (is_array($mapperFields[$mappingContactType[$x][$i]])) {
 
         if (isset($mappingRelation[$x][$i])) {
-          $relLocationId = isset($mappingLocation[$x][$i]) ? $mappingLocation[$x][$i] : 0;
+          $relLocationId = $mappingLocation[$x][$i] ?? 0;
           if (!$relLocationId && in_array($mappingName[$x][$i], $specialFields)) {
             $relLocationId = " ";
           }
 
-          $relPhoneType = isset($mappingPhoneType[$x][$i]) ? $mappingPhoneType[$x][$i] : NULL;
+          $relPhoneType = $mappingPhoneType[$x][$i] ?? NULL;
 
           $defaults["mapper[$x][$i]"] = [
             $mappingContactType[$x][$i],
@@ -910,8 +910,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           $noneArray[] = [$x, $i, 2];
         }
         else {
-          $phoneType = isset($mappingPhoneType[$x][$i]) ? $mappingPhoneType[$x][$i] : NULL;
-          $imProvider = isset($mappingImProvider[$x][$i]) ? $mappingImProvider[$x][$i] : NULL;
+          $phoneType = $mappingPhoneType[$x][$i] ?? NULL;
+          $imProvider = $mappingImProvider[$x][$i] ?? NULL;
           if (!$locationId && in_array($mappingName[$x][$i], $specialFields)) {
             $locationId = " ";
           }

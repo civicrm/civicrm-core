@@ -110,8 +110,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   public static function postProcess(&$form) {
     $formValues = $form->controller->exportValues($form->getName());
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
-    $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
-    $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
+    $skipOnHold = $form->skipOnHold ?? FALSE;
+    $skipDeceased = $form->skipDeceased ?? TRUE;
     $html = $activityIds = [];
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)

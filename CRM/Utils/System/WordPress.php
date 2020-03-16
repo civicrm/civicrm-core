@@ -723,7 +723,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function getLoggedInUfID() {
     $ufID = NULL;
     $current_user = $this->getLoggedInUserObject();
-    return isset($current_user->ID) ? $current_user->ID : NULL;
+    return $current_user->ID ?? NULL;
   }
 
   /**

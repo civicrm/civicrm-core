@@ -6407,7 +6407,7 @@ AND   displayRelType.is_active = 1
     foreach ($orderByArray as $orderByClause) {
       $orderByClauseParts = explode(' ', trim($orderByClause));
       $field = $orderByClauseParts[0];
-      $direction = isset($orderByClauseParts[1]) ? $orderByClauseParts[1] : 'asc';
+      $direction = $orderByClauseParts[1] ?? 'asc';
       $fieldSpec = $this->getMetadataForRealField($field);
 
       // This is a hacky add-in for primary address joins. Feel free to iterate as it is unit tested.
@@ -6901,8 +6901,8 @@ AND   displayRelType.is_active = 1
       // This seems to be the only anomaly.
       $fieldName = 'id';
     }
-    $pseudoField = isset($this->_pseudoConstantsSelect[$fieldName]) ? $this->_pseudoConstantsSelect[$fieldName] : [];
-    $field = isset($this->_fields[$fieldName]) ? $this->_fields[$fieldName] : $pseudoField;
+    $pseudoField = $this->_pseudoConstantsSelect[$fieldName] ?? [];
+    $field = $this->_fields[$fieldName] ?? $pseudoField;
     $field = array_merge($field, $pseudoField);
     if (!empty($field) && empty($field['name'])) {
       // standardising field formatting here - over time we can phase out variants.

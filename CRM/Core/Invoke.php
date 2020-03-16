@@ -238,7 +238,7 @@ class CRM_Core_Invoke {
         $result = $wrapper->run(
           CRM_Utils_Array::value('page_callback', $item),
           CRM_Utils_Array::value('title', $item),
-          isset($pageArgs) ? $pageArgs : NULL
+          $pageArgs ?? NULL
         );
       }
       else {

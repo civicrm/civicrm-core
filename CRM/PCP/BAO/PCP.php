@@ -888,7 +888,7 @@ WHERE pcp.id = %1";
       'contribute' => 'civicrm_contribution_page',
       'civicrm_contribution_page' => 'civicrm_contribution_page',
     ];
-    return isset($entity_table_map[$component]) ? $entity_table_map[$component] : FALSE;
+    return $entity_table_map[$component] ?? FALSE;
   }
 
   /**

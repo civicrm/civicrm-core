@@ -165,8 +165,8 @@ class CRM_Contact_Import_ImportJob {
 
       $fldNameParts = explode('_', $fldName, 3);
       $id = $fldNameParts[0];
-      $first = isset($fldNameParts[1]) ? $fldNameParts[1] : NULL;
-      $second = isset($fldNameParts[2]) ? $fldNameParts[2] : NULL;
+      $first = $fldNameParts[1] ?? NULL;
+      $second = $fldNameParts[2] ?? NULL;
       if (($first == 'a' && $second == 'b') ||
         ($first == 'b' && $second == 'a')
       ) {
@@ -294,7 +294,7 @@ class CRM_Contact_Import_ImportJob {
 
     if ($newGroupName) {
       /* Create a new group */
-      $newGroupType = isset($newGroupType) ? $newGroupType : array();
+      $newGroupType = $newGroupType ?? array();
       $gParams = array(
         'title' => $newGroupName,
         'description' => $newGroupDesc,

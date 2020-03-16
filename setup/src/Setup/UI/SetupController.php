@@ -209,7 +209,7 @@ class SetupController implements SetupControllerInterface {
   }
 
   public function getUrl($name) {
-    return isset($this->urls[$name]) ? $this->urls[$name] : NULL;
+    return $this->urls[$name] ?? NULL;
   }
 
   /**
