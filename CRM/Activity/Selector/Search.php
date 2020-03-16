@@ -282,9 +282,9 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         }
       }
 
-      $contactId = CRM_Utils_Array::value('contact_id', $row);
+      $contactId = $row['contact_id'] ?? NULL;
       if (!$contactId) {
-        $contactId = CRM_Utils_Array::value('source_contact_id', $row);
+        $contactId = $row['source_contact_id'] ?? NULL;
       }
 
       $row['target_contact_name'] = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $targetID);
@@ -339,7 +339,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       );
 
       // Carry campaign to selector.
-      $row['campaign'] = CRM_Utils_Array::value($result->activity_campaign_id, $allCampaigns);
+      $row['campaign'] = $allCampaigns[$result->activity_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->activity_campaign_id;
 
       if ($engagementLevel = CRM_Utils_Array::value('activity_engagement_level', $row)) {

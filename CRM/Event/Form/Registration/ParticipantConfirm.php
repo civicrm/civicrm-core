@@ -50,9 +50,9 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       );
     }
 
-    $this->_participantStatusId = CRM_Utils_Array::value('status_id', $values);
-    $this->_eventId = CRM_Utils_Array::value('event_id', $values);
-    $csContactId = CRM_Utils_Array::value('contact_id', $values);
+    $this->_participantStatusId = $values['status_id'] ?? NULL;
+    $this->_eventId = $values['event_id'] ?? NULL;
+    $csContactId = $values['contact_id'] ?? NULL;
 
     // make sure we have right permission to edit this user
     $this->_csContactID = NULL;

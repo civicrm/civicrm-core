@@ -269,13 +269,13 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    */
   public function having($includeContactIDs = FALSE) {
     $clauses = [];
-    $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
+    $min = $this->_formValues['min_amount'] ?? NULL;
     if ($min) {
       $min = CRM_Utils_Rule::cleanMoney($min);
       $clauses[] = "sum(contrib.total_amount) >= $min";
     }
 
-    $max = CRM_Utils_Array::value('max_amount', $this->_formValues);
+    $max = $this->_formValues['max_amount'] ?? NULL;
     if ($max) {
       $max = CRM_Utils_Rule::cleanMoney($max);
       $clauses[] = "sum(contrib.total_amount) <= $max";

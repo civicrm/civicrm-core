@@ -31,7 +31,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     // should rewrite this UI.
     CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
-    $this->_soInstance = CRM_Utils_Array::value('instance', $_GET);
+    $this->_soInstance = $_GET['instance'] ?? NULL;
     $this->assign('soInstance', $this->_soInstance);
   }
 
@@ -148,10 +148,10 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   public static function formRule($values) {
     $errors = [];
 
-    $oldValues = CRM_Utils_Array::value('old', $values);
-    $newValues = CRM_Utils_Array::value('new', $values);
-    $enabled = CRM_Utils_Array::value('enabled', $values);
-    $exactMatch = CRM_Utils_Array::value('cb', $values);
+    $oldValues = $values['old'] ?? NULL;
+    $newValues = $values['new'] ?? NULL;
+    $enabled = $values['enabled'] ?? NULL;
+    $exactMatch = $values['cb'] ?? NULL;
 
     foreach ($oldValues as $k => $v) {
       if ($v && !$newValues[$k]) {

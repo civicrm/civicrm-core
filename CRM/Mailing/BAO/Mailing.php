@@ -1191,7 +1191,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailParams['attachments'] = $attachments;
 
-    $mailParams['Subject'] = CRM_Utils_Array::value('subject', $pEmails);
+    $mailParams['Subject'] = $pEmails['subject'] ?? NULL;
     if (is_array($mailParams['Subject'])) {
       $mailParams['Subject'] = implode('', $mailParams['Subject']);
     }
@@ -1396,7 +1396,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
     }
     else {
-      $data = CRM_Utils_Array::value("{$type}.{$token}", $contact);
+      $data = $contact["{$type}.{$token}"] ?? NULL;
     }
     return $data;
   }
@@ -2858,7 +2858,7 @@ ORDER BY civicrm_mailing.name";
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
     $params['caseId'] = NULL;
 
     // get contact mailings
@@ -2951,7 +2951,7 @@ ORDER BY civicrm_mailing.name";
     $params['version'] = 3;
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['limit'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
 
     $result = civicrm_api('MailingContact', 'get', $params);
     return $result['values'];

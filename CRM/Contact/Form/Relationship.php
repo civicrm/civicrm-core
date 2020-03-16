@@ -207,14 +207,14 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (!empty($this->_values)) {
         $defaults['relationship_type_id'] = $this->_rtypeId;
-        $defaults['start_date'] = CRM_Utils_Array::value('start_date', $this->_values);
-        $defaults['end_date'] = CRM_Utils_Array::value('end_date', $this->_values);
-        $defaults['description'] = CRM_Utils_Array::value('description', $this->_values);
-        $defaults['is_active'] = CRM_Utils_Array::value('is_active', $this->_values);
+        $defaults['start_date'] = $this->_values['start_date'] ?? NULL;
+        $defaults['end_date'] = $this->_values['end_date'] ?? NULL;
+        $defaults['description'] = $this->_values['description'] ?? NULL;
+        $defaults['is_active'] = $this->_values['is_active'] ?? NULL;
 
         // The postprocess function will swap these fields if it is a b_a relationship, so we compensate here
-        $defaults['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_' . $this->_rtype, $this->_values);
-        $defaults['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_' . strrev($this->_rtype), $this->_values);
+        $defaults['is_permission_a_b'] = $this->_values['is_permission_' . $this->_rtype] ?? NULL;
+        $defaults['is_permission_b_a'] = $this->_values['is_permission_' . strrev($this->_rtype)] ?? NULL;
 
         $defaults['is_current_employer'] = $this->_isCurrentEmployer;
 
@@ -239,7 +239,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'version' => 3,
         ];
         $note = civicrm_api('Note', 'getsingle', $noteParams);
-        $defaults['note'] = CRM_Utils_Array::value('note', $note);
+        $defaults['note'] = $note['note'] ?? NULL;
       }
     }
     else {

@@ -59,7 +59,7 @@ class CRM_Utils_Address {
 
     $formatted = $format;
 
-    $fullPostalCode = CRM_Utils_Array::value('postal_code', $fields);
+    $fullPostalCode = $fields['postal_code'] ?? NULL;
     if (!empty($fields['postal_code_suffix'])) {
       $fullPostalCode .= "-$fields[postal_code_suffix]";
     }
@@ -194,7 +194,7 @@ class CRM_Utils_Address {
     // also sub all token fields
     if ($tokenFields) {
       foreach ($tokenFields as $token) {
-        $replacements["{$token}"] = CRM_Utils_Array::value("{$token}", $fields);
+        $replacements["{$token}"] = $fields["{$token}"] ?? NULL;
       }
     }
 
@@ -320,7 +320,7 @@ class CRM_Utils_Address {
 
     $addressFields = [];
     foreach ($addressParts as $name => $field) {
-      $value = CRM_Utils_Array::value($field, $params);
+      $value = $params[$field] ?? NULL;
       $alternateName = 'billing_' . $name . '_id-' . $billingLocationTypeID;
       $alternate2 = 'billing_' . $name . '-' . $billingLocationTypeID;
       if (isset($params[$alternate2]) && !isset($params[$alternateName])) {

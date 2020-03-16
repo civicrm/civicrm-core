@@ -252,7 +252,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       // format new address for display
       $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
       foreach ($addressParts as $part) {
-        $addressParts[$part] = CRM_Utils_Array::value($part, $processorParams);
+        $addressParts[$part] = $processorParams[$part] ?? NULL;
       }
       $tplParams['address'] = CRM_Utils_Address::format($addressParts);
 
@@ -262,7 +262,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
       foreach ($addressParts as $part) {
         $key = "{$part}-{$this->_bltID}";
-        $addressParts[$part] = CRM_Utils_Array::value($key, $this->_defaults);
+        $addressParts[$part] = $this->_defaults[$key] ?? NULL;
       }
       $this->_defaults['address'] = CRM_Utils_Address::format($addressParts);
 

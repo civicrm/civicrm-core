@@ -307,9 +307,9 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
           if (strpos($name, '-') !== FALSE) {
             $value = explode('-', $name);
-            $fieldName = CRM_Utils_Array::value(0, $value);
-            $lType = CRM_Utils_Array::value(1, $value);
-            $type = CRM_Utils_Array::value(2, $value);
+            $fieldName = $value[0] ?? NULL;
+            $lType = $value[1] ?? NULL;
+            $type = $value[2] ?? NULL;
 
             if (!in_array($fieldName, $multipleFields)) {
               if ($lType == 'Primary') {
@@ -380,7 +380,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     if ($this->_multiRecordTableName &&
       !array_key_exists($this->_multiRecordTableName, $this->_query->_whereTables)
     ) {
-      $additionalFromClause = CRM_Utils_Array::value($this->_multiRecordTableName, $this->_query->_tables);
+      $additionalFromClause = $this->_query->_tables[$this->_multiRecordTableName] ?? NULL;
       $returnQuery = TRUE;
     }
 
@@ -436,7 +436,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       foreach ($vars as $key => $field) {
         $field = $vars[$key];
         $fieldArray = explode('-', $field['name']);
-        $fieldType = CRM_Utils_Array::value('2', $fieldArray);
+        $fieldType = $fieldArray['2'] ?? NULL;
         if (is_numeric(CRM_Utils_Array::value('1', $fieldArray))) {
           if (!in_array($fieldType, $multipleFields)) {
             $locationType = new CRM_Core_DAO_LocationType();
@@ -513,14 +513,14 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       ) {
         if (strpos($key, '-') !== FALSE) {
           $value = explode('-', $key);
-          $fieldName = CRM_Utils_Array::value(0, $value);
-          $id = CRM_Utils_Array::value(1, $value);
-          $type = CRM_Utils_Array::value(2, $value);
+          $fieldName = $value[0] ?? NULL;
+          $id = $value[1] ?? NULL;
+          $type = $value[2] ?? NULL;
 
           if (!in_array($fieldName, $multipleFields)) {
             $locationTypeName = NULL;
             if (is_numeric($id)) {
-              $locationTypeName = CRM_Utils_Array::value($id, $locationTypes);
+              $locationTypeName = $locationTypes[$id] ?? NULL;
             }
             else {
               if ($id == 'Primary') {

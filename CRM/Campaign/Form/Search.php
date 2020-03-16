@@ -186,7 +186,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         'release' => CRM_Campaign_Task::RELEASE,
       );
 
-      $currentTaskValue = CRM_Utils_Array::value($this->_operation, $taskMapping);
+      $currentTaskValue = $taskMapping[$this->_operation] ?? NULL;
       $taskValue = array($currentTaskValue => $allTasks[$currentTaskValue]);
       if ($this->_operation == 'interview' && !empty($this->_formValues['campaign_survey_id'])) {
         $activityTypes = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
@@ -288,7 +288,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   }
 
   public function formatParams() {
-    $interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->_formValues);
+    $interviewerId = $this->_formValues['survey_interviewer_id'] ?? NULL;
     if ($interviewerId) {
       $this->set('interviewerId', $interviewerId);
     }
@@ -298,7 +298,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
       if ($this->_force) {
         continue;
       }
-      $paramValue = CRM_Utils_Array::value($param, $this->_formValues);
+      $paramValue = $this->_formValues[$param] ?? NULL;
       if ($paramValue && is_array($paramValue)) {
         unset($this->_formValues[$param]);
         foreach ($paramValue as $key => $value) {
@@ -323,7 +323,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         //allow voter search in sub-part of given constituents,
         //but make sure in case user does not select any group.
         //get all associated campaign groups in where filter, CRM-7406
-        $groups = CRM_Utils_Array::value('group', $this->_formValues);
+        $groups = $this->_formValues['group'] ?? NULL;
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
           foreach ($campGroups as $id => $title) {
@@ -410,7 +410,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     );
 
     foreach ($clauseFields as $param => $key) {
-      $params[$key] = CRM_Utils_Array::value($key, $this->_formValues);
+      $params[$key] = $this->_formValues[$key] ?? NULL;
       if (!$params[$key]) {
         $params[$key] = $this->get($param);
       }

@@ -140,7 +140,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         continue;
       }
       $this->_selectFields[$name] = $field['title'];
-      $this->_hasLocationTypes[$name] = CRM_Utils_Array::value('hasLocationType', $field);
+      $this->_hasLocationTypes[$name] = $field['hasLocationType'] ?? NULL;
     }
 
     // lets add group, tag and current_employer to this list
@@ -187,7 +187,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       CRM_Core_BAO_UFField::retrieve($params, $defaults);
 
       // set it to null if so (avoids crappy E_NOTICE errors below
-      $defaults['location_type_id'] = CRM_Utils_Array::value('location_type_id', $defaults);
+      $defaults['location_type_id'] = $defaults['location_type_id'] ?? NULL;
 
       //CRM-20861 - Include custom fields defined for address to set its default location type to 0.
       $specialFields = array_merge(CRM_Core_BAO_UFGroup::getLocationFields(), $addressCustomFields);
@@ -245,8 +245,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         else {
           $this->_mapperFields[$key][$key1] = $value1['title'];
         }
-        $hasLocationTypes[$key][$key1] = CRM_Utils_Array::value('hasLocationType', $value1);
-        $hasWebsiteTypes[$key][$key1] = CRM_Utils_Array::value('hasWebsiteType', $value1);
+        $hasLocationTypes[$key][$key1] = $value1['hasLocationType'] ?? NULL;
+        $hasWebsiteTypes[$key][$key1] = $value1['hasWebsiteType'] ?? NULL;
         // hide the 'is searchable' field for 'File' custom data
         if (isset($value1['data_type']) &&
           isset($value1['html_type']) &&
@@ -700,7 +700,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if (array_key_exists($profileFieldName, $checkPrimary)) {
       $whereCheck = $checkPrimary[$profileFieldName];
     }
-    $potentialLocationType = CRM_Utils_Array::value(2, $fields['field_name']);
+    $potentialLocationType = $fields['field_name'][2] ?? NULL;
 
     if ($whereCheck && $potentialLocationType == 0) {
       $primaryOfSameTypeFound = '';
@@ -761,7 +761,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     $isCustomField = FALSE;
-    $profileFieldName = CRM_Utils_Array::value(1, $fields['field_name']);
+    $profileFieldName = $fields['field_name'][1] ?? NULL;
     if ($profileFieldName) {
       //get custom field id
       $customFieldId = explode('_', $profileFieldName);

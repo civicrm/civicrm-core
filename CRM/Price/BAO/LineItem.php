@@ -32,7 +32,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @throws \Exception
    */
   public static function create(&$params) {
-    $id = CRM_Utils_Array::value('id', $params);
+    $id = $params['id'] ?? NULL;
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
       $op = CRM_Core_Action::UPDATE;
@@ -45,8 +45,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     // unset entity table and entity id in $params
     // we never update the entity table and entity id during update mode
     if ($id) {
-      $entity_id = CRM_Utils_Array::value('entity_id', $params);
-      $entity_table = CRM_Utils_Array::value('entity_table', $params);
+      $entity_id = $params['entity_id'] ?? NULL;
+      $entity_table = $params['entity_table'] ?? NULL;
       unset($params['entity_id'], $params['entity_table']);
     }
     else {
@@ -242,7 +242,7 @@ WHERE li.contribution_id = %1";
 
     $getTaxDetails = FALSE;
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
 
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
@@ -286,7 +286,7 @@ WHERE li.contribution_id = %1";
     }
     if ($invoicing) {
       // @todo - this is an inappropriate place to be doing form level assignments.
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('taxTerm', $taxTerm);
       $smarty->assign('getTaxDetails', $getTaxDetails);
@@ -329,7 +329,7 @@ WHERE li.contribution_id = %1";
     else {
       CRM_Price_BAO_PriceFieldValue::getValues($fid, $options, 'weight', TRUE);
     }
-    $fieldTitle = CRM_Utils_Array::value('label', $fields);
+    $fieldTitle = $fields['label'] ?? NULL;
     if (!$fieldTitle) {
       $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $fid, 'label');
     }
@@ -533,7 +533,7 @@ WHERE li.contribution_id = %1";
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
       $totalAmount = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
-      $financialType = CRM_Utils_Array::value('financial_type_id', $params);
+      $financialType = $params['financial_type_id'] ?? NULL;
       foreach ($priceSetDetails as $values) {
         if ($entityTable == 'membership') {
           if ($isRelatedID != $values['membership_type_id']) {

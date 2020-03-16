@@ -824,7 +824,7 @@ WHERE  id = %1";
         $countryIsoCodes = self::countryIsoCode();
         $defaultID = array_search(CRM_Core_BAO_Country::defaultContactCountry(), $countryIsoCodes);
         if ($defaultID !== FALSE) {
-          $default[$defaultID] = CRM_Utils_Array::value($defaultID, self::$country);
+          $default[$defaultID] = self::$country[$defaultID] ?? NULL;
           self::$country = $default + self::$country;
         }
       }
@@ -1393,7 +1393,7 @@ WHERE  id = %1
     $index = $filter['greeting_type'] . '_' . $columnName;
 
     // also add contactType to the array
-    $contactType = CRM_Utils_Array::value('contact_type', $filter);
+    $contactType = $filter['contact_type'] ?? NULL;
     if ($contactType) {
       $index .= '_' . $contactType;
     }

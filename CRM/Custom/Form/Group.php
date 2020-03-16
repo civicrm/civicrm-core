@@ -73,7 +73,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $params = ['id' => $this->_id];
       CRM_Core_BAO_CustomGroup::retrieve($params, $this->_defaults);
 
-      $subExtends = CRM_Utils_Array::value('extends_entity_column_value', $this->_defaults);
+      $subExtends = $this->_defaults['extends_entity_column_value'] ?? NULL;
       if (!empty($subExtends)) {
         $this->_subtypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($subExtends, 1, -1));
       }
@@ -255,7 +255,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $sel->_elements[1]->setSize(5);
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $subName = CRM_Utils_Array::value('extends_entity_column_id', $this->_defaults);
+      $subName = $this->_defaults['extends_entity_column_id'] ?? NULL;
       if ($this->_defaults['extends'] == 'Participant') {
         if ($subName == 1) {
           $this->_defaults['extends'] = 'ParticipantRole';

@@ -78,7 +78,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    * @return array saved values
    */
   public static function create(&$params) {
-    $id = CRM_Utils_Array::value('id', $params);
+    $id = $params['id'] ?? NULL;
 
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'SmsProvider', $id, $params);

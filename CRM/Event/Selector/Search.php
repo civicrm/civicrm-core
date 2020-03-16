@@ -333,7 +333,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       }
 
       //carry campaign on selectors.
-      $row['campaign'] = CRM_Utils_Array::value($result->participant_campaign_id, $allCampaigns);
+      $row['campaign'] = $allCampaigns[$result->participant_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->participant_campaign_id;
 
       // gross hack to show extra information for pending status

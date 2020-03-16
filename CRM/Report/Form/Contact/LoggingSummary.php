@@ -294,7 +294,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
 
     $detail = $this->_logTables[$entity];
     $tableName = CRM_Utils_Array::value('table_name', $detail, $entity);
-    $clause = CRM_Utils_Array::value('entity_table', $detail);
+    $clause = $detail['entity_table'] ?? NULL;
     $clause = $clause ? "AND entity_log_civireport.entity_table = 'civicrm_contact'" : NULL;
 
     $joinClause = "
@@ -302,7 +302,7 @@ INNER JOIN civicrm_contact modified_contact_civireport
         ON (entity_log_civireport.{$detail['fk']} = modified_contact_civireport.id {$clause})";
 
     if (!empty($detail['joins'])) {
-      $clause = CRM_Utils_Array::value('entity_table', $detail);
+      $clause = $detail['entity_table'] ?? NULL;
       $clause = $clause ? "AND fk_table.entity_table = 'civicrm_contact'" : NULL;
       $joinClause = "
 INNER JOIN `{$this->loggingDB}`.{$detail['joins']['table']} fk_table ON {$detail['joins']['join']}

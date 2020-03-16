@@ -220,7 +220,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
           $price_set  = $price_sets[$price_set_id];
           foreach ($price_set['fields'] as $field) {
-            $options = CRM_Utils_Array::value('options', $field);
+            $options = $field['options'] ?? NULL;
             if (!is_array($options)) {
               continue;
             }

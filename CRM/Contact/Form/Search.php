@@ -364,7 +364,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if ($this->_context !== 'amtg') {
       $taskParams['deletedContacts'] = FALSE;
       if ($this->_componentMode == CRM_Contact_BAO_Query::MODE_CONTACTS || $this->_componentMode == CRM_Contact_BAO_Query::MODE_CONTACTSRELATED) {
-        $taskParams['deletedContacts'] = CRM_Utils_Array::value('deleted_contacts', $this->_formValues);
+        $taskParams['deletedContacts'] = $this->_formValues['deleted_contacts'] ?? NULL;
       }
       $className = $this->_modeValue['taskClassName'];
       $taskParams['ssID'] = $this->_ssID ?? NULL;
@@ -398,9 +398,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     if ($this->_context === 'smog') {
       // CRM-11788, we might want to do this for all of search where force=1
-      $formQFKey = CRM_Utils_Array::value('qfKey', $this->_formValues);
-      $getQFKey = CRM_Utils_Array::value('qfKey', $_GET);
-      $postQFKey = CRM_Utils_Array::value('qfKey', $_POST);
+      $formQFKey = $this->_formValues['qfKey'] ?? NULL;
+      $getQFKey = $_GET['qfKey'] ?? NULL;
+      $postQFKey = $_POST['qfKey'] ?? NULL;
       if ($formQFKey && empty($getQFKey) && empty($postQFKey)) {
         $url = CRM_Utils_System::makeURL('qfKey') . $formQFKey;
         CRM_Utils_System::redirect($url);
@@ -481,7 +481,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     $selectedContactIds = [];
-    $qfKeyParam = CRM_Utils_Array::value('qfKey', $this->_formValues);
+    $qfKeyParam = $this->_formValues['qfKey'] ?? NULL;
     // We use ajax to handle selections only if the search results component_mode is set to "contacts"
     if ($qfKeyParam && ($this->get('component_mode') <= CRM_Contact_BAO_Query::MODE_CONTACTS || $this->get('component_mode') == CRM_Contact_BAO_Query::MODE_CONTACTSRELATED)) {
       $this->addClass('crm-ajax-selection-form');

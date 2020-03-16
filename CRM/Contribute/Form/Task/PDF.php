@@ -154,9 +154,9 @@ AND    {$this->_componentClause}";
       $ids['contribution'] = $contribID;
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
-      $ids['membership'] = CRM_Utils_Array::value('membership', $detail);
-      $ids['participant'] = CRM_Utils_Array::value('participant', $detail);
-      $ids['event'] = CRM_Utils_Array::value('event', $detail);
+      $ids['membership'] = $detail['membership'] ?? NULL;
+      $ids['participant'] = $detail['participant'] ?? NULL;
+      $ids['event'] = $detail['event'] ?? NULL;
 
       if (!$elements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
         throw new CRM_Core_Exception('invalid data');

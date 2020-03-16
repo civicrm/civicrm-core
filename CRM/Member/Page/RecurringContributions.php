@@ -96,7 +96,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
 
       $recurringContributions[$recurringContributionID]['id'] = $recurringContributionID;
       $recurringContributions[$recurringContributionID]['contactId'] = $contactID;
-      $recurringContributions[$recurringContributionID]['contribution_status'] = CRM_Utils_Array::value($contributionStatusID, $contributionStatuses);
+      $recurringContributions[$recurringContributionID]['contribution_status'] = $contributionStatuses[$contributionStatusID] ?? NULL;
 
       $this->setActionsForRecurringContribution($recurringContributionID, $recurringContributions[$recurringContributionID]);
     }

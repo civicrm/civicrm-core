@@ -166,8 +166,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
             }
           }
         }
@@ -222,9 +222,9 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
     $entryFound = FALSE;
 
-    $startDateFrom = CRM_Utils_Array::value("start_date_to", $this->_params);
-    $startDateTo = CRM_Utils_Array::value("start_date_from", $this->_params);
-    $startDateRelative = CRM_Utils_Array::value("start_date_relative", $this->_params);
+    $startDateFrom = $this->_params["start_date_to"] ?? NULL;
+    $startDateTo = $this->_params["start_date_from"] ?? NULL;
+    $startDateRelative = $this->_params["start_date_relative"] ?? NULL;
 
     $startedDateSql = $this->dateClause('start_date', $startDateRelative, $startDateFrom, $startDateTo);
     $startedDateSql = $startedDateSql ? $startedDateSql : " ( 1 ) ";
@@ -236,7 +236,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
     foreach ($rows as $rowNum => $row) {
 
-      $paymentInstrumentId = CRM_Utils_Array::value('civicrm_contribution_recur_payment_instrument_id', $row);
+      $paymentInstrumentId = $row['civicrm_contribution_recur_payment_instrument_id'] ?? NULL;
 
       $rows[$rowNum]['civicrm_contribution_recur_start_date'] = 0;
       $rows[$rowNum]['civicrm_contribution_recur_cancel_date'] = 0;

@@ -34,9 +34,9 @@ class CRM_Campaign_Page_AJAX {
 
     $params = [];
     foreach ($fields as $fld) {
-      $params[$fld] = CRM_Utils_Array::value($fld, $_POST);
+      $params[$fld] = $_POST[$fld] ?? NULL;
     }
-    $params['details'] = CRM_Utils_Array::value('note', $_POST);
+    $params['details'] = $_POST['note'] ?? NULL;
     $voterId = $params['voter_id'];
     $activityId = $params['activity_id'];
 
@@ -145,7 +145,7 @@ class CRM_Campaign_Page_AJAX {
       'group',
       'contact_type',
     ] as $param) {
-      $paramValue = CRM_Utils_Array::value($param, $params);
+      $paramValue = $params[$param] ?? NULL;
       if ($paramValue) {
         unset($params[$param]);
         $paramValue = explode(',', $paramValue);
@@ -161,7 +161,7 @@ class CRM_Campaign_Page_AJAX {
       'survey_interviewer_id',
       'campaign_search_voter_for',
     ] as $fld) {
-      $voterClauseParams[$fld] = CRM_Utils_Array::value($fld, $params);
+      $voterClauseParams[$fld] = $params[$fld] ?? NULL;
     }
 
     $interviewerId = $surveyTypeId = $surveyId = NULL;
@@ -178,7 +178,7 @@ class CRM_Campaign_Page_AJAX {
         //allow voter search in sub-part of given constituents,
         //but make sure in case user does not select any group.
         //get all associated campaign groups in where filter, CRM-7406
-        $groups = CRM_Utils_Array::value('group', $params);
+        $groups = $params['group'] ?? NULL;
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campaignGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
           foreach ($campaignGroups as $id => $group) {
@@ -392,7 +392,7 @@ class CRM_Campaign_Page_AJAX {
         ];
         $activityParams = [];
         foreach ($ids as $id) {
-          $val = CRM_Utils_Array::value($id, $_POST);
+          $val = $_POST[$id] ?? NULL;
           if (!$val) {
             $createActivity = FALSE;
             break;
@@ -415,7 +415,7 @@ class CRM_Campaign_Page_AJAX {
 
           $activityTypeId = $surveyValues['activity_type_id'];
 
-          $surveytitle = CRM_Utils_Array::value('surveyTitle', $_POST);
+          $surveytitle = $_POST['surveyTitle'] ?? NULL;
           if (!$surveytitle) {
             $surveytitle = $surveyValues['title'];
           }
@@ -442,7 +442,7 @@ class CRM_Campaign_Page_AJAX {
             [$scheduledStatusId]
           );
           foreach ($activities as $voterId => $values) {
-            $activityId = CRM_Utils_Array::value('activity_id', $values);
+            $activityId = $values['activity_id'] ?? NULL;
             if ($activityId && ($values['status_id'] == $scheduledStatusId)) {
               CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
                 $activityId,
@@ -604,7 +604,7 @@ class CRM_Campaign_Page_AJAX {
       }
       foreach ($campaigns as $campaignID => $values) {
         foreach ($selectorCols as $col) {
-          $searchRows[$campaignID][$col] = CRM_Utils_Array::value($col, $values);
+          $searchRows[$campaignID][$col] = $values[$col] ?? NULL;
         }
       }
     }
@@ -709,7 +709,7 @@ class CRM_Campaign_Page_AJAX {
       }
       foreach ($surveys as $surveyID => $values) {
         foreach ($selectorCols as $col) {
-          $searchRows[$surveyID][$col] = CRM_Utils_Array::value($col, $values);
+          $searchRows[$surveyID][$col] = $values[$col] ?? NULL;
         }
       }
     }
@@ -809,7 +809,7 @@ class CRM_Campaign_Page_AJAX {
       }
       foreach ($petitions as $petitionID => $values) {
         foreach ($selectorCols as $col) {
-          $searchRows[$petitionID][$col] = CRM_Utils_Array::value($col, $values);
+          $searchRows[$petitionID][$col] = $values[$col] ?? NULL;
         }
       }
     }

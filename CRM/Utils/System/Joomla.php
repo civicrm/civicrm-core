@@ -133,8 +133,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     if (!empty($row)) {
-      $dbName = CRM_Utils_Array::value('username', $row);
-      $dbEmail = CRM_Utils_Array::value('email', $row);
+      $dbName = $row['username'] ?? NULL;
+      $dbEmail = $row['email'] ?? NULL;
       if (strtolower($dbName) == strtolower($name)) {
         $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.',
           [1 => $name]

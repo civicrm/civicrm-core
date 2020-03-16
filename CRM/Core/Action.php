@@ -140,7 +140,7 @@ class CRM_Core_Action {
    *   the action mask corresponding to the input string
    */
   public static function mapItem($item) {
-    $mask = CRM_Utils_Array::value(trim($item), self::$_names);
+    $mask = self::$_names[trim($item)] ?? NULL;
     return $mask ? $mask : 0;
   }
 

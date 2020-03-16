@@ -167,8 +167,8 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
    */
   public static function &links() {
     $args = func_get_args();
-    $hideOption = CRM_Utils_Array::value(0, $args);
-    $key = CRM_Utils_Array::value(1, $args);
+    $hideOption = $args[0] ?? NULL;
+    $key = $args[1] ?? NULL;
 
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
@@ -299,7 +299,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
       }
 
       // carry campaign on selectors.
-      $row['campaign'] = CRM_Utils_Array::value($result->pledge_campaign_id, $allCampaigns);
+      $row['campaign'] = $allCampaigns[$result->pledge_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->pledge_campaign_id;
 
       // add pledge status name

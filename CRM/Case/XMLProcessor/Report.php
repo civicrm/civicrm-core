@@ -116,7 +116,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
           foreach ($activitySetXML->ActivityTypes as $activityTypesXML) {
             foreach ($activityTypesXML as $activityTypeXML) {
               $activityTypeName = (string ) $activityTypeXML->name;
-              $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $allActivityTypes);
+              $activityTypeInfo = $allActivityTypes[$activityTypeName] ?? NULL;
               if ($activityTypeInfo) {
                 $activityTypes[$activityTypeInfo['id']] = $activityTypeInfo;
               }
@@ -743,7 +743,7 @@ LIMIT  1
     $xml = $form->retrieve($case['caseTypeName']);
 
     $activitySetNames = CRM_Case_XMLProcessor_Process::activitySets($xml->ActivitySets);
-    $pageTitle = CRM_Utils_Array::value($activitySetName, $activitySetNames);
+    $pageTitle = $activitySetNames[$activitySetName] ?? NULL;
     $template->assign('pageTitle', $pageTitle);
 
     if ($activitySetName) {

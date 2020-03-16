@@ -69,7 +69,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         $cType = $type;
       }
       elseif (array_key_exists($type, $validSubTypes)) {
-        $cType = CRM_Utils_Array::value('parent', $validSubTypes[$type]);
+        $cType = $validSubTypes[$type]['parent'] ?? NULL;
       }
       if ($cType) {
         break;
@@ -932,7 +932,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         if (!empty($_POST)) {
           // get the new email
           $config = CRM_Core_Config::singleton();
-          $email = CRM_Utils_Array::value('mail', $_POST);
+          $email = $_POST['mail'] ?? NULL;
 
           if (CRM_Utils_Rule::email($email) && ($email != $userEmail[1])) {
             CRM_Core_BAO_UFMatch::updateContactEmail($userID, $email);
@@ -1115,7 +1115,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
               // field_type is only set when we are retrieving profile values
               // when sending email, we call the same function to get custom field
               // values etc, i.e. emulating a profile
-              $fieldType = CRM_Utils_Array::value('field_type', $field);
+              $fieldType = $field['field_type'] ?? NULL;
 
               if ($htmlType == 'File') {
                 $entityId = $cid;
@@ -1218,7 +1218,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
             $locationTypeName = 1;
           }
           else {
-            $locationTypeName = CRM_Utils_Array::value($id, $locationTypes);
+            $locationTypeName = $locationTypes[$id] ?? NULL;
           }
 
           if (!$locationTypeName) {
@@ -1448,8 +1448,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
     }
 
-    $params['limit_listings_group_id'] = CRM_Utils_Array::value('group', $params);
-    $params['add_to_group_id'] = CRM_Utils_Array::value('add_contact_to_group', $params);
+    $params['limit_listings_group_id'] = $params['group'] ?? NULL;
+    $params['add_to_group_id'] = $params['add_contact_to_group'] ?? NULL;
 
     //CRM-15427
     if (!empty($params['group_type']) && is_array($params['group_type'])) {
@@ -2288,7 +2288,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     if (!$componentId) {
       //get the contact details
       $contactDetails = CRM_Contact_BAO_Contact::getHierContactDetails($contactId, $fields);
-      $details = CRM_Utils_Array::value($contactId, $contactDetails);
+      $details = $contactDetails[$contactId] ?? NULL;
       $multipleFields = ['website' => 'url'];
 
       //start of code to set the default values
@@ -2397,7 +2397,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                           }
                         }
                         else {
-                          $phoneDefault = CRM_Utils_Array::value('phone', $value);
+                          $phoneDefault = $value['phone'] ?? NULL;
                           // CRM-9216
                           if (!is_array($phoneDefault)) {
                             $defaults[$fldName] = $phoneDefault;
@@ -2440,7 +2440,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                 && !empty($details['website'])
                 && !empty($details['website'][$locTypeId])
               ) {
-                $defaults[$fldName] = CRM_Utils_Array::value('url', $details['website'][$locTypeId]);
+                $defaults[$fldName] = $details['website'][$locTypeId]['url'] ?? NULL;
               }
             }
           }

@@ -994,7 +994,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if (!$register && empty($fields['_qf_Edit_upload_duplicate'])) {
       // fix for CRM-3240
       if (!empty($fields['email-Primary'])) {
-        $fields['email'] = CRM_Utils_Array::value('email-Primary', $fields);
+        $fields['email'] = $fields['email-Primary'] ?? NULL;
       }
 
       // fix for CRM-6141
@@ -1187,7 +1187,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    $addToGroupId = CRM_Utils_Array::value('add_to_group_id', $this->_ufGroup);
+    $addToGroupId = $this->_ufGroup['add_to_group_id'] ?? NULL;
     if (!empty($addToGroupId)) {
       //run same check whether group is a mailing list
       $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',

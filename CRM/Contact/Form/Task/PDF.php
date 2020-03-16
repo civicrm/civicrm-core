@@ -76,7 +76,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     if (isset($this->_activityId)) {
       $params = ['id' => $this->_activityId];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
-      $defaults['html_message'] = CRM_Utils_Array::value('details', $defaults);
+      $defaults['html_message'] = $defaults['details'] ?? NULL;
     }
     $defaults = $defaults + CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
     return $defaults;

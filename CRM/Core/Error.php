@@ -726,7 +726,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $ret = [];
     foreach ($backTrace as $trace) {
       $args = [];
-      $fnName = CRM_Utils_Array::value('function', $trace);
+      $fnName = $trace['function'] ?? NULL;
       $className = isset($trace['class']) ? ($trace['class'] . $trace['type']) : '';
 
       // Do not show args for a few password related functions

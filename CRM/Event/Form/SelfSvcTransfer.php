@@ -432,14 +432,14 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $eventParams = ['id' => $participant->event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails);
     //get default participant role.
-    $eventDetails['participant_role'] = CRM_Utils_Array::value($eventDetails['default_role_id'], $participantRoles);
+    $eventDetails['participant_role'] = $participantRoles[$eventDetails['default_role_id']] ?? NULL;
     //get the location info
     $locParams = [
       'entity_id' => $participant->event_id,
       'entity_table' => 'civicrm_event',
     ];
     $eventDetails['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
-    $toEmail = CRM_Utils_Array::value('email', $contactDetails[$participant->contact_id]);
+    $toEmail = $contactDetails[$participant->contact_id]['email'] ?? NULL;
     if ($toEmail) {
       //take a receipt from as event else domain.
       $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
@@ -512,7 +512,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $eventParams = ['id' => $this->_event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails[$this->_event_id]);
     //get default participant role.
-    $eventDetails[$this->_event_id]['participant_role'] = CRM_Utils_Array::value($eventDetails[$this->_event_id]['default_role_id'], $participantRoles);
+    $eventDetails[$this->_event_id]['participant_role'] = $participantRoles[$eventDetails[$this->_event_id]['default_role_id']] ?? NULL;
     //get the location info
     $locParams = ['entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event'];
     $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);

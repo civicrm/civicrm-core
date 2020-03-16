@@ -426,7 +426,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
-        $additonalId = CRM_Utils_Array::value('participant_id', $record);
+        $additonalId = $record['participant_id'] ?? NULL;
         if ($additonalId && $key = array_search($additonalId, $cancelledIds)) {
           unset($cancelledIds[$key]);
         }
@@ -473,7 +473,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       //Unset ContactID for additional participants and set RegisterBy Id.
       if (empty($value['is_primary'])) {
-        $contactID = CRM_Utils_Array::value('contact_id', $value);
+        $contactID = $value['contact_id'] ?? NULL;
         $registerByID = $this->get('registerByID');
         if ($registerByID) {
           $value['registered_by_id'] = $registerByID;
@@ -600,7 +600,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       //CRM-4453.
       if (!empty($value['is_primary'])) {
-        $primaryCurrencyID = CRM_Utils_Array::value('currencyID', $value);
+        $primaryCurrencyID = $value['currencyID'] ?? NULL;
       }
       if (empty($value['currencyID'])) {
         $value['currencyID'] = $primaryCurrencyID;
@@ -619,12 +619,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-      $value['fee_amount'] = CRM_Utils_Array::value('amount', $value);
+      $value['fee_amount'] = $value['amount'] ?? NULL;
       $this->set('value', $value);
 
       // handle register date CRM-4320
       if ($this->_allowConfirmation) {
-        $registerDate = CRM_Utils_Array::value('participant_register_date', $params);
+        $registerDate = $params['participant_register_date'] ?? NULL;
       }
       elseif (!empty($params['participant_register_date']) &&
         is_array($params['participant_register_date'])
@@ -683,7 +683,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
                 $dataArray[$line['tax_rate']] = $dataArray[$line['tax_rate']] + CRM_Utils_Array::value('tax_amount', $line);
               }
               else {
-                $dataArray[$line['tax_rate']] = CRM_Utils_Array::value('tax_amount', $line);
+                $dataArray[$line['tax_rate']] = $line['tax_amount'] ?? NULL;
               }
             }
           }
@@ -1156,7 +1156,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //get email primary first if exist
     $subscriptionEmail = ['email' => CRM_Utils_Array::value('email-Primary', $params)];
     if (!$subscriptionEmail['email']) {
-      $subscriptionEmail['email'] = CRM_Utils_Array::value("email-{$form->_bltID}", $params);
+      $subscriptionEmail['email'] = $params["email-{$form->_bltID}"] ?? NULL;
     }
     // subscribing contact to groups
     if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {
@@ -1200,7 +1200,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           if (count($values)) {
             $formattedValues[$count][$prefix1 . 'CustomPre'] = $values;
           }
-          $formattedValues[$count][$prefix1 . 'CustomPreGroupTitle'] = CRM_Utils_Array::value('groupTitle', $groupName);
+          $formattedValues[$count][$prefix1 . 'CustomPreGroupTitle'] = $groupName['groupTitle'] ?? NULL;
         }
         //get the customPost profile info
         if (!empty($form->_values[$prefix2 . 'custom_post_id'])) {
@@ -1259,9 +1259,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // This happens in buildQuickForm so emulate here.
     $form->_amount = $form->_totalAmount = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('totalAmount', $params));
     $form->set('params', $params['params']);
-    $form->_values['custom_pre_id'] = CRM_Utils_Array::value('custom_pre_id', $params);
-    $form->_values['custom_post_id'] = CRM_Utils_Array::value('custom_post_id', $params);
-    $form->_values['event'] = CRM_Utils_Array::value('event', $params);
+    $form->_values['custom_pre_id'] = $params['custom_pre_id'] ?? NULL;
+    $form->_values['custom_post_id'] = $params['custom_post_id'] ?? NULL;
+    $form->_values['event'] = $params['event'] ?? NULL;
     $form->_contributeMode = $params['contributeMode'];
     $eventParams = ['id' => $params['id']];
     CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);

@@ -71,7 +71,7 @@ class CRM_Contact_Form_Edit_CustomData {
       $contactSubType = $_POST['contact_sub_type'];
     }
     else {
-      $contactSubType = CRM_Utils_Array::value('contact_sub_type', $form->_values);
+      $contactSubType = $form->_values['contact_sub_type'] ?? NULL;
     }
     $form->assign('contactType', $form->_contactType);
     $form->assign('contactSubType', $contactSubType);

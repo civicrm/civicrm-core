@@ -712,7 +712,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $stat = FALSE;
     foreach ($discounts as $key => $discountValue) {
       if ($key == $discountCode) {
-        $events = CRM_Utils_Array::value('events', $discountValue);
+        $events = $discountValue['events'] ?? NULL;
         $evt_ids = implode(",", $events);
         if ($evt_ids == "0" || strpos($evt_ids, $event_id)) {
           $event_match = TRUE;

@@ -83,7 +83,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   public function setDefaultValues() {
     $defaults = [];
 
-    $defaults['sort_name'] = CRM_Utils_Array::value('sort_name', $this->_formValues);
+    $defaults['sort_name'] = $this->_formValues['sort_name'] ?? NULL;
     foreach (self::$csv as $v) {
       if (!empty($this->_formValues[$v]) && is_array($this->_formValues[$v])) {
         $tmpArray = array_keys($this->_formValues[$v]);

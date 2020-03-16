@@ -77,7 +77,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     if (isset($this->_activityId)) {
       $params = ['id' => $this->_activityId];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
-      $defaults['html_message'] = CRM_Utils_Array::value('details', $defaults);
+      $defaults['html_message'] = $defaults['details'] ?? NULL;
     }
     else {
       $defaults['thankyou_update'] = 1;

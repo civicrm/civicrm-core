@@ -97,7 +97,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     $participantBAO = new CRM_Event_BAO_Participant();
     if (!empty($params['id'])) {
-      $participantBAO->id = CRM_Utils_Array::value('id', $params);
+      $participantBAO->id = $params['id'] ?? NULL;
       $participantBAO->find(TRUE);
       $participantBAO->register_date = CRM_Utils_Date::isoToMysql($participantBAO->register_date);
     }
@@ -203,7 +203,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
     if (!$id) {
-      $id = CRM_Utils_Array::value('contact_id', $params);
+      $id = $params['contact_id'] ?? NULL;
     }
 
     // add custom field values
@@ -666,7 +666,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
               'column_name'
             );
             $value = $customFieldId ? 'custom_' . $customFieldId : $value;
-            $tmpContactField[trim($value)] = CRM_Utils_Array::value(trim($value), $contactFields);
+            $tmpContactField[trim($value)] = $contactFields[trim($value)] ?? NULL;
             if (!$status) {
               $title = $tmpContactField[trim($value)]['title'] . ' (match to contact)';
             }
@@ -678,7 +678,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
           }
         }
       }
-      $extIdentifier = CRM_Utils_Array::value('external_identifier', $contactFields);
+      $extIdentifier = $contactFields['external_identifier'] ?? NULL;
       if ($extIdentifier) {
         $tmpContactField['external_identifier'] = $extIdentifier;
         $tmpContactField['external_identifier']['title'] = CRM_Utils_Array::value('title', $extIdentifier) . ' (match to contact)';
@@ -904,8 +904,8 @@ WHERE  civicrm_participant.id = {$participantId}
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function checkDuplicate($input, &$duplicates) {
-    $eventId = CRM_Utils_Array::value('event_id', $input);
-    $contactId = CRM_Utils_Array::value('contact_id', $input);
+    $eventId = $input['event_id'] ?? NULL;
+    $contactId = $input['contact_id'] ?? NULL;
 
     $clause = [];
     $input = [];
@@ -1283,7 +1283,7 @@ UPDATE  civicrm_participant
         CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails[$eventId]);
 
         //get default participant role.
-        $eventDetails[$eventId]['participant_role'] = CRM_Utils_Array::value($eventDetails[$eventId]['default_role_id'], $participantRoles);
+        $eventDetails[$eventId]['participant_role'] = $participantRoles[$eventDetails[$eventId]['default_role_id']] ?? NULL;
 
         //get the location info
         $locParams = ['entity_id' => $eventId, 'entity_table' => 'civicrm_event'];
@@ -1296,7 +1296,7 @@ UPDATE  civicrm_participant
 
     $emailType = NULL;
     $toStatus = $statusTypes[$toStatusId];
-    $fromStatus = CRM_Utils_Array::value($fromStatusId, $statusTypes);
+    $fromStatus = $statusTypes[$fromStatusId] ?? NULL;
 
     switch ($toStatus) {
       case 'Pending from waitlist':
@@ -1432,7 +1432,7 @@ UPDATE  civicrm_participant
     ) {
       return $mailSent;
     }
-    $toEmail = CRM_Utils_Array::value('email', $contactDetails);
+    $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
 
       $contactId = $participantValues['contact_id'];
@@ -1442,7 +1442,7 @@ UPDATE  civicrm_participant
       $checksumValue = NULL;
       if ($mailType == 'Confirm' && !$participantValues['registered_by_id']) {
         $checksumLife = 'inf';
-        $endDate = CRM_Utils_Array::value('end_date', $eventDetails);
+        $endDate = $eventDetails['end_date'] ?? NULL;
         if ($endDate) {
           $checksumLife = (CRM_Utils_Date::unixTime($endDate) - time()) / (60 * 60);
         }

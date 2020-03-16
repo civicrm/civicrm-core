@@ -165,7 +165,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::ADD) {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
         $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
-        $financialAccountType = CRM_Utils_Array::value($this->_submitValues['account_relationship'], $financialAccountType);
+        $financialAccountType = $financialAccountType[$this->_submitValues['account_relationship']] ?? NULL;
         $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
 
         $financialAccountSelect = ['' => ts('- select -')] + $result;

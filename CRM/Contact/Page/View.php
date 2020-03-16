@@ -119,7 +119,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
         $found = TRUE;
       }
 
-      $context = CRM_Utils_Array::value('context', $_GET);
+      $context = $_GET['context'] ?? NULL;
       if (!$found) {
         // seems like we did not find any contacts
         // maybe due to bug CRM-9096

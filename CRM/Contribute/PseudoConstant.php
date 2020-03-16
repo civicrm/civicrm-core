@@ -108,7 +108,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$financialType);
+      $result = self::$financialType[$id] ?? NULL;
       return $result;
     }
     return self::$financialType;
@@ -149,7 +149,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 
     }
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$financialAccount[$cacheKey]);
+      $result = self::$financialAccount[$cacheKey][$id] ?? NULL;
       return $result;
     }
     return self::$financialAccount[$cacheKey];
@@ -197,7 +197,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       );
     }
     if ($id) {
-      $pageTitle = CRM_Utils_Array::value($id, $cacheVarToUse);
+      $pageTitle = $cacheVarToUse[$id] ?? NULL;
       return $pageTitle;
     }
     return $cacheVarToUse;
@@ -300,7 +300,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     $result = self::$contributionStatus[$cacheKey];
     if ($id) {
-      $result = CRM_Utils_Array::value($id, $result);
+      $result = $result[$id] ?? NULL;
     }
 
     return $result;
@@ -331,7 +331,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     $result = self::$pcPage[$pageType];
     if ($id) {
-      return $result = CRM_Utils_Array::value($id, $result);
+      return $result = $result[$id] ?? NULL;
     }
 
     return $result;
@@ -412,7 +412,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$batch);
+      $result = self::$batch[$id] ?? NULL;
       return $result;
     }
     return self::$batch;

@@ -153,7 +153,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $sourceRecordIds = implode(',', $params['source_record_id']);
     }
     else {
-      $sourceRecordIds = CRM_Utils_Array::value('source_record_id', $params);
+      $sourceRecordIds = $params['source_record_id'] ?? NULL;
     }
 
     $result = NULL;
@@ -490,7 +490,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
     else {
       // at worst, take source for recently viewed display
-      $recentContactId = CRM_Utils_Array::value('source_contact_id', $params);
+      $recentContactId = $params['source_contact_id'] ?? NULL;
     }
 
     if (isset($params['assignee_contact_id'])) {
@@ -582,7 +582,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // if the subject contains a ‘[case #…]’ string, file that activity on the related case (CRM-5916)
     $matches = [];
-    $subjectToMatch = CRM_Utils_Array::value('subject', $params);
+    $subjectToMatch = $params['subject'] ?? NULL;
     if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
       $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
       $hash = $matches[1];
@@ -804,7 +804,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
         // case related fields
         elseif ($apiKey == 'case_id' && !$isBulkActivity) {
-          $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity);
+          $activities[$id][$expectedName] = $activity[$apiKey] ?? NULL;
 
           // fetch case subject for case ID found
           if (!empty($activity['case_id'])) {
@@ -815,9 +815,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
         else {
           // @todo this generic assign could just be handled in array declaration earlier.
-          $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity);
+          $activities[$id][$expectedName] = $activity[$apiKey] ?? NULL;
           if ($apiKey == 'campaign_id') {
-            $activities[$id]['campaign'] = CRM_Utils_Array::value($activities[$id][$expectedName], $allCampaigns);
+            $activities[$id]['campaign'] = $allCampaigns[$activities[$id][$expectedName]] ?? NULL;
           }
         }
       }
@@ -1427,7 +1427,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       // To get primary mobile phonenumber, if not get the first mobile phonenumber
       if (!empty($toPhoneNumbers)) {
         $toPhoneNumberDetails = reset($toPhoneNumbers);
-        $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
+        $toPhoneNumber = $toPhoneNumberDetails['phone'] ?? NULL;
         // Contact allows to send sms
       }
     }
@@ -2002,8 +2002,8 @@ AND cl.modified_id  = c.id
 
     $followupParams['activity_type_id'] = $params['followup_activity_type_id'];
     // Get Subject of Follow-up Activiity, CRM-4491
-    $followupParams['subject'] = CRM_Utils_Array::value('followup_activity_subject', $params);
-    $followupParams['assignee_contact_id'] = CRM_Utils_Array::value('followup_assignee_contact_id', $params);
+    $followupParams['subject'] = $params['followup_activity_subject'] ?? NULL;
+    $followupParams['assignee_contact_id'] = $params['followup_assignee_contact_id'] ?? NULL;
 
     // Create target contact for followup.
     if (!empty($params['target_contact_id'])) {
@@ -2523,9 +2523,9 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     // Format the params.
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
     $params['caseId'] = NULL;
-    $context = CRM_Utils_Array::value('context', $params);
+    $context = $params['context'] ?? NULL;
     $showContactOverlay = !CRM_Utils_String::startsWith($context, "dashlet");
     $activityTypeInfo = civicrm_api3('OptionValue', 'get', [
       'option_group_id' => "activity_type",
@@ -2897,8 +2897,8 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
    */
   public static function sendToAssignee($activity, $mailToContacts, $params = []) {
     if (!CRM_Utils_Array::crmIsEmptyArray($mailToContacts)) {
-      $clientID = CRM_Utils_Array::value('client_id', $params);
-      $caseID = CRM_Utils_Array::value('case_id', $params);
+      $clientID = $params['client_id'] ?? NULL;
+      $caseID = $params['case_id'] ?? NULL;
 
       $ics = new CRM_Activity_BAO_ICalendar($activity);
       $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activity->id);

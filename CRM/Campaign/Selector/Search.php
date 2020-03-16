@@ -140,8 +140,8 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $this->_context = $context;
 
     $this->_campaignClause = $surveyClause;
-    $this->_campaignFromClause = CRM_Utils_Array::value('fromClause', $surveyClause);
-    $this->_campaignWhereClause = CRM_Utils_Array::value('whereClause', $surveyClause);
+    $this->_campaignFromClause = $surveyClause['fromClause'] ?? NULL;
+    $this->_campaignWhereClause = $surveyClause['whereClause'] ?? NULL;
 
     // type of selector
     $this->_action = $action;

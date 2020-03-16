@@ -465,7 +465,7 @@ class CRM_Core_Permission {
         'CiviMail' => 'access CiviMail',
         'CiviAuction' => 'add auction items',
       ];
-      $permissionName = CRM_Utils_Array::value($module, $editPermissions);
+      $permissionName = $editPermissions[$module] ?? NULL;
     }
 
     if ($module == 'CiviCase' && !$permissionName) {

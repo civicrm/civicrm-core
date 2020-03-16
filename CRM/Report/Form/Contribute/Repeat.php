@@ -263,17 +263,17 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
               $select[] = $field['clause'];
 
               // FIXME: dirty hack for setting columnHeaders
-              $this->_columnHeaders["{$field['alias']}_{$field['name']}_sum"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$field['alias']}_{$field['name']}_sum"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$field['alias']}_{$field['name']}_sum"]['title'] = $field['title'];
-              $this->_columnHeaders["{$field['alias']}_{$field['name']}_count"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$field['alias']}_{$field['name']}_count"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$field['alias']}_{$field['name']}_count"]['title'] = $field['title'];
               continue;
             }
 
             // only include statistics columns if set
             $select[] = "{$field['dbAlias']} as {$field['alias']}_{$field['name']}";
-            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['type'] = CRM_Utils_Array::value('type', $field);
-            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['title'] = CRM_Utils_Array::value('title', $field);
+            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['type'] = $field['type'] ?? NULL;
+            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['title'] = $field['title'] ?? NULL;
             if (!empty($field['no_display'])) {
               $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['no_display'] = TRUE;
             }
@@ -386,14 +386,14 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     foreach ($this->_columns['civicrm_contribution']['filters'] as $fieldName => $field) {
       $clause = NULL;
       if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-        $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-        $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-        $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+        $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+        $from = $this->_params["{$fieldName}_from"] ?? NULL;
+        $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
         $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type']);
       }
       else {
-        $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+        $op = $this->_params["{$fieldName}_op"] ?? NULL;
         if ($op) {
           $clause = $this->whereClause($field,
             $op,
@@ -450,7 +450,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
       ) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+          $op = $this->_params["{$fieldName}_op"] ?? NULL;
           if ($op) {
             $clause = $this->whereClause($field,
               $op,

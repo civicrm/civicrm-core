@@ -239,7 +239,7 @@ class CRM_Report_Form_Instance {
 
     if ($instanceID) {
       // this is already retrieved via Form.php
-      $defaults['description'] = CRM_Utils_Array::value('description', $defaults);
+      $defaults['description'] = $defaults['description'] ?? NULL;
       if (!empty($defaults['header'])) {
         $defaults['report_header'] = $defaults['header'];
       }
@@ -258,7 +258,7 @@ class CRM_Report_Form_Instance {
         $params = ['id' => $defaults['navigation_id']];
         CRM_Core_BAO_Navigation::retrieve($params, $navigationDefaults);
         $defaults['is_navigation'] = 1;
-        $defaults['parent_id'] = CRM_Utils_Array::value('parent_id', $navigationDefaults);
+        $defaults['parent_id'] = $navigationDefaults['parent_id'] ?? NULL;
         if (!empty($navigationDefaults['is_active'])) {
           $form->assign('is_navigation', TRUE);
         }

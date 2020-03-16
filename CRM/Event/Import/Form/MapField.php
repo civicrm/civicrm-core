@@ -100,9 +100,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $mappingName = $mappingName[1];
       $mappingContactType = $mappingContactType[1];
-      $mappingLocation = CRM_Utils_Array::value('1', $mappingLocation);
-      $mappingPhoneType = CRM_Utils_Array::value('1', $mappingPhoneType);
-      $mappingRelation = CRM_Utils_Array::value('1', $mappingRelation);
+      $mappingLocation = $mappingLocation['1'] ?? NULL;
+      $mappingPhoneType = $mappingPhoneType['1'] ?? NULL;
+      $mappingRelation = $mappingRelation['1'] ?? NULL;
 
       //mapping is to be loaded from database
 
@@ -339,7 +339,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     if (!empty($fields['saveMapping'])) {
-      $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
+      $nameField = $fields['saveMappingName'] ?? NULL;
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
       }
@@ -352,7 +352,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //display Error if loaded mapping is not selected
     if (array_key_exists('loadMapping', $fields)) {
-      $getMapName = CRM_Utils_Array::value('savedMapping', $fields);
+      $getMapName = $fields['savedMapping'] ?? NULL;
       if (empty($getMapName)) {
         $errors['savedMapping'] = ts('Select saved mapping');
       }
@@ -428,9 +428,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $updateMappingFields->column_number = $i;
 
         $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = CRM_Utils_Array::value(0, $explodedValues);
-        $first = CRM_Utils_Array::value(1, $explodedValues);
-        $second = CRM_Utils_Array::value(2, $explodedValues);
+        $id = $explodedValues[0] ?? NULL;
+        $first = $explodedValues[1] ?? NULL;
+        $second = $explodedValues[2] ?? NULL;
 
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
@@ -452,9 +452,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $saveMappingFields->column_number = $i;
 
         $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = CRM_Utils_Array::value(0, $explodedValues);
-        $first = CRM_Utils_Array::value(1, $explodedValues);
-        $second = CRM_Utils_Array::value(2, $explodedValues);
+        $id = $explodedValues[0] ?? NULL;
+        $first = $explodedValues[1] ?? NULL;
+        $second = $explodedValues[2] ?? NULL;
 
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();

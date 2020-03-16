@@ -29,7 +29,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_showRelatedCases = CRM_Utils_Array::value('relatedCases', $_GET);
+    $this->_showRelatedCases = $_GET['relatedCases'] ?? NULL;
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
@@ -470,7 +470,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $allCaseActTypes = CRM_Case_PseudoConstant::caseActivityType();
     foreach ($allCaseActTypes as $typeDetails) {
       if (!in_array($typeDetails['name'], ['Open Case'])) {
-        $aTypesFilter[$typeDetails['id']] = CRM_Utils_Array::value('label', $typeDetails);
+        $aTypesFilter[$typeDetails['id']] = $typeDetails['label'] ?? NULL;
       }
     }
     $aTypesFilter = $aTypesFilter + $aTypes;

@@ -113,9 +113,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $mappingName = $mappingName[1];
       $mappingContactType = $mappingContactType[1];
-      $mappingLocation = CRM_Utils_Array::value('1', $mappingLocation);
-      $mappingPhoneType = CRM_Utils_Array::value('1', $mappingPhoneType);
-      $mappingRelation = CRM_Utils_Array::value('1', $mappingRelation);
+      $mappingLocation = $mappingLocation['1'] ?? NULL;
+      $mappingPhoneType = $mappingPhoneType['1'] ?? NULL;
+      $mappingRelation = $mappingRelation['1'] ?? NULL;
 
       //mapping is to be loaded from database
 
@@ -361,7 +361,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     if (!empty($fields['saveMapping'])) {
-      $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
+      $nameField = $fields['saveMappingName'] ?? NULL;
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
       }

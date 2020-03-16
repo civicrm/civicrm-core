@@ -590,11 +590,11 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
  */
 function _civicrm_api3_get_query_object($params, $mode, $entity) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
-  $sort = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset = CRM_Utils_Array::value('offset', $options);
-  $rowCount = CRM_Utils_Array::value('limit', $options);
+  $sort = $options['sort'] ?? NULL;
+  $offset = $options['offset'] ?? NULL;
+  $rowCount = $options['limit'] ?? NULL;
   $inputParams = CRM_Utils_Array::value('input_params', $options, []);
-  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
+  $returnProperties = $options['return'] ?? NULL;
   if (empty($returnProperties)) {
     $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties($mode);
   }
@@ -1969,7 +1969,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   $entity = _civicrm_api_get_camel_name($entity);
   if ($entity == 'Contact') {
     // Use sub-type if available, otherwise "NULL" to fetch from all contact types
-    $entity = CRM_Utils_Array::value('contact_type', $params);
+    $entity = $params['contact_type'] ?? NULL;
   }
   $customfields = CRM_Core_BAO_CustomField::getFields($entity,
     FALSE,
@@ -2009,7 +2009,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
  */
 function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
   foreach ($fields as $field => $values) {
-    $uniqueName = CRM_Utils_Array::value('uniqueName', $values);
+    $uniqueName = $values['uniqueName'] ?? NULL;
     if (!empty($values['api.aliases'])) {
       // if aliased field is not set we try to use field alias
       if (!isset($apiRequest['params'][$field])) {
@@ -2037,7 +2037,7 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
       && $field != $uniqueName
       && array_key_exists($uniqueName, $apiRequest['params'])
     ) {
-      $apiRequest['params'][$field] = CRM_Utils_Array::value($values['uniqueName'], $apiRequest['params']);
+      $apiRequest['params'][$field] = $apiRequest['params'][$values['uniqueName']] ?? NULL;
       // note that it would make sense to unset the original field here but tests need to be in place first
     }
   }
@@ -2286,7 +2286,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     return;
   }
 
-  $options = CRM_Utils_Array::value('options', $fieldInfo);
+  $options = $fieldInfo['options'] ?? NULL;
 
   if (!$options) {
     if (strtolower($entity) == 'profile' && !empty($fieldInfo['entity'])) {
@@ -2457,7 +2457,7 @@ function _civicrm_api3_deprecation_check($entity, $result = []) {
  * @return mixed
  */
 function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
-  $fieldValue = CRM_Utils_Array::value($fieldName, $params);
+  $fieldValue = $params[$fieldName] ?? NULL;
   $op = NULL;
 
   if (!empty($fieldValue) && is_array($fieldValue) &&
@@ -2465,7 +2465,7 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
       $type == 'String' && strstr(key($fieldValue), 'EMPTY'))
   ) {
     $op = key($fieldValue);
-    $fieldValue = CRM_Utils_Array::value($op, $fieldValue);
+    $fieldValue = $fieldValue[$op] ?? NULL;
   }
   return [$fieldValue, $op];
 }
@@ -2491,8 +2491,8 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
 function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $filterableFields) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
   // TODO // $sort = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset = CRM_Utils_Array::value('offset', $options);
-  $limit = CRM_Utils_Array::value('limit', $options);
+  $offset = $options['offset'] ?? NULL;
+  $limit = $options['limit'] ?? NULL;
 
   $matches = [];
 

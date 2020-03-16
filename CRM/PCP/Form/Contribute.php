@@ -47,7 +47,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     if (isset($this->_id)) {
       $params = ['entity_id' => $this->_id, 'entity_table' => 'civicrm_contribution_page'];
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
-      $defaults['pcp_active'] = CRM_Utils_Array::value('is_active', $defaults);
+      $defaults['pcp_active'] = $defaults['is_active'] ?? NULL;
       // Assign contribution page ID to pageId for referencing in PCP.hlp - since $id is overwritten there. dgg
       $this->assign('pageId', $this->_id);
     }

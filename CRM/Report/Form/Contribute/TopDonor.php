@@ -204,8 +204,8 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   public static function formRule($fields, $files, $self) {
     $errors = [];
 
-    $op = CRM_Utils_Array::value('total_range_op', $fields);
-    $val = CRM_Utils_Array::value('total_range_value', $fields);
+    $op = $fields['total_range_op'] ?? NULL;
+    $val = $fields['total_range_value'] ?? NULL;
 
     if (!in_array($op, [
       'eq',
@@ -244,16 +244,16 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             if ($relative || $from || $to) {
               $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
             }
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
@@ -266,7 +266,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
           if (!empty($clause)) {
             if ($fieldName == 'total_range') {
-              $value = CRM_Utils_Array::value("total_range_value", $this->_params);
+              $value = $this->_params["total_range_value"] ?? NULL;
               $this->_outerCluase = " WHERE (( @rows := @rows + 1) <= {$value}) ";
               $this->_groupLimit = " LIMIT {$value}";
             }

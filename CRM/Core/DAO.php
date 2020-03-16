@@ -202,8 +202,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $params
    */
   protected function assignTestFK($fieldName, $fieldDef, $params) {
-    $required = CRM_Utils_Array::value('required', $fieldDef);
-    $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
+    $required = $fieldDef['required'] ?? NULL;
+    $FKClassName = $fieldDef['FKClassName'] ?? NULL;
     $dbName = $fieldDef['name'];
     $daoName = str_replace('_BAO_', '_DAO_', get_class($this));
 
@@ -343,7 +343,7 @@ class CRM_Core_DAO extends DB_DataObject {
           }
           else {
             $this->$dbName = $dbName . '_' . $counter;
-            $maxlength = CRM_Utils_Array::value('maxlength', $fieldDef);
+            $maxlength = $fieldDef['maxlength'] ?? NULL;
             if ($maxlength > 0 && strlen($this->$dbName) > $maxlength) {
               $this->$dbName = substr($this->$dbName, 0, $fieldDef['maxlength']);
             }
@@ -672,7 +672,7 @@ class CRM_Core_DAO extends DB_DataObject {
           $allNull = FALSE;
         }
         else {
-          $maxLength = CRM_Utils_Array::value('maxlength', $field);
+          $maxLength = $field['maxlength'] ?? NULL;
           if (!is_array($value) && $maxLength && mb_strlen($value) > $maxLength && empty($field['pseudoconstant'])) {
             Civi::log()->warning(ts('A string for field $dbName has been truncated. The original string was %1', [CRM_Utils_Type::escape($value, 'String')]));
             // The string is too long - what to do what to do? Well losing data is generally bad so lets' truncate
@@ -721,8 +721,8 @@ class CRM_Core_DAO extends DB_DataObject {
   public static function makeAttribute($field) {
     if ($field) {
       if (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_STRING) {
-        $maxLength = CRM_Utils_Array::value('maxlength', $field);
-        $size = CRM_Utils_Array::value('size', $field);
+        $maxLength = $field['maxlength'] ?? NULL;
+        $size = $field['size'] ?? NULL;
         if ($maxLength || $size) {
           $attributes = [];
           if ($maxLength) {
@@ -735,11 +735,11 @@ class CRM_Core_DAO extends DB_DataObject {
         }
       }
       elseif (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_TEXT) {
-        $rows = CRM_Utils_Array::value('rows', $field);
+        $rows = $field['rows'] ?? NULL;
         if (!isset($rows)) {
           $rows = 2;
         }
-        $cols = CRM_Utils_Array::value('cols', $field);
+        $cols = $field['cols'] ?? NULL;
         if (!isset($cols)) {
           $cols = 80;
         }
@@ -775,7 +775,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $object = new $class();
     $fields = $object->fields();
     if ($fieldName != NULL) {
-      $field = CRM_Utils_Array::value($fieldName, $fields);
+      $field = $fields[$fieldName] ?? NULL;
       return self::makeAttribute($field);
     }
     else {
@@ -1993,8 +1993,8 @@ SELECT contact_id
       $fields = $object->fields();
       foreach ($fields as $fieldName => $fieldDef) {
         $dbName = $fieldDef['name'];
-        $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
-        $required = CRM_Utils_Array::value('required', $fieldDef);
+        $FKClassName = $fieldDef['FKClassName'] ?? NULL;
+        $required = $fieldDef['required'] ?? NULL;
 
         if (CRM_Utils_Array::value($dbName, $params) !== NULL && !is_array($params[$dbName])) {
           $object->$dbName = $params[$dbName];
@@ -2046,7 +2046,7 @@ SELECT contact_id
     $config->backtrace = TRUE;
 
     $object = new $daoName();
-    $object->id = CRM_Utils_Array::value('id', $params);
+    $object->id = $params['id'] ?? NULL;
 
     // array(array(0 => $daoName, 1 => $daoParams))
     $deletions = [];
@@ -2057,8 +2057,8 @@ SELECT contact_id
 
         $dbName = $value['name'];
 
-        $FKClassName = CRM_Utils_Array::value('FKClassName', $value);
-        $required = CRM_Utils_Array::value('required', $value);
+        $FKClassName = $value['FKClassName'] ?? NULL;
+        $required = $value['required'] ?? NULL;
         if ($FKClassName != NULL
           && $object->$dbName
           && !in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)
@@ -2526,7 +2526,7 @@ SELECT contact_id
       throw new Exception('Cannot call getOptionLabels on CRM_Core_DAO');
     }
     foreach ($fields as $field) {
-      $name = CRM_Utils_Array::value('name', $field);
+      $name = $field['name'] ?? NULL;
       if ($name && isset($this->$name)) {
         $label = CRM_Core_PseudoConstant::getLabel(get_class($this), $name, $this->$name);
         if ($label !== FALSE) {
@@ -2573,7 +2573,7 @@ SELECT contact_id
     // Support "unique names" as well as sql names
     $fieldKey = $fieldName;
     if (empty($fields[$fieldKey])) {
-      $fieldKey = CRM_Utils_Array::value($fieldName, $fieldKeys);
+      $fieldKey = $fieldKeys[$fieldName] ?? NULL;
     }
     // If neither worked then this field doesn't exist. Return false.
     if (empty($fields[$fieldKey])) {

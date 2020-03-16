@@ -50,7 +50,7 @@ WHERE   id = %1";
     // fix the display of the monetary value, CRM-4038
     $details['total_amount'] = CRM_Utils_Money::format($details['total_amount'], NULL, '%a');
     $options = CRM_Core_SelectValues::memberAutoRenew();
-    $details['auto_renew'] = CRM_Utils_Array::value('auto_renew', $options[$details]);
+    $details['auto_renew'] = $options[$details]['auto_renew'] ?? NULL;
     CRM_Utils_JSON::output($details);
   }
 

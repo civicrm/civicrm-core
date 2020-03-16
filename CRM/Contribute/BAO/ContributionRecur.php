@@ -66,7 +66,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
 
     $recurring = new CRM_Contribute_BAO_ContributionRecur();
     $recurring->copyValues($params);
-    $recurring->id = CRM_Utils_Array::value('id', $params);
+    $recurring->id = $params['id'] ?? NULL;
 
     // set currency for CRM-1496
     if (empty($params['id']) && !isset($recurring->currency)) {
@@ -103,9 +103,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   true if duplicate, false otherwise
    */
   public static function checkDuplicate($params, &$duplicates) {
-    $id = CRM_Utils_Array::value('id', $params);
-    $trxn_id = CRM_Utils_Array::value('trxn_id', $params);
-    $invoice_id = CRM_Utils_Array::value('invoice_id', $params);
+    $id = $params['id'] ?? NULL;
+    $trxn_id = $params['trxn_id'] ?? NULL;
+    $invoice_id = $params['invoice_id'] ?? NULL;
 
     $clause = [];
     $params = [];
@@ -264,19 +264,19 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $recur->start_date = CRM_Utils_Date::isoToMysql($recur->start_date);
       $recur->create_date = CRM_Utils_Date::isoToMysql($recur->create_date);
       $recur->modified_date = CRM_Utils_Date::isoToMysql($recur->modified_date);
-      $recur->cancel_reason = CRM_Utils_Array::value('cancel_reason', $params);
+      $recur->cancel_reason = $params['cancel_reason'] ?? NULL;
       $recur->cancel_date = date('YmdHis');
       $recur->save();
 
       // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
       $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);
       if ($dao && $dao->recur_id) {
-        $details = CRM_Utils_Array::value('details', $activityParams);
+        $details = $activityParams['details'] ?? NULL;
         if ($dao->auto_renew && $dao->membership_id) {
           // its auto-renewal membership mode
           $membershipTypes = CRM_Member_PseudoConstant::membershipType();
           $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
-          $membershipType = CRM_Utils_Array::value($membershipType, $membershipTypes);
+          $membershipType = $membershipTypes[$membershipType] ?? NULL;
           $details .= '
 <br/>' . ts('Automatic renewal of %1 membership cancelled.', [1 => $membershipType]);
         }

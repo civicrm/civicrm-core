@@ -461,7 +461,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     CRM_Utils_Hook::tokens($hookTokens);
     $categories = array_keys($hookTokens);
 
-    $contactID = CRM_Utils_Array::value('contactId', $params);
+    $contactID = $params['contactId'] ?? NULL;
 
     if ($contactID) {
       $contactParams = ['contact_id' => $contactID];

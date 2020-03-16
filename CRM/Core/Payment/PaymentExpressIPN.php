@@ -62,7 +62,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @return mixed
    */
   public static function retrieve($name, $type, $object, $abort = TRUE) {
-    $value = CRM_Utils_Array::value($name, $object);
+    $value = $object[$name] ?? NULL;
     if ($abort && $value === NULL) {
       CRM_Core_Error::debug_log_message("Could not find an entry for $name");
       echo "Failure: Missing Parameter - " . $name . "<p>";

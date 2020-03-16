@@ -97,8 +97,8 @@ class CRM_Queue_Runner {
     $this->queue = $runnerSpec['queue'];
     $this->errorMode = CRM_Utils_Array::value('errorMode', $runnerSpec, self::ERROR_ABORT);
     $this->isMinimal = CRM_Utils_Array::value('isMinimal', $runnerSpec, FALSE);
-    $this->onEnd = CRM_Utils_Array::value('onEnd', $runnerSpec, NULL);
-    $this->onEndUrl = CRM_Utils_Array::value('onEndUrl', $runnerSpec, NULL);
+    $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
+    $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
     $this->pathPrefix = CRM_Utils_Array::value('pathPrefix', $runnerSpec, 'civicrm/queue');
     $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, ['retry' => TRUE, 'skip' => TRUE]);
     // perhaps this value should be randomized?

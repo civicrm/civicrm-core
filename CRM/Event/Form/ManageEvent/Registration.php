@@ -102,7 +102,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
       // Set event registration as the default profile if none selected
       if (!$defaults['custom_pre_id'] && count($defaults['custom_post']) == 0) {
-        $defaults['custom_pre_id'] = CRM_Utils_Array::value('id', $eventRegistrationIdDefaults);
+        $defaults['custom_pre_id'] = $eventRegistrationIdDefaults['id'] ?? NULL;
       }
       if (isset($defaults['custom_post']) && is_numeric($defaults['custom_post'])) {
         $defaults['custom_post_id'] = $defaults['custom_post'];
@@ -499,7 +499,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
 
         //check for additional custom pre profile
-        $additionalCustomPreId = CRM_Utils_Array::value('additional_custom_pre_id', $values);
+        $additionalCustomPreId = $values['additional_custom_pre_id'] ?? NULL;
         if (!empty($additionalCustomPreId)) {
           if (!($additionalCustomPreId == 'none')) {
             $customPreId = $additionalCustomPreId;
@@ -527,7 +527,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
         // We don't have required Individual fields in the pre-custom profile, so now check the post-custom profile
         if ($isPreError) {
-          $additionalCustomPostId = CRM_Utils_Array::value('additional_custom_post_id', $values);
+          $additionalCustomPostId = $values['additional_custom_post_id'] ?? NULL;
           if (!empty($additionalCustomPostId)) {
             if (!($additionalCustomPostId == 'none')) {
               $customPostId = $additionalCustomPostId;

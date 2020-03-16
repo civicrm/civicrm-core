@@ -111,8 +111,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
     // display taxTerm for priceFields
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
@@ -126,7 +126,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         $params = ['price_field_id' => $priceFieldBAO->id];
 
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
-        $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
+        $priceField[$priceFieldBAO->id]['price'] = $optionValues['amount'] ?? NULL;
         $financialTypeId = $optionValues['financial_type_id'];
         if ($invoicing && isset($taxRate[$financialTypeId])) {
           $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];

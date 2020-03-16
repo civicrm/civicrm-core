@@ -673,7 +673,7 @@ FROM civicrm_action_schedule cas
     //to get primary mobile ph,if not get a first mobile phONE
     if (!empty($toPhoneNumbers)) {
       $toPhoneNumberDetails = reset($toPhoneNumbers);
-      $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
+      $toPhoneNumber = $toPhoneNumberDetails['phone'] ?? NULL;
       return $toPhoneNumber;
     }
     return NULL;

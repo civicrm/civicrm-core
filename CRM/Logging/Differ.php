@@ -231,7 +231,7 @@ WHERE lt.log_conn_id = %1
             if (!empty(${$var[$diff]})) {
               $holder =& $$var;
               $val = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $holder[$diff]);
-              $holder[$diff] = CRM_Utils_Array::value(1, $val);
+              $holder[$diff] = $val[1] ?? NULL;
             }
           }
         }
@@ -306,7 +306,7 @@ WHERE lt.log_conn_id = %1
 
         $dao = new $tableDAO();
         foreach ($dao->fields() as $field) {
-          $titles[$table][$field['name']] = CRM_Utils_Array::value('title', $field);
+          $titles[$table][$field['name']] = $field['title'] ?? NULL;
 
           if ($field['type'] == CRM_Utils_Type::T_BOOLEAN) {
             $values[$table][$field['name']] = ['0' => ts('false'), '1' => ts('true')];

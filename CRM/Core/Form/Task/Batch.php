@@ -134,7 +134,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
       $typeId = CRM_Core_DAO::getFieldValue('CRM_' . ucfirst($this::$entityShortname) . '_DAO_' . ucfirst($this::$entityShortname), $entityId, $this::$entityShortname . '_type_id');
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
-          $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
+          $customValue = $customFields[$customFieldID] ?? NULL;
           $entityColumnValue = [];
           if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,

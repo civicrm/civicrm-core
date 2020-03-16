@@ -81,8 +81,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @throws Exception
    */
   public function process($xml, &$params) {
-    $standardTimeline = CRM_Utils_Array::value('standardTimeline', $params);
-    $activitySetName = CRM_Utils_Array::value('activitySetName', $params);
+    $standardTimeline = $params['standardTimeline'] ?? NULL;
+    $activitySetName = $params['activitySetName'] ?? NULL;
 
     if ('Open Case' == CRM_Utils_Array::value('activityTypeName', $params)) {
       // create relationships for the ones that are required
@@ -269,7 +269,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       foreach ($activityTypeXML as $recordXML) {
         $activityTypeName = (string ) $recordXML->name;
         $maxInstances = (string ) $recordXML->max_instances;
-        $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $activityTypes);
+        $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;
 
         if ($activityTypeInfo['id']) {
           if ($maskAction) {
@@ -415,7 +415,7 @@ AND        a.is_deleted = 0
   public function createActivity($activityTypeXML, &$params) {
     $activityTypeName = (string) $activityTypeXML->name;
     $activityTypes = &$this->allActivityTypes(TRUE, TRUE);
-    $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $activityTypes);
+    $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;
 
     if (!$activityTypeInfo) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
@@ -503,7 +503,7 @@ AND        a.is_deleted = 0
           $activityDate = $params['activity_date_time'];
         }
         else {
-          $referenceActivityInfo = CRM_Utils_Array::value($referenceActivityName, $activityTypes);
+          $referenceActivityInfo = $activityTypes[$referenceActivityName] ?? NULL;
           if ($referenceActivityInfo['id']) {
             $caseActivityParams = ['activity_type_id' => $referenceActivityInfo['id']];
 
@@ -516,7 +516,7 @@ AND        a.is_deleted = 0
 
             if (is_array($referenceActivity)) {
               foreach ($referenceActivity as $aId => $details) {
-                $activityDate = CRM_Utils_Array::value('activity_date', $details);
+                $activityDate = $details['activity_date'] ?? NULL;
                 break;
               }
             }

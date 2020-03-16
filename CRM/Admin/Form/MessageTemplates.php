@@ -94,7 +94,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       ]);
     }
     else {
-      $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $this->_values);
+      $this->_workflow_id = $this->_values['workflow_id'] ?? NULL;
       $this->checkUserPermission($this->_workflow_id);
       $this->assign('workflow_id', $this->_workflow_id);
 
@@ -289,7 +289,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
         }
       }
 
-      $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $this->_values);
+      $this->_workflow_id = $this->_values['workflow_id'] ?? NULL;
       if ($this->_workflow_id) {
         $params['workflow_id'] = $this->_workflow_id;
         $params['is_active'] = TRUE;

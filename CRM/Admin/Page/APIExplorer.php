@@ -131,9 +131,9 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
   public static function getDoc() {
     // Verify the API handler we're talking to is valid.
     $entities = civicrm_api3('Entity', 'get');
-    $entity = CRM_Utils_Array::value('entity', $_GET);
+    $entity = $_GET['entity'] ?? NULL;
     if (!empty($entity) && in_array($entity, $entities['values']) && strpos($entity, '.') === FALSE) {
-      $action = CRM_Utils_Array::value('action', $_GET);
+      $action = $_GET['action'] ?? NULL;
       $doc = self::getDocblock($entity, $action);
       $result = [
         'doc' => $doc ? self::formatDocBlock($doc[0]) : 'Not found.',

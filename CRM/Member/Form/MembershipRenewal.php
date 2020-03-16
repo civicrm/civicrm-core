@@ -214,7 +214,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
     $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
 
-    $renewalDate = CRM_Utils_Array::value('renewal_date', $defaults);
+    $renewalDate = $defaults['renewal_date'] ?? NULL;
     $this->assign('renewalDate', $renewalDate);
     $this->assign('member_is_test', CRM_Utils_Array::value('member_is_test', $defaults));
 
@@ -259,7 +259,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           continue;
         }
         else {
-          $memberOfContactId = CRM_Utils_Array::value('member_of_contact_id', $values);
+          $memberOfContactId = $values['member_of_contact_id'] ?? NULL;
           if (empty($selMemTypeOrg[$memberOfContactId])) {
             $selMemTypeOrg[$memberOfContactId] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
               $memberOfContactId,
@@ -270,13 +270,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
             $selOrgMemType[$memberOfContactId][0] = ts('- select -');
           }
           if (empty($selOrgMemType[$memberOfContactId][$key])) {
-            $selOrgMemType[$memberOfContactId][$key] = CRM_Utils_Array::value('name', $values);
+            $selOrgMemType[$memberOfContactId][$key] = $values['name'] ?? NULL;
           }
         }
 
         //CRM-16950
         $taxAmount = NULL;
-        $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
+        $totalAmount = $values['minimum_fee'] ?? NULL;
         // @todo - feels a bug - we use taxRate from the form default rather than from the specified type?!?
         if ($this->getTaxRateForFinancialType($values['financial_type_id'])) {
           $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);

@@ -950,12 +950,12 @@ class CRM_Utils_Date {
    */
   public static function intervalAdd($unit, $interval, $date, $dontCareTime = FALSE) {
     if (is_array($date)) {
-      $hour = CRM_Utils_Array::value('H', $date);
-      $minute = CRM_Utils_Array::value('i', $date);
-      $second = CRM_Utils_Array::value('s', $date);
-      $month = CRM_Utils_Array::value('M', $date);
-      $day = CRM_Utils_Array::value('d', $date);
-      $year = CRM_Utils_Array::value('Y', $date);
+      $hour = $date['H'] ?? NULL;
+      $minute = $date['i'] ?? NULL;
+      $second = $date['s'] ?? NULL;
+      $month = $date['M'] ?? NULL;
+      $day = $date['d'] ?? NULL;
+      $year = $date['Y'] ?? NULL;
     }
     else {
       extract(date_parse($date));

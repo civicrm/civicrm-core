@@ -463,7 +463,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           continue;
         }
 
-        $value['contact_id'] = CRM_Utils_Array::value($key, $params['primary_contact_id']);
+        $value['contact_id'] = $params['primary_contact_id'][$key] ?? NULL;
 
         // update contact information
         $this->updateContactInfo($value);
@@ -647,7 +647,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           continue;
         }
 
-        $value['contact_id'] = CRM_Utils_Array::value($key, $params['primary_contact_id']);
+        $value['contact_id'] = $params['primary_contact_id'][$key] ?? NULL;
 
         // update contact information
         $this->updateContactInfo($value);
@@ -779,12 +779,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           // The following parameter setting may be obsolete.
           $this->_params = $params;
           $value['is_renew'] = TRUE;
-          $isPayLater = CRM_Utils_Array::value('is_pay_later', $params);
+          $isPayLater = $params['is_pay_later'] ?? NULL;
           $campaignId = NULL;
           if (isset($this->_values) && is_array($this->_values) && !empty($this->_values)) {
-            $campaignId = CRM_Utils_Array::value('campaign_id', $this->_params);
+            $campaignId = $this->_params['campaign_id'] ?? NULL;
             if (!array_key_exists('campaign_id', $this->_params)) {
-              $campaignId = CRM_Utils_Array::value('campaign_id', $this->_values);
+              $campaignId = $this->_values['campaign_id'] ?? NULL;
             }
           }
 
@@ -792,7 +792,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'end_date' => $value['membership_end_date'] ?? NULL,
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
-          $membershipSource = CRM_Utils_Array::value('source', $value);
+          $membershipSource = $value['source'] ?? NULL;
           list($membership) = CRM_Member_BAO_Membership::processMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
             //$numTerms should be default to 1.
@@ -822,7 +822,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           ];
           foreach ($dateTypes as $dateField => $dateVariable) {
             $$dateVariable = CRM_Utils_Date::processDate($value[$dateField]);
-            $fDate[$dateField] = CRM_Utils_Array::value($dateField, $value);
+            $fDate[$dateField] = $value[$dateField] ?? NULL;
           }
 
           $calcDates = [];
@@ -833,9 +833,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           foreach ($calcDates as $memType => $calcDate) {
             foreach ($dates as $d) {
               //first give priority to form values then calDates.
-              $date = CRM_Utils_Array::value($d, $value);
+              $date = $value[$d] ?? NULL;
               if (!$date) {
-                $date = CRM_Utils_Array::value($d, $calcDate);
+                $date = $calcDate[$d] ?? NULL;
               }
 
               $value[$d] = CRM_Utils_Date::processDate($date);

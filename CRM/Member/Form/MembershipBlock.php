@@ -337,7 +337,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       if (is_array($params['membership_type'])) {
         foreach ($params['membership_type'] as $k => $v) {
           if ($v) {
-            $membershipTypes[$k] = CRM_Utils_Array::value("auto_renew_$k", $params);
+            $membershipTypes[$k] = $params["auto_renew_$k"] ?? NULL;
           }
         }
       }
@@ -347,7 +347,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       }
 
       // check for price set.
-      $priceSetID = CRM_Utils_Array::value('member_price_set_id', $params);
+      $priceSetID = $params['member_price_set_id'] ?? NULL;
       if (!empty($params['member_is_active']) && is_array($membershipTypes) && !$priceSetID) {
         $usedPriceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, 2);
         if (empty($params['mem_price_field_id']) && !$usedPriceSetId) {
@@ -365,21 +365,21 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           }
           $setParams['is_quick_config'] = 1;
           $setParams['extends'] = CRM_Core_Component::getComponentID('CiviMember');
-          $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
+          $setParams['financial_type_id'] = $this->_values['financial_type_id'] ?? NULL;
           $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
           $priceSetID = $priceSet->id;
           $fieldParams['price_set_id'] = $priceSet->id;
         }
         elseif ($usedPriceSetId) {
           $setParams['extends'] = CRM_Core_Component::getComponentID('CiviMember');
-          $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
+          $setParams['financial_type_id'] = $this->_values['financial_type_id'] ?? NULL;
           $setParams['id'] = $usedPriceSetId;
           $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
           $priceSetID = $priceSet->id;
           $fieldParams['price_set_id'] = $priceSet->id;
         }
         else {
-          $fieldParams['id'] = CRM_Utils_Array::value('mem_price_field_id', $params);
+          $fieldParams['id'] = $params['mem_price_field_id'] ?? NULL;
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('mem_price_field_id', $params), 'price_set_id');
         }
         $editedFieldParams = [
@@ -396,7 +396,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           $fieldParams['weight'] = 1;
         }
         else {
-          $fieldParams['id'] = CRM_Utils_Array::value('id', $editedResults);
+          $fieldParams['id'] = $editedResults['id'] ?? NULL;
         }
 
         $fieldParams['label'] = !empty($params['membership_type_label']) ? $params['membership_type_label'] : ts('Membership');
@@ -416,12 +416,12 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             unset($options[$priceFieldID]);
           }
           $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
-          $fieldParams['option_label'][$rowCount] = CRM_Utils_Array::value('name', $membetype);
+          $fieldParams['option_label'][$rowCount] = $membetype['name'] ?? NULL;
           $fieldParams['option_amount'][$rowCount] = CRM_Utils_Array::value('minimum_fee', $membetype, 0);
-          $fieldParams['option_weight'][$rowCount] = CRM_Utils_Array::value('weight', $membetype);
-          $fieldParams['option_description'][$rowCount] = CRM_Utils_Array::value('description', $membetype);
-          $fieldParams['default_option'] = CRM_Utils_Array::value('membership_type_default', $params);
-          $fieldParams['option_financial_type_id'][$rowCount] = CRM_Utils_Array::value('financial_type_id', $membetype);
+          $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
+          $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;
+          $fieldParams['default_option'] = $params['membership_type_default'] ?? NULL;
+          $fieldParams['option_financial_type_id'][$rowCount] = $membetype['financial_type_id'] ?? NULL;
 
           $fieldParams['membership_type_id'][$rowCount] = $memType;
           // [$rowCount] = $membetype[''];

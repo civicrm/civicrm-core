@@ -268,9 +268,9 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($subTypes);
 
     foreach ($customGroup as $key => $values) {
-      $subValue = CRM_Utils_Array::value('extends_entity_column_value', $customGroup[$key]);
-      $subName = CRM_Utils_Array::value('extends_entity_column_id', $customGroup[$key]);
-      $type = CRM_Utils_Array::value('extends', $customGroup[$key]);
+      $subValue = $customGroup[$key]['extends_entity_column_value'] ?? NULL;
+      $subName = $customGroup[$key]['extends_entity_column_id'] ?? NULL;
+      $type = $customGroup[$key]['extends'] ?? NULL;
       if ($subValue) {
         $subValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           substr($subValue, 1, -1)

@@ -52,7 +52,7 @@ function run() {
       }
     }
     if (!$$var) {
-      $$var = CRM_Utils_Array::value($var, $_REQUEST);
+      $$var = $_REQUEST[$var] ?? NULL;
     }
     $_REQUEST[$var] = $$var;
   }

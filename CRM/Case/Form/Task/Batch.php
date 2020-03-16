@@ -60,7 +60,7 @@ class CRM_Case_Form_Task_Batch extends CRM_Core_Form_Task_Batch {
 
       // Get the case status
       $daoClass = 'CRM_Case_DAO_Case';
-      $caseStatus = CRM_Utils_Array::value('case_status', $value);
+      $caseStatus = $value['case_status'] ?? NULL;
       if (!$caseStatus) {
         // default to existing status ID
         $caseStatus = CRM_Core_DAO::getFieldValue($daoClass, $key, 'status_id');

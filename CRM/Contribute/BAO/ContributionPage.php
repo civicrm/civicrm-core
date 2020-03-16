@@ -314,7 +314,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
           if (in_array('Individual', $preProfileTypes) || in_array('Contact', $preProfileTypes)) {
             //Take Individual contact ID
-            $userID = CRM_Utils_Array::value('related_contact', $values);
+            $userID = $values['related_contact'] ?? NULL;
           }
         }
         list($values['customPre_grouptitle'], $values['customPre']) = self::getProfileNameAndFields($preID, $userID, $params['custom_pre_id']);
@@ -325,7 +325,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           $postProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($postID);
           if (in_array('Individual', $postProfileTypes) || in_array('Contact', $postProfileTypes)) {
             //Take Individual contact ID
-            $userID = CRM_Utils_Array::value('related_contact', $values);
+            $userID = $values['related_contact'] ?? NULL;
           }
         }
         list($values['customPost_grouptitle'], $values['customPost']) = self::getProfileNameAndFields($postID, $userID, $params['custom_post_id']);
@@ -391,7 +391,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
 
       // CRM-6976
-      $originalCCReceipt = CRM_Utils_Array::value('cc_receipt', $values);
+      $originalCCReceipt = $values['cc_receipt'] ?? NULL;
 
       // cc to related contacts of contributor OR the one who
       // signs up. Is used for cases like - on behalf of
@@ -442,13 +442,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $sendTemplateParams['from'] = CRM_Utils_Array::value('receipt_from_name', $values) . ' <' . $values['receipt_from_email'] . '>';
         $sendTemplateParams['toName'] = $displayName;
         $sendTemplateParams['toEmail'] = $email;
-        $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
-        $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $values);
+        $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
+        $sendTemplateParams['bcc'] = $values['bcc_receipt'] ?? NULL;
         //send email with pdf invoice
         $template = CRM_Core_Smarty::singleton();
         $taxAmt = $template->get_template_vars('dataArray');
         $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-        $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+        $invoicing = $prefixValue['invoicing'] ?? NULL;
         if (isset($invoicing) && isset($prefixValue['is_email_pdf'])) {
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
@@ -461,8 +461,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $sendTemplateParams['groupName'] = 'msg_tpl_workflow_contribution';
         $sendTemplateParams['valueName'] = 'contribution_dupalert';
         $sendTemplateParams['from'] = ts('Automatically Generated') . " <{$values['receipt_from_email']}>";
-        $sendTemplateParams['toName'] = CRM_Utils_Array::value('receipt_from_name', $values);
-        $sendTemplateParams['toEmail'] = CRM_Utils_Array::value('receipt_from_email', $values);
+        $sendTemplateParams['toName'] = $values['receipt_from_name'] ?? NULL;
+        $sendTemplateParams['toEmail'] = $values['receipt_from_email'] ?? NULL;
         $sendTemplateParams['tplParams']['onBehalfID'] = $contactID;
         $sendTemplateParams['tplParams']['receiptMessage'] = $message;
 
@@ -539,7 +539,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'cc_receipt',
         'bcc_receipt',
       ]);
-      $isEmailReceipt = CRM_Utils_Array::value('is_email_receipt', $value[$pageID]);
+      $isEmailReceipt = $value[$pageID]['is_email_receipt'] ?? NULL;
     }
     elseif ($recur->id) {
       // This means we are coming from back-office - ie. no page ID, but recurring.
@@ -585,8 +585,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       ];
       //CRM-13811
       if ($pageID) {
-        $templatesParams['cc'] = CRM_Utils_Array::value('cc_receipt', $value[$pageID]);
-        $templatesParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $value[$pageID]);
+        $templatesParams['cc'] = $value[$pageID]['cc_receipt'] ?? NULL;
+        $templatesParams['bcc'] = $value[$pageID]['bcc_receipt'] ?? NULL;
       }
       if ($recur->id) {
         // in some cases its just recurringNotify() thats called for the first time and these urls don't get set.

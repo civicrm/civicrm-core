@@ -1006,7 +1006,7 @@ class CRM_Export_BAO_ExportProcessor {
           $fieldValue = $phoneTypes[$fieldValue];
         }
         elseif ($field == 'provider_id' || $field == 'im_provider') {
-          $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
+          $fieldValue = $imProviders[$fieldValue] ?? NULL;
         }
         elseif (strstr($field, 'master_id')) {
           // @todo - why not just $field === 'master_id'  - what else would it be?
@@ -1031,7 +1031,7 @@ class CRM_Export_BAO_ExportProcessor {
       if (!$this->isExportSpecifiedPaymentFields()) {
         $nullContributionDetails = array_fill_keys(array_keys($this->getPaymentHeaders()), NULL);
         if ($this->isExportPaymentFields()) {
-          $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+          $paymentData = $paymentDetails[$row[$paymentTableId]] ?? NULL;
           if (!is_array($paymentData) || empty($paymentData)) {
             $paymentData = $nullContributionDetails;
           }
@@ -1170,7 +1170,7 @@ class CRM_Export_BAO_ExportProcessor {
     }
     elseif ($this->isExportSpecifiedPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
       $paymentTableId = $this->getPaymentTableID();
-      $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
+      $paymentData = $paymentDetails[$iterationDAO->$paymentTableId] ?? NULL;
       $payFieldMapper = [
         'componentPaymentField_total_amount' => 'total_amount',
         'componentPaymentField_contribution_status' => 'contribution_status',
@@ -1357,7 +1357,7 @@ class CRM_Export_BAO_ExportProcessor {
   public function setRelationshipReturnProperties($value, $relationshipKey) {
     $relationField = $value['name'];
     $relIMProviderId = NULL;
-    $relLocTypeId = CRM_Utils_Array::value('location_type_id', $value);
+    $relLocTypeId = $value['location_type_id'] ?? NULL;
     $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $relLocTypeId);
     $relPhoneTypeId = CRM_Utils_Array::value('phone_type_id', $value, ($locationName ? 'Primary' : NULL));
     $relIMProviderId = CRM_Utils_Array::value('im_provider_id', $value, ($locationName ? 'Primary' : NULL));
@@ -2104,7 +2104,7 @@ WHERE  id IN ( $deleteIDString )
     if (!empty($greetingOptions)) {
       // Greeting options is keyed by 'postal_greeting' or 'addressee'.
       foreach ($greetingOptions as $key => $value) {
-        $option = CRM_Utils_Array::value($key, $formValues);
+        $option = $formValues[$key] ?? NULL;
         if ($option) {
           if ($greetingOptions[$key][$option] == ts('Other')) {
             $formValues[$key] = $formValues["{$key}_other"];
@@ -2185,7 +2185,7 @@ WHERE  id IN ( $deleteIDString )
           $fieldValue = $phoneTypes[$relationValue];
         }
         elseif ($relationField == 'provider_id') {
-          $fieldValue = CRM_Utils_Array::value($relationValue, $imProviders);
+          $fieldValue = $imProviders[$relationValue] ?? NULL;
         }
         // CRM-13995
         elseif (is_object($relDAO) && in_array($relationField, [

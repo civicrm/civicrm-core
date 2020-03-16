@@ -387,7 +387,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $entityValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_value', $defaults));
       $entityStatus = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_status', $defaults));
       if (empty($this->getContext())) {
-        $defaults['entity'][0] = CRM_Utils_Array::value('mapping_id', $defaults);
+        $defaults['entity'][0] = $defaults['mapping_id'] ?? NULL;
         $defaults['entity'][1] = $entityValue;
         $defaults['entity'][2] = $entityStatus;
       }
@@ -400,11 +400,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           $recipientListing
         );
       }
-      $defaults['text_message'] = CRM_Utils_Array::value('body_text', $defaults);
-      $defaults['html_message'] = CRM_Utils_Array::value('body_html', $defaults);
-      $defaults['sms_text_message'] = CRM_Utils_Array::value('sms_body_text', $defaults);
-      $defaults['template'] = CRM_Utils_Array::value('msg_template_id', $defaults);
-      $defaults['SMStemplate'] = CRM_Utils_Array::value('sms_template_id', $defaults);
+      $defaults['text_message'] = $defaults['body_text'] ?? NULL;
+      $defaults['html_message'] = $defaults['body_html'] ?? NULL;
+      $defaults['sms_text_message'] = $defaults['sms_body_text'] ?? NULL;
+      $defaults['template'] = $defaults['msg_template_id'] ?? NULL;
+      $defaults['SMStemplate'] = $defaults['sms_template_id'] ?? NULL;
       if (!empty($defaults['group_id'])) {
         $defaults['recipient'] = 'group';
       }
@@ -489,7 +489,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'from_email',
     ];
     foreach ($keys as $key) {
-      $params[$key] = CRM_Utils_Array::value($key, $values);
+      $params[$key] = $values[$key] ?? NULL;
     }
 
     $params['is_repeat'] = CRM_Utils_Array::value('is_repeat', $values, 0);
@@ -515,15 +515,15 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $params[$mkey] = 'null';
         continue;
       }
-      $params[$mkey] = CRM_Utils_Array::value($mkey, $values);
+      $params[$mkey] = $values[$mkey] ?? NULL;
     }
 
-    $params['body_text'] = CRM_Utils_Array::value('text_message', $values);
-    $params['sms_body_text'] = CRM_Utils_Array::value('sms_text_message', $values);
-    $params['body_html'] = CRM_Utils_Array::value('html_message', $values);
+    $params['body_text'] = $values['text_message'] ?? NULL;
+    $params['sms_body_text'] = $values['sms_text_message'] ?? NULL;
+    $params['body_html'] = $values['html_message'] ?? NULL;
 
     if (CRM_Utils_Array::value('recipient', $values) == 'manual') {
-      $params['recipient_manual'] = CRM_Utils_Array::value('recipient_manual_id', $values);
+      $params['recipient_manual'] = $values['recipient_manual_id'] ?? NULL;
       $params['group_id'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
     elseif (CRM_Utils_Array::value('recipient', $values) == 'group') {
@@ -531,14 +531,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
     elseif (isset($values['recipient_listing']) && isset($values['limit_to']) && !CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
-      $params['recipient'] = CRM_Utils_Array::value('recipient', $values);
+      $params['recipient'] = $values['recipient'] ?? NULL;
       $params['recipient_listing'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('recipient_listing', $values)
       );
       $params['group_id'] = $params['recipient_manual'] = 'null';
     }
     else {
-      $params['recipient'] = CRM_Utils_Array::value('recipient', $values);
+      $params['recipient'] = $values['recipient'] ?? NULL;
       $params['group_id'] = $params['recipient_manual'] = $params['recipient_listing'] = 'null';
     }
 
@@ -573,7 +573,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     // multilingual options
     $params['filter_contact_language'] = CRM_Utils_Array::value('filter_contact_language', $values, []);
     $params['filter_contact_language'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['filter_contact_language']);
-    $params['communication_language'] = CRM_Utils_Array::value('communication_language', $values, NULL);
+    $params['communication_language'] = $values['communication_language'] ?? NULL;
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
@@ -657,7 +657,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           $params['sms_template_id'] = $msgTemplate->id;
         }
         else {
-          $params['sms_template_id'] = CRM_Utils_Array::value('SMStemplate', $values);
+          $params['sms_template_id'] = $values['SMStemplate'] ?? NULL;
         }
       }
       else {
@@ -665,7 +665,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           $params['msg_template_id'] = $msgTemplate->id;
         }
         else {
-          $params['msg_template_id'] = CRM_Utils_Array::value('template', $values);
+          $params['msg_template_id'] = $values['template'] ?? NULL;
         }
       }
     }

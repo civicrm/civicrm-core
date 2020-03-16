@@ -133,7 +133,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
 
-    $form->_task = CRM_Utils_Array::value('task', self::$_searchFormValues);
+    $form->_task = self::$_searchFormValues['task'] ?? NULL;
     $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
 
@@ -251,7 +251,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
       && ($form->_action != CRM_Core_Action::COPY)
     ) {
-      $sel = CRM_Utils_Array::value('radio_ts', self::$_searchFormValues);
+      $sel = self::$_searchFormValues['radio_ts'] ?? NULL;
       $form->assign('searchtype', $sel);
       $result = self::getSelectedContactNames();
       $form->assign("value", $result);

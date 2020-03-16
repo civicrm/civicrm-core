@@ -57,7 +57,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
-    $form->_task = CRM_Utils_Array::value('task', $values);
+    $form->_task = $values['task'] ?? NULL;
     $contributeTasks = CRM_Contribute_Task::tasks();
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $contributeTasks));
 

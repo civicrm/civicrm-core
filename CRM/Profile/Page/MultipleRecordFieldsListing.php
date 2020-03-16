@@ -220,7 +220,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           $dateFields[$fieldIDs[$key]] = 1;
           $actualPHPFormats = CRM_Utils_Date::datePluginToPHPFormats();
           $dateFormat = (array) CRM_Utils_Array::value($returnValues['date_format'], $actualPHPFormats);
-          $timeFormat = CRM_Utils_Array::value('time_format', $returnValues);
+          $timeFormat = $returnValues['time_format'] ?? NULL;
         }
 
         $optionValuePairs = CRM_Core_BAO_CustomOption::getCustomOption($fieldIDs[$key]);
@@ -233,12 +233,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $options[$fieldIDs[$key]]['attributes']['html_type'] = $returnValues['html_type'];
         $options[$fieldIDs[$key]]['attributes']['data_type'] = $returnValues['data_type'];
         $options[$fieldIDs[$key]]['attributes']['is_required'] = !empty($returnValues['is_required']);
-        $options[$fieldIDs[$key]]['attributes']['default_value'] = CRM_Utils_Array::value('default_value', $returnValues);
-        $options[$fieldIDs[$key]]['attributes']['is_view'] = CRM_Utils_Array::value('is_view', $returnValues);
+        $options[$fieldIDs[$key]]['attributes']['default_value'] = $returnValues['default_value'] ?? NULL;
+        $options[$fieldIDs[$key]]['attributes']['is_view'] = $returnValues['is_view'] ?? NULL;
 
         $options[$fieldIDs[$key]]['attributes']['format']
-          = $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
-        $options[$fieldIDs[$key]]['attributes']['time_format'] = CRM_Utils_Array::value('time_format', $returnValues);
+          = $options[$fieldIDs[$key]]['attributes']['date_format'] = $returnValues['date_format'] ?? NULL;
+        $options[$fieldIDs[$key]]['attributes']['time_format'] = $returnValues['time_format'] ?? NULL;
       }
       $linkAction = array_sum(array_keys($this->links()));
     }

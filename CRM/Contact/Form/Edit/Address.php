@@ -287,7 +287,7 @@ class CRM_Contact_Form_Edit_Address {
               $streetAddress .= ' ';
             }
             // CRM-17619 - if the street number suffix begins with a number, add a space
-            $numsuffix = CRM_Utils_Array::value($fld, $address);
+            $numsuffix = $address[$fld] ?? NULL;
             if ($fld === 'street_number_suffix' && !empty($numsuffix)) {
               if (ctype_digit(substr($numsuffix, 0, 1))) {
                 $streetAddress .= ' ';
@@ -301,7 +301,7 @@ class CRM_Contact_Form_Edit_Address {
           }
           if (isset($address['street_number'])) {
             // CRM-17619 - if the street number suffix begins with a number, add a space
-            $thesuffix = CRM_Utils_Array::value('street_number_suffix', $address);
+            $thesuffix = $address['street_number_suffix'] ?? NULL;
             if ($thesuffix) {
               if (ctype_digit(substr($thesuffix, 0, 1))) {
                 $address['street_number'] .= " ";
@@ -311,7 +311,7 @@ class CRM_Contact_Form_Edit_Address {
           }
           // build array for set default.
           foreach ($parseFields as $field) {
-            $addressValues["{$field}_{$cnt}"] = CRM_Utils_Array::value($field, $address);
+            $addressValues["{$field}_{$cnt}"] = $address[$field] ?? NULL;
           }
           // don't load fields, use js to populate.
           foreach (['street_number', 'street_name', 'street_unit'] as $f) {

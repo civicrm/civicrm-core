@@ -477,7 +477,7 @@ class CRM_Core_Block {
         $value['url'] = CRM_Utils_System::url($dash['path'], $dash['query'], FALSE);
       }
       $value['title'] = $dash['title'];
-      $value['key'] = CRM_Utils_Array::value('key', $dash);
+      $value['key'] = $dash['key'] ?? NULL;
       $values[] = $value;
     }
     self::setProperty(self::DASHBOARD, 'templateValues', array('dashboardLinks' => $values));

@@ -33,9 +33,9 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
 
     $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree("'Contact', 'Individual', 'Organization', 'Household'", NULL, NULL, -1);
 
-    $this->_group = CRM_Utils_Array::value('group', $this->_formValues);
+    $this->_group = $this->_formValues['group'] ?? NULL;
 
-    $this->_tag = CRM_Utils_Array::value('tag', $this->_formValues);
+    $this->_tag = $this->_formValues['tag'] ?? NULL;
 
     $this->_columns = [
       ts('Contact ID') => 'contact_id',
@@ -43,7 +43,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
       ts('Name') => 'sort_name',
     ];
 
-    $this->_customGroupIDs = CRM_Utils_Array::value('custom_group', $formValues);
+    $this->_customGroupIDs = $formValues['custom_group'] ?? NULL;
 
     if (!empty($this->_customGroupIDs)) {
       $this->addColumns();

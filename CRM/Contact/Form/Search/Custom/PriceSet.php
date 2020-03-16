@@ -229,7 +229,7 @@ AND    p.entity_id    = e.id
       foreach ($priceSet[$dao->price_set_id]['fields'] as $key => $value) {
         if (is_array($value['options'])) {
           foreach ($value['options'] as $oKey => $oValue) {
-            $columnHeader = CRM_Utils_Array::value('label', $value);
+            $columnHeader = $value['label'] ?? NULL;
             if (CRM_Utils_Array::value('html_type', $value) != 'Text') {
               $columnHeader .= ' - ' . $oValue['label'];
             }

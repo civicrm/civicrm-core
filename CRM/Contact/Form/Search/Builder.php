@@ -190,8 +190,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
               $fldName = substr($v[0], 13);
             }
 
-            $fldValue = CRM_Utils_Array::value($fldName, $fields);
-            $fldType = CRM_Utils_Array::value('type', $fldValue);
+            $fldValue = $fields[$fldName] ?? NULL;
+            $fldType = $fldValue['type'] ?? NULL;
             $type = CRM_Utils_Type::typeToString($fldType);
 
             if (strstr($v[1], 'IN')) {
@@ -328,7 +328,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         return;
       }
       // Add another field
-      $addMore = CRM_Utils_Array::value('addMore', $params);
+      $addMore = $params['addMore'] ?? NULL;
       for ($x = 1; $x <= $this->_blockCount; $x++) {
         if (!empty($addMore[$x])) {
           $this->set('newBlock', $x);

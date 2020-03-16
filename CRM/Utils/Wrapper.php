@@ -46,7 +46,7 @@ class CRM_Utils_Wrapper {
    */
   public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
-      $mode = CRM_Utils_Array::value('mode', $arguments);
+      $mode = $arguments['mode'] ?? NULL;
       $imageUpload = !empty($arguments['imageUpload']);
       $addSequence = !empty($arguments['addSequence']);
       $attachUpload = !empty($arguments['attachUpload']);
@@ -71,10 +71,10 @@ class CRM_Utils_Wrapper {
     if (array_key_exists('urlToSession', $arguments)) {
       if (is_array($arguments['urlToSession'])) {
         foreach ($arguments['urlToSession'] as $params) {
-          $urlVar = CRM_Utils_Array::value('urlVar', $params);
-          $sessionVar = CRM_Utils_Array::value('sessionVar', $params);
-          $type = CRM_Utils_Array::value('type', $params);
-          $default = CRM_Utils_Array::value('default', $params);
+          $urlVar = $params['urlVar'] ?? NULL;
+          $sessionVar = $params['sessionVar'] ?? NULL;
+          $type = $params['type'] ?? NULL;
+          $default = $params['default'] ?? NULL;
           $abort = CRM_Utils_Array::value('abort', $params, FALSE);
 
           $value = NULL;

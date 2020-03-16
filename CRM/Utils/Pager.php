@@ -240,7 +240,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
    */
   public function getCurrentLocation() {
     $config = CRM_Core_Config::singleton();
-    $path = CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET);
+    $path = $_GET[$config->userFrameworkURLVar] ?? NULL;
     return CRM_Utils_System::url($path, CRM_Utils_System::getLinksUrl(self::PAGE_ID, FALSE, TRUE), FALSE, NULL, FALSE) . $this->getCurrentPageID();
   }
 

@@ -440,8 +440,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     if (!is_array($params) || empty($params)) {
       return $voterClause;
     }
-    $surveyId = CRM_Utils_Array::value('campaign_survey_id', $params);
-    $searchVoterFor = CRM_Utils_Array::value('campaign_search_voter_for', $params);
+    $surveyId = $params['campaign_survey_id'] ?? NULL;
+    $searchVoterFor = $params['campaign_search_voter_for'] ?? NULL;
 
     //get the survey activities.
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
@@ -478,7 +478,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
         ) {
           $voterIds = [];
           foreach ($voterActValues as $values) {
-            $numOfDays = CRM_Utils_Array::value($values['result'], $recontactInterval);
+            $numOfDays = $recontactInterval[$values['result']] ?? NULL;
             if ($numOfDays &&
               $values['status_id'] == $completedStatusId
             ) {

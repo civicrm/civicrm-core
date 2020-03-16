@@ -276,7 +276,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     // Also don't allow user to update some fields for recurring contributions.
     if (!$this->_online) {
-      $this->_online = CRM_Utils_Array::value('contribution_recur_id', $values);
+      $this->_online = $values['contribution_recur_id'] ?? NULL;
     }
 
     $this->assign('isOnline', $this->_online ? TRUE : FALSE);
@@ -415,9 +415,9 @@ WHERE  contribution_id = {$id}
       $payParams = ['id' => $this->_ppID];
 
       CRM_Pledge_BAO_PledgePayment::retrieve($payParams, $this->_pledgeValues['pledgePayment']);
-      $this->_pledgeID = CRM_Utils_Array::value('pledge_id', $this->_pledgeValues['pledgePayment']);
-      $paymentStatusID = CRM_Utils_Array::value('status_id', $this->_pledgeValues['pledgePayment']);
-      $this->_id = CRM_Utils_Array::value('contribution_id', $this->_pledgeValues['pledgePayment']);
+      $this->_pledgeID = $this->_pledgeValues['pledgePayment']['pledge_id'] ?? NULL;
+      $paymentStatusID = $this->_pledgeValues['pledgePayment']['status_id'] ?? NULL;
+      $this->_id = $this->_pledgeValues['pledgePayment']['contribution_id'] ?? NULL;
 
       //get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');

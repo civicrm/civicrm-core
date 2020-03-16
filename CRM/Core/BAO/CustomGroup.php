@@ -46,7 +46,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     }
 
     $extends = CRM_Utils_Array::value('extends', $params, []);
-    $extendsEntity = CRM_Utils_Array::value(0, $extends);
+    $extendsEntity = $extends[0] ?? NULL;
 
     $participantEntities = [
       'ParticipantRole',
@@ -68,7 +68,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     }
 
     // this is format when form get submit.
-    $extendsChildType = CRM_Utils_Array::value(1, $extends);
+    $extendsChildType = $extends[1] ?? NULL;
     // lets allow user to pass direct child type value, CRM-6893
     if (!empty($params['extends_entity_column_value'])) {
       $extendsChildType = $params['extends_entity_column_value'];
@@ -144,8 +144,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       }
     }
     else {
-      $group->created_id = CRM_Utils_Array::value('created_id', $params);
-      $group->created_date = CRM_Utils_Array::value('created_date', $params);
+      $group->created_id = $params['created_id'] ?? NULL;
+      $group->created_date = $params['created_date'] ?? NULL;
 
       // we do this only once, so name never changes
       if (isset($params['name'])) {
@@ -1556,7 +1556,7 @@ ORDER BY civicrm_custom_group.weight,
     foreach ($groupTree as $id => $group) {
       CRM_Core_ShowHideBlocks::links($form, $group['title'], '', '');
       foreach ($group['fields'] as $field) {
-        $required = CRM_Utils_Array::value('is_required', $field);
+        $required = $field['is_required'] ?? NULL;
         //fix for CRM-1620
         if ($field['data_type'] == 'File') {
           if (!empty($field['element_value']['data'])) {
@@ -1815,21 +1815,21 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       }
 
       // add group information
-      $formattedGroupTree[$key]['name'] = CRM_Utils_Array::value('name', $value);
-      $formattedGroupTree[$key]['title'] = CRM_Utils_Array::value('title', $value);
-      $formattedGroupTree[$key]['help_pre'] = CRM_Utils_Array::value('help_pre', $value);
-      $formattedGroupTree[$key]['help_post'] = CRM_Utils_Array::value('help_post', $value);
-      $formattedGroupTree[$key]['collapse_display'] = CRM_Utils_Array::value('collapse_display', $value);
-      $formattedGroupTree[$key]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $value);
-      $formattedGroupTree[$key]['style'] = CRM_Utils_Array::value('style', $value);
+      $formattedGroupTree[$key]['name'] = $value['name'] ?? NULL;
+      $formattedGroupTree[$key]['title'] = $value['title'] ?? NULL;
+      $formattedGroupTree[$key]['help_pre'] = $value['help_pre'] ?? NULL;
+      $formattedGroupTree[$key]['help_post'] = $value['help_post'] ?? NULL;
+      $formattedGroupTree[$key]['collapse_display'] = $value['collapse_display'] ?? NULL;
+      $formattedGroupTree[$key]['collapse_adv_display'] = $value['collapse_adv_display'] ?? NULL;
+      $formattedGroupTree[$key]['style'] = $value['style'] ?? NULL;
 
       // this params needed of bulding multiple values
-      $formattedGroupTree[$key]['is_multiple'] = CRM_Utils_Array::value('is_multiple', $value);
-      $formattedGroupTree[$key]['extends'] = CRM_Utils_Array::value('extends', $value);
-      $formattedGroupTree[$key]['extends_entity_column_id'] = CRM_Utils_Array::value('extends_entity_column_id', $value);
-      $formattedGroupTree[$key]['extends_entity_column_value'] = CRM_Utils_Array::value('extends_entity_column_value', $value);
-      $formattedGroupTree[$key]['subtype'] = CRM_Utils_Array::value('subtype', $value);
-      $formattedGroupTree[$key]['max_multiple'] = CRM_Utils_Array::value('max_multiple', $value);
+      $formattedGroupTree[$key]['is_multiple'] = $value['is_multiple'] ?? NULL;
+      $formattedGroupTree[$key]['extends'] = $value['extends'] ?? NULL;
+      $formattedGroupTree[$key]['extends_entity_column_id'] = $value['extends_entity_column_id'] ?? NULL;
+      $formattedGroupTree[$key]['extends_entity_column_value'] = $value['extends_entity_column_value'] ?? NULL;
+      $formattedGroupTree[$key]['subtype'] = $value['subtype'] ?? NULL;
+      $formattedGroupTree[$key]['max_multiple'] = $value['max_multiple'] ?? NULL;
 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
@@ -1910,13 +1910,13 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             if (!empty($customValueId) && $customValueId != $values['id']) {
               continue;
             }
-            $details[$groupID][$values['id']]['title'] = CRM_Utils_Array::value('title', $group);
-            $details[$groupID][$values['id']]['name'] = CRM_Utils_Array::value('name', $group);
-            $details[$groupID][$values['id']]['help_pre'] = CRM_Utils_Array::value('help_pre', $group);
-            $details[$groupID][$values['id']]['help_post'] = CRM_Utils_Array::value('help_post', $group);
-            $details[$groupID][$values['id']]['collapse_display'] = CRM_Utils_Array::value('collapse_display', $group);
-            $details[$groupID][$values['id']]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $group);
-            $details[$groupID][$values['id']]['style'] = CRM_Utils_Array::value('style', $group);
+            $details[$groupID][$values['id']]['title'] = $group['title'] ?? NULL;
+            $details[$groupID][$values['id']]['name'] = $group['name'] ?? NULL;
+            $details[$groupID][$values['id']]['help_pre'] = $group['help_pre'] ?? NULL;
+            $details[$groupID][$values['id']]['help_post'] = $group['help_post'] ?? NULL;
+            $details[$groupID][$values['id']]['collapse_display'] = $group['collapse_display'] ?? NULL;
+            $details[$groupID][$values['id']]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
+            $details[$groupID][$values['id']]['style'] = $group['style'] ?? NULL;
             $details[$groupID][$values['id']]['fields'][$k] = [
               'field_title' => $properties['label'] ?? NULL,
               'field_type' => $properties['html_type'] ?? NULL,
@@ -1938,18 +1938,18 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               $details[$groupID][$values['id']]['fields'][$k]['field_data_type'] ==
               'ContactReference'
             ) {
-              $details[$groupID][$values['id']]['fields'][$k]['contact_ref_id'] = CRM_Utils_Array::value('data', $values);
+              $details[$groupID][$values['id']]['fields'][$k]['contact_ref_id'] = $values['data'] ?? NULL;
             }
           }
         }
         else {
-          $details[$groupID][0]['title'] = CRM_Utils_Array::value('title', $group);
-          $details[$groupID][0]['name'] = CRM_Utils_Array::value('name', $group);
-          $details[$groupID][0]['help_pre'] = CRM_Utils_Array::value('help_pre', $group);
-          $details[$groupID][0]['help_post'] = CRM_Utils_Array::value('help_post', $group);
-          $details[$groupID][0]['collapse_display'] = CRM_Utils_Array::value('collapse_display', $group);
-          $details[$groupID][0]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $group);
-          $details[$groupID][0]['style'] = CRM_Utils_Array::value('style', $group);
+          $details[$groupID][0]['title'] = $group['title'] ?? NULL;
+          $details[$groupID][0]['name'] = $group['name'] ?? NULL;
+          $details[$groupID][0]['help_pre'] = $group['help_pre'] ?? NULL;
+          $details[$groupID][0]['help_post'] = $group['help_post'] ?? NULL;
+          $details[$groupID][0]['collapse_display'] = $group['collapse_display'] ?? NULL;
+          $details[$groupID][0]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
+          $details[$groupID][0]['style'] = $group['style'] ?? NULL;
           $details[$groupID][0]['fields'][$k] = ['field_title' => CRM_Utils_Array::value('label', $properties)];
         }
       }

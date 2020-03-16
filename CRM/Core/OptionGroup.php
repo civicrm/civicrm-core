@@ -478,11 +478,11 @@ WHERE  v.option_group_id = g.id
         $value->option_group_id = $group->id;
         $value->label = $v['label'];
         $value->value = $v['value'];
-        $value->name = CRM_Utils_Array::value('name', $v);
-        $value->description = CRM_Utils_Array::value('description', $v);
-        $value->weight = CRM_Utils_Array::value('weight', $v);
-        $value->is_default = CRM_Utils_Array::value('is_default', $v);
-        $value->is_active = CRM_Utils_Array::value('is_active', $v);
+        $value->name = $v['name'] ?? NULL;
+        $value->description = $v['description'] ?? NULL;
+        $value->weight = $v['weight'] ?? NULL;
+        $value->is_default = $v['is_default'] ?? NULL;
+        $value->is_active = $v['is_active'] ?? NULL;
         $value->save();
 
         if ($value->is_default) {

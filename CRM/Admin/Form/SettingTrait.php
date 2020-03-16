@@ -162,7 +162,7 @@ trait CRM_Admin_Form_SettingTrait {
     foreach ($settingMetaData as $setting => $props) {
       $quickFormType = $this->getQuickFormType($props);
       if (isset($quickFormType)) {
-        $options = CRM_Utils_Array::value('options', $props);
+        $options = $props['options'] ?? NULL;
         if ($options) {
           if ($props['html_type'] === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
             // If the spec specifies the field is not required add a null option.
@@ -233,7 +233,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, $props['title'], $options);
         }
         // Migrate to using an array as easier in smart...
-        $description = CRM_Utils_Array::value('description', $props);
+        $description = $props['description'] ?? NULL;
         $descriptions[$setting] = $description;
         $this->assign("{$setting}_description", $description);
         if ($setting === 'max_attachments') {

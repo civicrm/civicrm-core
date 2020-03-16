@@ -308,9 +308,9 @@ class CRM_Utils_Rule {
   public static function currentDate($date, $monthRequired = TRUE) {
     $config = CRM_Core_Config::singleton();
 
-    $d = CRM_Utils_Array::value('d', $date);
-    $m = CRM_Utils_Array::value('M', $date);
-    $y = CRM_Utils_Array::value('Y', $date);
+    $d = $date['d'] ?? NULL;
+    $m = $date['M'] ?? NULL;
+    $y = $date['Y'] ?? NULL;
 
     if (!$d && !$m && !$y) {
       return TRUE;
@@ -318,7 +318,7 @@ class CRM_Utils_Rule {
 
     // CRM-9017 CiviContribute/CiviMember form with expiration date format 'm Y'
     if (!$m && !empty($date['m'])) {
-      $m = CRM_Utils_Array::value('m', $date);
+      $m = $date['m'] ?? NULL;
     }
 
     $day = $mon = 1;
@@ -889,13 +889,13 @@ class CRM_Utils_Rule {
   public static function qfDate($date) {
     $config = CRM_Core_Config::singleton();
 
-    $d = CRM_Utils_Array::value('d', $date);
-    $m = CRM_Utils_Array::value('M', $date);
-    $y = CRM_Utils_Array::value('Y', $date);
+    $d = $date['d'] ?? NULL;
+    $m = $date['M'] ?? NULL;
+    $y = $date['Y'] ?? NULL;
     if (isset($date['h']) ||
       isset($date['g'])
     ) {
-      $m = CRM_Utils_Array::value('M', $date);
+      $m = $date['M'] ?? NULL;
     }
 
     if (!$d && !$m && !$y) {

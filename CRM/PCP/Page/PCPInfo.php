@@ -139,7 +139,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
     if ($pcpInfo['contact_id'] == $session->get('userID')) {
       $owner = $pageInfo;
-      $owner['status'] = CRM_Utils_Array::value($pcpInfo['status_id'], $pcpStatus);
+      $owner['status'] = $pcpStatus[$pcpInfo['status_id']] ?? NULL;
 
       $this->assign('owner', $owner);
 

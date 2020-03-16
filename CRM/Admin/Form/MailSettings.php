@@ -157,7 +157,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
         $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
       }
       else {
-        $params[$f] = CRM_Utils_Array::value($f, $formValues);
+        $params[$f] = $formValues[$f] ?? NULL;
       }
     }
 

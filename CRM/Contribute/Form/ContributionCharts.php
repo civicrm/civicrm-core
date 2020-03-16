@@ -139,7 +139,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $monthlyChart = $yearlyChart = FALSE;
 
     foreach ($chartData as $chartKey => & $values) {
-      $chartValues = CRM_Utils_Array::value('values', $values);
+      $chartValues = $values['values'] ?? NULL;
 
       if (!is_array($chartValues) || empty($chartValues)) {
         continue;

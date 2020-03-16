@@ -204,10 +204,10 @@ class CRM_Badge_BAO_Badge {
     if ((CRM_Utils_Array::value('height_image_1', $formattedRow) >
         CRM_Utils_Array::value('height_image_2', $formattedRow)) && !empty($formattedRow['height_image_1'])
     ) {
-      $startOffset = CRM_Utils_Array::value('height_image_1', $formattedRow);
+      $startOffset = $formattedRow['height_image_1'] ?? NULL;
     }
     elseif (!empty($formattedRow['height_image_2'])) {
-      $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
+      $startOffset = $formattedRow['height_image_2'] ?? NULL;
     }
 
     if (!empty($formattedRow['participant_image'])) {

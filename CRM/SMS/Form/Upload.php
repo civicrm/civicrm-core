@@ -227,7 +227,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
         $params['msg_template_id'] = $msgTemplate->id;
       }
       else {
-        $params['msg_template_id'] = CRM_Utils_Array::value('SMStemplate', $formValues);
+        $params['msg_template_id'] = $formValues['SMStemplate'] ?? NULL;
       }
       $this->set('template', $params['msg_template_id']);
     }
@@ -299,7 +299,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
       else {
         if (!empty($params['text_message'])) {
-          $messageCheck = CRM_Utils_Array::value('text_message', $params);
+          $messageCheck = $params['text_message'] ?? NULL;
           if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
             $errors['text_message'] = ts("You can configure the SMS message body up to %1 characters", [1 => CRM_SMS_Provider::MAX_SMS_CHAR]);
           }

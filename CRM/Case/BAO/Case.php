@@ -602,15 +602,15 @@ HERESQL;
         $case['case_id']
       );
       $casesList[$key]['subject'] = $case['case_subject'];
-      $casesList[$key]['case_status'] = CRM_Utils_Array::value($case['case_status_id'], $caseStatuses);
+      $casesList[$key]['case_status'] = $caseStatuses[$case['case_status_id']] ?? NULL;
       if ($case['case_status_id'] == CRM_Case_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Urgent')) {
         $casesList[$key]['case_status'] = sprintf('<strong>%s</strong>', strtoupper($casesList[$key]['case_status']));
       }
-      $casesList[$key]['case_type'] = CRM_Utils_Array::value($case['case_type_id'], $caseTypeTitles);
+      $casesList[$key]['case_type'] = $caseTypeTitles[$case['case_type_id']] ?? NULL;
       $casesList[$key]['case_role'] = CRM_Utils_Array::value('case_role', $case, '---');
       $casesList[$key]['manager'] = self::getCaseManagerContact($caseTypes[$case['case_type_id']], $case['case_id']);
 
-      $casesList[$key]['date'] = CRM_Utils_Array::value($case['activity_type_id'], $activityTypeLabels);
+      $casesList[$key]['date'] = $activityTypeLabels[$case['activity_type_id']] ?? NULL;
       if ($actId = CRM_Utils_Array::value('activity_id', $case)) {
         if (self::checkPermission($actId, 'view', $case['activity_type_id'], $userID)) {
           if ($type == 'recent') {
@@ -951,7 +951,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
     $groupBy = "
          GROUP BY ca.id, tcc.id, scc.id, acc.id, ov.value";
 
-    $sortBy = CRM_Utils_Array::value('sortBy', $params);
+    $sortBy = $params['sortBy'] ?? NULL;
     if (!$sortBy) {
       // CRM-5081 - added id to act like creation date
       $orderBy = "
@@ -962,8 +962,8 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
       $orderBy = " ORDER BY $sortBy ";
     }
 
-    $page = CRM_Utils_Array::value('page', $params);
-    $rp = CRM_Utils_Array::value('rp', $params);
+    $page = $params['page'] ?? NULL;
+    $rp = $params['rp'] ?? NULL;
 
     if (!$page) {
       $page = 1;
@@ -1198,7 +1198,7 @@ HERESQL;
         ];
         // Add more info about the role (creator, manager)
         // The XML historically has the reverse direction, so look up reverse.
-        $role = CRM_Utils_Array::value($dao->role_name_reverse, $caseRoles);
+        $role = $caseRoles[$dao->role_name_reverse] ?? NULL;
         if ($role) {
           unset($role['name']);
           $details += $role;
@@ -1300,7 +1300,7 @@ HERESQL;
       $tplParams['contact'] = $info;
       self::buildPermissionLinks($tplParams, $activityParams);
 
-      $displayName = CRM_Utils_Array::value('display_name', $info);
+      $displayName = $info['display_name'] ?? NULL;
 
       list($result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
@@ -1417,11 +1417,11 @@ HERESQL;
     while ($res->fetch()) {
       if ($type == 'upcoming') {
         $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
-        $activityInfo[$res->case_id]['type'] = CRM_Utils_Array::value($res->activity_type_id, $activityTypes);
+        $activityInfo[$res->case_id]['type'] = $activityTypes[$res->activity_type_id] ?? NULL;
       }
       else {
         $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
-        $activityInfo[$res->case_id]['type'] = CRM_Utils_Array::value($res->activity_type_id, $activityTypes);
+        $activityInfo[$res->case_id]['type'] = $activityTypes[$res->activity_type_id] ?? NULL;
       }
     }
 
@@ -2022,7 +2022,7 @@ HERESQL;
       //for duplicate cases do not process singleton activities.
       $otherActivityIds = $singletonActivityIds = [];
       foreach ($otherCaseActivities as $caseActivityId => $otherIds) {
-        $otherActId = CRM_Utils_Array::value('activity_id', $otherIds);
+        $otherActId = $otherIds['activity_id'] ?? NULL;
         if (!$otherActId || in_array($otherActId, $otherActivityIds)) {
           continue;
         }
@@ -2425,7 +2425,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
         //check for core permission.
         $hasPermissions = [];
-        $checkPermissions = CRM_Utils_Array::value($operation, $permissions);
+        $checkPermissions = $permissions[$operation] ?? NULL;
         if (is_array($checkPermissions)) {
           foreach ($checkPermissions as $per) {
             if (CRM_Core_Permission::check($per)) {

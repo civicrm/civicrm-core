@@ -70,7 +70,7 @@ class CRM_Core_OptionValue {
       $optionGroupID = $groupParams['id'];
     }
 
-    $groupName = CRM_Utils_Array::value('name', $groupParams);
+    $groupName = $groupParams['name'] ?? NULL;
     if (!$groupName && $optionGroupID) {
       $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
         $optionGroupID, 'name', 'id'
@@ -418,8 +418,8 @@ FROM
 
     $order = " ORDER BY " . $orderBy;
 
-    $groupId = CRM_Utils_Array::value('id', $groupParams);
-    $groupName = CRM_Utils_Array::value('name', $groupParams);
+    $groupId = $groupParams['id'] ?? NULL;
+    $groupName = $groupParams['name'] ?? NULL;
 
     if ($groupId) {
       $where .= " AND option_group.id = %1";

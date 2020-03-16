@@ -87,7 +87,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     $buttonName = $this->controller->getButtonName();
     $walkListActivityId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'WalkList');
     if ($buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
-      $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
+      $orderByParams = $_POST['order_bys'] ?? NULL;
     }
     elseif ($walkListActivityId == $this->_surveyDetails['activity_type_id']) {
       $orderByParams
@@ -160,9 +160,9 @@ WHERE {$clause}
 
     $activityIds = [];
     foreach ($this->_contactIds as $key => $voterId) {
-      $actVals = CRM_Utils_Array::value($voterId, $this->_surveyActivityIds);
-      $statusId = CRM_Utils_Array::value('status_id', $actVals);
-      $activityId = CRM_Utils_Array::value('activity_id', $actVals);
+      $actVals = $this->_surveyActivityIds[$voterId] ?? NULL;
+      $statusId = $actVals['status_id'] ?? NULL;
+      $activityId = $actVals['activity_id'] ?? NULL;
       if ($activityId &&
         $statusId &&
         $scheduledStatusId == $statusId
@@ -233,7 +233,7 @@ WHERE {$clause}
     }
 
     //set the title.
-    $this->_surveyTypeId = CRM_Utils_Array::value('activity_type_id', $this->_surveyValues);
+    $this->_surveyTypeId = $this->_surveyValues['activity_type_id'] ?? NULL;
     $surveyTypeLabel = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $this->_surveyTypeId);
     CRM_Utils_System::setTitle(ts('Record %1 Responses', [1 => $surveyTypeLabel]));
   }
@@ -446,8 +446,8 @@ WHERE {$clause}
    * @return mixed
    */
   public static function registerInterview($params) {
-    $activityId = CRM_Utils_Array::value('activity_id', $params);
-    $surveyTypeId = CRM_Utils_Array::value('activity_type_id', $params);
+    $activityId = $params['activity_id'] ?? NULL;
+    $surveyTypeId = $params['activity_type_id'] ?? NULL;
     if (!is_array($params) || !$surveyTypeId || !$activityId) {
       return FALSE;
     }
@@ -496,7 +496,7 @@ WHERE {$clause}
       }
     }
 
-    $contactId = CRM_Utils_Array::value('voter_id', $params);
+    $contactId = $params['voter_id'] ?? NULL;
     if ($contactId && !empty($contactParams)) {
       CRM_Contact_BAO_Contact::createProfileContact($contactParams, $fields, $contactId);
     }
@@ -516,7 +516,7 @@ WHERE {$clause}
     }
 
     $subject = '';
-    $surveyTitle = CRM_Utils_Array::value('surveyTitle', $params);
+    $surveyTitle = $params['surveyTitle'] ?? NULL;
     if ($surveyTitle) {
       $subject = $surveyTitle . ' - ';
     }

@@ -157,8 +157,8 @@ function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $
       elseif ($type == 'Select' || $type == 'Radio') {
         $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
         foreach ($customOption as $customFldID => $customValue) {
-          $val = CRM_Utils_Array::value('value', $customValue);
-          $label = CRM_Utils_Array::value('label', $customValue);
+          $val = $customValue['value'] ?? NULL;
+          $label = $customValue['label'] ?? NULL;
           $label = strtolower($label);
           $value = strtolower(trim($value));
           if (($value == $label) || ($value == strtolower($val))) {
@@ -434,7 +434,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
           // mark an entry in fields array since we want the value of custom field to be copied
           $fields['Address'][$key] = NULL;
 
-          $htmlType = CRM_Utils_Array::value('html_type', $customFields[$customFieldID]);
+          $htmlType = $customFields[$customFieldID]['html_type'] ?? NULL;
           switch ($htmlType) {
             case 'CheckBox':
             case 'Multi-Select':
@@ -548,8 +548,8 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
  *   <type>
  */
 function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
-  $id = CRM_Utils_Array::value('id', $params);
-  $externalId = CRM_Utils_Array::value('external_identifier', $params);
+  $id = $params['id'] ?? NULL;
+  $externalId = $params['external_identifier'] ?? NULL;
   if ($id || $externalId) {
     $contact = new CRM_Contact_DAO_Contact();
 
@@ -755,7 +755,7 @@ function _civicrm_api3_deprecated_contact_check_params(
     if (empty($params['contact_type'])) {
       return civicrm_api3_create_error("No Contact Type");
     }
-    $fields = CRM_Utils_Array::value($params['contact_type'], $required);
+    $fields = $required[$params['contact_type']] ?? NULL;
     if ($fields == NULL) {
       return civicrm_api3_create_error("Invalid Contact Type: {$params['contact_type']}");
     }

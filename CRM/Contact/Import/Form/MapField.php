@@ -429,7 +429,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   public static function formRule($fields) {
     $errors = [];
     if (!empty($fields['saveMapping'])) {
-      $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
+      $nameField = $fields['saveMappingName'] ?? NULL;
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
       }
@@ -532,10 +532,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
 
-      $fldName = CRM_Utils_Array::value(0, $mapperKeys[$i]);
-      $selOne = CRM_Utils_Array::value(1, $mapperKeys[$i]);
-      $selTwo = CRM_Utils_Array::value(2, $mapperKeys[$i]);
-      $selThree = CRM_Utils_Array::value(3, $mapperKeys[$i]);
+      $fldName = $mapperKeys[$i][0] ?? NULL;
+      $selOne = $mapperKeys[$i][1] ?? NULL;
+      $selTwo = $mapperKeys[$i][2] ?? NULL;
+      $selThree = $mapperKeys[$i][3] ?? NULL;
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
       $mapperKeysMain[$i] = $fldName;
 
@@ -569,7 +569,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             $parserParameters['relatedContactWebsiteType'][$i] = $websiteTypes[$selTwo];
           }
           else {
-            $parserParameters['relatedContactLocType'][$i] = CRM_Utils_Array::value($selTwo, $locationTypes);
+            $parserParameters['relatedContactLocType'][$i] = $locationTypes[$selTwo] ?? NULL;
             if ($selThree) {
               if ($selOne === 'phone') {
                 $parserParameters['relatedContactPhoneType'][$i] = $phoneTypes[$selThree];
@@ -623,7 +623,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       for ($i = 0; $i < $this->_columnCount; $i++) {
         $updateMappingFields = new CRM_Core_DAO_MappingField();
-        $updateMappingFields->id = CRM_Utils_Array::value($i, $mappingFieldsId);
+        $updateMappingFields->id = $mappingFieldsId[$i] ?? NULL;
         $updateMappingFields->mapping_id = $params['mappingId'];
         $updateMappingFields->column_number = $i;
 

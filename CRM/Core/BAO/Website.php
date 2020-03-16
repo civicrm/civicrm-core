@@ -83,7 +83,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
     $ids = self::allWebsites($contactID);
     foreach ($params as $key => $values) {
-      $id = CRM_Utils_Array::value('id', $values);
+      $id = $values['id'] ?? NULL;
       if (array_key_exists($id, $ids)) {
         unset($ids[$id]);
       }

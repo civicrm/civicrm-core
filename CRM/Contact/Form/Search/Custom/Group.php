@@ -91,7 +91,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     $this->_allSearch = FALSE;
     $this->_groups = FALSE;
     $this->_tags = FALSE;
-    $this->_andOr = CRM_Utils_Array::value('andOr', $this->_formValues);
+    $this->_andOr = $this->_formValues['andOr'] ?? NULL;
     //make easy to check conditions for groups and tags are
     //selected or it is empty search
     if (empty($this->_includeGroups) && empty($this->_excludeGroups) &&

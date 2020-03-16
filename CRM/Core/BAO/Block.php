@@ -231,7 +231,7 @@ class CRM_Core_BAO_Block {
     //get existing block ids.
     $blockIds = self::getBlockIds($blockName, $contactId, $entityElements);
     foreach ($params[$blockName] as $count => $value) {
-      $blockId = CRM_Utils_Array::value('id', $value);
+      $blockId = $value['id'] ?? NULL;
       if ($blockId) {
         if (is_array($blockIds) && array_key_exists($blockId, $blockIds)) {
           unset($blockIds[$blockId]);
@@ -275,13 +275,13 @@ class CRM_Core_BAO_Block {
         if (empty($value['id']) && $blockValue['locationTypeId'] == CRM_Utils_Array::value('location_type_id', $value) && !$isIdSet) {
           $valueId = FALSE;
           if ($blockName == 'phone') {
-            $phoneTypeBlockValue = CRM_Utils_Array::value('phoneTypeId', $blockValue);
+            $phoneTypeBlockValue = $blockValue['phoneTypeId'] ?? NULL;
             if ($phoneTypeBlockValue == CRM_Utils_Array::value('phone_type_id', $value)) {
               $valueId = TRUE;
             }
           }
           elseif ($blockName == 'im') {
-            $providerBlockValue = CRM_Utils_Array::value('providerId', $blockValue);
+            $providerBlockValue = $blockValue['providerId'] ?? NULL;
             if (!empty($value['provider_id']) && $providerBlockValue == $value['provider_id']) {
               $valueId = TRUE;
             }
@@ -474,8 +474,8 @@ class CRM_Core_BAO_Block {
    * @return int
    */
   public static function primaryComparison($location1, $location2) {
-    $l1 = CRM_Utils_Array::value('is_primary', $location1);
-    $l2 = CRM_Utils_Array::value('is_primary', $location2);
+    $l1 = $location1['is_primary'] ?? NULL;
+    $l2 = $location2['is_primary'] ?? NULL;
     if ($l1 == $l2) {
       return 0;
     }

@@ -152,7 +152,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->_allowWaitlist = FALSE;
     if ($eventFull && !$this->_allowConfirmation && !empty($this->_values['event']['has_waitlist'])) {
       $this->_allowWaitlist = TRUE;
-      $this->_waitlistMsg = CRM_Utils_Array::value('waitlist_text', $this->_values['event']);
+      $this->_waitlistMsg = $this->_values['event']['waitlist_text'] ?? NULL;
       if (!$this->_waitlistMsg) {
         $this->_waitlistMsg = ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
       }
@@ -523,14 +523,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       return;
     }
 
-    $feeFields = CRM_Utils_Array::value('fee', $form->_values);
+    $feeFields = $form->_values['fee'] ?? NULL;
 
     if (is_array($feeFields)) {
       $form->_feeBlock = &$form->_values['fee'];
     }
 
     //check for discount.
-    $discountedFee = CRM_Utils_Array::value('discount', $form->_values);
+    $discountedFee = $form->_values['discount'] ?? NULL;
     if (is_array($discountedFee) && !empty($discountedFee)) {
       if (!$discountId) {
         $form->_discountId = $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
@@ -586,13 +586,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $fieldId = $field['id'];
           $elementName = 'price_' . $fieldId;
 
-          $isRequire = CRM_Utils_Array::value('is_required', $field);
+          $isRequire = $field['is_required'] ?? NULL;
           if ($button == 'skip') {
             $isRequire = FALSE;
           }
 
           //user might modified w/ hook.
-          $options = CRM_Utils_Array::value('options', $field);
+          $options = $field['options'] ?? NULL;
           $formClasses = ['CRM_Event_Form_Participant', 'CRM_Event_Form_ParticipantFeeSelection'];
 
           if (!is_array($options)) {
@@ -654,7 +654,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       $form->assign('eventFeeBlockValues', json_encode($eventFeeBlockValues));
 
-      $form->_defaults['amount'] = CRM_Utils_Array::value('default_fee_id', $form->_values['event']);
+      $form->_defaults['amount'] = $form->_values['event']['default_fee_id'] ?? NULL;
       $element = &$form->addGroup($elements, 'amount', ts('Event Fee(s)'), '<br />');
       if (isset($form->_online) && $form->_online) {
         $element->freeze();
@@ -967,7 +967,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $params['campaign_id'] = $params['participant_campaign_id'];
     }
     else {
-      $params['campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values['event']);
+      $params['campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
     }
 
     //hack to allow group to register w/ waiting
