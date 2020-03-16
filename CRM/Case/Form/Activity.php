@@ -598,11 +598,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       foreach ($selectedContacts as $dnt => $val) {
         if (array_key_exists($val, $params) && !CRM_Utils_Array::crmIsEmptyArray($params[$val])) {
           if ($val == 'contact_check') {
-            $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
+            $mailStatus = ts("A copy of the activity has also been sent to selected contact(s).");
           }
           else {
             $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$vval['actId']], TRUE, FALSE);
-            $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contacts(s).");
+            $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contact(s).");
           }
           //build an associative array with unique email addresses.
           foreach ($params[$val] as $key => $value) {
