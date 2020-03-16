@@ -160,11 +160,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $rule = new CRM_ACL_BAO_ACL();
 
-    $acl = self::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
 
     $query = " SELECT acl.*
-      FROM $acl acl
+      FROM civicrm_acl acl
       WHERE   acl.entity_table   = '$contact'
       AND acl.entity_id      = $contact_id";
 
@@ -232,7 +231,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $rule = new CRM_ACL_BAO_ACL();
 
-    $acl = self::getTableName();
     $c2g = CRM_Contact_BAO_GroupContact::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
     $results = [];
@@ -240,7 +238,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     if ($contact_id) {
       $query = "
 SELECT      acl.*
-  FROM      $acl acl
+  FROM      civicrm_acl acl
  INNER JOIN  $c2g group_contact
         ON  acl.entity_id      = group_contact.group_id
      WHERE  acl.entity_table   = '$group'
@@ -277,14 +275,13 @@ SELECT      acl.*
 
     $rule = new CRM_ACL_BAO_ACL();
 
-    $acl = self::getTableName();
     $aclRole = 'civicrm_acl_role';
 
     $aclER = CRM_ACL_DAO_EntityRole::getTableName();
     $c2g = CRM_Contact_BAO_GroupContact::getTableName();
 
     $query = "   SELECT          acl.*
-                        FROM            $acl acl
+                        FROM            civicrm_acl acl
                         INNER JOIN      civicrm_option_group og
                                 ON      og.name = 'acl_role'
                         INNER JOIN      civicrm_option_value ov
@@ -321,7 +318,7 @@ SELECT      acl.*
 
     $query = "
 SELECT acl.*
-  FROM $acl acl
+  FROM civicrm_acl acl
  WHERE acl.entity_id      IN ( $roles )
    AND acl.entity_table   = 'civicrm_acl_role'
 ";
