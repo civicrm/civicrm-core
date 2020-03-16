@@ -90,12 +90,12 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   public static function getPcpDashboardInfo($contactId) {
     $links = self::pcpLinks();
 
-    $query = "
+    $query = '
 SELECT pcp.*, block.is_tellfriend_enabled FROM civicrm_pcp pcp
 LEFT JOIN civicrm_pcp_block block ON block.id = pcp.pcp_block_id
 WHERE pcp.is_active = 1
   AND pcp.contact_id = %1
-ORDER BY page_type, page_id";
+ORDER BY page_type, page_id';
 
     $params = [1 => [$contactId, 'Integer']];
 
@@ -104,10 +104,7 @@ ORDER BY page_type, page_id";
     $hide = $mask = array_sum(array_keys($links['all']));
     $contactPCPPages = [];
 
-    $event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
-    $contribute = CRM_Contribute_PseudoConstant::contributionPage();
-    $pcpStatus = CRM_Contribute_PseudoConstant::pcpStatus();
-    $approved = CRM_Utils_Array::key('Approved', $pcpStatus);
+    $approved = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
 
     while ($pcpInfoDao->fetch()) {
       $mask = $hide;
@@ -137,14 +134,14 @@ ORDER BY page_type, page_id";
       }
       $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
         FALSE, 'pcp.dashboard.active', 'PCP', $pcpInfoDao->id);
-      $component = $pcpInfoDao->page_type;
-      $pageTitle = CRM_Utils_Array::value($pcpInfoDao->page_id, $$component);
+
+      $pageTitle = self::getPcpTitle($pcpInfoDao->page_type, (int) $pcpInfoDao->page_id);
 
       $pcpInfo[] = [
         'pageTitle' => $pageTitle,
         'pcpId' => $pcpInfoDao->id,
         'pcpTitle' => $pcpInfoDao->title,
-        'pcpStatus' => $pcpStatus[$pcpInfoDao->status_id],
+        'pcpStatus' => CRM_Core_PseudoConstant::getLabel('CRM_PCP_BAO_PCP', 'status_id', $pcpInfoDao->status_id),
         'action' => $action,
         'class' => $class,
       ];
@@ -185,8 +182,8 @@ ORDER BY target_entity_type, target_entity_id
       $pcpLink = $links['add'];
       $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
         FALSE, 'pcp.dashboard.other', "{$pcpBlockDao->target_entity_type}_PCP", $pcpBlockDao->target_entity_id);
-      $component = $pcpBlockDao->target_entity_type;
-      if ($pageTitle = CRM_Utils_Array::value($pcpBlockDao->target_entity_id, $$component)) {
+      $pageTitle = self::getPcpTitle($pcpBlockDao->target_entity_type, (int) $pcpBlockDao->target_entity_id);
+      if ($pageTitle) {
         $pcpBlock[] = [
           'pageId' => $pcpBlockDao->target_entity_id,
           'pageTitle' => $pageTitle,
@@ -944,6 +941,21 @@ INNER JOIN civicrm_uf_group ufgroup
     else {
       return $ownerNotificationId;
     }
+  }
+
+  /**
+   * Get the title of the pcp.
+   *
+   * @param string $component
+   * @param int $id
+   *
+   * @return bool|string|null
+   */
+  protected static function getPcpTitle(string $component, int $id) {
+    if ($component === 'contribute') {
+      return CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_page_id', $id);
+    }
+    return CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'event_id', $id);
   }
 
 }
