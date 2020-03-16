@@ -41,7 +41,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
   public $job_id;
 
   /**
-   * The email of the receipients this mail is to be sent.
+   * The email of the recipients this mail is to be sent.
    *
    * @var text
    */
@@ -134,7 +134,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'name' => 'recipient_email',
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Recipient Email'),
-          'description' => ts('The email of the receipients this mail is to be sent.'),
+          'description' => ts('The email of the recipients this mail is to be sent.'),
           'where' => 'civicrm_mailing_spool.recipient_email',
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
