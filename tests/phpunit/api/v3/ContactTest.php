@@ -2095,6 +2095,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test civicrm_contact_get(,true) with space in sort_name.
+   */
+  public function testContactGetSpaceMatches() {
+    $contactParams_1 = [
+      'first_name' => 'Sanford',
+      'last_name' => 'Blackwell',
+      'sort_name' => 'Blackwell, Sanford',
+      'contact_type' => 'Individual',
+    ];
+    $this->individualCreate($contactParams_1);
+
+    $contactParams_2 = [
+      'household_name' => 'Blackwell family',
+      'sort_name' => 'Blackwell family',
+      'contact_type' => 'Household',
+    ];
+    $this->individualCreate($contactParams_2);
+
+    $result = $this->callAPISuccess('contact', 'get', ['sort_name' => 'Blackwell F']);
+    $this->assertEquals(1, $result['count']);
+  }
+
+  /**
    * Test civicrm_contact_search_count().
    */
   public function testContactGetEmail() {
