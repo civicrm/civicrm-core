@@ -498,6 +498,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       'check_permissions' => TRUE,
       'contact_id' => $this->_contactID,
       'is_deleted' => 0,
+      'option.limit' => 0,
       'id' => ['!=' => $this->_caseID],
       'return' => ['id', 'start_date', 'case_type_id.title'],
     ]);
