@@ -103,6 +103,10 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'msg_subject' => 'test msg permission subject',
       'check_permissions' => TRUE,
     ]);
+    $newEntityParams = $entity['values'][$entity['id']];
+    unset($newEntityParams['id']);
+    $newEntityParams['check_permissions'] = TRUE;
+    $this->callAPISuccess('MessageTemplate', 'create', $newEntityParams);
     // verify with all 3 permissions someone can do everything.
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'edit system workflow message templates',
