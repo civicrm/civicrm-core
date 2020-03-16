@@ -757,7 +757,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       ];
       $activities[$id]['activity_type_name'] = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
       $activities[$id]['activity_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
-      $activities[$id]['target_contact_count'] = CRM_Utils_Array::value('target_contact_count', $activity, 0);
+      $activities[$id]['target_contact_count'] = $activity['target_contact_count'] ?? 0;
       if (!empty($activity['target_contact_count'])) {
         $displayedTarget = civicrm_api3('ActivityContact', 'get', [
           'activity_id' => $id,
@@ -1356,7 +1356,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $smsProviderParams['To'] = '';
       }
 
-      $doNotSms = CRM_Utils_Array::value('do_not_sms', $contact, 0);
+      $doNotSms = $contact['do_not_sms'] ?? 0;
 
       if ($doNotSms) {
         $errMsgs[] = PEAR::raiseError('Contact Does not accept SMS', NULL, PEAR_ERROR_RETURN);
@@ -2462,7 +2462,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
       'activity_date_time' => $params['activity_date_time'] ?? NULL,
       'check_permissions' => 1,
       'options' => [
-        'offset' => CRM_Utils_Array::value('offset', $params, 0),
+        'offset' => $params['offset'] ?? 0,
       ],
     ];
 

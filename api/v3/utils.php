@@ -776,25 +776,21 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
 function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $entity = '', $action = '') {
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   $is_count = FALSE;
-  $sort = CRM_Utils_Array::value('sort', $params, 0);
-  $sort = CRM_Utils_Array::value('option.sort', $params, $sort);
-  $sort = CRM_Utils_Array::value('option_sort', $params, $sort);
 
-  $offset = CRM_Utils_Array::value('offset', $params, 0);
-  $offset = CRM_Utils_Array::value('option.offset', $params, $offset);
   // dear PHP thought it would be a good idea to transform a.b into a_b in the get/post
-  $offset = CRM_Utils_Array::value('option_offset', $params, $offset);
+  $sort = $params['option_sort'] ?? $params['option.sort'] ?? $params['sort'] ?? 0;
+  $offset = $params['option_offset'] ?? $params['option.offset'] ?? $params['offset'] ?? 0;
 
   $limit = CRM_Utils_Array::value('rowCount', $params, 25);
   $limit = CRM_Utils_Array::value('option.limit', $params, $limit);
   $limit = CRM_Utils_Array::value('option_limit', $params, $limit);
 
-  if (is_array(CRM_Utils_Array::value('options', $params))) {
+  if (isset($params['options']) && is_array($params['options'])) {
     // is count is set by generic getcount not user
-    $is_count = CRM_Utils_Array::value('is_count', $params['options']);
-    $offset = CRM_Utils_Array::value('offset', $params['options'], $offset);
-    $limit  = CRM_Utils_Array::value('limit', $params['options'], $limit);
-    $sort   = CRM_Utils_Array::value('sort', $params['options'], $sort);
+    $is_count = $params['options']['is_count'] ?? FALSE;
+    $offset = $params['options']['offset'] ?? $offset;
+    $limit = CRM_Utils_Array::value('limit', $params['options'], $limit);
+    $sort = $params['options']['sort'] ?? $sort;
   }
 
   $returnProperties = [];
@@ -869,9 +865,7 @@ function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $e
     elseif ($n === 'id') {
       $inputParams[$lowercase_entity . '_id'] = $v;
     }
-    elseif (in_array($n, $otherVars)) {
-    }
-    else {
+    elseif (!in_array($n, $otherVars)) {
       $inputParams[$n] = $v;
       if ($v && !is_array($v) && stristr($v, 'SELECT')) {
         throw new API_Exception('invalid string');
