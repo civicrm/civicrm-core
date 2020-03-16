@@ -171,10 +171,11 @@ class CRM_Extension_Mapper {
       }
       catch (CRM_Extension_Exception $e) {
         // file has more detailed info, but we'll fallback to DB if it's missing -- DB has enough info to uninstall
-        $this->infos[$key] = CRM_Extension_System::singleton()->getManager()->createInfoFromDB($key);
-        if (!$this->infos[$key]) {
+        $dbInfo = CRM_Extension_System::singleton()->getManager()->createInfoFromDB($key);
+        if (!$dbInfo) {
           throw $e;
         }
+        $this->infos[$key] = $dbInfo;
       }
     }
     return $this->infos[$key];
@@ -441,7 +442,16 @@ class CRM_Extension_Mapper {
    */
   public function getAllInfos() {
     foreach ($this->container->getKeys() as $key) {
-      $this->keyToInfo($key);
+      try {
+        $this->keyToInfo($key);
+      }
+      catch (CRM_Extension_Exception_ParseException $e) {
+        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
+          1 => $e->getMessage(),
+        ]), '', 'error');
+        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        continue;
+      }
     }
     return $this->infos;
   }
