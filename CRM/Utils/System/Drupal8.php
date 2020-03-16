@@ -141,7 +141,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
         return $v->getPropertyPath() == 'name';
       }));
       if (count($violations) > 0) {
-        $errors['cms_name'] = (string) $violations[0]->getMessage();
+        $arrayKey = key($violations);
+        $errors['cms_name'] = (string) $violations[$arrayKey]->getMessage();
       }
     }
 
@@ -159,7 +160,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
         return $v->getPropertyPath() == 'mail';
       }));
       if (count($violations) > 0) {
-        $errors[$emailName] = (string) $violations[0]->getMessage();
+        $arrayKey = key($violations);
+        $errors[$emailName] = (string) $violations[$arrayKey]->getMessage();
       }
     }
   }
