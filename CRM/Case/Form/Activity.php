@@ -601,11 +601,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             $mailStatus = ts("A copy of the activity has also been sent to selected contact(s).");
           }
           else {
-            $actTypeId = civicrm_api3('Activity', 'getvalue', [
-              'return' => 'activity_type_id',
-              'id' => $vval['actId'],
-            ]);
-            if (!in_array($actTypeId, Civi::settings()->get('do_not_notify_assignees_for'))) {
+            if (!in_array($this->_activityTypeId, Civi::settings()->get('do_not_notify_assignees_for'))) {
               $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(
                 [$vval['actId']], TRUE, FALSE
               );
