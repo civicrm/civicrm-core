@@ -115,7 +115,7 @@
   </field>
   <field>
     <name>color_main_bg</name>
-    <title>Backgroup Color</title>
+    <title>Background Color</title>
     <type>varchar</type>
     <length>10</length>
     <add>2.0</add>
