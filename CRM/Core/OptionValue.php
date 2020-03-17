@@ -261,7 +261,7 @@ class CRM_Core_OptionValue {
     }
 
     if ($object->find(TRUE)) {
-      return ($daoID && $object->id == $daoID) ? TRUE : FALSE;
+      return $daoID && $object->id == $daoID;
     }
     else {
       return TRUE;

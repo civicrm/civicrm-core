@@ -150,7 +150,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       $numberDomains = CRM_Core_DAO::singleValueQuery($query);
       $session->set('numberDomains', $numberDomains);
     }
-    return $numberDomains > 1 ? TRUE : FALSE;
+    return $numberDomains > 1;
   }
 
   /**
@@ -240,7 +240,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    */
   public static function isDomainGroup($groupId) {
     $domainGroupID = self::getGroupId();
-    return $domainGroupID == $groupId ? TRUE : FALSE;
+    return $domainGroupID == (bool) $groupId;
   }
 
   /**

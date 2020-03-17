@@ -730,7 +730,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $className = isset($trace['class']) ? ($trace['class'] . $trace['type']) : '';
 
       // Do not show args for a few password related functions
-      $skipArgs = ($className == 'DB::' && $fnName == 'connect') ? TRUE : FALSE;
+      $skipArgs = $className == 'DB::' && $fnName == 'connect';
 
       if (!empty($trace['args'])) {
         foreach ($trace['args'] as $arg) {
