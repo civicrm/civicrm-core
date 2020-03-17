@@ -32,7 +32,8 @@
     $scope.index = '';
     $scope.selectedTab = {result: 'result', code: 'php'};
     $scope.perm = {
-      accessDebugOutput: CRM.checkPerm('access debug output')
+      accessDebugOutput: CRM.checkPerm('access debug output'),
+      editGroups: CRM.checkPerm('edit groups')
     };
     marked.setOptions({highlight: prettyPrintOne});
     var getMetaParams = {},
@@ -709,6 +710,9 @@
     $scope.save = function() {
       var model = {
         title: '',
+        description: '',
+        visibility: 'User and User Admin Only',
+        group_type: [],
         id: null,
         entity: $scope.entity,
         params: JSON.parse(angular.toJson($scope.params))
@@ -731,9 +735,28 @@
   angular.module('api4Explorer').controller('SaveSearchCtrl', function($scope, crmApi4, dialogService) {
     var ts = $scope.ts = CRM.ts(),
       model = $scope.model;
+    $scope.groupEntityRefParams = {
+      entity: 'Group',
+      api: {
+        params: {is_hidden: 0, is_active: 1, 'saved_search_id.api_entity': model.entity},
+        extra: ['saved_search_id', 'description', 'visibility', 'group_type']
+      },
+      select: {
+        allowClear: true,
+        minimumInputLength: 0,
+        placeholder: ts('Select existing group')
+      }
+    };
+    if (!CRM.checkPerm('administer reserved groups')) {
+      $scope.groupEntityRefParams.api.params.is_reserved = 0;
+    }
+    $scope.perm = {
+      administerReservedGroups: CRM.checkPerm('administer reserved groups')
+    };
+    $scope.options = CRM.vars.api4.groupOptions;
     $scope.$watch('model.id', function(id) {
       if (id) {
-        model.description = $('#api-save-search-select-group').select2('data').extra.description;
+        _.assign(model, $('#api-save-search-select-group').select2('data').extra);
       }
     });
     $scope.cancel = function() {
@@ -743,13 +766,15 @@
       $('.ui-dialog:visible').block();
       var group = model.id ? {id: model.id} : {title: model.title};
       group.description = model.description;
+      group.visibility = model.visibility;
+      group.group_type = model.group_type;
       group.saved_search_id = '$id';
       var savedSearch = {
         api_entity: model.entity,
         api_params: model.params
       };
       if (group.id) {
-        savedSearch.id = $('#api-save-search-select-group').select2('data').extra.saved_search_id;
+        savedSearch.id = model.saved_search_id;
       }
       crmApi4('SavedSearch', 'save', {records: [savedSearch], chain: {group: ['Group', 'save', {'records': [group]}]}})
         .then(function(result) {

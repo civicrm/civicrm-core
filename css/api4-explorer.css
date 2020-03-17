@@ -199,6 +199,14 @@ div.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.opt
   content: "\f0d7";
 }
 
+/* Another weird shoreditch fix */
+#bootstrap-theme .form-inline div.checkbox {
+  margin-right: 1em;
+}
+#bootstrap-theme .form-inline div.checkbox label input[type=checkbox] {
+  margin: 0;
+}
+
 /**
  * Shims so the UI isn't completely broken when a Bootstrap theme is not installed
  */
