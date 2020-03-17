@@ -171,7 +171,7 @@ class CRM_Extension_Browser {
     }
 
     // 3 minutes ago for now
-    $outdated = (int) $timestamp < (time() - 180) ? TRUE : FALSE;
+    $outdated = (int) $timestamp < (time() - 180);
 
     if (!$timestamp || $outdated) {
       $remotes = json_decode($this->grabRemoteJson(), TRUE);

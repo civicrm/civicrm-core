@@ -134,7 +134,7 @@ class CRM_Extension_Mapper {
    */
   public function isExtensionKey($key) {
     // check if the string is an extension name or the class
-    return (strpos($key, '.') !== FALSE) ? TRUE : FALSE;
+    return strpos($key, '.') !== FALSE;
   }
 
   /**

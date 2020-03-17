@@ -79,7 +79,7 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
     $id = $cr[$customReports[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::del($id);
 
-    return $optionValue ? TRUE : FALSE;
+    return (bool) $optionValue;
   }
 
   /**
