@@ -265,7 +265,7 @@
     <type>boolean</type>
     <default>0</default>
     <add>2.2</add>
-    <comment>Should we overrite VERP address in Reply-To</comment>
+    <comment>Overwrite the VERP address in Reply-To</comment>
     <html>
       <type>CheckBox</type>
     </html>
