@@ -99,13 +99,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that import parser will not fail when same external_identifier found of deleted contact.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportParserWtihDeletedContactExternalIdentifier() {
     $contactId = $this->individualCreate([
-      "external_identifier" => "ext-1",
+      'external_identifier' => 'ext-1',
     ]);
-    CRM_Contact_BAO_Contact::deleteContact($contactId);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contactId]);
     list($originalValues, $result) = $this->setUpBaseContact([
       'external_identifier' => 'ext-1',
     ]);
