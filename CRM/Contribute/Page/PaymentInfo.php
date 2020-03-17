@@ -30,7 +30,7 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
   }
 
   public function browse() {
-    $getTrxnInfo = $this->_context == 'transaction' ? TRUE : FALSE;
+    $getTrxnInfo = $this->_context == 'transaction';
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, $getTrxnInfo, TRUE);
     if ($this->_context == 'payment_info') {
       $this->assign('paymentInfo', $paymentInfo);
