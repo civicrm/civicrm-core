@@ -36,7 +36,7 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
 
     $actionLog->copyValues($params);
 
-    $edit = ($actionLog->id) ? TRUE : FALSE;
+    $edit = (bool) $actionLog->id;
     if ($edit) {
       CRM_Utils_Hook::pre('edit', 'ActionLog', $actionLog->id, $actionLog);
     }

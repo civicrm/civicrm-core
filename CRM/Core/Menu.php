@@ -216,7 +216,7 @@ class CRM_Core_Menu {
     );
     $fieldsPresent = array();
     foreach ($fieldsToPropagate as $field) {
-      $fieldsPresent[$field] = CRM_Utils_Array::value($field, $menu[$path]) !== NULL ? TRUE : FALSE;
+      $fieldsPresent[$field] = isset($menu[$path][$field]);
     }
 
     $args = explode('/', $path);

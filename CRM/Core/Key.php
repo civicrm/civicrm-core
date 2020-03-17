@@ -135,7 +135,7 @@ class CRM_Core_Key {
     }
 
     // ensure that hash is a 32 digit hex number
-    return preg_match('#[0-9a-f]{32}#i', $hash) ? TRUE : FALSE;
+    return (bool) preg_match('#[0-9a-f]{32}#i', $hash);
   }
 
 }

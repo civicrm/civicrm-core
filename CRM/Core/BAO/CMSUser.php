@@ -72,8 +72,8 @@ class CRM_Core_BAO_CMSUser {
     $showCMS = FALSE;
 
     $isDrupal = $config->userSystem->is_drupal;
-    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
-    $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
+    $isJoomla = ucfirst($config->userFramework) == 'Joomla';
+    $isWordPress = $config->userFramework == 'WordPress';
 
     if (!$config->userSystem->isUserRegistrationPermitted()) {
       // Do not build form if CMS is not configured to allow creating users.
@@ -148,8 +148,8 @@ class CRM_Core_BAO_CMSUser {
     $config = CRM_Core_Config::singleton();
 
     $isDrupal = $config->userSystem->is_drupal;
-    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
-    $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
+    $isJoomla = ucfirst($config->userFramework) == 'Joomla';
+    $isWordPress = $config->userFramework == 'WordPress';
 
     $errors = [];
     if ($isDrupal || $isJoomla || $isWordPress) {

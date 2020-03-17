@@ -273,7 +273,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $escapedValue = CRM_Core_DAO::VALUE_SEPARATOR . CRM_Core_DAO::escapeString($columnValue) . CRM_Core_DAO::VALUE_SEPARATOR;
     $dao->whereAdd("extends_entity_column_value LIKE \"%$escapedValue%\"");
     //$dao->extends_entity_column_value = $columnValue;
-    return $dao->find() ? TRUE : FALSE;
+    return (bool) $dao->find();
   }
 
   /**
@@ -673,7 +673,7 @@ ORDER BY civicrm_custom_group.weight,
     if ($getCount) {
       return $recordExists;
     }
-    return $recordExists ? TRUE : FALSE;
+    return (bool) $recordExists;
   }
 
   /**
@@ -2103,7 +2103,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   public static function hasReachedMaxLimit($customGroupId, $entityId) {
     // check whether the group is multiple
     $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_multiple');
-    $isMultiple = ($isMultiple) ? TRUE : FALSE;
+    $isMultiple = (bool) $isMultiple;
     $hasReachedMax = FALSE;
     if ($isMultiple &&
       ($maxMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'max_multiple'))

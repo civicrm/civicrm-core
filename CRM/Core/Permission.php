@@ -278,7 +278,7 @@ class CRM_Core_Permission {
     }
 
     $groups = self::ufGroup($type);
-    return !empty($groups) && in_array($gid, $groups) ? TRUE : FALSE;
+    return !empty($groups) && in_array($gid, $groups);
   }
 
   /**
@@ -1627,7 +1627,7 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function isMultisiteEnabled() {
-    return Civi::settings()->get('is_enabled') ? TRUE : FALSE;
+    return (bool) Civi::settings()->get('is_enabled');
   }
 
   /**

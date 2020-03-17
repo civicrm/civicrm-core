@@ -128,7 +128,7 @@ class CRM_Core_BAO_ConfigSetting {
    */
   public static function applyLocale($settings, $activatedLocales) {
     // are we in a multi-language setup?
-    $multiLang = $activatedLocales ? TRUE : FALSE;
+    $multiLang = (bool) $activatedLocales;
 
     // set the current language
     $chosenLocale = NULL;

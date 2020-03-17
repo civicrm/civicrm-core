@@ -1804,7 +1804,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $rule = $field['rule'];
     $view = $field['is_view'];
     $required = ($mode == CRM_Profile_Form::MODE_SEARCH) ? FALSE : $field['is_required'];
-    $search = ($mode == CRM_Profile_Form::MODE_SEARCH) ? TRUE : FALSE;
+    $search = $mode == CRM_Profile_Form::MODE_SEARCH;
     $isShared = CRM_Utils_Array::value('is_shared', $field, 0);
 
     // do not display view fields in drupal registration form
@@ -2573,7 +2573,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         }
       }
 
-      $validProfile = (empty($required)) ? TRUE : FALSE;
+      $validProfile = (empty($required));
     }
 
     return $validProfile;
