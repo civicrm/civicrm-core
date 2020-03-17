@@ -46,7 +46,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    */
   public static function isActive($contactType) {
     $contact = self::contactTypeInfo(FALSE);
-    $active = array_key_exists($contactType, $contact) ? TRUE : FALSE;
+    $active = array_key_exists($contactType, $contact);
     return $active;
   }
 

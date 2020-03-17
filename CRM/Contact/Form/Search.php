@@ -183,7 +183,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public static function isSearchContext($context) {
     $searchContext = CRM_Utils_Array::value($context, self::validContext());
-    return $searchContext ? TRUE : FALSE;
+    return (bool) $searchContext;
   }
 
   public static function setModeValues() {
