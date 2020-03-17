@@ -1465,7 +1465,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       }
       $updateParams = [
         'id' => $entity['id'],
-        $field => isset($entity[$field]) ? $entity[$field] : NULL,
+        $field => $entity[$field] ?? NULL,
       ];
       if (isset($updateParams['financial_type_id']) && in_array($entityName, ['Grant'])) {
         //api has special handling on these 2 fields for backward compatibility reasons

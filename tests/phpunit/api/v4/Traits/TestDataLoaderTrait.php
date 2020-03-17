@@ -63,7 +63,7 @@ trait TestDataLoaderTrait {
    * @return null|mixed
    */
   protected function getReference($name) {
-    return isset($this->references[$name]) ? $this->references[$name] : NULL;
+    return $this->references[$name] ?? NULL;
   }
 
   /**
