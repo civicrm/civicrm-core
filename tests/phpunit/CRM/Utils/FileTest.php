@@ -115,7 +115,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public function mimeTypeToExtension() {
     $cases = [];
-    $cases[] = ['text/plain', ['txt', 'text', 'conf', 'def', 'list', 'log', 'in']];
+    $cases[] = ['text/plain', ['txt', 'text', 'conf', 'def', 'list', 'log', 'in', 'ini']];
     $cases[] = ['image/jpeg', ['jpeg', 'jpg', 'jpe']];
     $cases[] = ['image/png', ['png']];
     return $cases;
