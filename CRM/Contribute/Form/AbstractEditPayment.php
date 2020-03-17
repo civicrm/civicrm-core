@@ -279,7 +279,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       $this->_online = $values['contribution_recur_id'] ?? NULL;
     }
 
-    $this->assign('isOnline', $this->_online ? TRUE : FALSE);
+    $this->assign('isOnline', (bool) $this->_online);
 
     //to get note id
     $daoNote = new CRM_Core_BAO_Note();

@@ -1149,7 +1149,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_currentMemberships = [];
 
       $membershipTypeIds = $membershipTypes = $radio = [];
-      $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember) ? TRUE : FALSE;
+      $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
       $allowAutoRenewMembership = $autoRenewOption = FALSE;
       $autoRenewMembershipTypeOptions = [];
@@ -1283,7 +1283,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
       //give preference to user submitted auto_renew value.
-      $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted()) ? TRUE : FALSE;
+      $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted());
       $this->assign('takeUserSubmittedAutoRenew', $takeUserSubmittedAutoRenew);
 
       // Assign autorenew option (0:hide,1:optional,2:required) so we can use it in confirmation etc.
