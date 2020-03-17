@@ -178,9 +178,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
     $enableWorkflow = Civi::settings()->get('civimail_workflow');
 
-    return ($enableWorkflow &&
-      $config->userSystem->is_drupal
-    ) ? TRUE : FALSE;
+    return $enableWorkflow && $config->userSystem->is_drupal;
   }
 
   /**

@@ -299,7 +299,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         'custom_group_id' => $customGroup->id,
         'extends_entity_column_id' => $customGroup->extends_entity_column_id,
         'extends_entity_column_value' => CRM_Utils_Array::explodePadded($customGroup->extends_entity_column_value),
-        'is_reserved' => $customGroup->is_reserved ? TRUE : FALSE,
+        'is_reserved' => (bool) $customGroup->is_reserved,
       ];
       $result['sections'][$sectionName] = $section;
     }

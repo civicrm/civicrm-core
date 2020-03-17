@@ -2550,15 +2550,15 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       if (in_array($actTypeName, $singletonNames)) {
         $allow = FALSE;
         if ($operation == 'File On Case') {
-          $allow = (in_array($actTypeName, $doNotFileNames)) ? FALSE : TRUE;
+          $allow = !in_array($actTypeName, $doNotFileNames);
         }
         if (in_array($operation, $actionOperations)) {
           $allow = TRUE;
           if ($operation == 'edit') {
-            $allow = (in_array($actTypeName, $allowEditNames)) ? TRUE : FALSE;
+            $allow = in_array($actTypeName, $allowEditNames);
           }
           elseif ($operation == 'delete') {
-            $allow = (in_array($actTypeName, $doNotDeleteNames)) ? FALSE : TRUE;
+            $allow = !in_array($actTypeName, $doNotDeleteNames);
           }
         }
       }
@@ -2740,7 +2740,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
     //lets check for case configured.
     $allCasesCount = CRM_Case_BAO_Case::caseCount(NULL, FALSE);
-    $configured['configured'] = ($allCasesCount) ? TRUE : FALSE;
+    $configured['configured'] = (bool) $allCasesCount;
     if (!$configured['configured']) {
       //do check for case type and case status.
       $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);

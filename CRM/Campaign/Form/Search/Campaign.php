@@ -45,7 +45,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     $this->_searchTab = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, 'campaign');
 
     //when we do load tab, lets load the default objects.
-    $this->assign('force', ($this->_force || $this->_searchTab) ? TRUE : FALSE);
+    $this->assign('force', $this->_force || $this->_searchTab);
     $this->assign('searchParams', json_encode($this->get('searchParams')));
     $this->assign('buildSelector', $this->_search);
     $this->assign('searchFor', $this->_searchTab);
