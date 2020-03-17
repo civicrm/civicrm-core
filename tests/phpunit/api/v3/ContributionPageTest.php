@@ -2049,8 +2049,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function hook_civicrm_alterPaymentProcessorParams($paymentObj, &$rawParams, &$cookedParams) {
     // Ensure total_amount are the same if they're both given.
-    $total_amount = CRM_Utils_Array::value('total_amount', $rawParams);
-    $amount = CRM_Utils_Array::value('amount', $rawParams);
+    $total_amount = $rawParams['total_amount'] ?? NULL;
+    $amount = $rawParams['amount'] ?? NULL;
     if (!empty($total_amount) && !empty($amount) && $total_amount != $amount) {
       throw new Exception("total_amount '$total_amount' and amount '$amount' differ.");
     }

@@ -71,8 +71,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->_priceSetID = $this->priceSetCreate();
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $this->_priceSetID);
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->_priceSetID, TRUE, FALSE);
-    $priceSet = CRM_Utils_Array::value($this->_priceSetID, $priceSet);
-    $this->_feeBlock = CRM_Utils_Array::value('fields', $priceSet);
+    $priceSet = $priceSet[$this->_priceSetID] ?? NULL;
+    $this->_feeBlock = $priceSet['fields'] ?? NULL;
   }
 
   /**
@@ -376,8 +376,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->_priceSetID = $this->priceSetCreate('Text');
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $this->_priceSetID);
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->_priceSetID, TRUE, FALSE);
-    $priceSet = CRM_Utils_Array::value($this->_priceSetID, $priceSet);
-    $this->_feeBlock = CRM_Utils_Array::value('fields', $priceSet);
+    $priceSet = $priceSet[$this->_priceSetID] ?? NULL;
+    $this->_feeBlock = $priceSet['fields'] ?? NULL;
 
     $params = [
       'send_receipt' => 1,

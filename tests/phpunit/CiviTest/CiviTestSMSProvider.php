@@ -28,7 +28,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
       $providerID = $provider['id'];
     }
     else {
-      $providerID = CRM_Utils_Array::value('provider_id', $providerParams);
+      $providerID = $providerParams['provider_id'] ?? NULL;
     }
     $skipAuth   = $providerID ? FALSE : TRUE;
     $cacheKey   = (int) $providerID;
