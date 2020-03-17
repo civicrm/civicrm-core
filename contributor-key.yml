@@ -1,6 +1,10 @@
 # This is a key of GitHub handles to real contributors' names and organizations,
 # to be used for preparing credits for release notes.
 ---
+- github      : acrollet
+  name        : Adrian Rollett
+  organization: Roomify, LLC
+
 - github      : adixon
   name        : Alan Dixon
   organization: Blackfly Solutions
@@ -51,6 +55,10 @@
   name        : Alain Benbassat
   organization: Business & Code
   jira        : alainb
+
+- github      : albionbrown
+  name        : Josh Brown
+  organization: CEPR
 
 - name        : Alex Lee
   organization: GMCVO Databases
@@ -177,6 +185,9 @@
 - name        : Ben Jarlett
   jira        : benjarlett
 
+- github      : BettyDolfing
+  name        : Betty Dolfing
+
 - github      : bmango
   name        : Ben Mango
 
@@ -186,11 +197,13 @@
 
 - github      : borisson
   name        : Joris Vercammen
-  
+
 - name        : Brian McFee
   jira        : brian
 
-  github      : brianPHM
+- github      : breheret
+
+- github      : brianPHM
   name        : Brian Matemachani
 
 - github      : brucew2013
@@ -629,6 +642,10 @@
 - name        : Brian Hay
   jira        : inteja
 
+- github      : irritatie
+  name        : Matthijs Keijser
+  organization: CiviCoop
+
 - github      : jaapjansma
   name        : Jaap Jansma
   organization: CiviCoop
@@ -690,7 +707,7 @@
 
 - github      : JGaunt
   name        : Jade Gaunt
-  organisation: GMCVO Databases
+  organization: GMCVO Databases
 
 - github      : jgillmanjr
   name        : Jason Gillman Jr.
@@ -782,6 +799,9 @@
   name        : Kajakaran Balakrishnan
   organization: Veda Consulting
   jira        : kajan
+
+- github      : kartik1000
+  name        : Kartik Kathuria
 
 - github      : karthik-awebon
   name        : Karthikeyan Balasubramanian
@@ -1302,6 +1322,9 @@
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
   jira        : samuelsov
+
+- github      : simonjohnparker
+  name        : Simon John Parker
 
 - gitub       : sushant
   organization: OSSeed Technologies LLP
