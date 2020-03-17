@@ -2356,7 +2356,7 @@ LIMIT $offset, $limit
     // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
     // and it continues to work on Libre Office, Numbers, Notes etc.
     echo "\xEF\xBB\xBF";
-    CRM_Core_Report_Excel::makeCSVTable($headerRows, [], NULL, TRUE);
+    CRM_Core_Report_Excel::makeCSVTable($headerRows, [], TRUE);
   }
 
   /**
@@ -2367,7 +2367,6 @@ LIMIT $offset, $limit
     CRM_Core_Report_Excel::writeCSVFile($this->getExportFileName(),
       $headerRows,
       $componentDetails,
-      NULL,
       FALSE
     );
   }
