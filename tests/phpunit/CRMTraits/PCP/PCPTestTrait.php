@@ -29,7 +29,7 @@ trait CRMTraits_PCP_PCPTestTrait {
     $supporterProfile = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
     $supporterProfileId = $supporterProfile->id;
 
-    $params = array(
+    $params = [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contribPageId,
       'supporter_profile_id' => $supporterProfileId,
@@ -39,7 +39,7 @@ trait CRMTraits_PCP_PCPTestTrait {
       'tellfriend_limit' => 1,
       'link_text' => 'Create your own PCP',
       'is_active' => 1,
-    );
+    ];
 
     return $params;
   }
@@ -56,7 +56,7 @@ trait CRMTraits_PCP_PCPTestTrait {
     $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
     $contribPageId = $contribPage->id;
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'status_id' => '1',
       'title' => 'My PCP',
@@ -68,7 +68,7 @@ trait CRMTraits_PCP_PCPTestTrait {
       'is_honor_roll' => 1,
       'goal_amount' => 10000.00,
       'is_active' => 1,
-    );
+    ];
 
     return $params;
   }
