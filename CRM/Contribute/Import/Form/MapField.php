@@ -81,7 +81,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->assign('dataValues', $this->_dataValues);
 
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-    $this->_onDuplicate = $this->get('onDuplicate', isset($onDuplicate) ? $onDuplicate : "");
+    $this->_onDuplicate = $this->get('onDuplicate', $onDuplicate ?? "");
 
     if ($skipColumnHeader) {
       $this->assign('skipColumnHeader', $skipColumnHeader);

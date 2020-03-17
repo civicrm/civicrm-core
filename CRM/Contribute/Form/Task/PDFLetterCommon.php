@@ -49,8 +49,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       }
     }
     // update dates ?
-    $receipt_update = isset($formValues['receipt_update']) ? $formValues['receipt_update'] : FALSE;
-    $thankyou_update = isset($formValues['thankyou_update']) ? $formValues['thankyou_update'] : FALSE;
+    $receipt_update = $formValues['receipt_update'] ?? FALSE;
+    $thankyou_update = $formValues['thankyou_update'] ?? FALSE;
     $nowDate = date('YmdHis');
     $receipts = $thanks = $emailed = 0;
     $updateStatus = '';
@@ -75,8 +75,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $groupBy = $formValues['group_by'];
 
     // skip some contacts ?
-    $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
-    $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
+    $skipOnHold = $form->skipOnHold ?? FALSE;
+    $skipDeceased = $form->skipDeceased ?? TRUE;
     $contributionIDs = $form->getVar('_contributionIds');
     if ($form->_includesSoftCredits) {
       //@todo - comment on what is stored there

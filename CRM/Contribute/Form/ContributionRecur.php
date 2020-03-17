@@ -192,7 +192,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    */
   protected function getSubscriptionContactID() {
     $sub = $this->getSubscriptionDetails();
-    return isset($sub->contact_id) ? $sub->contact_id : FALSE;
+    return $sub->contact_id ?? FALSE;
   }
 
   /**

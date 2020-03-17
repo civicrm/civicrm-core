@@ -4438,7 +4438,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CiviCRM_API3_Exception
    */
   public static function completeOrder($input, &$ids, $objects, $transaction, $contribution, $isPostPaymentCreate = FALSE) {
-    $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
+    $primaryContributionID = $contribution->id ?? $objects['first_contribution']->id;
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id]);
