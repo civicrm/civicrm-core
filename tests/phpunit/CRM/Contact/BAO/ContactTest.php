@@ -611,7 +611,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $values['noteTotalCount'], 'Check for total note count');
 
     foreach ($values['note'] as $key => $val) {
-      $retrieveNote = CRM_Utils_Array::value('note', $val);
+      $retrieveNote = $val['note'] ?? NULL;
       //check the note value
       $this->assertEquals($params['note'], $retrieveNote, 'Check for note');
     }

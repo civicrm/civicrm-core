@@ -75,8 +75,8 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     // -- processing priceSet using the BAO
     $lineItems = [];
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
-    $priceSet = CRM_Utils_Array::value($priceSetId, $priceSet);
-    $feeBlock = CRM_Utils_Array::value('fields', $priceSet);
+    $priceSet = $priceSet[$priceSetId] ?? NULL;
+    $feeBlock = $priceSet['fields'] ?? NULL;
     $params['price_2'] = $feeTotal;
     $tempParams = $params;
 

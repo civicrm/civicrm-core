@@ -312,14 +312,14 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $result = civicrm_api3('Address', 'create', $params);
     $value = array_pop($result['values']);
-    $street_number = CRM_Utils_Array::value('street_number', $value);
+    $street_number = $value['street_number'] ?? NULL;
     $this->assertEquals($street_number, '54');
 
     // Ensure street parsing does not happen if disabled.
     $this->setStreetAddressParsing(FALSE);
     $result = civicrm_api3('Address', 'create', $params);
     $value = array_pop($result['values']);
-    $street_number = CRM_Utils_Array::value('street_number', $value);
+    $street_number = $value['street_number'] ?? NULL;
     $this->assertEmpty($street_number);
 
   }

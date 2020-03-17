@@ -286,11 +286,11 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     foreach ($memType as $rowCount => $type) {
       $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($type);
       $fieldParams['option_id'] = [1 => $priceFieldValue['id']];
-      $fieldParams['option_label'][$rowCount] = CRM_Utils_Array::value('name', $membetype);
+      $fieldParams['option_label'][$rowCount] = $membetype['name'] ?? NULL;
       $fieldParams['option_amount'][$rowCount] = $membetype['minimum_fee'] ?? 0;
-      $fieldParams['option_weight'][$rowCount] = CRM_Utils_Array::value('weight', $membetype);
-      $fieldParams['option_description'][$rowCount] = CRM_Utils_Array::value('description', $membetype);
-      $fieldParams['option_financial_type_id'][$rowCount] = CRM_Utils_Array::value('financial_type_id', $membetype);
+      $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
+      $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;
+      $fieldParams['option_financial_type_id'][$rowCount] = $membetype['financial_type_id'] ?? NULL;
       $fieldParams['membership_type_id'][$rowCount] = $type;
     }
     $priceField = CRM_Price_BAO_PriceField::create($fieldParams);

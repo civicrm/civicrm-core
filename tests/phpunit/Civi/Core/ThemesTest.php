@@ -192,7 +192,7 @@ class ThemesTest extends \CiviUnitTestCase {
     $map['bluemarine']['civicrm']['css/civicrm.css'] = ['http://example.com/blue/civicrm.css'];
     $map['bluemarine']['test.extension.uitest']['files/foo.css'] = ['http://example.com/blue/foobar/foo.css'];
     $map['aquamarine']['civicrm']['css/civicrm.css'] = ['http://example.com/aqua/civicrm.css'];
-    return isset($map[$themeKey][$cssExt][$cssFile]) ? $map[$themeKey][$cssExt][$cssFile] : Themes::PASSTHRU;
+    return $map[$themeKey][$cssExt][$cssFile] ?? Themes::PASSTHRU;
   }
 
   public function testGetAll() {
