@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -138,6 +122,10 @@ class CRM_Utils_Money {
   /**
    * Subtract currencies using integers instead of floats, to preserve precision
    *
+   * @param string|float $leftOp
+   * @param string|float $rightOp
+   * @param string $currency
+   *
    * @return float
    *   Result of subtracting $rightOp from $leftOp to the precision of $currency
    */
@@ -150,18 +138,13 @@ class CRM_Utils_Money {
 
   /**
    * Tests if two currency values are equal, taking into account the currency's
-   * precision, so that if the difference between the two values is less than
-   * one more order of magnitude for the precision, then the values are
-   * considered as equal. So, if the currency has  precision of 2 decimal
-   * points, a difference of more than 0.001 will cause the values to be
-   * considered as different. Anything less than 0.001 will be considered as
-   * equal.
+   * precision, so that the two values are compared as integers after rounding.
    *
    * Eg.
    *
-   * 1.2312 == 1.2319 with a currency precision of 2 decimal points
-   * 1.2310 != 1.2320 with a currency precision of 2 decimal points
-   * 1.3000 != 1.2000 with a currency precision of 2 decimal points
+   * 1.231 == 1.232 with a currency precision of 2 decimal points
+   * 1.234 != 1.236 with a currency precision of 2 decimal points
+   * 1.300 != 1.200 with a currency precision of 2 decimal points
    *
    * @param $value1
    * @param $value2
@@ -170,14 +153,9 @@ class CRM_Utils_Money {
    * @return bool
    */
   public static function equals($value1, $value2, $currency) {
-    $precision = 1 / pow(10, self::getCurrencyPrecision($currency) + 1);
-    $difference = self::subtractCurrencies($value1, $value2, $currency);
+    $precision = pow(10, self::getCurrencyPrecision($currency));
 
-    if (abs($difference) > $precision) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (int) round($value1 * $precision) == (int) round($value2 * $precision);
   }
 
   /**

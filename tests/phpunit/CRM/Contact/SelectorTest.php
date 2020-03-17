@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -103,6 +87,72 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
         CRM_Core_DAO::reenableFullGroupByMode();
         $selector->getQueryObject()->getCachedContacts([$contactID], FALSE);
+      }
+    }
+  }
+
+  /**
+   * Test advanced search results by uf_group_id.
+   */
+  public function testSearchByProfile() {
+    //Create search profile for contacts.
+    $ufGroup = $this->callAPISuccess('uf_group', 'create', [
+      'group_type' => 'Contact',
+      'name' => 'test_search_profile',
+      'title' => 'Test Search Profile',
+      'api.uf_field.create' => [
+        [
+          'field_name' => 'email',
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'label' => 'Email',
+          'in_selector' => 1,
+        ],
+      ],
+    ]);
+    $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
+    //Put the email on hold.
+    $email = $this->callAPISuccess('Email', 'get', [
+      'sequential' => 1,
+      'contact_id' => $contactID,
+    ]);
+    $this->callAPISuccess('Email', 'create', [
+      'id' => $email['id'],
+      'on_hold' => 1,
+    ]);
+
+    $dataSet = [
+      'description' => 'Normal default behaviour',
+      'class' => 'CRM_Contact_Selector',
+      'settings' => [],
+      'form_values' => ['email' => 'mickey@mouseville.com', 'uf_group_id' => $ufGroup['id']],
+      'params' => [],
+      'return_properties' => NULL,
+      'context' => 'advanced',
+      'action' => CRM_Core_Action::ADVANCED,
+      'includeContactIds' => NULL,
+      'searchDescendentGroups' => FALSE,
+    ];
+    $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
+    // create CRM_Contact_Selector instance and set desired query params
+    $selector = new CRM_Contact_Selector(
+      $dataSet['class'],
+      $dataSet['form_values'],
+      $params,
+      $dataSet['return_properties'],
+      $dataSet['action'],
+      $dataSet['includeContactIds'],
+      $dataSet['searchDescendentGroups'],
+      $dataSet['context']
+    );
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+    $this->assertEquals(1, count($rows));
+    $this->assertEquals($contactID, key($rows));
+
+    //Check if email column contains (On Hold) string.
+    foreach ($rows[$contactID] as $key => $value) {
+      if (strpos($key, 'email') !== FALSE) {
+        $this->assertContains("(On Hold)", (string) $value);
       }
     }
   }

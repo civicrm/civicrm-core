@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -97,18 +81,12 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     $this->_caseDetails = [
       'case_type' => $caseType,
-      'case_status' => CRM_Utils_Array::value($values['case_status_id'], $statuses),
-      'case_subject' => CRM_Utils_Array::value('subject', $values),
+      'case_status' => $statuses[$values['case_status_id']] ?? NULL,
+      'case_subject' => $values['subject'] ?? NULL,
       'case_start_date' => $values['case_start_date'],
     ];
     $this->_caseType = $caseTypeName;
     $this->assign('caseDetails', $this->_caseDetails);
-
-    $reportUrl = CRM_Utils_System::url('civicrm/case/report',
-      "reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&asn=",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('reportUrl', $reportUrl);
 
     // add to recently viewed
 
@@ -190,11 +168,31 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
 
     $allowedRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactID);
+    $relationshipTypeMetadata = CRM_Contact_Form_Relationship::getRelationshipTypeMetadata($allowedRelationshipTypes);
+
+    $caseTypeDefinition = civicrm_api3('CaseType', 'getsingle', ['name' => $this->_caseType])['definition'];
+
+    foreach ($caseTypeDefinition['caseRoles'] as $role) {
+      if (!empty($role['groups'])) {
+        $relationshipType = civicrm_api3('RelationshipType', 'get', [
+          'sequential' => 1,
+          'name_a_b' => $role['name'],
+          'name_b_a' => $role['name'],
+          'options' => ['limit' => 1, 'or' => [["name_a_b", "name_b_a"]]],
+        ]);
+        if (($relationshipType['values'][0]['name_a_b'] ?? NULL) === $role['name']) {
+          $relationshipTypeMetadata[$relationshipType['id']]['group_a'] = $role['groups'];
+        }
+        if (($relationshipType['values'][0]['name_b_a'] ?? NULL) === $role['name']) {
+          $relationshipTypeMetadata[$relationshipType['id']]['group_b'] = $role['groups'];
+        }
+      }
+    }
 
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header')
       ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header')
-      ->addVars('relationshipTypes', CRM_Contact_Form_Relationship::getRelationshipTypeMetadata($allowedRelationshipTypes));
+      ->addVars('relationshipTypes', $relationshipTypeMetadata);
 
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($this->_caseType, 'CaseRoles');
@@ -500,6 +498,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       'check_permissions' => TRUE,
       'contact_id' => $this->_contactID,
       'is_deleted' => 0,
+      'option.limit' => 0,
       'id' => ['!=' => $this->_caseID],
       'return' => ['id', 'start_date', 'case_type_id.title'],
     ]);

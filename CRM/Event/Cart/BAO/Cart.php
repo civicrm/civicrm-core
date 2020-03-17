@@ -238,7 +238,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return mixed
    */
   public function get_event_in_cart_by_event_id($event_id) {
-    return CRM_Utils_Array::value($event_id, $this->events_in_carts);
+    return $this->events_in_carts[$event_id] ?? NULL;
   }
 
   /**

@@ -50,7 +50,7 @@ class ThemesTest extends \CiviUnitTestCase {
       ],
     ];
 
-    $civicrmBaseUrl = "";
+    $civicrmBaseUrl = rtrim(\Civi::paths()->getVariable('civicrm.root', 'url'), '/');
 
     // --- Library of tests ---
 
@@ -62,7 +62,7 @@ class ThemesTest extends \CiviUnitTestCase {
       [
         'civicrm-css/civicrm.css' => ["$civicrmBaseUrl/css/civicrm.css"],
         'civicrm-css/joomla.css' => ["$civicrmBaseUrl/css/joomla.css"],
-        'test.extension.uitest-files/foo.css' => ["/tests/extensions/test.extension.uitest/files/foo.css"],
+        'test.extension.uitest-files/foo.css' => ["$civicrmBaseUrl/tests/extensions/test.extension.uitest/files/foo.css"],
       ],
     ];
 
@@ -76,7 +76,7 @@ class ThemesTest extends \CiviUnitTestCase {
       [
         'civicrm-css/civicrm.css' => ["$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/judy/css/civicrm.css"],
         'civicrm-css/joomla.css' => ["$civicrmBaseUrl/css/joomla.css"],
-        'test.extension.uitest-files/foo.css' => ["/tests/extensions/test.extension.uitest/files/foo.css"],
+        'test.extension.uitest-files/foo.css' => ["$civicrmBaseUrl/tests/extensions/test.extension.uitest/files/foo.css"],
         // excluded
         'test.extension.uitest-files/ignoreme.css' => [],
       ],
@@ -90,7 +90,7 @@ class ThemesTest extends \CiviUnitTestCase {
       [
         'civicrm-css/civicrm.css' => ["$civicrmBaseUrl/css/civicrm.css"],
         'civicrm-css/joomla.css' => ["$civicrmBaseUrl/css/joomla.css"],
-        'test.extension.uitest-files/foo.css' => ["/tests/extensions/test.extension.uitest/files/foo.css"],
+        'test.extension.uitest-files/foo.css' => ["$civicrmBaseUrl/tests/extensions/test.extension.uitest/files/foo.css"],
       ],
     ];
 
@@ -102,7 +102,7 @@ class ThemesTest extends \CiviUnitTestCase {
       [
         'civicrm-css/civicrm.css' => [],
         'civicrm-css/joomla.css' => ["$civicrmBaseUrl/css/joomla.css"],
-        'test.extension.uitest-files/foo.css' => ["/tests/extensions/test.extension.uitest/files/foo.css"],
+        'test.extension.uitest-files/foo.css' => ["$civicrmBaseUrl/tests/extensions/test.extension.uitest/files/foo.css"],
       ],
     ];
 
@@ -116,7 +116,7 @@ class ThemesTest extends \CiviUnitTestCase {
         'civicrm-css/civicrm.css' => ["$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/liza/css/civicrm.css"],
         'civicrm-css/civicrm.min.css' => ["$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/liza/css/civicrm.min.css"],
         'civicrm-css/joomla.css' => ["$civicrmBaseUrl/css/joomla.css"],
-        'test.extension.uitest-files/foo.css' => ["/tests/phpunit/Civi/Core/Theme/liza/test.extension.uitest-files/foo.css"],
+        'test.extension.uitest-files/foo.css' => ["$civicrmBaseUrl/tests/phpunit/Civi/Core/Theme/liza/test.extension.uitest-files/foo.css"],
       ],
     ];
 

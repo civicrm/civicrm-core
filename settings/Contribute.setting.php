@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  *
  * Settings metadata file
  */
@@ -43,11 +27,12 @@ return [
     'quick_form_type' => 'YesNo',
     'default' => '1',
     'add' => '4.1',
-    'title' => 'CVV required for backoffice?',
+    'title' => ts('CVV required for backoffice?'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Is the CVV code required for back office credit card transactions',
+    'description' => ts('Is the CVV code required for back office credit card transactions'),
     'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
+    'settings_pages' => ['contribute' => ['weight' => 10]],
   ],
   'contribution_invoice_settings' => [
     // @todo our standard is to have a setting per item not to hide settings in an array with
@@ -66,10 +51,9 @@ return [
       'tax_display_settings' => 'Inclusive',
     ],
     'add' => '4.7',
-    'title' => 'Contribution Invoice Settings',
+    'title' => ts('Deprecated setting'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'invoicing' => [
@@ -81,12 +65,89 @@ return [
     'quick_form_type' => 'Element',
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Enable Tax and Invoicing',
+    'title' => ts('Enable Tax and Invoicing'),
     'is_domain' => 1,
     'is_contact' => 0,
     'on_change' => [
       'CRM_Invoicing_Utils::onToggle',
     ],
+    'settings_pages' => ['contribute' => ['weight' => 90]],
+  ],
+  'invoice_prefix' => [
+    'html_type' => 'text',
+    'name' => 'invoice_prefix',
+    'add' => '5.23',
+    'type' => CRM_Utils_Type::T_STRING,
+    'title' => ts('Invoice Prefix'),
+    'description' => ts('Enter prefix to be be preprended when creating an invoice number'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+  ],
+  'invoice_due_date' => [
+    'name' => 'invoice_due_date',
+    'html_type' => 'text',
+    'title' => ts('Due Date'),
+    'add' => '5.23',
+    'type' => CRM_Utils_Type::T_INT,
+    'is_domain' => 1,
+    'is_contact' => 0,
+  ],
+  'invoice_due_date_period' => [
+    'html_type' => 'select',
+    'name' => 'invoice_due_date_period',
+    'title' => ts('For transmission'),
+    'weight' => 4,
+    'add' => '5.23',
+    'type' => CRM_Utils_Type::T_STRING,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Select the interval for due date.'),
+    'options' => [
+      'select' => ts('- select -'),
+      'days' => ts('Days'),
+      'months' => ts('Months'),
+      'years' => ts('Years'),
+    ],
+  ],
+  'invoice_notes' => [
+    'name' => 'invoice_notes',
+    'html_type' => 'wysiwyg',
+    'title' => ts('Notes or Standard Terms'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'add' => '5.23',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Enter note or message to be displayed on PDF invoice or credit notes '),
+    'attributes' => ['rows' => 2, 'cols' => 40],
+  ],
+  'invoice_is_email_pdf' => [
+    'name' => 'invoice_is_email_pdf',
+    'html_type' => 'checkbox',
+    'add' => '5.23',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'title' => ts('Automatically email invoice when user purchases online'),
+    'description' => ts('Should a pdf invoice be emailed automatically?'),
+  ],
+  'tax_term' => [
+    'name' => 'tax_term',
+    'html_type' => 'text',
+    'add' => '5.23',
+    'title' => ts('Tax Term'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'is_domain' => 1,
+    'is_contact' => 0,
+  ],
+  'tax_display_settings' => [
+    'html_type' => 'select',
+    'name' => 'tax_display_settings',
+    'type' => CRM_Utils_Type::T_STRING,
+    'add' => '5.23',
+    'title' => ts('Tax Display Settings'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::taxDisplayOptions'],
   ],
   'acl_financial_type' => [
     'group_name' => 'Contribute Preferences',
@@ -97,12 +158,12 @@ return [
     'quick_form_type' => 'Element',
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Enable Access Control by Financial Type',
+    'title' => ts('Enable Access Control by Financial Type'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
     'help' => ['id' => 'acl_financial_type'],
+    'settings_pages' => ['contribute' => ['weight' => 30]],
   ],
   'deferred_revenue_enabled' => [
     'group_name' => 'Contribute Preferences',
@@ -113,11 +174,11 @@ return [
     'quick_form_type' => 'Element',
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Enable Deferred Revenue',
+    'title' => ts('Enable Deferred Revenue'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 50]],
   ],
   'default_invoice_page' => [
     'group_name' => 'Contribute Preferences',
@@ -132,11 +193,11 @@ return [
     ],
     'html_type' => 'select',
     'add' => '4.7',
-    'title' => 'Default invoice payment page',
+    'title' => ts('Default invoice payment page'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 70]],
   ],
   'always_post_to_accounts_receivable' => [
     'group_name' => 'Contribute Preferences',
@@ -147,11 +208,11 @@ return [
     'quick_form_type' => 'Element',
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Always post to Accounts Receivable?',
+    'title' => ts('Always post to Accounts Receivable?'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 40]],
   ],
   'update_contribution_on_membership_type_change' => [
     'group_name' => 'Contribute Preferences',
@@ -162,10 +223,11 @@ return [
     'quick_form_type' => 'Element',
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Automatically update related contributions when Membership Type is changed',
+    'title' => ts('Automatically update related contributions when Membership Type is changed'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.',
+    'description' => ts('Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.'),
     'help_text' => NULL,
+    'settings_pages' => ['contribute' => ['weight' => 20]],
   ],
 ];

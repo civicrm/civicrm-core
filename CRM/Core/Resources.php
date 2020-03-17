@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 use Civi\Core\Event\GenericHookEvent;
 
@@ -38,7 +22,7 @@ use Civi\Core\Event\GenericHookEvent;
  * should incorporte services for aggregation, minimization, etc.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -204,7 +188,8 @@ class CRM_Core_Resources {
    *   - string: Load translated strings. Use a specific domain.
    *
    * @return CRM_Core_Resources
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
@@ -833,6 +818,19 @@ class CRM_Core_Resources {
     // Allow hooks to modify this list
     CRM_Utils_Hook::coreResourceList($items, $region);
 
+    // Oof, existing listeners would expect $items to typically begin with 'bower_components/' or 'packages/'
+    // (using an implicit base of `[civicrm.root]`). We preserve the hook contract and cleanup $items post-hook.
+    $map = [
+      'bower_components' => rtrim(Civi::paths()->getUrl('[civicrm.bower]/.', 'absolute'), '/'),
+      'packages' => rtrim(Civi::paths()->getUrl('[civicrm.packages]/.', 'absolute'), '/'),
+    ];
+    $filter = function($m) use ($map) {
+      return $map[$m[1]] . $m[2];
+    };
+    $items = array_map(function($item) use ($filter) {
+      return is_array($item) ? $item : preg_replace_callback(';^(bower_components|packages)(/.*);', $filter, $item);
+    }, $items);
+
     return $items;
   }
 
@@ -883,7 +881,7 @@ class CRM_Core_Resources {
       '$breakMin' => $params['breakpoint'] . 'px',
       '$breakMax' => ($params['breakpoint'] - 1) . 'px',
       '$menubarColor' => $menubarColor,
-      '$menuItemColor' => $params['menuItemColor'] ?? 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($menubarColor)) . ", .9)",
+      '$menuItemColor' => $params['menuItemColor'] ?? $menubarColor,
       '$highlightColor' => $params['highlightColor'] ?? CRM_Utils_Color::getHighlight($menubarColor),
       '$textColor' => $params['textColor'] ?? CRM_Utils_Color::getContrast($menubarColor, '#333', '#ddd'),
     ];

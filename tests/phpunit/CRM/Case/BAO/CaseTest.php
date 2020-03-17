@@ -137,6 +137,115 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * core/issue-1623: My Case dashlet doesn't sort by name but contact_id instead
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSortByCaseContact() {
+    // delete any cases if present
+    $this->callAPISuccess('Case', 'get', ['api.Case.delete' => ['id' => '$value.id']]);
+
+    // create three contacts with different name, later used in respective cases
+    $contacts = [
+      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
+      $this->individualCreate(['first_name' => 'Darric', 'last_name' => 'Roy']),
+      $this->individualCreate(['first_name' => 'Adam', 'last_name' => 'Pitt']),
+    ];
+    $loggedInUser = $this->createLoggedInUser();
+    $relationshipType = $this->relationshipTypeCreate([
+      'contact_type_b' => 'Individual',
+    ]);
+
+    // create cases for each contact
+    $cases = [];
+    foreach ($contacts as $contactID) {
+      $cases[] = $caseID = $this->createCase($contactID)->id;
+      $this->callAPISuccess('Relationship', 'create', [
+        'contact_id_a'         => $contactID,
+        'contact_id_b'         => $loggedInUser,
+        'relationship_type_id' => $relationshipType,
+        'case_id'              => $caseID,
+        'is_active'            => TRUE,
+      ]);
+    }
+
+    // USECASE A: fetch all cases using the AJAX fn without any sorting criteria, and match the result
+    global $_GET;
+    $_GET = [
+      'start' => 0,
+      'length' => 10,
+      'type' => 'any',
+      'all' => 1,
+      'is_unittest' => 1,
+    ];
+
+    $cases = [];
+    try {
+      CRM_Case_Page_AJAX::getCases();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $cases = $e->errorData['data'];
+    }
+
+    // list of expected sorted names in order the respective cases were created
+    $unsortedExpectedContactNames = [
+      'D`souza, Antonia',
+      'Roy, Darric',
+      'Pitt, Adam',
+    ];
+    $unsortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
+    foreach ($unsortedExpectedContactNames as $key => $name) {
+      $this->assertContains($name, $unsortedActualContactNames[$key]);
+    }
+
+    // USECASE B: fetch all cases using the AJAX fn based any 'Contact' sorting criteria, and match the result against expected sequence of names
+    $_GET = [
+      'start' => 0,
+      'length' => 10,
+      'type' => 'any',
+      'all' => 1,
+      'is_unittest' => 1,
+      'columns' => [
+        1 => [
+          'data' => 'sort_name',
+          'name' => NULL,
+          'searchable' => TRUE,
+          'orderable' => TRUE,
+          'search' => [
+            'value' => NULL,
+            'regex' => FALSE,
+          ],
+        ],
+      ],
+      'order' => [
+        [
+          'column' => 1,
+          'dir' => 'asc',
+        ],
+      ],
+    ];
+
+    $cases = [];
+    try {
+      CRM_Case_Page_AJAX::getCases();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $cases = $e->errorData['data'];
+    }
+
+    // list of expected sorted names in ASC order
+    $sortedExpectedContactNames = [
+      'D`souza, Antonia',
+      'Pitt, Adam',
+      'Roy, Darric',
+    ];
+    $sortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
+    foreach ($sortedExpectedContactNames as $key => $name) {
+      $this->assertContains($name, $sortedActualContactNames[$key]);
+    }
+  }
+
+  /**
    * Test that Case count is exactly one for logged in user for user's active role.
    *
    * @throws \CRM_Core_Exception
@@ -366,6 +475,34 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
     $_GET = $oldGET;
     $_REQUEST = $oldREQUEST;
+  }
+
+  /**
+   * Test getGlobalContacts
+   */
+  public function testGetGlobalContacts() {
+    //Add contact to case resource.
+    $caseResourceContactID = $this->individualCreate();
+    $this->callAPISuccess('GroupContact', 'create', [
+      'group_id' => "Case_Resources",
+      'contact_id' => $caseResourceContactID,
+    ]);
+
+    //No contact should be returned.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    $groupInfo = [];
+    $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
+    $this->assertEquals(0, count($groupContacts));
+
+    //Verify if contact is returned correctly.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+    $groupInfo = [];
+    $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
+    $this->assertEquals(1, count($groupContacts));
+    $this->assertEquals($caseResourceContactID, key($groupContacts));
   }
 
   /**

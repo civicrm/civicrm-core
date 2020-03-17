@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -57,6 +41,9 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param array $params
    *   Associated array of civicrm variables.
+   * @deprecated
+   *   This method was historically used to access civicrm_domain.config_backend.
+   *   However, that has been fully replaced by the settings system since v4.7.
    */
   public static function add(&$params) {
     $domain = new CRM_Core_DAO_Domain();
@@ -85,6 +72,9 @@ class CRM_Core_BAO_ConfigSetting {
    * @param $defaults
    *
    * @return array
+   * @deprecated
+   *   This method was historically used to access civicrm_domain.config_backend.
+   *   However, that has been fully replaced by the settings system since v4.7.
    */
   public static function retrieve(&$defaults) {
     $domain = new CRM_Core_DAO_Domain();
@@ -96,7 +86,8 @@ class CRM_Core_BAO_ConfigSetting {
       $urlVar = 'task';
     }
 
-    if ($isUpgrade && CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend')) {
+    $hasBackend = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend');
+    if ($isUpgrade && $hasBackend) {
       $domain->selectAdd('config_backend');
     }
     else {
@@ -105,7 +96,10 @@ class CRM_Core_BAO_ConfigSetting {
 
     $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
-    if ($domain->config_backend) {
+    if ($hasBackend && $domain->config_backend) {
+      // This whole branch can probably be removed; the transitional loading
+      // is in SettingBag::loadValues(). Moreover, since 4.7.alpha1 dropped
+      // the column, anyone calling ::retrieve() has likely not gotten any data.
       $defaults = unserialize($domain->config_backend);
       if ($defaults === FALSE || !is_array($defaults)) {
         $defaults = [];
@@ -269,8 +263,7 @@ class CRM_Core_BAO_ConfigSetting {
       'Boolean',
       CRM_Core_DAO::$_nullArray,
       FALSE,
-      FALSE,
-      'REQUEST'
+      FALSE
     );
     if ($config->userSystem->is_drupal &&
       $resetSessionTable

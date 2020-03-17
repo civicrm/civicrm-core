@@ -1,1 +1,1 @@
-{ts 1=$event.event_title}Event Registration Cancelled for %1{/ts}
+{ts 1=$event.event_title}Event Registration Cancelled for %1{/ts} - {contact.display_name}

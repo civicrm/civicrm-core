@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -41,6 +25,7 @@ use Civi\Api4\Event\Events;
 use Civi\Api4\Event\PostSelectQueryEvent;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Utils\ArrayInsertionUtil;
+use Civi\Api4\Utils\FormattingUtil;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -49,7 +34,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PostSelectQuerySubscriber implements EventSubscriberInterface {
 
   /**
-   * @inheritdoc
+   * @inheritDoc
    */
   public static function getSubscribedEvents() {
     return [
@@ -76,8 +61,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       return $results;
     }
 
-    $fieldSpec = $query->getApiFieldSpec();
-    $this->unserializeFields($results, $query->getEntity(), $fieldSpec);
+    FormattingUtil::formatOutputValues($results, $query->getApiFieldSpec(), $query->getEntity());
 
     // Group the selects to avoid queries for each field
     $groupedSelects = $this->getNtoManyJoinSelects($query);
@@ -91,7 +75,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       foreach ($results as &$primaryResult) {
         $baseId = $primaryResult['id'];
         $filtered = array_filter($joinResults, function ($res) use ($baseId) {
-          return ($res['_base_id'] === $baseId);
+          return ($res['_base_id'] == $baseId);
         });
         $filtered = array_values($filtered);
         ArrayInsertionUtil::insert($primaryResult, $joinPath, $filtered);
@@ -114,25 +98,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
       $fields[array_pop($name)] = $field->toArray();
     }
     if ($fields) {
-      $this->unserializeFields($joinResults, NULL, $fields);
-    }
-  }
-
-  /**
-   * Unserialize values
-   *
-   * @param array $results
-   * @param string $entity
-   * @param array $fields
-   */
-  protected function unserializeFields(&$results, $entity, $fields = []) {
-    foreach ($results as &$result) {
-      foreach ($result as $field => &$value) {
-        if (!empty($fields[$field]['serialize']) && is_string($value)) {
-          $serializationType = $fields[$field]['serialize'];
-          $value = \CRM_Core_DAO::unSerializeField($value, $serializationType);
-        }
-      }
+      FormattingUtil::formatOutputValues($joinResults, $fields, $join->getEntity());
     }
   }
 
@@ -274,9 +240,13 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
     }, $selects, array_keys($selects));
 
     $newSelect = sprintf('SELECT DISTINCT %s', implode(", ", $aliasedSelects));
-    $sql = str_replace("\n", ' ', $query->getQuery()->toSQL());
-    $originalSelect = substr($sql, 0, strpos($sql, ' FROM'));
-    $sql = str_replace($originalSelect, $newSelect, $sql);
+    $sql = $query->getQuery()->toSQL();
+    // Replace the "SELECT" clause
+    $sql = $newSelect . substr($sql, strpos($sql, "\nFROM"));
+
+    if (is_array($query->debugOutput)) {
+      $query->debugOutput['sql'][] = $sql;
+    }
 
     $relatedResults = [];
     $resultDAO = \CRM_Core_DAO::executeQuery($sql);

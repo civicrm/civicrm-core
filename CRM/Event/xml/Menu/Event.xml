@@ -44,10 +44,18 @@
   <item>
      <path>civicrm/event/ical</path>
      <title>Current and Upcoming Events</title>
-     <page_callback>CRM_Event_Page_ICalendar</page_callback>
+     <page_callback>CRM_Event_ICalendar::run</page_callback>
      <access_arguments>view event info</access_arguments>
      <is_public>true</is_public>
      <weight>0</weight>
+  </item>
+  <item>
+    <path>civicrm/event/list</path>
+    <title>Current and Upcoming Events</title>
+    <page_callback>CRM_Event_Page_List</page_callback>
+    <access_arguments>view event info</access_arguments>
+    <is_public>true</is_public>
+    <weight>0</weight>
   </item>
   <item>
      <path>civicrm/event/participant</path>

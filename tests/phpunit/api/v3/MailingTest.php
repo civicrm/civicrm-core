@@ -102,6 +102,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Create a completed mailing (e.g when importing from a provider).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMailerCreateCompleted() {
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
@@ -146,6 +148,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * The `template_options` field should be treated a JSON object.
    *
    * This test will create, read, and update the field.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMailerCreateTemplateOptions() {
     // 1. Create mailing with template_options.
@@ -183,6 +187,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * The Mailing.create API supports magic properties "groups[include,enclude]" and "mailings[include,exclude]".
    * Make sure these work
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMagicGroups_create_update() {
     // BEGIN SAMPLE DATA
@@ -369,6 +375,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Test if Mailing recipients include duplicate OR on_hold emails
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMailerPreviewRecipientsDeduplicateAndOnholdEmails() {
     // BEGIN SAMPLE DATA
@@ -639,14 +647,16 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * @param array $submitParams
    * @param null|string $expectedFailure
    * @param int $expectedJobCount
+   *
    * @dataProvider submitProvider
+   * @throws \CRM_Core_Exception
    */
   public function testMailerSubmit($useLogin, $createParams, $submitParams, $expectedFailure, $expectedJobCount) {
     if ($useLogin) {
       $this->createLoggedInUser();
     }
 
-    if (isset($createParams['footer_id']) && $createParams['footer_id'] == '%FOOTER%') {
+    if (isset($createParams['footer_id']) && $createParams['footer_id'] === '%FOOTER%') {
       $createParams['footer_id'] = $this->footer['id'];
     }
 
@@ -671,6 +681,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Test unsubscribe list contains correct groups
    * when include = 'previous mailing'
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testUnsubscribeGroupList() {
     // Create set of groups and add a contact to both of them.
@@ -709,7 +722,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'entity_id' => $mail['id'],
       'group_type' => 'Include',
     ];
-    $mailingGroup = $this->callAPISuccess('MailingGroup', 'create', $mgParams);
+    $this->callAPISuccess('MailingGroup', 'create', $mgParams);
     //CRM-20431 - Delete group id that matches first mailing id.
     $this->callAPISuccess('Group', 'delete', ['id' => $this->_groupID]);
     $jobId = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingJob', $mail2['id'], 'id', 'mailing_id');
@@ -742,24 +755,19 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery($sql);
 
     foreach (['bounce', 'unsubscribe', 'opened'] as $type) {
-      $sql = "CREATE TEMPORARY TABLE mail_{$type}_temp
-(event_queue_id int, time_stamp datetime, delivered_id int)
-SELECT event_queue_id, time_stamp, id
- FROM civicrm_mailing_event_delivered
- WHERE id IN ($deliveredIds)
- ORDER BY RAND() LIMIT 0,20;";
-      CRM_Core_DAO::executeQuery($sql);
-
-      $sql = "DELETE FROM civicrm_mailing_event_delivered WHERE id IN (SELECT delivered_id FROM mail_{$type}_temp);";
-      CRM_Core_DAO::executeQuery($sql);
+      $temporaryTable = CRM_Utils_SQL_TempTable::build()->setCategory($type)->createWithQuery("SELECT event_queue_id, time_stamp, id as delivered_id
+        FROM civicrm_mailing_event_delivered
+        WHERE id IN ($deliveredIds)
+         ORDER BY RAND() LIMIT 0,20");
+      $temporaryTableName = $temporaryTable->getName();
 
       if ($type == 'unsubscribe') {
         $sql = "INSERT INTO civicrm_mailing_event_{$type} (event_queue_id, time_stamp, org_unsubscribe)
-SELECT event_queue_id, time_stamp, 1 FROM mail_{$type}_temp";
+SELECT event_queue_id, time_stamp, 1 FROM {$temporaryTableName}";
       }
       else {
         $sql = "INSERT INTO civicrm_mailing_event_{$type} (event_queue_id, time_stamp)
-SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
+SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
       }
       CRM_Core_DAO::executeQuery($sql);
     }
@@ -777,6 +785,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'clickthrough_rate' => '0%',
     ];
     $this->checkArrayEquals($expectedResult, $result['values'][$mail['id']]);
+    $temporaryTable->drop();
   }
 
   /**
@@ -803,6 +812,11 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $this->assertArrayHasKey('id', $result['values'][0]['children'][0]);
   }
 
+  /**
+   * Test clone function.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testClone() {
     // BEGIN SAMPLE DATA
     $groupIDs['inc'] = $this->groupCreate(['name' => 'Example include group', 'title' => 'Example include group']);
@@ -954,6 +968,8 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
   /**
    * Test to make sure that if the event queue hashes have been archived,
    * we can still have working click-trough URLs working (CRM-17959).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testUrlWithMissingTrackingHash() {
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
@@ -1030,6 +1046,15 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     catch (Exception $e) {
       $this->assertRegExp("/Failure in api call for mailing create:  Mailing has not been saved, Content maybe out of date, please refresh the page and try again/", $e->getMessage());
     }
+  }
+
+  /**
+   * Test that api Mailing.update_email_resetdate does not throw a core error.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdateEmailResetdate() {
+    $this->callAPISuccess('Mailing', 'update_email_resetdate', []);
   }
 
 }

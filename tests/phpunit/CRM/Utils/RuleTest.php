@@ -82,9 +82,15 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @dataProvider moneyDataProvider
    * @param $inputData
+   * @param $decimalPoint
+   * @param $thousandSeparator
+   * @param $currency
    * @param $expectedResult
    */
-  public function testMoney($inputData, $expectedResult) {
+  public function testMoney($inputData, $decimalPoint, $thousandSeparator, $currency, $expectedResult) {
+    $this->setDefaultCurrency($currency);
+    $this->setMonetaryDecimalPoint($decimalPoint);
+    $this->setMonetaryThousandSeparator($thousandSeparator);
     $this->assertEquals($expectedResult, CRM_Utils_Rule::money($inputData));
   }
 
@@ -93,22 +99,66 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    */
   public function moneyDataProvider() {
     return [
-      [10, TRUE],
-      ['145.0E+3', FALSE],
-      ['10', TRUE],
-      [-10, TRUE],
-      ['-10', TRUE],
-      ['-10foo', FALSE],
-      ['-10.0345619', TRUE],
-      ['-10.010,4345619', TRUE],
-      ['10.0104345619', TRUE],
-      ['-0', TRUE],
-      ['-.1', TRUE],
-      ['.1', TRUE],
+      [10, '.', ',', 'USD', TRUE],
+      ['145.0E+3', '.', ',', 'USD', FALSE],
+      ['10', '.', ',', 'USD', TRUE],
+      [-10, '.', ',', 'USD', TRUE],
+      ['-10', '.', ',', 'USD', TRUE],
+      ['-10foo', '.', ',', 'USD', FALSE],
+      ['-10.0345619', '.', ',', 'USD', TRUE],
+      ['-10.010,4345619', '.', ',', 'USD', TRUE],
+      ['10.0104345619', '.', ',', 'USD', TRUE],
+      ['-0', '.', ',', 'USD', TRUE],
+      ['-.1', '.', ',', 'USD', TRUE],
+      ['.1', '.', ',', 'USD', TRUE],
       // Test currency symbols too, default locale uses $, so if we wanted to test others we'd need to reconfigure locale
-      ['$500.3333', TRUE],
-      ['-$500.3333', TRUE],
-      ['$-500.3333', TRUE],
+      ['$1,234,567.89', '.', ',', 'USD', TRUE],
+      ['-$1,234,567.89', '.', ',', 'USD', TRUE],
+      ['$-1,234,567.89', '.', ',', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'USD', TRUE],
+      // Test EURO currency
+      ['€1,234,567.89', '.', ',', 'EUR', TRUE],
+      ['-€1,234,567.89', '.', ',', 'EUR', TRUE],
+      ['€-1,234,567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'EUR', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'EUR', TRUE],
+      // Test Norwegian KR currency
+      ['kr1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr 1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['-kr1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['-kr 1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr-1,234,567.89', '.', ',', 'NOK', TRUE],
+      ['kr -1,234,567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', '.', ',', 'NOK', TRUE],
+      // This is the float format.
+      [1234567.89, '.', ',', 'NOK', TRUE],
+      // Test different localization options: , as decimal separator and dot as thousand separator
+      ['$1.234.567,89', ',', '.', 'USD', TRUE],
+      ['-$1.234.567,89', ',', '.', 'USD', TRUE],
+      ['$-1.234.567,89', ',', '.', 'USD', TRUE],
+      ['1.234.567,89', ',', '.', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', '.', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', '.', 'USD', TRUE],
+      ['$1,234,567.89', ',', '.', 'USD', FALSE],
+      ['-$1,234,567.89', ',', '.', 'USD', FALSE],
+      ['$-1,234,567.89', ',', '.', 'USD', FALSE],
+      // Now with a space as thousand separator
+      ['$1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['-$1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['$-1 234 567,89', ',', ' ', 'USD', TRUE],
+      ['1 234 567,89', ',', ' ', 'USD', TRUE],
+      // This is the float format. Encapsulated in strings
+      ['1234567.89', ',', ' ', 'USD', TRUE],
+      // This is the float format.
+      [1234567.89, ',', ' ', 'USD', TRUE],
     ];
   }
 

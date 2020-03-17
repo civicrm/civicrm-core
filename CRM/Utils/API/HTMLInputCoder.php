@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -35,7 +19,7 @@
  * escaping scheme and consequently remove HTMLInputCoder.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   private $skipFields = NULL;
@@ -121,6 +105,10 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'content',
         // CiviCampaign Goal Details
         'goal_general',
+        // https://lab.civicrm.org/dev/core/issues/1286
+        'header',
+        // https://lab.civicrm.org/dev/core/issues/1286
+        'footer',
       ];
       $custom = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_custom_field WHERE html_type = "RichTextEditor"');
       while ($custom->fetch()) {
@@ -146,7 +134,39 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(['<', '>'], ['&lt;', '&gt;'], $values);
+      $values = $this->encodeValue($values);
+    }
+  }
+
+  public function encodeValue($value) {
+    return str_replace(['<', '>'], ['&lt;', '&gt;'], $value);
+  }
+
+  /**
+   * Perform in-place decode on strings (in a list of records).
+   *
+   * @param array $rows
+   *   Ex in: $rows[0] = ['first_name' => 'A&W'].
+   *   Ex out: $rows[0] = ['first_name' => 'A&amp;W'].
+   */
+  public function encodeRows(&$rows) {
+    foreach ($rows as $rid => $row) {
+      $this->encodeRow($rows[$rid]);
+    }
+  }
+
+  /**
+   * Perform in-place encode on strings (in a single record).
+   *
+   * @param array $row
+   *   Ex in: ['first_name' => 'A&W'].
+   *   Ex out: ['first_name' => 'A&amp;W'].
+   */
+  public function encodeRow(&$row) {
+    foreach ($row as $k => $v) {
+      if (is_string($v) && !$this->isSkippedField($k)) {
+        $row[$k] = $this->encodeValue($v);
+      }
     }
   }
 
@@ -161,7 +181,39 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(['&lt;', '&gt;'], ['<', '>'], $values);
+      $values = $this->decodeValue($values);
+    }
+  }
+
+  public function decodeValue($value) {
+    return str_replace(['&lt;', '&gt;'], ['<', '>'], $value);
+  }
+
+  /**
+   * Perform in-place decode on strings (in a list of records).
+   *
+   * @param array $rows
+   *   Ex in: $rows[0] = ['first_name' => 'A&amp;W'].
+   *   Ex out: $rows[0] = ['first_name' => 'A&W'].
+   */
+  public function decodeRows(&$rows) {
+    foreach ($rows as $rid => $row) {
+      $this->decodeRow($rows[$rid]);
+    }
+  }
+
+  /**
+   * Perform in-place decode on strings (in a single record).
+   *
+   * @param array $row
+   *   Ex in: ['first_name' => 'A&amp;W'].
+   *   Ex out: ['first_name' => 'A&W'].
+   */
+  public function decodeRow(&$row) {
+    foreach ($row as $k => $v) {
+      if (is_string($v) && !$this->isSkippedField($k)) {
+        $row[$k] = $this->decodeValue($v);
+      }
     }
   }
 

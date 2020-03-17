@@ -1,49 +1,24 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for the display preferences.
  */
 class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
-  protected $_settings = [
-    'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'update_contribution_on_membership_type_change' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'acl_financial_type' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'always_post_to_accounts_receivable' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'deferred_revenue_enabled' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'default_invoice_page' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'invoicing' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-  ];
 
   /**
    * Our standards for settings are to have a setting per value with defined metadata.
@@ -51,7 +26,10 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    * Unfortunately the 'contribution_invoice_settings' has been added in non-compliance.
    * We use this array to hack-handle.
    *
-   * I think the best way forwards would be to covert to multiple individual settings.
+   * These are now stored as individual settings but this form still does weird & wonderful things.
+   *
+   * Note the 'real' settings on this form are added via metadata definition - ie
+   * 'settings_pages' => ['contribute' => ['weight' => 1]], in their metadata.
    *
    * @var array
    */
@@ -59,22 +37,18 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
 
   /**
    * Build the form object.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $config = CRM_Core_Config::singleton();
     $this->invoiceSettings = [
       'invoice_prefix' => [
         'html_type' => 'text',
         'title' => ts('Invoice Prefix'),
         'weight' => 1,
         'description' => ts('Enter prefix to be display on PDF for invoice'),
-      ],
-      'credit_notes_prefix' => [
-        'html_type' => 'text',
-        'title' => ts('Credit Notes Prefix'),
-        'weight' => 2,
-        'description' => ts('Enter prefix to be display on PDF for credit notes.'),
       ],
       'due_date' => [
         'html_type' => 'text',

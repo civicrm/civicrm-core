@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -39,6 +23,8 @@ namespace Civi\Api4;
 
 /**
  * Retrieves information about all Api4 entities.
+ *
+ * @see \Civi\Api4\Generic\AbstractEntity
  *
  * @package Civi\Api4
  */
@@ -57,9 +43,23 @@ class Entity extends Generic\AbstractEntity {
   public static function getFields() {
     return new \Civi\Api4\Generic\BasicGetFieldsAction('Entity', __FUNCTION__, function() {
       return [
-        ['name' => 'name'],
-        ['name' => 'description'],
-        ['name' => 'comment'],
+        [
+          'name' => 'name',
+          'description' => 'Entity name',
+        ],
+        [
+          'name' => 'description',
+          'description' => 'Description from docblock',
+        ],
+        [
+          'name' => 'comment',
+          'description' => 'Comments from docblock',
+        ],
+        [
+          'name' => 'see',
+          'data_type' => 'Array',
+          'description' => 'Any @see annotations from docblock',
+        ],
       ];
     });
   }

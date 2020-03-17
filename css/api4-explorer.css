@@ -22,7 +22,7 @@
 #bootstrap-theme.api4-explorer-page > div > .panel {
   flex: 1;
   margin: 10px;
-  min-height: 400px;
+  min-height: 500px;
 }
 #bootstrap-theme.api4-explorer-page > div > form.panel {
   flex: 2;
@@ -33,8 +33,21 @@
   border-bottom-left-radius: 0;
   margin-bottom: 0;
 }
+#bootstrap-theme.api4-explorer-page .panel-heading.nav-tabs {
+  padding: 8px 0 0 20px;
+}
+#bootstrap-theme .panel-heading>li>a {
+  background-color: #f1f1f18c
+}
 #bootstrap-theme.api4-explorer-page .explorer-code-panel table td:first-child {
-  width: 5em;
+  width: 6em;
+  word-break: break-word;
+}
+#bootstrap-theme.api4-explorer-page .explorer-code-panel table td pre {
+  min-height: 3.3em;
+}
+#bootstrap-theme.api4-explorer-page .explorer-code-panel .panel-heading.nav li a {
+  text-transform: uppercase;
 }
 
 #bootstrap-theme.api4-explorer-page .explorer-params-panel > .panel-body > div.api4-input {
@@ -47,6 +60,11 @@
 
 #bootstrap-theme.api4-explorer-page .explorer-help-panel .panel-body {
   word-break: break-word;
+}
+
+/* because each help p is in a div, this undoes bootstrap removing margin from last-child */
+#bootstrap-theme.api4-explorer-page .explorer-help-panel .panel-body p {
+  margin-bottom: 10px;
 }
 
 #bootstrap-theme.api4-explorer-page form label {
@@ -90,15 +108,19 @@
   background-color: rgba(255, 255, 255, .9);
 }
 
-#bootstrap-theme.api4-explorer-page div.api4-input.form-inline .form-control {
+#bootstrap-theme.api4-explorer-page div.api4-input.form-inline label.form-control {
   margin-right: 6px;
 }
+#bootstrap-theme.api4-explorer-page div.api4-input.form-inline label.form-control input[type=checkbox] {
+  margin: 0 2px 0 0;
+}
 
-#bootstrap-theme.api4-explorer-page div.api4-input.form-inline .form-control:not(.api4-option-selected) {
+#bootstrap-theme.api4-explorer-page div.api4-input.form-inline label.form-control:not(.api4-option-selected) {
   transition: none;
   box-shadow: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
+  font-weight: normal;
 }
 
 #bootstrap-theme.api4-explorer-page div.api4-input.form-inline .form-control label {
@@ -146,12 +168,11 @@
 
 #bootstrap-theme.api4-explorer-page .api4-operator,
 #bootstrap-theme.api4-explorer-page .api4-chain-index,
-#bootstrap-theme.api4-explorer-page .api4-index,
 #bootstrap-theme.api4-explorer-page .api4-chain-action {
-  width: 70px;
+  width: 90px;
 }
 #bootstrap-theme.api4-explorer-page .api4-chain-params {
-  width: calc( 100% - 346px);
+  width: calc(100% - 390px);
 }
 
 #bootstrap-theme.api4-explorer-page .api4-add-where-group-menu {

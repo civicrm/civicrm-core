@@ -218,4 +218,20 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     return $ufGroup->id;
   }
 
+  /**
+   * Test ability to modify the acceptable fields for use in a profile via hook
+   */
+  public function testGetFieldsFlatModifiedByHook() {
+    unset(Civi::$statics['UFFieldsFlat']);
+    $this->hookClass->setHook('civicrm_alterUFFields', [$this, 'modifyUFFields']);
+    $fields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
+
+    $this->assertEquals('Grant', $fields['grant_id']['field_type']);
+    $this->assertEquals('contact_id', $fields['grant_contact_id']['name']);
+  }
+
+  public function modifyUFFields(&$fields) {
+    $fields['Grant'] = CRM_Grant_DAO_Grant::export();
+  }
+
 }

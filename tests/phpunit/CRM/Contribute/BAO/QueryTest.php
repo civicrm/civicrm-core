@@ -74,14 +74,43 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testRelativeContributionDates() {
-    $this->contributionCreate(['receive_date' => '2018-01-02', 'contact_id' => $this->individualCreate()]);
-    $this->contributionCreate(['receive_date' => '2017-01-02', 'contact_id' => $this->individualCreate()]);
+    $contribution1 = $this->contributionCreate(['receive_date' => '2018-01-02', 'contact_id' => $this->individualCreate()]);
+    $contribution2 = $this->contributionCreate(['receive_date' => '2017-01-02', 'contact_id' => $this->individualCreate()]);
     $queryObj = new CRM_Contact_BAO_Query([['receive_date_low', '=', 20170101, 1, 0]]);
     $this->assertEquals(2, $queryObj->searchQuery(0, 0, NULL, TRUE));
     $queryObj = new CRM_Contact_BAO_Query([['receive_date_low', '=', 20180101, 1, 0]]);
     $this->assertEquals(1, $queryObj->searchQuery(0, 0, NULL, TRUE));
     $queryObj = new CRM_Contact_BAO_Query([['receive_date_high', '=', 20180101, 1, 0]]);
     $this->assertEquals(1, $queryObj->searchQuery(0, 0, NULL, TRUE));
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution1]);
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution2]);
+  }
+
+  public function testContributionWithoutSoftCredits() {
+    $contribution1 = $this->contributionCreate(['receive_date' => '2018-01-02', 'contact_id' => $this->individualCreate()]);
+    $contact2 = $this->callAPISuccess('Contact', 'create', [
+      'display_name' => 'superman',
+      'contact_type' => 'Individual',
+    ]);
+    $contribution2 = $this->contributionCreate([
+      'receive_date' => '2017-01-02',
+      'contact_id' => $this->individualCreate(),
+      'honor_contact_id' => $contact2['id'],
+    ]);
+    $queryObj = new CRM_Contact_BAO_Query([['contribution_or_softcredits', '=', 'only_contribs_unsoftcredited', 1, 0]], NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+    $this->assertEquals(1, $queryObj->searchQuery(0, 0, NULL, TRUE));
+    $this->assertContains('contribution_search_scredit_combined.filter_id IS NULL', $queryObj->_where[1]);
+    $queryObj = new CRM_Contact_BAO_Query([['contribution_or_softcredits', '=', 'only_scredits', 1, 0]], NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+    $this->assertEquals(1, $queryObj->searchQuery(0, 0, NULL, TRUE));
+    $this->assertContains('contribution_search_scredit_combined.scredit_id IS NOT NULL', $queryObj->_where[1]);
+    $queryObj = new CRM_Contact_BAO_Query([['contribution_or_softcredits', '=', 'both_related', 1, 0]], NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+    $this->assertEquals(2, $queryObj->searchQuery(0, 0, NULL, TRUE));
+    $this->assertContains('contribution_search_scredit_combined.filter_id IS NOT NULL', $queryObj->_where[1]);
+    $queryObj = new CRM_Contact_BAO_Query([['contribution_or_softcredits', '=', 'both', 1, 0]], NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+    $this->assertEquals(3, $queryObj->searchQuery(0, 0, NULL, TRUE));
+    $this->assertEmpty($queryObj->_where[0]);
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution1]);
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution2]);
   }
 
 }

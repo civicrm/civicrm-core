@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -46,6 +30,8 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    *
    * This method is called after a test is executed.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function tearDown() {
     $this->quickCleanup([
@@ -57,10 +43,15 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * Test Relationship Type Options Will Return Specified Type
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testRelationshipTypeOptionsWillReturnSpecifiedType() {
     $orgToOrgType = 'A_B_relationship';
     $orgToOrgReverseType = 'B_A_relationship';
-    civicrm_api3('RelationshipType', 'create', [
+    $this->callAPISuccess('RelationshipType', 'create', [
       'name_a_b' => $orgToOrgType,
       'name_b_a' => $orgToOrgReverseType,
       'contact_type_a' => 'Organization',
@@ -226,16 +217,18 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'period_type' => 'rolling',
       'name' => 'Inherited Membership',
       'relationship_type_id' => [$orgToPersonTypeId1, $orgToPersonTypeId2],
-      'relationship_direction' => ['b_a', 'a_b'],
+      'relationship_direction' => ['b_a', 'b_a'],
     ]);
     $membershipType = $this->callAPISuccessGetSingle('MembershipType', ['id' => $membershipType['id']]);
     // Check the metadata worked....
     $this->assertEquals([$orgToPersonTypeId1, $orgToPersonTypeId2], $membershipType['relationship_type_id']);
-    $this->assertEquals(['b_a', 'a_b'], $membershipType['relationship_direction']);
+    $this->assertEquals(['b_a', 'b_a'], $membershipType['relationship_direction']);
 
     $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $membershipType['id'],
       'contact_id' => $organisationID,
+      'start_date' => '2019-08-19',
+      'join_date' => '2019-07-19',
     ]);
 
     $relationshipOne = $this->callAPISuccess('Relationship', 'create', [
@@ -243,27 +236,32 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'contact_id_b' => $organisationID,
       'relationship_type_id' => $orgToPersonTypeId1,
     ]);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $relationshipTwo = $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organisationID,
       'relationship_type_id' => $orgToPersonTypeId2,
     ]);
-
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
+    $inheritedMembership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $individualID]);
+    $this->assertEquals('2019-08-19', $inheritedMembership['start_date']);
+    $this->assertEquals('2019-07-19', $inheritedMembership['join_date']);
+
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $organisationID], 1);
-    // Disable the relationship & check the membership is removed.
+    // Disable the relationship & check the membership is not removed because the other relationship is still valid.
     $relationshipOne['is_active'] = 0;
     $this->callAPISuccess('Relationship', 'create', array_merge($relationshipOne, ['is_active' => 0]));
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
-    /*
-     * @todo this section not yet working due to bug in would-be-tested code.
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
     $relationshipTwo['is_active'] = 0;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
 
     $relationshipOne['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipOne);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
     $relationshipTwo['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
@@ -271,7 +269,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $this->callAPISuccess('Relationship', 'delete', ['id' => $relationshipOne['id']]);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
-     */
+
   }
 
   /**

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -277,32 +261,39 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $address = CRM_Core_BAO_Address::getValues($entityBlock);
     $this->assertEquals($address[1]['id'], $addressId);
     $this->assertEquals($address[1]['contact_id'], $contactId);
+    $this->assertEquals($address[1]['state_province_abbreviation'], 'AL');
+    $this->assertEquals($address[1]['state_province'], 'Alabama');
+    $this->assertEquals($address[1]['country'], 'United States');
     $this->assertEquals($address[1]['street_address'], 'Oberoi Garden');
     $this->contactDelete($contactId);
   }
 
+  /**
+   * Enable street address parsing.
+   *
+   * @param string $status
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setStreetAddressParsing($status) {
-    $address_options = CRM_Core_BAO_Setting::valueOptions(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'address_options',
-      TRUE, NULL, TRUE
-    );
-    if ($status) {
-      $value = 1;
+    $options = $this->callAPISuccess('Setting', 'getoptions', ['field' => 'address_options'])['values'];
+    $address_options = reset($this->callAPISuccess('Setting', 'get', ['return' => 'address_options'])['values'])['address_options'];
+    $parsingOption = array_search('Street Address Parsing', $options, TRUE);
+    $optionKey = array_search($parsingOption, $address_options, FALSE);
+    if ($status && !$optionKey) {
+      $address_options[] = $parsingOption;
     }
-    else {
-      $value = 0;
+    if (!$status && $optionKey) {
+      unset($address_options[$optionKey]);
     }
-    $address_options['street_address_parsing'] = $value;
-    CRM_Core_BAO_Setting::setValueOption(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'address_options',
-      $address_options
-    );
+    $this->callAPISuccess('Setting', 'create', ['address_options' => $address_options]);
   }
 
   /**
    * ParseStreetAddress if enabled, otherwise, don't.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testParseStreetAddressIfEnabled() {
     // Turn off address standardization. Parsing should work without it.
@@ -312,7 +303,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->setStreetAddressParsing(TRUE);
 
     $contactId = $this->individualCreate();
-    $street_address = "54 Excelsior Ave.";
+    $street_address = '54 Excelsior Ave.';
     $params = [
       'contact_id' => $contactId,
       'street_address' => $street_address,
@@ -347,7 +338,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // Out-of-range street number to be parsed.
-    $street_address = "505050505050 Main St";
+    $street_address = '505050505050 Main St';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address);
     $this->assertEquals($parsedStreetAddress['street_name'], '');
     $this->assertEquals($parsedStreetAddress['street_unit'], '');

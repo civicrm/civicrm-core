@@ -36,8 +36,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (!empty($formValues['email_options'])) {
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = [
-        'subject' => CRM_Utils_Array::value('subject', $formValues),
-        'from' => CRM_Utils_Array::value('from_email_address', $formValues),
+        'subject' => $formValues['subject'] ?? NULL,
+        'from' => $formValues['from_email_address'] ?? NULL,
       ];
 
       $emailParams['from'] = CRM_Utils_Mail::formatFromAddress($emailParams['from']);

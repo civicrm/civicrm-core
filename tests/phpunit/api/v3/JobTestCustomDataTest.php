@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -124,6 +108,8 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
 
   /**
    * Cleanup after tests.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanup(['civicrm_contact'], TRUE);
@@ -145,6 +131,10 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    * 4) NULL (ie not set)
    *  - in safe mode NULL is not a conflict with any option but the other
    *   combos are a conflict.
+   *
+   * @param array $dataSet
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCheckboxCustomFieldHandling($dataSet) {
     $customFieldLabel = 'custom_' . $this->customStringCheckboxID;
@@ -153,8 +143,8 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate($contact1Params);
     $this->individualCreate($contact2Params);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
-    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
-    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']));
+    $this->assertCount($dataSet['merged'], $result['values']['merged']);
+    $this->assertCount($dataSet['skipped'], $result['values']['skipped']);
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
     $this->assertEquals($dataSet['expected'], $contact[$customFieldLabel]);
   }

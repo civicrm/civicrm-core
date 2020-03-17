@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -76,7 +60,7 @@ class FieldSpec {
   protected $requiredIf;
 
   /**
-   * @var array|boolean
+   * @var array|bool
    */
   protected $options;
 
@@ -104,6 +88,21 @@ class FieldSpec {
    * @var int
    */
   protected $serialize;
+
+  /**
+   * @var string
+   */
+  protected $helpPre;
+
+  /**
+   * @var string
+   */
+  protected $helpPost;
+
+  /**
+   * @var array
+   */
+  protected $permission;
 
   /**
    * Aliases for the valid data types
@@ -287,6 +286,22 @@ class FieldSpec {
   }
 
   /**
+   * @param array $permission
+   * @return $this
+   */
+  public function setPermission($permission) {
+    $this->permission = $permission;
+    return $this;
+  }
+
+  /**
+   * @return array
+   */
+  public function getPermission() {
+    return $this->permission;
+  }
+
+  /**
    * @return string
    */
   public function getInputType() {
@@ -321,6 +336,34 @@ class FieldSpec {
   }
 
   /**
+   * @return string|NULL
+   */
+  public function getHelpPre() {
+    return $this->helpPre;
+  }
+
+  /**
+   * @param string|NULL $helpPre
+   */
+  public function setHelpPre($helpPre) {
+    $this->helpPre = is_string($helpPre) && strlen($helpPre) ? $helpPre : NULL;
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public function getHelpPost() {
+    return $this->helpPost;
+  }
+
+  /**
+   * @param string|NULL $helpPost
+   */
+  public function setHelpPost($helpPost) {
+    $this->helpPost = is_string($helpPost) && strlen($helpPost) ? $helpPost : NULL;
+  }
+
+  /**
    * Add valid types that are not not part of \CRM_Utils_Type::dataTypes
    *
    * @return array
@@ -333,9 +376,10 @@ class FieldSpec {
   }
 
   /**
+   * @param array $values
    * @return array
    */
-  public function getOptions() {
+  public function getOptions($values = []) {
     if (!isset($this->options) || $this->options === TRUE) {
       $fieldName = $this->getName();
 
@@ -345,7 +389,7 @@ class FieldSpec {
       }
 
       $bao = CoreUtil::getBAOFromApiName($this->getEntity());
-      $options = $bao::buildOptions($fieldName);
+      $options = $bao::buildOptions($fieldName, NULL, $values);
 
       if (!is_array($options) || !$options) {
         $options = FALSE;

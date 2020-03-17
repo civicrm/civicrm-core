@@ -88,6 +88,7 @@
       </td>
       <td class="total">
   &nbsp;{$total|crmMoney:$currency|string_format:"%10s"}
+        <input type="hidden" id="total_amount" value="{$total}">
       </td>
     </tr>
   </tfoot>
@@ -113,45 +114,6 @@
   </div>
   <div class="clear"></div>
 </div>
-{/if}
-
-{if $administrator}
-<!--
-<div style="border: 1px solid blue; padding: 5px;">
-<b>{ts}Staff use only{/ts}</b>
-<div class="crm-section {$form.note.name}-section">
-  <div class="label">{$form.note.label}</div>
-  <div class="content">{$form.note.html}
-    <div class="description">{ts}Note that will be sent to the billing customer.{/ts}</div>
-  </div>
-  <div class="clear"></div>
-</div>
-<div class="crm-section {$form.source.name}-section">
-  <div class="label">{$form.source.label}</div>
-  <div class="content">{$form.source.html}
-    <div class="description">{ts}Description of this transaction.{/ts}</div>
-  </div>
-  <div class="clear"></div>
-</div>
-<div class="crm-section {$form.payment_type.name}-section">
-  <div class="label">{$form.payment_type.label}</div>
-  <div class="content">{$form.payment_type.html}
-  </div>
-  <div class="clear"></div>
-</div>
-<div class="crm-section {$form.check_number.name}-section" style="display: none;">
-  <div class="label">{$form.check_number.label}</div>
-  <div class="content">{$form.check_number.html}</div>
-  <div class="clear"></div>
-</div>
-<div class="crm-section {$form.is_pending.name}-section">
-  <div class="label">{$form.is_pending.label}</div>
-  <div class="content">{$form.is_pending.html}
-  </div>
-  <div class="clear"></div>
-</div>
-</div>
--->
 {/if}
 
 <script type="text/javascript">

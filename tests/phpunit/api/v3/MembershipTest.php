@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -114,14 +98,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   public function testMembershipDeleteInvalidID() {
     $this->callAPIFailure('membership', 'delete', ['id' => 'blah']);
-  }
-
-  /**
-   * Test civicrm_membership_delete() with invalid Membership Id.
-   */
-  public function testMembershipDeleteWithInvalidMembershipId() {
-    $membershipId = 'membership';
-    $this->callAPIFailure('membership', 'delete', $membershipId);
   }
 
   /**
@@ -516,6 +492,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    *
    * Test suite for CRM-14758: API ( contact, create ) does not always create related membership
    * and max_related property for Membership_Type and Membership entities
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateWithRelationship() {
     // Create membership type: inherited through employment, max_related = 2
@@ -551,7 +530,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
       'source' => 'Test suite',
       'start_date' => date('Y-m-d'),
-      'end_date' => "+1 year",
+      'end_date' => '+1 year',
     ];
     $OrganizationMembershipID = $this->contactMembershipCreate($params);
 
@@ -634,17 +613,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'is_pay_later' => 1,
       'status_id' => 5,
     ];
-    $organizationMembership = CRM_Member_BAO_Membership::add($params);
-    $organizationMembershipID = $organizationMembership->id;
+    $organizationMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
+
     $memberContactId[3] = $this->individualCreate(['employer_id' => $employerId[2]], 0);
     // Check that the employee inherited the membership
     $params = [
       'contact_id' => $memberContactId[3],
       'membership_type_id' => $membershipTypeId,
     ];
-    $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $result['count']);
-    $result = $result['values'][$result['id']];
+    $result = $this->callAPISuccessGetSingle('membership', $params);
     $this->assertEquals($organizationMembershipID, $result['owner_membership_id']);
 
     // Set up params for enable/disable checks
@@ -691,6 +668,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * We are checking for no e-notices + only id & end_date returned
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipGetWithReturn() {
     $this->contactMembershipCreate($this->_params);

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -426,6 +410,76 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $this->participantDelete($participant->id);
     $this->contactDelete($this->_contactId);
     $this->eventDelete($eventId);
+  }
+
+  /**
+   * Test various self-service eligibility scenarios.
+   *
+   * @dataProvider selfServiceScenarios
+   * @param $selfSvcEnabled
+   * @param $selfSvcHours
+   * @param $hoursToEvent
+   * @param $participantStatusId
+   * @param $isBackOffice
+   * @param $successExpected  A boolean that indicates whether this test should pass or fail.
+   */
+  public function testGetSelfServiceEligibility($selfSvcEnabled, $selfSvcHours, $hoursToEvent, $participantStatusId, $isBackOffice, $successExpected) {
+    $participantId = $this->participantCreate(['contact_id' => $this->_contactId, 'event_id' => $this->_eventId, 'status_id' => $participantStatusId]);
+    $now = new Datetime();
+    $startDate = $now->add(new DateInterval("PT{$hoursToEvent}H"))->format('Y-m-d H:i:s');
+    $this->callAPISuccess('Event', 'create', [
+      'id' => $this->_eventId,
+      'allow_selfcancelxfer' => $selfSvcEnabled,
+      'selfcancelxfer_time' => $selfSvcHours,
+      'start_date' => $startDate,
+    ]);
+    $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_eventId}");
+    // If we return without an error, then success.  But we don't always expect success.
+    try {
+      CRM_Event_BAO_Participant::getSelfServiceEligibility($participantId, $url, $isBackOffice);
+    }
+    catch (\Exception $e) {
+      if ($successExpected === FALSE) {
+        return;
+      }
+      else {
+        $this->fail();
+      }
+    }
+    if ($successExpected === FALSE) {
+      $this->fail();
+    }
+  }
+
+  public function selfServiceScenarios() {
+    // Standard pass scenario
+    $scenarios[] = [
+      'selfSvcEnabled' => TRUE,
+      'selfSvcHours' => 12,
+      'hoursToEvent' => 16,
+      'participantStatusId' => 1,
+      'isBackOffice' => FALSE,
+      'successExpected' => TRUE,
+    ];
+    // Too late to self-service
+    $scenarios[] = [
+      'selfSvcEnabled' => TRUE,
+      'selfSvcHours' => 12,
+      'hoursToEvent' => 8,
+      'participantStatusId' => 1,
+      'isBackOffice' => FALSE,
+      'successExpected' => FALSE,
+    ];
+    // Participant status is other than "Registered".
+    $scenarios[] = [
+      'selfSvcEnabled' => TRUE,
+      'selfSvcHours' => 12,
+      'hoursToEvent' => 16,
+      'participantStatusId' => 2,
+      'isBackOffice' => FALSE,
+      'successExpected' => FALSE,
+    ];
+    return $scenarios;
   }
 
 }

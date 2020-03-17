@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  */
 
@@ -66,7 +50,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_gid;
 
   /**
-   * @var array details of the UFGroup used on this page
+   * @var array
+   * Details of the UFGroup used on this page
    */
   protected $_ufGroup = ['name' => 'unknown'];
 
@@ -372,7 +357,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $this->_ufGroup = (array) $dao;
       }
 
-      if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
+      if (empty($this->_ufGroup['is_active'])) {
         CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', [
           1 => $this->_gid,
         ]));
@@ -1119,7 +1104,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $contactDetails = CRM_Contact_BAO_Contact::getHierContactDetails($this->_id,
         $greetingTypes
       );
-      $details = $contactDetails[0][$this->_id];
+      $details = $contactDetails[$this->_id];
     }
     if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
       CRM_Utils_Array::value('postal_greeting_id', $details)

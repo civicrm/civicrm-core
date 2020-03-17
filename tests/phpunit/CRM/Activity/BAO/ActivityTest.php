@@ -8,6 +8,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   private $allowedContactsACL = [];
 
+  /**
+   * Set up for test.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->prepareForACLs();
@@ -17,6 +22,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Clean up after tests.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown() {
     $tablesToTruncate = [
@@ -34,6 +42,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test case for create() method.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreate() {
     $contactId = $this->individualCreate();
@@ -73,6 +83,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test case for getContactActivity() method.
    *
    * getContactActivity() method get activities detail for given target contact id.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetContactActivity() {
     $contactId = $this->individualCreate();
@@ -331,18 +343,36 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test getActivities BAO method for getting count.
+   *
    */
   public function testGetActivitiesCountForAdminDashboard() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
+
     $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
     $this->assertEquals(8, $activityCount);
+
+    // If we're showing case activities, we exepct to see one more (the scheduled meeting)...
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
+    $this->assertEquals(9, $activityCount);
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
    * Test getActivities BAO method for getting count
+   *
    */
   public function testGetActivitiesCountforNonAdminDashboard() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $params = [
       'contact_id' => 9,
@@ -358,15 +388,27 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
 
     //since we are loading activities from dataset, we know total number of activities for this contact
-    // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
+    // 5 activities ( 2 scheduled, 3 Completed, 1 Scheduled Case activity ),
+    // note that dashboard shows only scheduled activities
     $this->assertEquals(2, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+
+    // If we're showing case activities, we exepct to see one more (the scheduled meeting)...
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $this->assertEquals(3, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
    * Test getActivities BAO method for getting count
+   *
    */
   public function testGetActivitiesCountforContactSummary() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $params = [
       'contact_id' => 9,
@@ -380,8 +422,14 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
 
     //since we are loading activities from dataset, we know total number of activities for this contact
-    // 5 activities, Contact Summary should show all activities
+    // 5 activities
     $this->assertEquals(5, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+
+    // If we're showing case activities, we exepct to see one more (the scheduled meeting)...
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $this->assertEquals(6, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
@@ -447,7 +495,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesForAdminDashboard() {
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
+
     $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
     // $this->assertEquals($activities, $activitiesDeprecatedFn);
 
@@ -463,6 +515,16 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
       }
     }
+
+    // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
+    $this->assertEquals(9, count($activitiesNew));
+    // Scan through to find the meeting.
+    $this->assertTrue(in_array('test meeting activity', array_column($activitiesNew, 'subject')),
+      "failed to find scheduled case Meeting activity");
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
@@ -492,7 +554,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesforNonAdminDashboard() {
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $contactID = 9;
     $params = [
@@ -527,6 +592,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         }
       }
     }
+
+    // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $this->assertEquals(3, count($activities));
+    // Scan through to find the meeting.
+    $this->assertTrue(in_array('test meeting activity', array_column($activities, 'subject')),
+      "failed to find scheduled case Meeting activity");
+
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
@@ -586,7 +662,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesForContactSummary() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $contactID = 9;
     $params = [
@@ -635,12 +715,24 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertArrayHasKey($contactID, $value['assignee_contact_name']);
       }
     }
+
+    // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $this->assertEquals(6, count($activities));
+    // Scan through to find the meeting.
+    $this->assertTrue(in_array('test meeting activity', array_column($activities, 'subject')),
+      "failed to find scheduled case Meeting activity");
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
    * Test getActivities BAO method.
    */
   public function testGetActivitiesforContactSummaryWithActivities() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
 
     // parameters for different test cases, check each array key for the specific test-case
@@ -1178,7 +1270,7 @@ $text
     $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
     $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
     $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0], "Expected error doesn't match");
     $this->assertEquals(0, $success, "Expected success to be 0");
   }
 
@@ -1193,7 +1285,7 @@ $text
     $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
     $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
     $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0], "Expected error doesn't match");
     $this->assertEquals(0, $success, "Expected success to be 0");
   }
 
@@ -1229,7 +1321,7 @@ $text
   public function testSendSMSMobileInToProviderParamWithDoNotSMS() {
     list($sent, $activityId, $success) = $this->createSendSmsTest(2, TRUE, ['do_not_sms' => 1]);
     foreach ($sent as $error) {
-      $this->assertEquals('Contact Does not accept SMS', $error->getMessage());
+      $this->assertEquals('Contact Does not accept SMS', $error);
     }
     $this->assertEquals(1, count($sent), "Expected sent should a PEAR Error");
     $this->assertEquals(0, $success, "Expected success to be 0");
@@ -1341,6 +1433,171 @@ $text
       $contact_id_list = implode(',', $this->allowedContactsACL);
       $where = " contact_a.id IN ($contact_id_list)";
     }
+  }
+
+  public function testCaseTokens() {
+    $caseTest = new CiviCaseTestCase();
+    $caseTest->setUp();
+    // Create a contact and contactDetails array.
+    $contactId = $this->individualCreate();
+
+    // create a case for this user
+    $result = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $contactId,
+      'case_type_id' => '1',
+      'subject' => "my case",
+      'status_id' => "Open",
+    ]);
+
+    $caseId = $result['id'];
+    $html_message = "<p>This is a test case with id: {case.id} and subject: {case.subject}</p>";
+    $html_message = CRM_Utils_Token::replaceCaseTokens($caseId, $html_message);
+
+    $this->assertTrue(strpos($html_message, 'id: ' . $caseId) !== 0);
+    $this->assertTrue(strpos($html_message, 'subject: my case') !== 0);
+    $caseTest->tearDown();
+  }
+
+  public function testSendEmailWithCaseId() {
+    $caseTest = new CiviCaseTestCase();
+    $caseTest->setUp();
+    // Create a contact and contactDetails array.
+    $contactId = $this->individualCreate();
+    $contact = $this->callAPISuccess('Contact', 'get', ['id' => $contactId]);
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access CiviCRM', 'access all cases and activities', 'administer CiviCase'];
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+
+    // create a case for this user
+    $result = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $contactId,
+      'case_type_id' => 1,
+      'subject' => "my case",
+      'status_id' => "Open",
+    ]);
+
+    $caseId = $result['id'];
+
+    $subject = __FUNCTION__ . ' subject {case.subject}';
+    $html = __FUNCTION__ . ' html {case.subject}';
+    $text = __FUNCTION__ . ' text';
+
+    $mut = new CiviMailUtils($this, TRUE);
+    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+      $contact['values'],
+      $subject,
+      $text,
+      $html,
+      $contact['values'][$contactId]['email'],
+      $loggedInUser,
+      $from = __FUNCTION__ . '@example.com',
+      NULL,
+      NULL,
+      NULL,
+      [$contactId],
+      NULL,
+      NULL,
+      NULL,
+      $caseId
+    );
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['id' => $activity_id, 'return' => ['case_id']]);
+    $this->assertEquals($caseId, $activity['case_id'][0], 'Activity case_id does not match.');
+    $mut->checkMailLog(['subject my case']);
+    $mut->stop();
+  }
+
+  /**
+   * Adds a case with one activity.
+   *
+   */
+  protected function addCaseWithActivity() {
+    // case is not enabled by default do that now.
+    $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
+
+    // We need a minimal case setup.
+    $case_type_id = civicrm_api3('CaseType', 'get', ['return' => 'id', 'name' => 'test_case_type'])['id'] ?? NULL;
+    if (!$case_type_id) {
+      $params = [
+        'name'  => 'test_case_type',
+        'title' => 'test_case_type',
+        "is_active" => "1",
+        "definition" => [
+          "activityTypes" => [
+            ["name" => "Open Case", "max_instances" => "1"],
+            ["name" => "Meeting"],
+          ],
+          "activitySets" => [
+            [
+              "name" => "standard_timeline",
+              "label" => "Standard Timeline",
+              "timeline" => "1",
+              "activityTypes" => [
+                [
+                  "name" => "Open Case",
+                  "status" => "Completed",
+                  "label" => "Open Case",
+                  "default_assignee_type" => "1",
+                ],
+              ],
+            ],
+          ],
+          "timelineActivityTypes" => [
+            [
+              "name" => "Open Case",
+              "status" => "Completed",
+              "label" => "Open Case",
+              "default_assignee_type" => "1",
+            ],
+          ],
+          "caseRoles" => [
+            [
+              "name" => "Case Coordinator",
+              "creator" => "1",
+              "manager" => "1",
+            ],
+          ],
+        ],
+      ];
+      $case_type_id = $this->callAPISuccess('CaseType', 'create', $params)['id'];
+    }
+
+    // Create a case with Contact #3 as the client.
+    $case_id = civicrm_api3('case', 'get', ['subject' => 'test case 1'])['id'] ?? NULL;
+    if (!$case_id) {
+      // Create case
+      $params = [
+        'subject'       => 'test case 1',
+        'contact_id'    => 3,
+        'status_id'     => 'Open',
+        'case_type_id'  => $case_type_id,
+        'creator_id'    => 3,
+      ];
+      $case_id = $this->callAPISuccess('case', 'create', $params)['id'];
+    }
+
+    // Create a scheduled 'Meeting' activity that belongs to this case, but is
+    // assigned to contact #9
+    $activity_id = $this->callAPISuccess('Activity', 'create', [
+      'activity_type_id' => 'Meeting',
+      'status_id' => 'Scheduled',
+      'case_id' => $case_id,
+      'source_contact_id' => 3,
+      'assignee_id' => [9],
+      'subject' => 'test meeting activity',
+    ])['id'] ?? NULL;
+  }
+
+  /**
+   * Change setting, and the cache of it.
+   */
+  protected function setShowCaseActivitiesInCore(bool $val) {
+    Civi::settings()->set('civicaseShowCaseActivities', $val ? 1 : 0);
+    CRM_Core_Component::getEnabledComponents();
+    Civi::$statics['CRM_Core_Component']['info']['CiviCase']->info['showActivitiesInCore'] = $val;
   }
 
 }

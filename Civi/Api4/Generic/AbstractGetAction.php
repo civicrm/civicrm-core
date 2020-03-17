@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -37,21 +21,25 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\SelectUtil;
+
 /**
- * Base class for all "Get" api actions.
+ * Base class for all `Get` api actions.
  *
  * @package Civi\Api4\Generic
  *
- * @method $this addSelect(string $select)
- * @method $this setSelect(array $selects)
+ * @method $this setSelect(array $selects) Set array of fields to be selected (wildcard * allowed)
  * @method array getSelect()
  */
 abstract class AbstractGetAction extends AbstractQueryAction {
 
   /**
-   * Fields to return. Defaults to all fields.
+   * Fields to return for each $ENTITY. Defaults to all fields `[*]`.
    *
-   * Set to ["row_count"] to return only the number of items found.
+   * Use the * wildcard by itself to select all available fields, or use it to match similarly-named fields.
+   * E.g. `is_*` will match fields named is_primary, is_active, etc.
+   *
+   * Set to `["row_count"]` to return only the number of $ENTITIES found.
    *
    * @var array
    */
@@ -87,6 +75,20 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   }
 
   /**
+   * Adds all fields matched by the * wildcard
+   *
+   * @throws \API_Exception
+   */
+  protected function expandSelectClauseWildcards() {
+    foreach ($this->select as $item) {
+      if (strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE) {
+        $this->select = array_diff($this->select, [$item]);
+        $this->select = array_unique(array_merge($this->select, SelectUtil::getMatchingFields($item, array_column($this->entityFields(), 'name'))));
+      }
+    }
+  }
+
+  /**
    * Helper to parse the WHERE param for getRecords to perform simple pre-filtering.
    *
    * This is intended to optimize some common use-cases e.g. calling the api to get
@@ -94,7 +96,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    *
    * Ex: If getRecords fetches a long list of items each with a unique name,
    * but the user has specified a single record to retrieve, you can optimize the call
-   * by checking $this->_itemsToGet('name') and only fetching the item(s) with that name.
+   * by checking `$this->_itemsToGet('name')` and only fetching the item(s) with that name.
    *
    * @param string $field
    * @return array|null
@@ -110,45 +112,60 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   }
 
   /**
-   * Helper to see if a field should be selected by the getRecords function.
+   * Helper to see if field(s) should be selected by the getRecords function.
    *
    * Checks the SELECT, WHERE and ORDER BY params to see what fields are needed.
    *
    * Note that if no SELECT clause has been set then all fields should be selected
    * and this function will always return TRUE.
    *
-   * @param string $field
+   * @param string ...$fieldNames
+   *   One or more field names to check (uses OR if multiple)
    * @return bool
+   *   Returns true if any given fields are in use.
    */
-  protected function _isFieldSelected($field) {
-    if (!$this->select || in_array($field, $this->select) || isset($this->orderBy[$field])) {
+  protected function _isFieldSelected(string ...$fieldNames) {
+    if (!$this->select || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
       return TRUE;
     }
-    return $this->_whereContains($field);
+    return $this->_whereContains($fieldNames);
   }
 
   /**
-   * Walk through the where clause and check if a field is in use.
+   * Walk through the where clause and check if field(s) are in use.
    *
-   * @param string $field
+   * @param string|array $fieldName
+   *   A single fieldName or an array of names (uses OR if multiple)
    * @param array $clauses
    * @return bool
+   *   Returns true if any given fields are found in the where clause.
    */
-  protected function _whereContains($field, $clauses = NULL) {
+  protected function _whereContains($fieldName, $clauses = NULL) {
     if ($clauses === NULL) {
       $clauses = $this->where;
     }
+    $fieldName = (array) $fieldName;
     foreach ($clauses as $clause) {
       if (is_array($clause) && is_string($clause[0])) {
-        if ($clause[0] == $field) {
+        if (in_array($clause[0], $fieldName)) {
           return TRUE;
         }
         elseif (is_array($clause[1])) {
-          return $this->_whereContains($field, $clause[1]);
+          return $this->_whereContains($fieldName, $clause[1]);
         }
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Add one or more fields to be selected (wildcard * allowed)
+   * @param string ...$fieldNames
+   * @return $this
+   */
+  public function addSelect(string ...$fieldNames) {
+    $this->select = array_merge($this->select, $fieldNames);
+    return $this;
   }
 
 }

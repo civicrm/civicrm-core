@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -37,6 +21,10 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   public function teardown() {
+    global $dbLocale;
+    if ($dbLocale) {
+      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    }
     $this->financialAccountDelete('Donations');
   }
 
@@ -105,9 +93,28 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method del()
+   * Data provider for testGitLabIssue1108
+   *
+   * First we run it without multiLingual mode, then with.
+   *
+   * This is because we test table names, which may have been translated in a
+   * multiLingual context.
+   *
    */
-  public function testDel() {
+  public function multiLingual() {
+    return [[0], [1]];
+  }
+
+  /**
+   * Check method del()
+   *
+   * @dataProvider multiLingual
+   */
+  public function testDel($isMultiLingual) {
+    if ($isMultiLingual) {
+      $this->enableMultilingual();
+      CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
+    }
     $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -116,17 +123,27 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $ids = [];
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
 
+    if ($isMultiLingual) {
+      global $dbLocale;
+      $dbLocale = '_fr_FR';
+    }
     CRM_Financial_BAO_FinancialType::del($financialType->id);
     $params = ['id' => $financialType->id];
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
+    $results = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_entity_financial_account WHERE entity_id = %1", [1 => [$financialType->id, 'Positive']])->fetchAll();
+    $this->assertEquals(empty($results), TRUE, 'Assert related entity financial account has been deleted as well');
+    if ($isMultiLingual) {
+      global $dbLocale;
+      $dbLocale = '_en_US';
+    }
   }
 
   /**
    * Set ACLs for Financial Types()
    */
   public function setACL() {
-    CRM_Core_BAO_Setting::setItem(['acl_financial_type' => 1], NULL, 'contribution_invoice_settings');
+    Civi::settings()->set('acl_financial_type', 1);
   }
 
   /**
@@ -231,8 +248,11 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Check method testcheckPermissionedLineItems()
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testcheckPermissionedLineItems() {
+  public function testCheckPermissionedLineItems() {
     $contactId = $this->individualCreate();
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
@@ -298,10 +318,10 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
     try {
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
-      $this->fail("Missed expected exception");
+      $this->fail('Missed expected exception');
     }
     catch (Exception $e) {
-      $this->assertEquals("A fatal error was triggered: You do not have permission to access this page.", $e->getMessage());
+      $this->assertEquals('A fatal error was triggered: You do not have permission to access this page.', $e->getMessage());
     }
 
     $this->setPermissions([
@@ -309,17 +329,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     ]);
     $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
     $this->assertEquals($perm, TRUE, 'Verify that lineitems now have permission.');
-  }
-
-  /**
-   * Check method testisACLFinancialTypeStatus()
-   */
-  public function testisACLFinancialTypeStatus() {
-    $isACL = CRM_Core_BAO_Setting::getItem(NULL, 'contribution_invoice_settings');
-    $this->assertEquals(array_search('acl_financial_type', $isACL), NULL);
-    $this->setACL();
-    $isACL = CRM_Core_BAO_Setting::getItem(NULL, 'contribution_invoice_settings');
-    $this->assertEquals($isACL, ['acl_financial_type' => 1]);
   }
 
   /**

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * smart caching scheme on a per domain basis
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -103,7 +87,7 @@ class CRM_Core_SelectValues {
       'month' => ts('month'),
       'year' => ts('year'),
     ];
-    if ($unitType == 'duration') {
+    if ($unitType === 'duration') {
       $unitList['lifetime'] = ts('lifetime');
     }
     return $unitList;
@@ -137,10 +121,10 @@ class CRM_Core_SelectValues {
    */
   public static function emailSelectMethods() {
     return [
-      'automatic' => ts("Automatic"),
-      'location-only' => ts("Only send to email addresses assigned to the specified location"),
-      'location-prefer' => ts("Prefer email addresses assigned to the specified location"),
-      'location-exclude' => ts("Exclude email addresses assigned to the specified location"),
+      'automatic' => ts('Automatic'),
+      'location-only' => ts('Only send to email addresses assigned to the specified location'),
+      'location-prefer' => ts('Prefer email addresses assigned to the specified location'),
+      'location-exclude' => ts('Exclude email addresses assigned to the specified location'),
     ];
   }
 
@@ -310,7 +294,7 @@ class CRM_Core_SelectValues {
    *
    * @return array
    *   the date array
-   * @throws \Exception
+   * @throws CRM_Core_Exception
    */
   public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL, $context = 'display') {
     // These options are deprecated. Definitely not used in datepicker. Possibly not even in jcalendar+addDateTime.
@@ -328,7 +312,7 @@ class CRM_Core_SelectValues {
         $dao = new CRM_Core_DAO_PreferencesDate();
         $dao->name = $type;
         if (!$dao->find(TRUE)) {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Date preferences not configured.');
         }
         if (!$maxOffset) {
           $maxOffset = $dao->end;
@@ -342,7 +326,7 @@ class CRM_Core_SelectValues {
       }
 
       if (empty($date['format'])) {
-        if ($context == 'Input') {
+        if ($context === 'Input') {
           $date['format'] = Civi::settings()->get('dateInputFormat');
         }
         else {
@@ -460,6 +444,27 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * Get options for displaying tax.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function taxDisplayOptions() {
+    return [
+      'Do_not_show' => ts('Do not show breakdown, only show total - i.e %1', [
+        1 => CRM_Utils_Money::format(120),
+      ]),
+      'Inclusive' => ts('Show [tax term] inclusive price - i.e. %1', [
+        1 => ts('%1 (includes [tax term] of %2)', [1 => CRM_Utils_Money::format(120), 2 => CRM_Utils_Money::format(20)]),
+      ]),
+      'Exclusive' => ts('Show [tax term] exclusive price - i.e. %1', [
+        1 => ts('%1 + %2 [tax term]', [1 => CRM_Utils_Money::format(120), 2 => CRM_Utils_Money::format(20)]),
+      ]),
+    ];
+  }
+
+  /**
    * Get the Address Standardization Providers from available plugins.
    *
    * @return array
@@ -493,6 +498,7 @@ class CRM_Core_SelectValues {
       '{domain.address}' => ts('Domain (organization) address'),
       '{domain.phone}' => ts('Domain (organization) phone'),
       '{domain.email}' => ts('Domain (organization) email'),
+      '{mailing.key}' => ts('Mailing key'),
       '{mailing.name}' => ts('Mailing name'),
       '{mailing.group}' => ts('Mailing group'),
       '{mailing.viewUrl}' => ts('Mailing permalink'),
@@ -881,7 +887,7 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function getSearchBuilderOperators($fieldType = NULL) {
+  public static function getSearchBuilderOperators() {
     return [
       '=' => '=',
       '!=' => '≠',
@@ -1114,6 +1120,7 @@ class CRM_Core_SelectValues {
    * Dropdown options for quicksearch in the menu
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   public static function quicksearchOptions() {
     $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);

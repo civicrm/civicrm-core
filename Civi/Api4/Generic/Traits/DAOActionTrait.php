@@ -2,41 +2,24 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 
 namespace Civi\Api4\Generic\Traits;
 
-use CRM_Utils_Array as UtilsArray;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Query\Api4SelectQuery;
 
@@ -64,19 +47,33 @@ trait DAOActionTrait {
   }
 
   /**
-   * Extract the true fields from a BAO
+   * Convert saved object to array
    *
-   * (Used by create and update actions)
-   * @param object $bao
+   * Used by create, update & save actions
+   *
+   * @param \CRM_Core_DAO $bao
+   * @param array $input
    * @return array
    */
-  public static function baoToArray($bao) {
-    $fields = $bao->fields();
+  public function baoToArray($bao, $input) {
+    $allFields = array_column($bao->fields(), 'name');
+    if (!empty($this->reload)) {
+      $inputFields = $allFields;
+      $bao->find(TRUE);
+    }
+    else {
+      $inputFields = array_keys($input);
+      // Convert 'null' input to true null
+      foreach ($input as $key => $val) {
+        if ($val === 'null') {
+          $bao->$key = NULL;
+        }
+      }
+    }
     $values = [];
-    foreach ($fields as $key => $field) {
-      $name = $field['name'];
-      if (property_exists($bao, $name)) {
-        $values[$name] = isset($bao->$name) ? $bao->$name : NULL;
+    foreach ($allFields as $field) {
+      if (isset($bao->$field) || in_array($field, $inputFields)) {
+        $values[$field] = $bao->$field ?? NULL;
       }
     }
     return $values;
@@ -92,7 +89,14 @@ trait DAOActionTrait {
     $query->orderBy = $this->getOrderBy();
     $query->limit = $this->getLimit();
     $query->offset = $this->getOffset();
-    return $query->run();
+    if ($this->getDebug()) {
+      $query->debugOutput =& $this->_debugOutput;
+    }
+    $result = $query->run();
+    if (is_array($result)) {
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
+    }
+    return $result;
   }
 
   /**
@@ -141,7 +145,7 @@ trait DAOActionTrait {
     $result = [];
 
     foreach ($items as $item) {
-      $entityId = UtilsArray::value('id', $item);
+      $entityId = $item['id'] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->getEntityName(), $this->entityFields());
       $this->formatCustomParams($item, $entityId);
       $item['check_permissions'] = $this->getCheckPermissions();
@@ -170,15 +174,9 @@ trait DAOActionTrait {
         throw new \API_Exception($errMessage);
       }
 
-      if (!empty($this->reload) && is_a($createResult, 'CRM_Core_DAO')) {
-        $createResult->find(TRUE);
-      }
-
-      // trim back the junk and just get the array:
-      $resultArray = $this->baoToArray($createResult);
-
-      $result[] = $resultArray;
+      $result[] = $this->baoToArray($createResult, $item);
     }
+    FormattingUtil::formatOutputValues($result, $this->entityFields(), $this->getEntityName());
     return $result;
   }
 
@@ -192,10 +190,10 @@ trait DAOActionTrait {
     $baoName = $this->getBaoName();
     $hook = empty($params['id']) ? 'create' : 'edit';
 
-    \CRM_Utils_Hook::pre($hook, $this->getEntityName(), UtilsArray::value('id', $params), $params);
+    \CRM_Utils_Hook::pre($hook, $this->getEntityName(), $params['id'] ?? NULL, $params);
     /** @var \CRM_Core_DAO $instance */
     $instance = new $baoName();
-    $instance->copyValues($params, TRUE);
+    $instance->copyValues($params);
     $instance->save();
     \CRM_Utils_Hook::post($hook, $this->getEntityName(), $instance->id, $instance);
 

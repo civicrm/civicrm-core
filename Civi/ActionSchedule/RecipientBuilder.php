@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -154,7 +138,7 @@ class RecipientBuilder {
   public function build() {
     $this->buildRelFirstPass();
 
-    if ($this->prepareAddlFilter('c.id')) {
+    if ($this->prepareAddlFilter('c.id') && $this->notTemplate()) {
       $this->buildAddlFirstPass();
     }
 
@@ -617,6 +601,27 @@ reminder.action_schedule_id = {$this->actionSchedule->id}";
    */
   protected function resetOnTriggerDateChange() {
     return $this->mapping->resetOnTriggerDateChange($this->actionSchedule);
+  }
+
+  /**
+   * Confirm this object isn't attached to a template.
+   * Returns TRUE if this action schedule isn't attached to a template.
+   * Templates are (currently) unique to events, so we only evaluate those.
+   *
+   * @return bool;
+   */
+  private function notTemplate() {
+    if ($this->mapping->getEntity() === 'civicrm_participant') {
+      $entityId = $this->actionSchedule->entity_value;
+      $query = new \CRM_Utils_SQL_Select('civicrm_event e');
+      $sql = $query
+        ->select('is_template')
+        ->where("e.id = {$entityId}")
+        ->toSQL();
+      $dao = \CRM_Core_DAO::executeQuery($sql);
+      return !(bool) $dao->fetchValue();
+    }
+    return TRUE;
   }
 
 }

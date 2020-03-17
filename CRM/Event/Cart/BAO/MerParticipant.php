@@ -1,36 +1,32 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 5                                                  |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  * Class CRM_Event_Cart_BAO_MerParticipant
  */
 class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
+
+  /**
+   * @var string
+   */
   public $email = NULL;
+
+  /**
+   * @var int
+   */
   public $contribution_id = NULL;
+
+  /**
+   * @var \CRM_Event_Cart_BAO_Cart
+   */
   public $cart = NULL;
 
   /**
@@ -53,25 +49,20 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    */
   public static function create(&$params) {
     $participantParams = [
-      'id' => CRM_Utils_Array::value('id', $params),
+      'id' => $params['id'] ?? NULL,
       'role_id' => self::get_attendee_role_id(),
       'status_id' => self::get_pending_in_cart_status_id(),
       'contact_id' => $params['contact_id'],
       'event_id' => $params['event_id'],
       'cart_id' => $params['cart_id'],
-      //XXX
-      //'registered_by_id'  =>
-      //'discount_amount'   =>
-      //'fee_level'         => $params['fee_level'],
     ];
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
     if (is_a($participant, 'CRM_Core_Error')) {
-      CRM_Core_Error::fatal(ts('There was an error creating a cart participant'));
+      throw new CRM_Core_Exception(ts('There was an error creating a cart participant'));
     }
 
     $mer_participant = new CRM_Event_Cart_BAO_MerParticipant($participant);
-
     return $mer_participant;
   }
 

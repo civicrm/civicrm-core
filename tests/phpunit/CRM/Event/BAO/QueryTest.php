@@ -9,6 +9,11 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * Test searching for participant note.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testParticipantNote() {
     $event = $this->eventCreate();
     $this->individualCreate([
@@ -42,6 +47,7 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Unit test to check if participant search retrieves correct event type id.
    *
+   * @throws \CRM_Core_Exception
    */
   public function testEventType() {
     $event = $this->eventCreate();
@@ -83,6 +89,45 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
       'return' => 'event_type_id',
     ]);
     $this->assertEquals($eventTypeId, $result->event_type_id);
+  }
+
+  /**
+   * Test provided event search parameters.
+   *
+   * @dataProvider getEventSearchParameters
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testParameters($parameters, $expected) {
+    $query = new CRM_Contact_BAO_Query(
+      $parameters, NULL, NULL,
+      FALSE, FALSE, CRM_Contact_BAO_Query::MODE_EVENT
+    );
+    $query->query(FALSE);
+    $this->assertEquals($expected['where'], trim($query->_whereClause));
+    $this->assertEquals($expected['qill'], trim($query->_qill[0][0]));
+  }
+
+  /**
+   * @return array
+   */
+  public function getEventSearchParameters() {
+    return [
+      [
+        [['participant_status_id', '=', 1, 0, 0]],
+        [
+          'where' => '( civicrm_participant.status_id = 1 )',
+          'qill' => 'Participant Status (ID) = Registered',
+        ],
+      ],
+      [
+        [['participant_status_id', 'IN', [1, 2], 0, 0]],
+        [
+          'where' => '( civicrm_participant.status_id IN ("1", "2") )',
+          'qill' => 'Participant Status (ID) In Registered, Attended',
+        ],
+      ],
+    ];
   }
 
 }

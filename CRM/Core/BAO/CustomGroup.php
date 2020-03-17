@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -176,7 +160,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
         if (CRM_Core_DAO_AllCoreTables::isCoreTable($tableName)) {
           // Bad idea.  Prevent group creation because it might lead to a broken configuration.
-          CRM_Core_Error::fatal(ts("Cannot create custom table because %1 is already a core table.", ['1' => $tableName]));
+          throw new CRM_Core_Exception(ts('Cannot create custom table because %1 is already a core table.', ['1' => $tableName]));
         }
       }
     }
@@ -1655,9 +1639,9 @@ ORDER BY civicrm_custom_group.weight,
               $value = NULL;
             }
           }
-          elseif ($field['html_type'] == 'Select' ||
-            ($field['html_type'] == 'Radio' &&
-              $field['data_type'] != 'Boolean'
+          elseif ($field['html_type'] === 'Select' ||
+            ($field['html_type'] === 'Radio' &&
+              $field['data_type'] !== 'Boolean'
             )
           ) {
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($key, TRUE);
@@ -1670,7 +1654,7 @@ ORDER BY civicrm_custom_group.weight,
               }
             }
           }
-          elseif ($field['data_type'] == 'Date') {
+          elseif ($field['data_type'] === 'Date') {
             $valid = CRM_Utils_Rule::date($value);
           }
 
@@ -1695,12 +1679,14 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return bool
    *   false if it matches else true
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
-    $query = "SELECT cg.extends as extends
+    $query = 'SELECT cg.extends as extends
                   FROM civicrm_custom_group as cg, civicrm_custom_field as cf
                   WHERE cg.id = cf.custom_group_id
-                    AND cf.id =" .
+                    AND cf.id =' .
       CRM_Utils_Type::escape($customFieldId, 'Integer');
 
     $extends = CRM_Core_DAO::singleValueQuery($query);
@@ -1778,7 +1764,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           if (array_key_exists($table, $extendObjs)) {
             return $extendObjs[$table];
           }
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Unknown error');
         }
     }
   }
@@ -1855,7 +1841,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           if (isset($properties['customValue'][$groupCount])) {
             $properties['element_name'] = "custom_{$k}_{$properties['customValue'][$groupCount]['id']}";
             $formattedGroupTree[$key]['table_id'] = $properties['customValue'][$groupCount]['id'];
-            if ($properties['data_type'] == 'File') {
+            if ($properties['data_type'] === 'File') {
               $properties['element_value'] = $properties['customValue'][$groupCount];
               $uploadNames[] = $properties['element_name'];
             }
@@ -1932,11 +1918,11 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             $details[$groupID][$values['id']]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $group);
             $details[$groupID][$values['id']]['style'] = CRM_Utils_Array::value('style', $group);
             $details[$groupID][$values['id']]['fields'][$k] = [
-              'field_title' => CRM_Utils_Array::value('label', $properties),
-              'field_type' => CRM_Utils_Array::value('html_type', $properties),
-              'field_data_type' => CRM_Utils_Array::value('data_type', $properties),
+              'field_title' => $properties['label'] ?? NULL,
+              'field_type' => $properties['html_type'] ?? NULL,
+              'field_data_type' => $properties['data_type'] ?? NULL,
               'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
-              'options_per_line' => CRM_Utils_Array::value('options_per_line', $properties),
+              'options_per_line' => $properties['options_per_line'] ?? NULL,
             ];
             // editable = whether this set contains any non-read-only fields
             if (!isset($details[$groupID][$values['id']]['editable'])) {
@@ -2080,7 +2066,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
 
     if (!$flag) {
       $extendObjs = [];
-      CRM_Core_OptionValue::getValues(['name' => 'cg_extend_objects'], $extendObjs);
+      CRM_Core_OptionValue::getValues(['name' => 'cg_extend_objects'], $extendObjs, 'weight', TRUE);
 
       foreach ($extendObjs as $ovId => $ovValues) {
         if ($ovValues['description']) {
@@ -2092,7 +2078,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           }
 
           if (!is_array($args)) {
-            CRM_Core_Error::fatal('Arg is not of type array');
+            throw new CRM_Core_Exception('Arg is not of type array');
           }
 
           list($className) = explode('::', $callback);

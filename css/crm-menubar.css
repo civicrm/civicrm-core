@@ -183,6 +183,22 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   transform: rotate(180deg);
 }
 
+/* Drilldown menu item finder */
+#civicrm-menu [data-name=MenubarDrillDown] > a {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+#crm-menubar-drilldown {
+  padding: 4px;
+  background-color: #eee;
+}
+#crm-menubar-drilldown:focus {
+  background-color: white;
+}
+#crm-menubar-drilldown + .sub-arrow:before {
+  margin-top: 5px;
+}
+
 @media (min-width: $breakMin) {
 
   /* Switch to desktop layout

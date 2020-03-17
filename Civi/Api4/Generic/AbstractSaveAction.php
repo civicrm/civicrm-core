@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -38,13 +22,11 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for all "Save" api actions.
+ * Base class for all `Save` api actions.
  *
- * @method $this setRecords(array $records) Array of records.
- * @method $this addRecord($record) Add a record to update.
+ * @method $this setRecords(array $records) Set array of records to be saved.
  * @method array getRecords()
  * @method $this setDefaults(array $defaults) Array of defaults.
- * @method $this addDefault($name, $value) Add a default value.
  * @method array getDefaults()
  * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
  * @method bool getReload()
@@ -54,9 +36,9 @@ namespace Civi\Api4\Generic;
 abstract class AbstractSaveAction extends AbstractAction {
 
   /**
-   * Array of records.
+   * Array of $ENTITIES to save.
    *
-   * Should be in the same format as returned by Get.
+   * Should be in the same format as returned by `Get`.
    *
    * @var array
    * @required
@@ -66,18 +48,20 @@ abstract class AbstractSaveAction extends AbstractAction {
   /**
    * Array of default values.
    *
-   * These defaults will be applied to all records unless they specify otherwise.
+   * These defaults will be merged into every $ENTITY in `records` before saving.
+   * Values set in `records` will override these defaults if set in both places,
+   * but updating existing $ENTITIES will overwrite current values with these defaults.
    *
    * @var array
    */
   protected $defaults = [];
 
   /**
-   * Reload records after saving.
+   * Reload $ENTITIES after saving.
    *
-   * By default this api typically returns partial records containing only the fields
-   * that were updated. Set reload to TRUE to do an additional lookup after saving
-   * to return complete records.
+   * By default this action typically returns partial records containing only the fields
+   * that were updated. Set `reload` to `true` to do an additional lookup after saving
+   * to return complete values for every $ENTITY.
    *
    * @var bool
    */
@@ -120,6 +104,27 @@ abstract class AbstractSaveAction extends AbstractAction {
    */
   protected function getIdField() {
     return $this->idField;
+  }
+
+  /**
+   * Add one or more records to be saved.
+   * @param array ...$records
+   * @return $this
+   */
+  public function addRecord(array ...$records) {
+    $this->records = array_merge($this->records, $records);
+    return $this;
+  }
+
+  /**
+   * Set default value for a field.
+   * @param string $fieldName
+   * @param mixed $defaultValue
+   * @return $this
+   */
+  public function addDefault(string $fieldName, $defaultValue) {
+    $this->defaults[$fieldName] = $defaultValue;
+    return $this;
   }
 
 }

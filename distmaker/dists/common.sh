@@ -65,7 +65,7 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes xml ; do
+  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes xml setup ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
@@ -87,6 +87,26 @@ function dm_install_core() {
   set +e
   rm -rf $to/sql/civicrm_*.??_??.mysql
   set -e
+}
+
+## Copy built-in extensions
+## usage: dm_install_core <core_repo_path> <to_path> <ext-dirs...>
+function dm_install_coreext() {
+  local repo="$1"
+  local to="$2"
+  shift
+  shift
+
+  for relext in "$@" ; do
+    [ ! -d "$to/$relext" ] && mkdir -p "$to/$relext"
+    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/$relext/./" "$to/$relext/./"
+  done
+}
+
+## Get a list of default/core extension directories (space-delimited)
+## reldirs=$(dm_core_exts)
+function dm_core_exts() {
+  echo ext/sequentialcreditnotes
 }
 
 ## Copy all packages
@@ -190,6 +210,7 @@ function dm_install_wordpress() {
   ## Need --exclude=civicrm for self-building on WP site
 
   dm_preg_edit '/^Version: [0-9\.]+/m' "Version: $DM_VERSION" "$to/civicrm.php"
+  dm_preg_edit "/^define\( \'CIVICRM_PLUGIN_VERSION\',\W'[0-9\.]+/m" "define( 'CIVICRM_PLUGIN_VERSION', '$DM_VERSION" "$to/civicrm.php"
 }
 
 ## Generate the composer "vendor" folder

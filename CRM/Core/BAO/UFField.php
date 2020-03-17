@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -55,6 +39,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   public static function create($params) {
     $id = CRM_Utils_Array::value('id', $params);
 
+    $op = empty($id) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre('UFField', $op, $id, $params);
     // Merge in data from existing field
     if (!empty($id)) {
       $UFField = new CRM_Core_BAO_UFField();
@@ -120,6 +106,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
     $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($ufField->uf_group_id, TRUE);
     CRM_Core_BAO_UFGroup::updateGroupTypes($ufField->uf_group_id, $fieldsType);
+
+    CRM_Utils_Hook::post('UFField', $op, $ufField->id, $ufField);
 
     civicrm_api3('profile', 'getfields', ['cache_clear' => TRUE]);
     return $ufField;
@@ -203,7 +191,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     else {
       $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
     }
-    $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);;
+    $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);
 
     if (!empty($params['id'])) {
       $ufField->whereAdd("id <> " . $params['id']);
@@ -1043,6 +1031,8 @@ SELECT  id
       unset($fields[$value['field_type']][$key]);
     }
 
+    // Allow extensions to alter the array of entity => fields permissible in a CiviCRM Profile.
+    CRM_Utils_Hook::alterUFFields($fields);
     return $fields;
   }
 

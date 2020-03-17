@@ -13,6 +13,8 @@
  * @author Marshal Newrock <marshal@idealso.com>
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * NOTE:
  * When looking up response codes in the Authorize.Net API, they
@@ -762,7 +764,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     // submit to authorize.net
     $submit = curl_init($this->_paymentProcessor['url_recur']);
     if (!$submit) {
-      return self::error(9002, 'Could not initiate connection to payment gateway');
+      throw new PaymentProcessorException('Could not initiate connection to payment gateway', 9002);
     }
 
     curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
@@ -784,7 +786,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $message = "{$responseFields['code']}: {$responseFields['text']}";
 
     if ($responseFields['resultCode'] == 'Error') {
-      return self::error($responseFields['code'], $responseFields['text']);
+      throw new PaymentProcessorException($responseFields['text'], $responseFields['code']);
     }
     return TRUE;
   }

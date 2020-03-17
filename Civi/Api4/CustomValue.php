@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -38,15 +22,25 @@
 namespace Civi\Api4;
 
 /**
- * CustomGroup entity.
+ * Provides virtual api entities for every multi-record custom group.
  *
+ * This class is different from other apis in that it is not itself an entity, but allows every
+ * multi-record custom group to act like an entity.
+ *
+ * Each action takes the name of the custom group as a parameter, or in traditional syntax the entity is prefixed with 'Custom_'
+ *
+ * **Ex. OOP:** `\Civi\Api4\CustomValue::get('MyStuff')->addWhere('id', '=', 123);`
+ * **Non-OOP:** `civicrm_api4('Custom_MyStuff', 'get', ['where' => [['id', '=', 123]]]);`
+ *
+ * Note: This class does NOT extend AbstractEntity so it doesn't get mistaken for a "real" entity.
  * @package Civi\Api4
  */
-class CustomValue extends Generic\AbstractEntity {
+class CustomValue {
 
   /**
    * @param string $customGroup
    * @return Action\CustomValue\Get
+   * @throws \API_Exception
    */
   public static function get($customGroup) {
     return new Action\CustomValue\Get($customGroup, __FUNCTION__);
@@ -55,6 +49,7 @@ class CustomValue extends Generic\AbstractEntity {
   /**
    * @param string $customGroup
    * @return Action\CustomValue\GetFields
+   * @throws \API_Exception
    */
   public static function getFields($customGroup = NULL) {
     return new Action\CustomValue\GetFields($customGroup, __FUNCTION__);
@@ -63,6 +58,7 @@ class CustomValue extends Generic\AbstractEntity {
   /**
    * @param string $customGroup
    * @return Action\CustomValue\Save
+   * @throws \API_Exception
    */
   public static function save($customGroup) {
     return new Action\CustomValue\Save($customGroup, __FUNCTION__);
@@ -71,6 +67,7 @@ class CustomValue extends Generic\AbstractEntity {
   /**
    * @param string $customGroup
    * @return Action\CustomValue\Create
+   * @throws \API_Exception
    */
   public static function create($customGroup) {
     return new Action\CustomValue\Create($customGroup, __FUNCTION__);
@@ -79,6 +76,7 @@ class CustomValue extends Generic\AbstractEntity {
   /**
    * @param string $customGroup
    * @return Action\CustomValue\Update
+   * @throws \API_Exception
    */
   public static function update($customGroup) {
     return new Action\CustomValue\Update($customGroup, __FUNCTION__);
@@ -87,6 +85,7 @@ class CustomValue extends Generic\AbstractEntity {
   /**
    * @param string $customGroup
    * @return Action\CustomValue\Delete
+   * @throws \API_Exception
    */
   public static function delete($customGroup) {
     return new Action\CustomValue\Delete($customGroup, __FUNCTION__);
@@ -95,6 +94,7 @@ class CustomValue extends Generic\AbstractEntity {
   /**
    * @param string $customGroup
    * @return Action\CustomValue\Replace
+   * @throws \API_Exception
    */
   public static function replace($customGroup) {
     return new Action\CustomValue\Replace($customGroup, __FUNCTION__);
@@ -103,6 +103,7 @@ class CustomValue extends Generic\AbstractEntity {
   /**
    * @param string $customGroup
    * @return Action\CustomValue\GetActions
+   * @throws \API_Exception
    */
   public static function getActions($customGroup = NULL) {
     return new Action\CustomValue\GetActions($customGroup, __FUNCTION__);

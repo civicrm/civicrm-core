@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -183,8 +167,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
+   * Add buttons to the form.
    *
    * @param string $title
    *   Title of the main button.
@@ -215,6 +198,57 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    */
   public function getQueryMode() {
     return $this->queryMode ?: CRM_Contact_BAO_Query::MODE_CONTACTS;
+  }
+
+  /**
+   * Given the component id, compute the contact id
+   * since it's used for things like send email.
+   *
+   * @todo At the moment this duplicates a similar function in CRM_Core_DAO
+   * because right now only the case component is using this. Since the
+   * default $orderBy is '' which is what the original does, others should be
+   * easily convertable as NFC.
+   * @todo The passed in variables should be class member variables. Shouldn't
+   * need to have passed in vars.
+   *
+   * @param $componentIDs
+   * @param string $tableName
+   * @param string $idField
+   *
+   * @return array
+   */
+  public function getContactIDsFromComponent($componentIDs, $tableName, $idField = 'id') {
+    $contactIDs = [];
+
+    if (empty($componentIDs)) {
+      return $contactIDs;
+    }
+
+    $orderBy = $this->orderBy();
+
+    $IDs = implode(',', $componentIDs);
+    $query = "
+SELECT contact_id
+  FROM $tableName
+ WHERE $idField IN ( $IDs ) $orderBy
+";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $contactIDs[] = $dao->contact_id;
+    }
+    return $contactIDs;
+  }
+
+  /**
+   * Default ordering for getContactIDsFromComponent. Subclasses can override.
+   *
+   * @return string
+   *   SQL fragment. Either return '' or a valid order clause including the
+   *   words "ORDER BY", e.g. "ORDER BY `{$this->idField}`"
+   */
+  public function orderBy() {
+    return '';
   }
 
 }

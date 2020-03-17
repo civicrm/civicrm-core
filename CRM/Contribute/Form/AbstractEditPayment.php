@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be usefusul, but   |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -92,13 +76,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @var CRM_Core_Payment
    */
   protected $_paymentObject;
-
-  /**
-   * The id of the contribution that we are processing.
-   *
-   * @var int
-   */
-  public $_id;
 
   /**
    * Entity that $this->_id relates to.
@@ -248,6 +225,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * Pre process function with common actions.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -385,19 +365,12 @@ WHERE  contribution_id = {$id}
     }
     $this->_processors = [];
     foreach ($this->_paymentProcessors as $id => $processor) {
-      // @todo review this. The inclusion of this IF was to address test processors being incorrectly loaded.
-      // However the function $this->getValidProcessors() is expected to only return the processors relevant
-      // to the mode (using the actual id - ie. the id of the test processor for the test processor).
-      // for some reason there was a need to filter here per commit history - but this indicates a problem
-      // somewhere else.
-      if ($processor['is_test'] == ($this->_mode == 'test')) {
-        $this->_processors[$id] = $processor['name'];
-        if (!empty($processor['description'])) {
-          $this->_processors[$id] .= ' : ' . $processor['description'];
-        }
-        if ($processor['is_recur']) {
-          $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
-        }
+      $this->_processors[$id] = $processor['name'];
+      if (!empty($processor['description'])) {
+        $this->_processors[$id] .= ' : ' . $processor['description'];
+      }
+      if ($processor['is_recur']) {
+        $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
       }
     }
     // CRM-21002: pass the default payment processor ID whose credit card type icons should be populated first
@@ -546,7 +519,6 @@ WHERE  contribution_id = {$id}
 
   /**
    * Common block for setting up the parts of a form that relate to credit / debit card
-   * @throws Exception
    */
   protected function assignPaymentRelatedVariables() {
     try {
@@ -573,10 +545,6 @@ WHERE  contribution_id = {$id}
         $this->_params['payment_processor_id'],
         ($this->_mode == 'test')
       );
-      if (in_array('credit_card_exp_date', array_keys($this->_params))) {
-        $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-        $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-      }
       $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
       $this->assign('credit_card_number', CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number']));
       $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
@@ -611,6 +579,10 @@ WHERE  contribution_id = {$id}
     }
     if (!empty($params['credit_card_number']) && empty($params['pan_truncation'])) {
       $params['pan_truncation'] = substr($params['credit_card_number'], -4);
+    }
+    if (!empty($params['credit_card_exp_date'])) {
+      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
+      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
     }
   }
 

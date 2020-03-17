@@ -678,16 +678,6 @@
      <page_callback>CRM_Price_Page_Option</page_callback>
   </item>
   <item>
-     <path>civicrm/admin/tplstrings/add</path>
-     <page_callback>CRM_Admin_Form_Persistent</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/admin/tplstrings</path>
-     <page_callback>CRM_Admin_Page_Persistent</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
      <path>civicrm/ajax/mapping</path>
      <page_callback>CRM_Admin_Page_AJAX::mappingList</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
@@ -695,7 +685,7 @@
   <item>
      <path>civicrm/ajax/recipientListing</path>
      <page_callback>CRM_Admin_Page_AJAX::recipientListing</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
+     <access_arguments>access CiviEvent,access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/sms/provider</path>

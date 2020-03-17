@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -68,6 +52,12 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
       'action' => '<span><a href="/index.php?q=civicrm/contact/view/membership&amp;reset=1&amp;id=1&amp;cid=' . $this->_contactID . '&amp;action=view&amp;context=search&amp;selectedChild=member&amp;compContext=membership" class="action-item crm-hover-button" title=\'View Membership\' >View</a><a href="/index.php?q=civicrm/contact/view/membership&amp;reset=1&amp;action=update&amp;id=' . $membershipID . '&amp;cid=' . $this->_contactID . '&amp;context=search&amp;compContext=membership" class="action-item crm-hover-button" title=\'Edit Membership\' >Edit</a></span><span class=\'btn-slide crm-hover-button\'>Renew...<ul class=\'panel\'><li><a href="/index.php?q=civicrm/contact/view/membership&amp;reset=1&amp;action=delete&amp;id=' . $membershipID . '&amp;cid=' . $this->_contactID . '&amp;context=search&amp;compContext=membership" class="action-item crm-hover-button small-popup" title=\'Delete Membership\' >Delete</a></li><li><a href="/index.php?q=civicrm/contact/view/membership&amp;reset=1&amp;action=renew&amp;id=' . $membershipID . '&amp;cid=' . $this->_contactID . '&amp;context=search&amp;compContext=membership" class="action-item crm-hover-button" title=\'Renew Membership\' >Renew</a></li><li><a href="/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;mid=' . $membershipID . '&amp;context=search&amp;compContext=membership" class="action-item crm-hover-button" title=\'Cancel Auto Renew Subscription\' >Cancel Auto-renewal</a></li></ul></span>',
       'auto_renew' => 1,
     ], $rows[0]);
+    $this->assertCount(1, $rows);
+
+    //Verify if NULL search on source returns the row correctly.
+    $params = [['membership_source', 'IS NOT NULL', '', 1, 0]];
+    $selector = new CRM_Member_Selector_Search($params);
+    $rows = $selector->getRows(CRM_Core_Permission::VIEW, 0, 25, NULL);
     $this->assertCount(1, $rows);
   }
 

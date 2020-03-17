@@ -7,6 +7,8 @@ use Civi\Payment\Exception\PaymentProcessorException;
  * @group headless
  */
 class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
+  use CRMTraits_Financial_OrderTrait;
+
   protected $_contributionID;
   protected $_invoiceID = 'c2r9c15f7be20b4f3fef1f77e4c37424';
   protected $_financialTypeID = 1;
@@ -15,12 +17,16 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
+  /**
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate(['is_test' => 0]);
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', [
-      'title' => "Test Contribution Page",
+      'title' => 'Test Contribution Page',
       'financial_type_id' => $this->_financialTypeID,
       'currency' => 'USD',
       'payment_processor' => $this->_paymentProcessorID,
@@ -101,6 +107,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       $this->markTestSkipped('Error from A.net - cannot proceed');
     }
     $this->_contributionID = $contribution->id;
+    $this->ids['Contribution'][0] = $contribution->id;
     $this->_contributionRecurID = $contribution->contribution_recur_id;
     $recur_params = [
       'id' => $this->_contributionRecurID,
@@ -126,6 +133,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
@@ -196,16 +205,19 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentMembershipRecurSuccess() {
-    $this->setupMembershipRecurringPaymentProcessorTransaction();
+    $this->createRepeatMembershipOrder();
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $IPN->main();
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->ids['Contribution'][0]]);
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('6511143069', $contribution['trxn_id']);
+
     // source gets set by processor
-    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $this->assertEquals('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
@@ -224,6 +236,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['values'][1]['id'],
       'entity_table' => 'civicrm_membership',
     ]);
+    $this->validateAllContributions();
+    $this->validateAllPayments();
   }
 
   /**
@@ -394,7 +408,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'x_state' => 'WA',
       'x_city' => 'Dallas',
       'x_address' => '41 My ST',
-      'x_invoice_num' => $this->_contributionID,
+      'x_invoice_num' => $this->ids['Contribution'][0],
       'x_cust_id' => $this->_contactID,
       'x_company' => 'nowhere@civicrm.org',
       'x_last_name' => 'Roberts',

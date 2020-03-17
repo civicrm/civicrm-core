@@ -21,6 +21,11 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Type of bounce</comment>
+    <pseudoconstant>
+      <table>civicrm_mailing_bounce_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>bounce_type_id</name>

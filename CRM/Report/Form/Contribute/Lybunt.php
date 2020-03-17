@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
@@ -206,6 +190,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_MONEY,
             'statistics' => ['sum' => ts('Lifetime total')],
+            'required' => TRUE,
           ],
         ],
         'filters' => [
@@ -646,9 +631,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $interval['life_time'] = 'Life Time';
 
     foreach ($rows as $key => $row) {
-      $display['life_time'] = CRM_Utils_Array::value('life_time', $display) +
-        $row['civicrm_life_time_total'];
-      $display[$previous_year] = CRM_Utils_Array::value($previous_year, $display) + $row[$previous_year];
+      // The final row contains the totals so we don't need to include it here.
+      if (!empty($row['civicrm_contribution_contact_id'])) {
+        $display['life_time'] = CRM_Utils_Array::value('life_time', $display) +
+          $row['civicrm_contribution_civicrm_life_time_total'];
+        $display[$previous_year] = CRM_Utils_Array::value($previous_year, $display) + $row['civicrm_contribution_last_year_total_amount'];
+      }
     }
 
     $config = CRM_Core_Config::Singleton();

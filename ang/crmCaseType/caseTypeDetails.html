@@ -48,7 +48,7 @@ The original form used table layout; don't know if we have an alternative, CSS-b
           <input
             name="activityAsgmtGrps"
             crm-ui-id="caseTypeDetailForm.activityAsgmtGrps"
-            crm-entityref="{entity: 'Group', api: {params: {is_hidden: 0, is_active: 1}}, select: {allowClear: true, multiple: true, placeholder: ts('Select Group')}}"
+            crm-entityref="{entity: 'Group', api: {id_field: 'name', params: {is_hidden: 0, is_active: 1}}, select: {allowClear: true, multiple: true, placeholder: ts('Select Group')}}"
             ng-model="caseType.definition.activityAsgmtGrps"
           />
         </div>

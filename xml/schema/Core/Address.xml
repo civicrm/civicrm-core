@@ -9,7 +9,9 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <uniqueName>address_id</uniqueName>
     <type>int unsigned</type>
+    <export>true</export>
     <title>Address ID</title>
     <required>true</required>
     <comment>Unique Address ID</comment>
@@ -55,13 +57,13 @@
   </index>
   <field>
     <name>is_primary</name>
-    <title>Is Address Primary?</title>
+    <title>Primary address</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this the primary address.</comment>
     <add>2.0</add>
     <html>
-      <type>CheckBox</type>
+      <type>Radio</type>
     </html>
   </field>
   <index>
@@ -259,6 +261,7 @@
     </pseudoconstant>
     <html>
       <type>ChainSelect</type>
+      <controlField>state_province_id</controlField>
     </html>
     <add>1.1</add>
   </field>
@@ -285,6 +288,7 @@
     <localize_context>province</localize_context>
     <html>
       <type>ChainSelect</type>
+      <controlField>country_id</controlField>
     </html>
     <add>1.1</add>
   </field>

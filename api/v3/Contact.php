@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -97,6 +81,9 @@ function civicrm_api3_contact_create($params) {
 
   if (empty($params['contact_type']) && $contactID) {
     $params['contact_type'] = CRM_Contact_BAO_Contact::getContactType($contactID);
+    if (!$params['contact_type']) {
+      throw new API_Exception('Contact id ' . $contactID . ' not found.');
+    }
   }
 
   if (!isset($params['contact_sub_type']) && $contactID) {
@@ -774,6 +761,10 @@ function civicrm_api3_contact_getquick($params) {
     if ($field_name == 'contact_id') {
       $field_name = 'id';
     }
+    // core#1420 : trim non-numeric character from phone search string
+    elseif ($field_name == 'phone_numeric') {
+      $name = preg_replace('/[^\d]/', '', $name);
+    }
     if (isset($table_names[$field_name])) {
       $table_name = $table_names[$field_name];
     }
@@ -867,7 +858,7 @@ function civicrm_api3_contact_getquick($params) {
   }
   $actualSelectElements = implode(', ', $actualSelectElements);
   $from = implode(' ', $from);
-  $limit = (int) CRM_Utils_Array::value('limit', $params);
+  $limit = (int) ($params['limit'] ?? 0);
   $limit = $limit > 0 ? $limit : Civi::settings()->get('search_autocomplete_count');
 
   // add acl clause here
@@ -1220,7 +1211,7 @@ function civicrm_api3_contact_get_merge_conflicts($params) {
   $migrationInfo = [];
   $result = [];
   foreach ((array) $params['mode'] as $mode) {
-    $result[$mode]['conflicts'] = CRM_Dedupe_Merger::getConflicts(
+    $result[$mode] = CRM_Dedupe_Merger::getConflicts(
       $migrationInfo,
       $params['to_remove_id'], $params['to_keep_id'],
       $mode
@@ -1601,9 +1592,9 @@ function civicrm_api3_contact_duplicatecheck($params) {
     return civicrm_api3('Contact', 'get', [
       'return' => $params['return'],
       'id' => ['IN' => $dupes],
-      'options' => CRM_Utils_Array::value('options', $params),
-      'sequential' => CRM_Utils_Array::value('sequential', $params),
-      'check_permissions' => CRM_Utils_Array::value('check_permissions', $params),
+      'options' => $params['options'] ?? NULL,
+      'sequential' => $params['sequential'] ?? NULL,
+      'check_permissions' => $params['check_permissions'] ?? NULL,
     ]);
   }
   foreach ($dupes as $dupe) {

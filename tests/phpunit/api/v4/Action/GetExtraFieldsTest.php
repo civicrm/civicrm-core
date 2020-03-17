@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -38,6 +22,7 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Address;
 use Civi\Api4\Contact;
 
 /**
@@ -45,17 +30,40 @@ use Civi\Api4\Contact;
  */
 class GetExtraFieldsTest extends UnitTestCase {
 
-  public function testBAOFieldsWillBeReturned() {
-    $returnedFields = Contact::getFields()
-      ->execute()
-      ->getArrayCopy();
+  public function testGetFieldsByContactType() {
+    $getFields = Contact::getFields()->setCheckPermissions(FALSE)->addSelect('name')->setIncludeCustom(FALSE);
 
-    $baseFields = \CRM_Contact_BAO_Contact::fields();
-    $baseFieldNames = array_column($baseFields, 'name');
-    $returnedFieldNames = array_column($returnedFields, 'name');
-    $notReturned = array_diff($baseFieldNames, $returnedFieldNames);
+    $baseFields = array_column(\CRM_Contact_BAO_Contact::fields(), 'name');
+    $returnedFields = $getFields->execute()->column('name');
+    $notReturned = array_diff($baseFields, $returnedFields);
 
+    // With no contact_type specified, all fields should be returned
     $this->assertEmpty($notReturned);
+
+    $individualFields = $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name');
+    $this->assertNotContains('sic_code', $individualFields);
+    $this->assertNotContains('contact_type', $individualFields);
+    $this->assertContains('first_name', $individualFields);
+
+    $organizationFields = $getFields->setValues(['contact_type' => 'Organization'])->execute()->column('name');
+    $this->assertContains('sic_code', $organizationFields);
+    $this->assertNotContains('contact_type', $organizationFields);
+    $this->assertNotContains('first_name', $organizationFields);
+    $this->assertNotContains('household_name', $organizationFields);
+  }
+
+  public function testGetOptionsAddress() {
+    $getFields = Address::getFields()->setCheckPermissions(FALSE)->addWhere('name', '=', 'state_province_id')->setLoadOptions(TRUE);
+
+    $usOptions = $getFields->setValues(['country_id' => 1228])->execute()->first();
+
+    $this->assertContains('Alabama', $usOptions['options']);
+    $this->assertNotContains('Alberta', $usOptions['options']);
+
+    $caOptions = $getFields->setValues(['country_id' => 1039])->execute()->first();
+
+    $this->assertNotContains('Alabama', $caOptions['options']);
+    $this->assertContains('Alberta', $caOptions['options']);
   }
 
 }

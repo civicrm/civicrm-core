@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * This class stores logic for managing CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
@@ -50,17 +34,18 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * @inheritDoc
    *
    * @param CRM_Extension_Info $info
+   * @throws CRM_Core_Exception
    */
   public function onPreInstall(CRM_Extension_Info $info) {
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
 
     if (array_key_exists($info->key, $paymentProcessorTypes)) {
-      CRM_Core_Error::fatal('This payment processor type is already installed.');
+      throw new CRM_Core_Exception(ts('This payment processor type is already installed.'));
     }
 
     $ppByName = $this->_getAllPaymentProcessorTypes('name');
     if (array_key_exists($info->name, $ppByName)) {
-      CRM_Core_Error::fatal('This payment processor type already exists.');
+      throw new CRM_Core_Exception(ts('This payment processor type already exists.'));
     }
 
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
@@ -98,7 +83,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
         break;
 
       default:
-        CRM_Core_Error::fatal('Billing mode in info file has wrong value.');
+        throw new CRM_Core_Exception(ts('Billing mode in info file has wrong value.'));
     }
 
     $dao->is_recur = trim($info->typeInfo['isRecur']);
@@ -124,7 +109,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   public function onPreUninstall(CRM_Extension_Info $info) {
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
     if (!array_key_exists($info->key, $paymentProcessorTypes)) {
-      CRM_Core_Error::fatal('This payment processor type is not registered.');
+      CRM_Core_Error::fatal(ts('This payment processor type is not registered.'));
     }
 
     $dao = new CRM_Financial_DAO_PaymentProcessor();

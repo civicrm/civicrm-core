@@ -1,32 +1,19 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {strip}{literal}
 <style type="text/css">
   #civicrm-news-feed {
     border: 0 none;
+  }
+  #civicrm-news-feed .crm-news-feed-unread .crm-news-feed-item-title {
+    font-weight: bold;
   }
   #civicrm-news-feed .collapsed .crm-accordion-header {
     text-overflow: ellipsis;
@@ -61,7 +48,7 @@
       <div class="crm-accordion-wrapper collapsed">
         <div class="crm-accordion-header">
           <span class="crm-news-feed-item-title">{$article.title}</span>
-          <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|strip_tags|mb_substr:0:100}{else}{$article.description|strip_tags}{/if}</span>
+          <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|strip_tags|mb_substr:0:150}{else}{$article.description|strip_tags}{/if}</span>
         </div>
         <div class="crm-accordion-body">
           <div>{$article.description}</div>
@@ -78,53 +65,45 @@
     </div>
   {/if}
 </div>
-  
+
 </div>
 {literal}<script type="text/javascript">
   (function($, _) {
     $(function() {
       $('#civicrm-news-feed').tabs();
-      if (window.localStorage) {
-        var opened = localStorage.newsFeed ? JSON.parse(localStorage.newsFeed) : {};
-        $('#civicrm-news-feed ul.ui-tabs-nav a').each(function() {
-          var
-            $tab = $(this),
-            href = $tab.attr('href'),
-            $content = $(href),
-            $items = $('.crm-accordion-wrapper', $content),
-            key = href.substring(19),
-            count = 0;
-          if (!opened[key]) opened[key] = [];
-          if ($items.length) {
-            $items.each(function () {
-              var itemKey = $('.crm-news-feed-item-link a', this).attr('href');
-              if ($.inArray(itemKey, opened[key]) < 0) {
-                $('.crm-news-feed-item-title', this).css('font-weight', 'bold');
-                ++count;
-                $(this).one('crmAccordion:open', function () {
-                  $('.crm-news-feed-item-title', this).css('font-weight', '');
-                  $('em', $tab).text(--count);
-                  if (!count) {
-                    $('em', $tab).remove();
-                  }
-                  opened[key].push(itemKey);
-                  localStorage.newsFeed = JSON.stringify(opened);
-                });
-              }
-            });
-            if (count) {
-              $tab.html($tab.text() + ' <em>' + count + '</em>');
+      var opened = CRM.cache.get('newsFeed', {});
+      $('#civicrm-news-feed ul.ui-tabs-nav a').each(function() {
+        var
+          $tab = $(this),
+          href = $tab.attr('href'),
+          $content = $(href),
+          $items = $('.crm-accordion-wrapper', $content),
+          key = href.substring(19),
+          count = 0;
+        if (!opened[key]) opened[key] = [];
+        if ($items.length) {
+          $items.each(function () {
+            var itemKey = $('.crm-news-feed-item-link a', this).attr('href');
+            if ($.inArray(itemKey, opened[key]) < 0) {
+              $(this).addClass('crm-news-feed-unread');
+              ++count;
+              $(this).one('crmAccordion:open', function () {
+                $(this).removeClass('crm-news-feed-unread');
+                $('em', $tab).text(--count || '');
+                opened[key].push(itemKey);
+                CRM.cache.set('newsFeed', opened);
+              });
             }
-            // Remove items from localstorage that are no longer in the current feed
-            $.each(opened[key], function(i, itemKey) {
-              if (!$('a[href="' + itemKey + '"]', $content).length) {
-                opened[key][i] = null;
-              }
-            });
-            _.remove(opened[key], function(n) {return !n});
+          });
+          if (count) {
+            $tab.html($tab.text() + ' <em>' + count + '</em>');
           }
-        });
-      }
+          // Remove items from localstorage that are no longer in the current feed
+          _.remove(opened[key], function(itemKey) {
+            return !$('a[href="' + itemKey + '"]', $content).length;
+          });
+        }
+      });
     });
   })(CRM.$, CRM._);
 </script>{/literal}

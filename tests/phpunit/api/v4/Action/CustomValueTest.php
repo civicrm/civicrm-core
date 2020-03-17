@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -57,6 +41,7 @@ class CustomValueTest extends BaseCustomValueTest {
 
     $group = uniqid('groupc');
     $colorField = uniqid('colorc');
+    $multiField = uniqid('chkbx');
     $textField = uniqid('txt');
 
     $customGroup = CustomGroup::create()
@@ -73,6 +58,15 @@ class CustomValueTest extends BaseCustomValueTest {
       ->addValue('options', $optionValues)
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Select')
+      ->addValue('data_type', 'String')
+      ->execute();
+
+    CustomField::create()
+      ->setCheckPermissions(FALSE)
+      ->addValue('label', $multiField)
+      ->addValue('options', $optionValues)
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'CheckBox')
       ->addValue('data_type', 'String')
       ->execute();
 
@@ -96,22 +90,31 @@ class CustomValueTest extends BaseCustomValueTest {
     $fields = CustomValue::getFields($group)->execute();
     $expectedResult = [
       [
-        'custom_field_id' => 1,
         'custom_group' => $group,
         'name' => $colorField,
         'title' => $colorField,
         'entity' => "Custom_$group",
         'data_type' => 'String',
         'fk_entity' => NULL,
+        'serialize' => NULL,
       ],
       [
-        'custom_field_id' => 2,
+        'custom_group' => $group,
+        'name' => $multiField,
+        'title' => $multiField,
+        'entity' => "Custom_$group",
+        'data_type' => 'String',
+        'fk_entity' => NULL,
+        'serialize' => 1,
+      ],
+      [
         'custom_group' => $group,
         'name' => $textField,
         'title' => $textField,
         'entity' => "Custom_$group",
         'data_type' => 'String',
         'fk_entity' => NULL,
+        'serialize' => NULL,
       ],
       [
         'name' => 'id',
@@ -138,11 +141,11 @@ class CustomValueTest extends BaseCustomValueTest {
     // CASE 1: Test CustomValue::create
     // Create two records for a single contact and using CustomValue::get ensure that two records are created
     CustomValue::create($group)
-      ->addValue($colorField, 'Green')
+      ->addValue($colorField, 'g')
       ->addValue("entity_id", $this->contactID)
       ->execute();
     CustomValue::create($group)
-      ->addValue($colorField, 'Red')
+      ->addValue($colorField, 'r')
       ->addValue("entity_id", $this->contactID)
       ->execute();
     // fetch custom values using API4 CustomValue::get
@@ -153,12 +156,12 @@ class CustomValueTest extends BaseCustomValueTest {
     $expectedResult = [
       [
         'id' => 1,
-        $colorField => 'Green',
+        $colorField => 'g',
         'entity_id' => $this->contactID,
       ],
       [
         'id' => 2,
-        $colorField => 'Red',
+        $colorField => 'r',
         'entity_id' => $this->contactID,
       ],
     ];
@@ -170,10 +173,10 @@ class CustomValueTest extends BaseCustomValueTest {
     }
 
     // CASE 2: Test CustomValue::update
-    // Update a records whose id is 1 and change the custom field (name = Color) value to 'White' from 'Green'
+    // Update a records whose id is 1 and change the custom field (name = Color) value to 'Blue' from 'Green'
     CustomValue::update($group)
       ->addWhere("id", "=", 1)
-      ->addValue($colorField, 'White')
+      ->addValue($colorField, 'b')
       ->execute();
 
     // ensure that the value is changed for id = 1
@@ -181,7 +184,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ->addWhere("id", "=", 1)
       ->execute()
       ->first()[$colorField];
-    $this->assertEquals('White', $color);
+    $this->assertEquals('b', $color);
 
     // CASE 3: Test CustomValue::replace
     // create a second contact which will be used to replace the custom values, created earlier
@@ -193,9 +196,9 @@ class CustomValueTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
     // Replace all the records which was created earlier with entity_id = first contact
-    //  with custom record [$colorField => 'Rainbow', 'entity_id' => $secondContactID]
+    //  with custom record [$colorField => 'g', 'entity_id' => $secondContactID]
     CustomValue::replace($group)
-      ->setRecords([[$colorField => 'Rainbow', 'entity_id' => $secondContactID]])
+      ->setRecords([[$colorField => 'g', $multiField => ['r', 'g'], 'entity_id' => $secondContactID]])
       ->addWhere('entity_id', '=', $this->contactID)
       ->execute();
 
@@ -206,7 +209,8 @@ class CustomValueTest extends BaseCustomValueTest {
     $expectedResult = [
       [
         'id' => 3,
-        $colorField => 'Rainbow',
+        $colorField => 'g',
+        $multiField => ['r', 'g'],
         'entity_id' => $secondContactID,
       ],
     ];

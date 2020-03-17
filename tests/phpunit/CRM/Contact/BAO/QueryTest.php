@@ -49,9 +49,10 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @param $fv
    * @param $count
    * @param $ids
-   * @param $full
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSearch($fv, $count, $ids, $full) {
+  public function testSearch($fv, $count, $ids) {
     $this->callAPISuccess('SavedSearch', 'create', ['form_values' => 'a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}']);
     $this->callAPISuccess('SavedSearch', 'create', ['form_values' => 'a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}']);
 
@@ -194,6 +195,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Check that we get a successful result querying for home address.
    * CRM-14263 search builder failure with search profile & address in criteria
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchProfileHomeCityCRM14263() {
     $contactID = $this->individualCreate();
@@ -233,6 +236,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Check that we get a successful result querying for home address.
    * CRM-14263 search builder failure with search profile & address in criteria
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchProfileHomeCityNoResultsCRM14263() {
     $contactID = $this->individualCreate();
@@ -271,6 +276,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   /**
    * Test searchPrimaryDetailsOnly setting.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchPrimaryLocTypes() {
     $contactID = $this->individualCreate();
@@ -325,6 +332,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    *  Test created to prove failure of search on state when location
    *  display name is different form location name (issue 607)
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSearchOtherLocationUpperLower() {
 
@@ -453,6 +462,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * Test smart groups with non-numeric don't fail on range queries.
    *
    * CRM-14720
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testNumericPostal() {
     // Precaution as hitting some inconsistent set up running in isolation vs in the suite.
@@ -491,6 +502,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   /**
    * Test searches are case insensitive.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCaseInsensitive() {
     $orgID = $this->organizationCreate(['organization_name' => 'BOb']);
@@ -505,15 +518,15 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', $params);
     unset($params['contact_type']);
     foreach ($params as $key => $value) {
-      if ($key == 'employer_id') {
+      if ($key === 'employer_id') {
         $searchParams = [['current_employer', '=', 'bob', 0, 1]];
       }
       else {
         $searchParams = [[$key, '=', strtolower($value), 0, 1]];
       }
-      $query = new CRM_Contact_BAO_Query($searchParams);
-      $result = $query->apiQuery($searchParams);
-      $this->assertEquals(1, count($result[0]), 'search for ' . $key);
+
+      $result = CRM_Contact_BAO_Query::apiQuery($searchParams);
+      $this->assertCount(1, $result[0], 'search for ' . $key);
       $contact = reset($result[0]);
       $this->assertEquals('Minnie Mouse', $contact['display_name']);
       $this->assertEquals('BOb', $contact['current_employer']);
@@ -524,6 +537,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * Test smart groups with non-numeric don't fail on equal queries.
    *
    * CRM-14720
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testNonNumericEqualsPostal() {
     $this->individualCreate(['api.address.create' => ['postal_code' => 5, 'location_type_id' => 'Main']]);
@@ -548,10 +563,15 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Test relationship description.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testRelationshipDescription() {
     $relType = $this->callAPISuccess('RelationshipType', 'create', [
-      'name_a_b' => uniqid('a'),
-      'name_b_a' => uniqid('b'),
+      'name_a_b' => 'blah',
+      'name_b_a' => 'other blah',
     ]);
     $contactID_a = $this->individualCreate([], 1);
     $contactID_b = $this->individualCreate([], 2);
@@ -581,11 +601,16 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     // This is a little weird but seems consistent with the behavior of the search form in general.
     // Technically there are 2 contacts who share a relationship with the description searched for,
     // so one might expect the search form to return both of them instead of just Contact A... but it doesn't.
-    $this->assertEquals('1', $dao->N, "Search query returns exactly 1 result?");
-    $this->assertTrue($dao->fetch(), "Search query returns success?");
-    $this->assertEquals($contactID_a, $dao->contact_id, "Search query returns contact A?");
+    $this->assertEquals('1', $dao->N, 'Search query returns exactly 1 result?');
+    $this->assertTrue($dao->fetch(), 'Search query returns success?');
+    $this->assertEquals($contactID_a, $dao->contact_id, 'Search query returns contact A?');
   }
 
+  /**
+   * Test non-reciprocal relationship.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testNonReciprocalRelationshipTargetGroupIsCorrectResults() {
     $contactID_a = $this->individualCreate();
     $contactID_b = $this->individualCreate();
@@ -708,9 +733,14 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       ],
     ];
     $sql = CRM_Contact_BAO_Query::getQuery($params);
-    $this->assertContains('INNER JOIN civicrm_rel_temp_', $sql, "Query appears to use temporary table of compiled relationships?", TRUE);
+    $this->assertContains('INNER JOIN civicrm_tmp_e', $sql, "Query appears to use temporary table of compiled relationships?", TRUE);
   }
 
+  /**
+   * Test relationship permission clause.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testRelationshipPermissionClause() {
     $params = [['relation_type_id', 'IN', ['1_b_a'], 0, 0], ['relation_permission', 'IN', [2], 0, 0]];
     $sql = CRM_Contact_BAO_Query::getQuery($params);
@@ -719,6 +749,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   /**
    * Test Relationship Clause
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRelationshipClause() {
     $today = date('Ymd');
@@ -876,29 +908,31 @@ civicrm_relationship.is_active = 1 AND
 
   /**
    * CRM-19562 ensure that only ids are used for contact_id searching.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactIDClause() {
     $params = [
-      ["mark_x_2", "=", 1, 0, 0],
-      ["mark_x_foo@example.com", "=", 1, 0, 0],
+      ['mark_x_2', '=', 1, 0, 0],
+      ['mark_x_foo@example.com', '=', 1, 0, 0],
     ];
     $returnProperties = [
-      "sort_name" => 1,
-      "email" => 1,
-      "do_not_email" => 1,
-      "is_deceased" => 1,
-      "on_hold" => 1,
-      "display_name" => 1,
-      "preferred_mail_format" => 1,
+      'sort_name' => 1,
+      'email' => 1,
+      'do_not_email' => 1,
+      'is_deceased' => 1,
+      'on_hold' => 1,
+      'display_name' => 1,
+      'preferred_mail_format' => 1,
     ];
     $numberOfContacts = 2;
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
+
     try {
-      $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberOfContacts);
+      CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberOfContacts);
     }
     catch (Exception $e) {
       $this->assertEquals(
-        "A fatal error was triggered: One of parameters  (value: foo@example.com) is not of the type Positive",
+        'One of parameters  (value: foo@example.com) is not of the type Positive',
         $e->getMessage()
       );
       $this->assertTrue(TRUE);
@@ -927,6 +961,8 @@ civicrm_relationship.is_active = 1 AND
    * Test the sorting on the contact ID query works with a profile search.
    *
    * Checking for lack of fatal.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactIDQueryProfileSearchResults() {
     $profile = $this->callAPISuccess('UFGroup', 'create', ['group_type' => 'Contact', 'name' => 'search', 'title' => 'search']);
@@ -961,6 +997,8 @@ civicrm_relationship.is_active = 1 AND
 
   /**
    * Test the summary query does not add an acl clause when acls not enabled..
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetSummaryQueryWithFinancialACLDisabled() {
     $this->createContributionsForSummaryQueryTests();
@@ -992,6 +1030,8 @@ civicrm_relationship.is_active = 1 AND
 
   /**
    * Test the summary query accurately adds financial acl filters.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetSummaryQueryWithFinancialACLEnabled() {
     $where = $from = NULL;
@@ -1028,43 +1068,32 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
-   * When we have a relative date in search criteria, check that convertFormValues() sets _low & _high date fields and returns other criteria.
-   * CRM-21816 fix relative dates in search bug
+   * Test relative date filters to ensure they generate correct SQL.
+   *
+   * @dataProvider relativeDateFilters
    */
-  public function testConvertFormValuesCRM21816() {
-    $fv = [
-      // next 60 days
-      "member_end_date_relative" => "starting_2.month",
-      "member_end_date_low" => "20180101000000",
-      "member_end_date_high" => "20180331235959",
-      "membership_is_current_member" => "1",
-      "member_is_primary" => "1",
-    ];
-    // $fv is modified by convertFormValues()
-    $fv_orig = $fv;
-    $params = CRM_Contact_BAO_Query::convertFormValues($fv);
+  public function testRelativeDateFilters($filter, $expectedWhere) {
+    $params = [['created_date_relative', '=', $filter, 0, 0]];
 
-    // restructure for easier testing
-    $modparams = [];
-    foreach ($params as $p) {
-      $modparams[$p[0]] = $p;
-    }
+    $dates = CRM_Utils_Date::getFromTo($filter, NULL, NULL);
+    $expectedWhere = str_replace(['date0', 'date1'], [$dates[0], $dates[1]], $expectedWhere);
 
-    // Check member_end_date_low is in params
-    $this->assertTrue(is_array($modparams['member_end_date_low']));
-    // ... fv and params should match
-    $this->assertEquals($modparams['member_end_date_low'][2], $fv['member_end_date_low']);
-    // ... fv & fv_orig should be different
-    $this->assertNotEquals($fv['member_end_date_low'], $fv_orig['member_end_date_low']);
+    $query = new CRM_Contact_BAO_Query(
+      $params, [],
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
 
-    // same for member_end_date_high
-    $this->assertTrue(is_array($modparams['member_end_date_high']));
-    $this->assertEquals($modparams['member_end_date_high'][2], $fv['member_end_date_high']);
-    $this->assertNotEquals($fv['member_end_date_high'], $fv_orig['member_end_date_high']);
+    list($select, $from, $where, $having) = $query->query();
+    $this->assertEquals($expectedWhere, $where);
+  }
 
-    // Check other fv values are in params
-    $this->assertEquals($modparams['membership_is_current_member'][2], $fv_orig['membership_is_current_member']);
-    $this->assertEquals($modparams['member_is_primary'][2], $fv_orig['member_is_primary']);
+  public function relativeDateFilters() {
+    $dataProvider[] = ['this.year', "WHERE  ( contact_a.created_date BETWEEN 'date0' AND 'date1' )  AND (contact_a.is_deleted = 0)"];
+    $dataProvider[] = ['greater.day', "WHERE  ( contact_a.created_date >= 'date0' )  AND (contact_a.is_deleted = 0)"];
+    $dataProvider[] = ['earlier.week', "WHERE  ( contact_a.created_date <= 'date1' )  AND (contact_a.is_deleted = 0)"];
+    return $dataProvider;
   }
 
   /**
@@ -1078,6 +1107,8 @@ civicrm_relationship.is_active = 1 AND
    * Donation           |NULL                | 300.00     |SSF         | Donation,Donation         | 2                | 200.00,100.00
    * Donation           |2019-02-13 00:00:00 | 50.00      |SSF         | Donation                  | 1                | 50.00
    * Member Dues        |2019-02-13 00:00:00 | 50.00      |SSF         | Member Dues               | 1                | 50.00
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function createContributionsForSummaryQueryTests() {
     $contactID = $this->individualCreate();
@@ -1114,6 +1145,63 @@ civicrm_relationship.is_active = 1 AND
       'cancel_date' => 'yesterday',
       'financial_type_id' => 'Member Dues',
     ]);
+  }
+
+  /**
+   * Test the options are handled for the qill.
+   */
+  public function testQillOptions() {
+    $qill = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_BAO_Activity', 'activity_type_id', 2, '=');
+    $this->assertEquals(['=', 'Phone Call'], $qill);
+
+    $qill = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_BAO_Activity', 'priority_id', 2, '=');
+    $this->assertEquals(['=', 'Normal'], $qill);
+  }
+
+  /**
+   * Test tests that a value on 'any entity' with the right metadata will be handled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGenericWhereHandling() {
+    $query = new CRM_Contact_BAO_Query([['suffix_id', '=', 2, 0]]);
+    $this->assertEquals("contact_a.suffix_id = 2", $query->_where[0][0]);
+    $this->assertEquals('Individual Suffix = Sr.', $query->_qill[0][0]);
+    $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
+
+    $query = new CRM_Contact_BAO_Query([['prefix_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.prefix_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Individual Prefix = Ms.', $query->_qill[0][0]);
+    $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
+
+    $query = new CRM_Contact_BAO_Query([['gender_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.gender_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Gender = Male', $query->_qill[0][0]);
+    $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
+
+    $query = new CRM_Contact_BAO_Query([['communication_style_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.communication_style_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Communication Style = Familiar', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['communication_style_id', '=', 2, 0]]);
+    $this->assertEquals('contact_a.communication_style_id = 2', $query->_where[0][0]);
+    $this->assertEquals('Communication Style = Familiar', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['contact_type', '=', 'Household', 0]]);
+    $this->assertEquals("contact_a.contact_type = 'Household'", $query->_where[0][0]);
+    $this->assertEquals('Contact Type = Household', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['on_hold', '=', 0, 0]]);
+    $this->assertEquals('civicrm_email.on_hold = 0', $query->_where[0][0]);
+    $this->assertEquals('On Hold = 0', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['on_hold', '=', 1, 0]]);
+    $this->assertEquals('civicrm_email.on_hold = 1', $query->_where[0][0]);
+    $this->assertEquals('On Hold = 1', $query->_qill[0][0]);
+
+    $query = new CRM_Contact_BAO_Query([['world_region', '=', 3, 0]]);
+    $this->assertEquals('civicrm_worldregion.id = 3', $query->_where[0][0]);
+    $this->assertEquals('World Region = Middle East and North Africa', $query->_qill[0][0]);
   }
 
 }

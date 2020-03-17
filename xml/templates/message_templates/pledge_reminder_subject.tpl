@@ -1,1 +1,1 @@
-{ts}Pledge Payment Reminder{/ts}
+{ts}Pledge Payment Reminder{/ts} - {contact.display_name}

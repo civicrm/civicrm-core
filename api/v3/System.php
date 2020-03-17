@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -262,7 +246,7 @@ function civicrm_api3_system_get($params) {
         'exampleUrl' => CRM_Utils_System::url('civicrm/example', NULL, TRUE, NULL, FALSE),
       ],
       'http' => [
-        'software' => CRM_Utils_Array::value('SERVER_SOFTWARE', $_SERVER),
+        'software' => $_SERVER['SERVER_SOFTWARE'] ?? NULL,
         'forwarded' => !empty($_SERVER['HTTP_X_FORWARDED_FOR']) || !empty($_SERVER['X_FORWARDED_PROTO']),
         'port' => (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == 80 || $_SERVER['SERVER_PORT'] == 443) ? 'Standard' : 'Nonstandard',
       ],
@@ -401,6 +385,38 @@ function civicrm_api3_system_updatelogtables($params) {
 }
 
 /**
+ * Update log table structures.
+ *
+ * This updates the engine type if defined in the hook and changes the field type
+ * for log_conn_id to reflect CRM-18193.
+ *
+ * @param array $params
+ *
+ * @return array
+ *
+ * @throws \API_Exception
+ */
+function civicrm_api3_system_utf8conversion($params) {
+  if (CRM_Core_BAO_SchemaHandler::migrateUtf8mb4($params['is_revert'])) {
+    return civicrm_api3_create_success(1);
+  }
+  throw new API_Exception('Conversion failed');
+}
+
+/**
+ * Metadata for conversion function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_system_utf8conversion_spec(&$params) {
+  $params['is_revert'] = [
+    'title' => ts('Revert back from UTF8MB4 to UTF8?'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => FALSE,
+  ];
+}
+
+/**
  * Adjust Metadata for Flush action.
  *
  * The metadata is used for setting defaults, documentation & validation.
@@ -427,10 +443,54 @@ function _civicrm_api3_system_updatelogtables_spec(&$params) {
  * Update indexes.
  *
  * This adds any indexes that exist in the schema but not the database.
+ *
+ * @param array $params
+ *
+ * @return array
  */
-function civicrm_api3_system_updateindexes() {
-  CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(TRUE));
+function civicrm_api3_system_updateindexes(array $params):array {
+  $tables = empty($params['tables']) ? FALSE : (array) $params['tables'];
+  CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(TRUE, $tables));
   return civicrm_api3_create_success(1);
+}
+
+/**
+ * Declare metadata for api System.getmissingindices
+ *
+ * @param array $params
+ */
+function _civicrm_api3_system_updateindexes_spec(array &$params) {
+  $params['tables'] = [
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => FALSE,
+    'title' => ts('Optional tables filter'),
+  ];
+}
+
+/**
+ * Get an array of indices that should be defined but are not.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_system_getmissingindices($params) {
+  $tables = empty($params['tables']) ? FALSE : (array) $params['tables'];
+  $indices = CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE, $tables);
+  return civicrm_api3_create_success($indices);
+}
+
+/**
+ * Declare metadata for api System.getmissingindices
+ *
+ * @param array $params
+ */
+function _civicrm_api3_system_getmissingindices_spec(&$params) {
+  $params['tables'] = [
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => FALSE,
+    'title' => ts('Optional tables filter'),
+  ];
 }
 
 /**

@@ -1,40 +1,23 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
-  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The values for the contribution db object.
@@ -87,17 +70,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('hookDiscount', $this->_params[0]['discount']);
     }
 
-    if (!$this->preProcessExpress()) {
-      //process only primary participant params.
-      $registerParams = $this->_params[0];
-      $registerParams = $this->prepareParamsForPaymentProcessor($registerParams);
-
-      if ($this->_values['event']['is_monetary']) {
-        $registerParams['currencyID'] = $this->_params[0]['currencyID'];
-      }
-      //assign back primary participant params.
-      $this->_params[0] = $registerParams;
-    }
+    $this->preProcessExpress();
 
     if ($this->_values['event']['is_monetary']) {
       $this->_params[0]['invoiceID'] = $this->get('invoiceID');
@@ -392,6 +365,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     $now = date('YmdHis');
@@ -577,7 +553,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             list($result, $value) = $this->processPayment($payment, $value);
           }
           else {
-            CRM_Core_Error::fatal($paymentObjError);
+            throw new CRM_Core_Exception($paymentObjError);
           }
         }
 
@@ -600,13 +576,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // if paid event add a contribution record
           //if primary participant contributing additional amount
           //append (multiple participants) to its fee level. CRM-4196.
-          $isAdditionalAmount = FALSE;
           if (count($params) > 1) {
-            $isAdditionalAmount = TRUE;
+            $value['amount_level'] .= ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
           }
 
           //passing contribution id is already registered.
-          $contribution = self::processContribution($this, $value, $result, $contactID, $pending, $isAdditionalAmount, $this->_paymentProcessor);
+          $contribution = $this->processContribution($this, $value, $result, $contactID, $pending, $this->_paymentProcessor);
           $value['contributionID'] = $contribution->id;
           $value['contributionTypeID'] = $contribution->financial_type_id;
           $value['receive_date'] = $contribution->receive_date;
@@ -818,7 +793,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $this->processPayment($payment, $primaryParticipant);
         }
         else {
-          CRM_Core_Error::fatal($paymentObjError);
+          throw new CRM_Core_Exception($paymentObjError);
         }
       }
     }
@@ -928,7 +903,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param array $result
    * @param int $contactID
    * @param bool $pending
-   * @param bool $isAdditionalAmount
    * @param array $paymentProcessor
    *
    * @return \CRM_Contribute_BAO_Contribution
@@ -936,11 +910,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function processContribution(
+  protected function processContribution(
     &$form, $params, $result, $contactID,
-    $pending = FALSE, $isAdditionalAmount = FALSE,
+    $pending = FALSE,
     $paymentProcessor = NULL
   ) {
+    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
     $transaction = new CRM_Core_Transaction();
 
     $now = date('YmdHis');
@@ -948,10 +923,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if (!empty($form->_values['event']['is_email_confirm'])) {
       $receiptDate = $now;
-    }
-    //CRM-4196
-    if ($isAdditionalAmount) {
-      $params['amount_level'] = $params['amount_level'] . ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
     }
 
     // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
@@ -968,9 +939,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'currency' => $params['currencyID'],
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
-      'card_type_id' => CRM_Utils_Array::value('card_type_id', $params),
-      'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),
+      'campaign_id' => $params['campaign_id'] ?? NULL,
+      'card_type_id' => $params['card_type_id'] ?? NULL,
+      'pan_truncation' => $params['pan_truncation'] ?? NULL,
     ];
 
     if ($paymentProcessor) {
@@ -980,7 +951,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if (!$pending && $result) {
       $contribParams += [
-        'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+        'fee_amount' => $result['fee_amount'] ?? NULL,
         'trxn_id' => $result['trxn_id'],
         'receipt_date' => $receiptDate,
       ];
@@ -1311,7 +1282,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   private function processPayment($payment, $value) {
     try {
-      $result = $payment->doPayment($value, 'event');
+      $params = $this->prepareParamsForPaymentProcessor($value);
+      $result = $payment->doPayment($params, 'event');
       return [$result, $value];
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {

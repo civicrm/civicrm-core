@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
@@ -54,6 +38,14 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   public static function create($params) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
+
+    if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
+      if (!isset($params['total_amount'])) {
+        $trxn->fetch();
+        $params['total_amount'] = $trxn->total_amount;
+      }
+      $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
+    }
 
     if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
       $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
@@ -356,8 +348,8 @@ WHERE ceft.entity_id = %1";
         'to_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $toFinancialAccountType),
         'from_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $fromFinancialAccountType),
         'trxn_date' => date('YmdHis'),
-        'total_amount' => CRM_Utils_Array::value('cost', $params) ? $params['cost'] : 0,
-        'currency' => CRM_Utils_Array::value('currency', $params),
+        'total_amount' => $params['cost'] ?? 0,
+        'currency' => $params['currency'] ?? NULL,
         'status_id' => array_search('Completed', $contributionStatuses),
         'entity_table' => 'civicrm_contribution',
         'entity_id' => $params['contributionId'],
@@ -372,9 +364,9 @@ WHERE ceft.entity_id = %1";
       $productDetails = [];
       CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
       $params = [
-        'cost' => CRM_Utils_Array::value('cost', $productDetails),
-        'currency' => CRM_Utils_Array::value('currency', $productDetails),
-        'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $productDetails),
+        'cost' => $productDetails['cost'] ?? NULL,
+        'currency' => $productDetails['currency'] ?? NULL,
+        'financial_type_id' => $productDetails['financial_type_id'] ?? NULL,
         'contributionId' => $params['oldPremium']['contribution_id'],
         'isDeleted' => TRUE,
       ];
@@ -487,12 +479,14 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
+   * Get the total sum of all payments (and optionally refunds) for a contribution record
+   *
    * @param int $contributionID
    * @param bool $includeRefund
    *
-   * @return string
+   * @return float
    */
-  public static function getTotalPayments($contributionID, $includeRefund = FALSE) {
+  public static function getTotalPayments($contributionID, $includeRefund = FALSE): float {
     $statusIDs = [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')];
 
     if ($includeRefund) {
@@ -503,7 +497,7 @@ WHERE ceft.entity_id = %1";
       INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution')
       WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id IN (%2) ";
 
-    return CRM_Core_DAO::singleValueQuery($sql, [
+    return (float) CRM_Core_DAO::singleValueQuery($sql, [
       1 => [$contributionID, 'Integer'],
       2 => [implode(',', $statusIDs), 'CommaSeparatedIntegers'],
     ]);

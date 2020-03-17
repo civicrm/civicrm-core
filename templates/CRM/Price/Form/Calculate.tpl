@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
@@ -170,33 +154,27 @@ function calculateTotalFee() {
  * Display calculated amount.
  */
 function display(totalfee) {
+  // totalfee is monetary, round it to 2 decimal points so it can
+  // go as a float - CRM-13491
+  totalfee = Math.round(totalfee*100)/100;
+  var totalFormattedFee = CRM.formatMoney(totalfee);
+  cj('#pricevalue').html(totalFormattedFee);
 
-    // totalfee is monetary, round it to 2 decimal points so it can
-    // go as a float - CRM-13491
-    totalfee = Math.round(totalfee*100)/100;
-    var totalEventFee  = formatMoney( totalfee, 2, separator, thousandMarker);
-    document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
+  cj('#total_amount').val( totalfee );
+  cj('#pricevalue').data('raw-total', totalfee).trigger('change');
 
-    cj('#total_amount').val( totalfee );
-    cj('#pricevalue').data('raw-total', totalfee).trigger('change');
+  if (totalfee < 0) {
+    cj('table#pricelabel').addClass('disabled');
+  }
+  else {
+    cj('table#pricelabel').removeClass('disabled');
+  }
 
-    ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
-    if (typeof skipPaymentMethod == 'function') {
-      // Advice to anyone who, like me, feels hatred towards this if construct ... if you remove the if you
-      // get an error on participant 2 of a event that requires approval & permits multiple registrants.
-      skipPaymentMethod();
-    }
-}
-
-//money formatting/localization
-function formatMoney (amount, c, d, t) {
-var n = amount,
-    c = isNaN(c = Math.abs(c)) ? 2 : c,
-    d = d == undefined ? "," : d,
-    t = t == undefined ? "." : t, s = n < 0 ? "-" : "",
-    i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
-    j = (j = i.length) > 3 ? j % 3 : 0;
-  return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+  if (typeof skipPaymentMethod == 'function') {
+    // Advice to anyone who, like me, feels hatred towards this if construct ... if you remove the if you
+    // get an error on participant 2 of a event that requires approval & permits multiple registrants.
+    skipPaymentMethod();
+  }
 }
 
 {/literal}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -241,43 +241,43 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  */
 
  // Override the Temporary Files directory.
- // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
+ // $civicrm_setting['domain']['uploadDir'] = '/path/to/upload-dir' ;
 
  // Override the custom files upload directory.
- // $civicrm_setting['Directory Preferences']['customFileUploadDir'] = '/path/to/custom-dir';
+ // $civicrm_setting['domain']['customFileUploadDir'] = '/path/to/custom-dir';
 
  // Override the images directory.
- // $civicrm_setting['Directory Preferences']['imageUploadDir'] = '/path/to/image-upload-dir' ;
+ // $civicrm_setting['domain']['imageUploadDir'] = '/path/to/image-upload-dir' ;
 
  // Override the custom templates directory.
- // $civicrm_setting['Directory Preferences']['customTemplateDir'] = '/path/to/template-dir';
+ // $civicrm_setting['domain']['customTemplateDir'] = '/path/to/template-dir';
 
  // Override the Custom php path directory.
- // $civicrm_setting['Directory Preferences']['customPHPPathDir'] = '/path/to/custom-php-dir';
+ // $civicrm_setting['domain']['customPHPPathDir'] = '/path/to/custom-php-dir';
 
  // Override the extensions directory.
- // $civicrm_setting['Directory Preferences']['extensionsDir'] = '/path/to/extensions-dir';
+ // $civicrm_setting['domain']['extensionsDir'] = '/path/to/extensions-dir';
 
  // Override the resource url
- // $civicrm_setting['URL Preferences']['userFrameworkResourceURL'] = 'http://example.com/example-resource-url/';
+ // $civicrm_setting['domain']['userFrameworkResourceURL'] = 'http://example.com/example-resource-url/';
 
  // Override the Image Upload URL (System Settings > Resource URLs)
- // $civicrm_setting['URL Preferences']['imageUploadURL'] = 'http://example.com/example-image-upload-url';
+ // $civicrm_setting['domain']['imageUploadURL'] = 'http://example.com/example-image-upload-url';
 
  // Override the Custom CiviCRM CSS URL
- // $civicrm_setting['URL Preferences']['customCSSURL'] = 'http://example.com/example-css-url' ;
+ // $civicrm_setting['domain']['customCSSURL'] = 'http://example.com/example-css-url' ;
 
  // Override the extensions resource URL
- // $civicrm_setting['URL Preferences']['extensionsURL'] = 'http://example.com/pathtoextensiondir'
+ // $civicrm_setting['domain']['extensionsURL'] = 'http://example.com/pathtoextensiondir'
 
  // Disable display of Community Messages on home dashboard
- // $civicrm_setting['CiviCRM Preferences']['communityMessagesUrl'] = false;
+ // $civicrm_setting['domain']['communityMessagesUrl'] = false;
 
  // Disable automatic download / installation of extensions
- // $civicrm_setting['Extension Preferences']['ext_repo_url'] = false;
+ // $civicrm_setting['domain']['ext_repo_url'] = false;
 
  // set triggers to be managed offline per CRM-18212
- // $civicrm_setting['CiviCRM Preferences']['logging_no_trigger_permission'] = 1;
+ // $civicrm_setting['domain']['logging_no_trigger_permission'] = 1;
 
  // Override the CMS root path defined by cmsRootPath.
  // define('CIVICRM_CMSDIR', '/path/to/install/root/');
@@ -287,7 +287,7 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  //   "asks": requests for donations or membership signup/renewal to CiviCRM
  //   "releases": major release announcements
  //   "events": announcements of local/national upcoming events
- // $civicrm_setting['CiviCRM Preferences']['communityMessagesUrl'] = 'https://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}&lang={lang}&co={co}&optout=offers,asks';
+ // $civicrm_setting['domain']['communityMessagesUrl'] = 'https://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}&lang={lang}&co={co}&optout=offers,asks';
 
 
 /**
@@ -503,6 +503,9 @@ if (!defined('CIVICRM_CLEANURL')) {
     define('CIVICRM_CLEANURL', 1 );
   }
   elseif ( function_exists('config_get') && config_get('system.core', 'clean_url') != 0) {
+    define('CIVICRM_CLEANURL', 1 );
+  }
+  elseif( function_exists('get_option') && get_option('permalink_structure') != '' ) {
     define('CIVICRM_CLEANURL', 1 );
   }
   else {

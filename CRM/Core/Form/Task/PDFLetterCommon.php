@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -147,7 +131,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
     $form->assign('useThisPageFormat', ts('Always use this Page Format with the new template?'));
     $form->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
-    $form->assign('totalSelectedContacts', count($form->_contactIds));
+    $form->assign('totalSelectedContacts', !is_null($form->_contactIds) ? count($form->_contactIds) : 0);
 
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
 
@@ -235,6 +219,10 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
   /**
    * Handle the template processing part of the form
+   *
+   * @param array $formValues
+   *
+   * @return string $html_message
    */
   public static function processTemplate(&$formValues) {
     $html_message = CRM_Utils_Array::value('html_message', $formValues);
@@ -334,6 +322,48 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       $m = implode($newLineOperators['br']['oper'], $messages);
     }
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
+  }
+
+  /**
+   * Render html from rows
+   * @param  array $rows   Array of \Civi\Token\TokenRow
+   * @param  string $msgPart The name registered with the TokenProcessor
+   * @param  string $formValues The values submitted through the form
+   * @return string
+   *   $html if formValues['is_unit_test'] is true, otherwise outputs document to browser
+   *
+   */
+  public static function renderFromRows($rows, $msgPart, $formValues) {
+    $html = array();
+    foreach ($rows as $row) {
+      $html[] = $row->render($msgPart);
+    }
+
+    if (!empty($formValues['is_unit_test'])) {
+      return $html;
+    }
+
+    if (!empty($html)) {
+      $type = $formValues['document_type'];
+
+      if ($type == 'pdf') {
+        CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      }
+      else {
+        CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+      }
+    }
+  }
+
+  /**
+   * List the available tokens
+   * @return array of token name => label
+   */
+  public static function listTokens() {
+    $class = get_called_class();
+    if (method_exists($class, 'createTokenProcessor')) {
+      return $class::createTokenProcessor()->listTokens();
+    }
   }
 
 }

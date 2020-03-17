@@ -2,33 +2,17 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,39 +20,58 @@
  *
  * Generate "activity.*" tokens.
  *
- * This TokenSubscriber was produced by refactoring the code from the
+ * This TokenSubscriber was originally produced by refactoring the code from the
  * scheduled-reminder system with the goal of making that system
  * more flexible. The current implementation is still coupled to
  * scheduled-reminders. It would be good to figure out a more generic
  * implementation which is not tied to scheduled reminders, although
  * that is outside the current scope.
+ *
+ * This has been enhanced to work with PDF/letter merge
  */
 class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
+  use CRM_Core_TokenTrait;
+
   /**
-   * CRM_Activity_Tokens constructor.
+   * @return string
    */
-  public function __construct() {
-    parent::__construct('activity', array_merge(
-      $this->getBasicTokens(),
-      $this->getCustomFieldTokens()
-    ));
+  private function getEntityName(): string {
+    return 'activity';
   }
 
   /**
-   * @inheritDoc
+   * @return string
    */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    // Extracted from scheduled-reminders code. See the class description.
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_activity';
+  private function getEntityTableName(): string {
+    return 'civicrm_activity';
   }
+
+  /**
+   * @return string
+   */
+  private function getEntityContextSchema(): string {
+    return 'activityId';
+  }
+
+  /**
+   * Mapping from tokenName to api return field
+   * Use lists since we might need multiple fields
+   *
+   * @var array
+   */
+  private static $fieldMapping = [
+    'activity_id' => ['id'],
+    'activity_type' => ['activity_type_id'],
+    'status' => ['status_id'],
+    'campaign' => ['campaign_id'],
+  ];
 
   /**
    * @inheritDoc
    */
   public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
-    if ($e->mapping->getEntity() !== 'civicrm_activity') {
+    if ($e->mapping->getEntity() !== $this->getEntityTableName()) {
       return;
     }
 
@@ -76,39 +79,90 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     // Multiple revisions of the activity.
     // Q: Could we simplify & move the extra AND clauses into `where(...)`?
     $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
+  }
 
-    // FIXME: seems too broad.
-    $e->query->select('e.*');
-    $e->query->select('ov.label as activity_type, e.id as activity_id');
+  /**
+   * @inheritDoc
+   */
+  public function prefetch(\Civi\Token\Event\TokenValueEvent $e) {
+    // Find all the entity IDs
+    $entityIds
+      = $e->getTokenProcessor()->getContextValues('actionSearchResult', 'entityID')
+      + $e->getTokenProcessor()->getContextValues($this->getEntityContextSchema());
 
-    $e->query->join("og", "!casMailingJoinType civicrm_option_group og ON og.name = 'activity_type'");
-    $e->query->join("ov", "!casMailingJoinType civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id");
-
-    // if CiviCase component is enabled, join for caseId.
-    $compInfo = CRM_Core_Component::getEnabledComponents();
-    if (array_key_exists('CiviCase', $compInfo)) {
-      $e->query->select("civicrm_case_activity.case_id as case_id");
-      $e->query->join('civicrm_case_activity', "LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`");
+    if (!$entityIds) {
+      return NULL;
     }
+
+    // Get data on all activities for basic and customfield tokens
+    $activities = civicrm_api3('Activity', 'get', [
+      'id' => ['IN' => $entityIds],
+      'options' => ['limit' => 0],
+      'return' => self::getReturnFields($this->activeTokens),
+    ]);
+    $prefetch['activity'] = $activities['values'];
+
+    // Store the activity types if needed
+    if (in_array('activity_type', $this->activeTokens)) {
+      $this->activityTypes = \CRM_Core_OptionGroup::values('activity_type');
+    }
+
+    // Store the activity statuses if needed
+    if (in_array('status', $this->activeTokens)) {
+      $this->activityStatuses = \CRM_Core_OptionGroup::values('activity_status');
+    }
+
+    // Store the campaigns if needed
+    if (in_array('campaign', $this->activeTokens)) {
+      $this->campaigns = \CRM_Campaign_BAO_Campaign::getCampaigns();
+    }
+
+    return $prefetch;
   }
 
   /**
    * @inheritDoc
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $actionSearchResult = $row->context['actionSearchResult'];
+    // maps token name to api field
+    $mapping = [
+      'activity_id' => 'id',
+    ];
 
-    if (in_array($field, array('activity_date_time'))) {
-      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
+    // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
+    $activityId = $row->context['actionSearchResult']->entityID ?? $row->context[$this->getEntityContextSchema()];
+
+    $activity = (object) $prefetch['activity'][$activityId];
+
+    if (in_array($field, ['activity_date_time', 'created_date'])) {
+      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity->$field));
     }
-    elseif (isset($actionSearchResult->$field)) {
-      $row->tokens($entity, $field, $actionSearchResult->$field);
+    elseif (isset($mapping[$field]) and (isset($activity->{$mapping[$field]}))) {
+      $row->tokens($entity, $field, $activity->{$mapping[$field]});
     }
-    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
+    elseif (in_array($field, ['activity_type'])) {
+      $row->tokens($entity, $field, $this->activityTypes[$activity->activity_type_id]);
     }
-    else {
-      $row->tokens($entity, $field, '');
+    elseif (in_array($field, ['status'])) {
+      $row->tokens($entity, $field, $this->activityStatuses[$activity->status_id]);
+    }
+    elseif (in_array($field, ['campaign'])) {
+      $row->tokens($entity, $field, $this->campaigns[$activity->campaign_id]);
+    }
+    elseif (in_array($field, ['case_id'])) {
+      // An activity can be linked to multiple cases so case_id is always an array.
+      // We just return the first case ID for the token.
+      $row->tokens($entity, $field, is_array($activity->case_id) ? reset($activity->case_id) : $activity->case_id);
+    }
+    elseif (array_key_exists($field, $this->customFieldTokens)) {
+      $row->tokens($entity, $field,
+        isset($activity->$field)
+          ? \CRM_Core_BAO_CustomField::displayValue($activity->$field, $field)
+          : ''
+      );
+    }
+    elseif (isset($activity->$field)) {
+      $row->tokens($entity, $field, $activity->$field);
     }
   }
 
@@ -118,21 +172,27 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * @return array token name => token label
    */
   protected function getBasicTokens() {
-    return [
-      'activity_id' => ts('Activity ID'),
-      'activity_type' => ts('Activity Type'),
-      'subject' => ts('Activity Subject'),
-      'details' => ts('Activity Details'),
-      'activity_date_time' => ts('Activity Date-Time'),
-    ];
-  }
-
-  /**
-   * Get the tokens for custom fields
-   * @return array token name => token label
-   */
-  protected function getCustomFieldTokens() {
-    return CRM_Utils_Token::getCustomFieldTokens('Activity');
+    if (!isset($this->basicTokens)) {
+      $this->basicTokens = [
+        'activity_id' => ts('Activity ID'),
+        'activity_type' => ts('Activity Type'),
+        'subject' => ts('Activity Subject'),
+        'details' => ts('Activity Details'),
+        'activity_date_time' => ts('Activity Date-Time'),
+        'activity_type_id' => ts('Activity Type ID'),
+        'status' => ts('Activity Status'),
+        'status_id' => ts('Activity Status ID'),
+        'location' => ts('Activity Location'),
+        'created_date' => ts('Activity Creation Date'),
+        'duration' => ts('Activity Duration'),
+        'campaign' => ts('Activity Campaign'),
+        'campaign_id' => ts('Activity Campaign ID'),
+      ];
+      if (array_key_exists('CiviCase', CRM_Core_Component::getEnabledComponents())) {
+        $this->basicTokens['case_id'] = ts('Activity Case ID');
+      }
+    }
+    return $this->basicTokens;
   }
 
 }

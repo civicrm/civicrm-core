@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -573,7 +557,7 @@ MODIFY      {$columnName} varchar( $length )
    * Check if the table has an index matching the name.
    *
    * @param string $tableName
-   * @param array $indexName
+   * @param string $indexName
    *
    * @return bool
    */
@@ -670,15 +654,20 @@ MODIFY      {$columnName} varchar( $length )
    * @param bool $dropFalseIndices
    *  If set - this function deletes false indices present in the DB which mismatches the expected
    *  values of xml file so that civi re-creates them with correct values using createMissingIndices() function.
+   * @param array|FALSE $tables
+   *   An optional array of tables - if provided the results will be restricted to these tables.
    *
    * @return array
    *   index specifications
    */
-  public static function getMissingIndices($dropFalseIndices = FALSE) {
+  public static function getMissingIndices($dropFalseIndices = FALSE, $tables = FALSE) {
     $requiredSigs = $existingSigs = [];
     // Get the indices defined (originally) in the xml files
     $requiredIndices = CRM_Core_DAO_AllCoreTables::indices();
     $reqSigs = [];
+    if ($tables !== FALSE) {
+      $requiredIndices = array_intersect_key($requiredIndices, array_fill_keys($tables, TRUE));
+    }
     foreach ($requiredIndices as $table => $indices) {
       $reqSigs[] = CRM_Utils_Array::collect('sig', $indices);
     }
@@ -805,6 +794,103 @@ MODIFY      {$columnName} varchar( $length )
         break;
     }
     return $sql;
+  }
+
+  /**
+   * Performs the utf8mb4 migration.
+   *
+   * @param bool $revert
+   *   Being able to revert if primarily for unit testing.
+   *
+   * @return bool
+   */
+  public static function migrateUtf8mb4($revert = FALSE) {
+    $newCharSet = $revert ? 'utf8' : 'utf8mb4';
+    $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
+    $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
+    $tables = [];
+    $dao = new CRM_Core_DAO();
+    $database = $dao->_database;
+    CRM_Core_DAO::executeQuery("ALTER DATABASE $database CHARACTER SET = $newCharSet COLLATE = $newCollation");
+    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS WHERE Engine = 'InnoDB' AND Name LIKE 'civicrm\_%'");
+    while ($dao->fetch()) {
+      $tables[$dao->Name] = [
+        'Engine' => $dao->Engine,
+      ];
+    }
+    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    $logging_database = $dsn['database'];
+    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `$logging_database` WHERE Engine <> 'MyISAM' AND Name LIKE 'log\_civicrm\_%'");
+    while ($dao->fetch()) {
+      $tables["$logging_database.{$dao->Name}"] = [
+        'Engine' => $dao->Engine,
+      ];
+    }
+    foreach ($tables as $table => $param) {
+      $query = "ALTER TABLE $table";
+      $dao = CRM_Core_DAO::executeQuery("SHOW FULL COLUMNS FROM $table", [], TRUE, NULL, FALSE, FALSE);
+      $index = 0;
+      $params = [];
+      $tableCollation = $newCollation;
+      while ($dao->fetch()) {
+        if (!$dao->Collation || $dao->Collation === $newCollation || $dao->Collation === $newBinaryCollation) {
+          continue;
+        }
+        if (strpos($dao->Collation, 'utf8') !== 0) {
+          continue;
+        }
+
+        if (strpos($dao->Collation, '_bin') !== FALSE) {
+          $tableCollation = $newBinaryCollation;
+        }
+        else {
+          $tableCollation = $newCollation;
+        }
+        if ($dao->Null === 'YES') {
+          $null = 'NULL';
+        }
+        else {
+          $null = 'NOT NULL';
+        }
+        $default = '';
+        if ($dao->Default !== NULL) {
+          $index++;
+          $default = "DEFAULT %$index";
+          $params[$index] = [$dao->Default, 'String'];
+        }
+        elseif ($dao->Null === 'YES') {
+          $default = 'DEFAULT NULL';
+        }
+        $index++;
+        $params[$index] = [$dao->Comment, 'String'];
+        $query .= " MODIFY `{$dao->Field}` {$dao->Type} CHARACTER SET $newCharSet COLLATE $tableCollation $null $default {$dao->Extra} COMMENT %$index,";
+      }
+      $query .= " CHARACTER SET = $newCharSet COLLATE = $tableCollation";
+      if ($param['Engine'] === 'InnoDB') {
+        $query .= ' ROW_FORMAT = Dynamic';
+      }
+      // Disable i18n rewrite.
+      CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
+  /**
+   * Get the database collation.
+   *
+   * @return string
+   */
+  public static function getDBCollation() {
+    return CRM_Core_DAO::singleValueQuery('SELECT @@collation_database');
+  }
+
+  /**
+   * Get the database collation.
+   *
+   * @return string
+   */
+  public static function getDBCharset() {
+    return CRM_Core_DAO::singleValueQuery('SELECT @@character_set_database');
   }
 
 }

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -99,11 +83,11 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => 1012,
       'billing_postal_code-5' => 5010,
       'billing_country_id-5' => 1228,
-      'credit_card_number' => '4007000000027',
+      'credit_card_number' => '4444333322221111',
       'cvv2' => 123,
       'credit_card_exp_date' => [
-        'M' => 10,
-        'Y' => 2019,
+        'M' => 9,
+        'Y' => 2025,
       ],
       'credit_card_type' => 'Visa',
       'is_recur' => 1,
@@ -126,8 +110,8 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'state_province-5' => 'IL',
       'billing_country-5' => 'US',
       'country-5' => 'US',
-      'year' => 2019,
-      'month' => 10,
+      'year' => 2025,
+      'month' => 9,
       'ip_address' => '127.0.0.1',
       'amount' => 7,
       'amount_level' => 0,

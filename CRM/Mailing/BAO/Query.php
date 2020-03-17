@@ -1,52 +1,38 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_BAO_Query {
 
-  public static $_mailingFields = NULL;
-
   /**
-   * @return array|null
+   * Get fields for the mailing & mailing job entity.
+   *
+   * @return array
    */
   public static function &getFields() {
-    if (!self::$_mailingFields) {
-      self::$_mailingFields = [];
-      $_mailingFields['mailing_id'] = [
-        'name' => 'mailing_id',
-        'title' => ts('Mailing ID'),
-        'where' => 'civicrm_mailing.id',
-      ];
-    }
-    return self::$_mailingFields;
+    $mailingFields = CRM_Mailing_BAO_Mailing::fields();
+    $mailingJobFields = CRM_Mailing_BAO_MailingJob::fields();
+
+    // In general it's good to return as many fields as could possibly be searched, but
+    // with the limitation that if the fields do not have unique names they might
+    // clobber other fields :-(
+    $fields = [
+      'mailing_id' => $mailingFields['id'],
+      'mailing_job_start_date' => $mailingJobFields['mailing_job_start_date'],
+    ];
+    return $fields;
   }
 
   /**
@@ -120,11 +106,26 @@ class CRM_Mailing_BAO_Query {
       }
     }
 
-    if (CRM_Utils_Array::value('mailing_campaign_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['mailing_campaign_id'])) {
       $query->_select['mailing_campaign_id'] = 'civicrm_mailing.campaign_id as mailing_campaign_id';
       $query->_element['mailing_campaign_id'] = 1;
       $query->_tables['civicrm_campaign'] = 1;
     }
+  }
+
+  /**
+   * Get the metadata for fields to be included on the mailing search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   *
+   * @todo ideally this would be a trait included on the mailing search & advanced search
+   * rather than a static function.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = ['mailing_job_start_date'];
+    $metadata = civicrm_api3('Mailing', 'getfields', [])['values'];
+    $metadata = array_merge($metadata, civicrm_api3('MailingJob', 'getfields', [])['values']);
+    return array_intersect_key($metadata, array_flip($fields));
   }
 
   /**
@@ -271,11 +272,7 @@ class CRM_Mailing_BAO_Query {
       case 'mailing_date':
       case 'mailing_date_low':
       case 'mailing_date_high':
-        // process to / from date
-        $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
-        $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
-        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         $query->dateQueryBuilder($values,
           'civicrm_mailing_job', 'mailing_date', 'start_date', 'Mailing Delivery Date'
         );
@@ -372,10 +369,7 @@ class CRM_Mailing_BAO_Query {
           if ($value != 'Scheduled' && $value != 'Canceled') {
             $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
           }
-          $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
           $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
-          $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
-
           $query->_where[$grouping][] = " civicrm_mailing_job.status = '{$value}' ";
           $query->_qill[$grouping][] = "Mailing Job Status IS \"$value\"";
         }
@@ -395,10 +389,14 @@ class CRM_Mailing_BAO_Query {
   /**
    * Add all the elements shared between Mailing search and advnaced search.
    *
+   * @param \CRM_Mailing_Form_Search $form
    *
-   * @param CRM_Core_Form $form
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
+    $form->addSearchFieldMetadata(['Mailing' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
+
     // mailing selectors
     $mailings = CRM_Mailing_BAO_Mailing::getMailingsList();
 
@@ -407,10 +405,6 @@ class CRM_Mailing_BAO_Query {
         ['id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
-
-    CRM_Core_Form_Date::buildDateRange($form, 'mailing_date', 1, '_low', '_high', ts('From'), FALSE);
-    $form->addElement('hidden', 'mailing_date_range_error');
-    $form->addFormRule(['CRM_Mailing_BAO_Query', 'formRule'], $form);
 
     $mailingJobStatuses = [
       '' => ts('- select -'),
@@ -455,6 +449,10 @@ class CRM_Mailing_BAO_Query {
    * @param $tables
    */
   public static function tableNames(&$tables) {
+    if (isset($tables['civicrm_mailing_job'])) {
+      $tables['civicrm_mailing'] = $tables['civicrm_mailing'] ?? 1;
+      $tables['civicrm_mailing_recipients'] = $tables['civicrm_mailing_recipients'] ?? 1;
+    }
   }
 
   /**
@@ -496,27 +494,6 @@ class CRM_Mailing_BAO_Query {
     $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
     $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
-  }
-
-  /**
-   * Check if the values in the date range are in correct chronological order.
-   *
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $form
-   *
-   * @return bool|array
-   */
-  public static function formRule($fields, $files, $form) {
-    $errors = [];
-
-    if (empty($fields['mailing_date_high']) || empty($fields['mailing_date_low'])) {
-      return TRUE;
-    }
-
-    CRM_Utils_Rule::validDateRange($fields, 'mailing_date', $errors, ts('Mailing Date'));
-
-    return empty($errors) ? TRUE : $errors;
   }
 
 }

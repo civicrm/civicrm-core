@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Mail {
 
@@ -41,6 +25,8 @@ class CRM_Utils_Mail {
    * to the mailer through the container.
    *
    * @return Mail
+   *
+   * @throws CRM_Core_Exception
    */
   public static function createMailer() {
     $mailingInfo = Civi::settings()->get('mailing_backend');
@@ -53,7 +39,7 @@ class CRM_Utils_Mail {
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
       if ($mailingInfo['smtpServer'] == '' || !$mailingInfo['smtpServer']) {
         CRM_Core_Error::debug_log_message(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
-        CRM_Core_Error::fatal(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+        throw new CRM_Core_Exception(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
 
       $params['host'] = $mailingInfo['smtpServer'] ? $mailingInfo['smtpServer'] : 'localhost';
@@ -97,7 +83,7 @@ class CRM_Utils_Mail {
         !$mailingInfo['sendmail_path']
       ) {
         CRM_Core_Error::debug_log_message(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
-        CRM_Core_Error::fatal(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+        throw new CRM_Core_Exception(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
       $params['sendmail_path'] = $mailingInfo['sendmail_path'];
       $params['sendmail_args'] = $mailingInfo['sendmail_args'];
@@ -137,6 +123,17 @@ class CRM_Utils_Mail {
     }
     else {
       $mailer = Mail::factory($driver, $params);
+    }
+
+    // Previously, CiviCRM bundled patches to change the behavior of 3 specific drivers. Use wrapper/filters to avoid patching.
+    $mailer = new CRM_Utils_Mail_FilteredPearMailer($driver, $params, $mailer);
+    if (in_array($driver, ['smtp', 'mail', 'sendmail'])) {
+      $mailer->addFilter('2000_log', ['CRM_Utils_Mail_Logger', 'filter']);
+      $mailer->addFilter('2100_validate', function ($mailer, &$recipients, &$headers, &$body) {
+        if (!is_array($headers)) {
+          return PEAR::raiseError('$headers must be an array');
+        }
+      });
     }
     CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
     return $mailer;
@@ -282,7 +279,10 @@ class CRM_Utils_Mail {
     // * All other mailers require that all be recipients be listed in the $to array AND that
     //   the Bcc must not be present in $header as otherwise it will be shown to all recipients
     // ref: https://pear.php.net/bugs/bug.php?id=8047, full thread and answer [2011-04-19 20:48 UTC]
-    if (get_class($mailer) != "Mail_mail") {
+    // TODO: Refactor this quirk-handler as another filter in FilteredPearMailer. But that would merit review of impact on universe.
+    $driver = ($mailer instanceof CRM_Utils_Mail_FilteredPearMailer) ? $mailer->getDriver() : NULL;
+    $isPhpMail = (get_class($mailer) === "Mail_mail" || $driver === 'mail');
+    if (!$isPhpMail) {
       // get emails from headers, since these are
       // combination of name and email addresses.
       if (!empty($headers['Cc'])) {
@@ -340,34 +340,10 @@ class CRM_Utils_Mail {
    * @param $to
    * @param $headers
    * @param $message
+   * @deprecated
    */
   public static function logger(&$to, &$headers, &$message) {
-    if (is_array($to)) {
-      $toString = implode(', ', $to);
-      $fileName = $to[0];
-    }
-    else {
-      $toString = $fileName = $to;
-    }
-    $content = "To: " . $toString . "\n";
-    foreach ($headers as $key => $val) {
-      $content .= "$key: $val\n";
-    }
-    $content .= "\n" . $message . "\n";
-
-    if (is_numeric(CIVICRM_MAIL_LOG)) {
-      $config = CRM_Core_Config::singleton();
-      // create the directory if not there
-      $dirName = $config->configAndLogDir . 'mail' . DIRECTORY_SEPARATOR;
-      CRM_Utils_File::createDir($dirName);
-      $fileName = md5(uniqid(CRM_Utils_String::munge($fileName))) . '.txt';
-      file_put_contents($dirName . $fileName,
-        $content
-      );
-    }
-    else {
-      file_put_contents(CIVICRM_MAIL_LOG, $content, FILE_APPEND);
-    }
+    CRM_Utils_Mail_Logger::log($to, $headers, $message);
   }
 
   /**

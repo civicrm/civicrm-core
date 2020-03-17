@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  */
 
@@ -66,45 +49,45 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to delete this Campaign Page ?');
 
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/pcp/info',
           'qs' => 'action=update&reset=1&id=%%id%%&context=dashboard',
           'title' => ts('Edit Personal Campaign Page'),
-        ),
-        CRM_Core_Action::RENEW => array(
+        ],
+        CRM_Core_Action::RENEW => [
           'name' => ts('Approve'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=renew&id=%%id%%',
           'title' => ts('Approve Personal Campaign Page'),
-        ),
-        CRM_Core_Action::REVERT => array(
+        ],
+        CRM_Core_Action::REVERT => [
           'name' => ts('Reject'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=revert&id=%%id%%',
           'title' => ts('Reject Personal Campaign Page'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=delete&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete Personal Campaign Page'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=enable&id=%%id%%',
           'title' => ts('Enable'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=disable&id=%%id%%',
           'title' => ts('Disable'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -116,9 +99,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * type of action and executes that action.
    * Finally it calls the parent's run method.
    *
-   * @param
-   *
-   * @return void
+   * @return mixed|null
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $id = $this->getIdAndAction();
@@ -156,10 +138,9 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
   /**
    * Browse all custom data groups.
    *
+   * @param int $action
    *
-   * @param null $action
-   *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
   public function browse($action = NULL) {
     CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
@@ -176,32 +157,32 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
 
     $status = CRM_PCP_BAO_PCP::buildOptions('status_id', 'create');
 
-    $pcpSummary = $params = array();
+    $pcpSummary = $params = [];
     $whereClause = NULL;
 
     if (!empty($_POST) || !empty($_GET['page_type'])) {
       if (!empty($_POST['status_id'])) {
         $whereClause = ' AND cp.status_id = %1';
-        $params['1'] = array($_POST['status_id'], 'Integer');
+        $params['1'] = [$_POST['status_id'], 'Integer'];
       }
 
       if (!empty($_POST['page_type'])) {
         $whereClause .= ' AND cp.page_type = %2';
-        $params['2'] = array($_POST['page_type'], 'String');
+        $params['2'] = [$_POST['page_type'], 'String'];
       }
       elseif (!empty($_GET['page_type'])) {
         $whereClause .= ' AND cp.page_type = %2';
-        $params['2'] = array($_GET['page_type'], 'String');
+        $params['2'] = [$_GET['page_type'], 'String'];
       }
 
       if (!empty($_POST['page_id'])) {
         $whereClause .= ' AND cp.page_id = %4 AND cp.page_type = "contribute"';
-        $params['4'] = array($_POST['page_id'], 'Integer');
+        $params['4'] = [$_POST['page_id'], 'Integer'];
       }
 
       if (!empty($_POST['event_id'])) {
         $whereClause .= ' AND cp.page_id = %5 AND cp.page_type = "event"';
-        $params['5'] = array($_POST['event_id'], 'Integer');
+        $params['5'] = [$_POST['event_id'], 'Integer'];
       }
 
       if ($whereClause) {
@@ -242,7 +223,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
       $pages['event'][$epages->id]['end_date'] = $epages->registration_end_date;
     }
 
-    $params = $this->get('params') ? $this->get('params') : array();
+    $params = $this->get('params') ? $this->get('params') : [];
 
     $title = '1';
     if ($this->_sortByCharacter !== NULL) {
@@ -305,7 +286,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
         $pageUrl = CRM_Utils_System::url('civicrm/' . $page_type . '/register', 'reset=1&id=' . $pcp->page_id);
       }
 
-      $pcpSummary[$pcp->id] = array(
+      $pcpSummary[$pcp->id] = [
         'id' => $pcp->id,
         'start_date' => $pages[$page_type][$page_id]['start_date'],
         'end_date' => $pages[$page_type][$page_id]['end_date'],
@@ -317,11 +298,11 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
         'page_url' => $pageUrl,
         'page_type' => $page_type,
         'action' => CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $pcp->id), ts('more'), FALSE, 'contributionpage.pcp.list', 'PCP', $pcp->id
+          ['id' => $pcp->id], ts('more'), FALSE, 'contributionpage.pcp.list', 'PCP', $pcp->id
         ),
         'title' => $pcp->title,
         'class' => $class,
-      );
+      ];
     }
 
     $this->search();
@@ -339,7 +320,6 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
   }
 
   public function search() {
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }

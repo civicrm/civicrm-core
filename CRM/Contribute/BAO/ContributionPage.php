@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -362,18 +346,18 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
       $tplParams = [
         'email' => $email,
-        'receiptFromEmail' => CRM_Utils_Array::value('receipt_from_email', $values),
+        'receiptFromEmail' => $values['receipt_from_email'] ?? NULL,
         'contactID' => $contactID,
         'displayName' => $displayName,
-        'contributionID' => CRM_Utils_Array::value('contribution_id', $values),
-        'contributionOtherID' => CRM_Utils_Array::value('contribution_other_id', $values),
+        'contributionID' => $values['contribution_id'] ?? NULL,
+        'contributionOtherID' => $values['contribution_other_id'] ?? NULL,
         // CRM-5095
-        'lineItem' => CRM_Utils_Array::value('lineItem', $values),
+        'lineItem' => $values['lineItem'] ?? NULL,
         // CRM-5095
-        'priceSetID' => CRM_Utils_Array::value('priceSetID', $values),
+        'priceSetID' => $values['priceSetID'] ?? NULL,
         'title' => $title,
-        'isShare' => CRM_Utils_Array::value('is_share', $values),
-        'thankyou_title' => CRM_Utils_Array::value('thankyou_title', $values),
+        'isShare' => $values['is_share'] ?? NULL,
+        'thankyou_title' => $values['thankyou_title'] ?? NULL,
         'customPre' => $values['customPre'],
         'customPre_grouptitle' => $values['customPre_grouptitle'],
         'customPost' => $values['customPost'],
@@ -383,9 +367,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'amount' => $values['amount'],
         'is_pay_later' => $values['is_pay_later'],
         'receipt_date' => !$values['receipt_date'] ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
-        'pay_later_receipt' => CRM_Utils_Array::value('pay_later_receipt', $values),
-        'honor_block_is_active' => CRM_Utils_Array::value('honor_block_is_active', $values),
-        'contributionStatus' => CRM_Utils_Array::value('contribution_status', $values),
+        'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,
+        'honor_block_is_active' => $values['honor_block_is_active'] ?? NULL,
+        'contributionStatus' => $values['contribution_status'] ?? NULL,
       ];
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
@@ -844,10 +828,13 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
       case 'financial_type_id':
-        // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
-        return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-
-      break;
+        // @fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
+        // @fixme - https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
+        //   because $relationTypeId is not set in CRM_Financial_BAO_FinancialType::getIncomeFinancialType()
+        if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
+          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+        }
+        return [];
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

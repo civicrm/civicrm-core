@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -34,6 +18,7 @@ use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\SelectUtil;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 use CRM_Utils_Array as UtilsArray;
 
@@ -70,6 +55,13 @@ class Api4SelectQuery extends SelectQuery {
   protected $joinedTables = [];
 
   /**
+   * If set to an array, this will start collecting debug info.
+   *
+   * @var null|array
+   */
+  public $debugOutput = NULL;
+
+  /**
    * @param string $entity
    * @param bool $checkPermissions
    * @param array $fields
@@ -92,11 +84,14 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Why walk when you can
+   * Builds final sql statement after all params are set.
    *
-   * @return array|int
+   * @return string
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function run() {
+  public function getSql() {
     $this->addJoins();
     $this->buildSelectFields();
     $this->buildWhereClause();
@@ -117,9 +112,20 @@ class Api4SelectQuery extends SelectQuery {
     if (!empty($this->limit) || !empty($this->offset)) {
       $this->query->limit($this->limit, $this->offset);
     }
+    return $this->query->toSQL();
+  }
 
+  /**
+   * Why walk when you can
+   *
+   * @return array|int
+   */
+  public function run() {
     $results = [];
-    $sql = $this->query->toSQL();
+    $sql = $this->getSql();
+    if (is_array($this->debugOutput)) {
+      $this->debugOutput['sql'][] = $sql;
+    }
     $query = \CRM_Core_DAO::executeQuery($sql);
 
     while ($query->fetch()) {
@@ -177,15 +183,8 @@ class Api4SelectQuery extends SelectQuery {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function buildSelectFields() {
-    $return_all_fields = (empty($this->select) || !is_array($this->select));
-    $return = $return_all_fields ? $this->entityFieldNames : $this->select;
-    if ($return_all_fields || in_array('custom', $this->select)) {
-      foreach (array_keys($this->apiFieldSpec) as $fieldName) {
-        if (strpos($fieldName, 'custom_') === 0) {
-          $return[] = $fieldName;
-        }
-      }
-    }
+    $selectAll = (empty($this->select) || in_array('*', $this->select));
+    $select = $selectAll ? $this->entityFieldNames : $this->select;
 
     // Always select the ID if the table has one.
     if (array_key_exists('id', $this->apiFieldSpec) || strstr($this->entity, 'Custom_')) {
@@ -193,7 +192,7 @@ class Api4SelectQuery extends SelectQuery {
     }
 
     // core return fields
-    foreach ($return as $fieldName) {
+    foreach ($select as $fieldName) {
       $field = $this->getField($fieldName);
       if (strpos($fieldName, '.') && !empty($this->fkSelectAliases[$fieldName]) && !array_filter($this->getPathJoinTypes($fieldName))) {
         $this->selectFields[$this->fkSelectAliases[$fieldName]] = $fieldName;
@@ -296,7 +295,7 @@ class Api4SelectQuery extends SelectQuery {
       throw new \API_Exception("Invalid field '$key' in where clause.");
     }
 
-    FormattingUtil::formatValue($value, $fieldSpec, $this->getEntity());
+    FormattingUtil::formatInputValue($value, $fieldSpec, $this->getEntity());
 
     $sql_clause = \CRM_Core_DAO::createSQLFilter("`$table_name`.`$column_name`", [$operator => $value]);
     if ($sql_clause === NULL) {
@@ -354,6 +353,14 @@ class Api4SelectQuery extends SelectQuery {
     /** @var \Civi\Api4\Service\Schema\Joinable\Joinable $lastLink */
     $lastLink = array_pop($joinPath);
 
+    $isWild = strpos($field, '*') !== FALSE;
+    if ($isWild) {
+      if (!in_array($key, $this->select)) {
+        throw new \API_Exception('Wildcards can only be used in the SELECT clause.');
+      }
+      $this->select = array_diff($this->select, [$key]);
+    }
+
     // Cache field info for retrieval by $this->getField()
     $prefix = array_pop($pathArray) . '.';
     if (!isset($this->apiFieldSpec[$prefix . $field])) {
@@ -367,16 +374,29 @@ class Api4SelectQuery extends SelectQuery {
       }
     }
 
-    if (!$lastLink->getField($field)) {
+    if (!$isWild && !$lastLink->getField($field)) {
       throw new \API_Exception('Invalid join');
     }
 
-    // custom groups use aliases for field names
-    if ($lastLink instanceof CustomGroupJoinable) {
-      $field = $lastLink->getSqlColumn($field);
+    $fields = $isWild ? [] : [$field];
+    // Expand wildcard and add matching fields to $this->select
+    if ($isWild) {
+      $fields = SelectUtil::getMatchingFields($field, $lastLink->getEntityFieldNames());
+      foreach ($fields as $field) {
+        $this->select[] = $pathString . '.' . $field;
+      }
+      $this->select = array_unique($this->select);
     }
 
-    $this->fkSelectAliases[$key] = sprintf('%s.%s', $lastLink->getAlias(), $field);
+    foreach ($fields as $field) {
+      // custom groups use aliases for field names
+      $col = ($lastLink instanceof CustomGroupJoinable) ? $lastLink->getSqlColumn($field) : $field;
+      // Check Permission on field.
+      if ($this->checkPermissions && !empty($this->apiFieldSpec[$prefix . $field]['permission']) && !\CRM_Core_Permission::check($this->apiFieldSpec[$prefix . $field]['permission'])) {
+        return;
+      }
+      $this->fkSelectAliases[$pathString . '.' . $field] = sprintf('%s.%s', $lastLink->getAlias(), $col);
+    }
   }
 
   /**

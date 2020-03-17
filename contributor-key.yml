@@ -27,6 +27,10 @@
   name        : Francis Whittle
   organization: Agileware
 
+- github      : agileware-justin
+  name        : Justin Freeman
+  organization: Agileware
+
 - github      : agileware-pengyi
   name        : Pengyi Zhang
   organization: Agileware
@@ -166,6 +170,10 @@
   organization: British Humanist Association
   jira        : awestbha
 
+- github      : bjendres
+  name        : Björn Endres
+  organization: SYSTOPIA Organisationsberatung
+
 - name        : Ben Jarlett
   jira        : benjarlett
 
@@ -176,6 +184,9 @@
   name        : Borislav Zlatanov
   jira        : BorislavZlatanov
 
+- github      : borisson
+  name        : Joris Vercammen
+  
 - name        : Brian McFee
   jira        : brian
 
@@ -566,6 +577,10 @@
   jira        : peterhartmann
 
 - name        : Heather Oliver
+  organization: Red Hot Irons
+  github      : HROliver
+
+- name        : Heather Oliver
   organization: GMCVO Databases
   jira        : heather oliver
 
@@ -634,6 +649,9 @@
   organization: CompuCorp
   jira        : jamienovick
 
+- github      : jamie-tillman
+  name        : Jamie Tillman
+
 - github      : javiya-rupal
   name        : Rupal Javiya
   jira        : rupaljaviya
@@ -669,6 +687,10 @@
 - github      : jeromelebleu
   name        : Jérôme Lebleu
   jira        : jlebleu
+
+- github      : JGaunt
+  name        : Jade Gaunt
+  organisation: GMCVO Databases
 
 - github      : jgillmanjr
   name        : Jason Gillman Jr.
@@ -864,6 +886,7 @@
   jira        : loganbear
 
 - name        : Lola Slade
+  github      : lolaslade
   organization: Freeform Solutions
   jira        : lola_slade
 
@@ -1030,6 +1053,10 @@
   organization: JMA Consulting
   jira        : monish.deb
 
+- github      : mountev
+  organization: Mountev Ltd
+  name        : Mountev Ltd
+
 - name        : Martin Peth
   organization: Systopia
   jira        : mpeth
@@ -1086,7 +1113,7 @@
 
 - github      : pfigel
   name        : Patrick Figel
-  organization: Greenpeace CEE
+  organization: Greenpeace Central and Eastern Europe
 
 - github      : philmck
   name        : Phil McKerracher
@@ -1209,6 +1236,10 @@
   name        : René Olivo
   organization: CompuCorp
 
+- github      : revati90
+  name        : Revati Gawas
+  organization: OSSeed Technologies LLP
+
 - name        : Robyn Perry
   organization: Progressive Technology Project
   jira        : reperry
@@ -1301,7 +1332,7 @@
 
 - github      : seamuslee001
   name        : Seamus Lee
-  organization: Australian Greens
+  organization: JMA Consulting
   jira        : seamuslee
 
 - github      : seanmadsen
@@ -1582,3 +1613,7 @@
 - github      : reecebenson
   name        : Reece Benson
   organization: Circle Interactive
+
+- github      : UshaMakoa
+  name        : Usha F. Matisson
+  organization: Makoa

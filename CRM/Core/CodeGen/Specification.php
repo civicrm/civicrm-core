@@ -371,6 +371,7 @@ class CRM_Core_CodeGen_Specification {
     $field['uniqueTitle'] = $this->value('uniqueTitle', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
+    $field['contactType'] = $this->value('contactType', $fieldXML);
     if (isset($fieldXML->permission)) {
       $field['permission'] = trim($this->value('permission', $fieldXML));
       $field['permission'] = $field['permission'] ? array_filter(array_map('trim', explode(',', $field['permission']))) : [];
@@ -383,6 +384,7 @@ class CRM_Core_CodeGen_Specification {
         'type',
         'formatType',
         'label',
+        'controlField',
         /* Fixme: prior to CRM-13497 these were in a flat structure
         // CRM-13497 moved them to be nested within 'html' but there's no point
         // making that change in the DAOs right now since we are in the process of

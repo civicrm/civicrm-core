@@ -9,7 +9,8 @@ class KernelTest extends \CiviUnitTestCase {
   const MOCK_VERSION = 3;
 
   /**
-   * @var array(int => array('name' => string $eventName, 'type' => string $className))
+   * @var array
+   * (int => array('name' => string $eventName, 'type' => string $className))
    */
   public $actualEventSequence;
 
@@ -33,7 +34,7 @@ class KernelTest extends \CiviUnitTestCase {
 
   public function testNormalEvents() {
     $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
-    $result = $this->kernel->run('Widget', 'frobnicate', [
+    $result = $this->kernel->runSafe('Widget', 'frobnicate', [
       'version' => self::MOCK_VERSION,
     ]);
 
@@ -57,7 +58,7 @@ class KernelTest extends \CiviUnitTestCase {
     });
 
     $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
-    $result = $this->kernel->run('Widget', 'frobnicate', [
+    $result = $this->kernel->runSafe('Widget', 'frobnicate', [
       'version' => self::MOCK_VERSION,
     ]);
 

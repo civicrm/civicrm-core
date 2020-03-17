@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
@@ -1163,10 +1147,10 @@ WHERE civicrm_event.is_active = 1
         }
         $tplParams = array_merge($values, $participantParams, [
           'email' => $email,
-          'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
-          'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
+          'confirm_email_text' => $values['event']['confirm_email_text'] ?? NULL,
+          'isShowLocation' => $values['event']['is_show_location'] ?? NULL,
           // The concept of contributeMode is deprecated.
-          'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
+          'contributeMode' => $template->_tpl_vars['contributeMode'] ?? NULL,
           'customPre' => $profilePre[0],
           'customPre_grouptitle' => empty($profilePre[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $preProfileID)],
           'customPost' => $profilePost[0],
@@ -1248,8 +1232,6 @@ WHERE civicrm_event.is_active = 1
             $values['event']
           );
           // append invoice pdf to email
-          $template = CRM_Core_Smarty::singleton();
-          $taxAmt = $template->get_template_vars('totalTaxAmount');
           $prefixValue = Civi::settings()->get('contribution_invoice_settings');
           $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
           if (isset($invoicing) && isset($prefixValue['is_email_pdf']) && !empty($values['contributionId'])) {
@@ -1767,7 +1749,7 @@ WHERE  id = $cfID
 
     $customProfile = $additionalIDs = [];
     if (!$participantId) {
-      CRM_Core_Error::fatal(ts('Cannot find participant ID'));
+      throw new CRM_Core_Exception(ts('Cannot find participant ID'));
     }
 
     //set Ids of Primary Participant also.
@@ -2230,8 +2212,8 @@ WHERE  ce.loc_block_id = $locBlockId";
 
         $fromEmailValues['from_email_id'][$eventEmailId] = htmlspecialchars($eventEmailId);
         $fromEmailId = [
-          'cc' => CRM_Utils_Array::value('cc_confirm', $eventEmail),
-          'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventEmail),
+          'cc' => $eventEmail['cc_confirm'] ?? NULL,
+          'bcc' => $eventEmail['bcc_confirm'] ?? NULL,
         ];
         $fromEmailValues = array_merge($fromEmailValues, $fromEmailId);
       }
@@ -2366,10 +2348,13 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
       case 'financial_type_id':
-        // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
-        return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-
-      break;
+        // @fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
+        // @fixme - https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
+        //   because $relationTypeId is not set in CRM_Financial_BAO_FinancialType::getIncomeFinancialType()
+        if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
+          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+        }
+        return [];
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

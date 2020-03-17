@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
@@ -197,7 +181,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       'id' => $recurID,
       'return' => ['payment_processor_id'],
     ]);
-    return (int) CRM_Utils_Array::value('payment_processor_id', $recur, 0);
+    return (int) ($recur['payment_processor_id'] ?? 0);
   }
 
   /**
@@ -266,7 +250,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     }
     $activityParams = [
       'subject' => !empty($params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
-      'details' => CRM_Utils_Array::value('processor_message', $params),
+      'details' => $params['processor_message'] ?? NULL,
     ];
 
     $cancelledId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled');
@@ -426,6 +410,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getTemplateContribution($id, $overrides = []) {
     // use api3 because api4 doesn't handle ContributionRecur yet...
@@ -435,6 +420,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     ]);
     // First look for new-style template contribution with is_template=1
     $templateContributions = \Civi\Api4\Contribution::get()
+      ->setCheckPermissions(FALSE)
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_template', '=', 1)
       ->addWhere('is_test', '=', $is_test)
@@ -444,6 +430,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     if (!$templateContributions->count()) {
       // Fall back to old style template contributions
       $templateContributions = \Civi\Api4\Contribution::get()
+        ->setCheckPermissions(FALSE)
         ->addWhere('contribution_recur_id', '=', $id)
         ->addWhere('is_test', '=', $is_test)
         ->addOrderBy('id', 'DESC')
@@ -932,7 +919,11 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
           // CRM-17718 allow for possibility of changed financial type ID having been set prior to calling this.
           $lineItem['financial_type_id'] = $financial_type_id;
         }
-        if ($lineItem['line_total'] != $total_amount) {
+        $taxAmountMatches = FALSE;
+        if ((!empty($lineItem['tax_amount']) && ($lineItem['line_total'] + $lineItem['tax_amount']) == $total_amount)) {
+          $taxAmountMatches = TRUE;
+        }
+        if ($lineItem['line_total'] != $total_amount && !$taxAmountMatches) {
           // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
           // if there is only one line item, and the UI should prevent this situation for those with more than one.
           $lineItem['line_total'] = $total_amount;

@@ -154,14 +154,7 @@
 {/foreach}
 {/if}
 
-{if !( $contributeMode eq 'notify' OR $contributeMode eq 'directIPN' ) and $is_monetary}
-{if $is_pay_later}
-===========================================================
-{ts}Registered Email{/ts}
-
-===========================================================
-{$email}
-{elseif $amount GT 0 OR $membership_amount GT 0 }
+{if $billingName}
 ===========================================================
 {ts}Billing Name and Address{/ts}
 
@@ -170,9 +163,14 @@
 {$address}
 
 {$email}
-{/if} {* End ! is_pay_later condition. *}
-{/if}
-{if $contributeMode eq 'direct' AND !$is_pay_later AND ( $amount GT 0 OR $membership_amount GT 0 ) }
+{elseif $email}
+===========================================================
+{ts}Registered Email{/ts}
+
+===========================================================
+{$email}
+{/if} {* End billingName or email *}
+{if $credit_card_type}
 
 ===========================================================
 {ts}Credit Card Information{/ts}

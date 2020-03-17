@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
@@ -87,7 +71,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           $url[] = $log_path[1];
           $log_url = implode($filePathMarker, $url);
           if ($this->fileExists($log_url)) {
-            $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
+            $docs_url = $this->createDocUrl('the-log-file-should-not-be-accessible');
             $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
               . '<br />' .
               '<a href="%2">Read more about this warning</a>';
@@ -140,7 +124,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
             . '<br />'
             . '<a href="%1">Read more about this warning</a>',
             [
-              1 => $this->createDocUrl('checkUploadsAreNotAccessible'),
+              1 => $this->createDocUrl('uploads-should-not-be-accessible'),
               2 => $privateDir,
               3 => $heuristicUrl,
             ]),
@@ -188,7 +172,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         $msg = 'Directory <a href="%1">%2</a> should not be browseable via the web.'
           . '<br />' .
           '<a href="%3">Read more about this warning</a>';
-        $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
+        $docs_url = $this->createDocUrl('directories-should-not-be-browsable');
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
           ts($msg, [1 => $publicDir, 2 => $publicDir, 3 => $docs_url]),
@@ -380,7 +364,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @return string
    */
   public function createDocUrl($topic) {
-    return CRM_Utils_System::getWikiBaseURL() . $topic;
+    return CRM_Utils_System::docURL2('sysadmin/setup/security#' . $topic, TRUE);
   }
 
   /**

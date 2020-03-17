@@ -8,6 +8,7 @@
 {ts}Contribution Information{/ts}
 
 ===========================================================
+{ts}Contributor{/ts}: {contact.display_name}
 {ts}Financial Type{/ts}: {$formValues.contributionType_name}
 {if $lineItem}
 {foreach from=$lineItem item=value key=priceset}

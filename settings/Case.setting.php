@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC (c) 2004-2020
  * $Id$
  *
  */
@@ -49,13 +33,13 @@ return [
     ],
     'default' => 'default',
     'add' => '4.7',
-    'title' => 'Redact Activity Email',
+    'title' => ts('Redact Activity Email'),
     'is_domain' => 1,
     'is_contact' => 0,
     'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getRedactOptions',
     ],
-    'description' => 'Should activity emails be redacted? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
+    'description' => ts('Should activity emails be redacted? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
     'help_text' => '',
   ],
   'civicaseAllowMultipleClients' => [
@@ -70,13 +54,13 @@ return [
     ],
     'default' => 'default',
     'add' => '4.7',
-    'title' => 'Allow Multiple Case Clients',
+    'title' => ts('Allow Multiple Case Clients'),
     'is_domain' => 1,
     'is_contact' => 0,
     'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getMultiClientOptions',
     ],
-    'description' => 'How many clients may be associated with a given case? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
+    'description' => ts('How many clients may be associated with a given case? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
     'help_text' => '',
   ],
   'civicaseNaturalActivityTypeSort' => [
@@ -91,13 +75,13 @@ return [
     ],
     'default' => 'default',
     'add' => '4.7',
-    'title' => 'Activity Type Sorting',
+    'title' => ts('Activity Type Sorting'),
     'is_domain' => 1,
     'is_contact' => 0,
     'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getSortOptions',
     ],
-    'description' => 'How to sort activity-types on the "Manage Case" screen? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
+    'description' => ts('How to sort activity-types on the "Manage Case" screen? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
     'help_text' => '',
   ],
   'civicaseActivityRevisions' => [
@@ -109,10 +93,25 @@ return [
     'default' => FALSE,
     'html_type' => 'radio',
     'add' => '4.7',
-    'title' => 'Enable Embedded Activity Revisions',
+    'title' => ts('Enable Embedded Activity Revisions'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Enable tracking of activity revisions embedded within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".',
+    'description' => ts('Enable tracking of activity revisions embedded within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".'),
+    'help_text' => '',
+  ],
+  'civicaseShowCaseActivities' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'civicaseShowCaseActivities',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => FALSE,
+    'html_type' => 'radio',
+    'add' => '5.24',
+    'title' => ts('Include case activities in general activity views.'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('e.g. the Contact form\'s Activity tab listing. Without this ticked, activities that belong to a case are hidden (default behavior). Warning: enabling this option means that all case activities relating to a contact will be listed which could result in users without "access all cases and activities" permission being able to see see the summarized details (date, subject, assignees, status etc.). Such users will still be prevented from managing the case and viewing/editing the activity.'),
     'help_text' => '',
   ],
 ];

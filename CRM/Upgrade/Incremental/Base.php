@@ -1,29 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5  .alpha1                                         |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Core\SettingsBag;
 
 /**
  * Base class for incremental upgrades
@@ -211,11 +197,16 @@ class CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function updateContributeSettings($ctx) {
-    $settings = Civi::settings()->get('contribution_invoice_settings');
-    $metadata = \Civi\Core\SettingsMetadata::getMetadata();
-    $conversions = array_intersect_key((array) $settings, $metadata);
-    foreach ($conversions as $key => $conversion) {
-      Civi::settings()->set($key, $conversion);
+    // Use a direct query as api now does some handling on this.
+    $settings = CRM_Core_DAO::executeQuery("SELECT value, domain_id FROM civicrm_setting WHERE name = 'contribution_invoice_settings'");
+
+    while ($settings->fetch()) {
+      $contributionSettings = (array) CRM_Utils_String::unserialize($settings->value);
+      foreach (array_merge(SettingsBag::getContributionInvoiceSettingKeys(), ['deferred_revenue_enabled' => 'deferred_revenue_enabled']) as $possibleKeyName => $settingName) {
+        if (!empty($contributionSettings[$possibleKeyName]) && empty(Civi::settings($settings->domain_id)->getExplicit($settingName))) {
+          Civi::settings($settings->domain_id)->set($settingName, $contributionSettings[$possibleKeyName]);
+        }
+      }
     }
     return TRUE;
   }
@@ -275,6 +266,26 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function dropIndex($ctx, $table, $indexName) {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists($table, $indexName);
+
+    return TRUE;
+  }
+
+  /**
+   * Drop a table... but only if it's empty.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @return bool
+   */
+  public static function dropTableIfEmpty($ctx, $table) {
+    if (CRM_Core_DAO::checkTableExists($table)) {
+      if (!CRM_Core_DAO::checkTableHasData($table)) {
+        CRM_Core_BAO_SchemaHandler::dropTable($table);
+      }
+      else {
+        $ctx->log->warning("dropTableIfEmpty($table): Found data. Preserved table.");
+      }
+    }
 
     return TRUE;
   }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -62,7 +46,7 @@ return [
     'title' => ts('Track replies using VERP in Reply-To header'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If checked, mailings will default to tracking replies using VERP-ed Reply-To. '),
+    'description' => ts('If checked, mailings will default to tracking replies using VERP-ed Reply-To.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Core_BAO_Setting::validateBoolSetting',
   ],
@@ -91,7 +75,6 @@ return [
     'title' => ts('Enable global server wide lock for CiviMail'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'replyTo' => [
@@ -102,10 +85,10 @@ return [
     'quick_form_type' => 'YesNo',
     'default' => 0,
     'add' => '4.6',
-    'title' => 'Enable Custom Reply-To',
+    'title' => ts('Enable Custom Reply-To'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Allow CiviMail users to send mailings with a custom Reply-To header',
+    'description' => ts('Allow CiviMail users to send mailings with a custom Reply-To header.'),
     'help_text' => NULL,
   ],
   'mailing_backend' => [
@@ -116,10 +99,9 @@ return [
     'html_type' => 'checkbox',
     'default' => ['outBound_option' => '3'],
     'add' => '4.1',
-    'title' => 'Mailing Backend',
+    'title' => ts('Mailing Backend'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'profile_add_to_group_double_optin' => [
@@ -175,7 +157,7 @@ return [
     'title' => ts('Hashed Mailing URL\'s'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID'),
+    'description' => ts('If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID.'),
     'help_text' => NULL,
   ],
   'civimail_multiple_bulk_emails' => [
@@ -203,7 +185,6 @@ return [
     'title' => ts('Enable CiviMail to generate Message-ID header'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
   ],
   'mailerBatchLimit' => [
@@ -219,10 +200,10 @@ return [
     ],
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Mailer Batch Limit',
+    'title' => ts('Mailer Batch Limit'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Throttle email delivery by setting the maximum number of emails sent during each CiviMail run (0 = unlimited).',
+    'description' => ts('Throttle email delivery by setting the maximum number of emails sent during each CiviMail run (0 = unlimited).'),
     'help_text' => NULL,
   ],
   'mailerJobSize' => [
@@ -238,10 +219,10 @@ return [
     ],
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Mailer Job Size',
+    'title' => ts('Mailer Job Size'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'If you want to utilize multi-threading enter the size you want your sub jobs to be split into. Recommended values are between 1,000 and 10,000. Use a lower value if your server has multiple cron jobs running simultaneously, but do not use values smaller than 1,000. Enter "0" to disable multi-threading and process mail as one single job - batch limits still apply.',
+    'description' => ts('If you want to utilize multi-threading enter the size you want your sub jobs to be split into. Recommended values are between 1,000 and 10,000. Use a lower value if your server has multiple cron jobs running simultaneously, but do not use values smaller than 1,000. Enter "0" to disable multi-threading and process mail as one single job - batch limits still apply.'),
     'help_text' => NULL,
   ],
   'mailerJobsMax' => [
@@ -257,10 +238,10 @@ return [
     ],
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Mailer Cron Job Limit',
+    'title' => ts('Mailer Cron Job Limit'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'The maximum number of mailer delivery jobs executing simultaneously (0 = allow as many processes to execute as started by cron)',
+    'description' => ts('The maximum number of mailer delivery jobs executing simultaneously (0 = allow as many processes to execute as started by cron).'),
     'help_text' => NULL,
   ],
   'mailThrottleTime' => [
@@ -276,10 +257,10 @@ return [
     ],
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Mailer Throttle Time',
+    'title' => ts('Mailer Throttle Time'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'The time to sleep in between each e-mail in micro seconds. Setting this above 0 allows you to control the rate at which e-mail messages are sent to the mail server, avoiding filling up the mail queue very quickly. Set to 0 to disable.',
+    'description' => ts('The time to sleep in between each e-mail in micro seconds. Setting this above 0 allows you to control the rate at which e-mail messages are sent to the mail server, avoiding filling up the mail queue very quickly. Set to 0 to disable.'),
     'help_text' => NULL,
   ],
   'verpSeparator' => [
@@ -295,10 +276,10 @@ return [
     ],
     'default' => '.',
     'add' => '4.7',
-    'title' => 'VERP Separator',
+    'title' => ts('VERP Separator'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Separator character used when CiviMail generates VERP (variable envelope return path) Mail-From addresses.',
+    'description' => ts('Separator character used when CiviMail generates VERP (variable envelope return path) Mail-From addresses.'),
     'help_text' => NULL,
   ],
   'write_activity_record' => [
@@ -313,7 +294,6 @@ return [
     'title' => ts('Enable CiviMail to create activities on delivery'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'simple_mail_limit' => [
@@ -328,10 +308,10 @@ return [
       'maxlength' => 8,
     ],
     'default' => 50,
-    'title' => 'Simple mail limit',
+    'title' => ts('Simple mail limit'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting',
+    'description' => ts('The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting.'),
     'help_text' => 'CiviCRM forces users sending more than this number of mails to use CiviMails. CiviMails have additional precautions: not sending to contacts who do not want bulk mail, adding domain name and opt out links. You should familiarise yourself with the law relevant to you on bulk mailings if changing this setting. For the US https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003 is a good place to start.',
   ],
   'auto_recipient_rebuild' => [
@@ -355,10 +335,10 @@ return [
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
-    'title' => 'Allow mail from logged in contact',
+    'title' => ts('Allow mail from logged in contact'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Allow sending email from the logged in contact\'s email address',
+    'description' => ts('Allow sending email from the logged in contact\'s email address.'),
     'help_text' => 'CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.',
   ],
 ];

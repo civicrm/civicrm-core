@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -43,7 +27,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_PseudoConstant {
 
@@ -101,7 +85,7 @@ class CRM_Core_PseudoConstant {
    * RelationshipType
    * @var array
    */
-  private static $relationshipType;
+  private static $relationshipType = [];
 
   /**
    * Civicrm groups that are not smart groups
@@ -227,15 +211,15 @@ class CRM_Core_PseudoConstant {
     $dao = new $daoName();
     $fieldSpec = $dao->getFieldSpec($fieldName);
 
-    // Ensure we have the canonical name for this field
-    $fieldName = CRM_Utils_Array::value('name', $fieldSpec, $fieldName);
-
     // Return false if field doesn't exist.
     if (empty($fieldSpec)) {
       return FALSE;
     }
 
-    elseif (!empty($fieldSpec['pseudoconstant'])) {
+    // Ensure we have the canonical name for this field
+    $fieldName = $fieldSpec['name'] ?? $fieldName;
+
+    if (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
 
       // if callback is specified..
@@ -248,9 +232,9 @@ class CRM_Core_PseudoConstant {
 
       // Merge params with schema defaults
       $params += [
-        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, []),
-        'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
-        'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
+        'condition' => $pseudoconstant['condition'] ?? [],
+        'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
+        'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
       ];
 
       // Fetch option group from option_value table
@@ -374,7 +358,7 @@ class CRM_Core_PseudoConstant {
             $i18n->localizeArray($output, $I18nParams);
             // Maintain sort by label
             if ($order == "ORDER BY %2") {
-              CRM_Utils_Array::asort($output);
+              $output = CRM_Utils_Array::asort($output);
             }
           }
           CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
@@ -413,7 +397,7 @@ class CRM_Core_PseudoConstant {
     if ($values === FALSE) {
       return FALSE;
     }
-    return CRM_Utils_Array::value($key, $values);
+    return $values[$key] ?? NULL;
   }
 
   /**
@@ -433,7 +417,7 @@ class CRM_Core_PseudoConstant {
     if ($values === FALSE) {
       return FALSE;
     }
-    return CRM_Utils_Array::value($key, $values);
+    return $values[$key] ?? NULL;
   }
 
   /**
@@ -670,7 +654,7 @@ class CRM_Core_PseudoConstant {
    *   array reference of all State/Provinces.
    */
   public static function &stateProvince($id = FALSE, $limit = TRUE) {
-    if (($id && !CRM_Utils_Array::value($id, self::$stateProvince)) || !self::$stateProvince || !$id) {
+    if (($id && empty(self::$stateProvince[$id])) || !self::$stateProvince || !$id) {
       $whereClause = FALSE;
       if ($limit) {
         $countryIsoCodes = self::countryIsoCode();
@@ -807,7 +791,7 @@ WHERE  id = %1";
    *   array reference of all countries.
    */
   public static function country($id = FALSE, $applyLimit = TRUE) {
-    if (($id && !CRM_Utils_Array::value($id, self::$country)) || !self::$country || !$id) {
+    if (($id && empty(self::$country[$id])) || !self::$country || !$id) {
 
       $config = CRM_Core_Config::singleton();
       $limitCodes = [];
@@ -1022,9 +1006,9 @@ WHERE  id = %1";
    * @return array
    *   array reference of all relationship types.
    */
-  public static function &relationshipType($valueColumnName = 'label', $reset = FALSE, $isActive = 1) {
+  public static function relationshipType($valueColumnName = 'label', $reset = FALSE, $isActive = 1) {
     $cacheKey = $valueColumnName . '::' . $isActive;
-    if (!CRM_Utils_Array::value($cacheKey, self::$relationshipType) || $reset) {
+    if (!isset(self::$relationshipType[$cacheKey]) || $reset) {
       self::$relationshipType[$cacheKey] = [];
 
       //now we have name/label columns CRM-3336
@@ -1167,7 +1151,7 @@ WHERE  id = %1";
     if (empty(self::$paymentProcessorType[$cacheKey])) {
       self::populate(self::$paymentProcessorType[$cacheKey], 'CRM_Financial_DAO_PaymentProcessorType', $all, $return, 'is_active', NULL, "is_default, $return", 'id');
     }
-    if ($id && CRM_Utils_Array::value($id, self::$paymentProcessorType[$cacheKey])) {
+    if ($id && !empty(self::$paymentProcessorType[$cacheKey][$id])) {
       return self::$paymentProcessorType[$cacheKey][$id];
     }
     return self::$paymentProcessorType[$cacheKey];
@@ -1414,7 +1398,7 @@ WHERE  id = %1
       $index .= '_' . $contactType;
     }
 
-    if (!CRM_Utils_Array::value($index, Civi::$statics[__CLASS__]['greeting'])) {
+    if (empty(Civi::$statics[__CLASS__]['greeting'][$index])) {
       $filterCondition = NULL;
       if ($contactType) {
         $filterVal = 'v.filter =';
@@ -1494,7 +1478,7 @@ WHERE  id = %1
       self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition);
     }
     if ($id) {
-      return CRM_Utils_Array::value($id, self::$accountOptionValues[$cacheKey]);
+      return self::$accountOptionValues[$cacheKey][$id] ?? NULL;
     }
 
     return self::$accountOptionValues[$cacheKey];

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -255,6 +239,33 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     ]);
     $result = $this->callAPISuccess('Case', 'getoptions', ['field' => 'status_id', 'case_type_id' => 'test_case_type', 'context' => 'validate']);
     $this->assertEquals($template['definition']['statuses'], array_values($result['values']));
+  }
+
+  public function testDefinitionGroups() {
+    $gid1 = $this->groupCreate(['name' => 'testDefinitionGroups1', 'title' => 'testDefinitionGroups1']);
+    $gid2 = $this->groupCreate(['name' => 'testDefinitionGroups2', 'title' => 'testDefinitionGroups2']);
+    $def = $this->fixtures['Application_with_Definition'];
+    $def['definition']['caseRoles'][] = [
+      'name' => 'Second role',
+      'groups' => ['testDefinitionGroups1', 'testDefinitionGroups2'],
+    ];
+    $def['definition']['caseRoles'][] = [
+      'name' => 'Third role',
+      'groups' => 'testDefinitionGroups2',
+    ];
+    $def['definition']['activityAsgmtGrps'] = $gid1;
+    $createCaseType = $this->callAPISuccess('CaseType', 'create', $def);
+    $caseType = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $createCaseType['id']]);
+
+    // Assert the group id got converted to array with name not id
+    $this->assertEquals(['testDefinitionGroups1'], $caseType['definition']['activityAsgmtGrps']);
+
+    // Assert multiple groups are stored
+    $this->assertEquals(['testDefinitionGroups1', 'testDefinitionGroups2'], $caseType['definition']['caseRoles'][1]['groups']);
+
+    // Assert single group got converted to array
+    $this->assertEquals(['testDefinitionGroups2'], $caseType['definition']['caseRoles'][2]['groups']);
+
   }
 
 }

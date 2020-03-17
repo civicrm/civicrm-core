@@ -371,4 +371,43 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals($expectedString, CRM_Utils_String::purifyHTML($testString));
   }
 
+  public function getGoodSerializeExamples() {
+    $strs = [];
+
+    $strs[] = ['a:1:{s:1:"a";s:1:"b";}'];
+    $strs[] = ['d:1.2;'];
+    $strs[] = ['s:3:"abc";'];
+    $strs[] = ['N;'];
+    $strs[] = ['a:7:{i:0;N;i:1;s:3:"abc";i:2;i:1;i:3;d:2.3;i:4;b:1;i:5;b:0;i:6;i:0;}'];
+
+    return $strs;
+  }
+
+  /**
+   * @param string $str
+   *   A safe serialized value.
+   * @dataProvider getGoodSerializeExamples
+   */
+  public function testGoodSerialize($str) {
+    $this->assertEquals(unserialize($str), CRM_Utils_String::unserialize($str));
+  }
+
+  public function getBadSerializeExamples() {
+    $strs = [];
+
+    $strs[] = ['O:8:"stdClass":0:{}'];
+    $strs[] = ['O:9:"Exception":7:{s:10:"*message";s:3:"abc";s:17:"Exceptionstring";s:0:"";s:7:"*code";i:0;s:7:"*file";s:17:"Command line code";s:7:"*line";i:1;s:16:"Exceptiontrace";a:0:{}s:19:"Exceptionprevious";N;}'];
+
+    return $strs;
+  }
+
+  /**
+   * @param string $str
+   *   An unsafe serialized value.
+   * @dataProvider getBadSerializeExamples
+   */
+  public function testBadSerializeExamples($str) {
+    $this->assertFalse(CRM_Utils_String::unserialize($str));
+  }
+
 }

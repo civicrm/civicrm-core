@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -341,9 +325,26 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       $this->markTestIncomplete($reportID . " has non enotices when calling statistics fn");
     }
     $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
+    if ($reportID === 'contribute/summary') {
+      $this->hookClass->setHook('civicrm_alterReportVar', [$this, 'alterReportVarHook']);
+    }
     $result = $this->callAPIAndDocument('report_template', 'getstatistics', [
       'report_id' => $reportID,
     ], __FUNCTION__, __FILE__, $description, 'Getstatistics', 'getstatistics');
+  }
+
+  /**
+   * Implements hook_civicrm_alterReportVar().
+   */
+  public function alterReportVarHook($varType, &$var, &$object) {
+    if ($varType === 'sql' && $object instanceof CRM_Report_Form_Contribute_Summary) {
+      $from = $var->getVar('_from');
+      $from .= " LEFT JOIN civicrm_financial_type as temp ON temp.id = contribution_civireport.financial_type_id";
+      $var->setVar('_from', $from);
+      $where = $var->getVar('_where');
+      $where .= " AND ( temp.id IS NOT NULL )";
+      $var->setVar('_where', $where);
+    }
   }
 
   /**
@@ -652,6 +653,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test the group filter works on the contribution summary when 2 groups are involved.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithTwoGroups() {
     $groupID = $this->setUpPopulatedGroup();
@@ -666,7 +669,103 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test we don't get a fatal grouping  by only contribution status id.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionSummaryGroupByContributionStatus() {
+    $params = [
+      'report_id' => 'contribute/summary',
+      'fields' => ['total_amount' => 1, 'country_id' => 1],
+      'group_bys' => ['contribution_status_id' => 1],
+      'options' => ['metadata' => ['sql']],
+    ];
+    $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY contribution_civireport.contribution_status_id WITH ROLLUP', $rowsSql[0]);
+    $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY contribution_civireport.contribution_status_id, currency', $statsSql[2]);
+  }
+
+  /**
+   * Test we don't get a fatal grouping  by only contribution status id.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionSummaryGroupByYearFrequency() {
+    $params = [
+      'report_id' => 'contribute/summary',
+      'fields' => ['total_amount' => 1, 'country_id' => 1],
+      'group_bys' => ['receive_date' => 1],
+      'group_bys_freq' => ['receive_date' => 'YEAR'],
+      'options' => ['metadata' => ['sql']],
+    ];
+    $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY  YEAR(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY  YEAR(contribution_civireport.receive_date), currency', $statsSql[2]);
+  }
+
+  /**
+   * Test we don't get a fatal grouping with QUARTER frequency.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionSummaryGroupByYearQuarterFrequency() {
+    $params = [
+      'report_id' => 'contribute/summary',
+      'fields' => ['total_amount' => 1, 'country_id' => 1],
+      'group_bys' => ['receive_date' => 1],
+      'group_bys_freq' => ['receive_date' => 'QUARTER'],
+      'options' => ['metadata' => ['sql']],
+    ];
+    $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY YEAR(contribution_civireport.receive_date), QUARTER(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY YEAR(contribution_civireport.receive_date), QUARTER(contribution_civireport.receive_date), currency', $statsSql[2]);
+  }
+
+  /**
+   * Test we don't get a fatal grouping with QUARTER frequency.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionSummaryGroupByDateFrequency() {
+    $params = [
+      'report_id' => 'contribute/summary',
+      'fields' => ['total_amount' => 1, 'country_id' => 1],
+      'group_bys' => ['receive_date' => 1],
+      'group_bys_freq' => ['receive_date' => 'DATE'],
+      'options' => ['metadata' => ['sql']],
+    ];
+    $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY DATE(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY DATE(contribution_civireport.receive_date), currency', $statsSql[2]);
+  }
+
+  /**
+   * Test we don't get a fatal grouping with QUARTER frequency.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionSummaryGroupByWeekFrequency() {
+    $params = [
+      'report_id' => 'contribute/summary',
+      'fields' => ['total_amount' => 1, 'country_id' => 1],
+      'group_bys' => ['receive_date' => 1],
+      'group_bys_freq' => ['receive_date' => 'YEARWEEK'],
+      'options' => ['metadata' => ['sql']],
+    ];
+    $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY YEARWEEK(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
+    $this->assertContains('GROUP BY YEARWEEK(contribution_civireport.receive_date), currency', $statsSql[2]);
+  }
+
+  /**
    * CRM-20640: Test the group filter works on the contribution summary when a single contact in 2 groups.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithSingleContactsInTwoGroups() {
     list($groupID1, $individualID) = $this->setUpPopulatedGroup(TRUE);
@@ -714,6 +813,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * whenever they are hard-added or in the criteria.
    *
    * @return int
+   * @throws \CRM_Core_Exception
    */
   public function setUpPopulatedSmartGroup() {
     $household1ID = $this->householdCreate();
@@ -758,6 +858,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param bool $returnAddedContact
    *
    * @return int
+   * @throws \CRM_Core_Exception
    */
   public function setUpPopulatedGroup($returnAddedContact = FALSE) {
     $individual1ID = $this->individualCreate();
@@ -792,6 +893,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpIntersectingGroups() {
     $groupID = $this->setUpPopulatedGroup();
@@ -858,16 +961,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test Deferred Revenue Report.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testDeferredRevenueReport() {
     $indv1 = $this->individualCreate();
     $indv2 = $this->individualCreate();
-    $params = [
-      'contribution_invoice_settings' => [
-        'deferred_revenue_enabled' => '1',
-      ],
-    ];
-    $this->callAPISuccess('Setting', 'create', $params);
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $this->contributionCreate(
       [
         'contact_id' => $indv1,
@@ -941,6 +1041,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param string $template
    *   Report template unique identifier.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testReportsWithNoTInSmartGroupFilter($template) {
     $groupID = $this->setUpPopulatedGroup();
@@ -951,6 +1053,44 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ]);
     $this->assertNumberOfContactsInResult(2, $rows, $template);
+  }
+
+  /**
+   * Test we don't get a fatal grouping with various frequencies.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testActivitySummaryGroupByFrequency() {
+    $this->createContactsWithActivities();
+    foreach (['MONTH', 'YEARWEEK', 'QUARTER', 'YEAR'] as $frequency) {
+      $params = [
+        'report_id' => 'activitySummary',
+        'fields' => [
+          'activity_type_id' => 1,
+          'duration' => 1,
+          // id is "total activities", which is required by default(?)
+          'id' => 1,
+        ],
+        'group_bys' => ['activity_date_time' => 1],
+        'group_bys_freq' => ['activity_date_time' => $frequency],
+        'options' => ['metadata' => ['sql']],
+      ];
+      $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
+      $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
+      switch ($frequency) {
+        case 'YEAR':
+          // Year only contains one grouping.
+          // Also note the extra space.
+          $this->assertContains('GROUP BY  YEAR(activity_civireport.activity_date_time)', $rowsSql[1], "Failed for frequency $frequency");
+          $this->assertContains('GROUP BY  YEAR(activity_civireport.activity_date_time)', $statsSql[1], "Failed for frequency $frequency");
+          break;
+
+        default:
+          $this->assertContains("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $rowsSql[1], "Failed for frequency $frequency");
+          $this->assertContains("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $statsSql[1], "Failed for frequency $frequency");
+          break;
+      }
+    }
   }
 
   /**
@@ -1061,6 +1201,31 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Activity Details report has some whack-a-mole to fix when filtering on null/not null.
+   */
+  public function testActivityDetailsNullFilters() {
+    $this->createContactsWithActivities();
+    $params = [
+      'report_id' => 'activity',
+      'location_op' => 'nll',
+      'location_value' => '',
+    ];
+    $rowsWithoutLocation = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
+    $this->assertEmpty($rowsWithoutLocation);
+    $params['location_op'] = 'nnll';
+    $rowsWithLocation = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
+    $this->assertCount(1, $rowsWithLocation);
+    // Test for CRM-18356 - activity shouldn't appear if target contact filter is null.
+    $params = [
+      'report_id' => 'activity',
+      'contact_target_op' => 'nll',
+      'contact_target_value' => '',
+    ];
+    $rowsWithNullTarget = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
+    $this->assertEmpty($rowsWithNullTarget);
+  }
+
+  /**
    * Set up some activity data..... use some chars that challenge our utf handling.
    */
   public function createContactsWithActivities() {
@@ -1156,6 +1321,44 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'contact_sub_type_op' => 'nll',
       'contact_sub_type_value' => [],
       'contact_type_op' => 'eq',
+      'contact_type_value' => 'Individual',
+    ]);
+    $this->assertEquals(1, $rows['count']);
+  }
+
+  /**
+   * Test contact subtype filter on summary report.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContactSubtypeIn() {
+    $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $this->individualCreate();
+
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contact/summary',
+      'contact_sub_type_op' => 'in',
+      'contact_sub_type_value' => ['Student'],
+      'contact_type_op' => 'in',
+      'contact_type_value' => 'Individual',
+    ]);
+    $this->assertEquals(1, $rows['count']);
+  }
+
+  /**
+   * Test contact subtype filter on summary report.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContactSubtypeNotIn() {
+    $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $this->individualCreate();
+
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contact/summary',
+      'contact_sub_type_op' => 'notin',
+      'contact_sub_type_value' => ['Student'],
+      'contact_type_op' => 'in',
       'contact_type_value' => 'Individual',
     ]);
     $this->assertEquals(1, $rows['count']);

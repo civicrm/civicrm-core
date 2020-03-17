@@ -4,6 +4,10 @@
  * Class CRM_Event_Cart_Form_Cart
  */
 class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
+
+  /**
+   * @var \CRM_Event_Cart_BAO_Cart
+   */
   public $cart;
 
   public $_action;
@@ -13,7 +17,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   public $participants;
 
   public function preProcess() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_action = CRM_Utils_Request::retrieveValue('action', 'String');
     $this->_mode = 'live';
     $this->loadCart();
 
@@ -50,7 +54,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
         $participant_params = [
           'cart_id' => $this->cart->id,
           'event_id' => $event_in_cart->event_id,
-          'contact_id' => self::find_or_create_contact($this->getContactID()),
+          'contact_id' => self::find_or_create_contact(),
         ];
         $participant = CRM_Event_Cart_BAO_MerParticipant::create($participant_params);
         $participant->save();
@@ -93,22 +97,14 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   }
 
   /**
-   * @return bool
-   */
-  public static function is_administrator() {
-    global $user;
-    return CRM_Core_Permission::check('administer CiviCRM');
-  }
-
-  /**
-   * @return mixed
+   * @return int
+   * @throws \CRM_Core_Exception
    */
   public function getContactID() {
-    //XXX when do we query 'cid' ?
-    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $tempID = CRM_Utils_Request::retrieveValue('cid', 'Positive');
 
     //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    $userChecksum = CRM_Utils_Request::retrieveValue('cs', 'String');
     if ($userChecksum) {
       //check for anonymous user.
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
@@ -132,21 +128,20 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   }
 
   /**
-   * @param int $registeringContactID
    * @param array $fields
    *
    * @return int|mixed|null
    */
-  public static function find_or_create_contact($registeringContactID = NULL, $fields = []) {
+  public static function find_or_create_contact($fields = []) {
     $contact_id = self::find_contact($fields);
 
     if ($contact_id) {
       return $contact_id;
     }
     $contact_params = [
-      'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
-      'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
-      'last_name' => CRM_Utils_Array::value('last_name', $fields, NULL),
+      'email-Primary' => $fields['email'] ?? NULL,
+      'first_name' => $fields['first_name'] ?? NULL,
+      'last_name' => $fields['last_name'] ?? NULL,
       'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, TRUE),
     ];
     $no_fields = [];

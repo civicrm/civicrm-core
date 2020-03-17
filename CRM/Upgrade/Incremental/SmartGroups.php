@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  * Class to handled upgrading any saved searches with changed patterns.
  */
@@ -68,6 +52,14 @@ class CRM_Upgrade_Incremental_SmartGroups {
       'pledge_create_date' => 'pledge_create',
       'pledge_end_date' => 'pledge_end',
       'pledge_start_date' => 'pledge_start',
+      'case_start_date' => 'case_from',
+      'case_end_date' => 'case_to',
+      'mailing_job_start_date' => 'mailing_date',
+      'relationship_start_date' => 'relation_start',
+      'relationship_end_date' => 'relation_end',
+      'event' => 'event',
+      'created_date' => 'log',
+      'modified_date' => 'log',
     ];
 
     foreach ($fields as $field) {
@@ -88,12 +80,34 @@ class CRM_Upgrade_Incremental_SmartGroups {
           }
         }
         foreach ($formValues as $index => $formValue) {
+          if (!is_array($formValue)) {
+            if ($index === $relativeFieldName) {
+              $hasRelative = TRUE;
+              if (!empty($formValue)) {
+                $isRelative = TRUE;
+              }
+              continue;
+            }
+            elseif ($index === 'event_low' || $index === 'event_high') {
+              if ($isRelative || (!$isRelative && $formValue === '')) {
+                unset($formValues[$index]);
+              }
+              else {
+                $isHigh = substr($index, -5, 5) === '_high';
+                $formValues[$index] = $this->getConvertedDateValue($formValue, $isHigh);
+              }
+            }
+            continue;
+          }
           if (!isset($formValue[0])) {
             // Any actual criteria will have this key set but skip any weird lines
             continue;
           }
+          if ($formValue[0] === $relativeFieldName && !empty($formValue[2])) {
+            $hasRelative = TRUE;
+          }
           if ($formValue[0] === $relativeFieldName && empty($formValue[2])) {
-            unset($formValues[$index]);;
+            unset($formValues[$index]);
           }
           elseif (in_array($formValue[0], $fieldPossibilities)) {
             if ($isRelative) {
@@ -108,6 +122,9 @@ class CRM_Upgrade_Incremental_SmartGroups {
         if (!$isRelative) {
           if (!in_array($relativeFieldName, $relativeFieldNames)) {
             $relativeFieldNames[] = $relativeFieldName;
+            $formValues[] = [$relativeFieldName, '=', 0];
+          }
+          elseif (!$hasRelative) {
             $formValues[] = [$relativeFieldName, '=', 0];
           }
         }
@@ -175,8 +192,14 @@ class CRM_Upgrade_Incremental_SmartGroups {
     foreach ($this->getSearchesWithField($oldName) as $savedSearch) {
       $formValues = $savedSearch['form_values'];
       foreach ($formValues as $index => $formValue) {
-        if ($formValue[0] === $oldName) {
-          $formValues[$index][0] = $newName;
+        if (is_array($formValue)) {
+          if (isset($formValue[0]) && $formValue[0] === $oldName) {
+            $formValues[$index][0] = $newName;
+          }
+        }
+        elseif ($index === $oldName) {
+          $formValues[$newName] = $formValue;
+          unset($formValues[$oldName]);
         }
       }
 
@@ -209,12 +232,81 @@ class CRM_Upgrade_Incremental_SmartGroups {
    * @return mixed
    */
   protected function getSearchesWithField($field) {
-    $savedSearches = civicrm_api3('SavedSearch', 'get', [
+    return civicrm_api3('SavedSearch', 'get', [
       'options' => ['limit' => 0],
       'form_values' => ['LIKE' => "%{$field}%"],
+      'return' => ['id', 'form_values'],
     ])['values'];
-    return $savedSearches;
+  }
 
+  /**
+   * Convert the log_date saved search date fields to their correct name
+   * default to switching to created_date as that is what the code did originally
+   */
+  public function renameLogFields() {
+    $addedDate = TRUE;
+    foreach ($this->getSearchesWithField('log_date') as $savedSearch) {
+      $formValues = $savedSearch['form_values'];
+      foreach ($formValues as $index => $formValue) {
+        if (isset($formValue[0]) && $formValue[0] === 'log_date') {
+          if ($formValue[2] == 2) {
+            $addedDate = FALSE;
+          }
+        }
+        if (isset($formValue[0]) && ($formValue[0] === 'log_date_high' || $formValue[0] === 'log_date_low')) {
+          $isHigh = substr($index, -5, 5) === '_high';
+          if ($addedDate) {
+            $fieldName = 'created_date';
+          }
+          else {
+            $fieldName = 'modified_date';
+          }
+          if ($isHigh) {
+            $fieldName .= '_high';
+          }
+          else {
+            $fieldName .= '_low';
+          }
+          $formValues[$index][0] = $fieldName;
+        }
+      }
+      if ($formValues !== $savedSearch['form_values']) {
+        civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $formValues]);
+      }
+    }
+  }
+
+  /**
+   * Convert Custom date fields in smart groups
+   */
+  public function convertCustomSmartGroups() {
+    $custom_date_fields = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_custom_field WHERE data_type = 'Date' AND is_search_range = 1");
+    while ($custom_date_fields->fetch()) {
+      $savedSearches = $this->getSearchesWithField('custom_' . $custom_date_fields->id);
+      foreach ($savedSearches as $savedSearch) {
+        $form_values = $savedSearch['form_values'];
+        foreach ($form_values as $index => $formValues) {
+          if (isset($formValues[0]) && $formValues[0] === 'custom_' . $custom_date_fields->id && is_array($formValues[2])) {
+            if (isset($formValues[2]['BETWEEN'])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][0], FALSE)];
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['BETWEEN'][1], TRUE)];
+              unset($form_values[$index]);
+            }
+            if (isset($formValues[2]['>='])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_low', '=', $this->getConvertedDateValue($formValues[2]['>='], FALSE)];
+              unset($form_values[$index]);
+            }
+            if (isset($formValues[2]['<='])) {
+              $form_values[] = ['custom_' . $custom_date_fields->id . '_high', '=', $this->getConvertedDateValue($formValues[2]['<='], TRUE)];
+              unset($form_values[$index]);
+            }
+          }
+        }
+        if ($form_values !== $savedSearch['form_values']) {
+          civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $form_values]);
+        }
+      }
+    }
   }
 
 }

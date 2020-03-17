@@ -1,43 +1,34 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 trait CRM_Core_Form_EntityFormTrait {
+
+  /**
+   * The id of the object being edited / created.
+   *
+   * @var int
+   */
+  public $_id;
 
   /**
    * The entity subtype ID (eg. for Relationship / Activity)
    *
    * @var int
    */
-  protected $_entitySubTypeId;
+  protected $_entitySubTypeId = NULL;
 
   /**
    * Get entity fields for the entity to be added to the form.
@@ -88,6 +79,15 @@ trait CRM_Core_Form_EntityFormTrait {
   }
 
   /**
+   * Set the entity ID
+   *
+   * @param int $id The entity ID
+   */
+  public function setEntityId($id) {
+    $this->_id = $id;
+  }
+
+  /**
    * Should custom data be suppressed on this form.
    *
    * @return bool
@@ -99,15 +99,19 @@ trait CRM_Core_Form_EntityFormTrait {
   /**
    * Get the entity subtype ID being edited
    *
-   * @param $subTypeId
-   *
    * @return int|null
    */
-  public function getEntitySubTypeId($subTypeId) {
-    if ($subTypeId) {
-      return $subTypeId;
-    }
+  public function getEntitySubTypeId() {
     return $this->_entitySubTypeId;
+  }
+
+  /**
+   * Set the entity subtype ID being edited
+   *
+   * @param $subTypeId
+   */
+  public function setEntitySubTypeId($subTypeId) {
+    $this->_entitySubTypeId = $subTypeId;
   }
 
   /**
@@ -119,7 +123,7 @@ trait CRM_Core_Form_EntityFormTrait {
     }
     $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
     if (isset($customisableEntities[$this->getDefaultEntity()])) {
-      CRM_Custom_Form_CustomData::addToForm($this);
+      CRM_Custom_Form_CustomData::addToForm($this, $this->getEntitySubTypeId());
     }
   }
 

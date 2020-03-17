@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  * Settings metadata file
@@ -50,8 +34,8 @@ return [
       'maxlength' => '64',
     ],
     'default' => NULL,
-    'title' => 'Geo Provider Key',
-    'description' => 'Enter the API key or Application ID associated with your geocoding provider.',
+    'title' => ts('Geo Provider Key'),
+    'description' => ts('Enter the API key or Application ID associated with your geocoding provider.'),
   ],
   'geoProvider' => [
     'add' => '4.7',
@@ -71,8 +55,8 @@ return [
       'callback' => 'CRM_Core_SelectValues::geoProvider',
     ],
     'default' => NULL,
-    'title' => 'Geocoding Provider',
-    'description' => 'This can be the same or different from the mapping provider selected.',
+    'title' => ts('Geocoding Provider'),
+    'description' => ts('This can be the same or different from the mapping provider selected.'),
   ],
   'mapAPIKey' => [
     'add' => '4.7',
@@ -90,8 +74,8 @@ return [
       'maxlength' => '64',
     ],
     'default' => NULL,
-    'title' => 'Map Provider Key',
-    'description' => 'Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.',
+    'title' => ts('Map Provider Key'),
+    'description' => ts('Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.'),
   ],
   'mapProvider' => [
     'add' => '4.7',
@@ -111,7 +95,7 @@ return [
       'callback' => 'CRM_Core_SelectValues::mapProvider',
     ],
     'default' => NULL,
-    'title' => 'Mapping Provider',
-    'description' => 'Choose the mapping provider that has the best coverage for the majority of your contact addresses.',
+    'title' => ts('Mapping Provider'),
+    'description' => ts('Choose the mapping provider that has the best coverage for the majority of your contact addresses.'),
   ],
 ];

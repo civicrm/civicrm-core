@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -122,7 +106,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         // Note that most of the fields available come from 'importable fields' -
         // I thought about making this field 'importable' but it felt like there might be unknown consequences
         // so I opted for just adding it in & securing it with a unit test.
-        // Example usage of sort_name - It is possible to alter sort name via hook so 2 organization names might differ as in
+        /// Example usage of sort_name - It is possible to alter sort name via hook so 2 organization names might differ as in
         // Justice League vs The Justice League but these could have the same sort_name if 'the the'
         // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
@@ -209,17 +193,23 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
       $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
+      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe');
+      $this->temporaryTables['dedupe_copy'] = $dedupeCopyTemporaryTableObject->getName();
       $insertClause = "INSERT INTO {$this->temporaryTables['dedupe']}  (id1, weight)";
       $groupByClause = "GROUP BY id1, weight";
-      $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
+      $dupeCopyJoin = " JOIN {$this->temporaryTables['dedupe_copy']} ON {$this->temporaryTables['dedupe_copy']}.id1 = t1.column WHERE ";
     }
     else {
       $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)")->getName();
+      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe');
+      $this->temporaryTables['dedupe_copy'] = $dedupeCopyTemporaryTableObject->getName();
       $insertClause = "INSERT INTO {$this->temporaryTables['dedupe']}  (id1, id2, weight)";
       $groupByClause = "GROUP BY id1, id2, weight";
-      $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
+      $dupeCopyJoin = " JOIN {$this->temporaryTables['dedupe_copy']} ON {$this->temporaryTables['dedupe_copy']}.id1 = t1.column AND {$this->temporaryTables['dedupe_copy']}.id2 = t2.column WHERE ";
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
@@ -244,22 +234,25 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
           $query = array_shift($tableQueries);
 
           if ($searchWithinDupes) {
+            // drop dedupe_copy table just in case if its already there.
+            $dedupeCopyTemporaryTableObject->drop();
             // get prepared to search within already found dupes if $searchWithinDupes flag is set
-            $dao->query("DROP TEMPORARY TABLE IF EXISTS dedupe_copy");
-            $dao->query("CREATE TEMPORARY TABLE dedupe_copy SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}");
+            $dedupeCopyTemporaryTableObject->createWithQuery("SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}");
 
             preg_match($patternColumn, $query, $matches);
             $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
 
             // CRM-19612: If there's a union, there will be two WHEREs, and you
             // can't use the temp table twice.
-            if (preg_match('/dedupe_copy[\S\s]*(union)[\S\s]*dedupe_copy/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
+            if (preg_match('/' . $this->temporaryTables['dedupe_copy'] . '[\S\s]*(union)[\S\s]*' . $this->temporaryTables['dedupe_copy'] . '/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
               // Make a second temp table:
-              $dao->query("DROP TEMPORARY TABLE IF EXISTS dedupe_copy_2");
-              $dao->query("CREATE TEMPORARY TABLE dedupe_copy_2 SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}");
+              $this->temporaryTables['dedupe_copy_2'] = CRM_Utils_SQL_TempTable::build()
+                ->setCategory('dedupe')
+                ->createWithQuery("SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}")
+                ->getName();
               // After the union, use that new temp table:
               $part1 = substr($query, 0, $matches[1][1]);
-              $query = $part1 . str_replace('dedupe_copy', 'dedupe_copy_2', substr($query, $matches[1][1]));
+              $query = $part1 . str_replace($this->temporaryTables['dedupe_copy'], $this->temporaryTables['dedupe_copy_2'], substr($query, $matches[1][1]));
             }
           }
           $searchWithinDupes = 1;
@@ -438,7 +431,11 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $ruleBao->find();
     $ruleFields = [];
     while ($ruleBao->fetch()) {
-      $ruleFields[$ruleBao->rule_field] = $ruleBao->rule_weight;
+      $field_name = $ruleBao->rule_field;
+      if ($field_name == 'phone_numeric') {
+        $field_name = 'phone';
+      }
+      $ruleFields[$field_name] = $ruleBao->rule_weight;
     }
 
     return [$ruleFields, $rgBao->threshold];

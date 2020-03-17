@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -38,14 +22,21 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
-use Civi\Api4\Utils\ActionUtil;
 
 /**
- * Get fields for an entity.
+ * Lists information about fields for the $ENTITY entity.
+ *
+ * This field information is also known as "metadata."
+ *
+ * Note that different actions may support different lists of fields.
+ * By default this will fetch the field list relevant to `get`,
+ * but a different list may be returned if you specify another action.
  *
  * @method $this setLoadOptions(bool $value)
  * @method bool getLoadOptions()
  * @method $this setAction(string $value)
+ * @method $this setValues(array $values)
+ * @method array getValues()
  */
 class BasicGetFieldsAction extends BasicGetAction {
 
@@ -57,9 +48,18 @@ class BasicGetFieldsAction extends BasicGetAction {
   protected $loadOptions = FALSE;
 
   /**
+   * Fields will be returned appropriate to the specified action (get, create, delete, etc.)
+   *
    * @var string
    */
   protected $action = 'get';
+
+  /**
+   * Fields will be returned appropriate to the specified values (e.g. ['contact_type' => 'Individual'])
+   *
+   * @var array
+   */
+  protected $values = [];
 
   /**
    * To implement getFields for your own entity:
@@ -77,7 +77,7 @@ class BasicGetFieldsAction extends BasicGetAction {
    */
   public function _run(Result $result) {
     try {
-      $actionClass = ActionUtil::getAction($this->getEntityName(), $this->getAction());
+      $actionClass = \Civi\API\Request::create($this->getEntityName(), $this->getAction(), ['version' => 4]);
     }
     catch (NotImplementedException $e) {
     }
@@ -129,6 +129,29 @@ class BasicGetFieldsAction extends BasicGetAction {
       'replace' => 'create',
     ];
     return $sub[$this->action] ?? $this->action;
+  }
+
+  /**
+   * Add an item to the values array
+   * @param string $fieldName
+   * @param mixed $value
+   * @return $this
+   */
+  public function addValue(string $fieldName, $value) {
+    $this->values[$fieldName] = $value;
+    return $this;
+  }
+
+  /**
+   * @param bool $includeCustom
+   * @return $this
+   */
+  public function setIncludeCustom(bool $includeCustom) {
+    // Be forgiving if the param doesn't exist and don't throw an exception
+    if (property_exists($this, 'includeCustom')) {
+      $this->includeCustom = $includeCustom;
+    }
+    return $this;
   }
 
   public function fields() {

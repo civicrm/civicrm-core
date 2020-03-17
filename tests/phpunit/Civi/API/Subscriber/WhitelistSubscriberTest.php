@@ -163,8 +163,6 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
               0 => ['id' => 1, 'provider' => 'cosmo spacely'],
               1 => ['id' => 5, 'provider' => 'george jetson'],
             ],
-            // This is silly:
-            'undefined_fields' => ['entity_id', 'entity_table', 'widget_id', 'api.has_parent'],
           ],
         ],
       ],
@@ -384,9 +382,8 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
     $dispatcher->addSubscriber(new WhitelistSubscriber($whitelist));
     $dispatcher->addSubscriber(new ChainSubscriber());
 
-    $apiRequest['params']['debug'] = 1;
     $apiRequest['params']['check_permissions'] = 'whitelist';
-    $result = $kernel->run($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
+    $result = $kernel->runSafe($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
 
     if ($expectSuccess) {
       $this->assertAPISuccess($result);

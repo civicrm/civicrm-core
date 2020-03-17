@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Upgrade_Incremental_MessageTemplates {
 
@@ -131,6 +115,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_offline_receipt', 'type' => 'subject'],
           ['name' => 'contribution_offline_receipt', 'type' => 'text'],
           ['name' => 'contribution_online_receipt', 'type' => 'subject'],
+          ['name' => 'contribution_online_receipt', 'type' => 'html'],
           ['name' => 'contribution_recurring_billing', 'type' => 'html'],
           ['name' => 'contribution_recurring_billing', 'type' => 'subject'],
           ['name' => 'contribution_recurring_billing', 'type' => 'text'],
@@ -162,6 +147,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'membership_offline_receipt', 'type' => 'subject'],
           ['name' => 'membership_offline_receipt', 'type' => 'text'],
           ['name' => 'membership_online_receipt', 'type' => 'subject'],
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
           ['name' => 'participant_cancelled', 'type' => 'html'],
           ['name' => 'participant_cancelled', 'type' => 'subject'],
           ['name' => 'participant_cancelled', 'type' => 'text'],
@@ -182,6 +168,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'pcp_owner_notify', 'type' => 'subject'],
           ['name' => 'pcp_owner_notify', 'type' => 'text'],
           ['name' => 'pcp_status_change', 'type' => 'subject'],
+          ['name' => 'pcp_status_change', 'type' => 'html'],
           ['name' => 'pcp_supporter_notify', 'type' => 'html'],
           ['name' => 'pcp_supporter_notify', 'type' => 'subject'],
           ['name' => 'pcp_supporter_notify', 'type' => 'text'],
@@ -192,11 +179,40 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'petition_sign', 'type' => 'subject'],
           ['name' => 'petition_sign', 'type' => 'text'],
           ['name' => 'pledge_acknowledge', 'type' => 'subject'],
-          ['name' => 'pledge_acknowledge', 'type' => 'subject'],
+          ['name' => 'pledge_acknowledge', 'type' => 'html'],
+          ['name' => 'pledge_acknowledge', 'type' => 'text'],
           ['name' => 'pledge_reminder', 'type' => 'html'],
           ['name' => 'pledge_reminder', 'type' => 'subject'],
           ['name' => 'pledge_reminder', 'type' => 'text'],
           ['name' => 'uf_notify', 'type' => 'subject'],
+          ['name' => 'uf_notify', 'type' => 'html'],
+          ['name' => 'case_activity', 'type' => 'html'],
+          ['name' => 'contribution_dupalert', 'type' => 'html'],
+          ['name' => 'friend', 'type' => 'html'],
+          ['name' => 'test_preview', 'type' => 'html'],
+        ],
+      ],
+      [
+        'version' => '5.21.beta1',
+        'upgrade_descriptor' => ts('Fix Membership Receipt'),
+        'templates' => [
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
+        ],
+      ],
+      [
+        'version' => '5.23.alpha1',
+        'upgrade_descriptor' => ts('Add Contributor Name to Offline Contribution receipts; fix bad event self-service URL'),
+        'templates' => [
+          ['name' => 'contribution_offline_receipt', 'type' => 'text'],
+          ['name' => 'contribution_offline_receipt', 'type' => 'html'],
+          ['name' => 'participant_confirm', 'type' => 'html'],
+        ],
+      ],
+      [
+        'version' => '5.24.alpha1',
+        'upgrade_descriptor' => ts('Layout fixes for the Contribution templates'),
+        'templates' => [
+          ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
         ],
       ],
 
@@ -258,7 +274,12 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));
       $templatesToUpdate = [];
       if (!empty($workFlowID)) {
-        $templatesToUpdate[] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_msg_template WHERE workflow_id = $workFlowID AND is_reserved = 1");
+        // This could be empty if the template was deleted. It should not happen,
+        // but has been seen in the wild (ex: marketing/civicrm-website#163).
+        $id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_msg_template WHERE workflow_id = $workFlowID AND is_reserved = 1");
+        if ($id) {
+          $templatesToUpdate[] = $id;
+        }
         $defaultTemplateID = CRM_Core_DAO::singleValueQuery("
           SELECT default_template.id FROM civicrm_msg_template reserved
           LEFT JOIN civicrm_msg_template default_template
@@ -271,11 +292,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           $templatesToUpdate[] = $defaultTemplateID;
         }
 
-        CRM_Core_DAO::executeQuery("
-          UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
-            1 => [$content, 'String'],
-          ]
-        );
+        if (!empty($templatesToUpdate)) {
+          CRM_Core_DAO::executeQuery("
+            UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
+              1 => [$content, 'String'],
+            ]
+          );
+        }
       }
     }
   }

@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -52,14 +36,14 @@ class ReflectionUtilsTest extends UnitTestCase {
   public function testGetDocBlockForClass() {
     $grandChild = new MockV4ReflectionGrandchild();
     $reflection = new \ReflectionClass($grandChild);
-    $doc = ReflectionUtils::getCodeDocs($reflection);
+    $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => "Test"]);
 
     $this->assertEquals(TRUE, $doc['internal']);
-    $this->assertEquals('Grandchild class', $doc['description']);
+    $this->assertEquals('Grandchild class for Test, with a 2-line description!', $doc['description']);
 
-    $expectedComment = 'This is an extended description.
+    $expectedComment = 'This is an extended comment.
 
-There is a line break in this description.
+  There is a line break in this comment.
 
 This is the base class.';
 
@@ -75,7 +59,56 @@ This is the base class.';
     $doc = ReflectionUtils::getCodeDocs($reflection->getProperty('foo'), 'Property');
 
     $this->assertEquals('This is the foo property.', $doc['description']);
-    $this->assertEquals("In the child class, foo has been barred.\n\nIn general, you can do nothing with it.", $doc['comment']);
+    $this->assertEquals("In the child class, foo has been barred.\n\n - In general, you can do nothing with it.", $doc['comment']);
+  }
+
+  public function docBlockExamples() {
+    return [
+      [
+        "/**
+          * This is a function.
+          *
+          * Comment.
+          * IDK
+          * @see 0
+          * @param int|string \$foo
+          *   Nothing interesting.
+          * @see no evil
+          * @throws tantrums
+          * @param \$bar: - Has a title
+          * @return nothing|something
+          */
+        ",
+        [
+          'description' => 'This is a function.',
+          'comment' => "Comment.\nIDK",
+          'params' => [
+            '$foo' => [
+              'type' => ['int', 'string'],
+              'description' => '',
+              'comment' => "  Nothing interesting.\n",
+            ],
+            '$bar' => [
+              'type' => NULL,
+              'description' => 'Has a title',
+              'comment' => '',
+            ],
+          ],
+          'see' => ['0', 'no evil'],
+          'throws' => ['tantrums'],
+          'return' => ['nothing', 'something'],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider docBlockExamples
+   * @param $input
+   * @param $expected
+   */
+  public function testParseDocBlock($input, $expected) {
+    $this->assertEquals($expected, ReflectionUtils::parseDocBlock($input));
   }
 
 }

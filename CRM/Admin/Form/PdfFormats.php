@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,7 +41,7 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
    * PDF Page Format ID.
    * @var int
    */
-  protected $_id = NULL;
+  public $_id = NULL;
 
   /**
    * Build the form object.

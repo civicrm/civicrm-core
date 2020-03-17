@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -185,10 +169,17 @@ class CRM_Core_InnoDBIndexer {
     }
 
     // Note: this only works in MySQL 5.6,  but this whole system is intended to only work in MySQL 5.6
+    // Note: In MYSQL 8 the Tables have been renamed from INNODB_SYS_TABLES and INNODB_SYS_INDEXES to INNODB_TABLES and INNODB_INDEXES
+    $innodbTable = "innodb_sys_tables";
+    $innodbIndex = "innodb_sys_indexes";
+    if (version_compare($mysqlVersion, '8.0', '>=')) {
+      $innodbTable = "innodb_tables";
+      $innodbIndex = "innodb_indexes";
+    }
     $sql = "
-      SELECT i.name as index_name
-      FROM information_schema.innodb_sys_tables t
-      JOIN information_schema.innodb_sys_indexes i USING (table_id)
+      SELECT i.name as `index_name`
+      FROM information_schema.$innodbTable t
+      JOIN information_schema.$innodbIndex i USING (table_id)
       WHERE t.name = concat(database(),'/$table')
       AND i.name like '" . self::IDX_PREFIX . "%'
       ";

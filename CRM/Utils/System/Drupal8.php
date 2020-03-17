@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -153,17 +137,17 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both username uniqueness and validity.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the username field; discard the rest.
-      $violations = array_filter($violations, function ($v) {
+      $violations = array_values(array_filter($violations, function ($v) {
         return $v->getPropertyPath() == 'name';
-      });
+      }));
       if (count($violations) > 0) {
         $errors['cms_name'] = (string) $violations[0]->getMessage();
       }
     }
 
     // And if we are given an email address, let's check to see if it already exists.
-    if (!empty($params[$emailName])) {
-      $mail = $params[$emailName];
+    if (!empty($params['mail'])) {
+      $mail = $params['mail'];
 
       $user = entity_create('user');
       $user->setEmail($mail);
@@ -171,9 +155,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both email uniqueness.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the email field; discard the rest.
-      $violations = array_filter($violations, function ($v) {
+      $violations = array_values(array_filter($violations, function ($v) {
         return $v->getPropertyPath() == 'mail';
-      });
+      }));
       if (count($violations) > 0) {
         $errors[$emailName] = (string) $violations[0]->getMessage();
       }
@@ -721,6 +705,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function getTimeZoneString() {
+    $timezone = drupal_get_user_timezone();
+    return $timezone;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function setUFLocale($civicrm_language) {
     $langcode = substr(str_replace('_', '', $civicrm_language), 0, 2);
     $languageManager = \Drupal::languageManager();
@@ -769,7 +761,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
             if ($addLanguagePart && !empty($config['prefixes'][$language])) {
               $url .= $config['prefixes'][$language] . '/';
             }
-            if ($removeLanguagePart) {
+            if ($removeLanguagePart && !empty($config['prefixes'][$language])) {
               $url = str_replace("/" . $config['prefixes'][$language] . "/", '/', $url);
             }
           }
@@ -800,6 +792,15 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     return $url;
+  }
+
+  /**
+   * Get role names
+   *
+   * @return array|null
+   */
+  public function getRoleNames() {
+    return user_role_names();
   }
 
 }

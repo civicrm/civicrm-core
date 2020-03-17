@@ -632,8 +632,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('B', $result['values'][$contactId]['last_name']);
     $this->assertEquals('abcd1234', $result['values'][$contactId]['api_key']);
 
+    // Should also be returned via join
+    $joinResult = $this->callAPISuccessGetSingle('Email', [
+      'check_permissions' => 1,
+      'contact_id' => $contactId,
+      'return' => 'contact_id.api_key',
+    ]);
+    $field = $this->_apiversion == 4 ? 'contact.api_key' : 'contact_id.api_key';
+    $this->assertEquals('abcd1234', $joinResult[$field]);
+
     // Restricted return -- because we don't have permission
-    $config->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
+    $config->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'edit all contacts'];
     $result = $this->callAPISuccess('Contact', 'create', [
       'check_permissions' => 1,
       'id' => $contactId,
@@ -642,6 +651,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('A4', $result['values'][$contactId]['first_name']);
     $this->assertEquals('B', $result['values'][$contactId]['last_name']);
     $this->assertTrue(empty($result['values'][$contactId]['api_key']));
+
+    // Should also be restricted via join
+    $joinResult = $this->callAPISuccessGetSingle('Email', [
+      'check_permissions' => 1,
+      'contact_id' => $contactId,
+      'return' => ['email', 'contact_id.api_key'],
+    ]);
+    $this->assertTrue(empty($joinResult['contact_id.api_key']));
   }
 
   /**
@@ -1727,25 +1744,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test the function that determines if 2 contacts have conflicts.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMergeGetConflicts() {
-    $this->createCustomGroupWithFieldOfType();
-    $contact1 = $this->individualCreate([
-      'email' => 'bob@example.com',
-      'api.address.create' => ['location_type_id' => 'work', 'street_address' => 'big office', 'city' => 'small city'],
-      'api.address.create.2' => ['location_type_id' => 'home', 'street_address' => 'big house', 'city' => 'small city'],
-      'external_identifier' => 'unique and special',
-      $this->getCustomFieldName('text') => 'mummy loves me',
-    ]);
-    $contact2 = $this->individualCreate([
-      'first_name' => 'different',
-      'api.address.create.1' => ['location_type_id' => 'home', 'street_address' => 'medium house', 'city' => 'small city'],
-      'api.address.create.2' => ['location_type_id' => 'work', 'street_address' => 'medium office', 'city' => 'small city'],
-      'external_identifier' => 'uniquer and specialler',
-      'api.email.create' => ['location_type_id' => 'Other', 'email' => 'bob@example.com'],
-      $this->getCustomFieldName('text') => 'mummy loves me more',
-    ]);
+    list($contact1, $contact2) = $this->createDeeplyConflictedContacts();
     $conflicts = $this->callAPISuccess('Contact', 'get_merge_conflicts', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2])['values'];
     $this->assertEquals([
       'safe' => [
@@ -1796,10 +1798,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
             ],
           ],
         ],
+        'resolved' => [],
       ],
     ], $conflicts);
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge');
+    $this->callAPISuccess('Job', 'process_batch_merge');
     $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
       'contact_type' => 'Individual',
       'used' => 'Unsupervised',
@@ -1808,14 +1811,36 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
 
     $duplicates = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
-    $this->assertEquals($conflicts['safe'], $duplicates['values'][0]['safe']);
+    $this->assertEquals($conflicts['safe']['conflicts'], $duplicates['values'][0]['safe']['conflicts']);
   }
 
+  /**
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetConflictsAggressiveMode() {
+    list($contact1, $contact2) = $this->createDeeplyConflictedContacts();
+    $conflicts = $this->callAPISuccess('Contact', 'get_merge_conflicts', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2, 'mode' => ['safe', 'aggressive']])['values'];
+    $this->assertEquals([
+      'contact' => [
+        'external_identifier' => 'uniquer and specialler',
+        'first_name' => 'different',
+        'custom_1' => 'mummy loves me more',
+      ],
+    ], $conflicts['aggressive']['resolved']);
+  }
+
+  /**
+   * Create inherited membership type for employer relationship.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
   private function createEmployerOfMembership() {
     $params = [
       'domain_id' => CRM_Core_Config::domainID(),
       'name' => 'Organization Membership',
-      'description' => NULL,
       'member_of_contact_id' => 1,
       'financial_type_id' => 1,
       'minimum_fee' => 10,
@@ -1828,7 +1853,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
-    return $membershipType["values"][$membershipType["id"]];
+    return $membershipType['values'][$membershipType['id']];
   }
 
   /**
@@ -2070,6 +2095,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test civicrm_contact_get(,true) with space in sort_name.
+   */
+  public function testContactGetSpaceMatches() {
+    $contactParams_1 = [
+      'first_name' => 'Sanford',
+      'last_name' => 'Blackwell',
+      'sort_name' => 'Blackwell, Sanford',
+      'contact_type' => 'Individual',
+    ];
+    $this->individualCreate($contactParams_1);
+
+    $contactParams_2 = [
+      'household_name' => 'Blackwell family',
+      'sort_name' => 'Blackwell family',
+      'contact_type' => 'Household',
+    ];
+    $this->individualCreate($contactParams_2);
+
+    $result = $this->callAPISuccess('contact', 'get', ['sort_name' => 'Blackwell F']);
+    $this->assertEquals(1, $result['count']);
+  }
+
+  /**
    * Test civicrm_contact_search_count().
    */
   public function testContactGetEmail() {
@@ -2120,6 +2168,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Ensure consistent return format for option group fields.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPseudoFields() {
     $params = [
@@ -2156,6 +2206,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * These include value, array & birth_date_high, birth_date_low
    * && deceased.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactGetBirthDate() {
     $contact1 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, ['birth_date' => 'first day of next month - 2 years']));
@@ -3234,6 +3286,65 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that getquick returns contacts with different cases of phone substring.
+   */
+  public function testGetQuickPhone() {
+    $this->getQuickSearchSampleData();
+    $criterias = [
+      [
+        'criteria' => [
+          'name' => '87-6',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 2,
+        'sort_names' => [
+          'I Bobby, Bobby',
+          'J Bobby, Bobby',
+        ],
+      ],
+      [
+        'criteria' => [
+          'name' => '876-1',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 1,
+        'sort_names' => [
+          'I Bobby, Bobby',
+        ],
+      ],
+      [
+        'criteria' => [
+          'name' => '87623',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 1,
+        'sort_names' => [
+          'J Bobby, Bobby',
+        ],
+      ],
+      [
+        'criteria' => [
+          'name' => '8a7abc6',
+          'field_name' => 'phone_numeric',
+        ],
+        'count' => 2,
+        'sort_names' => [
+          'I Bobby, Bobby',
+          'J Bobby, Bobby',
+        ],
+      ],
+    ];
+
+    foreach ($criterias as $criteria) {
+      $result = $this->callAPISuccess('contact', 'getquick', $criteria['criteria']);
+      $this->assertEquals($result['count'], $criteria['count']);
+      foreach ($criteria['sort_names'] as $key => $sortName) {
+        $this->assertEquals($sortName, $result['values'][$key]['sort_name']);
+      }
+    }
+  }
+
+  /**
    * Test that getquick returns contacts with an exact first name match first.
    *
    * Depending on the setting the sort name sort might click in next or not - test!
@@ -3383,8 +3494,28 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ['first_name' => 'Bobby', 'last_name' => 'F Bobby', 'external_identifier' => 'klm'],
       ['first_name' => 'Bobby', 'last_name' => 'G Bobby', 'external_identifier' => 'nop'],
       ['first_name' => 'Bobby', 'last_name' => 'H Bobby', 'external_identifier' => 'qrs', 'email' => 'bob@h.com'],
-      ['first_name' => 'Bobby', 'last_name' => 'I Bobby'],
-      ['first_name' => 'Bobby', 'last_name' => 'J Bobby'],
+      [
+        'first_name' => 'Bobby',
+        'last_name' => 'I Bobby',
+        'api.phone.create' => [
+          'phone' => '876-123',
+          'phone_ext' => '444',
+          "phone_type_id" => "Phone",
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
+      [
+        'first_name' => 'Bobby',
+        'last_name' => 'J Bobby',
+        'api.phone.create' => [
+          'phone' => '87-6-234',
+          'phone_ext' => '134',
+          "phone_type_id" => "Phone",
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
       ['first_name' => 'Bob', 'last_name' => 'K Bobby', 'external_identifier' => 'bcdef'],
       ['first_name' => 'Bob', 'last_name' => 'Aadvark'],
     ];
@@ -4299,7 +4430,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
 
     $ssParams = [
-      'formValues' => [
+      'form_values' => [
         // Child of
         'display_relationship_type' => $rtype1['id'] . '_a_b',
         'sort_name' => 'Adams',
@@ -4307,14 +4438,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ];
     $g1ID = $this->smartGroupCreate($ssParams, ['name' => uniqid(), 'title' => uniqid()]);
     $ssParams = [
-      'formValues' => [
+      'form_values' => [
         // Household Member of
         'display_relationship_type' => $rtype2['id'] . '_a_b',
       ],
     ];
     $g2ID = $this->smartGroupCreate($ssParams, ['name' => uniqid(), 'title' => uniqid()]);
     $ssParams = [
-      'formValues' => [
+      'form_values' => [
         // Household Member is
         'display_relationship_type' => $rtype2['id'] . '_b_a',
       ],
@@ -4322,12 +4453,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // the reverse of g2 which adds another layer for overlap at related contact filter
     $g3ID = $this->smartGroupCreate($ssParams, ['name' => uniqid(), 'title' => uniqid()]);
     CRM_Contact_BAO_GroupContactCache::loadAll();
-    $g1Contacts = $this->callAPISuccess('contact', 'get', ['group' => $g1ID]);
-    $g2Contacts = $this->callAPISuccess('contact', 'get', ['group' => $g2ID]);
-    $g3Contacts = $this->callAPISuccess('contact', 'get', ['group' => $g3ID]);
-    $this->assertTrue($g1Contacts['count'] == 1);
-    $this->assertTrue($g2Contacts['count'] == 2);
-    $this->assertTrue($g3Contacts['count'] == 1);
+    $this->callAPISuccessGetCount('contact', ['group' => $g1ID], 1);
+    $this->callAPISuccessGetCount('contact', ['group' => $g2ID], 2);
+    $this->callAPISuccessGetCount('contact', ['group' => $g3ID], 1);
   }
 
   /**
@@ -4420,6 +4548,33 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'id' => $contact['id'],
       'skip_undelete' => TRUE,
     ]);
+  }
+
+  /**
+   * Create pair of contacts with multiple conflicts.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createDeeplyConflictedContacts(): array {
+    $this->createCustomGroupWithFieldOfType();
+    $contact1 = $this->individualCreate([
+      'email' => 'bob@example.com',
+      'api.address.create' => ['location_type_id' => 'work', 'street_address' => 'big office', 'city' => 'small city'],
+      'api.address.create.2' => ['location_type_id' => 'home', 'street_address' => 'big house', 'city' => 'small city'],
+      'external_identifier' => 'unique and special',
+      $this->getCustomFieldName('text') => 'mummy loves me',
+    ]);
+    $contact2 = $this->individualCreate([
+      'first_name' => 'different',
+      'api.address.create.1' => ['location_type_id' => 'home', 'street_address' => 'medium house', 'city' => 'small city'],
+      'api.address.create.2' => ['location_type_id' => 'work', 'street_address' => 'medium office', 'city' => 'small city'],
+      'external_identifier' => 'uniquer and specialler',
+      'api.email.create' => ['location_type_id' => 'Other', 'email' => 'bob@example.com'],
+      $this->getCustomFieldName('text') => 'mummy loves me more',
+    ]);
+    return [$contact1, $contact2];
   }
 
 }

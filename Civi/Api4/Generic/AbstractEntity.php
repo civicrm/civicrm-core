@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -46,17 +30,20 @@ use Civi\API\Exception\NotImplementedException;
  *
  * The recommended way to create a non-DAO-based api is to extend this class
  * and then add a getFields function and any other actions you wish, e.g.
- * - a get() function which returns BasicGetAction using your custom getter callback
- * - a create() function which returns BasicCreateAction using your custom setter callback
- * - an update() function which returns BasicUpdateAction using your custom setter callback
- * - a delete() function which returns BasicBatchAction using your custom delete callback
+ * - a get() function which returns BasicGetAction using your custom getter callback.
+ * - a create() function which returns BasicCreateAction using your custom setter callback.
+ * - a save() function which returns BasicSaveAction using your custom setter callback.
+ * - an update() function which returns BasicUpdateAction using your custom setter callback.
+ * - a delete() function which returns BasicBatchAction using your custom delete callback.
  * - a replace() function which returns BasicReplaceAction (no callback needed but
- *   depends on the existence of get, create, update & delete actions)
+ *   depends on the existence of get, save & delete actions).
  *
  * Note that you can use the same setter callback function for update as create -
  * that function can distinguish between new & existing records by checking if the
  * unique identifier has been set (identifier field defaults to "id" but you can change
- * that when constructing BasicUpdateAction)
+ * that when constructing BasicUpdateAction).
+ *
+ * @see https://lab.civicrm.org/extensions/api4example
  */
 abstract class AbstractEntity {
 
@@ -68,13 +55,9 @@ abstract class AbstractEntity {
   }
 
   /**
-   * Should return \Civi\Api4\Generic\BasicGetFieldsAction
-   * @todo make this function abstract when we require php 7.
-   * @throws \Civi\API\Exception\NotImplementedException
+   * @return \Civi\Api4\Generic\BasicGetFieldsAction
    */
-  public static function getFields() {
-    throw new NotImplementedException(self::getEntityName() . ' should implement getFields action.');
-  }
+  abstract public static function getFields();
 
   /**
    * Returns a list of permissions needed to access the various actions in this api.

@@ -96,8 +96,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     // be more complete.
     if (!empty($params['credit_card_exp_date']['Y']) && date('Y') >
       CRM_Core_Payment_Form::getCreditCardExpirationYear($params)) {
-      $error = new CRM_Core_Error(ts('transaction failed'));
-      return $error;
+      throw new PaymentProcessorException(ts('Invalid expiry date'));
     }
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {
@@ -128,19 +127,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     // Add a fee_amount so we can make sure fees are handled properly in underlying classes.
     $params['fee_amount'] = 1.50;
     $params['net_amount'] = $params['gross_amount'] - $params['fee_amount'];
+    $params['description'] = $this->getPaymentDescription($params);
 
     return $params;
-  }
-
-  /**
-   * Are back office payments supported.
-   *
-   * E.g paypal standard won't permit you to enter a credit card associated with someone else's login.
-   *
-   * @return bool
-   */
-  protected function supportsLiveMode() {
-    return TRUE;
   }
 
   /**

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  * Table naming rules:
  *   - MySQL imposes a 64 char limit.
@@ -141,12 +125,35 @@ class CRM_Utils_SQL_TempTable {
     $sql = sprintf('%s %s %s AS %s',
       $this->toSQL('CREATE'),
       $this->memory ? self::MEMORY : self::INNODB,
-      $this->utf8 ? self::UTF8 : '',
+      $this->getUtf8String(),
       ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
     );
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
     return $this;
+  }
+
+  /**
+   * Get the utf8 string for the table.
+   *
+   * If the db collation is already utf8 by default (either
+   * utf8 or utf84mb) then rely on that. Otherwise set to utf8.
+   *
+   * Respecting the DB collation supports utf8mb4 adopters, which is currently
+   * not the norm in civi installs.
+   *
+   * @return string
+   */
+  public function getUtf8String() {
+    if (!$this->utf8) {
+      return '';
+    }
+    $dbUTF = CRM_Core_BAO_SchemaHandler::getDBCollation();
+    if (in_array($dbUTF, ['utf8_unicode_ci', 'utf8mb4_unicode_ci'])
+      && in_array($dbUTF, ['utf8', 'utf8mb4'])) {
+      return '';
+    }
+    return self::UTF8;
   }
 
   /**
@@ -268,7 +275,7 @@ class CRM_Utils_SQL_TempTable {
    */
   public function setCategory($category) {
     if ($category && !preg_match(self::CATEGORY_REGEXP, $category) || strlen($category) > self::CATEGORY_LENGTH) {
-      throw new \RuntimeException("Malformed temp table category");
+      throw new \RuntimeException("Malformed temp table category $category");
     }
     $this->category = $category;
     return $this;

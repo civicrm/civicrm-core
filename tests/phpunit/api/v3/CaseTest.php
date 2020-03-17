@@ -651,15 +651,19 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'status_id' => "Open",
       'return' => ['contacts'],
     ]);
+
+    $foundManager = FALSE;
     foreach ($result['contacts'] as $contact) {
       if ($contact['role'] == 'Client') {
         $this->assertEquals(17, $contact['contact_id']);
       }
-      elseif ($contact['role'] == 'Homeless Services Coordinator') {
+      elseif ($contact['role'] == 'Homeless Services Coordinator is') {
         $this->assertEquals(1, $contact['creator']);
         $this->assertEquals(1, $contact['manager']);
+        $foundManager = TRUE;
       }
     }
+    $this->assertTrue($foundManager);
   }
 
   public function testCaseGetWithDefinition() {

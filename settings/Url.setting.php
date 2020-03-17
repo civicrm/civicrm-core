@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -41,7 +25,7 @@ return [
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'userFrameworkResourceURL',
-    'title' => 'CiviCRM Resource URL',
+    'title' => ts('CiviCRM Resource URL'),
     'type' => 'String',
     'html_type' => 'text',
     'quick_form_type' => 'Element',
@@ -49,7 +33,7 @@ return [
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Absolute URL of the location where the civicrm module or component has been installed.',
+    'description' => ts('Absolute URL of the location where the civicrm module or component has been installed.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
   ],
@@ -57,7 +41,7 @@ return [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
-    'title' => 'Image Upload URL',
+    'title' => ts('Image Upload URL'),
     'name' => 'imageUploadURL',
     'type' => 'String',
     'html_type' => 'text',
@@ -66,7 +50,7 @@ return [
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'URL of the location for uploaded image files.',
+    'description' => ts('URL of the location for uploaded image files.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
   ],
@@ -75,7 +59,7 @@ return [
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'customCSSURL',
-    'title' => 'Custom CSS URL',
+    'title' => ts('Custom CSS URL'),
     'type' => 'String',
     'html_type' => 'text',
     'quick_form_type' => 'Element',
@@ -83,7 +67,7 @@ return [
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.',
+    'description' => ts('You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
   ],
@@ -91,7 +75,7 @@ return [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
-    'title' => 'Extension Resource URL',
+    'title' => ts('Extension Resource URL'),
     'name' => 'extensionsURL',
     'type' => 'String',
     'html_type' => 'text',
@@ -100,7 +84,7 @@ return [
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Base URL for extension resources (images, stylesheets, etc). This should match extensionsDir.',
+    'description' => ts('Base URL for extension resources (images, stylesheets, etc). This should match extensionsDir.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
   ],

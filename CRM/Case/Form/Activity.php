@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -97,12 +81,12 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if (!$this->_caseId ||
       (!$this->_activityId && !$this->_activityTypeId)
     ) {
-      CRM_Core_Error::fatal('required params missing.');
+      CRM_Core_Error::statusBounce(ts('required params missing.'));
     }
 
     //check for case activity access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
     }
     //validate case id.
     if ($this->_caseId &&
@@ -111,7 +95,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $params = ['type' => 'any'];
       $allCases = CRM_Case_BAO_Case::getCases(TRUE, $params);
       if (count(array_intersect($this->_caseId, array_keys($allCases))) == 0) {
-        CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
       }
     }
 
@@ -123,7 +107,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $this->_activityTypeId
       );
       if (!$valid) {
-        CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
       }
     }
 
@@ -463,13 +447,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         }
       }
 
-      // build custom data getFields array
-      $customFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE, $this->_activityTypeId);
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-        CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
-          NULL, NULL, TRUE
-        )
-      );
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_activityId,
         'Activity'
@@ -518,6 +495,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
     else {
+      // create a new version of activity if activity was found to
+      // have been modified/created by user
+
       // since the params we need to set are very few, and we don't want rest of the
       // work done by bao create method , lets use dao object to make the changes
       $params = ['id' => $this->_activityId];
@@ -525,11 +505,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $activity = new CRM_Activity_DAO_Activity();
       $activity->copyValues($params);
       $activity->save();
-    }
 
-    // create a new version of activity if activity was found to
-    // have been modified/created by user
-    if (isset($newActParams)) {
       // set proper original_id
       if (!empty($this->_defaults['original_id'])) {
         $newActParams['original_id'] = $this->_defaults['original_id'];
@@ -622,11 +598,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       foreach ($selectedContacts as $dnt => $val) {
         if (array_key_exists($val, $params) && !CRM_Utils_Array::crmIsEmptyArray($params[$val])) {
           if ($val == 'contact_check') {
-            $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
+            $mailStatus = ts("A copy of the activity has also been sent to selected contact(s).");
           }
           else {
             $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$vval['actId']], TRUE, FALSE);
-            $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contacts(s).");
+            $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contact(s).");
           }
           //build an associative array with unique email addresses.
           foreach ($params[$val] as $key => $value) {

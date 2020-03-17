@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/common/pager.tpl" location="top"}
@@ -51,7 +35,7 @@
 
     {counter start=0 skip=1 print=false}
     {foreach from=$rows item=row}
-      <tr id="rowid{$row.contribution_id}" class="{cycle values="odd-row,even-row"} {if $row.cancel_date} cancelled{/if} crm-contribution_{$row.contribution_id}">
+      <tr id="rowid{$row.contribution_id}" class="{cycle values="odd-row,even-row"} {if $row.contribution_cancel_date} cancelled{/if} crm-contribution_{$row.contribution_id}">
         {if !$single }
           {if $context eq 'Search' }
             {assign var=cbName value=$row.checkbox}
@@ -72,11 +56,11 @@
         {if !$columnName}{* if field_name has not been set skip, this helps with not changing anything not specifically edited *}
         {elseif $columnName === 'total_amount'}{* rendered above as soft credit columns = confusing *}
         {elseif $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
-        {elseif $columnName == 'contribution-status'}
+        {elseif $columnName == 'contribution_status'}
           <td class="crm-contribution-status">
             {$row.contribution_status}<br/>
-            {if $row.cancel_date}
-              {$row.cancel_date|crmDate}
+            {if $row.contribution_cancel_date}
+              {$row.contribution_cancel_date|crmDate}
             {/if}
           </td>
         {else}

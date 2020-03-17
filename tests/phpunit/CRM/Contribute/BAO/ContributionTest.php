@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info'AT'civicrm'DOT'org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -44,6 +28,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test create method (create and update modes).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreate() {
     $contactId = $this->individualCreate();
@@ -537,40 +523,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check credit note id creation
-   * when a contribution is cancelled or refunded
-   * createCreditNoteId();
-   */
-  public function testCreateCreditNoteId() {
-    $contactId = $this->individualCreate();
-
-    $param = [
-      'contact_id' => $contactId,
-      'currency' => 'USD',
-      'financial_type_id' => 1,
-      'contribution_status_id' => 3,
-      'payment_instrument_id' => 1,
-      'source' => 'STUDENT',
-      'receive_date' => '20080522000000',
-      'receipt_date' => '20080522000000',
-      'id' => NULL,
-      'non_deductible_amount' => 0.00,
-      'total_amount' => 300.00,
-      'fee_amount' => 5,
-      'net_amount' => 295,
-      'trxn_id' => '76ereeswww835',
-      'invoice_id' => '93ed39a9e9hd621bs0eafe3da82',
-      'thankyou_date' => '20080522',
-      'sequential' => TRUE,
-    ];
-
-    $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
-    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
-    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
-    $this->assertEquals($creditNoteId, $contribution['creditnote_id'], 'Check if credit note id is created correctly.');
-  }
-
-  /**
    * Create() method (create and update modes).
    */
   public function testIsPaymentFlag() {
@@ -687,15 +639,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * addPayments() method (add and edit modes of participant)
-   */
-  public function testAddPayments() {
-    list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    CRM_Contribute_BAO_Contribution::addPayments([$contribution]);
-    $this->checkItemValues($contribution);
-  }
-
-  /**
    * checks db values for financial item
    */
   public function checkItemValues($contribution) {
@@ -717,9 +660,16 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * assignProportionalLineItems() method (add and edit modes of participant)
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testAssignProportionalLineItems() {
-    list($lineItems, $contribution) = $this->addParticipantWithContribution();
+    $contribution = $this->addParticipantWithContribution();
+    // Delete existing financial_trxns. This is because we are testing a code flow we
+    // want to deprecate & remove & the test relies on bad data asa starting point.
+    // End goal is the Order.create->Payment.create flow.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_financial_trxn WHERE entity_table = "civicrm_financial_item"');
     $params = [
       'contribution_id' => $contribution->id,
       'total_amount' => 150.00,
@@ -735,25 +685,16 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * Add participant with contribution
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function addParticipantWithContribution() {
     // creating price set, price field
     $this->_contactId = $this->individualCreate();
-    $event = $this->eventCreate();
+    $event = $this->eventCreatePaid([]);
     $this->_eventId = $event['id'];
-    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
-    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
-    $paramsSet['is_active'] = TRUE;
-    $paramsSet['financial_type_id'] = 4;
-    $paramsSet['extends'] = 1;
-
-    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
-    $priceSetId = $priceset->id;
-
-    //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created priceset'
-    );
+    $priceSetId = $this->priceSetID;
     $paramsField = [
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
@@ -767,7 +708,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => ['1' => 1, '2' => 1],
-      'price_set_id' => $priceset->id,
+      'price_set_id' => $this->priceSetID,
       'is_enter_qty' => 1,
       'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
     ];
@@ -791,16 +732,15 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
     $participant = CRM_Event_BAO_Participant::add($participantParams);
     $contributionParams = [
-      'total_amount' => 150,
+      'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
-      'contribution_status_id' => 1,
-      'partial_payment_total' => 300.00,
-      'partial_amount_to_pay' => 150,
+      'contribution_status_id' => 'Pending',
       'contribution_mode' => 'participant',
       'participant_id' => $participant->id,
       'sequential' => TRUE,
+      'api.Payment.create' => ['total_amount' => 150],
     ];
 
     foreach ($priceFields['values'] as $key => $priceField) {
@@ -828,7 +768,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $contributionObject->id = $contribution['id'];
     $contributionObject->find(TRUE);
 
-    return [$lineItems, $contributionObject];
+    return $contributionObject;
   }
 
   /**
@@ -1168,6 +1108,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test recording of amount with comma separator.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCommaSeparatorAmount() {
     $contactId = $this->individualCreate();
@@ -1176,16 +1118,15 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $contactId,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'contribution_status_id' => 8,
+      'contribution_status_id' => 'Pending',
       'payment_instrument_id' => 1,
       'receive_date' => '20080522000000',
       'receipt_date' => '20080522000000',
-      'total_amount' => '20000.00',
-      'partial_payment_total' => '20,000.00',
-      'partial_amount_to_pay' => '8,000.00',
+      'total_amount' => '20,000.00',
+      'api.Payment.create' => ['total_amount' => '8,000.00'],
     ];
 
-    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $contribution = $this->callAPISuccess('Order', 'create', $params);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
@@ -1194,7 +1135,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'return' => ['total_amount'],
       ]
     );
-    $this->assertEquals($financialTrxn['total_amount'], 8000, 'Invalid Tax amount.');
+    $this->assertEquals($financialTrxn['total_amount'], 8000, 'Invalid amount.');
   }
 
   /**

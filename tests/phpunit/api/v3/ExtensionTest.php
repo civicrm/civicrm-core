@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -86,9 +70,11 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * CRM-20532
    */
   public function testExtensionGet() {
-    $result = $this->callAPISuccess('extension', 'get', []);
+    $result = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
     $testExtensionResult = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.paymenttest']);
-    $this->assertNotNull($result['values'][$testExtensionResult['id']]['typeInfo']);
+    $ext = $result['values'][$testExtensionResult['id']];
+    $this->assertNotNull($ext['typeInfo']);
+    $this->assertEquals(['mock'], $ext['tags']);
     $this->assertTrue($result['count'] >= 6);
   }
 
@@ -96,8 +82,8 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Filtering by status=installed or status=uninstalled should produce different results.
    */
   public function testExtensionGetByStatus() {
-    $installed = $this->callAPISuccess('extension', 'get', ['status' => 'installed']);
-    $uninstalled = $this->callAPISuccess('extension', 'get', ['status' => 'uninstalled']);
+    $installed = $this->callAPISuccess('extension', 'get', ['status' => 'installed', 'options' => ['limit' => 0]]);
+    $uninstalled = $this->callAPISuccess('extension', 'get', ['status' => 'uninstalled', 'options' => ['limit' => 0]]);
 
     // If the filter works, then results should be strictly independent.
     $this->assertEquals(
@@ -108,7 +94,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
       )
     );
 
-    $all = $this->callAPISuccess('extension', 'get', []);
+    $all = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
     $this->assertEquals($all['count'], $installed['count'] + $uninstalled['count']);
   }
 

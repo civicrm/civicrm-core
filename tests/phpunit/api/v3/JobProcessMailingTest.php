@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -144,6 +128,38 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that "multiple bulk email recipients" setting is respected.
+   */
+  public function testMultipleBulkRecipients() {
+    Civi::settings()->add([
+      'civimail_multiple_bulk_emails' => 1,
+    ]);
+    $contactID = $this->individualCreate(['first_name' => 'test recipient']);
+    $email1 = $this->callAPISuccess('email', 'create', [
+      'contact_id' => $contactID,
+      'email' => 'mail1@example.org',
+      'is_bulkmail' => 1,
+    ]);
+    $email2 = $this->callAPISuccess('email', 'create', [
+      'contact_id' => $contactID,
+      'email' => 'mail2@example.org',
+      'is_bulkmail' => 1,
+    ]);
+    $this->callAPISuccess('group_contact', 'create', [
+      'contact_id' => $contactID,
+      'group_id' => $this->_groupID,
+      'status' => 'Added',
+    ]);
+    $mailing = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $this->assertEquals(2, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
+    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->_mut->assertRecipients([['mail1@example.org'], ['mail2@example.org']]);
+    // Don't leave data lying around for other tests to screw up on.
+    $this->callAPISuccess('Email', 'delete', ['id' => $email1['id']]);
+    $this->callAPISuccess('Email', 'delete', ['id' => $email2['id']]);
+  }
+
+  /**
    * Test pause and resume on Mailing.
    */
   public function testPauseAndResumeMailing() {
@@ -177,6 +193,12 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     //Execute the job and it should send the mailing to the recipients now.
     $this->callAPISuccess('job', 'process_mailing', []);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    // Ensure that loading the report produces no errors.
+    $report = CRM_Mailing_BAO_Mailing::report($result['id']);
+    // dev/mailing#56 dev/mailing#57 Ensure that for completed mailings the jobs array is not empty.
+    $this->assertTrue(!empty($report['jobs']));
+    // Ensure that mailing name is correctly stored in the report.
+    $this->assertEquals('mailing name', $report['mailing']['name']);
   }
 
   /**
@@ -199,7 +221,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('mailing', 'create', $this->_params);
     $this->_mut->assertRecipients([]);
-    $this->callAPIFailure('job', 'process_mailing', "Failure in api call for job process_mailing:  Job has not been executed as it is a non-production environment.");
+    $result = $this->callAPIFailure('job', 'process_mailing', []);
+    $this->assertEquals($result['error_message'], "Job has not been executed as it is a Staging (non-production) environment.");
 
     // Test with runInNonProductionEnvironment param.
     $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);

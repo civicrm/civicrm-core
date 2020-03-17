@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -106,6 +90,33 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
         $role->revokePermission($permission);
       }
     }
+  }
+
+  /**
+   * Given a roles array, check user has at least one of those roles
+   *
+   * @param array $roles_to_check
+   *   The roles to check. An array indexed starting at 0, e.g. [0 => 'administrator']
+   *
+   * @return bool
+   *   true if user has at least one of the roles, else false
+   */
+  public function checkGroupRole($roles_to_check) {
+    if (isset($roles_to_check)) {
+
+      // This returns an array indexed starting at 0 of role machine names, e.g.
+      // [
+      //   0 => 'authenticated',
+      //   1 => 'administrator',
+      // ]
+      // or
+      // [ 0 => 'anonymous' ]
+      $user_roles = \Drupal::currentUser()->getRoles();
+
+      $roles_in_both = array_intersect($user_roles, $roles_to_check);
+      return !empty($roles_in_both);
+    }
+    return FALSE;
   }
 
 }

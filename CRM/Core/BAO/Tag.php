@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
@@ -349,10 +333,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $allTags[$id] = [
         'text' => $tag['name'],
         'id' => $id,
-        'description' => CRM_Utils_Array::value('description', $tag),
-        'parent_id' => CRM_Utils_Array::value('parent_id', $tag),
-        'used_for' => CRM_Utils_Array::value('used_for', $tag),
-        'color' => CRM_Utils_Array::value('color', $tag),
+        'description' => $tag['description'] ?? NULL,
+        'parent_id' => $tag['parent_id'] ?? NULL,
+        'used_for' => $tag['used_for'] ?? NULL,
+        'color' => $tag['color'] ?? NULL,
       ];
       if (!$allowSelectingNonSelectable && empty($tag['is_selectable'])) {
         $allTags[$id]['disabled'] = TRUE;
@@ -409,7 +393,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   object on success, otherwise null
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
+    $id = $params['id'] ?? $ids['tag'] ?? NULL;
     if (!$id && !self::dataExists($params)) {
       return NULL;
     }
@@ -468,6 +452,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
         ]
       );
     }
+
+    CRM_Core_PseudoConstant::flush();
 
     return $tag;
   }

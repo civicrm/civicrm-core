@@ -157,7 +157,7 @@ class TokenRow {
    * @param string $tokenEntity
    * @param string $tokenField
    * @param string $baoName
-   * @param array $baoField
+   * @param string $baoField
    * @param mixed $fieldValue
    * @return TokenRow
    * @throws \CRM_Core_Exception

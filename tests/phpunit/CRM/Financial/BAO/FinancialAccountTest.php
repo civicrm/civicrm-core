@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -262,7 +246,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   public function testValidateFinancialAccount() {
     // Create a record with financial item having financial account as Event Fee.
-    $this->createParticipantWithContribution();
+    $this->createPartiallyPaidParticipantOrder();
     $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
     $financialAccountId = array_search('Event Fee', $financialAccounts);
     $message = CRM_Financial_BAO_FinancialAccount::validateFinancialAccount($financialAccountId);
@@ -274,9 +258,11 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
   /**
    * Test for validating financial type has deferred revenue account relationship.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testcheckFinancialTypeHasDeferred() {
-    Civi::settings()->set('deferred_revenue_enabled', 1);
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $params = [];
     $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
     $this->assertFalse($valid, "This should have been false");
@@ -357,7 +343,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    * CRM-20037: Test balance due amount, if contribution is done using deferred Financial Type
    */
   public function testBalanceDueIfDeferredRevenueEnabled() {
-    Civi::settings()->set('contribution_invoice_settings', ['deferred_revenue_enabled' => '1']);
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $deferredFinancialTypeID = $this->_createDeferredFinancialAccount();
 
     $totalAmount = 100.00;
@@ -374,7 +360,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     ]);
     $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($contribution['id'], $totalAmount);
     $this->assertEquals(0.0, $balance);
-    Civi::settings()->revert('contribution_invoice_settings');
+    Civi::settings()->set('deferred_revenue_enabled', FALSE);
   }
 
   /**

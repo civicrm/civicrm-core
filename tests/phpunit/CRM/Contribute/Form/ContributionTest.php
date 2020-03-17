@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -37,7 +21,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
@@ -88,6 +71,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp() {
     $this->_apiversion = 3;
@@ -133,10 +119,21 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
+  }
+
+  /**
+   * CHeck that all tests that have created payments have created them with the right financial entities.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
   }
 
   /**
@@ -982,6 +979,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function that completes the partially paid payment using Credit Card
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testPartialPaymentWithCreditCard() {
     // create a partially paid contribution by using back-office form
@@ -994,23 +994,23 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'check_number' => substr(sha1(rand()), 0, 7),
         'billing_city-5' => 'Vancouver',
-        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       ], CRM_Core_Action::ADD
     );
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertNotEmpty($contribution);
+    $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 10, 'payment_instrument_id' => 'Cash']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
     // pay additional amount by using Credit Card
     $form = new CRM_Contribute_Form_AdditionalPayment();
     $form->testSubmit([
       'contribution_id' => $contribution['id'],
       'contact_id' => $this->_individualId,
-      'total_amount' => 50,
+      'total_amount' => 40,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',
@@ -1080,6 +1080,10 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function for FT without tax.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function testSubmitWithOutSaleTax() {
     $this->enableTaxAndInvoicing();
@@ -1104,15 +1108,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals(NULL, $contribution['tax_amount']);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 1);
     $this->callAPISuccessGetCount('FinancialItem', [], 1);
-    $lineItem = $this->callAPISuccessGetSingle(
-      'LineItem',
-      [
-        'contribution_id' => $contribution['id'],
-        'return' => ['line_total', 'tax_amount'],
-      ]
-    );
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'return' => ['line_total', 'tax_amount'],
+    ]);
     $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertTrue(empty($lineItem['tax_amount']));
+    $this->assertEquals(0.00, $lineItem['tax_amount']);
   }
 
   /**
@@ -1315,6 +1316,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Check payment processor is correctly assigned for a contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function testContributionBasePreProcess() {
     //Create contribution page with only pay later enabled.
@@ -1324,6 +1328,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'currency' => 'NZD',
       'goal_amount' => 100,
       'is_pay_later' => 1,
+      'pay_later_text' => 'Send check',
       'is_monetary' => TRUE,
       'is_active' => TRUE,
       'is_email_receipt' => TRUE,

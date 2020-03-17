@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                            |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -147,9 +129,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * be transferred to this participant - at this point no transaction changes processed
    *
    * return @void
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
     $this->_from_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
@@ -171,7 +154,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     if ($this->_from_participant_id) {
       $this->assign('participantId', $this->_from_participant_id);
     }
-    $event = [];
+
     $daoName = 'title';
     $this->_event_title = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
     $daoName = 'start_date';
@@ -179,25 +162,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_from_contact_id);
     $this->_contact_name = $displayName;
     $this->_contact_email = $email;
-    $details = [];
+
     $details = CRM_Event_BAO_Participant::participantDetails($this->_from_participant_id);
-    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
-    $query = "
-      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, civicrm_event.start_date
-      FROM civicrm_participant cp
-      LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
-      LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
-      LEFT JOIN civicrm_event ON civicrm_event.id = cp.event_id
-      WHERE cp.id = {$this->_from_participant_id}";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $details['status']  = $dao->status;
-      $details['role'] = $dao->role;
-      $details['fee_level']   = $dao->fee_level;
-      $details['fee_amount'] = $dao->fee_amount;
-      $details['register_date'] = $dao->register_date;
-      $details['event_start_date'] = $dao->start_date;
-    }
+    $selfServiceDetails = CRM_Event_BAO_Participant::getSelfServiceEligibility($this->_from_participant_id, $url, $this->isBackoffice);
+    $details = array_merge($details, $selfServiceDetails);
     $this->assign('details', $details);
     //This participant row will be cancelled.  Get line item(s) to cancel
     $this->selfsvctransferUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate',
@@ -291,10 +259,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     if (empty($errors) && empty($contact_id)) {
       $params = [
-        'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
-        'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
-        'last_name' => CRM_Utils_Array::value('last_name', $fields, NULL),
-        'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, FALSE),
+        'email-Primary' => $fields['email'] ?? NULL,
+        'first_name' => $fields['first_name'] ?? NULL,
+        'last_name' => $fields['last_name'] ?? NULL,
+        'is_deleted' => $fields['is_deleted'] ?? FALSE,
       ];
       //create new contact for this name/email pair
       //if new contact, no need to check for contact already registered
@@ -312,7 +280,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     // verify whether this contact already registered for this event
     $contact_details = CRM_Contact_BAO_Contact::getContactDetails($contact_id);
     $display_name = $contact_details[0];
-    $query = "select event_id from civicrm_participant where contact_id = " . $contact_id;
+    $query = 'select event_id from civicrm_participant where contact_id = ' . $contact_id;
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $to_event_id[] = $dao->event_id;
@@ -329,6 +297,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   /**
    * Process transfer - first add the new participant to the event, then cancel
    * source participant - send confirmation email to transferee
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     //For transfer, process form to allow selection of transferree
@@ -340,7 +310,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       //cancel 'from' participant row
       $contact_id_result = civicrm_api3('Contact', 'get', [
         'sequential' => 1,
-        'return' => ["id"],
+        'return' => ['id'],
         'email' => $params['email'],
         'options' => ['limit' => 1],
       ]);
@@ -351,8 +321,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('Contact does not exist.'));
       }
     }
-    $from_participant = $params = [];
-    $query = "select role_id, source, fee_level, is_test, is_pay_later, fee_amount, discount_id, fee_currency,campaign_id, discount_amount from civicrm_participant where id = " . $this->_from_participant_id;
+
+    $query = 'select role_id, source, fee_level, is_test, is_pay_later, fee_amount, discount_id, fee_currency,campaign_id, discount_amount from civicrm_participant where id = ' . $this->_from_participant_id;
     $dao = CRM_Core_DAO::executeQuery($query);
     $value_to = [];
     while ($dao->fetch()) {
@@ -413,6 +383,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * Based on input, create participant row for transferee and send email
    *
    * return @ void
+   *
+   * @throws \CRM_Core_Exception
    */
   public function participantTransfer($participant) {
     $contactDetails = [];
@@ -490,8 +462,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'from' => $receiptFrom,
         'toName' => $participantName,
         'toEmail' => $toEmail,
-        'cc' => CRM_Utils_Array::value('cc_confirm', $eventDetails),
-        'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventDetails),
+        'cc' => $eventDetails['cc_confirm'] ?? NULL,
+        'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
       ];
       CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
@@ -518,7 +490,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     foreach ($tokens['domain'] as $token) {
       $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
     }
-    $participantRoles = [];
+
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
     $query = "SELECT * FROM civicrm_participant WHERE id = {$this->_from_participant_id}";

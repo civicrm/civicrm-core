@@ -1,33 +1,17 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting memberships for a contact  *}
 {if $cancelAutoRenew}
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
-    <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type or Membership Status. <a href="%1">Click here</a> if you want to cancel the automatic renewal option.{/ts}</p>
+    <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type or Membership Status: <a href="%1">Cancel auto-renew</a>{/ts}</p>
   </div>
 {/if}
 <div class="spacer"></div>
@@ -83,14 +67,10 @@
     </div>
     {else}
       <table class="form-layout-compressed">
-        {if $context neq 'standalone'}
-          <tr>
-            <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
-          </tr>
-        {else}
-          <td class="label">{$form.contact_id.label}</td>
-          <td>{$form.contact_id.html}</td>
-        {/if}
+        <tr class="crm-membership-form-contact-id">
+           <td class="label">{$form.contact_id.label}</td>
+           <td>{$form.contact_id.html}</td>
+        </tr>
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
           <td><span id='mem_type_id'>{$form.membership_type_id.html}</span>
@@ -110,7 +90,7 @@
         <tr id="maxRelated" class="crm-membership-form-block-max_related">
           <td class="label">{$form.max_related.label}</td>
           <td>{$form.max_related.html}<br />
-            <span class="description">{ts}Maximum number of related memberships (leave blank for unlimited).{/ts}</span>
+            <span class="description">{ts}Maximum number of related memberships (leave blank for unlimited).{/ts} <span id="eligibleRelated"></span></span>
           </td>
         </tr>
         {if $action eq 1}
@@ -141,7 +121,7 @@
           <td id="end-date-readonly">
               {$endDate|crmDate}
               <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
-                {ts}Over-ride end date{/ts}
+                {ts}Override end date{/ts}
               </a>
               {help id="override_end_date"}
           </td>
@@ -183,15 +163,25 @@
         {include file="CRM/Member/Form/MembershipCommon.tpl"}
         {if $emailExists and $isEmailEnabledForSite}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
-            <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
-            <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1? OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
-            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+            <td class="label">{$form.send_receipt.label}</td>
+            <td>
+              {$form.send_receipt.html}<br />
+              <span class="description">
+                {ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1? OR if the payment is from a different contact, this email will only go to them.{/ts}
+                <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+              </span>
+            </td>
           </tr>
-          {elseif $context eq 'standalone' and $isEmailEnabledForSite}
+        {elseif $context eq 'standalone' and $isEmailEnabledForSite}
           <tr id="email-receipt" style="display:none;">
-            <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
-            <span class="description">{ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
-            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+            <td class="label">{$form.send_receipt.label}</td>
+            <td>
+              {$form.send_receipt.html}<br />
+              <span class="description">
+                {ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}
+                <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+              </span>
+            </td>
           </tr>
         {/if}
         <tr id="fromEmail" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
@@ -530,8 +520,8 @@
     {/literal}
 
     {if $membershipMode or $action eq 2}
-
-    buildAutoRenew( null, null, '{$membershipMode}');
+      buildAutoRenew( null, null, '{$membershipMode}');
+    {/if}
     {literal}
     function buildAutoRenew( membershipType, processorId, mode ) {
       var action = {/literal}'{$action}'{literal};
@@ -594,10 +584,6 @@
       }
       showEmailOptions();
     }
-    {/literal}
-    {/if}
-
-    {literal}
 
     var customDataType = {/literal}{$customDataType|@json_encode}{literal};
 
@@ -678,7 +664,7 @@
                 relatable = '{/literal}{ts escape='js' 1='%1'}%1 contacts are currently eligible to inherit this relationship.{/ts}{literal}';
                 relatable = ts(relatable, {1: result});
               }
-              cj('#max_related').siblings('.description').append(' ' + relatable);
+              cj('#eligibleRelated').text(relatable);
             }
           });
         }

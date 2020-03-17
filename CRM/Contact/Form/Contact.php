@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -926,11 +910,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if (isset($params['contact_id'])) {
       // process membership status for deceased contact
       $deceasedParams = [
-        'contact_id' => CRM_Utils_Array::value('contact_id', $params),
-        'is_deceased' => CRM_Utils_Array::value('is_deceased', $params, FALSE),
-        'deceased_date' => CRM_Utils_Array::value('deceased_date', $params, NULL),
+        'contact_id' => $params['contact_id'] ?? NULL,
+        'is_deceased' => $params['is_deceased'] ?? FALSE,
+        'deceased_date' => $params['deceased_date'] ?? NULL,
       ];
-      $updateMembershipMsg = $this->updateMembershipStatus($deceasedParams);
+      $updateMembershipMsg = CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $this->_contactType);
     }
 
     // action is taken depending upon the mode
@@ -1408,103 +1392,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     return "$number$str";
-  }
-
-  /**
-   * Update membership status to deceased.
-   * function return the status message for updated membership.
-   *
-   * @param array $deceasedParams
-   *   having contact id and deceased value.
-   *
-   * @return null|string
-   *   $updateMembershipMsg string  status message for updated membership.
-   */
-  public function updateMembershipStatus($deceasedParams) {
-    $updateMembershipMsg = NULL;
-    $contactId = CRM_Utils_Array::value('contact_id', $deceasedParams);
-    $deceasedDate = CRM_Utils_Array::value('deceased_date', $deceasedParams);
-
-    // process to set membership status to deceased for both active/inactive membership
-    if ($contactId &&
-      $this->_contactType == 'Individual' && !empty($deceasedParams['is_deceased'])
-    ) {
-
-      $session = CRM_Core_Session::singleton();
-      $userId = $session->get('userID');
-      if (!$userId) {
-        $userId = $contactId;
-      }
-
-      // get deceased status id
-      $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-      $deceasedStatusId = array_search('Deceased', $allStatus);
-      if (!$deceasedStatusId) {
-        return $updateMembershipMsg;
-      }
-
-      $today = time();
-      if ($deceasedDate && strtotime($deceasedDate) > $today) {
-        return $updateMembershipMsg;
-      }
-
-      // get non deceased membership
-      $dao = new CRM_Member_DAO_Membership();
-      $dao->contact_id = $contactId;
-      $dao->whereAdd("status_id != $deceasedStatusId");
-      $dao->find();
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-      $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-      $memCount = 0;
-      while ($dao->fetch()) {
-        // update status to deceased (for both active/inactive membership )
-        CRM_Core_DAO::setFieldValue('CRM_Member_DAO_Membership', $dao->id,
-          'status_id', $deceasedStatusId
-        );
-
-        // add membership log
-        $membershipLog = [
-          'membership_id' => $dao->id,
-          'status_id' => $deceasedStatusId,
-          'start_date' => CRM_Utils_Date::isoToMysql($dao->start_date),
-          'end_date' => CRM_Utils_Date::isoToMysql($dao->end_date),
-          'modified_id' => $userId,
-          'modified_date' => date('Ymd'),
-          'membership_type_id' => $dao->membership_type_id,
-          'max_related' => $dao->max_related,
-        ];
-
-        CRM_Member_BAO_MembershipLog::add($membershipLog);
-
-        //create activity when membership status is changed
-        $activityParam = [
-          'subject' => "Status changed from {$allStatus[$dao->status_id]} to {$allStatus[$deceasedStatusId]}",
-          'source_contact_id' => $userId,
-          'target_contact_id' => $dao->contact_id,
-          'source_record_id' => $dao->id,
-          'activity_type_id' => array_search('Change Membership Status', $activityTypes),
-          'status_id' => 2,
-          'version' => 3,
-          'priority_id' => 2,
-          'activity_date_time' => date('Y-m-d H:i:s'),
-          'is_auto' => 0,
-          'is_current_revision' => 1,
-          'is_deleted' => 0,
-        ];
-        $activityResult = civicrm_api('activity', 'create', $activityParam);
-
-        $memCount++;
-      }
-
-      // set status msg
-      if ($memCount) {
-        $updateMembershipMsg = ts("%1 Current membership(s) for this contact have been set to 'Deceased' status.",
-          [1 => $memCount]
-        );
-      }
-    }
-
-    return $updateMembershipMsg;
   }
 
 }

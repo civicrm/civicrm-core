@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Invoicing_Utils {
 
@@ -40,6 +24,8 @@ class CRM_Invoicing_Utils {
    * @param bool $oldValue
    * @param bool $newValue
    * @param array $metadata
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function onToggle($oldValue, $newValue, $metadata) {
     if ($oldValue == $newValue) {
@@ -48,7 +34,7 @@ class CRM_Invoicing_Utils {
     $existingUserViewOptions = civicrm_api3('Setting', 'get', ['return' => 'user_dashboard_options'])['values'][CRM_Core_Config::domainID()]['user_dashboard_options'];
     $optionValues = civicrm_api3('Setting', 'getoptions', ['field' => 'user_dashboard_options'])['values'];
     $invoiceKey = array_search('Invoices / Credit Notes', $optionValues);
-    $existingIndex = in_array($invoiceKey, $existingUserViewOptions);
+    $existingIndex = array_search($invoiceKey, $existingUserViewOptions);
 
     if ($newValue && $existingIndex === FALSE) {
       $existingUserViewOptions[] = $invoiceKey;
@@ -73,25 +59,7 @@ class CRM_Invoicing_Utils {
       return TRUE;
     }
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    return CRM_Utils_Array::value('invoicing', $invoiceSettings);
-  }
-
-  /**
-   * Function to call to determine default invoice page.
-   *
-   * Historically the invoicing was declared as a setting but actually
-   * set within contribution_invoice_settings (which stores multiple settings
-   * as an array in a non-standard way).
-   *
-   * We check both here. But will deprecate the latter in time.
-   */
-  public static function getDefaultPaymentPage() {
-    $value = Civi::settings()->get('default_invoice_page');
-    if (is_numeric($value)) {
-      return $value;
-    }
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    return CRM_Utils_Array::value('default_invoice_page', $invoiceSettings);
+    return $invoiceSettings['invoicing'] ?? NULL;
   }
 
   /**
@@ -102,7 +70,7 @@ class CRM_Invoicing_Utils {
    */
   public static function getTaxTerm() {
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    return CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    return $invoiceSettings['tax_term'] ?? NULL;
   }
 
 }

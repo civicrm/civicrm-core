@@ -8,7 +8,7 @@
 function event_create_example() {
   $params = [
     'title' => 'Annual CiviCRM meet',
-    'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
+    'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
     'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
     'event_type_id' => 1,
     'is_public' => 1,
@@ -60,7 +60,7 @@ function event_create_expectedresult() {
       '3' => [
         'id' => '3',
         'title' => 'Annual CiviCRM meet',
-        'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
+        'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
         'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
         'event_type_id' => '1',
         'participant_listing_id' => '',

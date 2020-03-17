@@ -152,6 +152,7 @@ abstract class CRM_Utils_System_Base {
    *
    * @return array|bool
    *   [contactID, ufID, unique string] else false if no auth
+   * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     return FALSE;
@@ -179,9 +180,10 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Immediately stop script execution and display a 401 "Access Denied" page.
+   * @throws \CRM_Core_Exception
    */
   public function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
   /**
@@ -665,13 +667,9 @@ abstract class CRM_Utils_System_Base {
       $baseURL = str_replace('http://', 'https://', $baseURL);
     }
 
-    if ($config->userFramework == 'Joomla') {
-      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      $userFrameworkResourceURL = CIVICRM_PLUGIN_URL . "civicrm/";
-    }
-    elseif ($this->is_drupal) {
+    // @todo this function is only called / code is only reached when is_drupal is true - move this to the drupal classes
+    // and don't implement here.
+    if ($this->is_drupal) {
       // Drupal setting
       // check and see if we are installed in sites/all (for D5 and above)
       // we dont use checkURL since drupal generates an error page and throws
@@ -970,6 +968,22 @@ abstract class CRM_Utils_System_Base {
     }
     echo $response->getBody();
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    session_start();
+  }
+
+  /**
+   * Get role names
+   *
+   * @return array|null
+   */
+  public function getRoleNames() {
+    return NULL;
   }
 
 }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
 
@@ -167,6 +151,34 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       return;
     }
     list($name, $op, $value, $grouping) = $values;
+    $fields = self::getFields();
+
+    $quoteValue = NULL;
+
+    if (!empty($value) && !is_array($value)) {
+      $quoteValue = "\"$value\"";
+    }
+
+    $fieldAliases = self::getLegacySupportedFields();
+
+    $fieldName = $name = self::getFieldName($values);
+    $qillName = $name;
+    if (in_array($name, $fieldAliases)) {
+      $qillName = array_search($name, $fieldAliases);
+    }
+    $pseudoExtraParam = [];
+    $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
+    $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_membership');
+    $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
+    if ($dataType === 'Timestamp' || $dataType === 'Date') {
+      $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
+      $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
+      $query->dateQueryBuilder($values,
+        $tableName, $fieldName, $fieldSpec['name'], $title
+      );
+      return;
+    }
+
     switch ($name) {
       case 'member_join_date_low':
       case 'member_join_date_high':
@@ -181,7 +193,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
-      case 'membership_start_date':
       case 'member_start_date_low':
       case 'member_start_date_high':
         Civi::log()->warning(
@@ -195,7 +206,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
-      case 'membership_end_date':
       case 'member_end_date_low':
       case 'member_end_date_high':
         Civi::log()->warning(
@@ -222,12 +232,8 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'member_source':
       case 'membership_source':
-        $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-        $value = $strtolower(CRM_Core_DAO::escapeString(trim($value)));
-
-        $query->_where[$grouping][] = "civicrm_membership.source $op '{$value}'";
-        $query->_qill[$grouping][] = ts('Source %2 %1', [1 => $value, 2 => $op]);
-        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
+        $fieldSpec = $fields['membership_source'] ?? [];
+        $query->handleWhereFromMetadata($fieldSpec, $name, $value, $op);
         return;
 
       // CRM-17011 These 2 variants appear in some smart groups saved at some time prior to 4.6.6.
@@ -499,6 +505,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       'membership_join_date',
       'membership_start_date',
       'membership_end_date',
+      'membership_type_id',
     ];
     $metadata = civicrm_api3('Membership', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
@@ -508,6 +515,8 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
    * Build the search form.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Membership' => self::getSearchFieldMetadata()]);
@@ -517,13 +526,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       'id' => 'membership_status_id',
       'multiple' => 'multiple',
       'class' => 'crm-select2',
-    ]);
-
-    $form->addEntityRef('membership_type_id', ts('Membership Type'), [
-      'entity' => 'MembershipType',
-      'multiple' => TRUE,
-      'placeholder' => ts('- any -'),
-      'select' => ['minimumInputLength' => 0],
     ]);
 
     $form->addElement('text', 'member_source', ts('Source'));

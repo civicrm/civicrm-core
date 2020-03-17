@@ -168,7 +168,7 @@
           });
       }
 
-      CRM.loadScript(CRM.config.resourceBase + 'packages/jquery/plugins/jquery.jeditable.min.js').done(function() {
+      CRM.loadScript(CRM.config.packagesBase + 'jquery/plugins/jquery.jeditable.min.js').done(function() {
         $i.editable(callback, settings);
       });
 

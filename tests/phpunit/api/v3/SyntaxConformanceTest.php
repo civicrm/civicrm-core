@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -41,7 +25,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   /**
-   * @var array e.g. $this->deletes['CRM_Contact_DAO_Contact'][] = $contactID;
+   * @var array
+   * e.g. $this->deletes['CRM_Contact_DAO_Contact'][] = $contactID;
    */
   protected $deletableTestObjects;
 
@@ -111,7 +96,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Payment',
       'Order',
       //work fine in local
-      'SavedSearch',
       'Logging',
     ];
     $this->toBeImplemented['delete'] = [
@@ -663,6 +647,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'is_primary',
         ],
       ],
+      'FinancialTrxn' => [
+        'cant_update' => [
+          // Altering fee amount will also cause net_amount to be recalculated.
+          'fee_amount',
+        ],
+      ],
       'Navigation' => [
         'cant_update' => [
           // Weight is deliberately altered when this is changed - skip.
@@ -732,15 +722,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportInstance' => [
         // View mode is part of the navigation which is not retrieved by the api.
         'cant_return' => ['view_mode'],
-      ],
-      'SavedSearch' => [
-        // I think the fields below are generated based on form_values.
-        'cant_update' => [
-          'search_custom_id',
-          'where_clause',
-          'select_tables',
-          'where_tables',
-        ],
       ],
       'StatusPreference' => [
         'break_return' => [
@@ -823,21 +804,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $result = civicrm_api($Entity, 'Get', []);
     $this->assertEquals(1, $result['is_error']);
     $this->assertContains("Unknown api version", $result['error_message']);
-  }
-
-  /**
-   * @dataProvider entities_get
-   * @param $Entity
-   */
-  public function testEmptyParam_getString($Entity) {
-
-    if (in_array($Entity, $this->toBeImplemented['get'])) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_get to be implemented");
-      return;
-    }
-    $result = $this->callAPIFailure($Entity, 'Get', 'string');
-    $this->assertEquals(2000, $result['error_code']);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
 
   /**
@@ -1334,15 +1300,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @dataProvider entities
-   */
-  public function testCreateWrongTypeParamTag_create() {
-    $result = civicrm_api("Tag", 'Create', 'this is not a string');
-    $this->assertEquals(1, $result['is_error']);
-    $this->assertEquals("Input variable `params` is not an array", $result['error_message']);
-  }
-
-  /**
    * @dataProvider entities_updatesingle
    *
    * limitations include the problem with avoiding loops when creating test objects -
@@ -1605,15 +1562,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testInvalidID_delete($Entity) {
     $result = $this->callAPIFailure($Entity, 'Delete', ['id' => 999999]);
-  }
-
-  /**
-   * @dataProvider entities
-   */
-  public function testDeleteWrongTypeParamTag_delete() {
-    $result = civicrm_api("Tag", 'Delete', 'this is not a string');
-    $this->assertEquals(1, $result['is_error']);
-    $this->assertEquals("Input variable `params` is not an array", $result['error_message']);
   }
 
   /**
