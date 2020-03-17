@@ -208,7 +208,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'title' => ts('Membership Type'),
             'default' => TRUE,
           ],
-          'join_date' => NULL,
+          'join_date' => [
+            'title' => ts('Join Date'),
+          ],
           'membership_start_date' => [
             'title' => ts('Start Date'),
             'default' => TRUE,
