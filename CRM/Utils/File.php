@@ -399,7 +399,7 @@ class CRM_Utils_File {
       }
     }
     // support lower and uppercase file extensions
-    return isset($extensions[strtolower($ext)]) ? TRUE : FALSE;
+    return (bool) isset($extensions[strtolower($ext)]);
   }
 
   /**

@@ -492,7 +492,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    return preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value);
   }
 
   /**
@@ -513,7 +513,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function alphanumeric($value) {
-    return preg_match('/^[a-zA-Z0-9_-]*$/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/^[a-zA-Z0-9_-]*$/', $value);
   }
 
   /**
@@ -523,7 +523,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function numberOfDigit($value, $noOfDigit) {
-    return preg_match('/^\d{' . $noOfDigit . '}$/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/^\d{' . $noOfDigit . '}$/', $value);
   }
 
   /**
@@ -605,7 +605,7 @@ class CRM_Utils_Rule {
     // Allow values such as -0, 1.024555, -.1
     // We need to support multiple decimal places here, not just the number allowed by locale
     //  otherwise tax calculations break when you want the inclusive amount to be a round number (eg. £10 inc. VAT requires 8.333333333 here).
-    return preg_match('/(^-?\d+\.?\d*$)|(^-?\.\d+$)/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/(^-?\d+\.?\d*$)|(^-?\.\d+$)/', $value);
   }
 
   /**
