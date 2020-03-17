@@ -248,7 +248,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contact = CRM_Contact_BAO_Contact::findById($existing_contact->id);
     $this->assertEquals($existing_contact->id, $contact->id);
     $deleted_contact_id = $existing_contact->id;
-    CRM_Contact_BAO_Contact::deleteContact($contact->id, FALSE, TRUE);
+    $this->contactDelete($contact->id);
     $exception_thrown = FALSE;
     try {
       $deleted_contact = CRM_Contact_BAO_Contact::findById($deleted_contact_id);
