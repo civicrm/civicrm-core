@@ -102,7 +102,7 @@ function civicrm_api3_contribution_page_validate($params) {
   // authorization from a payment processor like Paypal checkout) the lack of a qfKey will not result in a valid
   // one being generated so we generate one first.
   $originalRequest = $_REQUEST;
-  $qfKey = CRM_Utils_Array::value('qfKey', $_REQUEST);
+  $qfKey = $_REQUEST['qfKey'] ?? NULL;
   if (!$qfKey) {
     $_REQUEST['qfKey'] = CRM_Core_Key::get('CRM_Core_Controller', TRUE);
   }

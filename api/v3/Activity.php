@@ -556,7 +556,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
     ]);
     foreach ($activities as &$activity) {
       if (!empty($activity['case_id'])) {
-        $case = CRM_Utils_Array::value($activity['case_id'][0], $cases['values']);
+        $case = $cases['values'][$activity['case_id'][0]] ?? NULL;
         if ($case) {
           foreach ($case as $key => $value) {
             if ($key != 'id') {
@@ -705,14 +705,14 @@ function _civicrm_api3_activity_check_params(&$params) {
   //correctly by doing pseudoconstant validation
   // needs testing
   $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
-  $activityName = CRM_Utils_Array::value('activity_name', $params);
+  $activityName = $params['activity_name'] ?? NULL;
   $activityName = ucfirst($activityName);
-  $activityLabel = CRM_Utils_Array::value('activity_label', $params);
+  $activityLabel = $params['activity_label'] ?? NULL;
   if ($activityLabel) {
     $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create');
   }
 
-  $activityTypeId = CRM_Utils_Array::value('activity_type_id', $params);
+  $activityTypeId = $params['activity_type_id'] ?? NULL;
 
   if ($activityName || $activityLabel) {
     $activityTypeIdInList = array_search(($activityName ? $activityName : $activityLabel), $activityTypes);

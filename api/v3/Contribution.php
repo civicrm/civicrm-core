@@ -356,7 +356,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
 
   $params['financial_type_id']['api.aliases'] = ['contribution_type_id'];
   $params['payment_instrument_id']['api.aliases'] = ['contribution_payment_instrument', 'payment_instrument'];
-  $params['contact_id'] = CRM_Utils_Array::value('contribution_contact_id', $params);
+  $params['contact_id'] = $params['contribution_contact_id'] ?? NULL;
   $params['contact_id']['api.aliases'] = ['contribution_contact_id'];
   $params['is_template']['api.default'] = 0;
   unset($params['contribution_contact_id']);
@@ -672,8 +672,8 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
     $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
     $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
   }
-  $input['card_type_id'] = CRM_Utils_Array::value('card_type_id', $params);
-  $input['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
+  $input['card_type_id'] = $params['card_type_id'] ?? NULL;
+  $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
   $transaction = new CRM_Core_Transaction();
   return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction,
      $contribution, CRM_Utils_Array::value('is_post_payment_create', $params));

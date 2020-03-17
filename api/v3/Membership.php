@@ -208,7 +208,7 @@ function _civicrm_api3_membership_get_spec(&$params) {
 function civicrm_api3_membership_get($params) {
   $activeOnly = $membershipTypeId = $membershipType = NULL;
 
-  $contactID = CRM_Utils_Array::value('contact_id', $params);
+  $contactID = $params['contact_id'] ?? NULL;
   if (!empty($params['filters']) && is_array($params['filters']) && isset($params['filters']['is_current'])) {
     $activeOnly = $params['filters']['is_current'];
     unset($params['filters']['is_current']);
@@ -291,7 +291,7 @@ function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, 
 
     // populating relationship type name.
     $relationshipType = new CRM_Contact_BAO_RelationshipType();
-    $relationshipType->id = CRM_Utils_Array::value('relationship_type_id', $membershipType);
+    $relationshipType->id = $membershipType['relationship_type_id'] ?? NULL;
     if ($relationshipType->find(TRUE)) {
       $membershipValues[$membershipId]['relationship_name'] = $relationshipType->name_a_b;
     }

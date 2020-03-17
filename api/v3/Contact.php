@@ -607,9 +607,9 @@ function _civicrm_api3_greeting_format_params($params) {
     ];
 
     $greetings = CRM_Core_PseudoConstant::greeting($filter);
-    $greetingId = CRM_Utils_Array::value("{$key}{$greeting}_id", $params);
-    $greetingVal = CRM_Utils_Array::value("{$key}{$greeting}", $params);
-    $customGreeting = CRM_Utils_Array::value("{$key}{$greeting}_custom", $params);
+    $greetingId = $params["{$key}{$greeting}_id"] ?? NULL;
+    $greetingVal = $params["{$key}{$greeting}"] ?? NULL;
+    $customGreeting = $params["{$key}{$greeting}_custom"] ?? NULL;
 
     if (!$greetingId && $greetingVal) {
       $params["{$key}{$greeting}_id"] = CRM_Utils_Array::key($params["{$key}{$greeting}"], $greetings);
@@ -1419,11 +1419,11 @@ function _civicrm_api3_contact_proximity_spec(&$params) {
  * @throws Exception
  */
 function civicrm_api3_contact_proximity($params) {
-  $latitude = CRM_Utils_Array::value('latitude', $params);
-  $longitude = CRM_Utils_Array::value('longitude', $params);
-  $distance = CRM_Utils_Array::value('distance', $params);
+  $latitude = $params['latitude'] ?? NULL;
+  $longitude = $params['longitude'] ?? NULL;
+  $distance = $params['distance'] ?? NULL;
 
-  $unit = CRM_Utils_Array::value('unit', $params);
+  $unit = $params['unit'] ?? NULL;
 
   // check and ensure that lat/long and distance are floats
   if (

@@ -30,7 +30,7 @@ function civicrm_api3_payment_get($params) {
   $financialTrxn = [];
   $limit = '';
   if (isset($params['options']) && !empty($params['options']['limit'])) {
-    $limit = CRM_Utils_Array::value('limit', $params['options']);
+    $limit = $params['options']['limit'] ?? NULL;
   }
   $params['options']['limit'] = 0;
   if (isset($params['trxn_id'])) {

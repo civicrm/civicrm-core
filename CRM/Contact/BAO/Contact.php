@@ -105,7 +105,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    */
   public static function add(&$params) {
     $contact = new CRM_Contact_DAO_Contact();
-    $contactID = CRM_Utils_Array::value('contact_id', $params);
+    $contactID = $params['contact_id'] ?? NULL;
     if (empty($params)) {
       return NULL;
     }
@@ -164,7 +164,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $contact->sort_name = substr($contact->sort_name, 0, 128);
     }
 
-    $privacy = CRM_Utils_Array::value('privacy', $params);
+    $privacy = $params['privacy'] ?? NULL;
     if ($privacy &&
       is_array($privacy) &&
       !empty($privacy)
@@ -1610,7 +1610,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
         //Sorting fields in alphabetical order(CRM-1507)
         foreach ($fields as $k => $v) {
-          $sortArray[$k] = CRM_Utils_Array::value('title', $v);
+          $sortArray[$k] = $v['title'] ?? NULL;
         }
 
         $fields = array_merge($sortArray, $fields);
@@ -1748,7 +1748,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             $locationTypeName = 1;
           }
           else {
-            $locationTypeName = CRM_Utils_Array::value($id, $locationTypes);
+            $locationTypeName = $locationTypes[$id] ?? NULL;
             if (!$locationTypeName) {
               continue;
             }
@@ -1814,7 +1814,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $blocks = CRM_Core_BAO_Location::getValues($entityBlock);
       foreach ($blocks[$block] as $key => $value) {
         if (!empty($value['is_primary'])) {
-          $locationType = CRM_Utils_Array::value('location_type_id', $value);
+          $locationType = $value['location_type_id'] ?? NULL;
         }
       }
     }
@@ -2056,8 +2056,8 @@ ORDER BY civicrm_email.is_primary DESC";
       $details = self::getHierContactDetails($contactID, $fields);
 
       $contactDetails = $details[$contactID];
-      $data['contact_type'] = CRM_Utils_Array::value('contact_type', $contactDetails);
-      $data['contact_sub_type'] = CRM_Utils_Array::value('contact_sub_type', $contactDetails);
+      $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
+      $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
     }
     else {
       //we should get contact type only if contact
@@ -2106,10 +2106,10 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     if ($ctype == 'Organization') {
-      $data['organization_name'] = CRM_Utils_Array::value('organization_name', $contactDetails);
+      $data['organization_name'] = $contactDetails['organization_name'] ?? NULL;
     }
     elseif ($ctype == 'Household') {
-      $data['household_name'] = CRM_Utils_Array::value('household_name', $contactDetails);
+      $data['household_name'] = $contactDetails['household_name'] ?? NULL;
     }
 
     $locationType = [];
@@ -2606,7 +2606,7 @@ AND       civicrm_openid.is_primary = 1";
       CRM_Core_OptionGroup::lookupValues($temp, $names, FALSE);
 
       $values['preferred_communication_method'] = $preffComm;
-      $values['preferred_communication_method_display'] = CRM_Utils_Array::value('preferred_communication_method_display', $temp);
+      $values['preferred_communication_method_display'] = $temp['preferred_communication_method_display'] ?? NULL;
 
       if ($contact->preferred_mail_format) {
         $preferredMailingFormat = CRM_Core_SelectValues::pmf();
@@ -2623,8 +2623,8 @@ AND       civicrm_openid.is_primary = 1";
         $birthDate = CRM_Utils_Date::customFormat($contact->birth_date, '%Y%m%d');
         if ($birthDate < date('Ymd')) {
           $age = CRM_Utils_Date::calculateAge($birthDate);
-          $values['age']['y'] = CRM_Utils_Array::value('years', $age);
-          $values['age']['m'] = CRM_Utils_Array::value('months', $age);
+          $values['age']['y'] = $age['years'] ?? NULL;
+          $values['age']['m'] = $age['months'] ?? NULL;
         }
       }
 
@@ -3254,7 +3254,7 @@ AND       civicrm_openid.is_primary = 1";
    *   TRUE if user has all permissions, FALSE if otherwise.
    */
   public static function checkUserMenuPermissions($aclPermissionedTasks, $corePermission, $menuOptions) {
-    $componentName = CRM_Utils_Array::value('component', $menuOptions);
+    $componentName = $menuOptions['component'] ?? NULL;
 
     // if component action - make sure component is enable.
     if ($componentName && !in_array($componentName, CRM_Core_Config::singleton()->enableComponents)) {
@@ -3264,7 +3264,7 @@ AND       civicrm_openid.is_primary = 1";
     // make sure user has all required permissions.
     $hasAllPermissions = FALSE;
 
-    $permissions = CRM_Utils_Array::value('permissions', $menuOptions);
+    $permissions = $menuOptions['permissions'] ?? NULL;
     if (!is_array($permissions) || empty($permissions)) {
       $hasAllPermissions = TRUE;
     }

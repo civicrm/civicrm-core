@@ -132,7 +132,7 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
  * @throws \API_Exception
  */
 function civicrm_api3_setting_getoptions($params) {
-  $domainId = CRM_Utils_Array::value('domain_id', $params);
+  $domainId = $params['domain_id'] ?? NULL;
   $specs = \Civi\Core\SettingsMetadata::getMetadata(['name' => $params['field']], $domainId, TRUE);
 
   if (empty($specs[$params['field']]) || !is_array(CRM_Utils_Array::value('options', $specs[$params['field']]))) {
