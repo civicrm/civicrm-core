@@ -52,7 +52,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   protected $_financialTypeId = 1;
 
-
   /**
    * Entity to be extended.
    *
@@ -169,7 +168,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test for international string acceptance (CRM-10210).
-   * Requires the databsase to be in utf8.
+   * Requires the database to be in utf8.
    *
    * @dataProvider getInternationalStrings
    *
@@ -178,7 +177,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    *   Bool to see if we should check charset.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testInternationalStrings($string) {
     $this->callAPISuccess('Contact', 'create', array_merge(
@@ -219,6 +218,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testAddCreateIndividualWithPreferredLanguage($version) {
     $this->_apiversion = $version;
@@ -241,6 +241,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testIndividualSubType($version) {
     $this->_apiversion = $version;
@@ -276,6 +277,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify that we can retreive contacts of different sub types
    *
    * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    *
    * @dataProvider versionThreeAndFour
    */
@@ -390,16 +394,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $email1['count']);
     $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
 
-    $email2 = $this->callAPISuccess('email', 'create', ['contact_id' => $contact1['id'], 'is_primary' => 0, 'email' => $notPrimaryEmail]);
+    $this->callAPISuccess('email', 'create', ['contact_id' => $contact1['id'], 'is_primary' => 0, 'email' => $notPrimaryEmail]);
 
     // Case 1: Check with criteria primary 'email' => array('IS NOT NULL' => 1)
     $result = $this->callAPISuccess('contact', 'get', ['email' => ['IS NOT NULL' => 1]]);
-    $primaryEmailContactIds = array_keys($result['values']);
     $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
 
     // Case 2: Check with criteria primary 'email' => array('<>' => '')
     $result = $this->callAPISuccess('contact', 'get', ['email' => ['<>' => '']]);
-    $primaryEmailContactIds = array_keys($result['values']);
     $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
 
     // Case 3: Check with email_id='primary email id'
@@ -420,6 +422,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateNameIndividual($version) {
     $this->_apiversion = $version;
@@ -440,6 +443,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateDisplayNameIndividual($version) {
     $this->_apiversion = $version;
@@ -459,6 +463,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetNameVariantsCaseInsensitive($version) {
     $this->_apiversion = $version;
@@ -469,7 +474,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
     $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
     Civi::settings()->set('includeNickNameInName', TRUE);
-    $result = $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
+    $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
     $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
     Civi::settings()->set('includeNickNameInName', FALSE);
   }
@@ -479,6 +484,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * Verify that attempt to create individual contact with
    * first and last names and old key values works
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateNameIndividualOldKeys() {
     $params = [
@@ -534,6 +541,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateNameHousehold($version) {
     $this->_apiversion = $version;
