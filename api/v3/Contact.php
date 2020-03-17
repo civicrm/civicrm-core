@@ -27,10 +27,12 @@
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
- *
  * @return array
  *   API Result Array
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_create($params) {
   $contactID = CRM_Utils_Array::value('contact_id', $params, CRM_Utils_Array::value('id', $params));
@@ -152,6 +154,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
  *   API Result Array
  *
  * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_contact_get($params) {
   $options = [];
@@ -169,6 +172,7 @@ function civicrm_api3_contact_get($params) {
  * @param array $params
  *
  * @return int
+ * @throws \API_Exception
  */
 function civicrm_api3_contact_getcount($params) {
   $options = [];
@@ -444,20 +448,21 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
  * @param array $params
  *   input parameters per getfields
  *
- * @throws \Civi\API\Exception\UnauthorizedException
  * @return array
  *   API Result Array
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_contact_delete($params) {
-  $contactID = CRM_Utils_Array::value('id', $params);
+  $contactID = (int) $params['id'];
 
   if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::DELETE)) {
     throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
   }
 
-  $session = CRM_Core_Session::singleton();
-  if ($contactID == $session->get('userID')) {
-    return civicrm_api3_create_error('This contact record is linked to the currently logged in user account - and cannot be deleted.');
+  if ($contactID == CRM_Core_Session::getLoggedInContactID()) {
+    throw new API_Exception('This contact record is linked to the currently logged in user account - and cannot be deleted.');
   }
   $restore = !empty($params['restore']);
   $skipUndelete = !empty($params['skip_undelete']);
@@ -466,15 +471,13 @@ function civicrm_api3_contact_delete($params) {
   // restrict permanent delete if a contact has financial trxn associated with it
   $error = NULL;
   if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent([$contactID], $error)) {
-    return civicrm_api3_create_error($error['_qf_default']);
+    throw new API_Exception($error['_qf_default']);
   }
   if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete,
     CRM_Utils_Array::value('check_permissions', $params))) {
     return civicrm_api3_create_success();
   }
-  else {
-    return civicrm_api3_create_error('Could not delete contact');
-  }
+  throw new CiviCRM_API3_Exception('Could not delete contact');
 }
 
 /**
@@ -557,6 +560,10 @@ function _civicrm_api3_contact_check_params(&$params) {
  *   If present the contact with that ID is updated.
  *
  * @return CRM_Contact_BAO_Contact|CRM_Core_Error
+ *
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_contact_update($params, $contactID = NULL) {
   //@todo - doesn't contact create support 'id' which is already set- check & remove
@@ -574,6 +581,7 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
  *   Array per getfields metadata.
  *
  * @throws API_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_greeting_format_params($params) {
   $greetingParams = ['', '_id', '_custom'];
@@ -1147,7 +1155,10 @@ function _civicrm_api3_contact_deprecation() {
  *
  * @return array
  *   API Result Array
+ *
  * @throws API_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_merge($params) {
   if (($result = CRM_Dedupe_Merger::merge(
@@ -1250,7 +1261,8 @@ function _civicrm_api3_contact_get_merge_conflicts_spec(&$params) {
  *
  * @return array
  *   API Result Array
- * @throws API_Exception
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_contact_getmergedto($params) {
   $contactID = _civicrm_api3_contact_getmergedto($params);
@@ -1273,6 +1285,8 @@ function civicrm_api3_contact_getmergedto($params) {
  * @param array $params
  *
  * @return int|false
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_contact_getmergedto($params) {
   $contactID = FALSE;
@@ -1324,7 +1338,8 @@ function _civicrm_api3_contact_getmergedto_spec(&$params) {
  *
  * @return array
  *   API Result Array
- * @throws API_Exception
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_contact_getmergedfrom($params) {
   $contacts = _civicrm_api3_contact_getmergedfrom($params);
@@ -1337,6 +1352,8 @@ function civicrm_api3_contact_getmergedfrom($params) {
  * @param array $params
  *
  * @return array
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_contact_getmergedfrom($params) {
   $activities = [];
@@ -1431,10 +1448,10 @@ function civicrm_api3_contact_proximity($params) {
     !CRM_Utils_Rule::numeric($longitude) ||
     !CRM_Utils_Rule::numeric($distance)
   ) {
-    throw new Exception(ts('Latitude, Longitude and Distance should exist and be numeric'));
+    throw new API_Exception(ts('Latitude, Longitude and Distance should exist and be numeric'));
   }
 
-  if ($unit == "mile") {
+  if ($unit === 'mile') {
     $conversionFactor = 1609.344;
   }
   else {
@@ -1489,7 +1506,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   // If we are doing quicksearch by a field other than name, make sure that field is added to results
   $field_name = CRM_Utils_String::munge($request['search_field']);
   // Unique name contact_id = id
-  if ($field_name == 'contact_id') {
+  if ($field_name === 'contact_id') {
     $field_name = 'id';
   }
   // phone_numeric should be phone
@@ -1505,7 +1522,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   if (!empty($request['input'])) {
     $request['params'][$request['search_field']] = $request['input'];
     // Temporarily override wildcard setting
-    if (Civi::settings()->get('includeWildCardInName') != $request['add_wildcard']) {
+    if (Civi::settings()->get('includeWildCardInName') !== $request['add_wildcard']) {
       Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard'] = !$request['add_wildcard'];
       Civi::settings()->set('includeWildCardInName', $request['add_wildcard']);
     }
@@ -1577,6 +1594,8 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
  *
  * @return array
  *   API formatted array
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_contact_duplicatecheck($params) {
   $dupes = CRM_Contact_BAO_Contact::getDuplicateContacts(
@@ -1606,7 +1625,7 @@ function civicrm_api3_contact_duplicatecheck($params) {
 /**
  * Declare metadata for contact dedupe function.
  *
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_contact_duplicatecheck_spec(&$params) {
   $params['dedupe_rule_id'] = [
