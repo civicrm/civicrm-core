@@ -459,8 +459,8 @@ function civicrm_api3_contact_delete($params) {
   if ($contactID == $session->get('userID')) {
     return civicrm_api3_create_error('This contact record is linked to the currently logged in user account - and cannot be deleted.');
   }
-  $restore = !empty($params['restore']) ? $params['restore'] : FALSE;
-  $skipUndelete = !empty($params['skip_undelete']) ? $params['skip_undelete'] : FALSE;
+  $restore = !empty($params['restore']);
+  $skipUndelete = !empty($params['skip_undelete']);
 
   // CRM-12929
   // restrict permanent delete if a contact has financial trxn associated with it

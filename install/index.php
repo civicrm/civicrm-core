@@ -517,7 +517,7 @@ class InstallRequirements {
           )
         );
       }
-      $onlyRequire = ($dbName == 'Drupal' || $dbName == 'Backdrop') ? TRUE : FALSE;
+      $onlyRequire = $dbName == 'Drupal' || $dbName == 'Backdrop';
       $this->requireDatabaseOrCreatePermissions(
         $databaseConfig['server'],
         $databaseConfig['username'],

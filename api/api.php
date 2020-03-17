@@ -184,12 +184,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  *   true if error, false otherwise
  */
 function civicrm_error($result) {
-  if (is_array($result)) {
-    return (array_key_exists('is_error', $result) &&
-      $result['is_error']
-    ) ? TRUE : FALSE;
-  }
-  return FALSE;
+  return is_array($result) && !empty($result['is_error']);
 }
 
 /**

@@ -423,7 +423,7 @@ SELECT count( a.id )
     $params = [1 => [$str, 'String']];
 
     $count = CRM_Core_DAO::singleValueQuery($query, $params);
-    return ($count) ? TRUE : FALSE;
+    return (bool) $count;
   }
 
   /**
