@@ -49,7 +49,7 @@ class CRM_Contact_Form_Task_ProximityCommon {
    */
   public static function buildQuickForm($form, $proxSearch) {
     // is proximity search required (2) or optional (1)?
-    $proxRequired = ($proxSearch == 2 ? TRUE : FALSE);
+    $proxRequired = ($proxSearch == 2);
     $form->assign('proximity_search', TRUE);
 
     $form->add('text', 'prox_street_address', ts('Street Address'), NULL, FALSE);
