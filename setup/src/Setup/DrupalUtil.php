@@ -47,7 +47,7 @@ class DrupalUtil {
     preg_quote($modules, DIRECTORY_SEPARATOR) . "/",
     $_SERVER['SCRIPT_FILENAME'], $matches
     );
-    $siteDir = isset($matches[1]) ? $matches[1] : 'default';
+    $siteDir = $matches[1] ?? 'default';
 
     if (strtolower($siteDir) == 'all') {
     // For this case - use drupal's way of finding out multi-site directory

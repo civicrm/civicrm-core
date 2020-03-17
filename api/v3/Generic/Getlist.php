@@ -182,7 +182,7 @@ function _civicrm_api3_generic_getlist_output($result, $request, $entity, $field
         }
       };
       if (!empty($request['image_field'])) {
-        $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
+        $data['image'] = $row[$request['image_field']] ?? '';
       }
       if (isset($row[$request['color_field']])) {
         $data['color'] = $row[$request['color_field']];
@@ -210,10 +210,10 @@ function _civicrm_api3_generic_getlist_postprocess($result, $request, &$values) 
   if (!empty($result['values'])) {
     foreach (array_values($result['values']) as $num => $row) {
       foreach ($request['extra'] as $field) {
-        $values[$num]['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
+        $values[$num]['extra'][$field] = $row[$field] ?? NULL;
       }
       foreach ($chains as $chain) {
-        $values[$num][$chain] = isset($row[$chain]) ? $row[$chain] : NULL;
+        $values[$num][$chain] = $row[$chain] ?? NULL;
       }
     }
   }

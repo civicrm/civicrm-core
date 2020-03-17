@@ -501,7 +501,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $defaults[$name][$instance]['location_type_id'] = $locationType->id;
         }
         else {
-          $locTypeId = isset($locationTypeKeys[$instance - 1]) ? $locationTypeKeys[$instance - 1] : $locationType->id;
+          $locTypeId = $locationTypeKeys[$instance - 1] ?? $locationType->id;
           $defaults[$name][$instance]['location_type_id'] = $locTypeId;
         }
 
@@ -653,7 +653,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           if ($name == 'openid' && !empty($blockValues[$name])) {
             $oid = new CRM_Core_DAO_OpenID();
             $oid->openid = $openIds[$instance] = CRM_Utils_Array::value($name, $blockValues);
-            $cid = isset($contactId) ? $contactId : 0;
+            $cid = $contactId ?? 0;
             if ($oid->find(TRUE) && ($oid->contact_id != $cid)) {
               $errors["{$name}[$instance][openid]"] = ts('%1 already exist.', [1 => $blocks['OpenID']]);
             }

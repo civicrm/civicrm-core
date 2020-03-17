@@ -43,7 +43,7 @@ abstract class AbstractCreateAction extends AbstractAction {
    * @return mixed|null
    */
   public function getValue(string $fieldName) {
-    return isset($this->values[$fieldName]) ? $this->values[$fieldName] : NULL;
+    return $this->values[$fieldName] ?? NULL;
   }
 
   /**

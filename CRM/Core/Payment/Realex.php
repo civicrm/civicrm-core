@@ -276,7 +276,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
       if ($data['level'] == $depth) {
         switch ($data['type']) {
           case 'complete':
-            $output[$data['tag']] = isset($data['value']) ? $data['value'] : '';
+            $output[$data['tag']] = $data['value'] ?? '';
             break;
 
           case 'open':
@@ -364,7 +364,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('country', $params['country']);
     $this->_setParam('post_code', $params['postal_code']);
     $this->_setParam('order_id', $params['invoiceID']);
-    $params['issue_number'] = (isset($params['issue_number']) ? $params['issue_number'] : '');
+    $params['issue_number'] = ($params['issue_number'] ?? '');
     $this->_setParam('issue_number', $params['issue_number']);
     $this->_setParam('varref', $params['contributionType_name']);
     $comment = $params['description'] . ' (page id:' . $params['contributionPageID'] . ')';

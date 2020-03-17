@@ -532,7 +532,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
 
     }
 
-    $ppID = (isset($dao->ppID1) && $dao->ppID1) ? $dao->ppID1 : (isset($dao->ppID2) ? $dao->ppID2 : NULL);
+    $ppID = (isset($dao->ppID1) && $dao->ppID1) ? $dao->ppID1 : ($dao->ppID2 ?? NULL);
     $mode = (isset($dao->is_test) && $dao->is_test) ? 'test' : 'live';
     if (!$ppID || $type == 'id') {
       $result = $ppID;

@@ -464,7 +464,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     if (isset($field->phone_type_id)) {
       $name .= "-{$field->phone_type_id}";
     }
-    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, (isset($importableFields[$field->field_name]) ? $importableFields[$field->field_name] : []));
+    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, ($importableFields[$field->field_name] ?? []));
 
     // No lie: this is bizarre; why do we need to mix so many UFGroup properties into UFFields?
     // I guess to make field self sufficient with all the required data and avoid additional calls
@@ -485,12 +485,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'visibility' => $field->visibility,
       'in_selector' => $field->in_selector,
       'rule' => CRM_Utils_Array::value('rule', CRM_Utils_Array::value($field->field_name, $importableFields)),
-      'location_type_id' => isset($field->location_type_id) ? $field->location_type_id : NULL,
-      'website_type_id' => isset($field->website_type_id) ? $field->website_type_id : NULL,
-      'phone_type_id' => isset($field->phone_type_id) ? $field->phone_type_id : NULL,
+      'location_type_id' => $field->location_type_id ?? NULL,
+      'website_type_id' => $field->website_type_id ?? NULL,
+      'phone_type_id' => $field->phone_type_id ?? NULL,
       'group_id' => $group->id,
-      'add_to_group_id' => isset($group->add_to_group_id) ? $group->add_to_group_id : NULL,
-      'add_captcha' => isset($group->add_captcha) ? $group->add_captcha : NULL,
+      'add_to_group_id' => $group->add_to_group_id ?? NULL,
+      'add_captcha' => $group->add_captcha ?? NULL,
       'field_type' => $field->field_type,
       'field_id' => $field->id,
       'pseudoconstant' => CRM_Utils_Array::value(

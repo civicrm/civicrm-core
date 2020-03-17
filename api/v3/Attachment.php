@@ -385,7 +385,7 @@ function _civicrm_api3_attachment_parse_params($params) {
 
   $isTrusted = empty($params['check_permissions']);
 
-  $returns = isset($params['return']) ? $params['return'] : [];
+  $returns = $params['return'] ?? [];
   $returns = is_array($returns) ? $returns : [$returns];
   $returnContent = in_array('content', $returns);
 

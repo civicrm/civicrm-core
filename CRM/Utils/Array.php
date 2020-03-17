@@ -569,10 +569,10 @@ class CRM_Utils_Array {
       $node = &$result;
       foreach ($keys as $key) {
         if (is_array($record)) {
-          $keyvalue = isset($record[$key]) ? $record[$key] : NULL;
+          $keyvalue = $record[$key] ?? NULL;
         }
         else {
-          $keyvalue = isset($record->{$key}) ? $record->{$key} : NULL;
+          $keyvalue = $record->{$key} ?? NULL;
         }
         if (isset($node[$keyvalue]) && !is_array($node[$keyvalue])) {
           $node[$keyvalue] = [];

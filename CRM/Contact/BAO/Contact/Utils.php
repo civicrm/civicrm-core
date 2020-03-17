@@ -1081,7 +1081,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
       if (!empty($contactParams[$greeting . '_id'])) {
         $string = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $greeting . '_id', $contactParams[$greeting . '_id']);
       }
-      $string = isset($contactParams[$greeting . '_custom']) ? $contactParams[$greeting . '_custom'] : $string;
+      $string = $contactParams[$greeting . '_custom'] ?? $string;
       if (empty($string)) {
         $tokens[$greeting] = [];
       }

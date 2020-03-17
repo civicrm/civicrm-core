@@ -110,7 +110,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
-    $fieldValue = isset($actionSearchResult->{"contrib_$field"}) ? $actionSearchResult->{"contrib_$field"} : NULL;
+    $fieldValue = $actionSearchResult->{"contrib_$field"} ?? NULL;
 
     $aliasTokens = $this->getAliasTokens();
     if (in_array($field, ['total_amount', 'fee_amount', 'net_amount'])) {

@@ -129,7 +129,7 @@ $installTypeToUF = array(
   'backdrop' => 'Backdrop',
 );
 
-$uf = (isset($installTypeToUF[$installType]) ? $installTypeToUF[$installType] : 'Drupal');
+$uf = ($installTypeToUF[$installType] ?? 'Drupal');
 define('CIVICRM_UF', $uf);
 
 // Set the Locale (required by CRM_Core_Config)
@@ -1916,7 +1916,7 @@ function getSiteDir($cmsPath, $str) {
     preg_quote($modules, CIVICRM_DIRECTORY_SEPARATOR) . "/",
     $_SERVER['SCRIPT_FILENAME'], $matches
   );
-  $siteDir = isset($matches[1]) ? $matches[1] : 'default';
+  $siteDir = $matches[1] ?? 'default';
 
   if (strtolower($siteDir) == 'all') {
     // For this case - use drupal's way of finding out multi-site directory

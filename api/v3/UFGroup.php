@@ -135,7 +135,7 @@ function _civicrm_api3_uf_group_getlist_output($result, $request, $entity, $fiel
         }
       };
       if (!empty($request['image_field'])) {
-        $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
+        $data['image'] = $row[$request['image_field']] ?? '';
       }
       $output[] = $data;
     }

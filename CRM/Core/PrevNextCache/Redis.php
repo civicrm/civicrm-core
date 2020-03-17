@@ -41,7 +41,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
    */
   public function __construct($settings) {
     $this->redis = CRM_Utils_Cache_Redis::connect($settings);
-    $this->prefix = isset($settings['prefix']) ? $settings['prefix'] : '';
+    $this->prefix = $settings['prefix'] ?? '';
     $this->prefix .= \CRM_Utils_Cache::DELIMITER . 'prevnext' . \CRM_Utils_Cache::DELIMITER;
   }
 

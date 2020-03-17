@@ -100,7 +100,7 @@ trait GenericAssertionsTrait {
   public function assertArrayValueNotNull($key, &$list) {
     $this->assertArrayKeyExists($key, $list);
 
-    $value = isset($list[$key]) ? $list[$key] : NULL;
+    $value = $list[$key] ?? NULL;
     $this->assertTrue($value,
       sprintf("%s element not null?", $key)
     );

@@ -197,7 +197,7 @@ class ResolverApi {
     }
 
     $result = civicrm_api3($this->url['host'], ltrim($this->url['path'], '/'), $apiParams);
-    return isset($result['values']) ? $result['values'] : NULL;
+    return $result['values'] ?? NULL;
   }
 
   /**

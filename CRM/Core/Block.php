@@ -175,7 +175,7 @@ class CRM_Core_Block {
     if (!(self::$_properties)) {
       self::initProperties();
     }
-    return isset(self::$_properties[$id][$property]) ? self::$_properties[$id][$property] : NULL;
+    return self::$_properties[$id][$property] ?? NULL;
   }
 
   /**
@@ -439,7 +439,7 @@ class CRM_Core_Block {
       $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
     }
     $value['title'] = $short['title'];
-    $value['ref'] = isset($short['ref']) ? $short['ref'] : '';
+    $value['ref'] = $short['ref'] ?? '';
     if (!empty($short['shortCuts'])) {
       foreach ($short['shortCuts'] as $shortCut) {
         $value['shortCuts'][] = self::setShortcutValues($shortCut);

@@ -2636,9 +2636,9 @@ WHERE      civicrm_membership.is_test = 0
            * Update status
            */
           $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
-            isset($updates["start_date"]) ? $updates["start_date"] : $newMembership->start_date,
-            isset($updates["end_date"]) ? $updates["end_date"] : $newMembership->end_date,
-            isset($updates["join_date"]) ? $updates["join_date"] : $newMembership->join_date,
+            $updates["start_date"] ?? $newMembership->start_date,
+            $updates["end_date"] ?? $newMembership->end_date,
+            $updates["join_date"] ?? $newMembership->join_date,
             'today',
             FALSE,
             $newMembershipId,

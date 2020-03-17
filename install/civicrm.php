@@ -67,7 +67,7 @@ function civicrm_main(&$config) {
   global $sqlPath, $crmPath, $cmsPath, $installType;
 
   if ($installType == 'drupal') {
-    $siteDir = isset($config['site_dir']) ? $config['site_dir'] : getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
+    $siteDir = $config['site_dir'] ?? getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
     civicrm_setup($cmsPath . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . $siteDir . DIRECTORY_SEPARATOR . 'files'
     );
   }
@@ -212,7 +212,7 @@ function civicrm_config(&$config) {
     'dbName' => addslashes($config['mysql']['database']),
   );
 
-  $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
+  $params['baseURL'] = $config['base_url'] ?? civicrm_cms_base();
   if ($installType == 'drupal' && defined('VERSION')) {
     if (version_compare(VERSION, '8.0') >= 0) {
       $params['cms'] = 'Drupal';

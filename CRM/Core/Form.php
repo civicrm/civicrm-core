@@ -487,7 +487,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {
-        $this->ajaxResponse['id'] = isset($this->id) ? $this->id : $this->_id;
+        $this->ajaxResponse['id'] = $this->id ?? $this->_id;
       }
       CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
     }
@@ -1442,7 +1442,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       list(, $id) = explode('_', $name);
-      $label = isset($props['label']) ? $props['label'] : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
+      $label = $props['label'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
       if (CRM_Utils_Array::value('context', $props) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
@@ -1460,7 +1460,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           break;
         }
       }
-      $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
+      $label = $props['label'] ?? $fieldSpec['title'];
       if (CRM_Utils_Array::value('context', $props) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
@@ -1525,10 +1525,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Core field - get metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-    $fieldSpecLabel = isset($fieldSpec['html']['label']) ? $fieldSpec['html']['label'] : CRM_Utils_Array::value('title', $fieldSpec);
+    $fieldSpecLabel = $fieldSpec['html']['label'] ?? CRM_Utils_Array::value('title', $fieldSpec);
     $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
 
-    $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
+    $widget = $props['type'] ?? $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $context == 'search') {
       $widget = 'Text';
     }
@@ -1547,7 +1547,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $options = $props['options'];
       }
       else {
-        $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
+        $options = $fieldSpec['options'] ?? NULL;
       }
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
@@ -1579,7 +1579,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Number':
       case 'Email':
         //TODO: Autodetect ranges
-        $props['size'] = isset($props['size']) ? $props['size'] : 60;
+        $props['size'] = $props['size'] ?? 60;
         return $this->add(strtolower($widget), $name, $label, $props, $required);
 
       case 'hidden':
@@ -1587,8 +1587,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'TextArea':
         //Set default columns and rows for textarea.
-        $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
-        $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
+        $props['rows'] = $props['rows'] ?? 4;
+        $props['cols'] = $props['cols'] ?? 60;
         if (empty($props['maxlength']) && isset($fieldSpec['length'])) {
           $props['maxlength'] = $fieldSpec['length'];
         }
@@ -1610,7 +1610,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
 
       case 'Radio':
-        $separator = isset($props['separator']) ? $props['separator'] : NULL;
+        $separator = $props['separator'] ?? NULL;
         unset($props['separator']);
         if (!isset($props['allowClear'])) {
           $props['allowClear'] = !$required;
@@ -1645,13 +1645,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $this->addYesNo($name, $label, TRUE, FALSE, $props);
           return;
         }
-        $text = isset($props['text']) ? $props['text'] : NULL;
+        $text = $props['text'] ?? NULL;
         unset($props['text']);
         return $this->addElement('checkbox', $name, $label, $text, $props);
 
       //add support for 'Advcheckbox' field
       case 'advcheckbox':
-        $text = isset($props['text']) ? $props['text'] : NULL;
+        $text = $props['text'] ?? NULL;
         unset($props['text']);
         return $this->addElement('advcheckbox', $name, $label, $text, $props);
 
@@ -1671,7 +1671,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':
-        $props['size'] = isset($props['size']) ? $props['size'] : 60;
+        $props['size'] = $props['size'] ?? 60;
         return $this->add('password', $name, $label, $props, $required);
 
       // Check datatypes of fields
@@ -1771,7 +1771,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return null
    */
   public function getVar($name) {
-    return isset($this->$name) ? $this->$name : NULL;
+    return $this->$name ?? NULL;
   }
 
   /**

@@ -570,7 +570,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if (!empty(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
       // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
       if ($config->userSystem->is_drupal and function_exists('watchdog')) {
-        watchdog('civicrm', '%message', ['%message' => $message], isset($priority) ? $priority : WATCHDOG_DEBUG);
+        watchdog('civicrm', '%message', ['%message' => $message], $priority ?? WATCHDOG_DEBUG);
       }
     }
 
@@ -1005,8 +1005,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function deprecatedFunctionWarning($newMethod) {
     $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-    $callerFunction = isset($dbt[1]['function']) ? $dbt[1]['function'] : NULL;
-    $callerClass = isset($dbt[1]['class']) ? $dbt[1]['class'] : NULL;
+    $callerFunction = $dbt[1]['function'] ?? NULL;
+    $callerClass = $dbt[1]['class'] ?? NULL;
     Civi::log()->warning("Deprecated function $callerClass::$callerFunction, use $newMethod.", ['civi.tag' => 'deprecated']);
   }
 

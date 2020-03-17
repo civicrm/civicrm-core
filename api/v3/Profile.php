@@ -442,17 +442,17 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 
   if (!empty($result['api.address.get.1']['count'])) {
     foreach ($addressFields as $fieldname) {
-      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.1']['values'][0][$fieldname]) ? $result['api.address.get.1']['values'][0][$fieldname] : '';
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = $result['api.address.get.1']['values'][0][$fieldname] ?? '';
     }
   }
   elseif (!empty($result['api.address.get.2']['count'])) {
     foreach ($addressFields as $fieldname) {
-      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.2']['values'][0][$fieldname]) ? $result['api.address.get.2']['values'][0][$fieldname] : '';
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = $result['api.address.get.2']['values'][0][$fieldname] ?? '';
     }
   }
   else {
     foreach ($addressFields as $fieldname) {
-      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result[$fieldname]) ? $result[$fieldname] : '';
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = $result[$fieldname] ?? '';
     }
   }
 

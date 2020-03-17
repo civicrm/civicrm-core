@@ -756,7 +756,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         if (!empty($table[$fieldGrp]) && is_array($table[$fieldGrp])) {
           foreach ($table[$fieldGrp] as $fieldName => $field) {
             // $name is the field name used to reference the BAO/DAO export fields array
-            $name = isset($field['name']) ? $field['name'] : $fieldName;
+            $name = $field['name'] ?? $fieldName;
 
             // Sometimes the field name key in the BAO/DAO export fields array is
             // different from the actual database field name.
@@ -790,8 +790,8 @@ class CRM_Report_Form extends CRM_Core_Form {
             }
 
             // set alias = table-name, unless already set
-            $alias = isset($field['alias']) ? $field['alias'] : (
-              isset($this->_columns[$tableName]['alias']) ? $this->_columns[$tableName]['alias'] : $tableName
+            $alias = $field['alias'] ?? (
+              $this->_columns[$tableName]['alias'] ?? $tableName
             );
             $this->_columns[$tableName][$fieldGrp][$fieldName]['alias'] = $alias;
 

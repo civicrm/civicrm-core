@@ -189,7 +189,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
 
-      $taskParams['ssID'] = isset($this->_ssID) ? $this->_ssID : NULL;
+      $taskParams['ssID'] = $this->_ssID ?? NULL;
       $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
 
       if (isset($this->_ssID)) {

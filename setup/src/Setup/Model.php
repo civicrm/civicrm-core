@@ -176,7 +176,7 @@ class Model {
     $field = array_merge($defaults, $field);
 
     if (array_key_exists('value', $field) || !array_key_exists($field['name'], $this->values)) {
-      $this->values[$field['name']] = isset($field['value']) ? $field['value'] : NULL;
+      $this->values[$field['name']] = $field['value'] ?? NULL;
       unset($field['value']);
     }
 
@@ -202,10 +202,10 @@ class Model {
    */
   public function getField($field, $property = NULL) {
     if ($property) {
-      return isset($this->fields[$field][$property]) ? $this->fields[$field][$property] : NULL;
+      return $this->fields[$field][$property] ?? NULL;
     }
     else {
-      return isset($this->fields[$field]) ? $this->fields[$field] : NULL;
+      return $this->fields[$field] ?? NULL;
     }
   }
 

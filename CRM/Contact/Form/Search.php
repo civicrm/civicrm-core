@@ -367,7 +367,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $taskParams['deletedContacts'] = CRM_Utils_Array::value('deleted_contacts', $this->_formValues);
       }
       $className = $this->_modeValue['taskClassName'];
-      $taskParams['ssID'] = isset($this->_ssID) ? $this->_ssID : NULL;
+      $taskParams['ssID'] = $this->_ssID ?? NULL;
       $this->_taskList += $className::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
     }
 

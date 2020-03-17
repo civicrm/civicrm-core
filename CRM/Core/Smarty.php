@@ -276,7 +276,7 @@ class CRM_Core_Smarty extends Smarty {
     $oldVars = $this->get_template_vars();
     $backupFrame = [];
     foreach ($vars as $key => $value) {
-      $backupFrame[$key] = isset($oldVars[$key]) ? $oldVars[$key] : NULL;
+      $backupFrame[$key] = $oldVars[$key] ?? NULL;
     }
     $this->backupFrames[] = $backupFrame;
 

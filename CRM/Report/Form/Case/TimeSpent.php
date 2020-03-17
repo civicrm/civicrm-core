@@ -340,13 +340,13 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
       if (isset($row['civicrm_activity_activity_type_id'])) {
         $entryFound = TRUE;
         $val = $row['civicrm_activity_activity_type_id'];
-        $rows[$rowNum]['civicrm_activity_activity_type_id'] = isset($this->activityTypes[$val]) ? $this->activityTypes[$val] : '';
+        $rows[$rowNum]['civicrm_activity_activity_type_id'] = $this->activityTypes[$val] ?? '';
       }
 
       if (isset($row['civicrm_activity_status_id'])) {
         $entryFound = TRUE;
         $val = $row['civicrm_activity_status_id'];
-        $rows[$rowNum]['civicrm_activity_status_id'] = isset($this->activityStatuses[$val]) ? $this->activityStatuses[$val] : '';
+        $rows[$rowNum]['civicrm_activity_status_id'] = $this->activityStatuses[$val] ?? '';
       }
 
       // The next two make it easier to make pivot tables after exporting to Excel

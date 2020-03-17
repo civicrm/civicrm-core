@@ -386,8 +386,8 @@ class CRM_Utils_Migrate_Export {
    * @param null $sql
    */
   public function fetch($groupName, $daoName, $sql = NULL) {
-    $idNameFields = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
-    $mappedFields = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
+    $idNameFields = $this->_xml[$groupName]['idNameFields'] ?? NULL;
+    $mappedFields = $this->_xml[$groupName]['mappedFields'] ?? NULL;
 
     $dao = new $daoName();
     if ($sql) {

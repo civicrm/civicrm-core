@@ -133,7 +133,7 @@ class CiviEventInspector {
    * @return CiviEventInspector
    */
   public function add($eventDef) {
-    $name = isset($eventDef['name']) ? $eventDef['name'] : NULL;
+    $name = $eventDef['name'] ?? NULL;
 
     if (!isset($eventDef['type'])) {
       $eventDef['type'] = preg_match('/^hook_/', $eventDef['name']) ? 'hook' : 'object';

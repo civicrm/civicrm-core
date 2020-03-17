@@ -97,7 +97,7 @@ class Themes {
    */
   public function get($themeKey) {
     $all = $this->getAll();
-    return isset($all[$themeKey]) ? $all[$themeKey] : NULL;
+    return $all[$themeKey] ?? NULL;
   }
 
   /**

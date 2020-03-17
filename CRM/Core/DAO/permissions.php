@@ -44,5 +44,5 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   // Translate specific actions into their generic equivalents
   $action = CRM_Core_Permission::getGenericAction($action);
 
-  return isset($perm[$action]) ? $perm[$action] : $perm['default'];
+  return $perm[$action] ?? $perm['default'];
 }

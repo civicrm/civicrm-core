@@ -73,7 +73,7 @@ class AngularLoader {
     $this->res = \CRM_Core_Resources::singleton();
     $this->angular = \Civi::service('angular');
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
-    $this->pageName = isset($_GET['q']) ? $_GET['q'] : NULL;
+    $this->pageName = $_GET['q'] ?? NULL;
     $this->modules = [];
   }
 

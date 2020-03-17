@@ -719,13 +719,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           list($locType) = explode("-email", $property);
           $onholdProperty = "{$locType}-on_hold";
 
-          $row[$property] = isset($result->$property) ? $result->$property : NULL;
+          $row[$property] = $result->$property ?? NULL;
           if (!empty($row[$property]) && !empty($result->$onholdProperty)) {
             $row[$property] .= " (On Hold)";
           }
         }
         else {
-          $row[$property] = isset($result->$property) ? $result->$property : NULL;
+          $row[$property] = $result->$property ?? NULL;
         }
       }
 

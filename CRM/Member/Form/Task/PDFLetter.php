@@ -76,8 +76,8 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   public function postProcess() {
     // TODO: rewrite using contribution token and one letter by contribution
     $this->setContactIDs();
-    $skipOnHold = isset($this->skipOnHold) ? $this->skipOnHold : FALSE;
-    $skipDeceased = isset($this->skipDeceased) ? $this->skipDeceased : TRUE;
+    $skipOnHold = $this->skipOnHold ?? FALSE;
+    $skipDeceased = $this->skipDeceased ?? TRUE;
     CRM_Member_Form_Task_PDFLetterCommon::postProcessMembers(
       $this, $this->_memberIds, $skipOnHold, $skipDeceased, $this->_contactIds
     );
