@@ -262,7 +262,7 @@ function _civicrm_api_replace_variable($value, $parentResult, $separator) {
       if (array_key_exists($fieldname, $parentResult) && is_array($parentResult[$fieldname])) {
         $arrayLocation = $parentResult[$fieldname];
         foreach ($stringParts as $key => $innerValue) {
-          $arrayLocation = CRM_Utils_Array::value($innerValue, $arrayLocation);
+          $arrayLocation = $arrayLocation[$innerValue] ?? NULL;
         }
         $value = $arrayLocation;
       }

@@ -60,8 +60,8 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   }
   $entity = $apiRequest['entity'];
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
-  $subentity    = CRM_Utils_Array::value('contact_type', $apiRequest['params']);
-  $action = CRM_Utils_Array::value('action', $apiRequest['params']);
+  $subentity    = $apiRequest['params']['contact_type'] ?? NULL;
+  $action = $apiRequest['params']['action'] ?? NULL;
   $sequential = empty($apiRequest['params']['sequential']) ? 0 : 1;
   $apiRequest['params']['options'] = CRM_Utils_Array::value('options', $apiRequest['params'], []);
   $optionsToResolve = (array) CRM_Utils_Array::value('get_options', $apiRequest['params']['options'], []);
@@ -414,7 +414,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
   }
   // Validate 'context' from params
-  $context = CRM_Utils_Array::value('context', $apiRequest['params']);
+  $context = $apiRequest['params']['context'] ?? NULL;
   CRM_Core_DAO::buildOptionsContext($context);
   unset($apiRequest['params']['context'], $apiRequest['params']['field'], $apiRequest['params']['condition']);
 
@@ -502,10 +502,10 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
   }
 
   // Allow caller to specify context
-  $context = CRM_Utils_Array::value('get_options_context', $apiRequest['params']['options']);
+  $context = $apiRequest['params']['options']['get_options_context'] ?? NULL;
   // Default to api action if it is a supported context.
   if (!$context) {
-    $action = CRM_Utils_Array::value('action', $apiRequest['params']);
+    $action = $apiRequest['params']['action'] ?? NULL;
     $contexts = CRM_Core_DAO::buildOptionsContext();
     if (isset($contexts[$action])) {
       $context = $action;

@@ -539,10 +539,10 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     }
   }
   $options = array_merge($options, $additional_options);
-  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset             = CRM_Utils_Array::value('offset', $options, NULL);
-  $limit             = CRM_Utils_Array::value('limit', $options, NULL);
-  $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
+  $sort             = $options['sort'] ?? NULL;
+  $offset             = $options['offset'] ?? NULL;
+  $limit             = $options['limit'] ?? NULL;
+  $smartGroupCache  = $params['smartGroupCache'] ?? NULL;
 
   if ($getCount) {
     $limit = NULL;

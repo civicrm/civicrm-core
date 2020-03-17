@@ -25,7 +25,7 @@
  */
 function civicrm_api3_domain_get($params) {
 
-  $params['version'] = CRM_Utils_Array::value('domain_version', $params);
+  $params['version'] = $params['domain_version'] ?? NULL;
   unset($params['version']);
 
   $bao = new CRM_Core_BAO_Domain();
@@ -54,7 +54,7 @@ function civicrm_api3_domain_get($params) {
       ];
 
       if (!empty($values['location']['email'])) {
-        $domain['domain_email'] = CRM_Utils_Array::value('email', $values['location']['email'][1]);
+        $domain['domain_email'] = $values['location']['email'][1]['email'] ?? NULL;
       }
 
       if (!empty($values['location']['phone'])) {

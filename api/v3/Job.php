@@ -512,7 +512,7 @@ function civicrm_api3_job_process_respondent($params) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_process_batch_merge($params) {
-  $rule_group_id = CRM_Utils_Array::value('rule_group_id', $params);
+  $rule_group_id = $params['rule_group_id'] ?? NULL;
   if (!$rule_group_id) {
     $rule_group_id = civicrm_api3('RuleGroup', 'getvalue', [
       'contact_type' => 'Individual',
@@ -521,8 +521,8 @@ function civicrm_api3_job_process_batch_merge($params) {
       'options' => ['limit' => 1],
     ]);
   }
-  $rgid = CRM_Utils_Array::value('rgid', $params);
-  $gid = CRM_Utils_Array::value('gid', $params);
+  $rgid = $params['rgid'] ?? NULL;
+  $gid = $params['gid'] ?? NULL;
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
 
   $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, []), CRM_Utils_Array::value('check_permissions', $params), NULL, $params['search_limit']);

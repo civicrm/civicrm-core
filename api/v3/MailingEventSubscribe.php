@@ -29,7 +29,7 @@
 function civicrm_api3_mailing_event_subscribe_create($params) {
   $email      = $params['email'];
   $group_id   = $params['group_id'];
-  $contact_id = CRM_Utils_Array::value('contact_id', $params);
+  $contact_id = $params['contact_id'] ?? NULL;
 
   $group            = new CRM_Contact_DAO_Group();
   $group->is_active = 1;

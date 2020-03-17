@@ -192,7 +192,7 @@ function civicrm_api3_mailing_clone($params) {
   $get = civicrm_api3('Mailing', 'getsingle', ['id' => $params['id']]);
 
   $newParams = [];
-  $newParams['debug'] = CRM_Utils_Array::value('debug', $params);
+  $newParams['debug'] = $params['debug'] ?? NULL;
   $newParams['groups']['include'] = [];
   $newParams['groups']['exclude'] = [];
   $newParams['mailings']['include'] = [];
@@ -393,9 +393,9 @@ function civicrm_api3_mailing_event_reply($params) {
   $queue     = $params['event_queue_id'];
   $hash      = $params['hash'];
   $replyto   = $params['replyTo'];
-  $bodyTxt   = CRM_Utils_Array::value('bodyTxt', $params);
-  $bodyHTML  = CRM_Utils_Array::value('bodyHTML', $params);
-  $fullEmail = CRM_Utils_Array::value('fullEmail', $params);
+  $bodyTxt   = $params['bodyTxt'] ?? NULL;
+  $bodyHTML  = $params['bodyHTML'] ?? NULL;
+  $fullEmail = $params['fullEmail'] ?? NULL;
 
   $mailing = CRM_Mailing_Event_BAO_Reply::reply($job, $queue, $hash, $replyto);
 
@@ -440,8 +440,8 @@ function civicrm_api3_mailing_event_forward($params) {
   $queue     = $params['event_queue_id'];
   $hash      = $params['hash'];
   $email     = $params['email'];
-  $fromEmail = CRM_Utils_Array::value('fromEmail', $params);
-  $params    = CRM_Utils_Array::value('params', $params);
+  $fromEmail = $params['fromEmail'] ?? NULL;
+  $params    = $params['params'] ?? NULL;
 
   $forward = CRM_Mailing_Event_BAO_Forward::forward($job, $queue, $hash, $email, $fromEmail, $params);
 
@@ -538,7 +538,7 @@ function civicrm_api3_mailing_preview($params) {
   }
 
   $mailing = new CRM_Mailing_BAO_Mailing();
-  $mailingID = CRM_Utils_Array::value('id', $params);
+  $mailingID = $params['id'] ?? NULL;
   if ($mailingID) {
     $mailing->id = $mailingID;
     $mailing->find(TRUE);
@@ -555,7 +555,7 @@ function civicrm_api3_mailing_preview($params) {
   $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $mailing->id);
 
   $returnProperties = $mailing->getReturnProperties();
-  $contactID = CRM_Utils_Array::value('contact_id', $params);
+  $contactID = $params['contact_id'] ?? NULL;
   if (!$contactID) {
     // If we still don't have a userID in a session because we are annon then set contactID to be 0
     $contactID = empty($session->get('userID')) ? 0 : $session->get('userID');
@@ -564,7 +564,7 @@ function civicrm_api3_mailing_preview($params) {
 
   if (!$contactID) {
     $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
-    $details = CRM_Utils_Array::value(0, $details[0]);
+    $details = $details[0][0] ?? NULL;
   }
   else {
     $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());

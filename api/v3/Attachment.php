@@ -338,7 +338,7 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
  * @throws API_Exception validation errors
  */
 function _civicrm_api3_attachment_parse_params($params) {
-  $id = CRM_Utils_Array::value('id', $params, NULL);
+  $id = $params['id'] ?? NULL;
   if ($id && !is_numeric($id)) {
     throw new API_Exception("Malformed id");
   }

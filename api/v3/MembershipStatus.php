@@ -72,7 +72,7 @@ function civicrm_api3_membership_status_update($params) {
 
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
   //don't allow duplicate names.
-  $name = CRM_Utils_Array::value('name', $params);
+  $name = $params['name'] ?? NULL;
   if ($name) {
     $status = new CRM_Member_DAO_MembershipStatus();
     $status->name = $params['name'];
