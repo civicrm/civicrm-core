@@ -114,10 +114,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    */
   public static function &create(&$params) {
     if (isset($params['report_header'])) {
-      $params['header'] = CRM_Utils_Array::value('report_header', $params);
+      $params['header'] = $params['report_header'] ?? NULL;
     }
     if (isset($params['report_footer'])) {
-      $params['footer'] = CRM_Utils_Array::value('report_footer', $params);
+      $params['footer'] = $params['report_footer'] ?? NULL;
     }
 
     // build navigation parameters
@@ -131,8 +131,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       $navigationParams['label'] = $params['title'];
       $navigationParams['name'] = $params['title'];
 
-      $navigationParams['current_parent_id'] = CRM_Utils_Array::value('parent_id', $navigationParams);
-      $navigationParams['parent_id'] = CRM_Utils_Array::value('parent_id', $params);
+      $navigationParams['current_parent_id'] = $navigationParams['parent_id'] ?? NULL;
+      $navigationParams['parent_id'] = $params['parent_id'] ?? NULL;
       $navigationParams['is_active'] = 1;
 
       if ($permission = CRM_Utils_Array::value('permission', $params)) {

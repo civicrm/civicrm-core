@@ -38,7 +38,7 @@ class CRM_Financial_Page_AJAX {
     }
     else {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
-      $financialAccountType = CRM_Utils_Array::value($_GET['_value'], $financialAccountType);
+      $financialAccountType = $financialAccountType[$_GET['_value']] ?? NULL;
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
       if ($financialAccountType) {
         $defaultId = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = $financialAccountType");
@@ -303,7 +303,7 @@ class CRM_Financial_Page_AJAX {
     $params['context'] = $context;
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
     $params['total'] = 0;
 
     // get batch list

@@ -98,7 +98,7 @@ class CRM_Case_Form_Activity_LinkCases {
   public static function formRule($values, $files, $form) {
     $errors = [];
 
-    $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
+    $linkCaseId = $values['link_to_case_id'] ?? NULL;
     assert('is_numeric($linkCaseId)');
     if ($linkCaseId == CRM_Utils_Array::first($form->_caseId)) {
       $errors['link_to_case'] = ts('Please select some other case to link.');
@@ -133,7 +133,7 @@ class CRM_Case_Form_Activity_LinkCases {
    */
   public static function endPostProcess(&$form, &$params, &$activity) {
     $activityId = $activity->id;
-    $linkCaseID = CRM_Utils_Array::value('link_to_case_id', $params);
+    $linkCaseID = $params['link_to_case_id'] ?? NULL;
 
     //create a link between two cases.
     if ($activityId && $linkCaseID) {

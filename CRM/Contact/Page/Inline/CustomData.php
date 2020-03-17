@@ -44,7 +44,7 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
       $fields = reset($details[$cgId]);
     }
     else {
-      $fields = CRM_Utils_Array::value($customRecId, $details[$cgId]);
+      $fields = $details[$cgId][$customRecId] ?? NULL;
     }
     $this->assign('cgcount', $cgcount);
     $this->assign('customRecId', $customRecId);

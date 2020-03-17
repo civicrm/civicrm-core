@@ -173,7 +173,7 @@ WHERE  $where
       $clauses[] = "civicrm_contribution.receive_date <= '{$this->_formValues['end_date']} 23:59:59'";
     }
 
-    $tag = CRM_Utils_Array::value('tag', $this->_formValues);
+    $tag = $this->_formValues['tag'] ?? NULL;
     if ($tag) {
       $clauses[] = "civicrm_entity_tag.tag_id = $tag";
       $clauses[] = "civicrm_tag.id = civicrm_entity_tag.tag_id";

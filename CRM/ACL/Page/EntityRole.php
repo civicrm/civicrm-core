@@ -127,7 +127,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
       $entityRoles[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $entityRoles[$dao->id]);
 
-      $entityRoles[$dao->id]['acl_role'] = CRM_Utils_Array::value($dao->acl_role_id, $aclRoles);
+      $entityRoles[$dao->id]['acl_role'] = $aclRoles[$dao->acl_role_id] ?? NULL;
       $entityRoles[$dao->id]['entity'] = $groups[$dao->entity_id];
 
       // form all action links

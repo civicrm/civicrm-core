@@ -319,7 +319,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     $recursionDates = [];
     if (is_a($this->recursion, 'When\When')) {
-      $initialCount = CRM_Utils_Array::value('start_action_offset', $this->schedule);
+      $initialCount = $this->schedule['start_action_offset'] ?? NULL;
 
       $exRangeStart = $exRangeEnd = NULL;
       if (!empty($this->excludeDateRangeColumns)) {
@@ -894,7 +894,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     //For Repeats on:(weekly case)
     if ($formParams['repetition_frequency_unit'] == 'week') {
       if (!empty($formParams['start_action_condition'])) {
-        $repeats_on = CRM_Utils_Array::value('start_action_condition', $formParams);
+        $repeats_on = $formParams['start_action_condition'] ?? NULL;
         $dbParams['start_action_condition'] = implode(",", array_keys($repeats_on));
       }
     }

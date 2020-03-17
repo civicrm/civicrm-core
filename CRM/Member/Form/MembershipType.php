@@ -502,7 +502,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         ];
         $editedResults = [];
         CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
-        $optionsIds['option_id'][1] = CRM_Utils_Array::value('id', $editedResults);
+        $optionsIds['option_id'][1] = $editedResults['id'] ?? NULL;
       }
     }
   }

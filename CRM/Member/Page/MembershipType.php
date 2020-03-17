@@ -125,7 +125,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
             $value, $relationshipName
           );
         }
-        $membershipType[$dao->id]['maxRelated'] = CRM_Utils_Array::value('max_related', $membershipType[$dao->id]);
+        $membershipType[$dao->id]['maxRelated'] = $membershipType[$dao->id]['max_related'] ?? NULL;
       }
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
         unset($links[CRM_Core_Action::UPDATE], $links[CRM_Core_Action::ENABLE], $links[CRM_Core_Action::DISABLE]);

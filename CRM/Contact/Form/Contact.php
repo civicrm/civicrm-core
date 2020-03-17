@@ -200,8 +200,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           CRM_Core_Error::statusBounce(ts('A Contact with that ID does not exist: %1', [1 => $this->_contactId]));
         }
 
-        $this->_contactType = CRM_Utils_Array::value('contact_type', $defaults);
-        $this->_contactSubType = CRM_Utils_Array::value('contact_sub_type', $defaults);
+        $this->_contactType = $defaults['contact_type'] ?? NULL;
+        $this->_contactSubType = $defaults['contact_sub_type'] ?? NULL;
 
         // check for permissions
         $session = CRM_Core_Session::singleton();
@@ -321,7 +321,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     // retain the multiple count custom fields value
     if (!empty($_POST['hidden_custom'])) {
-      $customGroupCount = CRM_Utils_Array::value('hidden_custom_group_count', $_POST);
+      $customGroupCount = $_POST['hidden_custom_group_count'] ?? NULL;
 
       if ($contactSubType = CRM_Utils_Array::value('contact_sub_type', $_POST)) {
         $paramSubType = implode(',', $contactSubType);
@@ -614,7 +614,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $dataExists = self::blockDataExists($blockValues);
 
           if (!$dataExists && $name == 'address') {
-            $dataExists = CRM_Utils_Array::value('use_shared_address', $fields['address'][$instance]);
+            $dataExists = $fields['address'][$instance]['use_shared_address'] ?? NULL;
           }
 
           if ($dataExists) {
@@ -652,7 +652,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
           if ($name == 'openid' && !empty($blockValues[$name])) {
             $oid = new CRM_Core_DAO_OpenID();
-            $oid->openid = $openIds[$instance] = CRM_Utils_Array::value($name, $blockValues);
+            $oid->openid = $openIds[$instance] = $blockValues[$name];
             $cid = $contactId ?? 0;
             if ($oid->find(TRUE) && ($oid->contact_id != $cid)) {
               $errors["{$name}[$instance][openid]"] = ts('%1 already exist.', [1 => $blocks['OpenID']]);
@@ -869,7 +869,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['preferred_communication_method'] = 'null';
     }
 
-    $group = CRM_Utils_Array::value('group', $params);
+    $group = $params['group'] ?? NULL;
     if (!empty($group) && is_array($group)) {
       unset($params['group']);
       foreach ($group as $key => $value) {
@@ -1256,7 +1256,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
 
       // main parse string.
-      $parseString = CRM_Utils_Array::value($parseFieldName, $address);
+      $parseString = $address[$parseFieldName] ?? NULL;
 
       // parse address field.
       $parsedFields = CRM_Core_BAO_Address::parseStreetAddress($parseString);
@@ -1288,7 +1288,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             $streetAddress .= ' ';
           }
           // CRM-17619 - if the street number suffix begins with a number, add a space
-          $thesuffix = CRM_Utils_Array::value('street_number_suffix', $address);
+          $thesuffix = $address['street_number_suffix'] ?? NULL;
           if ($fld === 'street_number_suffix' && $thesuffix) {
             if (ctype_digit(substr($thesuffix, 0, 1))) {
               $streetAddress .= ' ';

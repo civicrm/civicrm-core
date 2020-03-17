@@ -133,12 +133,12 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           }
           if (!empty($financialAccount->financial_account_type_id)) {
             $optionGroupName = 'financial_account_type';
-            $financialType[$dao->id]['financial_account_type'] = CRM_Utils_Array::value($financialAccount->financial_account_type_id, $financialAccountType);
+            $financialType[$dao->id]['financial_account_type'] = $financialAccountType[$financialAccount->financial_account_type_id] ?? NULL;
 
           }
           if (!empty($dao->account_relationship)) {
             $optionGroupName = 'account_relationship';
-            $financialType[$dao->id]['account_relationship'] = CRM_Utils_Array::value($dao->account_relationship, $accountRelationship);
+            $financialType[$dao->id]['account_relationship'] = $accountRelationship[$dao->account_relationship] ?? NULL;
           }
         }
         // form all action links

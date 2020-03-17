@@ -43,7 +43,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    */
   public static function create(&$params) {
     $op = 'edit';
-    $batchId = CRM_Utils_Array::value('id', $params);
+    $batchId = $params['id'] ?? NULL;
     if (!$batchId) {
       $op = 'create';
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
@@ -150,7 +150,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
 
     // get batches
     $batches = self::getBatchList($params);
@@ -185,8 +185,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $batch['batch_name'] = $value['title'];
       $batch['total'] = '';
       $batch['payment_instrument'] = $value['payment_instrument'];
-      $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
-      $batch['type'] = CRM_Utils_Array::value('batch_type', $value);
+      $batch['item_count'] = $value['item_count'] ?? NULL;
+      $batch['type'] = $value['batch_type'] ?? NULL;
       if (!empty($value['total'])) {
         // CRM-21205
         $batch['total'] = CRM_Utils_Money::format($value['total'], $value['currency']);

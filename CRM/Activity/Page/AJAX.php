@@ -249,7 +249,7 @@ class CRM_Activity_Page_AJAX {
     $params = ['caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode'];
     $vals = [];
     foreach ($params as $param) {
-      $vals[$param] = CRM_Utils_Array::value($param, $_POST);
+      $vals[$param] = $_POST[$param] ?? NULL;
     }
 
     CRM_Utils_JSON::output(self::_convertToCaseActivity($vals));

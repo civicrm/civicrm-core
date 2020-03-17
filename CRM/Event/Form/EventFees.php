@@ -254,8 +254,8 @@ class CRM_Event_Form_EventFees {
 
       $priceFields = $htmlTypes = $optionValues = [];
       foreach ($lineItems[$participantID] as $lineId => $items) {
-        $priceFieldId = CRM_Utils_Array::value('price_field_id', $items);
-        $priceOptionId = CRM_Utils_Array::value('price_field_value_id', $items);
+        $priceFieldId = $items['price_field_id'] ?? NULL;
+        $priceOptionId = $items['price_field_value_id'] ?? NULL;
         if ($priceFieldId && $priceOptionId) {
           $priceFields[$priceFieldId][] = $priceOptionId;
         }
@@ -277,7 +277,7 @@ SELECT  id, html_type
 
       foreach ($lineItems[$participantID] as $lineId => $items) {
         $fieldId = $items['price_field_id'];
-        $htmlType = CRM_Utils_Array::value($fieldId, $htmlTypes);
+        $htmlType = $htmlTypes[$fieldId] ?? NULL;
         if (!$htmlType) {
           continue;
         }
@@ -286,7 +286,7 @@ SELECT  id, html_type
           $defaults["price_{$fieldId}"] = $items['qty'];
         }
         else {
-          $fieldOptValues = CRM_Utils_Array::value($fieldId, $priceFields);
+          $fieldOptValues = $priceFields[$fieldId] ?? NULL;
           if (!is_array($fieldOptValues)) {
             continue;
           }

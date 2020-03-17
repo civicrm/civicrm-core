@@ -126,7 +126,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
    * @return mixed|null
    */
   public function getFieldValue($formValues, $field, $type, $default = NULL) {
-    $value = CRM_Utils_Array::value($field, $formValues);
+    $value = $formValues[$field] ?? NULL;
     if (!$value) {
       return CRM_Utils_Request::retrieve($field, $type, CRM_Core_DAO::$_nullObject, FALSE, $default);
     }
@@ -384,7 +384,7 @@ WHERE      t.table_name = 'Activity' AND
           $row[$name] = $dao->$name;
         }
         else {
-          $row['activity_type'] = CRM_Utils_Array::value($dao->$name, $activityTypes);
+          $row['activity_type'] = $activityTypes[$dao->$name] ?? NULL;
         }
       }
       if (isset($row['participant_role'])) {
@@ -411,7 +411,7 @@ WHERE      t.table_name = 'Activity' AND
 
     $summary['Count'] = [];
     foreach (array_keys($summary) as $table) {
-      $summary['Count'][$table] = CRM_Utils_Array::value($table, $this->_foundRows);
+      $summary['Count'][$table] = $this->_foundRows[$table] ?? NULL;
       if ($summary['Count'][$table] >= self::LIMIT) {
         $summary['addShowAllLink'][$table] = TRUE;
       }

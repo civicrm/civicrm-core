@@ -104,7 +104,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   public function validateSurvey() {
     $errorMsg = NULL;
-    $maxVoters = CRM_Utils_Array::value('max_number_of_contacts', $this->_surveyDetails);
+    $maxVoters = $this->_surveyDetails['max_number_of_contacts'] ?? NULL;
     if ($maxVoters) {
       if ($maxVoters <= $this->_numVoters) {
         $errorMsg = ts('The maximum number of contacts is already reserved for this interviewer.');
@@ -119,7 +119,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       }
     }
 
-    $defaultNum = CRM_Utils_Array::value('default_number_of_contacts', $this->_surveyDetails);
+    $defaultNum = $this->_surveyDetails['default_number_of_contacts'] ?? NULL;
     if (!$errorMsg && $defaultNum && (count($this->_contactIds) > $defaultNum)) {
       $errorMsg = ts('You can reserve a maximum of %count contact at a time for this survey.',
         [
@@ -219,7 +219,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   public function postProcess() {
     //add reservation.
     $countVoters = 0;
-    $maxVoters = CRM_Utils_Array::value('max_number_of_contacts', $this->_surveyDetails);
+    $maxVoters = $this->_surveyDetails['max_number_of_contacts'] ?? NULL;
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusHeld = array_search('Scheduled', $activityStatus);
 
@@ -297,8 +297,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
     $params = $this->controller->exportValues($this->_name);
     $groups = CRM_Utils_Array::value('groups', $params, []);
-    $newGroupName = CRM_Utils_Array::value('newGroupName', $params);
-    $newGroupDesc = CRM_Utils_Array::value('newGroupDesc', $params);
+    $newGroupName = $params['newGroupName'] ?? NULL;
+    $newGroupDesc = $params['newGroupDesc'] ?? NULL;
 
     $newGroupId = NULL;
     //create new group.
@@ -317,7 +317,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       $existingGroups = CRM_Core_PseudoConstant::group();
       foreach ($groups as $groupId) {
         $addCount = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $groupId);
-        $totalCount = CRM_Utils_Array::value(1, $addCount);
+        $totalCount = $addCount[1] ?? NULL;
         if ($groupId == $newGroupId) {
           $name = $newGroupName;
           $new = TRUE;

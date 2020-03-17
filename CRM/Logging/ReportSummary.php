@@ -342,7 +342,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     $this->addToDeveloperTab($this->temporaryTable->getCreateSql());
     $this->temporaryTableName = $this->temporaryTable->getName();
 
-    $logTypes = CRM_Utils_Array::value('log_type_value', $this->_params);
+    $logTypes = $this->_params['log_type_value'] ?? NULL;
     unset($this->_params['log_type_value']);
     if (empty($logTypes)) {
       foreach (array_keys($this->_logTables) as $table) {

@@ -246,7 +246,7 @@ class CRM_Core_ManagedEntities {
     $dao->name = $todo['name'];
     $dao->entity_type = $todo['entity'];
     $dao->entity_id = $result['id'];
-    $dao->cleanup = CRM_Utils_Array::value('cleanup', $todo);
+    $dao->cleanup = $todo['cleanup'] ?? NULL;
     $dao->save();
   }
 

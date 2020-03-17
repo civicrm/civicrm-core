@@ -379,7 +379,7 @@ LIMIT 1";
     if (!Civi::settings()->get('deferred_revenue_enabled')) {
       return FALSE;
     }
-    $recognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $params);
+    $recognitionDate = $params['revenue_recognition_date'] ?? NULL;
     if (!(!CRM_Utils_System::isNull($recognitionDate)
       || ($contributionID && isset($params['prevContribution'])
         && !CRM_Utils_System::isNull($params['prevContribution']->revenue_recognition_date)))
@@ -387,8 +387,8 @@ LIMIT 1";
       return FALSE;
     }
 
-    $lineItems = CRM_Utils_Array::value('line_item', $params);
-    $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params);
+    $lineItems = $params['line_item'] ?? NULL;
+    $financialTypeID = $params['financial_type_id'] ?? NULL;
     if (!$financialTypeID) {
       $financialTypeID = $params['prevContribution']->financial_type_id;
     }

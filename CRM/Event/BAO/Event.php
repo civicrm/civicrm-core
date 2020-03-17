@@ -134,7 +134,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
     $contactId = CRM_Core_Session::getLoggedInContactID();
     if (!$contactId) {
-      $contactId = CRM_Utils_Array::value('contact_id', $params);
+      $contactId = $params['contact_id'] ?? NULL;
     }
 
     // Log the information on successful add/edit of Event
@@ -1104,8 +1104,8 @@ WHERE civicrm_event.is_active = 1
 
       //send email only when email is present
       if (isset($email) || $returnMessageText) {
-        $preProfileID = CRM_Utils_Array::value('custom_pre_id', $values);
-        $postProfileID = CRM_Utils_Array::value('custom_post_id', $values);
+        $preProfileID = $values['custom_pre_id'] ?? NULL;
+        $postProfileID = $values['custom_post_id'] ?? NULL;
 
         if (!empty($values['params']['additionalParticipant'])) {
           $preProfileID = CRM_Utils_Array::value('additional_custom_pre_id', $values, $preProfileID);
@@ -1233,7 +1233,7 @@ WHERE civicrm_event.is_active = 1
           );
           // append invoice pdf to email
           $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-          $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+          $invoicing = $prefixValue['invoicing'] ?? NULL;
           if (isset($invoicing) && isset($prefixValue['is_email_pdf']) && !empty($values['contributionId'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
             $sendTemplateParams['contributionId'] = $values['contributionId'];
@@ -1581,7 +1581,7 @@ WHERE civicrm_event.is_active = 1
         }
         elseif (substr($name, -11) == 'campaign_id') {
           $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($params[$name]);
-          $values[$index] = CRM_Utils_Array::value($params[$name], $campaigns);
+          $values[$index] = $campaigns[$params[$name]] ?? NULL;
         }
         elseif (strpos($name, '-') !== FALSE) {
           list($fieldName, $id) = CRM_Utils_System::explode('-', $name, 2);
@@ -1598,7 +1598,7 @@ WHERE civicrm_event.is_active = 1
           elseif ($fieldName == 'im') {
             $providerName = NULL;
             if ($providerId = $detailName . '-provider_id') {
-              $providerName = CRM_Utils_Array::value($params[$providerId], $imProviders);
+              $providerName = $imProviders[$params[$providerId]] ?? NULL;
             }
             if ($providerName) {
               $values[$index] = $params[$detailName] . " (" . $providerName . ")";
@@ -1638,8 +1638,8 @@ WHERE  id = $cfID
               $htmlType = $dao->html_type;
 
               if ($htmlType == 'File') {
-                $path = CRM_Utils_Array::value('name', $params[$name]);
-                $fileType = CRM_Utils_Array::value('type', $params[$name]);
+                $path = $params[$name]['name'] ?? NULL;
+                $fileType = $params[$name]['type'] ?? NULL;
                 $values[$index] = CRM_Utils_File::getFileURL($path, $fileType);
               }
               else {
@@ -1710,7 +1710,7 @@ WHERE  id = $cfID
               $values[$index] = CRM_Utils_Date::customFormat(CRM_Utils_Date::format($params[$name]));
             }
             else {
-              $values[$index] = CRM_Utils_Array::value($name, $params);
+              $values[$index] = $params[$name] ?? NULL;
             }
           }
         }
@@ -1780,8 +1780,8 @@ WHERE  id = $cfID
       return $additionalIDs;
     }
 
-    $preProfileID = CRM_Utils_Array::value('additional_custom_pre_id', $values);
-    $postProfileID = CRM_Utils_Array::value('additional_custom_post_id', $values);
+    $preProfileID = $values['additional_custom_pre_id'] ?? NULL;
+    $postProfileID = $values['additional_custom_post_id'] ?? NULL;
     //else build array of Additional participant's information.
     if (count($additionalIDs)) {
       if ($preProfileID || $postProfileID) {

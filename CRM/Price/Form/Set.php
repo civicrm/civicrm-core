@@ -269,7 +269,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
 
     $compIds = [];
-    $extends = CRM_Utils_Array::value('extends', $params);
+    $extends = $params['extends'] ?? NULL;
     if (is_array($extends)) {
       foreach ($extends as $compId => $selected) {
         if ($selected) {

@@ -293,9 +293,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
       if (!empty($this->_params['calculated_end_date_' . $suffix])) {
         // The calculated date field is in use - spring into action
         // Gather values
-        $relative = CRM_Utils_Array::value("calculated_end_date_relative", $this->_params);
-        $from = CRM_Utils_Array::value("calculated_end_date_from", $this->_params);
-        $to = CRM_Utils_Array::value("calculated_end_date_to", $this->_params);
+        $relative = $this->_params["calculated_end_date_relative"] ?? NULL;
+        $from = $this->_params["calculated_end_date_from"] ?? NULL;
+        $to = $this->_params["calculated_end_date_to"] ?? NULL;
         $end_date_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['end_date']['dbAlias'];
         $end_date_type = $this->_columns['civicrm_contribution_recur']['filters']['end_date']['type'];
         $start_date_type = $this->_columns['civicrm_contribution_recur']['filters']['start_date']['type'];

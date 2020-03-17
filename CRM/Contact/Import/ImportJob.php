@@ -133,11 +133,11 @@ class CRM_Contact_Import_ImportJob {
 
     foreach ($mapper as $key => $value) {
 
-      $fldName = CRM_Utils_Array::value(0, $mapper[$key]);
+      $fldName = $mapper[$key][0] ?? NULL;
       $header = array($this->_mapFields[$fldName]);
-      $selOne = CRM_Utils_Array::value(1, $mapper[$key]);
-      $selTwo = CRM_Utils_Array::value(2, $mapper[$key]);
-      $selThree = CRM_Utils_Array::value(3, $mapper[$key]);
+      $selOne = $mapper[$key][1] ?? NULL;
+      $selTwo = $mapper[$key][2] ?? NULL;
+      $selThree = $mapper[$key][3] ?? NULL;
       $this->_mapperKeys[$key] = $fldName;
 
       //need to differentiate non location elements.

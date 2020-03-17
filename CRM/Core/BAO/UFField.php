@@ -37,7 +37,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @throws \API_Exception
    */
   public static function create($params) {
-    $id = CRM_Utils_Array::value('id', $params);
+    $id = $params['id'] ?? NULL;
 
     $op = empty($id) ? 'create' : 'edit';
     CRM_Utils_Hook::pre('UFField', $op, $id, $params);
@@ -180,18 +180,18 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    */
   public static function duplicateField($params) {
     $ufField = new CRM_Core_DAO_UFField();
-    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group_id', $params);
-    $ufField->field_type = CRM_Utils_Array::value('field_type', $params);
-    $ufField->field_name = CRM_Utils_Array::value('field_name', $params);
-    $ufField->website_type_id = CRM_Utils_Array::value('website_type_id', $params);
+    $ufField->uf_group_id = $params['uf_group_id'] ?? NULL;
+    $ufField->field_type = $params['field_type'] ?? NULL;
+    $ufField->field_name = $params['field_name'] ?? NULL;
+    $ufField->website_type_id = $params['website_type_id'] ?? NULL;
     if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
       // primary location type have NULL value in DB
       $ufField->whereAdd("location_type_id IS NULL");
     }
     else {
-      $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
+      $ufField->location_type_id = $params['location_type_id'] ?? NULL;
     }
-    $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);
+    $ufField->phone_type_id = $params['phone_type_id'] ?? NULL;
 
     if (!empty($params['id'])) {
       $ufField->whereAdd("id <> " . $params['id']);

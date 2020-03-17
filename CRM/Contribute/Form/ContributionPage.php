@@ -156,7 +156,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     $this->applyFilter('__ALL__', 'trim');
 
     $session = CRM_Core_Session::singleton();
-    $this->_cancelURL = CRM_Utils_Array::value('cancelURL', $_POST);
+    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
 
     if (!$this->_cancelURL) {
       $this->_cancelURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
@@ -289,7 +289,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         'is_pledge_start_date_editable',
       ];
       foreach ($pledgeBlock as $key) {
-        $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
+        $defaults[$key] = $pledgeBlockDefaults[$key] ?? NULL;
         if ($key == 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
           $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
           $pledgeDateFields = [

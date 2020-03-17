@@ -878,8 +878,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->_paymentProcessorID = NULL;
     if ($this->_paymentProcessors) {
       if (!empty($this->_submitValues)) {
-        $this->_paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $this->_submitValues);
-        $this->_paymentProcessor = CRM_Utils_Array::value($this->_paymentProcessorID, $this->_paymentProcessors);
+        $this->_paymentProcessorID = $this->_submitValues['payment_processor_id'] ?? NULL;
+        $this->_paymentProcessor = $this->_paymentProcessors[$this->_paymentProcessorID] ?? NULL;
         $this->set('type', $this->_paymentProcessorID);
         $this->set('mode', $this->_mode);
         $this->set('paymentProcessor', $this->_paymentProcessor);
@@ -2522,7 +2522,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return string
    */
   public function getCurrency($submittedValues = []) {
-    $currency = CRM_Utils_Array::value('currency', $this->_values);
+    $currency = $this->_values['currency'] ?? NULL;
     // For event forms, currency is in a different spot
     if (empty($currency)) {
       $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));

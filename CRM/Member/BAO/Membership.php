@@ -89,7 +89,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //get the log start date.
     //it is set during renewal of membership.
-    $logStartDate = CRM_Utils_Array::value('log_start_date', $params);
+    $logStartDate = $params['log_start_date'] ?? NULL;
     $logStartDate = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : CRM_Utils_Date::isoToMysql($membership->start_date);
     $values = self::getStatusANDTypeValues($membership->id);
 
@@ -131,7 +131,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $targetContactID = $membership->contact_id;
     if (!empty($params['is_for_organization'])) {
       // @todo - deprecate is_for_organization, require modified_id
-      $targetContactID = CRM_Utils_Array::value('modified_id', $params);
+      $targetContactID = $params['modified_id'] ?? NULL;
     }
 
     // add custom field values
@@ -293,7 +293,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       if (!array_key_exists('max_related', $params) && !empty($params['membership_type_id'])) {
         $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($params['membership_type_id']);
         if (isset($membershipType['relationship_type_id'])) {
-          $params['max_related'] = CRM_Utils_Array::value('max_related', $membershipType);
+          $params['max_related'] = $membershipType['max_related'] ?? NULL;
         }
       }
     }
@@ -365,7 +365,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
       foreach ($params['line_item'] as $priceSetId => $lineItems) {
         foreach ($lineItems as $lineIndex => $lineItem) {
-          $lineMembershipType = CRM_Utils_Array::value('membership_type_id', $lineItem);
+          $lineMembershipType = $lineItem['membership_type_id'] ?? NULL;
           if (!empty($params['contribution'])) {
             $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
           }
@@ -520,7 +520,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       //get the membership status and type values.
       $statusANDType = self::getStatusANDTypeValues($membership->id);
       foreach (['status', 'membership_type'] as $fld) {
-        $defaults[$fld] = CRM_Utils_Array::value($fld, $statusANDType[$membership->id]);
+        $defaults[$fld] = $statusANDType[$membership->id][$fld] ?? NULL;
       }
       if (!empty($statusANDType[$membership->id]['is_current_member'])) {
         $defaults['active'] = TRUE;
@@ -929,7 +929,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
             'column_name'
           );
           $value = $customFieldId ? 'custom_' . $customFieldId : $value;
-          $tmpContactField[trim($value)] = CRM_Utils_Array::value(trim($value), $contactFields);
+          $tmpContactField[trim($value)] = $contactFields[trim($value)] ?? NULL;
           if (!$status) {
             $title = $tmpContactField[trim($value)]['title'] . " " . ts('(match to contact)');
           }
@@ -1849,9 +1849,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
         $currentMembership['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
         foreach (['start_date', 'end_date'] as $dateType) {
-          $currentMembership[$dateType] = CRM_Utils_Array::value($dateType, $formDates);
+          $currentMembership[$dateType] = $formDates[$dateType] ?? NULL;
           if (empty($currentMembership[$dateType])) {
-            $currentMembership[$dateType] = CRM_Utils_Array::value($dateType, $dates);
+            $currentMembership[$dateType] = $dates[$dateType] ?? NULL;
           }
         }
         $currentMembership['is_test'] = $is_test;
@@ -1892,9 +1892,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         $memParams = [];
         $memParams['join_date'] = CRM_Utils_Date::isoToMysql($membership->join_date);
         $memParams['start_date'] = CRM_Utils_Array::value('start_date', $formDates, CRM_Utils_Date::isoToMysql($membership->start_date));
-        $memParams['end_date'] = CRM_Utils_Array::value('end_date', $formDates);
+        $memParams['end_date'] = $formDates['end_date'] ?? NULL;
         if (empty($memParams['end_date'])) {
-          $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
+          $memParams['end_date'] = $dates['end_date'] ?? NULL;
         }
         $memParams['membership_type_id'] = $membershipTypeID;
 
@@ -1933,9 +1933,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeID, NULL, NULL, NULL, $numRenewTerms);
 
         foreach (['join_date', 'start_date', 'end_date'] as $dateType) {
-          $memParams[$dateType] = CRM_Utils_Array::value($dateType, $formDates);
+          $memParams[$dateType] = $formDates[$dateType] ?? NULL;
           if (empty($memParams[$dateType])) {
-            $memParams[$dateType] = CRM_Utils_Array::value($dateType, $dates);
+            $memParams[$dateType] = $dates[$dateType] ?? NULL;
           }
         }
 
@@ -1953,7 +1953,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           $membershipTypeID,
           $memParams
         );
-        $updateStatusId = CRM_Utils_Array::value('id', $status);
+        $updateStatusId = $status['id'] ?? NULL;
       }
       else {
         // if IPN/Pay-Later set status to: PENDING
@@ -2268,7 +2268,7 @@ WHERE      civicrm_membership.is_test = 0
           'ignore_admin_only' => TRUE,
         ], TRUE
       );
-      $statusId = CRM_Utils_Array::value('id', $newStatus);
+      $statusId = $newStatus['id'] ?? NULL;
 
       //process only when status change.
       if ($statusId &&
@@ -2400,11 +2400,11 @@ WHERE      civicrm_membership.is_test = 0
     $config = CRM_Core_Config::singleton();
     $contributionParams['currency'] = $config->defaultCurrency;
     $contributionParams['receipt_date'] = (CRM_Utils_Array::value('receipt_date', $params)) ? $params['receipt_date'] : 'null';
-    $contributionParams['source'] = CRM_Utils_Array::value('contribution_source', $params);
+    $contributionParams['source'] = $params['contribution_source'] ?? NULL;
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
-    $contributionParams['payment_processor'] = CRM_Utils_Array::value('payment_processor_id', $params);
-    $contributionSoftParams = CRM_Utils_Array::value('soft_credit', $params);
+    $contributionParams['payment_processor'] = $params['payment_processor_id'] ?? NULL;
+    $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
       'contact_id',
       'fee_amount',
@@ -2427,7 +2427,7 @@ WHERE      civicrm_membership.is_test = 0
       'card_type_id',
     ];
     foreach ($recordContribution as $f) {
-      $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
+      $contributionParams[$f] = $params[$f] ?? NULL;
     }
 
     if (!empty($params['contribution_id'])) {
@@ -2446,7 +2446,7 @@ WHERE      civicrm_membership.is_test = 0
     if (!empty($params['processPriceSet']) &&
       !empty($params['lineItems'])
     ) {
-      $contributionParams['line_item'] = CRM_Utils_Array::value('lineItems', $params, NULL);
+      $contributionParams['line_item'] = $params['lineItems'] ?? NULL;
     }
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
@@ -2680,8 +2680,8 @@ WHERE      civicrm_membership.is_test = 0
    */
   public static function updateMembershipStatus($deceasedParams, $contactType) {
     $updateMembershipMsg = NULL;
-    $contactId = CRM_Utils_Array::value('contact_id', $deceasedParams);
-    $deceasedDate = CRM_Utils_Array::value('deceased_date', $deceasedParams);
+    $contactId = $deceasedParams['contact_id'] ?? NULL;
+    $deceasedDate = $deceasedParams['deceased_date'] ?? NULL;
 
     // process to set membership status to deceased for both active/inactive membership
     if ($contactId &&

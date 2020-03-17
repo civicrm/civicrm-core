@@ -805,8 +805,8 @@ AND       CEF.entity_id    = %2";
    */
   public static function validateFileHash($hash, $entityId, $fileId) {
     $input = CRM_Utils_System::explode('_', $hash, 3);
-    $inputTs = CRM_Utils_Array::value(1, $input);
-    $inputLF = CRM_Utils_Array::value(2, $input);
+    $inputTs = $input[1] ?? NULL;
+    $inputLF = $input[2] ?? NULL;
     $testHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId, $inputTs, $inputLF);
     if (hash_equals($testHash, $hash)) {
       $now = time();

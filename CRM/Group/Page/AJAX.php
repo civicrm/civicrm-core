@@ -55,7 +55,7 @@ class CRM_Group_Page_AJAX {
       // go ahead with flat hierarchy, CRM-12225
       if (empty($groups)) {
         $groupsAccessible = CRM_Core_PseudoConstant::group();
-        $parentsOnly = CRM_Utils_Array::value('parentsOnly', $params);
+        $parentsOnly = $params['parentsOnly'] ?? NULL;
         if (!empty($groupsAccessible) && $parentsOnly) {
           // recompute group list with flat hierarchy
           $params['parentsOnly'] = 0;

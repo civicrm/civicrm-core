@@ -574,7 +574,7 @@ LIMIT 1
     }
     else {
       $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'contribution_status_id');
-      $name = CRM_Utils_Array::value($contributionStatus, $statusNames);
+      $name = $statusNames[$contributionStatus] ?? NULL;
       switch ($name) {
         case 'Completed':
           // [CRM-17498] Removing unsupported status change options.

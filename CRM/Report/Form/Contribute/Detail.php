@@ -697,7 +697,7 @@ UNION ALL
         $entryFound = TRUE;
       }
       if (!empty($row['civicrm_batch_batch_id'])) {
-        $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Utils_Array::value($row['civicrm_batch_batch_id'], $batches);
+        $rows[$rowNum]['civicrm_batch_batch_id'] = $batches[$row['civicrm_batch_batch_id']] ?? NULL;
         $entryFound = TRUE;
       }
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {

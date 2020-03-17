@@ -73,8 +73,8 @@ class CRM_Friend_Form extends CRM_Core_Form {
       CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage',
         $params, $values, ['title', 'campaign_id', 'is_share']
       );
-      $this->_title = CRM_Utils_Array::value('title', $values);
-      $this->_campaignId = CRM_Utils_Array::value('campaign_id', $values);
+      $this->_title = $values['title'] ?? NULL;
+      $this->_campaignId = $values['campaign_id'] ?? NULL;
       $this->_entityTable = 'civicrm_contribution_page';
       if ($pcomponent == 'event') {
         $this->_entityTable = 'civicrm_event';
@@ -82,7 +82,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
         $this->_title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_entityId, 'title');
       }
       else {
-        $isShare = CRM_Utils_Array::value('is_share', $values);
+        $isShare = $values['is_share'] ?? NULL;
       }
       // Tell Form.tpl whether to include SocialNetwork.tpl for social media sharing
       $this->assign('isShare', $isShare);

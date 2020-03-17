@@ -487,7 +487,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
     // create the signature activity record
     $params['contactId'] = $this->_contactId;
-    $params['activity_campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->petition);
+    $params['activity_campaign_id'] = $this->petition['campaign_id'] ?? NULL;
     $result = $this->bao->createSignature($params);
 
     // send thank you or email verification emails

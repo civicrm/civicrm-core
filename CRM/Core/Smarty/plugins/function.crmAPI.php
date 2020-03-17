@@ -31,7 +31,7 @@ function smarty_function_crmAPI($params, &$smarty) {
   $entity = $params['entity'];
   $action = CRM_Utils_Array::value('action', $params, 'get');
   $params['sequential'] = CRM_Utils_Array::value('sequential', $params, 1);
-  $var = CRM_Utils_Array::value('var', $params);
+  $var = $params['var'] ?? NULL;
   CRM_Utils_Array::remove($params, 'entity', 'action', 'var');
   $params['version'] = 3;
   require_once 'api/api.php';

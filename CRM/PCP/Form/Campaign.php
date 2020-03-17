@@ -68,8 +68,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
         $defaults['goal_amount'] = CRM_Utils_Money::format($defaults['goal_amount'], NULL, '%a');
       }
 
-      $defaults['pcp_title'] = CRM_Utils_Array::value('title', $defaults);
-      $defaults['pcp_intro_text'] = CRM_Utils_Array::value('intro_text', $defaults);
+      $defaults['pcp_title'] = $defaults['title'] ?? NULL;
+      $defaults['pcp_intro_text'] = $defaults['intro_text'] ?? NULL;
     }
 
     if ($this->get('action') & CRM_Core_Action::ADD) {
@@ -79,8 +79,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $defaults['is_notify'] = 1;
     }
 
-    $this->_contactID = CRM_Utils_Array::value('contact_id', $defaults);
-    $this->_contriPageId = CRM_Utils_Array::value('page_id', $defaults);
+    $this->_contactID = $defaults['contact_id'] ?? NULL;
+    $this->_contriPageId = $defaults['page_id'] ?? NULL;
 
     return $defaults;
   }

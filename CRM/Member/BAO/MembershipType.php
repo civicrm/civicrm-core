@@ -85,13 +85,13 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       if (isset($ids['membershipType'])) {
         Civi::log()->warning('Deprecated: Passing membershipType by $ids array in CRM_Member_BAO_MembershipType::add');
       }
-      $params['id'] = CRM_Utils_Array::value('membershipType', $ids);
+      $params['id'] = $ids['membershipType'] ?? NULL;
     }
 
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MembershipType', CRM_Utils_Array::value('id', $params), $params);
 
-    $membershipTypeId = CRM_Utils_Array::value('id', $params);
+    $membershipTypeId = $params['id'] ?? NULL;
 
     if (!$membershipTypeId) {
       if (!isset($params['is_active'])) {
@@ -717,15 +717,15 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $fieldParams['is_display_amounts'] = $fieldParams['is_required'] = 0;
       $fieldParams['weight'] = $fieldParams['option_weight'][1] = 1;
       $fieldParams['option_label'][1] = $params['name'];
-      $fieldParams['option_description'][1] = CRM_Utils_Array::value('description', $params);
+      $fieldParams['option_description'][1] = $params['description'] ?? NULL;
 
       $fieldParams['membership_type_id'][1] = $membershipTypeId;
       $fieldParams['option_amount'][1] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
-      $fieldParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
+      $fieldParams['financial_type_id'] = $params['financial_type_id'] ?? NULL;
 
       if ($previousID) {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
-        $fieldParams['option_id'] = CRM_Utils_Array::value('option_id', $optionsIds);
+        $fieldParams['option_id'] = $optionsIds['option_id'] ?? NULL;
       }
       CRM_Price_BAO_PriceField::create($fieldParams);
     }
@@ -759,8 +759,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
           $optionsIds['id'] = current(CRM_Utils_Array::value('option_id', $optionsIds));
         }
       }
-      $results['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
-      $results['description'] = CRM_Utils_Array::value('description', $params);
+      $results['financial_type_id'] = $params['financial_type_id'] ?? NULL;
+      $results['description'] = $params['description'] ?? NULL;
       CRM_Price_BAO_PriceFieldValue::add($results, $optionsIds);
     }
   }
@@ -801,7 +801,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
             $updateParams['visibility_id'] = CRM_Price_BAO_PriceField::getVisibilityOptionID(strtolower($params['visibility']));
           }
           else {
-            $updateParams[$value] = CRM_Utils_Array::value($key, $params);
+            $updateParams[$value] = $params[$key] ?? NULL;
           }
         }
         CRM_Price_BAO_PriceFieldValue::add($updateParams);

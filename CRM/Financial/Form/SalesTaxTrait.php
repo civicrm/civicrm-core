@@ -37,7 +37,7 @@ trait CRM_Financial_Form_SalesTaxTrait {
    */
   public function getSalesTaxTerm() {
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     if (!$invoicing) {
       return '';
     }

@@ -515,7 +515,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
     foreach ($contactTypes as $key => $value) {
       if ($key) {
         $typeValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $key);
-        $cType = CRM_Utils_Array::value('0', $typeValue);
+        $cType = $typeValue['0'] ?? NULL;
         $typeUrl = 'ct=' . $cType;
         if ($csType = CRM_Utils_Array::value('1', $typeValue)) {
           $typeUrl .= "&cst=$csType";
@@ -612,7 +612,7 @@ WHERE name = %1";
 
     $contactType = new CRM_Contact_DAO_ContactType();
     $contactType->copyValues($params);
-    $contactType->id = CRM_Utils_Array::value('id', $params);
+    $contactType->id = $params['id'] ?? NULL;
     $contactType->is_active = CRM_Utils_Array::value('is_active', $params, 0);
 
     $contactType->save();

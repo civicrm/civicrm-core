@@ -146,7 +146,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       $typeId = CRM_Core_DAO::getFieldValue("CRM_Activity_DAO_Activity", $activityId, 'activity_type_id');
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
-          $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
+          $customValue = $customFields[$customFieldID] ?? NULL;
           if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               $customValue['extends_entity_column_value']

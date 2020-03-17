@@ -69,12 +69,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       CRM_Core_DAO::storeValues($dao, $membership[$dao->id]);
 
       //carry campaign.
-      $membership[$dao->id]['campaign'] = CRM_Utils_Array::value($dao->campaign_id, $allCampaigns);
+      $membership[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
 
       //get the membership status and type values.
       $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($dao->id);
       foreach (['status', 'membership_type'] as $fld) {
-        $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
+        $membership[$dao->id][$fld] = $statusANDType[$dao->id][$fld] ?? NULL;
       }
       if (!empty($statusANDType[$dao->id]['is_current_member'])) {
         $membership[$dao->id]['active'] = TRUE;
@@ -162,7 +162,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
      LEFT JOIN civicrm_contact ct ON ct.id = m.contact_id
   WHERE m.owner_membership_id = {$dao->id} AND m.is_test = 0 AND ms.is_current_member = 1 AND ct.is_deleted = 0";
         $num_related = CRM_Core_DAO::singleValueQuery($query);
-        $max_related = CRM_Utils_Array::value('max_related', $membership[$dao->id]);
+        $max_related = $membership[$dao->id]['max_related'] ?? NULL;
         $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', [1 => $num_related]) : ts('%1 out of %2', [
           1 => $num_related,
           2 => $max_related,
@@ -181,7 +181,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         'limit' => 0,
       ],
     ]);
-    $membershipTypes = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
+    $membershipTypes = $membershipTypesResult['values'] ?? NULL;
 
     foreach ($membershipTypes as $key => $value) {
       $membershipTypes[$key]['action'] = CRM_Core_Action::formLink(self::membershipTypeslinks(),

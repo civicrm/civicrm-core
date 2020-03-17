@@ -357,7 +357,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       }
 
       //carry campaign on selectors.
-      $row['campaign'] = CRM_Utils_Array::value($result->member_campaign_id, $allCampaigns);
+      $row['campaign'] = $allCampaigns[$result->member_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->member_campaign_id;
 
       if (!empty($row['member_is_test'])) {

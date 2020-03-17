@@ -39,11 +39,11 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   }
 
   public function initialize() {
-    $this->_segmentSize = CRM_Utils_Array::value('segmentSize', $this->_formValues);
+    $this->_segmentSize = $this->_formValues['segmentSize'] ?? NULL;
 
-    $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $this->_formValues);
+    $this->_includeGroups = $this->_formValues['includeGroups'] ?? NULL;
 
-    $this->_excludeGroups = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
+    $this->_excludeGroups = $this->_formValues['excludeGroups'] ?? NULL;
 
     $this->_allSearch = FALSE;
     $this->_groups = FALSE;

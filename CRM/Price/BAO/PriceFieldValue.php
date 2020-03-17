@@ -39,7 +39,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     $fieldValueBAO->copyValues($params);
 
     // CRM-16189
-    $priceFieldID = CRM_Utils_Array::value('price_field_id', $params);
+    $priceFieldID = $params['price_field_id'] ?? NULL;
 
     $id = CRM_Utils_Array::value('id', $ids, CRM_Utils_Array::value('id', $params));
 
@@ -102,7 +102,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       }
     }
 
-    $financialType = CRM_Utils_Array::value('financial_type_id', $params, NULL);
+    $financialType = $params['financial_type_id'] ?? NULL;
     if (!$financialType && $id) {
       $financialType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'financial_type_id', 'id');
     }

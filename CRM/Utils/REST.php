@@ -175,13 +175,13 @@ class CRM_Utils_REST {
     $requestParams = CRM_Utils_Request::exportValues();
 
     // Get the function name being called from the q parameter in the query string
-    $q = CRM_Utils_Array::value('q', $requestParams);
+    $q = $requestParams['q'] ?? NULL;
     // or for the rest interface, from fnName
-    $r = CRM_Utils_Array::value('fnName', $requestParams);
+    $r = $requestParams['fnName'] ?? NULL;
     if (!empty($r)) {
       $q = $r;
     }
-    $entity = CRM_Utils_Array::value('entity', $requestParams);
+    $entity = $requestParams['entity'] ?? NULL;
     if (empty($entity) && !empty($q)) {
       $args = explode('/', $q);
       // If the function isn't in the civicrm namespace, reject the request.
@@ -204,8 +204,8 @@ class CRM_Utils_REST {
       // or the api format (entity+action)
       $args = [];
       $args[0] = 'civicrm';
-      $args[1] = CRM_Utils_Array::value('entity', $requestParams);
-      $args[2] = CRM_Utils_Array::value('action', $requestParams);
+      $args[1] = $requestParams['entity'] ?? NULL;
+      $args[2] = $requestParams['action'] ?? NULL;
     }
 
     // Everyone should be required to provide the server key, so the whole
@@ -213,7 +213,7 @@ class CRM_Utils_REST {
     // first check for civicrm site key
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
       $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
-      $key = CRM_Utils_Array::value('key', $requestParams);
+      $key = $requestParams['key'] ?? NULL;
       if (empty($key)) {
         return self::error("FATAL: mandatory param 'key' missing. More info at: " . $docLink);
       }
@@ -516,10 +516,10 @@ class CRM_Utils_REST {
       CRM_Utils_JSON::output($error);
     }
 
-    $q = CRM_Utils_Array::value('fnName', $requestParams);
+    $q = $requestParams['fnName'] ?? NULL;
     if (!$q) {
-      $entity = CRM_Utils_Array::value('entity', $requestParams);
-      $action = CRM_Utils_Array::value('action', $requestParams);
+      $entity = $requestParams['entity'] ?? NULL;
+      $action = $requestParams['action'] ?? NULL;
       if (!$entity || !$action) {
         $err = [
           'error_message' => 'missing mandatory params "entity=" or "action="',
@@ -535,7 +535,7 @@ class CRM_Utils_REST {
     }
 
     // get the class name, since all ajax functions pass className
-    $className = CRM_Utils_Array::value('className', $requestParams);
+    $className = $requestParams['className'] ?? NULL;
 
     // If the function isn't in the civicrm namespace, reject the request.
     if (($args[0] != 'civicrm' && count($args) != 3) && !$className) {
@@ -578,7 +578,7 @@ class CRM_Utils_REST {
    */
   public function loadCMSBootstrap() {
     $requestParams = CRM_Utils_Request::exportValues();
-    $q = CRM_Utils_Array::value('q', $requestParams);
+    $q = $requestParams['q'] ?? NULL;
     $args = explode('/', $q);
 
     // Proceed with bootstrap for "?entity=X&action=Y"

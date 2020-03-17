@@ -94,11 +94,11 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     $specialFields = ['contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id'];
     foreach ($result as $element => $value) {
       if (CRM_Contact_BAO_Query::isAlreadyProcessedForQueryFormat($value)) {
-        $id = CRM_Utils_Array::value(0, $value);
-        $value = CRM_Utils_Array::value(2, $value);
+        $id = $value[0] ?? NULL;
+        $value = $value[2] ?? NULL;
         if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
-          $value = CRM_Utils_Array::value($op, $value);
+          $value = $value[$op] ?? NULL;
           if (in_array($op, ['BETWEEN', '>=', '<='])) {
             self::decodeRelativeFields($result, $id, $op, $value);
             unset($result[$element]);
@@ -150,7 +150,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         // As per the OK (Operator as Key) value format, value array may contain key
         // as an operator so to ensure the default is always set actual value
         elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          $result[$element] = CRM_Utils_Array::value(key($value), $value);
+          $result[$element] = $value[key($value)] ?? NULL;
           if (is_string($result[$element])) {
             $result[$element] = str_replace("%", '', $result[$element]);
           }

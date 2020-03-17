@@ -188,9 +188,9 @@ WHERE  inst.report_id = %1";
     $params['from'] = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
     //$domainEmailName;
     $params['toName'] = "";
-    $params['toEmail'] = CRM_Utils_Array::value('email_to', $instanceInfo);
-    $params['cc'] = CRM_Utils_Array::value('email_cc', $instanceInfo);
-    $params['subject'] = CRM_Utils_Array::value('email_subject', $instanceInfo);
+    $params['toEmail'] = $instanceInfo['email_to'] ?? NULL;
+    $params['cc'] = $instanceInfo['email_cc'] ?? NULL;
+    $params['subject'] = $instanceInfo['email_subject'] ?? NULL;
     if (empty($instanceInfo['attachments'])) {
       $instanceInfo['attachments'] = [];
     }
@@ -251,7 +251,7 @@ WHERE  inst.report_id = %1";
     $value = NULL;
     foreach ($rows as $row) {
       foreach ($columnHeaders as $k => $v) {
-        $value = CRM_Utils_Array::value($v, $row);
+        $value = $row[$v] ?? NULL;
         if (isset($value)) {
           // Remove HTML, unencode entities, and escape quotation marks.
           $value = str_replace('"', '""', html_entity_decode(strip_tags($value)));
@@ -395,7 +395,7 @@ WHERE  inst.report_id = %1";
    * @return array
    */
   public static function processReport($params) {
-    $instanceId = CRM_Utils_Array::value('instanceId', $params);
+    $instanceId = $params['instanceId'] ?? NULL;
 
     // hack for now, CRM-8358
     $_REQUEST['instanceId'] = $instanceId;
@@ -502,7 +502,7 @@ WHERE  inst.report_id = %1";
             // (e.g., values for 'nll' and 'nnll' ops are blank),
             // so store them temporarily and examine below.
             $string_values[$basename] = $field_value;
-            $op_values[$basename] = CRM_Utils_Array::value("{$basename}_op", $params);
+            $op_values[$basename] = $params["{$basename}_op"] ?? NULL;
           }
           elseif ($suffix == '_op') {
             // These filters can have an effect even without a value

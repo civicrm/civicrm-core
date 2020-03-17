@@ -171,7 +171,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    */
   public static function processPremium($params, $contributionID, $premiumID = NULL, $options = []) {
     $selectedProductID = $params['product_name'][0];
-    $selectedProductOptionID = CRM_Utils_Array::value(1, $params['product_name']);
+    $selectedProductOptionID = $params['product_name'][1] ?? NULL;
 
     $dao = new CRM_Contribute_DAO_ContributionProduct();
     $dao->contribution_id = $contributionID;
@@ -186,7 +186,7 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     $productDetails = [];
     CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
-    $dao->financial_type_id = CRM_Utils_Array::value('financial_type_id', $productDetails);
+    $dao->financial_type_id = $productDetails['financial_type_id'] ?? NULL;
     if (!empty($options[$selectedProductID])) {
       $dao->product_option = $options[$selectedProductID][$selectedProductOptionID];
     }
@@ -268,7 +268,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       'contribution_page_id',
     ];
     foreach ($fields as $f) {
-      $formatted[$f] = CRM_Utils_Array::value($f, $params);
+      $formatted[$f] = $params[$f] ?? NULL;
     }
 
     if (!empty($params['thankyou_date']) && !CRM_Utils_System::isNull($params['thankyou_date'])) {
@@ -437,7 +437,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $taxAmt = $template->get_template_vars('dataArray');
     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
     $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+    $invoicing = $prefixValue['invoicing'] ?? NULL;
     if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
       $isEmailPdf = TRUE;
     }

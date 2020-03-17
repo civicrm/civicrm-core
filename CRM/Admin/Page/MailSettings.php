@@ -84,7 +84,7 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
     $mailSetting->find();
     while ($mailSetting->fetch()) {
       //replace protocol value with name
-      $mailSetting->protocol = CRM_Utils_Array::value($mailSetting->protocol, $allProtocols);
+      $mailSetting->protocol = $allProtocols[$mailSetting->protocol] ?? NULL;
       CRM_Core_DAO::storeValues($mailSetting, $allMailSettings[$mailSetting->id]);
 
       //form all action links

@@ -331,7 +331,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
             if (count($data_value) == 0 && $op == 'or') {
               $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
               foreach ($customOption as $option) {
-                $data_value[] = CRM_Utils_Array::value('value', $option);
+                $data_value[] = $option['value'] ?? NULL;
               }
             }
 

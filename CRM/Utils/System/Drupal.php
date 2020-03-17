@@ -511,7 +511,7 @@ AND    u.status = 1
       return TRUE;
     }
 
-    $uid = CRM_Utils_Array::value('uid', $params);
+    $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       //load user, we need to check drupal permissions.
       $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));

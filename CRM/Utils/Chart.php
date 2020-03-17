@@ -211,8 +211,8 @@ class CRM_Utils_Chart {
     }
 
     // legend
-    $chartData['xname'] = CRM_Utils_Array::value('xname', $rows);
-    $chartData['yname'] = CRM_Utils_Array::value('yname', $rows);
+    $chartData['xname'] = $rows['xname'] ?? NULL;
+    $chartData['yname'] = $rows['yname'] ?? NULL;
 
     // carry some chart params if pass.
     foreach ([

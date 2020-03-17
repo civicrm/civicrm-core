@@ -117,7 +117,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $values[$participantID]['lineItem'][] = $lineItem;
     }
 
-    $values[$participantID]['totalAmount'] = CRM_Utils_Array::value('fee_amount', $values[$participantID]);
+    $values[$participantID]['totalAmount'] = $values[$participantID]['fee_amount'] ?? NULL;
 
     // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
     if (!empty($values[$participantID]['participant_registered_by_id'])) {
@@ -193,7 +193,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     $participantCount = [];
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
@@ -211,7 +211,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     CRM_Utils_System::setTitle(ts('View Event Registration for') . ' ' . $displayName);
 
-    $roleId = CRM_Utils_Array::value('role_id', $values[$participantID]);
+    $roleId = $values[$participantID]['role_id'] ?? NULL;
     $title = $displayName . ' (' . CRM_Utils_Array::value($roleId, $participantRoles) . ' - ' . $eventTitle . ')';
 
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;

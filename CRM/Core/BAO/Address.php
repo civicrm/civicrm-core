@@ -353,7 +353,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         unset($params[$fld]);
       }
       // main parse string.
-      $parseString = CRM_Utils_Array::value('street_address', $params);
+      $parseString = $params['street_address'] ?? NULL;
       $parsedFields = CRM_Core_BAO_Address::parseStreetAddress($parseString);
 
       // merge parse address in to main address block.
@@ -450,7 +450,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     $address = new CRM_Core_BAO_Address();
 
     if (empty($entityBlock['entity_table'])) {
-      $address->$fieldName = CRM_Utils_Array::value($fieldName, $entityBlock);
+      $address->$fieldName = $entityBlock[$fieldName] ?? NULL;
     }
     else {
       $addressIds = [];
@@ -490,7 +490,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       // add state and country information: CRM-369
       if (!empty($address->location_type_id)) {
-        $values['location_type'] = CRM_Utils_Array::value($address->location_type_id, $locationTypes);
+        $values['location_type'] = $locationTypes[$address->location_type_id] ?? NULL;
       }
       if (!empty($address->state_province_id)) {
         $address->state = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address->state_province_id, FALSE);
@@ -978,8 +978,8 @@ SELECT is_primary,
       }
 
       $nameVal = explode('-', $values['name']);
-      $fldName = CRM_Utils_Array::value(0, $nameVal);
-      $locType = CRM_Utils_Array::value(1, $nameVal);
+      $fldName = $nameVal[0] ?? NULL;
+      $locType = $nameVal[1] ?? NULL;
       if (!empty($values['location_type_id'])) {
         $locType = $values['location_type_id'];
       }

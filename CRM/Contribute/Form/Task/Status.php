@@ -210,7 +210,7 @@ AND    co.id IN ( $contribIDs )";
    * @throws \Exception
    */
   public static function processForm($form, $params) {
-    $statusID = CRM_Utils_Array::value('contribution_status_id', $params);
+    $statusID = $params['contribution_status_id'] ?? NULL;
     $baseIPN = new CRM_Core_Payment_BaseIPN();
 
     $transaction = new CRM_Core_Transaction();
@@ -229,9 +229,9 @@ AND    co.id IN ( $contribIDs )";
       $ids['contribution'] = $row['contribution_id'];
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
-      $ids['membership'] = CRM_Utils_Array::value('membership', $details[$row['contribution_id']]);
-      $ids['participant'] = CRM_Utils_Array::value('participant', $details[$row['contribution_id']]);
-      $ids['event'] = CRM_Utils_Array::value('event', $details[$row['contribution_id']]);
+      $ids['membership'] = $details[$row['contribution_id']]['membership'] ?? NULL;
+      $ids['participant'] = $details[$row['contribution_id']]['participant'] ?? NULL;
+      $ids['event'] = $details[$row['contribution_id']]['event'] ?? NULL;
 
       if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
         CRM_Core_Error::fatal();

@@ -65,7 +65,7 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
     if (empty($defaults['weight'])) {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Event_DAO_ParticipantStatusType');
     }
-    $this->_isReserved = CRM_Utils_Array::value('is_reserved', $defaults);
+    $this->_isReserved = $defaults['is_reserved'] ?? NULL;
     if ($this->_isReserved) {
       $this->freeze(['name', 'class', 'is_active']);
     }

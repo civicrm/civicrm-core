@@ -203,10 +203,10 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         ) {
           $froms = $tos = [];
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($from, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {
-            $froms[] = CRM_Utils_Array::value($val, $values[$field]);
+            $froms[] = $values[$field][$val] ?? NULL;
           }
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($to, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {
-            $tos[] = CRM_Utils_Array::value($val, $values[$field]);
+            $tos[] = $values[$field][$val] ?? NULL;
           }
           $from = implode(', ', array_filter($froms));
           $to = implode(', ', array_filter($tos));

@@ -71,9 +71,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       );
       $softParams['currency'] = $contribution->currency;
       $softParams['amount'] = $contribution->total_amount;
-      $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
-      $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
-      $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
+      $softParams['pcp_display_in_roll'] = $pcp['pcp_display_in_roll'] ?? NULL;
+      $softParams['pcp_roll_nickname'] = $pcp['pcp_roll_nickname'] ?? NULL;
+      $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
       $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
       $contributionSoft = self::add($softParams);
       //Send notification to owner for PCP
@@ -130,7 +130,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         'pcp_personal_note',
       ];
       foreach ($fields as $f) {
-        $pcp[$f] = CRM_Utils_Array::value($f, $params);
+        $pcp[$f] = $params[$f] ?? NULL;
       }
     }
 
@@ -154,7 +154,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         FALSE
       );
       if (count($ids)) {
-        $honorId = CRM_Utils_Array::value(0, $ids);
+        $honorId = $ids[0] ?? NULL;
       }
 
       $null = [];
@@ -399,7 +399,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     // Format the params.
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
     $contactId = $params['cid'];
 
     $filter = NULL;

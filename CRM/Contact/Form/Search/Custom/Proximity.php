@@ -54,9 +54,9 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
       }
       $this->_distance = $this->_formValues['distance'] * $conversionFactor;
     }
-    $this->_group = CRM_Utils_Array::value('group', $this->_formValues);
+    $this->_group = $this->_formValues['group'] ?? NULL;
 
-    $this->_tag = CRM_Utils_Array::value('tag', $this->_formValues);
+    $this->_tag = $this->_formValues['tag'] ?? NULL;
 
     $this->_columns = [
       ts('Name') => 'sort_name',

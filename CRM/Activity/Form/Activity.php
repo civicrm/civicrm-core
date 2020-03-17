@@ -230,7 +230,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   public function preProcess() {
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
-    $this->_atypefile = CRM_Utils_Array::value('atypefile', $_GET);
+    $this->_atypefile = $_GET['atypefile'] ?? NULL;
     $this->assign('atypefile', FALSE);
     if ($this->_atypefile) {
       $this->assign('atypefile', TRUE);
@@ -444,7 +444,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // hack to retrieve activity type id from post variables
     if (!$this->_activityTypeId) {
-      $this->_activityTypeId = CRM_Utils_Array::value('activity_type_id', $_POST);
+      $this->_activityTypeId = $_POST['activity_type_id'] ?? NULL;
     }
 
     // when custom data is included in this page
@@ -540,8 +540,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
 
       // Fixme: why are we getting the wrong keys from upstream?
-      $defaults['target_contact_id'] = CRM_Utils_Array::value('target_contact', $defaults);
-      $defaults['assignee_contact_id'] = CRM_Utils_Array::value('assignee_contact', $defaults);
+      $defaults['target_contact_id'] = $defaults['target_contact'] ?? NULL;
+      $defaults['assignee_contact_id'] = $defaults['assignee_contact'] ?? NULL;
 
       // set default tags if exists
       $defaults['tag'] = implode(',', CRM_Core_BAO_EntityTag::getTag($this->_activityId, 'civicrm_activity'));
@@ -649,7 +649,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     foreach ($this->_fields as $field => $values) {
       if (!empty($this->_fields[$field])) {
-        $attribute = CRM_Utils_Array::value('attributes', $values);
+        $attribute = $values['attributes'] ?? NULL;
         $required = !empty($values['required']);
 
         if ($values['type'] == 'select' && empty($attribute)) {
@@ -831,8 +831,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $errors['activity_type_id'] = ts('Activity Type is a required field');
     }
 
-    $activity_type_id = CRM_Utils_Array::value('activity_type_id', $fields);
-    $activity_status_id = CRM_Utils_Array::value('status_id', $fields);
+    $activity_type_id = $fields['activity_type_id'] ?? NULL;
+    $activity_status_id = $fields['status_id'] ?? NULL;
     $scheduled_status_id = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled');
 
     if ($activity_type_id && $activity_status_id == $scheduled_status_id) {
@@ -1237,7 +1237,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       // Set title.
       if (isset($activityTypeDisplayLabels)) {
         // FIXME - it's not clear why the if line just above is needed here and why we can't just set this once above and re-use. What is interesting, but can't possibly be the reason, is that the first if block will fail if the label is the string '0', whereas this one won't. But who would have an activity type called '0'?
-        $activityTypeDisplayLabel = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeDisplayLabels);
+        $activityTypeDisplayLabel = $activityTypeDisplayLabels[$this->_activityTypeId] ?? NULL;
 
         if ($this->_currentlyViewedContactId) {
           $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);

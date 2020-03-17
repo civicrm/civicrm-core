@@ -154,7 +154,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       }
     }
     $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = CRM_Utils_Array::value('grant_id', $ids);
+    $grant->id = $ids['grant_id'] ?? NULL;
 
     $grant->copyValues($params);
 
@@ -233,7 +233,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
     if (!$id) {
-      $id = CRM_Utils_Array::value('contact_id', $params);
+      $id = $params['contact_id'] ?? NULL;
     }
     if (!empty($params['note']) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note', $ids))) {
       $noteParams = [

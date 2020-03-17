@@ -138,12 +138,12 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params = ['id' => $this->_id];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
-      $defaults['contact_types_a'] = CRM_Utils_Array::value('contact_type_a', $defaults);
+      $defaults['contact_types_a'] = $defaults['contact_type_a'] ?? NULL;
       if (!empty($defaults['contact_sub_type_a'])) {
         $defaults['contact_types_a'] .= '__' . $defaults['contact_sub_type_a'];
       }
 
-      $defaults['contact_types_b'] = CRM_Utils_Array::value('contact_type_b', $defaults);
+      $defaults['contact_types_b'] = $defaults['contact_type_b'] ?? NULL;
       if (!empty($defaults['contact_sub_type_b'])) {
         $defaults['contact_types_b'] .= '__' . $defaults['contact_sub_type_b'];
       }
@@ -187,7 +187,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'null';
 
       if (!strlen(trim(CRM_Utils_Array::value('label_b_a', $params)))) {
-        $params['label_b_a'] = CRM_Utils_Array::value('label_a_b', $params);
+        $params['label_b_a'] = $params['label_a_b'] ?? NULL;
       }
 
       if (empty($params['id'])) {

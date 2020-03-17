@@ -387,7 +387,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   public static function addDashlet(&$params) {
 
     // special case to handle duplicate entries for report instances
-    $dashboardID = CRM_Utils_Array::value('id', $params);
+    $dashboardID = $params['id'] ?? NULL;
 
     if (!empty($params['instanceURL'])) {
       $query = "SELECT id
@@ -405,16 +405,16 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         $dashlet->domain_id = CRM_Core_Config::domainID();
       }
       else {
-        $dashlet->domain_id = CRM_Utils_Array::value('domain_id', $params);
+        $dashlet->domain_id = $params['domain_id'] ?? NULL;
       }
 
       // Try and find an existing dashlet - it will be updated if found.
       if (!empty($params['name'])) {
-        $dashlet->name = CRM_Utils_Array::value('name', $params);
+        $dashlet->name = $params['name'] ?? NULL;
         $dashlet->find(TRUE);
       }
       else {
-        $dashlet->url = CRM_Utils_Array::value('url', $params);
+        $dashlet->url = $params['url'] ?? NULL;
         $dashlet->find(TRUE);
       }
 
@@ -494,8 +494,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $valuesString = NULL;
     $columns = [];
     foreach ($params as $dashboardIDs) {
-      $contactID = CRM_Utils_Array::value('contact_id', $dashboardIDs);
-      $dashboardID = CRM_Utils_Array::value('dashboard_id', $dashboardIDs);
+      $contactID = $dashboardIDs['contact_id'] ?? NULL;
+      $dashboardID = $dashboardIDs['dashboard_id'] ?? NULL;
       $column = $dashboardIDs['column_no'] ?? 0;
       $columns[$column][$dashboardID] = 0;
     }

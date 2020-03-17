@@ -117,7 +117,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
               $values['feeBlock']['value'][$fieldCnt] = '';
               $values['feeBlock']['label'][$fieldCnt] = $fieldValues['label'];
               $values['feeBlock']['lClass'][$fieldCnt] = 'price_set_option_group-label';
-              $values['feeBlock']['isDisplayAmount'][$fieldCnt] = CRM_Utils_Array::value('is_display_amounts', $fieldValues);
+              $values['feeBlock']['isDisplayAmount'][$fieldCnt] = $fieldValues['is_display_amounts'] ?? NULL;
               $fieldCnt++;
               $labelClass = 'price_set_option-label';
             }
@@ -126,9 +126,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             }
             // show tax rate with amount
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-            $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $displayOpt = CRM_Utils_Array::value('tax_display_settings', $invoiceSettings);
-            $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+            $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+            $displayOpt = $invoiceSettings['tax_display_settings'] ?? NULL;
+            $invoicing = $invoiceSettings['invoicing'] ?? NULL;
             foreach ($fieldValues['options'] as $optionId => $optionVal) {
               if (CRM_Utils_Array::value('visibility_id', $optionVal) != array_search('public', $visibility) &&
                 $adminFieldVisible == FALSE
@@ -136,7 +136,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
                 continue;
               }
 
-              $values['feeBlock']['isDisplayAmount'][$fieldCnt] = CRM_Utils_Array::value('is_display_amounts', $fieldValues);
+              $values['feeBlock']['isDisplayAmount'][$fieldCnt] = $fieldValues['is_display_amounts'] ?? NULL;
               if ($invoicing && isset($optionVal['tax_amount'])) {
                 $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $displayOpt, $taxTerm);
                 $values['feeBlock']['tax_amount'][$fieldCnt] = $optionVal['tax_amount'];
@@ -238,7 +238,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('findParticipants', $findParticipants);
     }
 
-    $participantListingID = CRM_Utils_Array::value('participant_listing_id', $values['event']);
+    $participantListingID = $values['event']['participant_listing_id'] ?? NULL;
     if ($participantListingID) {
       $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
         "reset=1&id={$this->_id}",
@@ -247,7 +247,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('participantListingURL', $participantListingURL);
     }
 
-    $hasWaitingList = CRM_Utils_Array::value('has_waitlist', $values['event']);
+    $hasWaitingList = $values['event']['has_waitlist'] ?? NULL;
     $eventFullMessage = CRM_Event_BAO_Participant::eventFull($this->_id,
       FALSE,
       $hasWaitingList
@@ -317,7 +317,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         }
       }
       elseif ($hasWaitingList) {
-        $statusMessage = CRM_Utils_Array::value('waitlist_text', $values['event']);
+        $statusMessage = $values['event']['waitlist_text'] ?? NULL;
         if (!$statusMessage) {
           $statusMessage = ts('Event is currently full, but you can register and be a part of waiting list.');
         }

@@ -226,8 +226,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
               foreach ($options as $optionId => $optionValue) {
                 $countRow++;
                 $defaults['value'][$countRow] = $optionValue['amount'];
-                $defaults['label'][$countRow] = CRM_Utils_Array::value('label', $optionValue);
-                $defaults['name'][$countRow] = CRM_Utils_Array::value('name', $optionValue);
+                $defaults['label'][$countRow] = $optionValue['label'] ?? NULL;
+                $defaults['name'][$countRow] = $optionValue['name'] ?? NULL;
                 $defaults['weight'][$countRow] = $optionValue['weight'];
 
                 $defaults["price_field_value"][$countRow] = $optionValue['id'];
@@ -339,8 +339,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if (!empty($fields['amount_block_is_active']) && empty($fields['price_set_id']) && empty($fields['amount_label'])) {
       $errors['amount_label'] = ts('Please enter the contribution amount label.');
     }
-    $minAmount = CRM_Utils_Array::value('min_amount', $fields);
-    $maxAmount = CRM_Utils_Array::value('max_amount', $fields);
+    $minAmount = $fields['min_amount'] ?? NULL;
+    $maxAmount = $fields['max_amount'] ?? NULL;
     if (!empty($minAmount) && !empty($maxAmount)) {
       $minAmount = CRM_Utils_Rule::cleanMoney($minAmount);
       $maxAmount = CRM_Utils_Rule::cleanMoney($maxAmount);
@@ -395,7 +395,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
           !$priceSetId
         ) {
           //get the values of amount block
-          $values = CRM_Utils_Array::value('value', $fields);
+          $values = $fields['value'] ?? NULL;
           $isSetRow = FALSE;
           for ($i = 1; $i < self::NUM_OPTION; $i++) {
             if ((isset($values[$i]) && (strlen(trim($values[$i])) > 0))) {
@@ -439,7 +439,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     // check for price set.
-    $priceSetID = CRM_Utils_Array::value('price_set_id', $params);
+    $priceSetID = $params['price_set_id'] ?? NULL;
 
     // get required fields.
     $fields = [
@@ -565,9 +565,9 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
           // process contribution amount block
           $deleteAmountBlk = FALSE;
 
-          $labels = CRM_Utils_Array::value('label', $params);
-          $values = CRM_Utils_Array::value('value', $params);
-          $default = CRM_Utils_Array::value('default', $params);
+          $labels = $params['label'] ?? NULL;
+          $values = $params['value'] ?? NULL;
+          $default = $params['default'] ?? NULL;
 
           $options = [];
           for ($i = 1; $i < self::NUM_OPTION; $i++) {
@@ -603,7 +603,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
                 $setParams['name'] = $pageTitle . '_' . date('is', $timeSec[0]) . $timeSec[1];
               }
               $setParams['is_quick_config'] = 1;
-              $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
+              $setParams['financial_type_id'] = $this->_values['financial_type_id'] ?? NULL;
               $setParams['extends'] = CRM_Core_Component::getComponentID('CiviContribute');
               $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
               $priceSetId = $priceSet->id;
@@ -620,7 +620,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
                   }
                 }
                 if (implode('', $params['price_field_value'])) {
-                  $fieldParams['id'] = CRM_Utils_Array::value('price_field_id', $params);
+                  $fieldParams['id'] = $params['price_field_id'] ?? NULL;
                   $fieldParams['option_id'] = $params['price_field_value'];
                 }
                 else {
@@ -629,7 +629,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
                 }
               }
               else {
-                $priceFieldId = CRM_Utils_Array::value('price_field_other', $params);
+                $priceFieldId = $params['price_field_other'] ?? NULL;
               }
               $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceFieldId, 'price_set_id');
             }
@@ -646,7 +646,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
                 $fieldParams['name'] = strtolower(CRM_Utils_String::munge("Contribution Amount", '_', 245));
               }
               else {
-                $fieldParams['id'] = CRM_Utils_Array::value('id', $editedResults);
+                $fieldParams['id'] = $editedResults['id'] ?? NULL;
               }
 
               $fieldParams['price_set_id'] = $priceSetId;
@@ -663,7 +663,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
               $fieldParams['html_type'] = 'Radio';
               $fieldParams['option_label'] = $params['label'];
               $fieldParams['option_amount'] = $params['value'];
-              $fieldParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
+              $fieldParams['financial_type_id'] = $this->_values['financial_type_id'] ?? NULL;
               foreach ($options as $value) {
                 $fieldParams['option_weight'][$value['weight']] = $value['weight'];
               }
@@ -759,7 +759,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
               'is_pledge_start_date_editable',
             ];
             foreach ($pledgeBlock as $key) {
-              $pledgeBlockParams[$key] = CRM_Utils_Array::value($key, $params);
+              $pledgeBlockParams[$key] = $params[$key] ?? NULL;
             }
             $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
               $params, FALSE

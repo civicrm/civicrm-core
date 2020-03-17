@@ -151,7 +151,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       $privateData .= ",f={$params['participantID']},g={$params['eventID']}";
     }
     elseif ($component == 'contribute') {
-      $membershipID = CRM_Utils_Array::value('membershipID', $params);
+      $membershipID = $params['membershipID'] ?? NULL;
       if ($membershipID) {
         $privateData .= ",e=$membershipID";
       }

@@ -149,7 +149,7 @@ class CRM_Contact_Form_Task_LabelCommon {
           $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[$value]["custom_{$cfID}"], $cfID);
         }
       }
-      $contact = CRM_Utils_Array::value($value, $details);
+      $contact = $details[$value] ?? NULL;
 
       if (is_a($contact, 'CRM_Core_Error')) {
         return NULL;

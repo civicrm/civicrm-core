@@ -476,7 +476,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
           }
         }
 
-        $default = CRM_Utils_Array::value('default', $values);
+        $default = $values['default'] ?? NULL;
         if ($default && !in_array($default, $optionKeys)) {
           $errors['default'] = ts('Please select an appropriate option as default.');
         }
@@ -577,9 +577,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       }
       else {
         // if there are label / values, create custom options for them
-        $labels = CRM_Utils_Array::value('label', $params);
-        $values = CRM_Utils_Array::value('value', $params);
-        $default = CRM_Utils_Array::value('default', $params);
+        $labels = $params['label'] ?? NULL;
+        $values = $params['value'] ?? NULL;
+        $default = $params['default'] ?? NULL;
         $options = [];
         if (!CRM_Utils_System::isNull($labels) && !CRM_Utils_System::isNull($values)) {
           for ($i = 1; $i < self::NUM_OPTION; $i++) {
@@ -624,7 +624,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                     unset($params['price_field_value'][$arrayID]);
                   }
                 }
-                $fieldParams['id'] = CRM_Utils_Array::value('price_field_id', $params);
+                $fieldParams['id'] = $params['price_field_id'] ?? NULL;
                 $fieldParams['option_id'] = $params['price_field_value'];
 
                 $priceSet = new CRM_Price_BAO_PriceSet();
@@ -654,9 +654,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         if (CRM_Utils_Array::value('is_discount', $params) == 1) {
           // if there are discounted set of label / values,
           // create custom options for them
-          $labels = CRM_Utils_Array::value('discounted_label', $params);
-          $values = CRM_Utils_Array::value('discounted_value', $params);
-          $default = CRM_Utils_Array::value('discounted_default', $params);
+          $labels = $params['discounted_label'] ?? NULL;
+          $values = $params['discounted_value'] ?? NULL;
+          $default = $params['discounted_default'] ?? NULL;
 
           if (!CRM_Utils_System::isNull($labels) && !CRM_Utils_System::isNull($values)) {
             for ($j = 1; $j <= self::NUM_DISCOUNT; $j++) {

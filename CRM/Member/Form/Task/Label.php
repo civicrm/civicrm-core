@@ -54,7 +54,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   public function setDefaultValues() {
     $defaults = [];
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
-    $defaults['label_name'] = CRM_Utils_Array::value('name', $format);
+    $defaults['label_name'] = $format['name'] ?? NULL;
     $defaults['merge_same_address'] = 0;
     $defaults['merge_same_household'] = 0;
     $defaults['do_not_mail'] = 1;
@@ -70,11 +70,11 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   public function postProcess() {
     $formValues = $this->controller->exportValues($this->_name);
     $locationTypeID = $formValues['location_type_id'];
-    $respectDoNotMail = CRM_Utils_Array::value('do_not_mail', $formValues);
+    $respectDoNotMail = $formValues['do_not_mail'] ?? NULL;
     $labelName = $formValues['label_name'];
-    $mergeSameAddress = CRM_Utils_Array::value('merge_same_address', $formValues);
-    $mergeSameHousehold = CRM_Utils_Array::value('merge_same_household', $formValues);
-    $isPerMembership = CRM_Utils_Array::value('per_membership', $formValues);
+    $mergeSameAddress = $formValues['merge_same_address'] ?? NULL;
+    $mergeSameHousehold = $formValues['merge_same_household'] ?? NULL;
+    $isPerMembership = $formValues['per_membership'] ?? NULL;
     if ($isPerMembership && ($mergeSameAddress || $mergeSameHousehold)) {
       // this shouldn't happen  - perhaps is could if JS is disabled
       CRM_Core_Session::setStatus(ts('As you are printing one label per membership your merge settings are being ignored'));

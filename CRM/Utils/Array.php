@@ -915,7 +915,7 @@ class CRM_Utils_Array {
     foreach ($matrix as $pos => $oldRow) {
       $newRow = [];
       foreach ($columns as $column) {
-        $newRow[$column] = CRM_Utils_Array::value($column, $oldRow);
+        $newRow[$column] = $oldRow[$column] ?? NULL;
       }
       $newRows[$pos] = $newRow;
     }

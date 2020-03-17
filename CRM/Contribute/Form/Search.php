@@ -276,7 +276,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams);
 
       // @todo - stop changing formValues - respect submitted form values, change a working array.
-      $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
+      $tags = $this->_formValues['contact_tags'] ?? NULL;
       if ($tags && !is_array($tags)) {
         // @todo - stop changing formValues - respect submitted form values, change a working array.
         unset($this->_formValues['contact_tags']);
@@ -291,7 +291,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-      $group = CRM_Utils_Array::value('group', $this->_formValues);
+      $group = $this->_formValues['group'] ?? NULL;
       if ($group && !is_array($group)) {
         // @todo - stop changing formValues - respect submitted form values, change a working array.
         unset($this->_formValues['group']);

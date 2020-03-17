@@ -90,7 +90,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
     $pledgeBlock = new CRM_Pledge_DAO_PledgeBlock();
 
     // fix for pledge_frequency_unit
-    $freqUnits = CRM_Utils_Array::value('pledge_frequency_unit', $params);
+    $freqUnits = $params['pledge_frequency_unit'] ?? NULL;
 
     if ($freqUnits && is_array($freqUnits)) {
       unset($params['pledge_frequency_unit']);
@@ -231,7 +231,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
             1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment), CRM_Utils_Array::value('scheduled_amount_currency', $payment)),
             2 => $payment['scheduled_date'] ?? NULL,
           ));
-          $paymentID = CRM_Utils_Array::value('id', $payment);
+          $paymentID = $payment['id'] ?? NULL;
           $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $payment)));
         }
       }
@@ -241,7 +241,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
           1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment), CRM_Utils_Array::value('scheduled_amount_currency', $nextPayment)),
           2 => $nextPayment['scheduled_date'] ?? NULL,
         ));
-        $paymentID = CRM_Utils_Array::value('id', $nextPayment);
+        $paymentID = $nextPayment['id'] ?? NULL;
         $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)));
       }
       // give error if empty or build form for payment.

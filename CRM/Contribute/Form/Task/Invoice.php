@@ -227,9 +227,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $ids['contribution'] = $contribID;
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
-      $ids['membership'] = CRM_Utils_Array::value('membership', $detail);
-      $ids['participant'] = CRM_Utils_Array::value('participant', $detail);
-      $ids['event'] = CRM_Utils_Array::value('event', $detail);
+      $ids['membership'] = $detail['membership'] ?? NULL;
+      $ids['participant'] = $detail['participant'] ?? NULL;
+      $ids['event'] = $detail['event'] ?? NULL;
 
       if (!$invoiceElements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
         CRM_Core_Error::fatal();
@@ -282,7 +282,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
         }
         else {
-          $dataArray[(string) $taxRate['tax_rate']] = CRM_Utils_Array::value('tax_amount', $taxRate);
+          $dataArray[(string) $taxRate['tax_rate']] = $taxRate['tax_amount'] ?? NULL;
         }
         $subTotal += CRM_Utils_Array::value('subTotal', $taxRate);
       }
@@ -299,11 +299,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           'confirm_from_email',
         ];
         CRM_Core_DAO::commonRetrieveAll($daoName, 'id', $pageId, $mailDetails, $mailElements);
-        $values['title'] = CRM_Utils_Array::value('title', $mailDetails[$contribution->_relatedObjects['event']->id]);
-        $values['confirm_from_name'] = CRM_Utils_Array::value('confirm_from_name', $mailDetails[$contribution->_relatedObjects['event']->id]);
-        $values['confirm_from_email'] = CRM_Utils_Array::value('confirm_from_email', $mailDetails[$contribution->_relatedObjects['event']->id]);
+        $values['title'] = $mailDetails[$contribution->_relatedObjects['event']->id]['title'] ?? NULL;
+        $values['confirm_from_name'] = $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_name'] ?? NULL;
+        $values['confirm_from_email'] = $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_email'] ?? NULL;
 
-        $title = CRM_Utils_Array::value('title', $mailDetails[$contribution->_relatedObjects['event']->id]);
+        $title = $mailDetails[$contribution->_relatedObjects['event']->id]['title'] ?? NULL;
       }
       elseif ($contribution->_component == 'contribute') {
         $daoName = 'CRM_Contribute_DAO_ContributionPage';
@@ -414,7 +414,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       ];
 
       // from email address
-      $fromEmailAddress = CRM_Utils_Array::value('from_email_address', $params);
+      $fromEmailAddress = $params['from_email_address'] ?? NULL;
 
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
@@ -442,8 +442,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $invoiceElements['params']['email_comment']]);
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
-        $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
-        $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $values);
+        $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
+        $sendTemplateParams['bcc'] = $values['bcc_receipt'] ?? NULL;
 
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
@@ -456,8 +456,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $invoiceElements['params']['email_comment']]);
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
-        $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_confirm', $values);
-        $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_confirm', $values);
+        $sendTemplateParams['cc'] = $values['cc_confirm'] ?? NULL;
+        $sendTemplateParams['bcc'] = $values['bcc_confirm'] ?? NULL;
 
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment

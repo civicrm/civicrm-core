@@ -39,7 +39,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     //lets process in-queue participants.
     if ($this->_participantId && $this->_additionalParticipantIds) {
-      $this->_additionalParticipantId = CRM_Utils_Array::value($participantNo, $this->_additionalParticipantIds);
+      $this->_additionalParticipantId = $this->_additionalParticipantIds[$participantNo] ?? NULL;
     }
 
     $participantCnt = $participantNo + 1;
@@ -130,7 +130,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     //load default campaign from page.
     if (array_key_exists('participant_campaign_id', $this->_fields)) {
-      $defaults['participant_campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values['event']);
+      $defaults['participant_campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
     }
 
     //CRM-17865 set custom field defaults
@@ -215,7 +215,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       //lets allow to become a part of runtime waiting list, if primary selected pay later.
       $realPayLater = FALSE;
       if (!empty($this->_values['event']['is_monetary']) && !empty($this->_values['event']['is_pay_later'])) {
-        $realPayLater = CRM_Utils_Array::value('is_pay_later', $this->_params[0]);
+        $realPayLater = $this->_params[0]['is_pay_later'] ?? NULL;
       }
 
       //truly spaces are greater than required.
@@ -360,7 +360,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     $realPayLater = FALSE;
     if (!empty($self->_values['event']['is_monetary']) && !empty($self->_values['event']['is_pay_later'])) {
-      $realPayLater = CRM_Utils_Array::value('is_pay_later', $self->_params[0]);
+      $realPayLater = $self->_params[0]['is_pay_later'] ?? NULL;
     }
 
     if ($button != 'skip') {
@@ -579,7 +579,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       $params['campaign_id'] = $params['participant_campaign_id'];
     }
     else {
-      $params['campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values['event']);
+      $params['campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
     }
 
     // if waiting is enabled

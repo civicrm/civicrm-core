@@ -43,8 +43,8 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
     }
 
     if (!$this->_action) {
-      $this->_action = CRM_Utils_Array::value('action', $_GET);
-      $this->_id = CRM_Utils_Array::value('id', $_GET);
+      $this->_action = $_GET['action'] ?? NULL;
+      $this->_id = $_GET['id'] ?? NULL;
     }
     else {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);

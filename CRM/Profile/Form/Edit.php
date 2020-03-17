@@ -188,7 +188,7 @@ SELECT module,is_reserved
       $this->_cancelURL = str_replace('&amp;', '&', $this->_cancelURL);
 
       // also retain error URL if set
-      $this->_errorURL = CRM_Utils_Array::value('errorURL', $_POST);
+      $this->_errorURL = $_POST['errorURL'] ?? NULL;
       if ($this->_errorURL) {
         // we do this gross hack since qf also does entity replacement
         $this->_errorURL = str_replace('&amp;', '&', $this->_errorURL);
@@ -252,7 +252,7 @@ SELECT module,is_reserved
       ]);
       foreach (explode(',', $this->returnExtra) as $field) {
         $field = trim($field);
-        $this->ajaxResponse['extra'][$field] = CRM_Utils_Array::value($field, $contact);
+        $this->ajaxResponse['extra'][$field] = $contact[$field] ?? NULL;
       }
     }
 

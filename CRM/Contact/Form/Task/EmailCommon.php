@@ -304,7 +304,7 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     foreach ($fields as $field => $values) {
       if (!empty($fields[$field])) {
-        $attribute = CRM_Utils_Array::value('attributes', $values);
+        $attribute = $values['attributes'] ?? NULL;
         $required = !empty($values['required']);
 
         if ($values['type'] == 'select' && empty($attribute)) {
@@ -380,7 +380,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   public static function submit(&$form, $formValues) {
     self::saveMessageTemplate($formValues);
 
-    $from = CRM_Utils_Array::value('from_email_address', $formValues);
+    $from = $formValues['from_email_address'] ?? NULL;
     // dev/core#357 User Emails are keyed by their id so that the Signature is able to be added
     // If we have had a contact email used here the value returned from the line above will be the
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>

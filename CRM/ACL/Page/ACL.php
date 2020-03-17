@@ -135,7 +135,7 @@ ORDER BY entity_id
       $acl[$dao->id]['is_active'] = $dao->is_active;
 
       if ($acl[$dao->id]['entity_id']) {
-        $acl[$dao->id]['entity'] = CRM_Utils_Array::value($acl[$dao->id]['entity_id'], $roles);
+        $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']] ?? NULL;
       }
       else {
         $acl[$dao->id]['entity'] = ts('Everyone');
@@ -143,22 +143,22 @@ ORDER BY entity_id
 
       switch ($acl[$dao->id]['object_table']) {
         case 'civicrm_saved_search':
-          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $group);
+          $acl[$dao->id]['object'] = $group[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Group');
           break;
 
         case 'civicrm_uf_group':
-          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $ufGroup);
+          $acl[$dao->id]['object'] = $ufGroup[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Profile');
           break;
 
         case 'civicrm_custom_group':
-          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $customGroup);
+          $acl[$dao->id]['object'] = $customGroup[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Custom Group');
           break;
 
         case 'civicrm_event':
-          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $event);
+          $acl[$dao->id]['object'] = $event[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Event');
           break;
       }

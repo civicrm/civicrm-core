@@ -51,7 +51,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $isCurrentMonth = 0;
 
     // You can force the dashboard to display based upon a certain date
-    $ym = CRM_Utils_Array::value('date', $_GET);
+    $ym = $_GET['date'] ?? NULL;
 
     if ($ym) {
       if (preg_match('/^\d{6}$/', $ym) == 0 ||

@@ -130,7 +130,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
 
-      $participantListingID = CRM_Utils_Array::value('participant_listing_id', $eventInfo);
+      $participantListingID = $eventInfo['participant_listing_id'] ?? NULL;
       //CRM_Core_DAO::getFieldValue( 'CRM_Event_DAO_Event', $this->_id, 'participant_listing_id' );
       if ($participantListingID) {
         $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
@@ -147,7 +147,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     // figure out whether we’re handling an event or an event template
     if ($this->_id) {
-      $this->_isTemplate = CRM_Utils_Array::value('is_template', $eventInfo);
+      $this->_isTemplate = $eventInfo['is_template'] ?? NULL;
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
       $this->_isTemplate = CRM_Utils_Request::retrieve('is_template', 'Boolean', $this);
@@ -250,7 +250,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $params = ['id' => $this->_id];
       CRM_Event_BAO_Event::retrieve($params, $defaults);
 
-      $this->_campaignID = CRM_Utils_Array::value('campaign_id', $defaults);
+      $this->_campaignID = $defaults['campaign_id'] ?? NULL;
     }
     elseif ($this->_templateId) {
       $params = ['id' => $this->_templateId];
@@ -275,7 +275,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
 
-    $this->_cancelURL = CRM_Utils_Array::value('cancelURL', $_POST);
+    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
 
     if (!$this->_cancelURL) {
       if ($this->_isTemplate) {
@@ -372,8 +372,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $config = CRM_Core_Config::singleton();
       if (in_array('CiviCampaign', $config->enableComponents)) {
         $values = $this->controller->exportValues($this->_name);
-        $newCampaignID = CRM_Utils_Array::value('campaign_id', $values);
-        $eventID = CRM_Utils_Array::value('id', $values);
+        $newCampaignID = $values['campaign_id'] ?? NULL;
+        $eventID = $values['id'] ?? NULL;
         if ($eventID && $this->_campaignID != $newCampaignID) {
           CRM_Event_BAO_Event::updateParticipantCampaignID($eventID, $newCampaignID);
         }

@@ -215,8 +215,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params = array_merge($this->controller->exportValues($this->_name), $this->_submitValues);
 
     //format params
-    $params['start_date'] = CRM_Utils_Array::value('start_date', $params);
-    $params['end_date'] = CRM_Utils_Array::value('end_date', $params);
+    $params['start_date'] = $params['start_date'] ?? NULL;
+    $params['end_date'] = $params['end_date'] ?? NULL;
     $params['has_waitlist'] = CRM_Utils_Array::value('has_waitlist', $params, FALSE);
     $params['is_map'] = CRM_Utils_Array::value('is_map', $params, FALSE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);

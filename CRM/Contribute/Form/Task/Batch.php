@@ -135,7 +135,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
       foreach ($this->_fields as $name => $field) {
         $entityColumnValue = [];
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
-          $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
+          $customValue = $customFields[$customFieldID] ?? NULL;
           if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               $customValue['extends_entity_column_value']

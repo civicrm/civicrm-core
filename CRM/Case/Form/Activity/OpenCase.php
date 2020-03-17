@@ -212,7 +212,7 @@ class CRM_Case_Form_Activity_OpenCase {
     }
 
     // rename activity_location param to the correct column name for activity DAO
-    $params['location'] = CRM_Utils_Array::value('activity_location', $params);
+    $params['location'] = $params['activity_location'] ?? NULL;
 
     // Add attachments
     CRM_Core_BAO_File::formatAttachment(

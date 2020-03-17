@@ -148,14 +148,14 @@ class CRM_Contribute_Form_SoftCredit {
     if (!empty($form->_softCreditInfo['pcp_id'])) {
       $noPCP = FALSE;
       $pcpInfo = $form->_softCreditInfo;
-      $pcpId = CRM_Utils_Array::value('pcp_id', $pcpInfo);
+      $pcpId = $pcpInfo['pcp_id'] ?? NULL;
       $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
       $contributionPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($pcpId, 'contribute');
       $defaults['pcp_made_through'] = CRM_Utils_Array::value('sort_name', $pcpInfo) . " :: " . $pcpTitle . " :: " . $contributionPageTitle;
-      $defaults['pcp_made_through_id'] = CRM_Utils_Array::value('pcp_id', $pcpInfo);
-      $defaults['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcpInfo);
-      $defaults['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcpInfo);
-      $defaults['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcpInfo);
+      $defaults['pcp_made_through_id'] = $pcpInfo['pcp_id'] ?? NULL;
+      $defaults['pcp_display_in_roll'] = $pcpInfo['pcp_display_in_roll'] ?? NULL;
+      $defaults['pcp_roll_nickname'] = $pcpInfo['pcp_roll_nickname'] ?? NULL;
+      $defaults['pcp_personal_note'] = $pcpInfo['pcp_personal_note'] ?? NULL;
     }
 
     $form->assign('noSoftCredit', $noSoftCredit);

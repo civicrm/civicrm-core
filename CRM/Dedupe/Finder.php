@@ -230,7 +230,7 @@ class CRM_Dedupe_Finder {
         continue;
       }
       foreach ($cg['fields'] as $cf) {
-        $flat[$cf['column_name']] = CRM_Utils_Array::value('data', $cf['customValue']);
+        $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
       }
     }
 

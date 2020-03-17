@@ -156,11 +156,11 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
     $paymentInstrumentName = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $params['payment_instrument_id']);
     if ($paymentInstrumentName == 'Credit Card') {
-      $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $this->_submitValues);
-      $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $this->_submitValues);
+      $params['card_type_id'] = $this->_submitValues['card_type_id'] ?? NULL;
+      $params['pan_truncation'] = $this->_submitValues['pan_truncation'] ?? NULL;
     }
     elseif ($paymentInstrumentName == 'Check') {
-      $params['check_number'] = CRM_Utils_Array::value('check_number', $this->_submitValues);
+      $params['check_number'] = $this->_submitValues['check_number'] ?? NULL;
     }
 
     $this->submit($params);

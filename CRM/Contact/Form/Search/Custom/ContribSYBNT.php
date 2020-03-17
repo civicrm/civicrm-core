@@ -58,7 +58,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
     $this->_checkboxes = ['is_first_amount' => ts('First Donation?')];
 
     foreach ($this->_amounts as $name => $title) {
-      $this->{$name} = CRM_Utils_Array::value($name, $this->_formValues);
+      $this->{$name} = $this->_formValues[$name] ?? NULL;
     }
 
     foreach ($this->_checkboxes as $name => $title) {
@@ -329,12 +329,12 @@ AND      c.receive_date < {$this->start_date_1}
    */
   public function having($includeContactIDs = FALSE) {
     $clauses = [];
-    $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
+    $min = $this->_formValues['min_amount'] ?? NULL;
     if ($min) {
       $clauses[] = "sum(contrib_1.total_amount) >= $min";
     }
 
-    $max = CRM_Utils_Array::value('max_amount', $this->_formValues);
+    $max = $this->_formValues['max_amount'] ?? NULL;
     if ($max) {
       $clauses[] = "sum(contrib_1.total_amount) <= $max";
     }

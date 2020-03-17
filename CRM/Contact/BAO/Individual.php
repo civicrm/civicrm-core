@@ -225,7 +225,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           }
         }
       }
-      $uniqId = CRM_Utils_Array::value('user_unique_id', $params);
+      $uniqId = $params['user_unique_id'] ?? NULL;
       if (!$email && $contact->id) {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contact->id);
       }

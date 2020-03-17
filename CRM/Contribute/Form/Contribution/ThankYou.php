@@ -204,7 +204,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
-    $this->_trxnId = CRM_Utils_Array::value('trxn_id', $this->_params);
+    $this->_trxnId = $this->_params['trxn_id'] ?? NULL;
 
     $this->assign('trxn_id', $this->_trxnId);
 

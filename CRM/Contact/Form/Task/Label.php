@@ -83,7 +83,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   public function setDefaultValues() {
     $defaults = [];
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
-    $defaults['label_name'] = CRM_Utils_Array::value('name', $format);
+    $defaults['label_name'] = $format['name'] ?? NULL;
     $defaults['do_not_mail'] = 1;
 
     return $defaults;
@@ -227,7 +227,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
           $details[0][$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[0][$value]["custom_{$cfID}"], $cfID);
         }
       }
-      $contact = CRM_Utils_Array::value($value, $details['0']);
+      $contact = $details['0'][$value] ?? NULL;
 
       if (is_a($contact, 'CRM_Core_Error')) {
         return NULL;

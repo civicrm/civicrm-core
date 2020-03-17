@@ -301,7 +301,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         }
       }
 
-      $email = CRM_Utils_Array::value($this->_emailIndex, $values);
+      $email = $values[$this->_emailIndex] ?? NULL;
       if ($email) {
         /* If the email address isn't valid, bail */
 
@@ -339,7 +339,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     //check for duplicate external Identifier
-    $externalID = CRM_Utils_Array::value($this->_externalIdentifierIndex, $values);
+    $externalID = $values[$this->_externalIdentifierIndex] ?? NULL;
     if ($externalID) {
       /* If it's a dupe,external Identifier  */
 
@@ -1121,7 +1121,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $dateType = CRM_Core_Session::singleton()->get("dateTypes");
 
     if (!empty($params['contact_sub_type'])) {
-      $csType = CRM_Utils_Array::value('contact_sub_type', $params);
+      $csType = $params['contact_sub_type'] ?? NULL;
     }
 
     if (empty($params['contact_type'])) {
@@ -1908,7 +1908,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         if (!empty($relatedContactFields[$name]) && !is_array($relatedContactFields[$name])) {
           $relatedContactFields[$name] = [];
         }
-        $fldName = CRM_Utils_Array::value($key, $this->_mapperRelatedContactDetails);
+        $fldName = $this->_mapperRelatedContactDetails[$key] ?? NULL;
         if ($fldName == 'url') {
           $fldName = 'website';
         }

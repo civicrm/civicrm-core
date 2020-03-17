@@ -167,7 +167,7 @@ class CRM_Utils_Mail {
     $defaultReturnPath = CRM_Core_BAO_MailSettings::defaultReturnPath();
     $includeMessageId = CRM_Core_BAO_MailSettings::includeMessageId();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-    $from = CRM_Utils_Array::value('from', $params);
+    $from = $params['from'] ?? NULL;
     if (!$defaultReturnPath) {
       $defaultReturnPath = self::pluckEmailFromHeader($from);
     }
@@ -180,9 +180,9 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    $textMessage = CRM_Utils_Array::value('text', $params);
-    $htmlMessage = CRM_Utils_Array::value('html', $params);
-    $attachments = CRM_Utils_Array::value('attachments', $params);
+    $textMessage = $params['text'] ?? NULL;
+    $htmlMessage = $params['html'] ?? NULL;
+    $attachments = $params['attachments'] ?? NULL;
 
     // CRM-6224
     if (trim(CRM_Utils_String::htmlToText($htmlMessage)) == '') {
@@ -203,13 +203,13 @@ class CRM_Utils_Mail {
 
     // On some servers mail() fails when 'Cc' or 'Bcc' headers are defined but empty.
     foreach (['Cc', 'Bcc'] as $optionalHeader) {
-      $headers[$optionalHeader] = CRM_Utils_Array::value(strtolower($optionalHeader), $params);
+      $headers[$optionalHeader] = $params[strtolower($optionalHeader)] ?? NULL;
       if (empty($headers[$optionalHeader])) {
         unset($headers[$optionalHeader]);
       }
     }
 
-    $headers['Subject'] = CRM_Utils_Array::value('subject', $params);
+    $headers['Subject'] = $params['subject'] ?? NULL;
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
     $headers['Content-Transfer-Encoding'] = '8bit';
@@ -286,10 +286,10 @@ class CRM_Utils_Mail {
       // get emails from headers, since these are
       // combination of name and email addresses.
       if (!empty($headers['Cc'])) {
-        $to[] = CRM_Utils_Array::value('Cc', $headers);
+        $to[] = $headers['Cc'] ?? NULL;
       }
       if (!empty($headers['Bcc'])) {
-        $to[] = CRM_Utils_Array::value('Bcc', $headers);
+        $to[] = $headers['Bcc'] ?? NULL;
         unset($headers['Bcc']);
       }
     }

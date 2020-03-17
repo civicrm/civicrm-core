@@ -179,7 +179,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $this->_searchContext = $searchContext;
 
-    $this->_ufGroupID = CRM_Utils_Array::value('uf_group_id', $this->_formValues);
+    $this->_ufGroupID = $this->_formValues['uf_group_id'] ?? NULL;
 
     if ($this->_ufGroupID) {
       $this->_fields = CRM_Core_BAO_UFGroup::getListingFields(CRM_Core_Action::VIEW,
@@ -204,7 +204,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       }
     }
 
-    $displayRelationshipType = CRM_Utils_Array::value('display_relationship_type', $this->_formValues);
+    $displayRelationshipType = $this->_formValues['display_relationship_type'] ?? NULL;
     $operator = CRM_Utils_Array::value('operator', $this->_formValues, 'AND');
 
     // rectify params to what proximity search expects if there is a value for prox_distance
@@ -612,7 +612,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               $locationTypeName = "website-{$id}";
             }
             else {
-              $locationTypeName = CRM_Utils_Array::value($id, $locationTypes);
+              $locationTypeName = $locationTypes[$id] ?? NULL;
               if (!$locationTypeName) {
                 continue;
               }
@@ -653,7 +653,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
 
     //check explicitly added contact to a Smart Group.
-    $groupID = CRM_Utils_Array::value('group', $this->_formValues);
+    $groupID = $this->_formValues['group'] ?? NULL;
 
     $pseudoconstants = [];
     // for CRM-3157 purposes

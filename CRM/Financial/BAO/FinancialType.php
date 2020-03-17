@@ -90,7 +90,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->copyValues($params);
     if (!empty($ids['financialType'])) {
-      $financialType->id = CRM_Utils_Array::value('financialType', $ids);
+      $financialType->id = $ids['financialType'] ?? NULL;
       if (self::isACLFinancialTypeStatus()) {
         $prevName = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $financialType->id, 'name');
         if ($prevName != $params['name']) {

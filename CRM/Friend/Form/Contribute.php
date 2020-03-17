@@ -48,11 +48,11 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
       $defaults['entity_table'] = 'civicrm_contribution_page';
       $defaults['entity_id'] = $this->_id;
       CRM_Friend_BAO_Friend::getValues($defaults);
-      $this->_friendId = CRM_Utils_Array::value('id', $defaults);
-      $defaults['tf_title'] = CRM_Utils_Array::value('title', $defaults);
-      $defaults['tf_is_active'] = CRM_Utils_Array::value('is_active', $defaults);
-      $defaults['tf_thankyou_title'] = CRM_Utils_Array::value('thankyou_title', $defaults);
-      $defaults['tf_thankyou_text'] = CRM_Utils_Array::value('thankyou_text', $defaults);
+      $this->_friendId = $defaults['id'] ?? NULL;
+      $defaults['tf_title'] = $defaults['title'] ?? NULL;
+      $defaults['tf_is_active'] = $defaults['is_active'] ?? NULL;
+      $defaults['tf_thankyou_title'] = $defaults['thankyou_title'] ?? NULL;
+      $defaults['tf_thankyou_text'] = $defaults['thankyou_text'] ?? NULL;
     }
 
     if (!$this->_friendId) {
@@ -76,7 +76,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
       $defaults['entity_table'] = 'civicrm_contribution_page';
       $defaults['entity_id'] = $this->_id;
       CRM_Friend_BAO_Friend::getValues($defaults);
-      $this->_friendId = CRM_Utils_Array::value('id', $defaults);
+      $this->_friendId = $defaults['id'] ?? NULL;
     }
 
     CRM_Friend_BAO_Friend::buildFriendForm($this);
@@ -97,8 +97,8 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $formValues['entity_id'] = $this->_id;
     $formValues['title'] = $formValues['tf_title'];
     $formValues['is_active'] = CRM_Utils_Array::value('tf_is_active', $formValues, FALSE);
-    $formValues['thankyou_title'] = CRM_Utils_Array::value('tf_thankyou_title', $formValues);
-    $formValues['thankyou_text'] = CRM_Utils_Array::value('tf_thankyou_text', $formValues);
+    $formValues['thankyou_title'] = $formValues['tf_thankyou_title'] ?? NULL;
+    $formValues['thankyou_text'] = $formValues['tf_thankyou_text'] ?? NULL;
 
     if (($this->_action & CRM_Core_Action::UPDATE) && $this->_friendId) {
       $formValues['id'] = $this->_friendId;

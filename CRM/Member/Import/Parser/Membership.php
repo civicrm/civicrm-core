@@ -524,7 +524,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           $formatted
         );
         if (empty($formatted['status_id'])) {
-          $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
+          $formatted['status_id'] = $calcStatus['id'] ?? NULL;
         }
         elseif (empty($formatted['member_is_override'])) {
           if (empty($calcStatus)) {

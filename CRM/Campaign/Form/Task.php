@@ -35,7 +35,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form_Task {
 
     $this->_task = $values['task'];
     $campaignTasks = CRM_Campaign_Task::tasks();
-    $taskName = CRM_Utils_Array::value($this->_task, $campaignTasks);
+    $taskName = $campaignTasks[$this->_task] ?? NULL;
     $this->assign('taskName', $taskName);
 
     $ids = [];

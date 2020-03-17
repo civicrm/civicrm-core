@@ -225,7 +225,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @return string $html_message
    */
   public static function processTemplate(&$formValues) {
-    $html_message = CRM_Utils_Array::value('html_message', $formValues);
+    $html_message = $formValues['html_message'] ?? NULL;
 
     // process message template
     if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {

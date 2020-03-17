@@ -316,8 +316,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assignBillingType();
 
       // check for is_monetary status
-      $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values);
-      $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_values);
+      $isMonetary = $this->_values['is_monetary'] ?? NULL;
+      $isPayLater = $this->_values['is_pay_later'] ?? NULL;
       if (!empty($this->_ccid)) {
         $this->_values['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
           $this->_ccid,
@@ -382,10 +382,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
 
       if ($pledgeBlock) {
-        $this->_values['pledge_block_id'] = CRM_Utils_Array::value('id', $pledgeBlock);
-        $this->_values['max_reminders'] = CRM_Utils_Array::value('max_reminders', $pledgeBlock);
-        $this->_values['initial_reminder_day'] = CRM_Utils_Array::value('initial_reminder_day', $pledgeBlock);
-        $this->_values['additional_reminder_day'] = CRM_Utils_Array::value('additional_reminder_day', $pledgeBlock);
+        $this->_values['pledge_block_id'] = $pledgeBlock['id'] ?? NULL;
+        $this->_values['max_reminders'] = $pledgeBlock['max_reminders'] ?? NULL;
+        $this->_values['initial_reminder_day'] = $pledgeBlock['initial_reminder_day'] ?? NULL;
+        $this->_values['additional_reminder_day'] = $pledgeBlock['additional_reminder_day'] ?? NULL;
 
         //set pledge id in values
         $pledgeId = CRM_Utils_Request::retrieve('pledgeId', 'Positive', $this);
@@ -482,7 +482,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // check if billing block is required for pay later
     if (!empty($this->_values['is_pay_later'])) {
-      $this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_required', $this->_values);
+      $this->_isBillingAddressRequiredForPayLater = $this->_values['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
   }
@@ -656,14 +656,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
           ) {
             //retrieve file value from submitted values on basis of $profileContactType
-            $fileValue = CRM_Utils_Array::value($key, $this->_params);
+            $fileValue = $this->_params[$key] ?? NULL;
             if (!empty($profileContactType) && !empty($this->_params[$profileContactType])) {
-              $fileValue = CRM_Utils_Array::value($key, $this->_params[$profileContactType]);
+              $fileValue = $this->_params[$profileContactType][$key] ?? NULL;
             }
 
             if ($fileValue) {
-              $path = CRM_Utils_Array::value('name', $fileValue);
-              $fileType = CRM_Utils_Array::value('type', $fileValue);
+              $path = $fileValue['name'] ?? NULL;
+              $fileType = $fileValue['type'] ?? NULL;
               $fileValue = CRM_Utils_File::getFileURL($path, $fileType);
             }
 
@@ -1154,7 +1154,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $allowAutoRenewMembership = $autoRenewOption = FALSE;
       $autoRenewMembershipTypeOptions = [];
 
-      $separateMembershipPayment = CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock);
+      $separateMembershipPayment = $this->_membershipBlock['is_separate_payment'] ?? NULL;
 
       if ($membershipPriceset) {
         foreach ($this->_priceSet['fields'] as $pField) {
@@ -1346,7 +1346,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Arguably the form should start to build $this->_params in the pre-process main page & use that array consistently throughout.
    */
   protected function setRecurringMembershipParams() {
-    $selectedMembershipTypeID = CRM_Utils_Array::value('selectMembership', $this->_params);
+    $selectedMembershipTypeID = $this->_params['selectMembership'] ?? NULL;
     if ($selectedMembershipTypeID) {
       // @todo the price_x fields will ALWAYS allow us to determine the membership - so we should ignore
       // 'selectMembership' and calculate from the price_x fields so we have one method that always works

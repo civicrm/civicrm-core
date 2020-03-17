@@ -1113,7 +1113,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         elseif (is_array($value)) {
           $v = [];
           foreach ($value as $key => $val) {
-            $v[] = CRM_Utils_Array::value($val, $field['options']);
+            $v[] = $field['options'][$val] ?? NULL;
           }
           $display = implode(', ', $v);
         }
@@ -1130,7 +1130,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $value = is_array($value) ? CRM_Utils_Array::first($value) : $value;
 
         $actualPHPFormats = CRM_Utils_Date::datePluginToPHPFormats();
-        $format = CRM_Utils_Array::value('date_format', $field);
+        $format = $field['date_format'] ?? NULL;
 
         if ($format) {
           if (array_key_exists($format, $actualPHPFormats)) {
@@ -1966,8 +1966,8 @@ WHERE  id IN ( %1, %2 )
         break;
     }
 
-    $htmlType = CRM_Utils_Array::value('html_type', $params);
-    $dataType = CRM_Utils_Array::value('data_type', $params);
+    $htmlType = $params['html_type'] ?? NULL;
+    $dataType = $params['data_type'] ?? NULL;
     $allowedOptionTypes = ['String', 'Int', 'Float', 'Money'];
 
     // create any option group & values if required
@@ -2450,7 +2450,7 @@ WHERE      f.id IN ($ids)";
 
     //pick up profile fields.
     $profileFields = [];
-    $ufGroupId = CRM_Utils_Array::value('ufGroupId', $params);
+    $ufGroupId = $params['ufGroupId'] ?? NULL;
     if ($ufGroupId) {
       $profileFields = CRM_Core_BAO_UFGroup::getFields($ufGroupId,
         FALSE,
@@ -2474,8 +2474,8 @@ WHERE      f.id IN ($ids)";
       $dataType = $field->data_type;
 
       $profileField = CRM_Utils_Array::value($key, $profileFields, []);
-      $fieldTitle = CRM_Utils_Array::value('title', $profileField);
-      $isRequired = CRM_Utils_Array::value('is_required', $profileField);
+      $fieldTitle = $profileField['title'] ?? NULL;
+      $isRequired = $profileField['is_required'] ?? NULL;
       if (!$fieldTitle) {
         $fieldTitle = $field->label;
       }

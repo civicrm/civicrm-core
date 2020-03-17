@@ -340,7 +340,7 @@ FROM   {$this->_componentTable}
       ];
 
       foreach ($greetings as $key => $value) {
-        $otherOption = CRM_Utils_Array::value($key, $params);
+        $otherOption = $params[$key] ?? NULL;
 
         if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
 
@@ -372,7 +372,7 @@ FROM   {$this->_componentTable}
     // all submitted options or any other argument
     $exportParams = $params;
 
-    $mappingId = CRM_Utils_Array::value('mapping', $params);
+    $mappingId = $params['mapping'] ?? NULL;
     if ($mappingId) {
       $this->set('mappingId', $mappingId);
     }

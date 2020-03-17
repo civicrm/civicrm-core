@@ -443,8 +443,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     if (is_array($newParticipant) && civicrm_error($newParticipant)) {
       if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
 
-        $contactID = CRM_Utils_Array::value('contactID', $newParticipant);
-        $participantID = CRM_Utils_Array::value('participantID', $newParticipant);
+        $contactID = $newParticipant['contactID'] ?? NULL;
+        $participantID = $newParticipant['participantID'] ?? NULL;
         $url = CRM_Utils_System::url('civicrm/contact/view/participant',
           "reset=1&id={$participantID}&cid={$contactID}&action=view", TRUE
         );
@@ -463,7 +463,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     }
 
     if (!(is_array($newParticipant) && civicrm_error($newParticipant))) {
-      $this->_newParticipants[] = CRM_Utils_Array::value('id', $newParticipant);
+      $this->_newParticipants[] = $newParticipant['id'] ?? NULL;
     }
 
     return CRM_Import_Parser::VALID;
@@ -535,8 +535,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         elseif ($type == 'Select' || $type == 'Radio') {
           $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
           foreach ($customOption as $customFldID => $customValue) {
-            $val = CRM_Utils_Array::value('value', $customValue);
-            $label = CRM_Utils_Array::value('label', $customValue);
+            $val = $customValue['value'] ?? NULL;
+            $label = $customValue['label'] ?? NULL;
             $label = strtolower($label);
             $value = strtolower(trim($value));
             if (($value == $label) || ($value == strtolower($val))) {
