@@ -2389,17 +2389,12 @@ WHERE      civicrm_membership.is_test = 0
    *
    * @param array $params
    *   Array of submitted params.
-   * @param array $ids
-   *   (@return CRM_Contribute_BAO_Contribution
    *
    * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function recordMembershipContribution(&$params, $ids = []) {
-    if (!empty($ids)) {
-      CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
-    }
+  public static function recordMembershipContribution(&$params) {
     $membershipId = $params['membership_id'];
     $contributionParams = [];
     $config = CRM_Core_Config::singleton();
