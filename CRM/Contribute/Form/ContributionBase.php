@@ -200,7 +200,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @return bool
    */
   public function isQuickConfig() {
-    return isset(self::$_quickConfig) ? self::$_quickConfig : FALSE;
+    return self::$_quickConfig ?? FALSE;
   }
 
   /**

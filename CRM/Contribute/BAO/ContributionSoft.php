@@ -289,7 +289,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    */
   public static function getSoftContribution($contributionID, $all = FALSE) {
     $softContributionFields = self::getSoftCreditContributionFields([$contributionID], $all);
-    return isset($softContributionFields[$contributionID]) ? $softContributionFields[$contributionID] : [];
+    return $softContributionFields[$contributionID] ?? [];
   }
 
   /**

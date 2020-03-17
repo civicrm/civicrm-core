@@ -133,7 +133,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
     $this->_defaults['is_notify'] = 1;
     foreach ($this->editableScheduleFields as $field) {
-      $this->_defaults[$field] = isset($this->_subscriptionDetails->$field) ? $this->_subscriptionDetails->$field : NULL;
+      $this->_defaults[$field] = $this->_subscriptionDetails->$field ?? NULL;
     }
 
     return $this->_defaults;

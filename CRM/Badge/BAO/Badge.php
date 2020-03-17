@@ -484,7 +484,7 @@ class CRM_Badge_BAO_Badge {
       $query->convertToPseudoNames($dao);
       $rows[$dao->participant_id] = [];
       foreach ($returnProperties as $key => $dontCare) {
-        $value = isset($dao->$key) ? $dao->$key : NULL;
+        $value = $dao->$key ?? NULL;
         // Format custom fields
         if (strstr($key, 'custom_') && isset($value)) {
           $value = CRM_Core_BAO_CustomField::displayValue($value, substr($key, 7), $dao->contact_id);

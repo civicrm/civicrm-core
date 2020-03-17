@@ -1513,7 +1513,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
         $i++;
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
-        $contributionRecurID = isset($form->_params['contributionRecurID']) ? $form->_params['contributionRecurID'] : NULL;
+        $contributionRecurID = $form->_params['contributionRecurID'] ?? NULL;
 
         $membershipSource = NULL;
         if (!empty($form->_params['membership_source'])) {
@@ -1945,7 +1945,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $capabilities[] = (ucfirst($form->_mode) . 'Mode');
     }
     $form->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
-    $form->_params['payment_processor_id'] = isset($params['payment_processor_id']) ? $params['payment_processor_id'] : 0;
+    $form->_params['payment_processor_id'] = $params['payment_processor_id'] ?? 0;
     if ($form->_params['payment_processor_id'] !== '') {
       // It can be blank with a $0 transaction - then no processor needs to be selected
       $form->_paymentProcessor = $form->_paymentProcessors[$form->_params['payment_processor_id']];

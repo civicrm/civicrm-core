@@ -398,7 +398,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // For Premium section.
     if ($this->_premiumID) {
       $this->assign('showOption', FALSE);
-      $options = isset($this->_options[$this->_productDAO->product_id]) ? $this->_options[$this->_productDAO->product_id] : "";
+      $options = $this->_options[$this->_productDAO->product_id] ?? "";
       if (!$options) {
         $this->assign('showOption', TRUE);
       }
@@ -430,7 +430,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['refund_trxn_id'] = CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($this->_id);
     }
     else {
-      $defaults['refund_trxn_id'] = isset($defaults['trxn_id']) ? $defaults['trxn_id'] : NULL;
+      $defaults['refund_trxn_id'] = $defaults['trxn_id'] ?? NULL;
     }
 
     if (!$this->_id && empty($defaults['receive_date'])) {
