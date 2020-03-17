@@ -917,10 +917,14 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * @return bool
    *   Was contact deleted?
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function deleteContact($id, $restore = FALSE, $skipUndelete = FALSE, $checkPermissions = TRUE) {
 
-    if (!$id) {
+    if (!$id || !is_numeric($id)) {
+      CRM_Core_Error::deprecatedFunctionWarning('calling delete contact without a valid contact ID is deprecated.');
       return FALSE;
     }
     // If trash is disabled in system settings then we always skip
