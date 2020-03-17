@@ -1192,9 +1192,7 @@ class CRM_Utils_System {
    * this function, please go and change the code in the install script as well.
    */
   public static function isSSL() {
-    return (isset($_SERVER['HTTPS']) &&
-        !empty($_SERVER['HTTPS']) &&
-        strtolower($_SERVER['HTTPS']) != 'off') ? TRUE : FALSE;
+    return !empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off';
   }
 
   /**
