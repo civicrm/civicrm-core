@@ -719,7 +719,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
           foreach ($localeCustomArray as $localCustomData) {
             // Traverse status array "enabled" "disabled"
             foreach ($localCustomData as $status => $matchTypes) {
-              $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
+              $params["is_active"] = $status == "enabled";
               // Traverse Match Type array "wildcardMatch" "exactMatch"
               foreach ($matchTypes as $matchType => $words) {
                 $params["match_type"] = $matchType;

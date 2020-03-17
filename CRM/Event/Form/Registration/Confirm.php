@@ -274,7 +274,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     self::assignProfiles($this);
 
     //consider total amount.
-    $this->assign('isAmountzero', ($this->_totalAmount <= 0) ? TRUE : FALSE);
+    $this->assign('isAmountzero', $this->_totalAmount <= 0);
 
     $contribButton = ts('Continue');
     $this->addButtons([
@@ -562,7 +562,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $value['participant_register_date'] = $this->_values['participant']['register_date'];
         }
 
-        $createContrib = ($value['amount'] != 0) ? TRUE : FALSE;
+        $createContrib = $value['amount'] != 0;
         // force to create zero amount contribution, CRM-5095
         if (!$createContrib && ($value['amount'] == 0)
           && $this->_priceSetId && $this->_lineItem

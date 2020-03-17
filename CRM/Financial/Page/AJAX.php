@@ -255,7 +255,7 @@ class CRM_Financial_Page_AJAX {
     $entityID = isset($_REQUEST['entityID']) ? CRM_Utils_Type::escape($_REQUEST['entityID'], 'String') : NULL;
     $notPresent = isset($_REQUEST['notPresent']) ? CRM_Utils_Type::escape($_REQUEST['notPresent'], 'String') : NULL;
     $statusID = isset($_REQUEST['statusID']) ? CRM_Utils_Type::escape($_REQUEST['statusID'], 'String') : NULL;
-    $search = isset($_REQUEST['search']) ? TRUE : FALSE;
+    $search = isset($_REQUEST['search']);
 
     $params = $_POST;
     if ($sort && $sortOrder) {
