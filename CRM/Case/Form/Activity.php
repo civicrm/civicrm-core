@@ -594,6 +594,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $selectedContacts[] = 'assignee_contact_id';
     }
 
+    $dndActivityTypes = Civi::settings()->get('do_not_notify_assignees_for') ?? [];
     foreach ($vvalue as $vkey => $vval) {
       foreach ($selectedContacts as $dnt => $val) {
         if (array_key_exists($val, $params) && !CRM_Utils_Array::crmIsEmptyArray($params[$val])) {
@@ -601,8 +602,12 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             $mailStatus = ts("A copy of the activity has also been sent to selected contact(s).");
           }
           else {
-            $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$vval['actId']], TRUE, FALSE);
-            $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contact(s).");
+            if (!in_array($this->_activityTypeId, $dndActivityTypes)) {
+              $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(
+                [$vval['actId']], TRUE, FALSE
+              );
+              $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contact(s).");
+            }
           }
           //build an associative array with unique email addresses.
           foreach ($params[$val] as $key => $value) {
