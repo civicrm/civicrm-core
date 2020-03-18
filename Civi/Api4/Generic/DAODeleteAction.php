@@ -73,6 +73,8 @@ class DAODeleteAction extends AbstractBatchAction {
     }
     else {
       foreach ($items as $item) {
+        $hookParams = ['check_permissions' => $this->getCheckPermissions()];
+        \CRM_Utils_Hook::pre('delete', $this->getEntityName(), $item['id'], $hookParams);
         $bao = new $baoName();
         $bao->id = $item['id'];
         // delete it
@@ -83,6 +85,7 @@ class DAODeleteAction extends AbstractBatchAction {
         else {
           throw new \API_Exception("Could not delete {$this->getEntityName()} id {$item['id']}");
         }
+        \CRM_Utils_Hook::post('delete', $this->getEntityName(), $item['id'], $bao);
       }
     }
     return $ids;
