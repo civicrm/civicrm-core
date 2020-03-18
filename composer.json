@@ -201,7 +201,7 @@
       },
       "google-code-prettify": {
         "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
-        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile"]
+        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile", "demo.html"]
       },
       "jquery": {
         "url": "https://github.com/civicrm/jquery/archive/1.12.4-civicrm-1.2.zip"
@@ -223,9 +223,6 @@
       },
       "phantomjs-polyfill": {
         "url": "https://github.com/conversocial/phantomjs-polyfill/archive/v0.0.2.zip"
-      },
-      "qunit": {
-        "url": "https://github.com/jquery/qunit/archive/v1.10.0.zip"
       },
       "select2": {
         "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
