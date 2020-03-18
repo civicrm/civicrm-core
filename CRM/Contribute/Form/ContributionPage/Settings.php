@@ -352,6 +352,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         // Look for an existing entry
         $ufJoinDAO = new CRM_Core_DAO_UFJoin();
         $ufJoinDAO->module = $ufJoinParam['module'];
+        $ufJoinDAO->entity_table = 'civicrm_contribution_page';
         $ufJoinDAO->entity_id = $ufJoinParam['entity_id'];
         $ufJoinDAO->find(TRUE);
 
