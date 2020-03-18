@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "94187b287c901c73a271a012b55ae19a",
+    "content-hash": "2152cbb055cad3dc17a73227438e08d0",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2431,7 +2431,9 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
+                "reference": null,
+                "shasum": null
             },
             "require": {
                 "php": ">=5.3.0"
