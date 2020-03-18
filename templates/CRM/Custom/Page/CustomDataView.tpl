@@ -130,7 +130,7 @@
                       <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
                     {/if}
                     {if $element.field_data_type == 'Memo'}
-                      {$element.field_value|nl2br}
+                      {if $element.field_value}{$element.field_value|nl2br}{else}<br/>{/if}
                     {else}
                       {if $element.field_value}{$element.field_value} {else}<br/>{/if}
                     {/if}
