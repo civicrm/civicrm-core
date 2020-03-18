@@ -2145,32 +2145,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Deprecated: Misnamed version of alterMailer(). Remove post-4.7.x.
-   * Modify or replace the Mailer object used for outgoing mail.
-   *
-   * @param object $mailer
-   *   The default mailer produced by normal configuration; a PEAR "Mail" class (like those returned by Mail::factory)
-   * @param string $driver
-   *   The type of the default mailer (eg "smtp", "sendmail", "mock", "CRM_Mailing_BAO_Spool")
-   * @param array $params
-   *   The default mailer config options
-   *
-   * @return mixed
-   * @see Mail::factory
-   * @deprecated
-   */
-  public static function alterMail(&$mailer, $driver, $params) {
-    // This has been deprecated on the premise it MIGHT be called externally for a long time.
-    // We don't have a clear policy on how much we support external extensions calling internal
-    // hooks (ie. in general we say 'don't call internal functions', but some hooks like pre hooks
-    // are expected to be called externally.
-    // It's really really unlikely anyone uses this - but let's add deprecations for a couple
-    // of releases first.
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Hook::alterMailer');
-    return CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
-  }
-
-  /**
    * This hook is called while building the core search query,
    * so hook implementers can provide their own query objects which alters/extends core search.
    *
