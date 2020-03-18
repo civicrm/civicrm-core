@@ -4656,46 +4656,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Add Address into From Table if required.
    *
-   * @deprecated use joinAddressFromContact
-   * (left here in case extensions use it).
-   */
-  public function addAddressFromClause() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Report_Form::joinAddressFromContact');
-    // include address field if address column is to be included
-    if ((isset($this->_addressField) &&
-        $this->_addressField
-      ) ||
-      $this->isTableSelected('civicrm_address')
-    ) {
-      $this->_from .= "
-                 LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                           ON ({$this->_aliases['civicrm_contact']}.id =
-                               {$this->_aliases['civicrm_address']}.contact_id) AND
-                               {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-  }
-
-  /**
-   * Add Phone into From Table if required.
-   *
-   * @deprecated use joinPhoneFromContact
-   *  (left here in case extensions use it).
-   */
-  public function addPhoneFromClause() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Report_Form::joinPhoneFromContact');
-    // include address field if address column is to be included
-    if ($this->isTableSelected('civicrm_phone')) {
-      $this->_from .= "
-      LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-      ON ({$this->_aliases['civicrm_contact']}.id =
-      {$this->_aliases['civicrm_phone']}.contact_id) AND
-      {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
-    }
-  }
-
-  /**
-   * Add Address into From Table if required.
-   *
    * Prefix will be added to both tables as
    * it is assumed you are using it to get address of a secondary contact.
    *
