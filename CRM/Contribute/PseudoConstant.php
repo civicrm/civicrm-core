@@ -69,6 +69,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Status of personal campaign page
    * @var array
+   * @deprecated
    */
   private static $pcpStatus;
 
@@ -342,12 +343,13 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array pcpStatus is returned
    *
-   *
+   * @deprecated
    * @param string $column
    * @return array
    *   array reference of all PCP activity statuses
    */
   public static function &pcpStatus($column = 'label') {
+    CRM_Core_Error::deprecatedFunctionWarning('Function pcpStatus will be removed');
     if (NULL === self::$pcpStatus) {
       self::$pcpStatus = [];
     }

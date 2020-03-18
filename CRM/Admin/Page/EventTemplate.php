@@ -76,7 +76,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
     $eventTypes = CRM_Event_PseudoConstant::eventType();
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
-    $participantListings = CRM_Event_PseudoConstant::participantListing();
+    $participantListings = CRM_Event_BAO_Event::buildOptions('participant_listing_id');
 
     //find all event templates.
     $eventTemplate->is_template = TRUE;

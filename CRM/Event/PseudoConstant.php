@@ -46,8 +46,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Participant Listing
-   *
    * @var array
+   * @deprecated
    */
   private static $participantListing;
 
@@ -67,6 +67,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Personal campaign pages
    * @var array
+   * @deprecated
    */
   private static $pcPage;
 
@@ -205,13 +206,13 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the participant listings.
    *
-   *
+   * @deprecated
    * @param int $id
-   *
    * @return array|string
    *   array reference of all participant listings if any
    */
   public static function &participantListing($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Function participantListing will be removed');
     if (!self::$participantListing) {
       self::$participantListing = [];
       self::$participantListing = CRM_Core_OptionGroup::values('participant_listing');
@@ -285,12 +286,13 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the Personal campaign pages.
    *
-   *
+   * @deprecated
    * @param int $id
    * @return array
    *   array reference of all pcp if any
    */
   public static function &pcPage($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Function pcPage will be removed');
     if (!self::$pcPage) {
       CRM_Core_PseudoConstant::populate(self::$pcPage,
         'CRM_PCP_DAO_PCP',
