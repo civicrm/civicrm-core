@@ -112,6 +112,7 @@ class CRM_Utils_PDF_Utils {
   /**
    * Convert html to tcpdf.
    *
+   * @deprecated
    * @param $paper_size
    * @param $orientation
    * @param $margins
