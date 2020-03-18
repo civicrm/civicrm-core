@@ -1176,9 +1176,11 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
      AND cr.is_active
      AND cc.id NOT IN (%2)
 HERESQL;
+
+    $clientIdType = !empty($caseInfo['client_id']) ? 'CommaSeparatedIntegers' : 'String';
     $params = [
       1 => [$caseID, 'Integer'],
-      2 => [implode(',', $caseInfo['client_id']), 'String'],
+      2 => [implode(',', $caseInfo['client_id']), $clientIdType],
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
