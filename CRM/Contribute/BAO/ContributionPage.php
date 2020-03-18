@@ -914,9 +914,9 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       $json = [$module => NULL];
       foreach ($moduleDataFormat[$module] as $key => $attribute) {
         if ($key === 'multilingual') {
-          $json[$module][$config->lcMessages] = [];
+          $json[$module][$tsLocale] = [];
           foreach ($attribute as $attr) {
-            $json[$module][$config->lcMessages][$attr] = $params[$attr];
+            $json[$module][$tsLocale][$attr] = $params[$attr];
           }
         }
         else {
