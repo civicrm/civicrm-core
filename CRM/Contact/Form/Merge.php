@@ -161,7 +161,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         $this->assign('otherUfName', $otherUser ? $otherUser['name'] : NULL);
       }
 
-      $cmsUser = ($mainUfId && $otherUfId) ? TRUE : FALSE;
+      $cmsUser = $mainUfId && $otherUfId;
       $this->assign('user', $cmsUser);
 
       $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($this->_cid, $this->_oid);

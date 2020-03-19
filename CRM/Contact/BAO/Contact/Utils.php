@@ -55,11 +55,7 @@ class CRM_Contact_BAO_Contact_Utils {
         $imageInfo[$contactType]['url'] = $imageUrl;
       }
       else {
-        $isSubtype = (array_key_exists('parent_id', $typeInfo) &&
-          $typeInfo['parent_id']
-        ) ? TRUE : FALSE;
-
-        if ($isSubtype) {
+        if (!empty($typeInfo['parent_id'])) {
           $type = CRM_Contact_BAO_ContactType::getBasicType($typeInfo['name']) . '-subtype';
         }
         else {
@@ -118,7 +114,7 @@ FROM   civicrm_contact
 WHERE  id IN ( $idString )
 ";
     $count = CRM_Core_DAO::singleValueQuery($query);
-    return $count > 1 ? TRUE : FALSE;
+    return $count > 1;
   }
 
   /**

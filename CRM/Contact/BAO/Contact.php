@@ -1935,9 +1935,9 @@ ORDER BY civicrm_email.is_primary DESC";
         $name = $dao->display_name;
       }
       $email = $dao->email;
-      $doNotEmail = $dao->do_not_email ? TRUE : FALSE;
-      $onHold = $dao->on_hold ? TRUE : FALSE;
-      $isDeceased = $dao->is_deceased ? TRUE : FALSE;
+      $doNotEmail = (bool) $dao->do_not_email;
+      $onHold = (bool) $dao->on_hold;
+      $isDeceased = (bool) $dao->is_deceased;
       return [$name, $email, $doNotEmail, $onHold, $isDeceased];
     }
     return [NULL, NULL, NULL, NULL, NULL];
