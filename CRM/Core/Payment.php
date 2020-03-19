@@ -354,7 +354,7 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsLiveMode() {
-    return empty($this->_paymentProcessor['is_test']) ? TRUE : FALSE;
+    return empty($this->_paymentProcessor['is_test']);
   }
 
   /**
@@ -363,7 +363,7 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsTestMode() {
-    return empty($this->_paymentProcessor['is_test']) ? FALSE : TRUE;
+    return !empty($this->_paymentProcessor['is_test']);
   }
 
   /**

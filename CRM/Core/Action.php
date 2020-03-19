@@ -216,7 +216,7 @@ class CRM_Core_Action {
       if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
         $extra = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
 
-        $frontend = (isset($link['fe'])) ? TRUE : FALSE;
+        $frontend = isset($link['fe']);
 
         if (isset($link['qs']) && !CRM_Utils_System::isNull($link['qs'])) {
           $urlPath = CRM_Utils_System::url(self::replace($link['url'], $values),

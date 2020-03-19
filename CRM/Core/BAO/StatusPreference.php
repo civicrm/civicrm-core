@@ -59,7 +59,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
 
     $statusPreference->copyValues($params);
 
-    $edit = ($statusPreference->id) ? TRUE : FALSE;
+    $edit = (bool) $statusPreference->id;
     if ($edit) {
       CRM_Utils_Hook::pre('edit', 'StatusPreference', $statusPreference->id, $statusPreference);
     }

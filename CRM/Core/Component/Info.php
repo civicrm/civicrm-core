@@ -305,7 +305,7 @@ abstract class CRM_Core_Component_Info {
    *   true if component needs search integration
    */
   public function usesSearch() {
-    return $this->info['search'] ? TRUE : FALSE;
+    return (bool) $this->info['search'];
   }
 
   /**

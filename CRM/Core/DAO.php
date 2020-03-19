@@ -877,7 +877,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
 
     if ($object->find(TRUE)) {
-      return ($daoID && $object->id == $daoID) ? TRUE : FALSE;
+      return $daoID && $object->id == $daoID;
     }
     else {
       return TRUE;
@@ -976,7 +976,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $show[$tableName] = $dao->Create_Table;
     }
 
-    return preg_match("/\b$constraint\b/i", $show[$tableName]) ? TRUE : FALSE;
+    return (bool) preg_match("/\b$constraint\b/i", $show[$tableName]);
   }
 
   /**
@@ -1003,7 +1003,7 @@ class CRM_Core_DAO extends DB_DataObject {
         $show[$tableName] = $dao->Create_Table;
       }
 
-      $result = preg_match("/\bCONSTRAINT\b\s/i", $show[$tableName]) ? TRUE : FALSE;
+      $result = (bool) preg_match("/\bCONSTRAINT\b\s/i", $show[$tableName]);
       if ($result == TRUE) {
         continue;
       }
@@ -1041,7 +1041,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     $constraint = "`FK_{$tableName}_{$columnName}`";
     $pattern = "/\bCONSTRAINT\b\s+%s\s+\bFOREIGN\s+KEY\b\s/i";
-    return preg_match(sprintf($pattern, $constraint), $show[$tableName]) ? TRUE : FALSE;
+    return (bool) preg_match(sprintf($pattern, $constraint), $show[$tableName]);
   }
 
   /**
@@ -1093,8 +1093,7 @@ LIKE %1
     $params = [1 => [$tableName, 'String']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
-    $result = $dao->fetch() ? TRUE : FALSE;
-    return $result;
+    return (bool) $dao->fetch();
   }
 
   /**
@@ -1120,7 +1119,7 @@ SELECT version
 FROM   civicrm_domain
 ";
     $dbVersion = CRM_Core_DAO::singleValueQuery($query);
-    return trim($version) == trim($dbVersion) ? TRUE : FALSE;
+    return trim($version) == trim($dbVersion);
   }
 
   /**
