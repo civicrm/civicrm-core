@@ -141,7 +141,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         $searchRange,
         'send_cancel_request',
         ts('Send cancellation request to %1 ?',
-          [1 => $this->_paymentProcessorObj->_processorName])
+          [1 => $this->_paymentProcessorObj->getTitle()])
       );
     }
     else {

@@ -97,13 +97,25 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     $pps = [];
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $processor) {
-        $pps[$key] = $processor['title'] ?? $processor['name'];
+        $pps[$key] = $this->getPaymentProcessorTitle($processor);
       }
     }
     if ($this->getPayLaterLabel()) {
       $pps[0] = $this->getPayLaterLabel();
     }
     return $pps;
+  }
+
+  /**
+   * Get the title of the payment processor to display to the user
+   * Note: There is an identical function in CRM_Core_Payment
+   *
+   * @param array $processor
+   *
+   * @return string
+   */
+  protected function getPaymentProcessorTitle($processor) {
+    return $processor['title'] ?? $processor['name'];
   }
 
   /**

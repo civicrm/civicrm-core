@@ -623,6 +623,15 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get the title of the payment processor to display to the user
+   *
+   * @return string
+   */
+  public function getTitle() {
+    return $this->getPaymentProcessor()['title'] ?? $this->getPaymentProcessor()['name'];
+  }
+
+  /**
    * Getter for accessing member vars.
    *
    * @todo believe this is unused
