@@ -488,6 +488,7 @@ class CRM_Import_ImportProcessor {
    */
   protected function getNameFromLabel($label) {
     $titleMap = array_flip($this->getMetadataTitles());
+    $label = str_replace(' (match to contact)', '', $label);
     return $titleMap[$label] ?? '';
   }
 
