@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\PaymentProcessor;
+
 /**
  * Class CRM_Financial_BAO_PaymentProcessorTypeTest
  * @group headless
