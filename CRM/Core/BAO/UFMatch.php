@@ -519,9 +519,11 @@ AND    domain_id    = %4
   }
 
   /**
+   * @deprecated
    * @return bool
    */
   public static function isEmptyTable() {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
     $sql = "SELECT count(id) FROM civicrm_uf_match";
     return CRM_Core_DAO::singleValueQuery($sql) > 0 ? FALSE : TRUE;
   }
@@ -529,11 +531,12 @@ AND    domain_id    = %4
   /**
    * Get the list of contact_id.
    *
-   *
+   * @deprecated
    * @return int
    *   contact_id on success, null otherwise
    */
   public static function getContactIDs() {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
     $id = [];
     $dao = new CRM_Core_DAO_UFMatch();
     $dao->find();
@@ -546,13 +549,14 @@ AND    domain_id    = %4
   /**
    * See if this user exists, and if so, if they're allowed to login
    *
-   *
+   * @deprecated
    * @param int $openId
    *
    * @return bool
    *   true if allowed to login, false otherwise
    */
   public static function getAllowedToLogin($openId) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
     $ufmatch = new CRM_Core_DAO_UFMatch();
     $ufmatch->uf_name = $openId;
     $ufmatch->allowed_to_login = 1;
@@ -566,11 +570,12 @@ AND    domain_id    = %4
    * Get the next unused uf_id value, since the standalone UF doesn't
    * have id's (it uses OpenIDs, which go in a different field)
    *
-   *
+   * @deprecated
    * @return int
    *   next highest unused value for uf_id
    */
   public static function getNextUfIdValue() {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
     $query = "SELECT MAX(uf_id)+1 AS next_uf_id FROM civicrm_uf_match";
     $dao = CRM_Core_DAO::executeQuery($query);
     if ($dao->fetch()) {
@@ -585,10 +590,11 @@ AND    domain_id    = %4
 
   /**
    * @param $email
-   *
+   * @deprecated
    * @return bool
    */
   public static function isDuplicateUser($email) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
     if (!empty($email) && isset($contactID)) {
