@@ -278,11 +278,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param bool $reset
    * @param bool $isCurrentDomainOnly
    *   Do we only want to load payment processors associated with the current domain.
+   * @param bool|NULL $isActive
+   *   Do we only want active processors, only inactive (FALSE) or all processors (NULL)
    *
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE) {
+  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE, $isActive = TRUE) {
 
     $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . $isCurrentDomainOnly . '_' . CRM_Core_Config::domainID();
     if (!$reset) {
@@ -293,10 +295,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
 
     $retrievalParameters = [
-      'is_active' => TRUE,
       'options' => ['sort' => 'is_default DESC, name', 'limit' => 0],
       'api.payment_processor_type.getsingle' => 1,
     ];
+    if (isset($isActive)) {
+      // We use isset because we don't want to set the is_active parameter at all is $isActive is NULL
+      $retrievalParameters['is_active'] = $isActive;
+    }
     if ($isCurrentDomainOnly) {
       $retrievalParameters['domain_id'] = CRM_Core_Config::domainID();
     }
@@ -379,22 +384,20 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   available processors
    */
   public static function getPaymentProcessors($capabilities = [], $ids = FALSE) {
-    if (is_array($ids)) {
-      $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : [];
-      $processors = self::getAllPaymentProcessors('all', FALSE, FALSE);
-      if (in_array('TestMode', $capabilities)) {
-        $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
-        foreach ($possibleLiveIDs as $possibleLiveID) {
-          if (isset($processors[$possibleLiveID]) && ($liveProcessorName = $processors[$possibleLiveID]['name']) != FALSE) {
-            foreach ($testProcessors as $index => $testProcessor) {
-              if ($testProcessor['name'] == $liveProcessorName) {
-                $ids[] = $testProcessor['id'];
-              }
+    if (is_array($ids) && in_array('TestMode', $capabilities)) {
+      $testProcessors = self::getAllPaymentProcessors('test');
+      $allPaymentProcessors = self::getAllPaymentProcessors('all', FALSE, FALSE, NULL);
+      $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
+      foreach ($possibleLiveIDs as $possibleLiveID) {
+        if (isset($allPaymentProcessors[$possibleLiveID]) && ($liveProcessorName = $allPaymentProcessors[$possibleLiveID]['name']) != FALSE) {
+          foreach ($testProcessors as $index => $testProcessor) {
+            if ($testProcessor['name'] == $liveProcessorName) {
+              $ids[] = $testProcessor['id'];
             }
           }
         }
-        $processors = $testProcessors;
       }
+      $processors = $testProcessors;
     }
     else {
       $processors = self::getAllPaymentProcessors('all');
