@@ -541,7 +541,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     foreach ($module_data as $module_name => $extension) {
       if (!isset($extension->info['hidden']) && $extension->origin != 'core') {
         $extension->schema_version = drupal_get_installed_schema_version($module_name);
-        $modules[] = new CRM_Core_Module('drupal.' . $module_name, ($extension->status == 1 ? TRUE : FALSE));
+        $modules[] = new CRM_Core_Module('drupal.' . $module_name, ($extension->status == 1));
       }
     }
     return $modules;
