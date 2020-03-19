@@ -56,7 +56,7 @@ class CRM_Activity_Page_AJAX {
     // get the total row count
     CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, NULL, FALSE, TRUE, NULL, NULL);
     // limit the rows
-    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $params['sortBy'], $showLinks = TRUE, FALSE, $params['offset'], $params['rp']);
+    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $params['sortBy'] ?? NULL, $showLinks = TRUE, FALSE, $params['offset'], $params['rp']);
 
     $relationships = [];
     // after sort we can update username fields to be a url
@@ -101,11 +101,14 @@ class CRM_Activity_Page_AJAX {
     }
 
     // sort clientRelationships array using jquery call params
-    foreach ($clientRelationships as $key => $row) {
-      $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+    $sortArray = [];
+    if (!empty($params['_raw_values']['sort'])) {
+      foreach ($clientRelationships as $key => $row) {
+        $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+      }
+      $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
+      array_multisort($sortArray, constant($sort_type), $clientRelationships);
     }
-    $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
-    array_multisort($sortArray, constant($sort_type), $clientRelationships);
 
     $relationships = [];
     // after sort we can update username fields to be a url
@@ -181,11 +184,14 @@ class CRM_Activity_Page_AJAX {
     }
 
     // sort clientRelationships array using jquery call params
-    foreach ($caseRelationships as $key => $row) {
-      $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+    $sortArray = [];
+    if (!empty($params['_raw_values']['sort'])) {
+      foreach ($caseRelationships as $key => $row) {
+        $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+      }
+      $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
+      array_multisort($sortArray, constant($sort_type), $caseRelationships);
     }
-    $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
-    array_multisort($sortArray, constant($sort_type), $caseRelationships);
 
     $relationships = [];
 

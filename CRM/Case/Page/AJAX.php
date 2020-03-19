@@ -182,7 +182,7 @@ class CRM_Case_Page_AJAX {
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
 
-    $allCases = (bool) $params['all'];
+    $allCases = !empty($params['all']);
 
     $cases = CRM_Case_BAO_Case::getCases($allCases, $params);
 
