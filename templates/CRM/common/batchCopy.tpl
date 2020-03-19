@@ -37,7 +37,7 @@
       // wysiwyg editor, advanced multi-select ( to do )
       if ( elementType == 'radio' ) {
         firstElementValue = elementId.filter(':checked').eq(0).val();
-        elementId.filter("[value=" + firstElementValue + "]").prop("checked",true).change();
+        elementId.filter("[value='" + firstElementValue + "']").prop("checked",true).change();
       }
       else if ( elementType == 'checkbox' ) {
         // handle checkbox
