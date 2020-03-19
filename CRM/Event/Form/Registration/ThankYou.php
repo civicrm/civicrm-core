@@ -120,7 +120,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('trxn_id', $this->_trxnId);
 
     //cosider total amount.
-    $this->assign('isAmountzero', ($this->_totalAmount <= 0) ? TRUE : FALSE);
+    $this->assign('isAmountzero', $this->_totalAmount <= 0);
 
     $this->assign('defaultRole', FALSE);
     if (CRM_Utils_Array::value('defaultRole', $this->_params[0]) == 1) {

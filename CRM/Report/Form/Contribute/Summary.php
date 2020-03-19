@@ -760,8 +760,8 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     if (!empty($this->_params['charts'])) {
       if (!empty($this->_params['group_bys']['receive_date'])) {
 
-        $contrib = !empty($this->_params['fields']['total_amount']) ? TRUE : FALSE;
-        $softContrib = !empty($this->_params['fields']['soft_amount']) ? TRUE : FALSE;
+        $contrib = !empty($this->_params['fields']['total_amount']);
+        $softContrib = !empty($this->_params['fields']['soft_amount']);
 
         foreach ($rows as $key => $row) {
           if ($row['civicrm_contribution_receive_date_subtotal']) {
@@ -817,7 +817,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
     //CRM-16338 if both soft-credit and contribution are enabled then process the contribution's
     //total amount's average, count and sum separately and add it to the respective result list
-    $softCredit = (!empty($this->_params['fields']['soft_amount']) && !empty($this->_params['fields']['total_amount'])) ? TRUE : FALSE;
+    $softCredit = (!empty($this->_params['fields']['soft_amount']) && !empty($this->_params['fields']['total_amount']));
     if ($softCredit) {
       $this->from('contribution');
       $this->customDataFrom();

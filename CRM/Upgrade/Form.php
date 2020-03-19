@@ -310,7 +310,7 @@ SET    version = '$version'
       $version, 'id',
       'version'
     );
-    return $domainID ? TRUE : FALSE;
+    return (bool) $domainID;
   }
 
   /**

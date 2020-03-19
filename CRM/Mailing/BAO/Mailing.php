@@ -1107,7 +1107,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $pEmails = [];
 
     foreach ($pTemplates as $type => $pTemplate) {
-      $html = ($type == 'html') ? TRUE : FALSE;
+      $html = $type == 'html';
       $pEmails[$type] = [];
       $pEmail = &$pEmails[$type];
       $template = &$pTemplates[$type]['template'];
@@ -1148,7 +1148,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $message = new Mail_mime("\n");
 
-    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY ? TRUE : FALSE;
+    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
     if ($useSmarty) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the contact tokens to the template
@@ -1300,7 +1300,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens(
           $mailing->templates[$type],
           $domain,
-          $type == 'html' ? TRUE : FALSE,
+          $type == 'html',
           $tokens[$type]
         );
         $mailing->templates[$type] = CRM_Utils_Token::replaceMailingTokens($mailing->templates[$type], $mailing, NULL, $tokens[$type]);
@@ -1329,7 +1329,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $token = $token_a['token'];
     $data = $token;
 
-    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY ? TRUE : FALSE;
+    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
 
     if ($type == 'embedded_url') {
       $embed_data = [];

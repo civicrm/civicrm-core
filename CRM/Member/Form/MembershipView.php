@@ -379,7 +379,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
 
       $isRecur = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->membershipID, 'contribution_recur_id');
 
-      $autoRenew = $isRecur ? TRUE : FALSE;
+      $autoRenew = (bool) $isRecur;
     }
 
     if (!empty($values['is_test'])) {
