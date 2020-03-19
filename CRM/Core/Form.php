@@ -413,6 +413,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
     }
+    $optionContext = $extra['option_context'] ?? NULL;
+    unset($extra['option_context']);
+
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
@@ -435,9 +438,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // Add context for the editing of option groups
-    if (isset($extra['option_context'])) {
-      $context = json_encode($extra['option_context']);
-      $element->setAttribute('data-option-edit-context', $context);
+    if ($optionContext) {
+      $element->setAttribute('data-option-edit-context', json_encode($optionContext));
     }
 
     return $element;
