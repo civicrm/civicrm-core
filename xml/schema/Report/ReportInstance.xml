@@ -118,7 +118,7 @@
   <field>
     <name>form_values</name>
     <title>Submitted Form Values</title>
-    <type>text</type>
+    <type>longtext</type>
     <import>true</import>
     <comment>Submitted form values for this report</comment>
     <serialize>PHP</serialize>
