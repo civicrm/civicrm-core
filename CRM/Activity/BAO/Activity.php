@@ -1855,7 +1855,7 @@ WHERE      activity.id IN ($activityIds)";
    *
    * @param $activityID
    *   Current activity id.
-   *
+   * @deprecated
    * @return int
    *   $params  count of prior activities otherwise false.
    * @throws \CRM_Core_Exception
