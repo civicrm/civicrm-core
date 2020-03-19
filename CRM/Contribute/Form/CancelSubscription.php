@@ -45,12 +45,17 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
    */
   public function preProcess() {
     parent::preProcess();
-    if ($this->_crid) {
-      $this->assign('frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
-      $this->assign('frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
-      $this->assign('amount', $this->getSubscriptionDetails()->amount);
-      $this->assign('installments', $this->getSubscriptionDetails()->installments);
 
+    $cancelRecurTextParams = [
+      'mode' => $this->_mode,
+      'amount' => $this->getSubscriptionDetails()->amount,
+      'currency' => $this->getSubscriptionDetails()->currency,
+      'frequency_interval' => $this->getSubscriptionDetails()->frequency_interval,
+      'frequency_unit' => $this->getSubscriptionDetails()->frequency_unit,
+      'installments' => $this->getSubscriptionDetails()->installments,
+    ];
+
+    if ($this->_crid) {
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
       if ($this->getSubscriptionDetails()->membership_id) {
         $this->_mid = $this->getSubscriptionDetails()->membership_id;
@@ -64,7 +69,9 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
 
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
       $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
-      $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
+      $membershipType = $membershipTypes[$membershipTypeId] ?? '';
+      $this->assign('membershipType', $membershipType);
+      $cancelRecurTextParams['membershipType'] = $membershipType;
     }
 
     if ($this->_coid) {
@@ -72,11 +79,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         CRM_Core_Error::statusBounce(ts('The recurring contribution looks to have been cancelled already.'));
       }
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-
-      $this->assign('frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
-      $this->assign('frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
-      $this->assign('amount', $this->getSubscriptionDetails()->amount);
-      $this->assign('installments', $this->getSubscriptionDetails()->installments);
     }
 
     if (
@@ -85,6 +87,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     ) {
       CRM_Core_Error::statusBounce('Required information missing.');
     }
+
+    $this->assign('cancelRecurDetailText', $this->_paymentProcessorObj->getText('cancelRecurDetailText', $cancelRecurTextParams));
 
     // handle context redirection
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
@@ -139,6 +143,9 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         ts('Send cancellation request to %1 ?',
           [1 => $this->_paymentProcessorObj->_processorName])
       );
+    }
+    else {
+      $this->assign('cancelRecurNotSupportedText', $this->_paymentProcessorObj->getText('cancelRecurNotSupportedText', []));
     }
     $this->assign('cancelSupported', $cancelSupported);
 
@@ -240,13 +247,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         else {
           $tplParams['recur_frequency_interval'] = $this->getSubscriptionDetails()->frequency_interval;
           $tplParams['recur_frequency_unit'] = $this->getSubscriptionDetails()->frequency_unit;
-          $tplParams['amount'] = $this->getSubscriptionDetails()->amount;
+          $tplParams['amount'] = CRM_Utils_Money::format($this->getSubscriptionDetails()->amount, $this->getSubscriptionDetails()->currency);
           $tplParams['contact'] = ['display_name' => $this->_donorDisplayName];
           $status = ts('The recurring contribution of %1, every %2 %3 has been cancelled.',
             [
-              1 => $this->getSubscriptionDetails()->amount,
-              2 => $this->getSubscriptionDetails()->frequency_interval,
-              3 => $this->getSubscriptionDetails()->frequency_unit,
+              1 => $tplParams['amount'],
+              2 => $tplParams['recur_frequency_interval'],
+              3 => $tplParams['recur_frequency_unit'],
             ]
           );
           $msgTitle = 'Contribution Cancelled';
