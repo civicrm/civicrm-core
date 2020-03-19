@@ -63,7 +63,7 @@ function civicrm_api3_profile_get($params) {
       NULL,
       FALSE,
       NULL,
-      empty($params['check_permissions']) ? FALSE : TRUE,
+      empty($params['check_permissions']),
       NULL,
       CRM_Core_Permission::EDIT
     );
