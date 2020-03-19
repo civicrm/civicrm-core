@@ -190,7 +190,7 @@ class CRM_Core_PseudoConstant {
     $params += [
       'grouping' => FALSE,
       'localize' => $localizeDefault,
-      'onlyActive' => ($context == 'validate' || $context == 'get') ? FALSE : TRUE,
+      'onlyActive' => !($context == 'validate' || $context == 'get'),
       'fresh' => FALSE,
       'context' => $context,
     ];

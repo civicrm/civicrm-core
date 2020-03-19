@@ -449,7 +449,7 @@ class CRM_Utils_Rule {
    */
   public static function positiveInteger($value) {
     if (is_int($value)) {
-      return ($value < 0) ? FALSE : TRUE;
+      return !($value < 0);
     }
 
     // CRM-13460
@@ -458,11 +458,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    if (preg_match('/^\d+$/', $value)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return (bool) preg_match('/^\d+$/', $value);
   }
 
   /**

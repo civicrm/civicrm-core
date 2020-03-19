@@ -429,9 +429,8 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
           $customGroupTitle = $this->_columns[$customGroupTitle[0]]['group_title'];
           $grantStatistics[$customGroupTitle]['title'] = ts('By %1', [1 => $customGroupTitle]);
 
-          $customData = ($customValue) ? FALSE : TRUE;
           self::getStatistics($grantStatistics[$customGroupTitle], $customFieldTitle, $values,
-            $awardedGrants, $awardedGrantsAmount, $customData
+            $awardedGrants, $awardedGrantsAmount, !$customValue
           );
         }
       }

@@ -342,7 +342,6 @@ class CRM_Core_Selector_Controller {
       // Merge headers not containing weight to ordered headers
       $finalColumnHeaders = array_merge($reorderedHeaders, $noWeightHeaders);
 
-      $rowsEmpty = count($rows) ? FALSE : TRUE;
       $qill = $this->getQill();
       $summary = $this->getSummary();
       // if we need to store in session, lets update session
@@ -353,7 +352,7 @@ class CRM_Core_Selector_Controller {
         }
         $this->_store->set("{$this->_prefix}rows", $rows);
         $this->_store->set("{$this->_prefix}rowCount", $this->_total);
-        $this->_store->set("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        $this->_store->set("{$this->_prefix}rowsEmpty", !$rows);
         $this->_store->set("{$this->_prefix}qill", $qill);
         $this->_store->set("{$this->_prefix}summary", $summary);
       }
@@ -363,7 +362,7 @@ class CRM_Core_Selector_Controller {
 
         self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         self::$_template->assign_by_ref("{$this->_prefix}rows", $rows);
-        self::$_template->assign("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        self::$_template->assign("{$this->_prefix}rowsEmpty", !$rows);
         self::$_template->assign("{$this->_prefix}qill", $qill);
         self::$_template->assign("{$this->_prefix}summary", $summary);
       }

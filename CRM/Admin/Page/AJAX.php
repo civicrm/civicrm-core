@@ -380,7 +380,7 @@ class CRM_Admin_Page_AJAX {
         }
       }
       else {
-        $hasChildTags = empty($childTagIDs[$dao->id]) ? FALSE : TRUE;
+        $hasChildTags = !empty($childTagIDs[$dao->id]);
         $usedFor = (array) explode(',', $dao->used_for);
         $tag = [
           'id' => $dao->id,
