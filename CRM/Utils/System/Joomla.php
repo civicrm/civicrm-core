@@ -606,7 +606,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function isUserLoggedIn() {
     $user = JFactory::getUser();
-    return ($user->guest) ? FALSE : TRUE;
+    return !$user->guest;
   }
 
   /**

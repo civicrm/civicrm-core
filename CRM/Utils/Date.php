@@ -771,7 +771,7 @@ class CRM_Utils_Date {
       $now = self::isoToMysql($now);
     }
 
-    return (strtotime($mysqlDate) >= strtotime($now)) ? FALSE : TRUE;
+    return !(strtotime($mysqlDate) >= strtotime($now));
   }
 
   /**

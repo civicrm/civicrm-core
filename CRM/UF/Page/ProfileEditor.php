@@ -295,7 +295,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       $sectionName = 'cg_' . $customGroup->id;
       $section = [
         'title' => ts('%1: %2', [1 => $title, 2 => $customGroup->title]),
-        'is_addable' => $customGroup->is_reserved ? FALSE : TRUE,
+        'is_addable' => !$customGroup->is_reserved,
         'custom_group_id' => $customGroup->id,
         'extends_entity_column_id' => $customGroup->extends_entity_column_id,
         'extends_entity_column_value' => CRM_Utils_Array::explodePadded($customGroup->extends_entity_column_value),

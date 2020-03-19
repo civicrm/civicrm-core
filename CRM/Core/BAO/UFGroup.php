@@ -846,7 +846,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $controller->setEmbedded(TRUE);
 
       //CRM-5839 - though we want to process form, get the control back.
-      $controller->setSkipRedirection(($doNotProcess) ? FALSE : TRUE);
+      $controller->setSkipRedirection(!$doNotProcess);
 
       $controller->run();
 
@@ -907,7 +907,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         $controller->setEmbedded(TRUE);
 
         //CRM-5846 - give the control back to drupal.
-        $controller->setSkipRedirection(($doNotProcess) ? FALSE : TRUE);
+        $controller->setSkipRedirection(!$doNotProcess);
         $controller->run();
 
         $template = CRM_Core_Smarty::singleton();

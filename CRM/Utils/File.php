@@ -1066,7 +1066,7 @@ HTACCESS;
    */
   public static function isValidFileName($fileName = NULL) {
     if ($fileName) {
-      $check = $fileName !== basename($fileName) ? FALSE : TRUE;
+      $check = ($fileName === basename($fileName));
       if ($check) {
         if (substr($fileName, 0, 1) == '/' || substr($fileName, 0, 1) == '.' || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
           $check = FALSE;

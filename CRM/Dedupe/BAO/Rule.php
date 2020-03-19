@@ -240,7 +240,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
       $exception->contact_id2 = $cid;
     }
 
-    return $exception->find(TRUE) ? FALSE : TRUE;
+    return !$exception->find(TRUE);
   }
 
   /**

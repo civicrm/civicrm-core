@@ -338,7 +338,7 @@ class CRM_Contact_Form_Edit_Address {
           }
         }
         $form->assign('showHideAddressFields', $parsedAddress);
-        $form->assign('loadShowHideAddressFields', empty($parsedAddress) ? FALSE : TRUE);
+        $form->assign('loadShowHideAddressFields', !empty($parsedAddress));
       }
       // end of parse address functionality
     }

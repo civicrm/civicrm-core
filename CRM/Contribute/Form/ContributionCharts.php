@@ -214,7 +214,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     // finally assign this chart data to template.
     $this->assign('hasYearlyChart', $yearlyChart);
     $this->assign('hasByMonthChart', $monthlyChart);
-    $this->assign('hasChart', empty($chartData) ? FALSE : TRUE);
+    $this->assign('hasChart', !empty($chartData));
     $this->assign('chartData', json_encode($chartData ?? []));
   }
 

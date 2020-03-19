@@ -637,7 +637,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
       // payment_instrument isn't required in edit and will not be present when payment block is enabled.
-      $required = $this->_id ? FALSE : TRUE;
+      $required = !$this->_id;
       $checkPaymentID = array_search('Check', CRM_Contribute_PseudoConstant::paymentInstrument('name'));
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
@@ -776,7 +776,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $totalAmount = $this->addMoney('total_amount',
         ts('Total Amount'),
-        ($hasPriceSets) ? FALSE : TRUE,
+        !$hasPriceSets,
         $attributes['total_amount'],
         TRUE, 'currency', NULL, $currencyFreeze
       );

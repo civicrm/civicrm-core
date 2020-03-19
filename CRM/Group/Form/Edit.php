@@ -263,7 +263,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     $doParentCheck = FALSE;
     if (CRM_Core_Permission::isMultisiteEnabled()) {
-      $doParentCheck = ($this->_id && CRM_Core_BAO_Domain::isDomainGroup($this->_id)) ? FALSE : TRUE;
+      $doParentCheck = !($this->_id && CRM_Core_BAO_Domain::isDomainGroup($this->_id));
     }
 
     $options = array(
