@@ -795,6 +795,62 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Create or update a record from supplied params.
+   *
+   * If 'id' is supplied, an existing record will be updated
+   * Otherwise a new record will be created.
+   *
+   * @param array $record
+   * @return CRM_Core_DAO
+   * @throws CRM_Core_Exception
+   */
+  public static function writeRecord(array $record) {
+    $hook = empty($record['id']) ? 'create' : 'edit';
+    $className = CRM_Core_DAO_AllCoreTables::getCanonicalClassName(static::class);
+    if ($className === 'CRM_Core_DAO') {
+      throw new CRM_Core_Exception('Function writeRecord must be called on a subclass of CRM_Core_DAO');
+    }
+    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
+
+    \CRM_Utils_Hook::pre($hook, $entityName, $record['id'] ?? NULL, $record);
+    $instance = new $className();
+    $instance->copyValues($record);
+    $instance->save();
+    \CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
+
+    return $instance;
+  }
+
+  /**
+   * Delete a record from supplied params.
+   *
+   * @param array $record
+   *   'id' is required.
+   * @return CRM_Core_DAO
+   * @throws CRM_Core_Exception
+   */
+  public static function deleteRecord(array $record) {
+    $className = CRM_Core_DAO_AllCoreTables::getCanonicalClassName(static::class);
+    if ($className === 'CRM_Core_DAO') {
+      throw new CRM_Core_Exception('Function deleteRecord must be called on a subclass of CRM_Core_DAO');
+    }
+    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
+    if (empty($record['id'])) {
+      throw new CRM_Core_Exception("Cannot delete {$entityName} with no id.");
+    }
+
+    CRM_Utils_Hook::pre('delete', $entityName, $record['id'], $record);
+    $instance = new $className();
+    $instance->id = $record['id'];
+    if (!$instance->delete()) {
+      throw new CRM_Core_Exception("Could not delete {$entityName} id {$record['id']}");
+    }
+    CRM_Utils_Hook::post('delete', $entityName, $record['id'], $instance);
+
+    return $instance;
+  }
+
+  /**
    * Check if there is a record with the same name in the db.
    *
    * @param string $value

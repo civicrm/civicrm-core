@@ -54,8 +54,9 @@ class DAODeleteAction extends AbstractBatchAction {
     $baoName = $this->getBaoName();
 
     if ($this->getCheckPermissions()) {
-      foreach ($items as $item) {
-        $this->checkContactPermissions($baoName, $item);
+      foreach (array_keys($items) as $key) {
+        $items[$key]['check_permissions'] = TRUE;
+        $this->checkContactPermissions($baoName, $items[$key]);
       }
     }
 
@@ -73,16 +74,8 @@ class DAODeleteAction extends AbstractBatchAction {
     }
     else {
       foreach ($items as $item) {
-        $bao = new $baoName();
-        $bao->id = $item['id'];
-        // delete it
-        $action_result = $bao->delete();
-        if ($action_result) {
-          $ids[] = ['id' => $item['id']];
-        }
-        else {
-          throw new \API_Exception("Could not delete {$this->getEntityName()} id {$item['id']}");
-        }
+        $baoName::deleteRecord($item);
+        $ids[] = ['id' => $item['id']];
       }
     }
     return $ids;

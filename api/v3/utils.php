@@ -1325,10 +1325,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
 /**
  * For BAO's which don't have a create() or add() functions, use this fallback implementation.
  *
- * @fixme There's an intuitive sense that this behavior should be defined somehow in the BAO/DAO class
- * structure. In practice, that requires a fair amount of refactoring and/or kludgery.
- *
- * @param string $bao_name
+ * @param string|CRM_Core_DAO $bao_name
  * @param array $params
  *
  * @throws API_Exception
@@ -1336,26 +1333,8 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
  * @return CRM_Core_DAO|NULL
  *   An instance of the BAO
  */
-function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
-  $dao_name = get_parent_class($bao_name);
-  if ($dao_name === 'CRM_Core_DAO' || !$dao_name) {
-    $dao_name = $bao_name;
-  }
-  $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($dao_name);
-  if (empty($entityName)) {
-    throw new API_Exception("Class \"$bao_name\" does not map to an entity name", "unmapped_class_to_entity", [
-      'class_name' => $bao_name,
-    ]);
-  }
-  $hook = empty($params['id']) ? 'create' : 'edit';
-
-  CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
-  $instance = new $dao_name();
-  $instance->copyValues($params);
-  $instance->save();
-  CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
-
-  return $instance;
+function _civicrm_api3_basic_create_fallback($bao_name, $params) {
+  return $bao_name::writeRecord($params);
 }
 
 /**
