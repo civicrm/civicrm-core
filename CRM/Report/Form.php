@@ -3870,6 +3870,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * Buld contact acl clause
    * @deprecated in favor of buildPermissionClause
    *
+   * Note that if the buildPermissionClause function is called (which most reports do from
+   * buildQuery then the results of this function are re-calculated and overwritten.
+   *
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact_a') {
