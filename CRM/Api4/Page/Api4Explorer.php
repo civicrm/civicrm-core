@@ -21,16 +21,18 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
 
   public function run() {
     $apiDoc = new ReflectionFunction('civicrm_api4');
+    $groupOptions = civicrm_api4('Group', 'getFields', ['loadOptions' => TRUE, 'select' => ['options', 'name'], 'where' => [['name', 'IN', ['visibility', 'group_type']]]]);
     $vars = [
       'operators' => \CRM_Core_DAO::acceptedSQLOperators(),
       'basePath' => Civi::resources()->getUrl('civicrm'),
       'schema' => (array) \Civi\Api4\Entity::get()->setChain(['fields' => ['$name', 'getFields']])->execute(),
       'links' => (array) \Civi\Api4\Entity::getLinks()->execute(),
       'docs' => \Civi\Api4\Utils\ReflectionUtils::parseDocBlock($apiDoc->getDocComment()),
+      'groupOptions' => array_column((array) $groupOptions, 'options', 'name'),
     ];
     Civi::resources()
       ->addVars('api4', $vars)
-      ->addPermissions(['access debug output'])
+      ->addPermissions(['access debug output', 'edit groups', 'administer reserved groups'])
       ->addScriptFile('civicrm', 'js/load-bootstrap.js')
       ->addScriptFile('civicrm', 'bower_components/js-yaml/dist/js-yaml.min.js')
       ->addScriptFile('civicrm', 'bower_components/marked/marked.min.js')
