@@ -399,25 +399,15 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashlet = new CRM_Core_DAO_Dashboard();
 
     if (!$dashboardID) {
-
       // Assign domain before search to allow identical dashlets in different domains.
-      if (empty($params['domain_id'])) {
-        $dashlet->domain_id = CRM_Core_Config::domainID();
-      }
-      else {
-        $dashlet->domain_id = $params['domain_id'] ?? NULL;
-      }
+      $dashlet->domain_id = $params['domain_id'] ?? CRM_Core_Config::domainID();
 
       // Try and find an existing dashlet - it will be updated if found.
-      if (!empty($params['name'])) {
+      if (!empty($params['name']) || !empty($params['url'])) {
         $dashlet->name = $params['name'] ?? NULL;
-        $dashlet->find(TRUE);
-      }
-      else {
         $dashlet->url = $params['url'] ?? NULL;
         $dashlet->find(TRUE);
       }
-
     }
     else {
       $dashlet->id = $dashboardID;
@@ -501,19 +491,18 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Delete Dashlet.
-   *
+   * @deprecated
    * @param int $dashletID
-   *
    * @return bool
    */
   public static function deleteDashlet($dashletID) {
-    $dashlet = new CRM_Core_DAO_Dashboard();
-    $dashlet->id = $dashletID;
-    if (!$dashlet->find(TRUE)) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_Dashboard::deleteRecord');
+    try {
+      CRM_Core_DAO_Dashboard::deleteRecord(['id' => $dashletID]);
+    }
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
-    $dashlet->delete();
     return TRUE;
   }
 

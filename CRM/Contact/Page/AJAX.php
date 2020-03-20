@@ -511,7 +511,7 @@ LIMIT {$offset}, {$rowCount}
 
       case 'delete_dashlet':
         $dashletID = CRM_Utils_Type::escape($_REQUEST['dashlet_id'], 'Positive');
-        CRM_Core_BAO_Dashboard::deleteDashlet($dashletID);
+        CRM_Core_DAO_Dashboard::deleteRecord(['id' => $dashletID]);
     }
 
     CRM_Utils_System::civiExit();
