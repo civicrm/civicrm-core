@@ -1342,7 +1342,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, $params) {
  *
  * When the api is only doing a $bao::del then use this if api::del doesn't exist it will try DAO delete method.
  *
- * @param string $bao_name
+ * @param string|CRM_Core_DAO $bao_name
  * @param array $params
  *
  * @return array
@@ -1355,8 +1355,8 @@ function _civicrm_api3_basic_create_fallback($bao_name, $params) {
 function _civicrm_api3_basic_delete($bao_name, &$params) {
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
   _civicrm_api3_check_edit_permissions($bao_name, ['id' => $params['id']]);
-  $args = [&$params['id']];
   if (method_exists($bao_name, 'del')) {
+    $args = [&$params['id']];
     $dao = new $bao_name();
     $dao->id = $params['id'];
     if ($dao->find()) {
@@ -1368,21 +1368,10 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
     }
     throw new API_Exception('Could not delete entity id ' . $params['id']);
   }
-  elseif (method_exists($bao_name, 'delete')) {
-    $dao = new $bao_name();
-    $dao->id = $params['id'];
-    if ($dao->find()) {
-      while ($dao->fetch()) {
-        $dao->delete();
-        return civicrm_api3_create_success();
-      }
-    }
-    else {
-      throw new API_Exception('Could not delete entity id ' . $params['id']);
-    }
+  else {
+    $bao_name::deleteRecord($params);
+    return civicrm_api3_create_success();
   }
-
-  throw new API_Exception('no delete method found');
 }
 
 /**
