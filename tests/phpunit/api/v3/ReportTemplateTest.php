@@ -520,6 +520,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param string $template
    *   Name of the template to test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithSmartGroupFilter($template) {
     $groupID = $this->setUpPopulatedSmartGroup();
@@ -788,6 +790,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test the group filter works on the contribution summary when 2 groups are involved.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithTwoGroupsWithIntersection() {
     $groups = $this->setUpIntersectingGroups();
@@ -799,6 +803,36 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ]);
     $this->assertEquals(7, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+  }
+
+  /**
+   * Test date field is correctly handled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionSummaryDateFields() {
+    $sql = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contribute/summary',
+      'thankyou_date_relative' => '0',
+      'thankyou_date_from' => '2020-03-01 00:00:00',
+      'thankyou_date_to' => '2020-03-31 23:59:59',
+      'options' => ['metadata' => ['sql']],
+    ])['metadata']['sql'];
+    $expectedSql = 'SELECT contact_civireport.id as civicrm_contact_id, DATE_SUB(contribution_civireport.receive_date, INTERVAL (DAYOFMONTH(contribution_civireport.receive_date)-1) DAY) as civicrm_contribution_receive_date_start, MONTH(contribution_civireport.receive_date) AS civicrm_contribution_receive_date_subtotal, MONTHNAME(contribution_civireport.receive_date) AS civicrm_contribution_receive_date_interval, contribution_civireport.currency as civicrm_contribution_currency, COUNT(contribution_civireport.total_amount) as civicrm_contribution_total_amount_count, SUM(contribution_civireport.total_amount) as civicrm_contribution_total_amount_sum, ROUND(AVG(contribution_civireport.total_amount),2) as civicrm_contribution_total_amount_avg, address_civireport.country_id as civicrm_address_country_id   FROM civicrm_contact contact_civireport
+             INNER JOIN civicrm_contribution   contribution_civireport
+                     ON contact_civireport.id = contribution_civireport.contact_id AND
+                        contribution_civireport.is_test = 0
+             LEFT JOIN civicrm_contribution_soft contribution_soft_civireport
+                       ON contribution_soft_civireport.contribution_id = contribution_civireport.id AND contribution_soft_civireport.id = (SELECT MIN(id) FROM civicrm_contribution_soft cs WHERE cs.contribution_id = contribution_civireport.id)
+             LEFT  JOIN civicrm_financial_type  financial_type_civireport
+                     ON contribution_civireport.financial_type_id =financial_type_civireport.id
+
+                 LEFT JOIN civicrm_address address_civireport
+                           ON (contact_civireport.id =
+                               address_civireport.contact_id)  AND
+                               address_civireport.is_primary = 1
+ WHERE ( contribution_civireport.thankyou_date >= 20200301000000) AND ( contribution_civireport.thankyou_date <= 20200331235959) AND ( contribution_civireport.contribution_status_id IN (1) ) GROUP BY EXTRACT(YEAR_MONTH FROM contribution_civireport.receive_date), contribution_civireport.contribution_status_id    LIMIT 25';
+    $this->assertLike($expectedSql, $sql[0]);
   }
 
   /**
