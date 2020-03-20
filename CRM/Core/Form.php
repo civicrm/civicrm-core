@@ -1335,13 +1335,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $required
    * @param string $fromLabel
    * @param string $toLabel
+   * @param array $additionalOptions
+   * @param string $to string to append to the to field.
+   * @param string $from string to append to the from field.
    */
-  public function addDatePickerRange($fieldName, $label, $isDateTime = FALSE, $required = FALSE, $fromLabel = 'From', $toLabel = 'To') {
+  public function addDatePickerRange($fieldName, $label, $isDateTime = FALSE, $required = FALSE, $fromLabel = 'From', $toLabel = 'To', $additionalOptions = [],
+    $to = '_high', $from = '_low') {
 
     $options = [
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
     ] + CRM_Core_OptionGroup::values('relative_date_filters');
+
+    if ($additionalOptions) {
+      foreach ($additionalOptions as $key => $optionLabel) {
+        $options[$key] = $optionLabel;
+      }
+    }
 
     $this->add('select',
       "{$fieldName}_relative",
@@ -1352,8 +1362,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     );
     $attributes = ['format' => 'searchDate'];
     $extra = ['time' => $isDateTime];
-    $this->add('datepicker', $fieldName . '_low', ts($fromLabel), $attributes, $required, $extra);
-    $this->add('datepicker', $fieldName . '_high', ts($toLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $from, ts($fromLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $to, ts($toLabel), $attributes, $required, $extra);
   }
 
   /**
