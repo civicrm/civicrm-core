@@ -343,12 +343,25 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             ],
           ],
         ],
+        'civicrm_pledge_payment' => [
+          'dao' => 'CRM_Pledge_DAO_PledgePayment',
+          'fields' => [
+            'pledge_id' => [
+              'title' => ts('Pledge ID'),
+            ],
+          ],
+          'filters' => [
+            'pledge_id' => [
+              'title' => ts('Pledge ID'),
+              'type' => CRM_Utils_Type::T_INT,
+            ],
+          ],
+        ],
       ],
       $this->getColumns('Address')
     );
     // The tests test for this variation of the sort_name field. Don't argue with the tests :-).
     $this->_columns['civicrm_contact']['fields']['sort_name']['title'] = ts('Donor Name');
-
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     // If we have campaigns enabled, add those elements to both the fields, filters and sorting
@@ -793,6 +806,27 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         );
       }
 
+      // Contribution amount links to viewing contribution
+      if ($value = CRM_Utils_Array::value('civicrm_pledge_payment_pledge_id', $row)) {
+        if (CRM_Core_Permission::check('access CiviContribute')) {
+          $url = CRM_Utils_System::url(
+            "civicrm/contact/view/pledge",
+            [
+              'reset' => 1,
+              'id' => $row['civicrm_pledge_payment_pledge_id'],
+              'cid' => $row['civicrm_contact_id'],
+              'action' => 'view',
+              'context' => 'pledge',
+              'selectedChild' => 'pledge',
+            ],
+            $this->_absoluteUrl
+          );
+          $rows[$rowNum]['civicrm_pledge_payment_pledge_id_link'] = $url;
+          $rows[$rowNum]['civicrm_pledge_payment_pledge_id_hover'] = ts("View Details of this Pledge.");
+        }
+        $entryFound = TRUE;
+      }
+
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s) for this ') ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't
@@ -965,6 +999,12 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
     }
     // for credit card type
     $this->addFinancialTrxnFromClause();
+
+    if ($this->isTableSelected('civicrm_pledge_payment')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_pledge_payment {$this->_aliases['civicrm_pledge_payment']} ON {$this->_aliases['civicrm_pledge_payment']}.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+      ";
+    }
   }
 
   /**
