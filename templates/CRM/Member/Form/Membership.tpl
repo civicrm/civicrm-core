@@ -8,10 +8,13 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting memberships for a contact  *}
-{if $cancelAutoRenew}
+{if $isRecur}
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
-    <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type or Membership Status: <a href="%1">Cancel auto-renew</a>{/ts}</p>
+    <p>{ts}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. Please be aware that any changes that you make here may not be reflected in the payment processor. Please ensure that you alter the related subscription at the payment processor.{/ts}</p>
+    {if $cancelAutoRenew}<p>{ts}To stop the automatic renewal:
+      <a href="%1">Cancel auto-renew</a>
+    {/ts}</p>{/if}
   </div>
 {/if}
 <div class="spacer"></div>
@@ -73,7 +76,16 @@
         </tr>
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
-          <td><span id='mem_type_id'>{$form.membership_type_id.html}</span>
+          <td id="mem_type_id-readonly">
+            <span id="membership_type_id_0-readonly"></span> : <span id="membership_type_id_1-readonly"></span>
+            <span id="mem-type-override">
+              <a href="#" class="crm-hover-button action-item override-mem-type" id="show-mem-type">
+                {ts}Override organization and type{/ts}
+              </a>
+              {help id="override_membership_type"}
+            </span>
+          </td>
+          <td id="mem_type_id-editable"><span id='mem_type_id'>{$form.membership_type_id.html}</span>
             {if $hasPriceSets}
               <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
               <span id='selectPriceSet'>{$form.price_set_id.html}</span>
@@ -347,6 +359,25 @@
       setDifferentContactBlock();
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
+      });
+
+      // give option to override membership type for auto-renew memberships - dev/core#1331
+      {/literal}
+      {if $isRecur}
+        cj('#membership_type_id_0-readonly').text(cj('#membership_type_id_0 option:selected').text());
+        cj('#membership_type_id_1-readonly').text(cj('#membership_type_id_1 option:selected').text());
+        cj('#mem_type_id-readonly').show();
+        cj('#mem_type_id-editable').hide();
+      {else}
+        cj('#mem_type_id-readonly').hide();
+        cj('#mem_type_id-editable').show();
+      {/if}
+      {literal}
+
+      cj('#show-mem-type').click( function( e ) {
+        e.preventDefault();
+        cj('#mem_type_id-readonly').hide();
+        cj('#mem_type_id-editable').show();
       });
 
       // give option to override end-date for auto-renew memberships

@@ -552,9 +552,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     );
 
     $sel->setOptions([$selMemTypeOrg, $selOrgMemType]);
-    if ($isUpdateToExistingRecurringMembership) {
-      $sel->freeze();
-    }
 
     if ($this->_action & CRM_Core_Action::ADD) {
       $this->add('number', 'num_terms', ts('Number of Terms'), ['size' => 6]);
@@ -579,9 +576,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $statusOverride = $this->addElement('select', 'is_override', ts('Status Override?'),
         CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
-      if ($statusOverride && $isUpdateToExistingRecurringMembership) {
-        $statusOverride->freeze();
-      }
 
       $this->add('datepicker', 'status_override_end_date', ts('Status Override End Date'), '', FALSE, ['minDate' => time(), 'time' => FALSE]);
 
