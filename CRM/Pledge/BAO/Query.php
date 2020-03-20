@@ -524,7 +524,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * Build the search for for pledges.
+   * Build the search for pledges.
    *
    * @param CRM_Pledge_Form_Search|\CRM_Contact_Form_Search_Advanced $form
    *
