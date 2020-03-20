@@ -93,7 +93,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $stateProvince = \CRM_Core_PseudoConstant::stateProvince();
       $loc['street_address'] = $actionSearchResult->street_address;
       $loc['city'] = $actionSearchResult->city;
-      $loc['state_province'] = \CRM_Utils_Array::value($actionSearchResult->state_province_id, $stateProvince);
+      $loc['state_province'] = $stateProvince[$actionSearchResult->state_province_id] ?? NULL;
       $loc['postal_code'] = $actionSearchResult->postal_code;
       //$entityTokenParams[$tokenEntity][$field] = \CRM_Utils_Address::format($loc);
       $row->tokens($entity, $field, \CRM_Utils_Address::format($loc));
@@ -115,7 +115,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       }
       elseif (!empty($actionSearchResult->entityID)) {
         $info = \CRM_Contribute_BAO_Contribution::getPaymentInfo($actionSearchResult->entityID, 'event');
-        $balancePay = \CRM_Utils_Array::value('balance', $info);
+        $balancePay = $info['balance'] ?? NULL;
         $balancePay = \CRM_Utils_Money::format($balancePay);
       }
       $row->tokens($entity, $field, $balancePay);

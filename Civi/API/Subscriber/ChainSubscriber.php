@@ -106,7 +106,7 @@ class ChainSubscriber implements EventSubscriberInterface {
 
         $subaction = empty($subAPI[2]) ? $action : $subAPI[2];
         $subParams = [
-          'debug' => \CRM_Utils_Array::value('debug', $params),
+          'debug' => $params['debug'] ?? NULL,
         ];
         $subEntity = _civicrm_api_get_entity_name_from_camel($subAPI[1]);
 
