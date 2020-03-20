@@ -23,20 +23,23 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class UFMatchCreationSpecProvider implements Generic\SpecProviderInterface {
+class FieldDomainIdSpecProvider implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * Generic create spec function to set sensible defaults for any entity with a "domain_id" field.
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('domain_id')->setRequired(FALSE);
+    $domainIdField = $spec->getFieldByName('domain_id');
+    if ($domainIdField) {
+      $domainIdField->setRequired(FALSE)->setDefaultValue('current_domain');;
+    }
   }
 
   /**
    * @inheritDoc
    */
   public function applies($entity, $action) {
-    return $entity === 'UFMatch' && $action === 'create';
+    return $action === 'create';
   }
 
 }

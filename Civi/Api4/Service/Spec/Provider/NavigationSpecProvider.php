@@ -28,6 +28,10 @@ class NavigationSpecProvider implements Generic\SpecProviderInterface {
   /**
    * This runs for both create and get actions
    *
+   * @fixme - for 'create', this is redundant with FieldDomainIdSpecProvider.
+   * @fixme - for 'get', this is inconsistent with other entities which do not set this default. We should standardize on setting or not setting it.
+   * @see FieldDomainIdSpecProvider
+   *
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
