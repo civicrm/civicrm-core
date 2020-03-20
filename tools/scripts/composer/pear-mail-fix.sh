@@ -24,12 +24,6 @@ function safe_delete() {
 }
 
 
-##############################################################################
-# @fixme Extend pear/mail rather than patching it.
-if ! grep -q 'CRM-1367' vendor/pear/mail/Mail.php; then
-  patch -d vendor/pear/mail -p1 < tools/scripts/composer/patches/pear-mail.patch.txt
-fi
-
 safe_delete vendor/pear/console_getopt/{package.xml,README.rst,tests}
 safe_delete vendor/pear/mail/{package.xml,README.rst,tests}
 safe_delete vendor/pear/pear-core-minimal/{package.xml,README.rst}
