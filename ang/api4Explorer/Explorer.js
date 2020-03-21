@@ -223,7 +223,7 @@
     };
 
     $scope.isSpecial = function(name) {
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain'];
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy'];
       return _.contains(specialParams, name);
     };
 
@@ -383,7 +383,7 @@
               deep: format === 'json'
             });
           }
-          if (typeof objectParams[name] !== 'undefined') {
+          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy') {
             $scope.$watch('params.' + name, function(values) {
               // Remove empty values
               _.each(values, function (clause, index) {
@@ -408,13 +408,17 @@
               var field = value;
               $timeout(function() {
                 if (field) {
-                  var defaultOp = _.cloneDeep(objectParams[name]);
-                  if (name === 'chain') {
-                    var num = $scope.params.chain.length;
-                    defaultOp[0] = field;
-                    field = 'name_me_' + num;
+                  if (name === 'groupBy') {
+                    $scope.params[name].push(field);
+                  } else {
+                    var defaultOp = _.cloneDeep(objectParams[name]);
+                    if (name === 'chain') {
+                      var num = $scope.params.chain.length;
+                      defaultOp[0] = field;
+                      field = 'name_me_' + num;
+                    }
+                    $scope.params[name].push([field, defaultOp]);
                   }
-                  $scope.params[name].push([field, defaultOp]);
                   $scope.controls[name] = null;
                 }
               });

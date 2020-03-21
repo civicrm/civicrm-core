@@ -93,20 +93,35 @@
             <div class="api4-input form-inline">
               <input class="collapsible-optgroups form-control" ng-model="controls[name]" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: fieldList(name), placeholder: ts('Add %1', {1: name.slice(0, -1)})}"/>
             </div>
-          </fieldset>
+          </fieldset><fieldset ng-if="availableParams.groupBy" ng-mouseenter="help('groupBy', availableParams.groupBy)" ng-mouseleave="help()">
+          <legend>groupBy<span class="crm-marker" ng-if="availableParams.groupBy.required"> *</span></legend>
+          <div ng-model="params.groupBy" ui-sortable="{axis: 'y'}">
+            <div class="api4-input form-inline" ng-repeat="(pos, field) in params.groupBy">
+              <i class="crm-i fa-arrows"></i>
+              <input class="collapsible-optgroups form-control" ng-model="params.groupBy[pos]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+            </div>
+          </div>
+          <div class="api4-input form-inline">
+            <input class="collapsible-optgroups form-control" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoins}" placeholder="Add groupBy" />
+          </div>
+        </fieldset>
           <fieldset ng-if="availableParams.orderBy" ng-mouseenter="help('orderBy', availableParams.orderBy)" ng-mouseleave="help()">
             <legend>orderBy<span class="crm-marker" ng-if="availableParams.orderBy.required"> *</span></legend>
-            <div class="api4-input form-inline" ng-repeat="clause in params.orderBy">
-              <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
-              <select class="form-control" ng-model="clause[1]">
-                <option value="ASC">ASC</option>
-                <option value="DESC">DESC</option>
-              </select>
+            <div ng-model="params.orderBy" ui-sortable="{axis: 'y'}">
+              <div class="api4-input form-inline" ng-repeat="clause in params.orderBy">
+                <i class="crm-i fa-arrows"></i>
+                <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+                <select class="form-control" ng-model="clause[1]">
+                  <option value="ASC">ASC</option>
+                  <option value="DESC">DESC</option>
+                </select>
+              </div>
             </div>
             <div class="api4-input form-inline">
               <input class="collapsible-optgroups form-control huge" ng-model="controls.orderBy" crm-ui-select="{data: fieldsAndJoinsAndFunctions}" placeholder="Add orderBy" />
             </div>
           </fieldset>
+
           <fieldset ng-if="availableParams.chain" ng-mouseenter="help('chain', availableParams.chain)" ng-mouseleave="help()">
             <legend>chain</legend>
             <div class="api4-input form-inline" ng-repeat="clause in params.chain" api4-exp-chain="clause" entities="::entities" main-entity="::entity" >

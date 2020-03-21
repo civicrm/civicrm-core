@@ -61,6 +61,11 @@ class Api4SelectQuery extends SelectQuery {
   public $debugOutput = NULL;
 
   /**
+   * @var array
+   */
+  public $groupBy = [];
+
+  /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
@@ -68,6 +73,7 @@ class Api4SelectQuery extends SelectQuery {
     $this->checkPermissions = $apiGet->getCheckPermissions();
     $this->select = $apiGet->getSelect();
     $this->where = $apiGet->getWhere();
+    $this->groupBy = $apiGet->getGroupBy();
     $this->orderBy = $apiGet->getOrderBy();
     $this->limit = $apiGet->getLimit();
     $this->offset = $apiGet->getOffset();
@@ -103,6 +109,7 @@ class Api4SelectQuery extends SelectQuery {
     $this->buildWhereClause();
     $this->buildOrderBy();
     $this->buildLimit();
+    $this->buildGroupBy();
     return $this->query->toSQL();
   }
 
@@ -118,20 +125,21 @@ class Api4SelectQuery extends SelectQuery {
       $this->debugOutput['sql'][] = $sql;
     }
     $query = \CRM_Core_DAO::executeQuery($sql);
-
+    $i = 0;
     while ($query->fetch()) {
+      $id = $query->id ?? $i++;
       if (in_array('row_count', $this->select)) {
         $results[]['row_count'] = (int) $query->c;
         break;
       }
-      $results[$query->id] = [];
+      $results[$id] = [];
       foreach ($this->select as $alias) {
         $returnName = $alias;
         if ($this->isOneToOneField($alias)) {
           $alias = str_replace('.', '_', $alias);
-          $results[$query->id][$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
+          $results[$id][$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
         }
-      };
+      }
     }
     $event = new PostSelectQueryEvent($results, $this);
     \Civi::dispatcher()->dispatch(Events::POST_SELECT_QUERY, $event);
@@ -148,8 +156,10 @@ class Api4SelectQuery extends SelectQuery {
       return;
     }
     else {
-      // Always select id field
-      $this->select = array_merge(['id'], $this->select);
+      // Always select ID (unless we're doing groupBy).
+      if (!$this->groupBy) {
+        $this->select = array_merge(['id'], $this->select);
+      }
 
       // Expand wildcards in joins (the api wrapper already expanded non-joined wildcards)
       $wildFields = array_filter($this->select, function($item) {
@@ -220,6 +230,20 @@ class Api4SelectQuery extends SelectQuery {
     if (!empty($this->limit) || !empty($this->offset)) {
       // If limit is 0, mysql will actually return 0 results. Instead set to maximum possible.
       $this->query->limit($this->limit ?: '18446744073709551615', $this->offset);
+    }
+  }
+
+  /**
+   *
+   */
+  protected function buildGroupBy() {
+    foreach ($this->groupBy as $field) {
+      if ($this->isOneToOneField($field) && $this->getField($field)) {
+        $this->query->groupBy($field['sql_name']);
+      }
+      else {
+        throw new \API_Exception("Invalid field. Cannot group by $field");
+      }
     }
   }
 
