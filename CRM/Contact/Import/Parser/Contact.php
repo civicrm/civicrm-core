@@ -1807,7 +1807,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     foreach ($locationFields as $locKeys) {
-      if (is_array(CRM_Utils_Array::value($locKeys, $params))) {
+      if (isset($params[$locKeys]) && is_array($params[$locKeys])) {
         foreach ($params[$locKeys] as $key => $value) {
           if ($modeFill) {
             $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $locKeys);

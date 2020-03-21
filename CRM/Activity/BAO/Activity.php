@@ -149,7 +149,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $transaction = new CRM_Core_Transaction();
-    if (is_array(CRM_Utils_Array::value('source_record_id', $params))) {
+    if (isset($params['source_record_id']) && is_array($params['source_record_id'])) {
       $sourceRecordIds = implode(',', $params['source_record_id']);
     }
     else {

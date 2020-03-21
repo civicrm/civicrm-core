@@ -303,7 +303,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
         $customGroup[$key]["extends_entity_column_value"] = $colValue;
       }
       else {
-        if (is_array(CRM_Utils_Array::value($type, $subTypes))) {
+        if (isset($subTypes[$type]) && is_array($subTypes[$type])) {
           $customGroup[$key]["extends_entity_column_value"] = ts("Any");
         }
       }
