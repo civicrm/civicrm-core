@@ -134,7 +134,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       unset($params['preferred_communication_method']);
     }
 
-    $defaults = ['source' => CRM_Utils_Array::value('contact_source', $params)];
+    $defaults = ['source' => $params['contact_source'] ?? NULL];
     if ($params['contact_type'] === 'Organization' && isset($params['organization_name'])) {
       $defaults['display_name'] = $params['organization_name'];
       $defaults['sort_name'] = $params['organization_name'];
@@ -165,13 +165,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     $privacy = $params['privacy'] ?? NULL;
-    if ($privacy &&
-      is_array($privacy) &&
-      !empty($privacy)
-    ) {
+    if ($privacy && is_array($privacy)) {
       $allNull = FALSE;
       foreach (self::$_commPrefs as $name) {
-        $contact->$name = CRM_Utils_Array::value($name, $privacy, FALSE);
+        $contact->$name = $privacy[$name] ?? FALSE;
       }
     }
 
@@ -199,19 +196,14 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     if ($contact->contact_type === 'Individual' && (isset($params['current_employer']) || isset($params['employer_id']))) {
       // Create current employer.
-      $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : CRM_Utils_Array::value('current_employer', $params);
+      $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : $params['current_employer'] ?? NULL;
 
-      $newContact = FALSE;
-      if (empty($params['contact_id'])) {
-        $newContact = TRUE;
-      }
+      $newContact = empty($params['contact_id']);
       if ($newEmployer) {
         CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId, $newContact);
       }
-      else {
-        if ($employerId) {
-          CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($contact->id, $employerId);
-        }
+      elseif ($employerId) {
+        CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($contact->id, $employerId);
       }
     }
 
@@ -444,7 +436,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $currentUser = CRM_Core_Session::getLoggedInContactID();
       $editOwn = $currentUser && CRM_Core_Permission::check('edit own api keys');
       foreach ($contacts as &$contact) {
-        $cid = is_object($contact) ? $contact->id : CRM_Utils_Array::value('id', $contact);
+        $cid = is_object($contact) ? $contact->id : $contact['id'] ?? NULL;
         if (!($editOwn && $cid == $currentUser)) {
           if (is_object($contact)) {
             unset($contact->api_key);
@@ -827,7 +819,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
               $reverse
             );
           }
-          $stateProvinceID = self::resolveStateProvinceID($values, CRM_Utils_Array::value('country_id', $values));
+          $stateProvinceID = self::resolveStateProvinceID($values, $values['country_id'] ?? NULL);
           if ($stateProvinceID) {
             $values['state_province_id'] = $stateProvinceID;
           }
@@ -1371,7 +1363,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $cacheKeyString .= $checkPermission ? '_1' : '_0';
     $cacheKeyString .= '_' . CRM_Core_Config::domainID() . '_';
 
-    $fields = CRM_Utils_Array::value($cacheKeyString, self::$_importableFields) ?: Civi::cache('fields')->get($cacheKeyString);
+    $fields = self::$_importableFields[$cacheKeyString] ?? Civi::cache('fields')->get($cacheKeyString);
 
     if (!$fields) {
       $fields = CRM_Contact_DAO_Contact::import();
@@ -1524,7 +1516,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     //as an interim fix we will cache the fields by contact
     $cacheKeyString .= '_' . CRM_Core_Session::getLoggedInContactID();
 
-    if (!self::$_exportableFields || !CRM_Utils_Array::value($cacheKeyString, self::$_exportableFields)) {
+    if (!self::$_exportableFields || empty(self::$_exportableFields[$cacheKeyString])) {
       if (!self::$_exportableFields) {
         self::$_exportableFields = [];
       }
@@ -2002,8 +1994,8 @@ ORDER BY civicrm_email.is_primary DESC";
 
     // manage is_opt_out
     if (array_key_exists('is_opt_out', $fields) && array_key_exists('is_opt_out', $params)) {
-      $wasOptOut = CRM_Utils_Array::value('is_opt_out', $contactDetails, FALSE);
-      $isOptOut = CRM_Utils_Array::value('is_opt_out', $params, FALSE);
+      $wasOptOut = $contactDetails['is_opt_out'] ?? FALSE;
+      $isOptOut = $params['is_opt_out'];
       $data['is_opt_out'] = $isOptOut;
       // on change, create new civicrm_subscription_history entry
       if (($wasOptOut != $isOptOut) && !empty($contactDetails['contact_id'])) {
@@ -3701,7 +3693,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
             'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
               NULL, NULL, FALSE, FALSE, TRUE),
             'type' => ucfirst(str_replace('new_', '', $profile['name'])),
-            'icon' => CRM_Utils_Array::value(str_replace('new_', '', $profile['name']), $icons),
+            'icon' => $icons[str_replace('new_', '', $profile['name'])] ?? NULL,
           ];
         }
         else {
