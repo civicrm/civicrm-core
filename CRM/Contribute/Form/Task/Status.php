@@ -83,6 +83,8 @@ AND    {$this->_componentClause}";
       $status,
       TRUE
     );
+    $this->add('checkbox', 'is_email_receipt', ts('Send e-mail receipt'));
+    $this->setDefaults(['is_email_receipt' => 1]);
 
     $contribIDs = implode(',', $this->_contributionIds);
     $query = "
@@ -278,6 +280,7 @@ AND    co.id IN ( $contribIDs )";
         $input['trxn_id'] = $contribution->invoice_id;
       }
       $input['trxn_date'] = $params["trxn_date_{$row['contribution_id']}"] . ' ' . date('H:i:s');
+      $input['is_email_receipt'] = !empty($params['is_email_receipt']);
 
       // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
       $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);

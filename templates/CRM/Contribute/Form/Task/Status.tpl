@@ -16,6 +16,11 @@
      <table class="form-layout-compressed">
      <tr class="crm-contribution-form-block-contribution_status_id"><td class="label">{$form.contribution_status_id.label}</td><td class="html-adjust">{$form.contribution_status_id.html}<br />
             <span class="description">{ts}Assign the selected status to all contributions listed below.{/ts}</td></tr>
+       <tr class="crm-contribution-form-block-is_email_receipt"><td class="label">{$form.is_email_receipt.label}</td>
+         <td class="html-adjust">{$form.is_email_receipt.html}<br />
+           <span class="description">{ts}When checked CiviCRM will send an e-mail receipt to the donor. Leave unchecked when you don't want to send an e-mail.{/ts}
+         </td>
+       </tr>
      </table>
 <table>
 <tr class="columnheader">
