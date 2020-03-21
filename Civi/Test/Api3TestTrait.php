@@ -104,7 +104,7 @@ trait Api3TestTrait {
     if (!empty($apiResult['trace'])) {
       $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
     }
-    $this->assertEmpty(\CRM_Utils_Array::value('is_error', $apiResult), $prefix . $errorMessage);
+    $this->assertEmpty($apiResult['is_error'] ?? NULL, $prefix . $errorMessage);
   }
 
   /**
@@ -284,7 +284,7 @@ trait Api3TestTrait {
    * @return array|int
    */
   public function civicrm_api($entity, $action, $params = []) {
-    if (\CRM_Utils_Array::value('version', $params) == 4) {
+    if (($params['version'] ?? 0) == 4) {
       return $this->runApi4Legacy($entity, $action, $params);
     }
     return civicrm_api($entity, $action, $params);
@@ -313,7 +313,7 @@ trait Api3TestTrait {
     if (!empty($v3Params['filters']['is_current']) || !empty($v3Params['isCurrent'])) {
       $v4Params['current'] = TRUE;
     }
-    $language = !empty($v3Params['options']['language']) ? $v3Params['options']['language'] : \CRM_Utils_Array::value('option.language', $v3Params);
+    $language = $v3Params['options']['language'] ?? $v3Params['option.language'] ?? NULL;
     if ($language) {
       $v4Params['language'] = $language;
     }
@@ -341,12 +341,12 @@ trait Api3TestTrait {
 
     if ($v4Entity == 'Setting') {
       $indexBy = NULL;
-      $v4Params['domainId'] = \CRM_Utils_Array::value('domain_id', $v3Params);
+      $v4Params['domainId'] = $v3Params['domain_id'] ?? NULL;
       if ($v3Action == 'getfields') {
         if (!empty($v3Params['name'])) {
           $v3Params['filters']['name'] = $v3Params['name'];
         }
-        foreach (\CRM_Utils_Array::value('filters', $v3Params, []) as $filter => $val) {
+        foreach ($v3Params['filters'] ?? [] as $filter => $val) {
           $v4Params['where'][] = [$filter, '=', $val];
         }
       }
@@ -373,7 +373,7 @@ trait Api3TestTrait {
 
     foreach ($v3Fields as $name => $field) {
       // Resolve v3 aliases
-      foreach (\CRM_Utils_Array::value('api.aliases', $field, []) as $alias) {
+      foreach ($field['api.aliases'] ?? [] as $alias) {
         if (isset($v3Params[$alias])) {
           $v3Params[$field['name']] = $v3Params[$alias];
           unset($v3Params[$alias]);
@@ -556,11 +556,12 @@ trait Api3TestTrait {
     }
 
     if ($v3Action == 'getvalue' && $v4Entity == 'Setting') {
-      return \CRM_Utils_Array::value('value', $result->first());
+      return $result->first()['value'] ?? NULL;
     }
 
     if ($v3Action == 'getvalue') {
-      return \CRM_Utils_Array::value(array_keys($options['return'])[0], $result->first());
+      $returnKey = array_keys($options['return'])[0];
+      return $result->first()[$returnKey] ?? NULL;
     }
 
     // Mimic api3 behavior when using 'replace' action to delete all
@@ -615,7 +616,7 @@ trait Api3TestTrait {
       'version' => 4,
       'count' => count($result),
       'values' => (array) $result,
-      'id' => is_object($result) && count($result) == 1 ? \CRM_Utils_Array::value('id', $result->first()) : NULL,
+      'id' => is_object($result) && count($result) == 1 ? ($result->first()['id'] ?? NULL) : NULL,
     ];
   }
 
@@ -652,7 +653,7 @@ trait Api3TestTrait {
     foreach ($params as $name => $param) {
       if (is_string($param) && strpos($param, '$value.') === 0) {
         $param = substr($param, 7);
-        $params[$name] = \CRM_Utils_Array::value($param, $result);
+        $params[$name] = $result[$param] ?? NULL;
       }
     }
 
@@ -688,7 +689,7 @@ trait Api3TestTrait {
       'Im' => 'IM',
       'Acl' => 'ACL',
     ];
-    return \CRM_Utils_Array::value($api4Name, $map, $api4Name);
+    return $map[$api4Name] ?? $api4Name;
   }
 
 }
