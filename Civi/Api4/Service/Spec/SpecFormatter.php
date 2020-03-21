@@ -21,7 +21,6 @@
 
 namespace Civi\Api4\Service\Spec;
 
-use CRM_Utils_Array as ArrayHelper;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class SpecFormatter {
@@ -64,32 +63,32 @@ class SpecFormatter {
         $field->setCustomTableName($data['custom_group.table_name']);
         $field->setCustomFieldColumnName($data['column_name']);
       }
-      $field->setCustomFieldId(ArrayHelper::value('id', $data));
+      $field->setCustomFieldId($data['id'] ?? NULL);
       $field->setCustomGroupName($data['custom_group.name']);
-      $field->setTitle(ArrayHelper::value('label', $data));
-      $field->setHelpPre(ArrayHelper::value('help_pre', $data));
-      $field->setHelpPost(ArrayHelper::value('help_post', $data));
+      $field->setTitle($data['label'] ?? NULL);
+      $field->setHelpPre($data['help_pre'] ?? NULL);
+      $field->setHelpPost($data['help_post'] ?? NULL);
       $field->setOptions(self::customFieldHasOptions($data));
       if (\CRM_Core_BAO_CustomField::isSerialized($data)) {
         $field->setSerialize(\CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND);
       }
     }
     else {
-      $name = ArrayHelper::value('name', $data);
+      $name = $data['name'] ?? NULL;
       $field = new FieldSpec($name, $entity, $dataTypeName);
-      $field->setRequired((bool) ArrayHelper::value('required', $data, FALSE));
-      $field->setTitle(ArrayHelper::value('title', $data));
+      $field->setRequired(!empty($data['required']));
+      $field->setTitle($data['title'] ?? NULL);
       $field->setOptions(!empty($data['pseudoconstant']));
-      $field->setSerialize(ArrayHelper::value('serialize', $data));
+      $field->setSerialize($data['serialize'] ?? NULL);
     }
 
-    $field->setDefaultValue(ArrayHelper::value('default', $data));
-    $field->setDescription(ArrayHelper::value('description', $data));
+    $field->setDefaultValue($data['default'] ?? NULL);
+    $field->setDescription($data['description'] ?? NULL);
     self::setInputTypeAndAttrs($field, $data, $dataTypeName);
 
-    $field->setPermission(ArrayHelper::value('permission', $data));
-    $fkAPIName = ArrayHelper::value('FKApiName', $data);
-    $fkClassName = ArrayHelper::value('FKClassName', $data);
+    $field->setPermission($data['permission'] ?? NULL);
+    $fkAPIName = $data['FKApiName'] ?? NULL;
+    $fkClassName = $data['FKClassName'] ?? NULL;
     if ($fkAPIName || $fkClassName) {
       $field->setFkEntity($fkAPIName ?: AllCoreTables::getBriefName($fkClassName));
     }
@@ -132,7 +131,7 @@ class SpecFormatter {
       return !empty($data['time_format']) ? 'Timestamp' : $data['data_type'];
     }
 
-    $dataTypeInt = ArrayHelper::value('type', $data);
+    $dataTypeInt = $data['type'] ?? NULL;
     $dataTypeName = \CRM_Utils_Type::typeToString($dataTypeInt);
 
     return $dataTypeName;
@@ -144,8 +143,8 @@ class SpecFormatter {
    * @param string $dataTypeName
    */
   public static function setInputTypeAndAttrs(FieldSpec &$fieldSpec, $data, $dataTypeName) {
-    $inputType = $data['html']['type'] ?? ArrayHelper::value('html_type', $data);
-    $inputAttrs = ArrayHelper::value('html', $data, []);
+    $inputType = $data['html']['type'] ?? $data['html_type'] ?? NULL;
+    $inputAttrs = $data['html'] ?? [];
     unset($inputAttrs['type']);
 
     if (strstr($inputType, 'Multi-Select') || ($inputType == 'Select' && !empty($data['serialize']))) {
@@ -158,7 +157,7 @@ class SpecFormatter {
       'Select Date' => 'Date',
       'Link' => 'Url',
     ];
-    $inputType = ArrayHelper::value($inputType, $map, $inputType);
+    $inputType = $map[$inputType] ?? $inputType;
     if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
       self::setLegacyDateFormat($inputAttrs);
     }

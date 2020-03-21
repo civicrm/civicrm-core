@@ -21,8 +21,6 @@
 
 namespace api\v4\Traits;
 
-use CRM_Utils_Array as ArrayHelper;
-
 trait QueryCounterTrait {
 
   /**
@@ -56,7 +54,7 @@ trait QueryCounterTrait {
       throw new \Exception('Database object not set so cannot count queries');
     }
 
-    return ArrayHelper::value('RESULTSEQ', $_DB_DATAOBJECT, 0);
+    return $_DB_DATAOBJECT['RESULTSEQ'] ?? 0;
   }
 
 }
