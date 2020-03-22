@@ -1683,7 +1683,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $action,
       $pledgePaymentID,
       $contribution->id,
-      (CRM_Utils_Array::value('option_type', $formValues) == 2) ? TRUE : FALSE,
+      ($formValues['option_type'] ?? 0) == 2,
       $formValues['total_amount'],
       CRM_Utils_Array::value('total_amount', $this->_defaults),
       $formValues['contribution_status_id'],
