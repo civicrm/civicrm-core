@@ -29,6 +29,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   protected $entity = 'Contribution';
 
+  protected $amountDue;
+
   protected $_owed = NULL;
 
   protected $_refund = NULL;
@@ -59,6 +61,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * Pre process form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
 
@@ -84,24 +87,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
-    $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
+    $paymentAmt = $this->getAmountDue();
 
     $this->_amtPaid = $paymentDetails['paid'];
     $this->_amtTotal = $paymentDetails['total'];
 
-    if ($paymentAmt < 0) {
-      $this->_refund = $paymentAmt;
-      $this->_paymentType = 'refund';
-    }
-    elseif ($paymentAmt > 0) {
+    if ($paymentAmt >= 0) {
       $this->_owed = $paymentAmt;
-      $this->_paymentType = 'owed';
-    }
-    else {
-      throw new CRM_Core_Exception(ts('No payment information found for this record'));
     }
 
-    if (!empty($this->_mode) && $this->_paymentType == 'refund') {
+    $this->_paymentType = $this->getPaymentType();
+
+    if (!empty($this->_mode) && $this->isARefund()) {
       throw new CRM_Core_Exception(ts('Credit card payment is not for Refund payments use'));
     }
 
@@ -110,9 +107,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('contributionMode', $this->_mode);
     $this->assign('contactId', $this->_contactID);
     $this->assign('paymentType', $this->_paymentType);
-    $this->assign('paymentAmt', abs($paymentAmt));
+    $this->assign('paymentAmt', $paymentAmt);
+    // It's easier to strip the minus sign for display purposes in php than smarty.
+    $this->assign('absolutePaymentAmount', abs($paymentAmt));
 
-    $this->setPageTitle($this->_refund ? ts('Refund') : ts('Payment'));
+    $this->setPageTitle($this->isARefund() ? ts('Refund') : ts('Payment'));
   }
 
   /**
@@ -138,6 +137,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   /**
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
@@ -153,10 +153,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $defaults['trxn_date'] = date('Y-m-d H:i:s');
     }
 
-    if ($this->_refund) {
-      $defaults['total_amount'] = CRM_Utils_Money::format(abs($this->_refund), NULL, NULL, TRUE);
+    if ($this->isARefund() && $this->amountDue < 0) {
+      $defaults['total_amount'] = CRM_Utils_Money::format(abs($this->amountDue), NULL, NULL, TRUE);
     }
-    elseif ($this->_owed) {
+    elseif ($this->_owed && $this->amountDue > 0) {
       $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_owed);
     }
 
@@ -169,9 +169,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
-    if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+    if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       $this->addButtons([
         [
           'type' => 'cancel',
@@ -188,9 +189,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
-    $label = ($this->_refund) ? ts('Refund Amount') : ts('Payment Amount');
     $this->addMoney('total_amount',
-      $label,
+      $this->isARefund() ? ts('Refund Amount') : ts('Payment Amount'),
       TRUE,
       $attributes['total_amount'],
       TRUE, 'currency', NULL
@@ -207,8 +207,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
-    $dateLabel = ($this->_refund) ? ts('Refund Date') : ts('Date Received');
-    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $dateLabel, 'context' => 'Contribution'], FALSE, FALSE);
+    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Date Received'), 'context' => 'Contribution'], FALSE, FALSE);
 
     if ($this->_contactId && $this->_id) {
       if ($this->_component == 'event') {
@@ -243,7 +242,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
     }
 
-    $buttonName = $this->_refund ? ts('Record Refund') : ts('Record Payment');
+    $buttonName = $this->isARefund() ? ts('Record Refund') : ts('Record Payment');
     $this->addButtons([
       [
         'type' => 'upload',
@@ -271,13 +270,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    if ($self->_paymentType == 'owed' && (int) $fields['total_amount'] > (int) $self->_owed) {
-      $errors['total_amount'] = ts('Payment amount cannot be greater than owed amount');
-    }
-    if ($self->_paymentType == 'refund' && $fields['total_amount'] != abs($self->_refund)) {
-      $errors['total_amount'] = ts('Refund amount must equal refund due amount.');
-    }
-
     if ($self->_paymentProcessor['id'] === 0 && empty($fields['payment_instrument_id'])) {
       $errors['payment_instrument_id'] = ts('Payment method is a required field');
     }
@@ -287,12 +279,14 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   /**
    * Process the form submission.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $submittedValues = $this->controller->exportValues($this->_name);
     $this->submit($submittedValues);
     $childTab = 'contribute';
-    if ($this->_component == 'event') {
+    if ($this->_component === 'event') {
       $childTab = 'participant';
     }
     $session = CRM_Core_Session::singleton();
@@ -307,6 +301,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @param array $submittedValues
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function submit($submittedValues) {
     $this->_params = $submittedValues;
@@ -314,7 +309,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_contributorContactID = $this->_contactID;
     $this->processBillingAddress();
     $participantId = NULL;
-    if ($this->_component == 'event') {
+    if ($this->_component === 'event') {
       $participantId = $this->_id;
     }
 
@@ -326,7 +321,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     // @todo we should clean $ on the form & pass in skipCleanMoney
     $trxnsData = $this->_params;
-    if ($this->_paymentType == 'refund') {
+    if ($this->isARefund()) {
       $trxnsData['total_amount'] = -$trxnsData['total_amount'];
     }
     $trxnsData['participant_id'] = $participantId;
@@ -453,6 +448,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @param string $entityType
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSubmit($params, $creditCardMode = NULL, $entityType = 'contribute') {
     $this->_bltID = 5;
@@ -467,18 +463,14 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
 
-      $paymentAmount = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
+      $paymentAmount = $this->getAmountDue();
       $this->_amtPaid = $paymentDetails['paid'];
       $this->_amtTotal = $paymentDetails['total'];
 
-      if ($paymentAmount < 0) {
-        $this->_refund = $paymentAmount;
-        $this->_paymentType = 'refund';
-      }
-      elseif ($paymentAmount > 0) {
+      if ($paymentAmount > 0) {
         $this->_owed = $paymentAmount;
-        $this->_paymentType = 'owed';
       }
+      $this->_paymentType = $this->getPaymentType();
     }
 
     if (!empty($params['contact_id'])) {
@@ -493,6 +485,49 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->set('cid', $this->_contactId);
     parent::preProcess();
     $this->submit($params);
+  }
+
+  /**
+   * Get the 'payment type' - ie is it a payment or a refund.
+   *
+   * We prefer the url action param but fall back on a guess from the balance.
+   *
+   * The refund|owed is not great - perhaps move to positive & negative.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPaymentType():string {
+    $urlParam = CRM_Utils_Request::retrieve('is_refund', 'Int', $this);
+    if ($urlParam === 0) {
+      return 'owed';
+    }
+    if ($urlParam === 1) {
+      return 'refund';
+    }
+
+    return $this->getAmountDue() < 0 ? 'refund' : 'owed';
+  }
+
+  /**
+   * Is the form processing a refund.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isARefund() {
+    return $this->getPaymentType() === 'refund';
+  }
+
+  /**
+   * @return float
+   */
+  protected function getAmountDue(): float {
+    if (!isset($this->amountDue)) {
+      $this->amountDue = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
+    }
+    return $this->amountDue;
   }
 
 }
