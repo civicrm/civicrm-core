@@ -151,58 +151,69 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
             0 => [
               'fields' => [
                 0 => [
+                  'name' => 'Client',
                   'label' => 'Client',
                   'value' => 'Casey Reportee',
                   'type' => 'String',
                 ],
                 1 => [
+                  'name' => 'Activity Type',
                   'label' => 'Activity Type',
                   'value' => 'Open Case',
                   'type' => 'String',
                 ],
                 2 => [
+                  'name' => 'Subject',
                   'label' => 'Subject',
                   'value' => 'Case Subject',
                   'type' => 'Memo',
                 ],
                 3 => [
+                  'name' => 'Created By',
                   'label' => 'Created By',
                   // data providers run before everything, so update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 4 => [
+                  'name' => 'Reported By',
                   'label' => 'Reported By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 5 => [
+                  'name' => 'Medium',
                   'label' => 'Medium',
                   'value' => 'Phone',
                   'type' => 'String',
                 ],
                 6 => [
+                  'name' => 'Location',
                   'label' => 'Location',
                   'value' => NULL,
                   'type' => 'String',
                 ],
                 7 => [
+                  'name' => 'Date and Time',
                   'label' => 'Date and Time',
                   'value' => '2019-11-14 00:00:00',
                   'type' => 'Date',
                 ],
                 8 => [
+                  'name' => 'Details',
                   'label' => 'Details',
                   'value' => NULL,
                   'type' => 'Memo',
                 ],
                 9 => [
+                  'name' => 'Status',
                   'label' => 'Status',
                   'value' => 'Completed',
                   'type' => 'String',
                 ],
                 10 => [
+                  'name' => 'Priority',
                   'label' => 'Priority',
                   'value' => 'Normal',
                   'type' => 'String',
@@ -214,53 +225,63 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
             1 => [
               'fields' => [
                 0 => [
+                  'name' => 'Client',
                   'label' => 'Client',
                   'value' => 'Casey Reportee',
                   'type' => 'String',
                 ],
                 1 => [
+                  'name' => 'Activity Type',
                   'label' => 'Activity Type',
                   'value' => 'Medical evaluation',
                   'type' => 'String',
                 ],
                 2 => [
+                  'name' => 'Subject',
                   'label' => 'Subject',
                   'value' => '',
                   'type' => 'Memo',
                 ],
                 3 => [
+                  'name' => 'Created By',
                   'label' => 'Created By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 4 => [
+                  'name' => 'Reported By',
                   'label' => 'Reported By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 5 => [
+                  'name' => 'Location',
                   'label' => 'Location',
                   'value' => NULL,
                   'type' => 'String',
                 ],
                 6 => [
+                  'name' => 'Date and Time',
                   'label' => 'Date and Time',
                   'value' => '2019-11-15 00:00:00',
                   'type' => 'Date',
                 ],
                 7 => [
+                  'name' => 'Details',
                   'label' => 'Details',
                   'value' => NULL,
                   'type' => 'Memo',
                 ],
                 8 => [
+                  'name' => 'Status',
                   'label' => 'Status',
                   'value' => 'Scheduled',
                   'type' => 'String',
                 ],
                 9 => [
+                  'name' => 'Priority',
                   'label' => 'Priority',
                   'value' => 'Normal',
                   'type' => 'String',
@@ -291,58 +312,69 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
             0 => [
               'fields' => [
                 0 => [
+                  'name' => 'Client',
                   'label' => 'Client',
                   'value' => 'Casey Reportee',
                   'type' => 'String',
                 ],
                 1 => [
+                  'name' => 'Activity Type',
                   'label' => 'Activity Type',
                   'value' => 'Open Case',
                   'type' => 'String',
                 ],
                 2 => [
+                  'name' => 'Subject',
                   'label' => 'Subject',
                   'value' => 'Case Subject',
                   'type' => 'Memo',
                 ],
                 3 => [
+                  'name' => 'Created By',
                   'label' => 'Created By',
                   // data providers run before everything, so update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 4 => [
+                  'name' => 'Reported By',
                   'label' => 'Reported By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 5 => [
+                  'name' => 'Medium',
                   'label' => 'Medium',
                   'value' => 'Phone',
                   'type' => 'String',
                 ],
                 6 => [
+                  'name' => 'Location',
                   'label' => 'Location',
                   'value' => NULL,
                   'type' => 'String',
                 ],
                 7 => [
+                  'name' => 'Date and Time',
                   'label' => 'Date and Time',
                   'value' => '2019-11-14 00:00:00',
                   'type' => 'Date',
                 ],
                 8 => [
+                  'name' => 'Details',
                   'label' => 'Details',
                   'value' => NULL,
                   'type' => 'Memo',
                 ],
                 9 => [
+                  'name' => 'Status',
                   'label' => 'Status',
                   'value' => 'Completed',
                   'type' => 'String',
                 ],
                 10 => [
+                  'name' => 'Priority',
                   'label' => 'Priority',
                   'value' => 'Normal',
                   'type' => 'String',
@@ -354,53 +386,63 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
             1 => [
               'fields' => [
                 0 => [
+                  'name' => 'Client',
                   'label' => 'Client',
                   'value' => 'Casey Reportee',
                   'type' => 'String',
                 ],
                 1 => [
+                  'name' => 'Activity Type',
                   'label' => 'Activity Type',
                   'value' => 'Medical evaluation',
                   'type' => 'String',
                 ],
                 2 => [
+                  'name' => 'Subject',
                   'label' => 'Subject',
                   'value' => '',
                   'type' => 'Memo',
                 ],
                 3 => [
+                  'name' => 'Created By',
                   'label' => 'Created By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 4 => [
+                  'name' => 'Reported By',
                   'label' => 'Reported By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 5 => [
+                  'name' => 'Location',
                   'label' => 'Location',
                   'value' => NULL,
                   'type' => 'String',
                 ],
                 6 => [
+                  'name' => 'Date and Time',
                   'label' => 'Date and Time',
                   'value' => '2019-11-15 00:00:00',
                   'type' => 'Date',
                 ],
                 7 => [
+                  'name' => 'Details',
                   'label' => 'Details',
                   'value' => NULL,
                   'type' => 'Memo',
                 ],
                 8 => [
+                  'name' => 'Status',
                   'label' => 'Status',
                   'value' => 'Scheduled',
                   'type' => 'String',
                 ],
                 9 => [
+                  'name' => 'Priority',
                   'label' => 'Priority',
                   'value' => 'Normal',
                   'type' => 'String',
@@ -412,53 +454,63 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
             2 => [
               'fields' => [
                 0 => [
+                  'name' => 'Client',
                   'label' => 'Client',
                   'value' => 'Casey Reportee',
                   'type' => 'String',
                 ],
                 1 => [
+                  'name' => 'Activity Type',
                   'label' => 'Activity Type',
                   'value' => 'Meeting',
                   'type' => 'String',
                 ],
                 2 => [
+                  'name' => 'Subject',
                   'label' => 'Subject',
                   'value' => 'Test Meeting',
                   'type' => 'Memo',
                 ],
                 3 => [
+                  'name' => 'Created By',
                   'label' => 'Created By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 4 => [
+                  'name' => 'Reported By',
                   'label' => 'Reported By',
                   // see above - need to update this later
                   'value' => 'placeholder',
                   'type' => 'String',
                 ],
                 5 => [
+                  'name' => 'Location',
                   'label' => 'Location',
                   'value' => NULL,
                   'type' => 'String',
                 ],
                 6 => [
+                  'name' => 'Date and Time',
                   'label' => 'Date and Time',
                   'value' => '2019-11-14 12:34:56',
                   'type' => 'Date',
                 ],
                 7 => [
+                  'name' => 'Details',
                   'label' => 'Details',
                   'value' => NULL,
                   'type' => 'Memo',
                 ],
                 8 => [
+                  'name' => 'Status',
                   'label' => 'Status',
                   'value' => 'Completed',
                   'type' => 'String',
                 ],
                 9 => [
+                  'name' => 'Priority',
                   'label' => 'Priority',
                   'value' => 'Normal',
                   'type' => 'String',

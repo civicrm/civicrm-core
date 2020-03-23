@@ -25,6 +25,7 @@
        <Fields>
 {foreach from=$activity.fields item=field}
           <Field>
+            <Name>{$field.name|escape}</Name>
             <Label>{$field.label|escape}</Label>
 {if $field.category}
             <Category>{$field.category|escape}</Category>
@@ -40,6 +41,7 @@
                <GroupName>{$customGroupName|escape}</GroupName>
 {foreach from=$customGroup item=field}
                   <Field>
+                    <Name>{*TODO*}</Name>
                     <Label>{$field.label|escape}</Label>
                     <Value>{$field.value|escape}</Value>
                     <Type>{$field.type}</Type>
