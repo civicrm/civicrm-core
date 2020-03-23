@@ -244,6 +244,9 @@
         "Support PHPUnit 6+": "https://github.com/php-cache/integration-tests/commit/1ec7362962185df91d3d749bc3fa7e7b99cb9fc7.patch",
         "Add tests for binary data round trip": "https://github.com/php-cache/integration-tests/commit/89cd7068e83aa776774bfc44f6bcba858c085616.patch"
       },
+      "pear/mail": {
+        "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
+      },
       "pear/net_smtp": {
         "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
       },

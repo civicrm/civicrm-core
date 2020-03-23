@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d22226af501e1f685b799acc269da69",
+    "content-hash": "9c8e8054f45d5bdd4e18f45701527d2b",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -145,7 +145,7 @@
                 {
                     "name": "Tobias Nyholm",
                     "email": "tobias.nyholm@gmail.com",
-                    "homepage": "https://github.com/nyholm"
+                    "homepage": "https://github.com/Nyholm"
                 },
                 {
                     "name": "Nicolas Grekas",
@@ -966,6 +966,11 @@
                 "pear/net_smtp": "Install optionally via your project's composer.json"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Mail": "./"
