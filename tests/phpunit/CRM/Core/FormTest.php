@@ -57,6 +57,14 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
           $form->_action = CRM_Core_Action::ADD;
         },
       ],
+      // This one is a bit flawed but the only point of this test is to catch
+      // simple stuff. This will catch e.g. "undefined index" and similar.
+      'Find Contacts' => [
+        'CRM_Contact_Form_Search_Basic',
+        function(CRM_Core_Form $form) {
+          $form->_action = CRM_Core_Action::BASIC;
+        },
+      ],
     ];
   }
 
