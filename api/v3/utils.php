@@ -457,11 +457,13 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
 /**
  * Returns field names of the given entity fields.
  *
+ * @deprecated
  * @param array $fields
  *   Fields array to retrieve the field names for.
  * @return array
  */
 function _civicrm_api3_field_names($fields) {
+  CRM_Core_Error::deprecatedFunctionWarning('array_column');
   $result = [];
   foreach ($fields as $key => $value) {
     if (!empty($value['name'])) {
