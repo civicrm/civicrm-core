@@ -254,21 +254,6 @@ input.crm-form-entityref {
   width: 6em;
 }
 
-/* Style civi form inputs to match select2 */
-.crm-container select.crm-form-select,
-.crm-container select.crm-form-date {
-  border: 1px solid #aaa;
-  color: #444;
-  height: 2.2em;
-  padding: 4px;
-  border-radius: 4px;
-  background-color: #fff;
-  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(0.5, #fff));
-  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #fff 50%);
-  background-image: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
-  background-image: linear-gradient(top, #fff 0%, #eee 50%);
-}
 .crm-container input.crm-form-text.ng-invalid.ng-dirty {
     border: 1px solid #FF0000;
 }
