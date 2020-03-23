@@ -907,16 +907,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['deceased_date'] = NULL;
     }
 
-    if (isset($params['contact_id'])) {
-      // process membership status for deceased contact
-      $deceasedParams = [
-        'contact_id' => $params['contact_id'] ?? NULL,
-        'is_deceased' => $params['is_deceased'] ?? FALSE,
-        'deceased_date' => $params['deceased_date'] ?? NULL,
-      ];
-      $updateMembershipMsg = CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $this->_contactType);
-    }
-
     // action is taken depending upon the mode
     if ($this->_action & CRM_Core_Action::UPDATE) {
       CRM_Utils_Hook::pre('edit', $params['contact_type'], $params['contact_id'], $params);
@@ -1014,9 +1004,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     if (!empty($parseStatusMsg)) {
       $message .= "<br />$parseStatusMsg";
-    }
-    if (!empty($updateMembershipMsg)) {
-      $message .= "<br />$updateMembershipMsg";
     }
 
     $session = CRM_Core_Session::singleton();
