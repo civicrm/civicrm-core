@@ -506,7 +506,7 @@ LIMIT {$offset}, {$rowCount}
   public static function dashboard() {
     switch ($_REQUEST['op']) {
       case 'save_columns':
-        CRM_Core_BAO_Dashboard::saveDashletChanges($_REQUEST['columns']);
+        CRM_Core_BAO_Dashboard::saveDashletChanges($_REQUEST['columns'] ?? NULL);
         break;
 
       case 'delete_dashlet':
