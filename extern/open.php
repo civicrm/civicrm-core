@@ -6,7 +6,7 @@ require_once 'CRM/Utils/Type.php';
 require_once 'CRM/Utils/Rule.php';
 require_once 'CRM/Utils/Request.php';
 
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 $queue_id = CRM_Utils_Request::retrieveValue('q', 'Positive', NULL, FALSE, 'GET');
 if (!$queue_id) {
   echo "Missing input parameters\n";

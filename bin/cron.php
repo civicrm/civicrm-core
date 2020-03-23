@@ -13,7 +13,7 @@
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
 require_once 'CRM/Utils/Request.php';
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 
 CRM_Utils_System::authenticateScript(TRUE);
 
