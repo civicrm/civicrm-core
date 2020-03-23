@@ -1410,7 +1410,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       // Reminder should be sent only to the direct membership
       unset($params['reminder_date']);
       // unset the custom value ids
-      if (is_array(CRM_Utils_Array::value('custom', $params))) {
+      if (isset($params['custom']) && is_array($params['custom'])) {
         foreach ($params['custom'] as $k => $values) {
           foreach ($values as $i => $value) {
             unset($params['custom'][$k][$i]['id']);

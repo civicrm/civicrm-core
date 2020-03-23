@@ -135,7 +135,7 @@ function civicrm_api3_setting_getoptions($params) {
   $domainId = $params['domain_id'] ?? NULL;
   $specs = \Civi\Core\SettingsMetadata::getMetadata(['name' => $params['field']], $domainId, TRUE);
 
-  if (empty($specs[$params['field']]) || !is_array(CRM_Utils_Array::value('options', $specs[$params['field']]))) {
+  if (!isset($specs[$params['field']]['options']) || !is_array($specs[$params['field']]['options'])) {
     throw new API_Exception("The field '" . $params['field'] . "' has no associated option list.");
   }
 

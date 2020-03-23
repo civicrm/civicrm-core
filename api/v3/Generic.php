@@ -513,7 +513,7 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
   }
 
   $options = civicrm_api($apiRequest['entity'], 'getoptions', ['version' => 3, 'field' => $fieldname, 'context' => $context]);
-  if (is_array(CRM_Utils_Array::value('values', $options))) {
+  if (isset($options['values']) && is_array($options['values'])) {
     $metadata[$fieldname]['options'] = $options['values'];
   }
 }

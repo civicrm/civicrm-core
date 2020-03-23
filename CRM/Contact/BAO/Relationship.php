@@ -516,16 +516,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * Check if there is data to create the object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return bool
    */
-  public static function dataExists(&$params) {
-    // return if no data present
-    if (!is_array(CRM_Utils_Array::value('contact_check', $params))) {
-      return FALSE;
-    }
-    return TRUE;
+  public static function dataExists($params) {
+    return (isset($params['contact_check']) && is_array($params['contact_check']));
   }
 
   /**

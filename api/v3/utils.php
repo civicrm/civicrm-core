@@ -183,7 +183,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
     }
 
     $allFields = [];
-    if ($action !== 'getfields' && is_array($apiFields) && is_array(CRM_Utils_Array::value('values', $apiFields))) {
+    if ($action !== 'getfields' && isset($apiFields['values']) && is_array($apiFields['values'])) {
       $allFields = array_keys($apiFields['values']);
     }
     $paramFields = array_keys($params);

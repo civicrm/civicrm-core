@@ -741,14 +741,11 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
       if (empty($this->_columns[$resTable]['alias'])) {
         $this->_columns[$resTable]['alias'] = "{$resTable}_survey_response";
       }
-      if (!is_array(CRM_Utils_Array::value('fields', $this->_columns[$resTable]))) {
-        $this->_columns[$resTable]['fields'] = array();
+      if (empty($this->_columns[$resTable]['fields'])) {
+        $this->_columns[$resTable]['fields'] = [];
       }
 
-      if (in_array($this->_outputMode, array(
-        'print',
-        'pdf',
-      ))) {
+      if (in_array($this->_outputMode, ['print', 'pdf'])) {
         $this->_columnTitleOverrides["{$resTable}_{$fieldName}"] = 'Q' . $fieldCnt;
         $fieldCnt++;
       }

@@ -423,7 +423,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       $dashlet->id = $dashboardID;
     }
 
-    if (is_array(CRM_Utils_Array::value('permission', $params))) {
+    if (isset($params['permission']) && is_array($params['permission'])) {
       $params['permission'] = implode(',', $params['permission']);
     }
     $dashlet->copyValues($params);
