@@ -2978,9 +2978,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test that delete with skip undelete respects permissions.
    * TODO: Api4
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactDeletePermissions() {
     $contactID = $this->individualCreate();
+    $tag = $this->callAPISuccess('Tag', 'create', ['name' => 'to be deleted']);
+    $this->callAPISuccess('EntityTag', 'create', ['entity_id' => $contactID, 'tag_id' => $tag['id']]);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->callAPIFailure('Contact', 'delete', [
       'id' => $contactID,
@@ -2992,6 +2996,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'check_permissions' => 0,
       'skip_undelete' => 1,
     ]);
+    $this->callAPISuccessGetCount('EntityTag', ['entity_id' => $contactID], 0);
   }
 
   /**

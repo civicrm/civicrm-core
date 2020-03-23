@@ -1011,7 +1011,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $transaction = new CRM_Core_Transaction();
 
     if ($skipUndelete) {
-      CRM_Utils_Hook::pre('delete', $contactType, $id, CRM_Core_DAO::$_nullArray);
+      $hookParams = ['check_permissions' => $checkPermissions];
+      CRM_Utils_Hook::pre('delete', $contactType, $id, $hookParams);
 
       //delete billing address if exists.
       CRM_Contribute_BAO_Contribution::deleteAddress(NULL, $id);

@@ -483,4 +483,38 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     return $options;
   }
 
+  /**
+   * This function deletes entity tags when a related entity is called.
+   *
+   * It is registered as a listener in \Civi\Core\Container::createEventDispatcher
+   *
+   * @param \Civi\Core\DAO\Event\PreDelete $event
+   */
+  public static function preDeleteOtherEntity($event) {
+    if (
+      $event->object instanceof CRM_Core_DAO_EntityTag
+      // Activity can call the pre hook for delete with no ID - this seems to be isolated to activity....
+      // @todo - what is the correct way to standardise activity delete?
+      || ($event->object instanceof CRM_Activity_DAO_Activity && !$event->object->id)
+
+    ) {
+      return;
+    }
+    // This is probably fairly mild in terms of helping performance - a case could be made to check if tags
+    // exist before deleting (further down) as delete is a locking action.
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($event->object));
+    if (!isset(Civi::$statics[__CLASS__]['tagged_entities'][$entity])) {
+      $tableName = CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity);
+      $used_for = CRM_Core_OptionGroup::values('tag_used_for');
+      Civi::$statics[__CLASS__]['tagged_entities'][$entity] = !empty($used_for[$tableName]) ? $tableName : FALSE;
+    }
+
+    if (Civi::$statics[__CLASS__]['tagged_entities'][$entity]) {
+      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_tag WHERE entity_table = %1 AND entity_id = %2',
+        [1 => [Civi::$statics[__CLASS__]['tagged_entities'][$entity], 'String'], 2 => [$event->object->id, 'Integer']]
+      );
+    }
+
+  }
+
 }

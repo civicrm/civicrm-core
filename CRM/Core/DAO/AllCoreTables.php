@@ -255,6 +255,17 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
+   * Convert the entity name into a table name.
+   *
+   * @param string $entityBriefName
+   *
+   * @return FALSE|string
+   */
+  public static function getTableForEntityName($entityBriefName) {
+    return self::getTableForClass(self::getFullName($entityBriefName));
+  }
+
+  /**
    * Reinitialise cache.
    *
    * @param bool $fresh
