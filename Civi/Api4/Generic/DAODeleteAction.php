@@ -38,7 +38,7 @@ class DAODeleteAction extends AbstractBatchAction {
       throw new \API_Exception('Cannot delete ' . $this->getEntityName() . ' with no "where" parameter specified');
     }
 
-    $items = $this->getObjects();
+    $items = $this->getBatchRecords();
     if ($items) {
       $result->exchangeArray($this->deleteObjects($items));
     }

@@ -62,22 +62,24 @@ class Api4SelectQuery extends SelectQuery {
   public $debugOutput = NULL;
 
   /**
-   * @param string $entity
-   * @param bool $checkPermissions
-   * @param array $fields
+   * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
-  public function __construct($entity, $checkPermissions, $fields) {
-    require_once 'api/v3/utils.php';
-    $this->entity = $entity;
-    $this->checkPermissions = $checkPermissions;
+  public function __construct($apiGet) {
+    $this->entity = $apiGet->getEntityName();
+    $this->checkPermissions = $apiGet->getCheckPermissions();
+    $this->select = $apiGet->getSelect();
+    $this->where = $apiGet->getWhere();
+    $this->orderBy = $apiGet->getOrderBy();
+    $this->limit = $apiGet->getLimit();
+    $this->offset = $apiGet->getOffset();
+    if ($apiGet->getDebug()) {
+      $this->debugOutput =& $apiGet->_debugOutput;
+    }
+    $baoName = CoreUtil::getBAOFromApiName($this->entity);
+    $this->entityFieldNames = array_column($baoName::fields(), 'name');
+    $this->apiFieldSpec = $apiGet->entityFields();
 
-    $baoName = CoreUtil::getBAOFromApiName($entity);
-    $bao = new $baoName();
-
-    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($bao));
-    $this->apiFieldSpec = (array) $fields;
-
-    \CRM_Utils_SQL_Select::from($this->getTableName($baoName) . ' ' . self::MAIN_TABLE_ALIAS);
+    $this->constructQueryObject($baoName);
 
     // Add ACLs first to avoid redundant subclauses
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
@@ -554,7 +556,7 @@ class Api4SelectQuery extends SelectQuery {
    *
    * @return void
    */
-  public function getTableName($baoName) {
+  public function constructQueryObject($baoName) {
     if (strstr($this->entity, 'Custom_')) {
       $this->query = \CRM_Utils_SQL_Select::from(CoreUtil::getCustomTableByName(str_replace('Custom_', '', $this->entity)) . ' ' . self::MAIN_TABLE_ALIAS);
       $this->entityFieldNames = array_keys($this->apiFieldSpec);

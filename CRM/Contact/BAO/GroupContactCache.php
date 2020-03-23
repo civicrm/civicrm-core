@@ -726,13 +726,9 @@ ORDER BY   gc.contact_id, g.children
    * @throws CRM_Core_Exception
    */
   protected static function getApiSQL($savedSearchID, array $savedSearch): array {
-    $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $savedSearch['api_params']);
-    $query = new \Civi\Api4\Query\Api4SelectQuery($api->getEntityName(), FALSE, $api->entityFields());
-    $query->select = ['id'];
-    $query->where = $api->getWhere();
-    $query->orderBy = $api->getOrderBy();
-    $query->limit = $api->getLimit();
-    $query->offset = $api->getOffset();
+    $apiParams = ['select' => ['id'], 'checkPermissions' => FALSE] + $savedSearch['api_params'];
+    $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $apiParams);
+    $query = new \Civi\Api4\Query\Api4SelectQuery($api);
     $sql = $query->getSql();
     return [
       'select' => substr($sql, 0, strpos($sql, 'FROM')),

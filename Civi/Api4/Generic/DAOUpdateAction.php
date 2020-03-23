@@ -66,7 +66,7 @@ class DAOUpdateAction extends AbstractUpdateAction {
     }
 
     // Batch update 1 or more records based on WHERE clause
-    $items = $this->getObjects();
+    $items = $this->getBatchRecords();
     foreach ($items as &$item) {
       $item = $this->values + $item;
     }

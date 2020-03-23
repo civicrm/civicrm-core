@@ -21,7 +21,6 @@
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\Api4\Utils\FormattingUtil;
-use Civi\Api4\Query\Api4SelectQuery;
 
 /**
  * @method string getLanguage()
@@ -77,26 +76,6 @@ trait DAOActionTrait {
       }
     }
     return $values;
-  }
-
-  /**
-   * @return array|int
-   */
-  protected function getObjects() {
-    $query = new Api4SelectQuery($this->getEntityName(), $this->getCheckPermissions(), $this->entityFields());
-    $query->select = $this->getSelect();
-    $query->where = $this->getWhere();
-    $query->orderBy = $this->getOrderBy();
-    $query->limit = $this->getLimit();
-    $query->offset = $this->getOffset();
-    if ($this->getDebug()) {
-      $query->debugOutput =& $this->_debugOutput;
-    }
-    $result = $query->run();
-    if (is_array($result)) {
-      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    }
-    return $result;
   }
 
   /**
