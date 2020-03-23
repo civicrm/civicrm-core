@@ -10,7 +10,7 @@
  */
 
 require_once '../civicrm.config.php';
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 
 if (defined('PANTHEON_ENVIRONMENT')) {
   ini_set('session.save_handler', 'files');
