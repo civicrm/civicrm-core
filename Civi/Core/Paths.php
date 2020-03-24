@@ -38,19 +38,19 @@ class Paths {
       ->register('civicrm.packages', function () {
         return [
           'path' => \Civi::paths()->getPath('[civicrm.root]/packages/'),
-          'url' => \Civi::paths()->getUrl('[civicrm.root]/packages/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/packages/', 'absolute'),
         ];
       })
       ->register('civicrm.vendor', function () {
         return [
           'path' => \Civi::paths()->getPath('[civicrm.root]/vendor/'),
-          'url' => \Civi::paths()->getUrl('[civicrm.root]/vendor/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/vendor/', 'absolute'),
         ];
       })
       ->register('civicrm.bower', function () {
         return [
           'path' => \Civi::paths()->getPath('[civicrm.root]/bower_components/'),
-          'url' => \Civi::paths()->getUrl('[civicrm.root]/bower_components/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/bower_components/', 'absolute'),
         ];
       })
       ->register('civicrm.files', function () {
