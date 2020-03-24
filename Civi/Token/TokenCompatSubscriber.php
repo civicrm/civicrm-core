@@ -63,7 +63,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = reset($contact);
         if (!$contact || is_a($contact, 'CRM_Core_Error')) {
           // FIXME: Need to differentiate errors which kill the batch vs the individual row.
-          CRM_Core_Error::debug_log_message("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
+          \Civi::log()->debug("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
           continue;
         }
 
