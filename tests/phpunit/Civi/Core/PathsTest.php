@@ -117,18 +117,21 @@ class PathsTest extends \CiviUnitTestCase {
       ];
     });
     $paths->register('test.goodsub', function () use ($paths) {
+      // This is a stand-in for how [civicrm.bower], [civicrm.packages], [civicrm.vendor] currently work.
       return [
         'path' => $paths->getPath('[test.base]/good/'),
         'url' => $paths->getUrl('[test.base]/good/', 'absolute'),
       ];
     });
     $paths->register('test.badsub', function () use ($paths) {
+      // This is a stand-in for how [civicrm.bower], [civicrm.packages], [civicrm.vendor] used to work (incorrectly).
       return [
         'path' => $paths->getPath('[test.base]/bad/'),
-        // This *looks* OK, but `getUrl()` by default uses `$preferFormat==relative`.
-        // The problem is that `$civicrm_paths['...']['url']` is interpreted as relative to CMS root,
-        // and `getUrl(..., 'relative')` is interpreted as relative to HTTP root.
-        // So this definition misbehaves on sites where the CMS root and HTTP root are different.
+        // The following *looks* OK, but it's not. Note that `getUrl()` by default uses `$preferFormat==relative`.
+        // Both registered URLs (`register()`, `$civicrm_paths`) and outputted URLs (`getUrl()`)
+        // can be in relative form. However, they are relative to different bases: registrations are
+        // relative to CMS root, and outputted URLs are relative to HTTP root. They are often the same, but...
+        // on deployments where they differ, this example will misbehave.
         'url' => $paths->getUrl('[test.base]/bad/'),
       ];
     });
