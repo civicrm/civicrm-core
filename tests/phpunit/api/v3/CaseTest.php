@@ -840,6 +840,53 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
+   * Test Case.Get does not return case clients as part of related contacts.
+   *
+   * For multi-client cases, case clients should not be returned in duplicates for contacts.
+   */
+  public function testCaseGetDoesNotReturnClientsAsPartOfRelatedContacts() {
+    $contact1 = $this->individualCreate(['first_name' => 'Aa', 'last_name' => 'Zz']);
+    $contact2 = $this->individualCreate(['first_name' => 'Bb', 'last_name' => 'Zz']);
+    $relContact = $this->individualCreate(['first_name' => 'Rel', 'last_name' => 'Contact']);
+
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => [$contact1, $contact2],
+      'subject' => "Test case 1",
+      'case_type_id' => $this->caseTypeId,
+    ]);
+
+    $relType = $this->relationshipTypeCreate(['name_a_b' => 'Test AB', 'name_b_a' => 'Test BA', 'contact_type_b' => 'Individual']);
+    $relContact = $this->individualCreate(['first_name' => 'First', 'last_name' => 'Last']);
+    $_REQUEST = [
+      'rel_type' => "{$relType}_b_a",
+      'rel_contact' => $relContact,
+      'case_id' => $case['id'],
+      'is_unit_test' => TRUE,
+    ];
+    CRM_Contact_Page_AJAX::relationship();
+
+    $result = $this->callAPISuccess('Case', 'get', [
+      'id' => $case['id'],
+      'sequential' => 1,
+      'return' => ['id', 'contacts'],
+    ]);
+
+    $caseContacts = $result['values'][0]['contacts'];
+    $contactIds = array_column($caseContacts, 'contact_id');
+    // We basically need to ensure that the case clients are not returned more than once.
+    // i.e there should be no duplicates for case clients.
+    $caseContactInstances = (array_count_values($contactIds));
+    $this->assertEquals(1, $caseContactInstances[$contact1]);
+    $this->assertEquals(1, $caseContactInstances[$contact2]);
+
+    // Verify that the case clients are not part of related contacts.
+    $relatedContacts = CRM_Case_BAO_Case::getRelatedContacts($case['id']);
+    $relatedContacts = array_column($relatedContacts, 'contact_id');
+    $this->assertNotContains($contact1, $relatedContacts);
+    $this->assertNotContains($contact2, $relatedContacts);
+  }
+
+  /**
    * Test the ability to add a timeline to an existing case.
    *
    * See the case.addtimeline api.
