@@ -131,7 +131,7 @@ class CRM_Case_Form_Activity_LinkCases {
    * @param array $params
    * @param CRM_Activity_BAO_Activity $activity
    */
-  public static function endPostProcess(&$form, &$params, &$activity) {
+  public static function endPostProcess($form, $params, $activity) {
     $activityId = $activity->id;
     $linkCaseID = $params['link_to_case_id'] ?? NULL;
 

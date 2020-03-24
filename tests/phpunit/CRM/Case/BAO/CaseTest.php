@@ -356,10 +356,49 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
 
-  /* FIXME: requires activities
-   * function testGetRelatedCases() {
-   * }
+  /**
+   * Test that getRelatedCases() returns the other case when you create a
+   * Link Cases activity on one of the cases.
    */
+  public function testGetRelatedCases() {
+    $loggedInUser = $this->createLoggedInUser();
+    // create some cases
+    $client_id_1 = $this->individualCreate([], 0);
+    $caseObj_1 = $this->createCase($client_id_1, $loggedInUser);
+    $case_id_1 = $caseObj_1->id;
+    $client_id_2 = $this->individualCreate([], 1);
+    $caseObj_2 = $this->createCase($client_id_2, $loggedInUser);
+    $case_id_2 = $caseObj_2->id;
+
+    // Create link case activity. We could go thru the whole form processes
+    // but we really just want to test the BAO function so just need the
+    // activity to exist.
+    $result = $this->callAPISuccess('activity', 'create', [
+      'activity_type_id' => 'Link Cases',
+      'subject' => 'Test Link Cases',
+      'status_id' => 'Completed',
+      'source_contact_id' => $loggedInUser,
+      'target_contact_id' => $client_id_1,
+      'case_id' => $case_id_1,
+    ]);
+
+    // Put it in the format needed for endPostProcess
+    $activity = new StdClass();
+    $activity->id = $result['id'];
+    $params = [
+      'link_to_case_id' => $case_id_2,
+    ];
+    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
+
+    // Get related cases for case 1
+    $cases = CRM_Case_BAO_Case::getRelatedCases($case_id_1);
+    // It should have case 2
+    $this->assertEquals($case_id_2, $cases[$case_id_2]['case_id']);
+
+    // Ditto but reverse the cases
+    $cases = CRM_Case_BAO_Case::getRelatedCases($case_id_2);
+    $this->assertEquals($case_id_1, $cases[$case_id_1]['case_id']);
+  }
 
   /**
    * Test various things after a case is closed.
