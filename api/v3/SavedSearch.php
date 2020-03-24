@@ -100,16 +100,19 @@ function civicrm_api3_saved_search_get($params) {
 }
 
 /**
- * This function unserializes the form_values in an SavedSearch API result.
+ * Unserialize the form_values field in SavedSearch API results.
+ *
+ * Note: APIv4 handles serialization automatically based on metadata.
  *
  * @param array $result API result to be cleaned up.
  */
 function _civicrm_api3_saved_search_result_cleanup(&$result) {
   if (isset($result['values']) && is_array($result['values'])) {
-    // Only clean up the values if there are values. (A getCount operation
-    // for example does not return values.)
+    // Only run if there are values (getCount for example does not return values).
     foreach ($result['values'] as $key => $value) {
-      $result['values'][$key]['form_values'] = \CRM_Utils_String::unserialize($value['form_values']);
+      if (isset($value['form_values'])) {
+        $result['values'][$key]['form_values'] = CRM_Utils_String::unserialize($value['form_values']);
+      }
     }
   }
 }
