@@ -210,7 +210,7 @@ abstract class SelectQuery {
       if (!isset($fkField['FKApiSpec'])) {
         $fkField['FKApiSpec'] = \_civicrm_api_get_fields($fkField['FKApiName']);
       }
-      $fieldInfo = \CRM_Utils_Array::value($fieldName, $fkField['FKApiSpec']);
+      $fieldInfo = $fkField['FKApiSpec'][$fieldName] ?? NULL;
 
       $keyColumn = \CRM_Utils_Array::value('FKKeyColumn', $fkField, 'id');
       if (!$fieldInfo || !isset($fkField['FKApiSpec'][$keyColumn])) {
@@ -259,7 +259,7 @@ abstract class SelectQuery {
   protected function getJoinInfo(&$fkField, $stack) {
     if ($fkField['name'] == 'entity_id') {
       $entityTableParam = substr(implode('.', $stack), 0, -2) . 'table';
-      $entityTable = \CRM_Utils_Array::value($entityTableParam, $this->where);
+      $entityTable = $this->where[$entityTableParam] ?? NULL;
       if ($entityTable && is_string($entityTable) && \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable)) {
         $fkField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable);
         $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getBriefName($fkField['FKClassName']);

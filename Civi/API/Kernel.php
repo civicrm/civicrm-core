@@ -325,8 +325,8 @@ class Kernel {
    */
   public function formatApiException($e, $apiRequest) {
     $data = $e->getExtraParams();
-    $data['entity'] = \CRM_Utils_Array::value('entity', $apiRequest);
-    $data['action'] = \CRM_Utils_Array::value('action', $apiRequest);
+    $data['entity'] = $apiRequest['entity'] ?? NULL;
+    $data['action'] = $apiRequest['action'] ?? NULL;
 
     if (\CRM_Utils_Array::value('debug', \CRM_Utils_Array::value('params', $apiRequest))
       // prevent recursion

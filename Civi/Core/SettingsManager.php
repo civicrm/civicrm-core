@@ -221,7 +221,7 @@ class SettingsManager {
       ]);
       $defaults = [];
       foreach ($specs as $key => $spec) {
-        $defaults[$key] = \CRM_Utils_Array::value('default', $spec);
+        $defaults[$key] = $spec['default'] ?? NULL;
       }
       \CRM_Utils_Array::extend($defaults, self::getSystemDefaults($entity));
       $this->cache->set($cacheKey, $defaults);

@@ -77,19 +77,19 @@ class Modules extends \CRM_Core_Page {
 
     switch ($event->asset) {
       case 'angular-modules.json':
-        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'application/json';
         $event->content = json_encode($page->getMetadata($moduleNames, $angular));
         break;
 
       case 'angular-modules.js':
-        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'application/javascript';
         $event->content = $page->digestJs($angular->getResources($moduleNames, 'js', 'path'));
         break;
 
       case 'angular-modules.css':
-        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'text/css';
         $event->content = \CRM_Utils_File::concat($angular->getResources($moduleNames, 'css', 'path'), "\n");
 
