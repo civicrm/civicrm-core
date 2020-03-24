@@ -149,19 +149,21 @@ class CustomValueTest extends BaseCustomValueTest {
       ->addValue("entity_id", $this->contactID)
       ->execute();
     // fetch custom values using API4 CustomValue::get
-    $result = CustomValue::get($group)->execute();
+    $result = CustomValue::get($group)
+      ->addOrderBy($colorField, 'DESC')
+      ->execute();
 
     // check if two custom values are created
     $this->assertEquals(2, count($result));
     $expectedResult = [
       [
-        'id' => 1,
-        $colorField => 'g',
+        'id' => 2,
+        $colorField => 'r',
         'entity_id' => $this->contactID,
       ],
       [
-        'id' => 2,
-        $colorField => 'r',
+        'id' => 1,
+        $colorField => 'g',
         'entity_id' => $this->contactID,
       ],
     ];

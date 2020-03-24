@@ -194,12 +194,8 @@ class Api4SelectQuery extends SelectQuery {
 
     // core return fields
     foreach ($select as $fieldName) {
-      $field = $this->getField($fieldName);
-      if (strpos($fieldName, '.') && !empty($this->fkSelectAliases[$fieldName]) && !array_filter($this->getPathJoinTypes($fieldName))) {
-        $this->selectFields[$this->fkSelectAliases[$fieldName]] = $fieldName;
-      }
-      elseif ($field && in_array($field['name'], $this->entityFieldNames)) {
-        $this->selectFields[self::MAIN_TABLE_ALIAS . "." . ($field['column_name'] ?? $field['name'])] = $field['name'];
+      if (strpos($fieldName, '.') === FALSE || !array_filter($this->getPathJoinTypes($fieldName))) {
+        $this->selectFields[$this->getFieldSqlName($fieldName)] = $fieldName;
       }
     }
   }
@@ -218,16 +214,11 @@ class Api4SelectQuery extends SelectQuery {
    * @inheritDoc
    */
   protected function buildOrderBy() {
-    foreach ($this->orderBy as $field => $dir) {
+    foreach ($this->orderBy as $fieldName => $dir) {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
-        throw new \API_Exception("Invalid sort direction. Cannot order by $field $dir");
+        throw new \API_Exception("Invalid sort direction. Cannot order by $fieldName $dir");
       }
-      if ($this->getField($field)) {
-        $this->query->orderBy(self::MAIN_TABLE_ALIAS . '.' . $field . " $dir");
-      }
-      else {
-        throw new \API_Exception("Invalid sort field. Cannot order by $field $dir");
-      }
+      $this->query->orderBy($this->getFieldSqlName($fieldName) . " $dir");
     }
   }
 
@@ -279,30 +270,40 @@ class Api4SelectQuery extends SelectQuery {
    */
   protected function validateClauseAndComposeSql($clause) {
     // Pad array for unary operators
-    list($key, $operator, $value) = array_pad($clause, 3, NULL);
-    $fieldSpec = $this->getField($key);
-    // derive table and column:
-    $table_name = NULL;
-    $column_name = NULL;
-    if (in_array($key, $this->entityFieldNames)) {
-      $table_name = self::MAIN_TABLE_ALIAS;
-      $column_name = $key;
-    }
-    elseif (strpos($key, '.') && isset($this->fkSelectAliases[$key])) {
-      list($table_name, $column_name) = explode('.', $this->fkSelectAliases[$key]);
-    }
-
-    if (!$table_name || !$column_name) {
-      throw new \API_Exception("Invalid field '$key' in where clause.");
-    }
+    list($fieldName, $operator, $value) = array_pad($clause, 3, NULL);
+    $fieldSpec = $this->getField($fieldName);
+    $sqlName = $this->getFieldSqlName($fieldName);
 
     FormattingUtil::formatInputValue($value, $fieldSpec, $this->getEntity());
 
-    $sql_clause = \CRM_Core_DAO::createSQLFilter("`$table_name`.`$column_name`", [$operator => $value]);
+    $sql_clause = \CRM_Core_DAO::createSQLFilter($sqlName, [$operator => $value]);
     if ($sql_clause === NULL) {
-      throw new \API_Exception("Invalid value in where clause for field '$key'");
+      throw new \API_Exception("Invalid value in where clause for field '$fieldName'");
     }
     return $sql_clause;
+  }
+
+  /**
+   * Translates an api fieldname to the table.column name used in the query.
+   *
+   * @param $fieldName
+   * @return string
+   * @throws \API_Exception
+   */
+  protected function getFieldSqlName($fieldName) {
+    $tableName = $columnName = NULL;
+    if (in_array($fieldName, $this->entityFieldNames)) {
+      $field = $this->getField($fieldName);
+      $tableName = self::MAIN_TABLE_ALIAS;
+      $columnName = $field['column_name'] ?? $field['name'];
+    }
+    elseif (strpos($fieldName, '.') && isset($this->fkSelectAliases[$fieldName])) {
+      list($tableName, $columnName) = explode('.', $this->fkSelectAliases[$fieldName]);
+    }
+    if (!$tableName || !$columnName) {
+      throw new \API_Exception("Invalid field '$fieldName'.");
+    }
+    return "`$tableName`.`$columnName`";
   }
 
   /**
