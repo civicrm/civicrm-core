@@ -20,7 +20,6 @@ use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\SelectUtil;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
-use CRM_Utils_Array as UtilsArray;
 
 /**
  * A query `node` may be in one of three formats:
@@ -200,7 +199,7 @@ class Api4SelectQuery extends SelectQuery {
         $this->selectFields[$this->fkSelectAliases[$fieldName]] = $fieldName;
       }
       elseif ($field && in_array($field['name'], $this->entityFieldNames)) {
-        $this->selectFields[self::MAIN_TABLE_ALIAS . "." . UtilsArray::value('column_name', $field, $field['name'])] = $field['name'];
+        $this->selectFields[self::MAIN_TABLE_ALIAS . "." . ($field['column_name'] ?? $field['name'])] = $field['name'];
       }
     }
   }
@@ -326,7 +325,7 @@ class Api4SelectQuery extends SelectQuery {
       if (count($fieldPath) > 1) {
         $fieldName = implode('.', array_slice($fieldPath, -2));
       }
-      return UtilsArray::value($fieldName, $this->apiFieldSpec);
+      return $this->apiFieldSpec[$fieldName] ?? NULL;
     }
     return NULL;
   }
