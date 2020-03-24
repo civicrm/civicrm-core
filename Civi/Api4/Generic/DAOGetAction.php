@@ -21,6 +21,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Query\Api4SelectQuery;
+
 /**
  * Retrieve $ENTITIES based on criteria specified in the `where` parameter.
  *
@@ -46,6 +48,19 @@ class DAOGetAction extends AbstractGetAction {
     $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
     $result->exchangeArray($this->getObjects());
+  }
+
+  /**
+   * @return array|int
+   */
+  protected function getObjects() {
+    $query = new Api4SelectQuery($this);
+
+    $result = $query->run();
+    if (is_array($result)) {
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
+    }
+    return $result;
   }
 
 }

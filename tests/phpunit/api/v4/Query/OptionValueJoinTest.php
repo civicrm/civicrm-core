@@ -48,7 +48,8 @@ class OptionValueJoinTest extends UnitTestCase {
   }
 
   public function testCommunicationMethodJoin() {
-    $query = new Api4SelectQuery('Contact', FALSE, civicrm_api4('Contact', 'getFields', ['includeCustom' => FALSE, 'checkPermissions' => FALSE, 'action' => 'get'], 'name'));
+    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
+    $query = new Api4SelectQuery($api);
     $query->select[] = 'first_name';
     $query->select[] = 'preferred_communication_method.label';
     $query->where[] = ['preferred_communication_method', 'IS NOT NULL'];

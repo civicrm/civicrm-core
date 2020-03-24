@@ -85,7 +85,7 @@ abstract class SelectQuery {
     $baoName = _civicrm_api3_get_BAO($entity);
     $bao = new $baoName();
 
-    $this->entityFieldNames = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($bao));
+    $this->entityFieldNames = array_column($baoName::fields(), 'name');
     $this->apiFieldSpec = $this->getFields();
 
     $this->query = \CRM_Utils_SQL_Select::from($bao->tableName() . ' ' . self::MAIN_TABLE_ALIAS);
