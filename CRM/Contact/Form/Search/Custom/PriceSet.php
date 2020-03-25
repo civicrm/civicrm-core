@@ -87,28 +87,33 @@ FROM   civicrm_contact c,
        civicrm_participant p
 WHERE  p.contact_id = c.id
   AND  p.is_test    = 0
-  AND  p.event_id = {$this->_eventID}
+  AND  p.event_id = %1
   AND  p.status_id NOT IN (4,11,12)
   AND  ( c.is_deleted = 0 OR c.is_deleted IS NULL )
 ";
-    CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql, [1 => [$this->_eventID, 'Positive']]);
 
     $sql = "
-SELECT c.id as contact_id,
-       p.id as participant_id,
-       l.price_field_value_id as price_field_value_id,
-       l.qty
-FROM   civicrm_contact c,
-       civicrm_participant  p,
-       civicrm_line_item    l
-WHERE  c.id = p.contact_id
-AND    p.event_id = {$this->_eventID}
-AND    p.id = l.entity_id
-AND    l.entity_table ='civicrm_participant'
-ORDER BY c.id, l.price_field_value_id;
-";
+      SELECT c.id as contact_id,
+        p.id as participant_id,
+        l.price_field_value_id AS price_field_value_id,
+        l.qty
+      FROM civicrm_contact c
+        INNER JOIN civicrm_participant p
+          ON p.contact_id = c.id AND c.is_deleted = 0
+        INNER JOIN civicrm_line_item l
+          ON p.id = l.entity_id AND l.entity_table ='civicrm_participant'
+        INNER JOIN civicrm_price_field_value cpfv
+          ON cpfv.id = l.price_field_value_id AND cpfv.is_active = 1
+        INNER JOIN civicrm_price_field cpf
+          ON cpf.id = l.price_field_id AND cpf.is_active = 1
+        INNER JOIN civicrm_price_set cps
+          ON cps.id = cpf.price_set_id AND cps.is_active = 1
+      WHERE  p.event_id = %1
+      ORDER BY c.id, l.price_field_value_id;
+    ";
 
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$this->_eventID, 'Positive']]);
 
     // first store all the information by option value id
     $rows = [];
