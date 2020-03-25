@@ -326,6 +326,7 @@ FROM   civicrm_prevnext_cache pn
    * @return array
    */
   public static function convertSetItemValues($sqlValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
     $closingBrace = strpos($sqlValues, ')') - strlen($sqlValues);
     $valueArray = array_map('trim', explode(', ', substr($sqlValues, strpos($sqlValues, '(') + 1, $closingBrace - 1)));
     foreach ($valueArray as $key => &$value) {
@@ -462,7 +463,13 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
     }
   }
 
+  /**
+   * Old function to clean up he cache.
+   *
+   * @deprecated.
+   */
   public static function cleanupCache() {
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
     Civi::service('prevnext')->cleanup();
   }
 
@@ -476,6 +483,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    * @see CRM_Core_PrevNextCache_Sql::getSelection()
    */
   public static function getSelection($cacheKey, $action = 'get') {
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
     return Civi::service('prevnext')->getSelection($cacheKey, $action);
   }
 
@@ -533,6 +541,8 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    * @param array $fieldDef
    * @param int $counter
    *   The globally-unique ID of the test object.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     if ($fieldName === 'cachekey') {

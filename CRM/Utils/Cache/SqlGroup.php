@@ -211,8 +211,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   public function flush() {
     if ($this->group == CRM_Utils_Cache::cleanKey('CiviCRM Search PrevNextCache') &&
       Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
-      // Use the standard PrevNextCache cleanup function here not just delete from civicrm_cache
-      CRM_Core_BAO_PrevNextCache::cleanupCache();
+      Civi::service('prevnext')->cleanup();
     }
     else {
       CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where()}");
