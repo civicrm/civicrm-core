@@ -109,4 +109,27 @@ class Api4SelectQueryTest extends UnitTestCase {
     $this->assertCount(2, $result['phones']);
   }
 
+  public function testInvaidSort() {
+    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
+    $query = new Api4SelectQuery($api);
+    $query->select[] = 'id';
+    $query->select[] = 'first_name';
+    $query->select[] = 'phones.phone';
+    $query->where[] = ['first_name', '=', 'Phoney'];
+    $query->orderBy = ['first_name' => 'sleep(1)'];
+    try {
+      $results = $query->run();
+      $this->fail('An Exception Should have been raised');
+    }
+    catch (\API_Exception $e) {
+    }
+    $query->orderBy = ['sleep(1)', 'ASC'];
+    try {
+      $results = $query->run();
+      $this->fail('An Exception Should have been raised');
+    }
+    catch (\API_Exception $e) {
+    }
+  }
+
 }
