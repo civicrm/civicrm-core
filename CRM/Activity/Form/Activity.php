@@ -227,6 +227,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
@@ -629,7 +631,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // Enable form element (ActivityLinks sets this true).
     $this->assign('suppressForm', FALSE);
 
-    $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
+    $element = $this->add('select', 'activity_type_id', ts('Activity Type'),
       ['' => '- ' . ts('select') . ' -'] + $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, [
         'onchange' => "CRM.buildCustomData( 'Activity', this.value, false, false, false, false, false, false, {$this->_currentlyViewedContactId});",
