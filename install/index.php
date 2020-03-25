@@ -138,6 +138,11 @@ global $tsLocale;
 $tsLocale = 'en_US';
 $seedLanguage = 'en_US';
 
+// Backwards compatibility with default location of l10n files
+if (!defined('CIVICRM_L10N_BASEDIR') && file_exists($crmPath . DIRECTORY_SEPARATOR . 'l10n')) {
+  define('CIVICRM_L10N_BASEDIR', $crmPath . DIRECTORY_SEPARATOR . 'l10n');
+}
+
 // CRM-16801 This validates that seedLanguage is valid by looking in $langs.
 // NB: the variable is initial a $_REQUEST for the initial page reload,
 // then becomes a $_POST when the installation form is submitted.
