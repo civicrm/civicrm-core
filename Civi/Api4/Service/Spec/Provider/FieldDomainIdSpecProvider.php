@@ -23,26 +23,23 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class NavigationSpecProvider implements Generic\SpecProviderInterface {
+class FieldDomainIdSpecProvider implements Generic\SpecProviderInterface {
 
   /**
-   * This runs for both create and get actions
-   *
-   * @fixme - for 'create', this is redundant with FieldDomainIdSpecProvider.
-   * @fixme - for 'get', this is inconsistent with other entities which do not set this default. We should standardize on setting or not setting it.
-   * @see FieldDomainIdSpecProvider
-   *
-   * @inheritDoc
+   * Generic create spec function to set sensible defaults for any entity with a "domain_id" field.
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('domain_id')->setRequired(FALSE)->setDefaultValue('current_domain');
+    $domainIdField = $spec->getFieldByName('domain_id');
+    if ($domainIdField) {
+      $domainIdField->setRequired(FALSE)->setDefaultValue('current_domain');;
+    }
   }
 
   /**
    * @inheritDoc
    */
   public function applies($entity, $action) {
-    return $entity === 'Navigation' && in_array($action, ['create', 'get']);
+    return $action === 'create';
   }
 
 }

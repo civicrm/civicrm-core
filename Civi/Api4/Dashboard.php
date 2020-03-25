@@ -18,25 +18,20 @@
  *
  */
 
+namespace Civi\Api4;
 
-namespace Civi\Api4\Service\Spec\Provider;
-
-use Civi\Api4\Service\Spec\RequestSpec;
-
-class UFMatchCreationSpecProvider implements Generic\SpecProviderInterface {
-
-  /**
-   * @inheritDoc
-   */
-  public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('domain_id')->setRequired(FALSE);
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function applies($entity, $action) {
-    return $entity === 'UFMatch' && $action === 'create';
-  }
+/**
+ * Dashboard entity.
+ *
+ * A "dashboard" record represents an item that can be displayed on a user's home screen.
+ * E.g. the "News" or "Getting Started" dashboard items.
+ *
+ * Dashboards can also be created from CiviReports, and some extensions provide dashboards as well.
+ * Displaying an item to a user is done with the `DashboardContact` entity.
+ *
+ * @see \Civi\Api4\DashboardContact
+ * @package Civi\Api4
+ */
+class Dashboard extends Generic\DAOEntity {
 
 }

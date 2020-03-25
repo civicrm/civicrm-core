@@ -28,7 +28,6 @@ class PaymentProcessorCreationSpecProvider implements Generic\SpecProviderInterf
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('domain_id')->setRequired(FALSE)->setDefaultValue('current_domain');
     // Billing mode is copied across from the payment processor type field in the BAO::create function.
     $spec->getFieldByName('billing_mode')->setRequired(FALSE);
 

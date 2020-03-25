@@ -44,7 +44,12 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  public function testDashboardCreate() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDashboardCreate($version) {
+    $this->_apiversion = $version;
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $params = [
       'label' => 'New Dashlet element',
@@ -62,11 +67,12 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19534.
-   *
-   * Ensure that Dashboard create works fine for non admins
+   * CRM-19534. Ensure that Dashboard create works fine for non admins
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDashboardCreateByNonAdmins() {
+  public function testDashboardCreateByNonAdmins($version) {
+    $this->_apiversion = $version;
     $loggedInContactID = $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $params = [
@@ -84,11 +90,12 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19217.
-   *
-   * Ensure that where is_active is specifically set to 0 is_active returns 0.
+   * CRM-19217. Ensure that where is_active is specifically set to 0 is_active returns 0.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDashboardCreateNotActive() {
+  public function testDashboardCreateNotActive($version) {
+    $this->_apiversion = $version;
     $params = [
       'label' => 'New Dashlet element',
       'name' => 'New Dashlet element',

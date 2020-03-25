@@ -18,25 +18,16 @@
  *
  */
 
+namespace Civi\Api4;
 
-namespace Civi\Api4\Service\Spec\Provider;
-
-use Civi\Api4\Service\Spec\RequestSpec;
-
-class StatusPreferenceCreationSpecProvider implements Generic\SpecProviderInterface {
-
-  /**
-   * @inheritDoc
-   */
-  public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('domain_id')->setRequired(FALSE);
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function applies($entity, $action) {
-    return $entity === 'StatusPreference' && $action === 'create';
-  }
+/**
+ * DashboardContact entity.
+ *
+ * This places a dashboard item on a user's home screen.
+ *
+ * @see \Civi\Api4\Dashboard
+ * @package Civi\Api4
+ */
+class DashboardContact extends Generic\DAOEntity {
 
 }

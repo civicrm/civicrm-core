@@ -65,12 +65,8 @@ function civicrm_api3_dashboard_get($params) {
  *   Array holding 'id' of dashlet to be deleted.
  * @return array
  * @throws API_Exception
+ * @throws CiviCRM_API3_Exception
  */
 function civicrm_api3_dashboard_delete($params) {
-  if (CRM_Core_BAO_Dashboard::deleteDashlet($params['id'])) {
-    return civicrm_api3_create_success(1, $params, 'Dashboard', 'delete');
-  }
-  else {
-    throw new API_Exception('Could not delete dashlet');
-  }
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
