@@ -227,14 +227,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
-    $this->_atypefile = $_GET['atypefile'] ?? NULL;
-    $this->assign('atypefile', FALSE);
-    if ($this->_atypefile) {
-      $this->assign('atypefile', TRUE);
-    }
 
     $session = CRM_Core_Session::singleton();
     $this->_currentUserId = CRM_Core_Session::getLoggedInContactID();
