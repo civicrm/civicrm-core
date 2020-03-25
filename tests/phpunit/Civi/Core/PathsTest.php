@@ -101,4 +101,55 @@ class PathsTest extends \CiviUnitTestCase {
     $this->assertEquals("$cmsRoot/foo", $p->getUrl('foo'));
   }
 
+  /**
+   * This test demonstrates how to (and how not to) compute a derivative path variable.
+   */
+  public function testAbsoluteRelativeConversions() {
+    $gstack = \CRM_Utils_GlobalStack::singleton();
+    $gstack->push(['_SERVER' => ['HTTP_HOST' => 'example.com']]);
+    $cleanup = \CRM_Utils_AutoClean::with([$gstack, 'pop']);
+
+    $paths = new Paths();
+    $paths->register('test.base', function () {
+      return [
+        'path' => '/var/foo/',
+        'url' => 'http://example.com/foo/',
+      ];
+    });
+    $paths->register('test.goodsub', function () use ($paths) {
+      // This is a stand-in for how [civicrm.bower], [civicrm.packages], [civicrm.vendor] currently work.
+      return [
+        'path' => $paths->getPath('[test.base]/good/'),
+        'url' => $paths->getUrl('[test.base]/good/', 'absolute'),
+      ];
+    });
+    $paths->register('test.badsub', function () use ($paths) {
+      // This is a stand-in for how [civicrm.bower], [civicrm.packages], [civicrm.vendor] used to work (incorrectly).
+      return [
+        'path' => $paths->getPath('[test.base]/bad/'),
+        // The following *looks* OK, but it's not. Note that `getUrl()` by default uses `$preferFormat==relative`.
+        // Both registered URLs (`register()`, `$civicrm_paths`) and outputted URLs (`getUrl()`)
+        // can be in relative form. However, they are relative to different bases: registrations are
+        // relative to CMS root, and outputted URLs are relative to HTTP root. They are often the same, but...
+        // on deployments where they differ, this example will misbehave.
+        'url' => $paths->getUrl('[test.base]/bad/'),
+      ];
+    });
+
+    // The test.base works as explicitly defined...
+    $this->assertEquals('/var/foo', $paths->getPath('[test.base]/.'));
+    $this->assertEquals('http://example.com/foo', $paths->getUrl('[test.base]/.', 'absolute'));
+    $this->assertEquals('/foo', $paths->getUrl('[test.base]/.', 'relative'));
+
+    // The test.goodsub works as expected...
+    $this->assertEquals('/var/foo/good', $paths->getPath('[test.goodsub]/.'));
+    $this->assertEquals('http://example.com/foo/good', $paths->getUrl('[test.goodsub]/.', 'absolute'));
+    $this->assertEquals('/foo/good', $paths->getUrl('[test.goodsub]/.', 'relative'));
+
+    // The test.badsub doesn't work as expected.
+    $this->assertEquals('/var/foo/bad', $paths->getPath('[test.badsub]/.'));
+    $this->assertNotEquals('http://example.com/foo/bad', $paths->getUrl('[test.badsub]/.', 'absolute'));
+    $this->assertNotEquals('/foo/bad', $paths->getUrl('[test.badsub]/.', 'relative'));
+  }
+
 }
