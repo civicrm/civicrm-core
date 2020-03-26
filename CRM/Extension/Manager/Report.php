@@ -53,7 +53,6 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
     $weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
       ['option_group_id' => $this->groupId]
     );
-    $ids = [];
     $params = [
       'label' => $info->label . ' (' . $info->key . ')',
       'value' => $info->typeInfo['reportUrl'],
@@ -65,7 +64,7 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
       'is_active' => 1,
     ];
 
-    $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
+    $optionValue = CRM_Core_BAO_OptionValue::add($params);
   }
 
   /**

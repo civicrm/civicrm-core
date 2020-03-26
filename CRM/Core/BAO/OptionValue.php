@@ -31,17 +31,14 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params
    *   Input parameters.
    *
-   * @return object
+   * @return CRM_Core_DAO_OptionValue
+   * @throws \CRM_Core_Exception
    */
   public static function create($params) {
     if (empty($params['id'])) {
       self::setDefaults($params);
     }
-    $ids = [];
-    if (!empty($params['id'])) {
-      $ids = ['optionValue' => $params['id']];
-    }
-    return CRM_Core_BAO_OptionValue::add($params, $ids);
+    return CRM_Core_BAO_OptionValue::add($params);
   }
 
   /**
@@ -151,9 +148,14 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *   deprecated Reference array contains the id.
    *
    * @return \CRM_Core_DAO_OptionValue
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function add(&$params, $ids = []) {
+    if (!empty($ids['optionValue']) && empty($params['id'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('$params[\'id\'] should be set, $ids is deprecated');
+    }
     $id = $params['id'] ?? $ids['optionValue'] ?? NULL;
     // CRM-10921: do not reset attributes to default if this is an update
     //@todo consider if defaults are being set in the right place. 'dumb' defaults like

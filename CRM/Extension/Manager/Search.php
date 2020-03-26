@@ -55,8 +55,7 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
       'is_active' => 1,
     ];
 
-    $ids = [];
-    $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
+    $optionValue = CRM_Core_BAO_OptionValue::add($params);
 
     return $optionValue ? TRUE : FALSE;
   }
