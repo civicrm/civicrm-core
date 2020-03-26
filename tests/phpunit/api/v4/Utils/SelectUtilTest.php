@@ -42,6 +42,12 @@ class SelectUtilTest extends UnitTestCase {
     'reset_date',
     'signature_text',
     'signature_html',
+    'contact.id',
+    'contact.display_name',
+    'contact.sort_name',
+    'contact.phone.id',
+    'contact.phone.phone',
+    'contact.phone.phone_type_id',
   ];
 
   public function getSelectExamples() {
@@ -52,6 +58,8 @@ class SelectUtilTest extends UnitTestCase {
       ['one', ['o*', 'two'], TRUE],
       ['one', ['*o', 'two'], FALSE],
       ['zoo', ['one', 'two'], FALSE],
+      ['one.id', ['one.id', 'two'], TRUE],
+      ['one.id', ['one.*', 'two'], TRUE],
     ];
   }
 
@@ -67,7 +75,7 @@ class SelectUtilTest extends UnitTestCase {
 
   public function getMatchingExamples() {
     return [
-      [$this->emailFieldNames, '*'],
+      [array_slice($this->emailFieldNames, 0, 12), '*'],
       [[], 'nothing'],
       [['email'], 'email'],
       [['contact_id', 'location_type_id'], '*_id'],
@@ -75,6 +83,10 @@ class SelectUtilTest extends UnitTestCase {
       [['contact_id'], 'con*_id'],
       [['is_primary', 'is_billing', 'is_bulkmail'], 'is_*'],
       [['is_billing', 'is_bulkmail'], 'is_*l*'],
+      [['contact.id', 'contact.display_name', 'contact.sort_name'], 'contact.*'],
+      [['contact.display_name', 'contact.sort_name'], 'contact.*_name'],
+      [['contact.phone.id', 'contact.phone.phone', 'contact.phone.phone_type_id'], 'contact.phone.*'],
+      [['contact.phone.phone', 'contact.phone.phone_type_id'], 'contact.phone.phone*'],
     ];
   }
 
