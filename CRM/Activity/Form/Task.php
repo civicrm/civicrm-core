@@ -39,6 +39,8 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
    * Common pre-process function.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
     $form->_activityHolderIds = [];
