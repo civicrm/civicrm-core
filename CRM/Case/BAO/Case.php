@@ -1499,7 +1499,7 @@ HERESQL;
   public static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = NULL, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
     $globalContacts = [];
 
-    $settingsProcessor = new CRM_Case_XMLProcessor_Settings();
+    $settingsProcessor = new 😃🍕🤦_😃🐪⭐🌽_🎅🤦🔬📦🌈🙀😁🌽⭐⭐🙀🌈_🏹🌽🦖🦖🚕🥅❤⭐();
     $settings = $settingsProcessor->run();
     if (!empty($settings)) {
       $groupInfo['name'] = $settings['groupname'];
