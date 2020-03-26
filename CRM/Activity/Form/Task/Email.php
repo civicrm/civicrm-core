@@ -35,7 +35,7 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
    *
    * @var array
    */
-  public $_templates = NULL;
+  public $_templates;
 
   /**
    * Build all the data structures needed to build the form.
@@ -43,10 +43,7 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
   public function preProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     parent::preProcess();
-
-    // we have all the contribution ids, so now we get the contact ids
-    parent::setContactIDs();
-
+    $this->setContactIDs();
     $this->assign('single', $this->_single);
   }
 
@@ -56,7 +53,6 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
   public function buildQuickForm() {
     // Enable form element.
     $this->assign('emailTask', TRUE);
-
     CRM_Contact_Form_Task_EmailCommon::buildQuickForm($this);
   }
 
@@ -73,8 +69,7 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
    * @return array
    */
   public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    return $tokens;
+    return CRM_Core_SelectValues::contactTokens();
   }
 
 }
