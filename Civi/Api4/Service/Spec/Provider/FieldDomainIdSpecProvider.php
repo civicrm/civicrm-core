@@ -31,7 +31,7 @@ class FieldDomainIdSpecProvider implements Generic\SpecProviderInterface {
   public function modifySpec(RequestSpec $spec) {
     $domainIdField = $spec->getFieldByName('domain_id');
     if ($domainIdField) {
-      $domainIdField->setRequired(FALSE)->setDefaultValue('current_domain');;
+      $domainIdField->setRequired(FALSE);
     }
   }
 
