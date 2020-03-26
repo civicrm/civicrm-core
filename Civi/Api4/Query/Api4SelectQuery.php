@@ -394,7 +394,7 @@ class Api4SelectQuery extends SelectQuery {
       $col = ($lastLink instanceof CustomGroupJoinable) ? $lastLink->getSqlColumn($field) : $field;
       // Check Permission on field.
       if ($this->checkPermissions && !empty($this->apiFieldSpec[$prefix . $field]['permission']) && !\CRM_Core_Permission::check($this->apiFieldSpec[$prefix . $field]['permission'])) {
-        return;
+        continue;
       }
       $this->fkSelectAliases[$pathString . '.' . $field] = sprintf('%s.%s', $lastLink->getAlias(), $col);
     }
