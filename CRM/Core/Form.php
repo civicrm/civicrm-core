@@ -1317,6 +1317,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $displayTime
    */
   public function addDateRange($name, $from = '_from', $to = '_to', $label = 'From:', $dateFormat = 'searchDate', $required = FALSE, $displayTime = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Core_Form::addDatePickerRange insted');
     if ($displayTime) {
       $this->addDateTime($name . $from, $label, $required, ['formatType' => $dateFormat]);
       $this->addDateTime($name . $to, ts('To:'), $required, ['formatType' => $dateFormat]);
