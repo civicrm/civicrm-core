@@ -80,12 +80,15 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * @throws \API_Exception
    */
   protected function expandSelectClauseWildcards() {
-    foreach ($this->select as $item) {
-      if (strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE) {
-        $this->select = array_diff($this->select, [$item]);
-        $this->select = array_unique(array_merge($this->select, SelectUtil::getMatchingFields($item, array_column($this->entityFields(), 'name'))));
-      }
+    $wildFields = array_filter($this->select, function($item) {
+      return strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE;
+    });
+    foreach ($wildFields as $item) {
+      $pos = array_search($item, array_values($this->select));
+      $matches = SelectUtil::getMatchingFields($item, array_column($this->entityFields(), 'name'));
+      array_splice($this->select, $pos, 1, $matches);
     }
+    $this->select = array_unique($this->select);
   }
 
   /**

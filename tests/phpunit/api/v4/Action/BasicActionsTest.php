@@ -197,4 +197,25 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertTrue($isFieldSelected->invoke($get, 'group'));
   }
 
+  public function testWildcardSelect() {
+    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
+
+    $records = [
+      ['group' => 'one', 'color' => 'red', 'shape' => 'round', 'size' => 'med', 'weight' => 10],
+      ['group' => 'two', 'color' => 'blue', 'shape' => 'round', 'size' => 'med', 'weight' => 20],
+    ];
+    MockBasicEntity::save()->setRecords($records)->execute();
+
+    foreach (MockBasicEntity::get()->addSelect('*')->execute() as $result) {
+      ksort($result);
+      $this->assertEquals(['color', 'group', 'id', 'shape', 'size', 'weight'], array_keys($result));
+    }
+
+    $result = MockBasicEntity::get()
+      ->addSelect('*e', 'weig*ht')
+      ->execute()
+      ->first();
+    $this->assertEquals(['shape', 'size', 'weight'], array_keys($result));
+  }
+
 }
