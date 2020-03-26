@@ -93,6 +93,62 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test multiple payments for contribution and assert if option
+   * and is_payment returns the correct list of payments.
+   */
+  public function testMultiplePaymentsForContribution() {
+    $params = [
+      'contact_id' => $this->_individualId,
+      'total_amount' => 100,
+      'contribution_status_id' => 5,
+    ];
+    $contributionID = $this->contributionCreate($params);
+    $paymentParams = [
+      'contribution_id' => $contributionID,
+      'total_amount' => 20,
+      'trxn_date' => date('Y-m-d'),
+    ];
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+    $paymentParams['total_amount'] = 30;
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+
+    //check if contribution status is set to "In Progress".
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contributionID,
+    ]);
+    $this->assertEquals('In Progress', $contribution['contribution_status']);
+
+    $paymentParams['total_amount'] = 50;
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+
+    //check if contribution status is set to "Completed".
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contributionID,
+    ]);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    //Get Payment using options
+    $getParams = [
+      'sequential' => 1,
+      'contribution_id' => $contributionID,
+      'is_payment' => 1,
+      'options' => ['limit' => 0, 'sort' => "total_amount DESC"],
+    ];
+    $payments = $this->callAPISuccess('Payment', 'get', $getParams);
+    $this->assertEquals(3, $payments['count']);
+    foreach ([50, 30, 20] as $key => $total_amount) {
+      $this->assertEquals($total_amount, $payments['values'][$key]['total_amount']);
+    }
+
+    $getParams['is_payment'] = 0;
+    $payments = $this->callAPISuccess('Payment', 'get', $getParams);
+    $this->assertEquals(2, $payments['count']);
+    //contributionCreate records total_amount = 100 and fee amount = 5.00.
+    $this->assertEquals(100.00, $payments['values'][0]['total_amount']);
+    $this->assertEquals(5.00, $payments['values'][1]['total_amount']);
+  }
+
+  /**
    * Retrieve Payment using trxn_id.
    *
    * @throws \CRM_Core_Exception
