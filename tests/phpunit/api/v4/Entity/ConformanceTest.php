@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -57,10 +55,16 @@ class ConformanceTest extends UnitTestCase {
     $this->loadDataSet('ConformanceTest');
     $this->creationParamProvider = \Civi::container()->get('test.param_provider');
     parent::setUp();
-    // calculateTaxAmount() for contribution triggers a deprecation notice
-    \PHPUnit\Framework\Error\Deprecated::$enabled = FALSE;
   }
 
+  /**
+   * Get entities to test.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function getEntities() {
     return Entity::get()->setCheckPermissions(FALSE)->execute()->column('name');
   }
@@ -97,7 +101,7 @@ class ConformanceTest extends UnitTestCase {
 
   /**
    * @param string $entityClass
-   * @param $entity
+   * @param string $entity
    */
   protected function checkFields($entityClass, $entity) {
     $fields = $entityClass::getFields()
@@ -114,6 +118,8 @@ class ConformanceTest extends UnitTestCase {
 
   /**
    * @param string $entityClass
+   *
+   * @return array
    */
   protected function checkActions($entityClass) {
     $actions = $entityClass::getActions()
