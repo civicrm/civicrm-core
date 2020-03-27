@@ -76,6 +76,9 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     // store case id if present
@@ -110,9 +113,12 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     else {
       CRM_Utils_System::setTitle(ts('New Email'));
     }
+    if ($this->_context === 'search') {
+      $this->_single = TRUE;
+    }
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
 
-    if (!$cid && $this->_context != 'standalone') {
+    if (!$cid && $this->_context !== 'standalone') {
       parent::preProcess();
     }
 
