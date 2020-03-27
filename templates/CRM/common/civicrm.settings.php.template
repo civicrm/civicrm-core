@@ -456,6 +456,21 @@ if (!defined('CIVICRM_PSR16_STRICT')) {
 // }
 
 /**
+ * By default CiviCRM is set to TRUE the Smarty option compile_check, 
+ * which forces to recompile Smarty templates on every call. 
+ * Recompiling does not need to happen unless a template or config file is changed. 
+ * Typically you enable this during development, and disable for production. 
+ * To disable this set this to FALSE.
+ *
+ * For more information:
+ * https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#disable-compile-check
+ */
+// if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK')) {
+// define('CIVICRM_TEMPLATE_COMPILE_CHECK', TRUE);
+// } 
+
+
+/**
  * Define how many times to retry a transaction when the DB hits a deadlock
  * (ie. the database is locked by another transaction). This is an
  * advanced setting intended for high-traffic databases & experienced developers/ admins.
