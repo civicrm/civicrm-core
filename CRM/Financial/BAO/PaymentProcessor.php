@@ -42,6 +42,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         'return' => 'payment_instrument_id',
       ]);
     }
+    if (empty($params['id']) && empty($params['domain_id'])) {
+      $params['domain_id'] = $params['domain_id'] ?? CRM_Core_Config::domainID();
+    }
     $processor = new CRM_Financial_DAO_PaymentProcessor();
     $processor->copyValues($params);
 
