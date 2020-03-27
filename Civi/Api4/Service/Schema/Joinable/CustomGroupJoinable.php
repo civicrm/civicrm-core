@@ -59,7 +59,7 @@ class CustomGroupJoinable extends Joinable {
     if (!$this->entityFields) {
       $fields = CustomField::get()
         ->setCheckPermissions(FALSE)
-        ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_required', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value', 'date_format', 'time_format', 'start_date_years', 'end_date_years'])
+        ->setSelect(['custom_group.name', '*'])
         ->addWhere('custom_group.table_name', '=', $this->getTargetTable())
         ->execute();
       foreach ($fields as $field) {

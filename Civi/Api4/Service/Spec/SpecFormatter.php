@@ -61,8 +61,8 @@ class SpecFormatter {
       }
       else {
         $field->setCustomTableName($data['custom_group.table_name']);
-        $field->setCustomFieldColumnName($data['column_name']);
       }
+      $field->setColumnName($data['column_name']);
       $field->setCustomFieldId($data['id'] ?? NULL);
       $field->setCustomGroupName($data['custom_group.name']);
       $field->setTitle($data['label'] ?? NULL);

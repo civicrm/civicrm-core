@@ -210,7 +210,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
     $selectFields = [];
 
     foreach ($selects as $select) {
-      $selectAlias = $query->getFkSelectAliases()[$select];
+      $selectAlias = str_replace('`', '', $query->getField($select)['sql_name']);
       $fieldAlias = substr($select, strrpos($select, '.') + 1);
       $selectFields[$fieldAlias] = $selectAlias;
     }

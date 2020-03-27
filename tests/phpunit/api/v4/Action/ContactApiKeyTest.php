@@ -33,9 +33,6 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'edit api keys', 'view all contacts', 'edit all contacts'];
     $key = \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $isSafe = function ($mixed) use ($key) {
-      if ($mixed instanceof Result) {
-        $mixed = $mixed->getArrayCopy();
-      }
       return strpos(json_encode($mixed), $key) === FALSE;
     };
 
@@ -69,28 +66,31 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     $this->assertFalse($isSafe($email), "Should reveal secret details ($key): " . var_export($email, 1));
 
     // Remove permission and we should not see the key
-    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view debug output', 'view all contacts'];
     $result = Contact::get()
       ->addWhere('id', '=', $contact['id'])
       ->addSelect('api_key')
-      ->execute()
-      ->first();
-    $this->assertTrue(empty($result['api_key']));
-    $this->assertTrue($isSafe($result), "Should NOT reveal secret details ($key): " . var_export($result, 1));
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertContains('api_key', $result->debug['undefined_fields']);
+    $this->assertArrayNotHasKey('api_key', $result[0]);
+    $this->assertTrue($isSafe($result[0]), "Should NOT reveal secret details ($key): " . var_export($result[0], 1));
 
     // Also not available via join
     $email = Email::get()
       ->addSelect('contact.api_key')
       ->addWhere('id', '=', $contact['email']['id'])
-      ->execute()->first();
-    $this->assertTrue(empty($email['contact.api_key']));
-    $this->assertTrue($isSafe($email), "Should NOT reveal secret details ($key): " . var_export($email, 1));
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertContains('contact.api_key', $email->debug['undefined_fields']);
+    $this->assertArrayNotHasKey('contact.api_key', $email[0]);
+    $this->assertTrue($isSafe($email[0]), "Should NOT reveal secret details ($key): " . var_export($email[0], 1));
 
     $result = Contact::get()
       ->addWhere('id', '=', $contact['id'])
       ->execute()
       ->first();
-    $this->assertTrue(empty($result['api_key']));
+    $this->assertArrayNotHasKey('api_key', $result);
     $this->assertTrue($isSafe($result), "Should NOT reveal secret details ($key): " . var_export($result, 1));
   }
 

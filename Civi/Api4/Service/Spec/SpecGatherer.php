@@ -131,7 +131,7 @@ class SpecGatherer {
       ->setCheckPermissions(FALSE)
       ->addWhere('custom_group.extends', 'IN', $extends)
       ->addWhere('custom_group.is_multiple', '=', '0')
-      ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value', 'date_format', 'time_format', 'start_date_years', 'end_date_years', 'help_pre', 'help_post'])
+      ->setSelect(['custom_group.name', '*'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {
@@ -147,7 +147,7 @@ class SpecGatherer {
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
     $customFields = CustomField::get()
       ->addWhere('custom_group.name', '=', $customGroup)
-      ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value', 'custom_group.table_name', 'column_name', 'date_format', 'time_format', 'start_date_years', 'end_date_years', 'help_pre', 'help_post'])
+      ->setSelect(['custom_group.name', 'custom_group.table_name', '*'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {
