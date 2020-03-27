@@ -21,6 +21,11 @@
     if (!mode) {
       mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
     }
+    if (CRM.config) {
+      if (CRM.config.locale !== 'en_US') {
+        path = CRM.config.locale.substring(0, 2) + '/' + path;
+      }
+    }
     query = query || '';
     var frag = path.split('?');
     var url = tplURL[mode].replace("civicrm-placeholder-url-path", frag[0]);
