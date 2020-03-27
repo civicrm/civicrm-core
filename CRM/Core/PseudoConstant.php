@@ -264,103 +264,16 @@ class CRM_Core_PseudoConstant {
 
       // Fetch options from other tables
       if (!empty($pseudoconstant['table'])) {
-        // Normalize params so the serialized cache string will be consistent.
         CRM_Utils_Array::remove($params, 'flip', 'fresh');
+        // Normalize params so the serialized cache string will be consistent.
         ksort($params);
         $cacheKey = $daoName . $fieldName . serialize($params);
-
         // Retrieve cached options
         if (isset(\Civi::$statics[__CLASS__][$cacheKey]) && empty($params['fresh'])) {
           $output = \Civi::$statics[__CLASS__][$cacheKey];
         }
         else {
-          $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']);
-          if (!class_exists($daoName)) {
-            return FALSE;
-          }
-          // Get list of fields for the option table
-          $dao = new $daoName();
-          $availableFields = array_keys($dao->fieldKeys());
-
-          $select = "SELECT %1 AS id, %2 AS label";
-          $from = "FROM %3";
-          $wheres = [];
-          $order = "ORDER BY %2";
-
-          // Use machine name in certain contexts
-          if ($context == 'validate' || $context == 'match') {
-            $nameField = $context == 'validate' ? 'labelColumn' : 'keyColumn';
-            if (!empty($pseudoconstant['nameColumn'])) {
-              $params[$nameField] = $pseudoconstant['nameColumn'];
-            }
-            elseif (in_array('name', $availableFields)) {
-              $params[$nameField] = 'name';
-            }
-          }
-
-          // Use abbrColum if context is abbreviate
-          if ($context == 'abbreviate' && (in_array('abbreviation', $availableFields) || !empty($pseudoconstant['abbrColumn']))) {
-            $params['labelColumn'] = $pseudoconstant['abbrColumn'] ?? 'abbreviation';
-          }
-
-          // Condition param can be passed as an sql clause string or an array of clauses
-          if (!empty($params['condition'])) {
-            $wheres[] = implode(' AND ', (array) $params['condition']);
-          }
-          // onlyActive param will automatically filter on common flags
-          if (!empty($params['onlyActive'])) {
-            foreach (['is_active' => 1, 'is_deleted' => 0, 'is_test' => 0, 'is_hidden' => 0] as $flag => $val) {
-              if (in_array($flag, $availableFields)) {
-                $wheres[] = "$flag = $val";
-              }
-            }
-          }
-          // Filter domain specific options
-          if (in_array('domain_id', $availableFields)) {
-            $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID();
-          }
-          $queryParams = [
-            1 => [$params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-            2 => [$params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-            3 => [$pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-          ];
-          // Add orderColumn param
-          if (!empty($params['orderColumn'])) {
-            $queryParams[4] = [$params['orderColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];
-            $order = "ORDER BY %4";
-          }
-          // Support no sorting if $params[orderColumn] is FALSE
-          elseif (isset($params['orderColumn']) && $params['orderColumn'] === FALSE) {
-            $order = '';
-          }
-          // Default to 'weight' if that column exists
-          elseif (in_array('weight', $availableFields)) {
-            $order = "ORDER BY weight";
-          }
-
-          $output = [];
-          $query = "$select $from";
-          if ($wheres) {
-            $query .= " WHERE " . implode($wheres, ' AND ');
-          }
-          $query .= ' ' . $order;
-          $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
-          while ($dao->fetch()) {
-            $output[$dao->id] = $dao->label;
-          }
-          // Localize results
-          if (!empty($params['localize']) || $pseudoconstant['table'] == 'civicrm_country' || $pseudoconstant['table'] == 'civicrm_state_province') {
-            $I18nParams = [];
-            if (isset($fieldSpec['localize_context'])) {
-              $I18nParams['context'] = $fieldSpec['localize_context'];
-            }
-            $i18n = CRM_Core_I18n::singleton();
-            $i18n->localizeArray($output, $I18nParams);
-            // Maintain sort by label
-            if ($order == "ORDER BY %2") {
-              $output = CRM_Utils_Array::asort($output);
-            }
-          }
+          $output = self::renderOptionsFromTablePseudoconstant($pseudoconstant, $params, ($fieldSpec['localize_context'] ?? NULL), $context);
           CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
           \Civi::$statics[__CLASS__][$cacheKey] = $output;
         }
@@ -1555,6 +1468,111 @@ WHERE  id = %1
       '1' => ts('On Hold Bounce'),
       '2' => ts('On Hold Opt Out'),
     ];
+  }
+
+  /**
+   * Render the field options from the available pseudoconstant.
+   *
+   * Do not call this function directly or from untested code. Further cleanup is likely.
+   *
+   * @param array $pseudoconstant
+   * @param array $params
+   * @param string|null $localizeContext
+   * @param string $context
+   *
+   * @return array|bool|mixed
+   */
+  public static function renderOptionsFromTablePseudoconstant($pseudoconstant, &$params = [], $localizeContext = NULL, $context = '') {
+    $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']);
+    if (!class_exists($daoName)) {
+      return FALSE;
+    }
+    // Get list of fields for the option table
+    /* @var CRM_Core_DAO $dao * */
+    $dao = new $daoName();
+    $availableFields = array_keys($dao->fieldKeys());
+
+    $select = 'SELECT %1 AS id, %2 AS label';
+    $from = 'FROM %3';
+    $wheres = [];
+    $order = 'ORDER BY %2';
+
+    // Use machine name in certain contexts
+    if ($context === 'validate' || $context === 'match') {
+      $nameField = $context === 'validate' ? 'labelColumn' : 'keyColumn';
+      if (!empty($pseudoconstant['nameColumn'])) {
+        $params[$nameField] = $pseudoconstant['nameColumn'];
+      }
+      elseif (in_array('name', $availableFields)) {
+        $params[$nameField] = 'name';
+      }
+    }
+
+    // Use abbrColum if context is abbreviate
+    if ($context === 'abbreviate' && (in_array('abbreviation', $availableFields) || !empty($pseudoconstant['abbrColumn']))) {
+      $params['labelColumn'] = $pseudoconstant['abbrColumn'] ?? 'abbreviation';
+    }
+
+    // Condition param can be passed as an sql clause string or an array of clauses
+    if (!empty($params['condition'])) {
+      $wheres[] = implode(' AND ', (array) $params['condition']);
+    }
+    // onlyActive param will automatically filter on common flags
+    if (!empty($params['onlyActive'])) {
+      foreach (['is_active' => 1, 'is_deleted' => 0, 'is_test' => 0, 'is_hidden' => 0] as $flag => $val) {
+        if (in_array($flag, $availableFields)) {
+          $wheres[] = "$flag = $val";
+        }
+      }
+    }
+    // Filter domain specific options
+    if (in_array('domain_id', $availableFields)) {
+      $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID();
+    }
+    $queryParams = [
+      1 => [$params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+      2 => [$params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+      3 => [$pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+    ];
+    // Add orderColumn param
+    if (!empty($params['orderColumn'])) {
+      $queryParams[4] = [$params['orderColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];
+      $order = 'ORDER BY %4';
+    }
+    // Support no sorting if $params[orderColumn] is FALSE
+    elseif (isset($params['orderColumn']) && $params['orderColumn'] === FALSE) {
+      $order = '';
+    }
+    // Default to 'weight' if that column exists
+    elseif (in_array('weight', $availableFields)) {
+      $order = "ORDER BY weight";
+    }
+
+    $output = [];
+    $query = "$select $from";
+    if ($wheres) {
+      $query .= " WHERE " . implode($wheres, ' AND ');
+    }
+    $query .= ' ' . $order;
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    while ($dao->fetch()) {
+      $output[$dao->id] = $dao->label;
+    }
+    // Localize results
+    if (!empty($params['localize']) || $pseudoconstant['table'] === 'civicrm_country' || $pseudoconstant['table'] === 'civicrm_state_province') {
+      $I18nParams = [];
+      if ($localizeContext) {
+        $I18nParams['context'] = $localizeContext;
+      }
+      $i18n = CRM_Core_I18n::singleton();
+      $i18n->localizeArray($output, $I18nParams);
+      // Maintain sort by label
+      if ($order === 'ORDER BY %2') {
+        $output = CRM_Utils_Array::asort($output);
+      }
+    }
+
+    return $output;
   }
 
 }
