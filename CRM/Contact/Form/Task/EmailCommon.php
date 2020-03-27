@@ -48,13 +48,9 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @throws \CiviCRM_API3_Exception
    */
   public static function preProcessFromAddress(&$form, $bounce = TRUE) {
-    $form->_single = FALSE;
-    $className = CRM_Utils_System::getClassName($form);
-    if (property_exists($form, '_context') &&
-      $form->_context != 'search' &&
-      $className == 'CRM_Contact_Form_Task_Email'
-    ) {
-      $form->_single = TRUE;
+    if (!isset($form->_single)) {
+      // @todo ensure this is already set.
+      $form->_single = FALSE;
     }
 
     $form->_emails = [];
