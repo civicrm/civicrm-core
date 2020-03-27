@@ -159,6 +159,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         }
         else {
           $recur->modified_date = $now;
+          $recur->next_sched_contribution_date = date('Y-m-d', strtotime('+' . $recur->frequency_interval . ' ' . $recur->frequency_unit, strtotime($recur->next_sched_contribution_date)));
         }
 
         // make sure the contribution status is not done
