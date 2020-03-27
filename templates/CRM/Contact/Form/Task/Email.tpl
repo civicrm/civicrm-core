@@ -23,7 +23,7 @@
     <tr class="crm-contactEmail-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>
-         {$form.to.html}{if $noEmails eq true}&nbsp;&nbsp;{$form.emailAddress.html}{/if}
+         {$form.to.html}
        </td>
     </tr>
     <tr class="crm-contactEmail-form-block-cc_id" {if !$form.cc_id.value}style="display:none;"{/if}>
