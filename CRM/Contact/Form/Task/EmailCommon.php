@@ -66,14 +66,8 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
 
-    $form->_noEmails = FALSE;
-    if (empty($fromEmailValues)) {
-      $form->_noEmails = TRUE;
-    }
-    $form->assign('noEmails', $form->_noEmails);
-
     if ($bounce) {
-      if ($form->_noEmails) {
+      if (empty($fromEmailValues)) {
         CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
       }
     }
