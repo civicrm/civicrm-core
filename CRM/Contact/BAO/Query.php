@@ -4049,24 +4049,14 @@ WHERE  $smartGroupClause
    */
   public function privacy(&$values) {
     list($name, $op, $value, $grouping) = $values;
-    //fixed for profile search listing CRM-4633
     if (is_array($value)) {
       if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
         $op = key($value);
         $value = $value[$op];
       }
     }
-    if (strpbrk($value, "[")) {
-      $value = CRM_Core_DAO::escapeString($value);
-      if (in_array("!{$op}", CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-        $op = "!{$op}";
-        $this->_where[$grouping][] = "contact_a.{$name} $op $value";
-      }
-    }
-    else {
-      CRM_Utils_Type::validate($value, 'Integer');
-      $this->_where[$grouping][] = "contact_a.{$name} $op $value";
-    }
+    CRM_Utils_Type::validate($value, 'Integer');
+    $this->_where[$grouping][] = "contact_a.{$name} $op $value";
     $field = CRM_Utils_Array::value($name, $this->_fields);
     $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
     $title = $field ? $field['title'] : $name;
