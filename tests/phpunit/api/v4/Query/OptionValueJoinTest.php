@@ -55,6 +55,9 @@ class OptionValueJoinTest extends UnitTestCase {
     $query->where[] = ['preferred_communication_method', 'IS NOT NULL'];
     $results = $query->run();
     $first = array_shift($results);
+    $keys = array_keys($first);
+    sort($keys);
+    $this->assertEquals(['first_name', 'id', 'preferred_communication_method'], $keys);
     $firstPreferredMethod = array_shift($first['preferred_communication_method']);
 
     $this->assertEquals(
