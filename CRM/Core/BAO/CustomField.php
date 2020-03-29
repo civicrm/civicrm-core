@@ -698,8 +698,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id);
     $dataCrmCustomVal = $groupName . ':' . $field->name;
     $dataCrmCustomAttr = 'data-crm-custom="' . $dataCrmCustomVal . '"';
-    $field->attributes .= $dataCrmCustomAttr;
-
+    $field->attributes .= ' ' . $dataCrmCustomAttr;
     // Fixed for Issue CRM-2183
     if ($widget == 'TextArea' && $search) {
       $widget = 'Text';

@@ -253,7 +253,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     ) {
       $defaults['in_selector'] = 1;
     }
-
+    $defaults['html_attributes'] = $defaults['attributes'] ?? NULL;
     return $defaults;
   }
 
@@ -495,6 +495,11 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->add('text', 'default_value', ts('Default Value'),
       $attributes['default_value']
     );
+
+    $this->add('text', 'html_attributes', ts('HTML Attributes'),
+      $attributes['attributes']
+    );
+
     $this->add('textarea', 'help_pre', ts('Field Pre Help'),
       $attributes['help_pre']
     );
@@ -912,6 +917,8 @@ AND    option_group_id = %2";
       $params['html_type'] = self::$_dataToHTML[$params['data_type'][0]][$params['data_type'][1]];
       $params['data_type'] = self::$_dataTypeKeys[$params['data_type'][0]];
     }
+
+    $params['attributes'] = $params['html_attributes'] ?? NULL;
 
     //fix for 'is_search_range' field.
     if (in_array($dataTypeKey, [

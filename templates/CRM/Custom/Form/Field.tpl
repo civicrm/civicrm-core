@@ -107,6 +107,10 @@
         {/if}
       </td>
     </tr>
+    <tr class="crm-custom-field-form-block-html_attributes">
+      <td class="label">{$form.html_attributes.label}</td>
+      <td class="html-adjust">{$form.html_attributes.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-default_value" id="hideDefault" {if $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
       <td title="hideDefaultValTxt" class="label">{$form.default_value.label}</td>
       <td title="hideDefaultValDef" class="html-adjust">{$form.default_value.html}</td>
