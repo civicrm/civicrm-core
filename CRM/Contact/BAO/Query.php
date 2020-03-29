@@ -4058,9 +4058,11 @@ WHERE  $smartGroupClause
       }
     }
     if (strpbrk($value, "[")) {
-      $value = "'{$value}'";
-      $op = "!{$op}";
-      $this->_where[$grouping][] = "contact_a.{$name} $op $value";
+      $value = CRM_Core_DAO::escapeString($value);
+      if (in_array("!{$op}", CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $op = "!{$op}";
+        $this->_where[$grouping][] = "contact_a.{$name} $op $value";
+      }
     }
     else {
       CRM_Utils_Type::validate($value, 'Integer');
