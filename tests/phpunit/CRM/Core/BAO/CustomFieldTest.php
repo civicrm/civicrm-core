@@ -731,4 +731,50 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals($expectedDisplayValue, CRM_Core_BAO_CustomField::displayValue($file['id'], $fileField['id']));
   }
 
+  /**
+   * Test for hook_civicrm_alterCustomFieldDisplayValue().
+   */
+  public function testAlterCustomFieldDisplayValueHook() {
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_alterCustomFieldDisplayValue', [$this, 'alterCustomFieldDisplayValue']);
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+      'title' => 'Test Contactcustom Group',
+    ])['id'];
+    $fieldId = $this->customFieldCreate([
+      'custom_group_id' => $customGroupId,
+      'name' => 'alter_cf_field',
+      'label' => 'Alter CF Field',
+    ])['id'];
+    $contactId = $this->individualCreate(['custom_' . $fieldId => 'Test']);
+
+    $this->assertEquals('Test', $this->callAPISuccessGetValue('Contact',
+      ['id' => $contactId, 'return' => "custom_{$fieldId}"]
+    ));
+
+    $values = [];
+    $fields = [
+      'custom_' . $fieldId => $this->callAPISuccess('Contact', 'getfield', [
+        'name' => 'custom_' . $fieldId,
+        'action' => 'get',
+      ])['values'],
+    ];
+
+    // CRM_Core_BAO_UFGroup::getValues() invokes CRM_Core_BAO_CustomField::displayValue() function.
+    CRM_Core_BAO_UFGroup::getValues($contactId, $fields, $values);
+    $this->assertEquals('New value', $values['Alter CF Field']);
+  }
+
+  /**
+   * @param string $displayValue
+   * @param mixed $value
+   * @param int $entityId
+   * @param array $fieldInfo
+   *
+   */
+  public function alterCustomFieldDisplayValue(&$displayValue, $value, $entityId, $fieldInfo) {
+    if ($fieldInfo['name'] == 'alter_cf_field') {
+      $displayValue = 'New value';
+    }
+  }
+
 }
