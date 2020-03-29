@@ -650,6 +650,7 @@ AND        a.is_deleted = 0
       "contact_id_$b" => $targetContactId,
       'is_active' => 1,
       'case_id' => $caseId,
+      'options' => ['limit' => 1],
     ];
 
     if ($this->isBidirectionalRelationshipType($relTypeId)) {
@@ -657,10 +658,14 @@ AND        a.is_deleted = 0
       $params['options']['or'] = [['contact_id_a', 'contact_id_b']];
     }
 
-    $relationships = civicrm_api3('Relationship', 'get', $params);
+    $relationships = civicrm_api3('Relationship', 'get', $params)['values'];
+    if (empty($relationships)) {
+      unset($params['case_id']);
+      $relationships = civicrm_api3('Relationship', 'get', $params)['values'];
+    }
 
-    if ($relationships['count']) {
-      $relationship = CRM_Utils_Array::first($relationships['values']);
+    if (!empty($relationships)) {
+      $relationship = CRM_Utils_Array::first($relationships);
 
       // returns the contact id on the other side of the relationship:
       return (int) $relationship['contact_id_a'] === (int) $targetContactId
