@@ -105,6 +105,11 @@ class FieldSpec {
   protected $permission;
 
   /**
+   * @var string
+   */
+  protected $columnName;
+
+  /**
    * Aliases for the valid data types
    *
    * @var array
@@ -122,7 +127,7 @@ class FieldSpec {
    */
   public function __construct($name, $entity, $dataType = 'String') {
     $this->entity = $entity;
-    $this->setName($name);
+    $this->name = $this->columnName = $name;
     $this->setDataType($dataType);
   }
 
@@ -425,6 +430,23 @@ class FieldSpec {
   public function setFkEntity($fkEntity) {
     $this->fkEntity = $fkEntity;
 
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getColumnName() {
+    return $this->columnName;
+  }
+
+  /**
+   * @param string $columnName
+   *
+   * @return $this
+   */
+  public function setColumnName($columnName) {
+    $this->columnName = $columnName;
     return $this;
   }
 

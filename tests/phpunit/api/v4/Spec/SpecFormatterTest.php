@@ -68,6 +68,7 @@ class SpecFormatterTest extends UnitTestCase {
       'name' => $name,
       'data_type' => 'String',
       'html_type' => 'Multi-Select',
+      'column_name' => $name,
     ];
 
     /** @var \Civi\Api4\Service\Spec\CustomFieldSpec $field */
