@@ -31,15 +31,6 @@ class CRM_Contact_Form_Task_EmailCommon {
   public $_toContactEmails = [];
 
   /**
-   * @return array $domainEmails;
-   * @deprecated Generate an array of Domain email addresses.
-   */
-  public static function domainEmails() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Email::domainEmails()');
-    return CRM_Core_BAO_Email::domainEmails();
-  }
-
-  /**
    * Pre Process Form Addresses to be used in Quickform
    *
    * @param CRM_Core_Form $form
