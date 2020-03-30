@@ -250,7 +250,56 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return array
    */
   protected function createSelectCustomField(array $params): array {
-    $optionValue = [
+
+    $optionValue = $this->getOptions();
+    $params = array_merge([
+      'label' => 'Pick Color',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'weight' => 2,
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      'option_values' => $optionValue,
+    ], $params);
+
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    return $customField['values'][$customField['id']];
+  }
+
+  /**
+   * Create custom Autocomplete field.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createAutoCompleteCustomField(array $params): array {
+
+    $optionValue = $this->getOptions();
+    $params = array_merge([
+      'label' => 'Pick Color - Autocomplete',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'String',
+      'weight' => 2,
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      'option_values' => $optionValue,
+    ], $params);
+
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    return $customField['values'][$customField['id']];
+  }
+
+  /**
+   * Array of dummy options.
+   *
+   * @return array
+   */
+  protected function getOptions() {
+    return [
       [
         'label' => 'Red',
         'value' => 'R',
@@ -270,20 +319,6 @@ trait CRMTraits_Custom_CustomDataTrait {
         'is_active' => 1,
       ],
     ];
-
-    $params = array_merge([
-      'label' => 'Pick Color',
-      'html_type' => 'Select',
-      'data_type' => 'String',
-      'weight' => 2,
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
-      'option_values' => $optionValue,
-    ], $params);
-
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
-    return $customField['values'][$customField['id']];
   }
 
   /**

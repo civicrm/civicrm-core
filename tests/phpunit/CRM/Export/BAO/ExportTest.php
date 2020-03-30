@@ -3009,4 +3009,59 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', $params);
   }
 
+  /**
+   * Test for single select Autocomplete custom field.
+   *
+   */
+  public function testSingleSelectAutoComplete() {
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+    ])['id'];
+    $fieldId = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+    ])['id'];
+    $contactId = $this->individualCreate(['custom_' . $fieldId => 'Y']);
+    $selectedFields = [
+      ['name' => 'contact_id'],
+      ['name' => "custom_{$fieldId}"],
+    ];
+
+    $this->doExportTest([
+      'ids' => [$contactId],
+      'fields' => $selectedFields,
+      'exportMode' => CRM_Export_Form_Select::CONTACT_EXPORT,
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('Yellow', $row['Pick Color - Autocomplete']);
+  }
+
+  /**
+   * Test for multi select Autocomplete custom field.
+   *
+   */
+  public function testMultiSelectAutoComplete() {
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+    ])['id'];
+    $fieldId = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+      'attributes' => ' multiple="1" ',
+    ])['id'];
+    $colors = ['Y' => 'Yellow', 'G' => 'Green'];
+    $contactId = $this->individualCreate(['custom_' . $fieldId => ['Y', 'G']]);
+
+    $selectedFields = [
+      ['name' => 'contact_id'],
+      ['name' => "custom_{$fieldId}"],
+    ];
+
+    $this->doExportTest([
+      'ids' => [$contactId],
+      'fields' => $selectedFields,
+      'exportMode' => CRM_Export_Form_Select::CONTACT_EXPORT,
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals(implode(', ', $colors), $row['Pick Color - Autocomplete']);
+  }
+
 }

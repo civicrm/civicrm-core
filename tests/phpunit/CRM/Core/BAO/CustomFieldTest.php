@@ -731,4 +731,44 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals($expectedDisplayValue, CRM_Core_BAO_CustomField::displayValue($file['id'], $fileField['id']));
   }
 
+  /**
+   * Test for single select Autocomplete custom field.
+   *
+   */
+  public function testSingleSelectAutoComplete() {
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+    ])['id'];
+    $fieldId = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+    ])['id'];
+    $contactId = $this->individualCreate(['custom_' . $fieldId => 'Y']);
+    $value = $this->callAPISuccessGetValue('Contact', [
+      'id' => $contactId,
+      'return' => 'custom_' . $fieldId
+    ]);
+    $this->assertEquals('Y', $value);
+  }
+
+  /**
+   * Test for multi select Autocomplete custom field.
+   *
+   */
+  public function testMultiSelectAutoComplete() {
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+    ])['id'];
+    $fieldId = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+      'attributes' => ' multiple="1" ',
+    ])['id'];
+    $colors = ['Y' => 'Yellow', 'G' => 'Green'];
+    $contactId = $this->individualCreate(['custom_' . $fieldId => ['Y', 'G']]);
+    $value = $this->callAPISuccessGetValue('Contact', [
+      'id' => $contactId,
+      'return' => 'custom_' . $fieldId
+    ]);
+    $this->assertTrue($value === array_keys($colors));
+  }
+
 }
