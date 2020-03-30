@@ -23,6 +23,9 @@
     <title>Cache Contact</title>
     <type>int unsigned</type>
     <comment>Foreign Key to Contact</comment>
+    <html>
+      <type>EntityRef</type>
+    </html>
     <add>1.6</add>
   </field>
   <foreignKey>
@@ -38,6 +41,11 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign Key to ACL</comment>
+    <pseudoconstant>
+      <table>civicrm_acl</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <foreignKey>
