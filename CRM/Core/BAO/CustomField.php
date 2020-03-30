@@ -444,6 +444,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cgTable.extends_entity_column_id,
                             $cfTable.is_view,
                             $cfTable.option_group_id,
+                            $cfTable.attributes,
                             $cfTable.date_format,
                             $cfTable.time_format,
                             $cgTable.is_multiple,
@@ -519,6 +520,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['custom_group_id'] = $dao->custom_group_id;
           $fields[$dao->id]['extends'] = $dao->extends;
           $fields[$dao->id]['is_search_range'] = $dao->is_search_range;
+          $fields[$dao->id]['attributes'] = $dao->attributes;
           $fields[$dao->id]['extends_entity_column_value'] = $dao->extends_entity_column_value;
           $fields[$dao->id]['extends_entity_column_id'] = $dao->extends_entity_column_id;
           $fields[$dao->id]['is_view'] = $dao->is_view;
@@ -1502,6 +1504,7 @@ SELECT id
 
     if ($customFields[$customFieldId]['html_type'] == 'Autocomplete-Select'
       && $customFields[$customFieldId]['data_type'] != 'ContactReference'
+      && stripos($customFields[$customFieldId]['attributes'], 'multiple=') !== FALSE
       && isset($value)
     ) {
       if (!is_array($value)) {
@@ -2612,10 +2615,13 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
   public static function isSerialized($field) {
     // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
     $html_type = is_object($field) ? $field->html_type : $field['html_type'];
+    $data_type = is_object($field) ? $field->data_type : $field['data_type'];
+    $attributes = is_object($field) ? $field->attributes : $field['attributes'];
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
-    return ($field['html_type'] == 'CheckBox'
-      || ($field['html_type'] == 'Autocomplete-Select' && $field['data_type'] != 'ContactReference')
-      || strpos($field['html_type'], 'Multi') !== FALSE
+    return ($html_type == 'CheckBox'
+      || ($html_type == 'Autocomplete-Select' && $data_type != 'ContactReference'
+        && stripos($attributes, 'multiple=') !== FALSE
+      ) || strpos($html_type, 'Multi') !== FALSE
     );
   }
 
