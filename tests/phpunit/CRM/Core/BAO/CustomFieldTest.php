@@ -745,7 +745,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate(['custom_' . $fieldId => 'Y']);
     $value = $this->callAPISuccessGetValue('Contact', [
       'id' => $contactId,
-      'return' => 'custom_' . $fieldId
+      'return' => 'custom_' . $fieldId,
     ]);
     $this->assertEquals('Y', $value);
   }
@@ -766,7 +766,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate(['custom_' . $fieldId => ['Y', 'G']]);
     $value = $this->callAPISuccessGetValue('Contact', [
       'id' => $contactId,
-      'return' => 'custom_' . $fieldId
+      'return' => 'custom_' . $fieldId,
     ]);
     $this->assertTrue($value === array_keys($colors));
   }
