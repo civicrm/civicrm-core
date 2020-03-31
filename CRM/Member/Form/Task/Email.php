@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
- *
  */
 
 /**
@@ -22,34 +20,15 @@
  * contacts.
  */
 class CRM_Member_Form_Task_Email extends CRM_Member_Form_Task {
-
-  /**
-   * Are we operating in "single mode", i.e. sending email to one
-   * specific contact?
-   *
-   * @var bool
-   */
-  public $_single = FALSE;
-
-  /**
-   * Are we operating in "single mode", i.e. sending email to one
-   * specific contact?
-   *
-   * @var bool
-   */
-  public $_noEmails = FALSE;
-
-  /**
-   * All the existing templates in the system.
-   *
-   * @var array
-   */
-  public $_templates = NULL;
+  use CRM_Contact_Form_Task_EmailTrait;
 
   /**
    * Build all the data structures needed to build the form.
    *
    * @return void
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
@@ -64,24 +43,14 @@ class CRM_Member_Form_Task_Email extends CRM_Member_Form_Task {
   /**
    * Build the form object.
    *
-   *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     //enable form element
     $this->assign('emailTask', TRUE);
 
     CRM_Contact_Form_Task_EmailCommon::buildQuickForm($this);
-  }
-
-  /**
-   * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
-   */
-  public function postProcess() {
-    CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
 
   /**
