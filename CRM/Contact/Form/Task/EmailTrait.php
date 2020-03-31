@@ -69,6 +69,19 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $_bccContactIds = [];
 
   /**
+   * Build all the data structures needed to build the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function preProcess() {
+    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
+    parent::preProcess();
+    $this->setContactIDs();
+    $this->assign('single', $this->_single);
+  }
+
+  /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
