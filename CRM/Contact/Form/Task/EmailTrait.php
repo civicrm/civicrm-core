@@ -38,6 +38,36 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $_templates;
 
   /**
+   * Store "to" contact details.
+   * @var array
+   */
+  public $_toContactDetails = [];
+
+  /**
+   * Store all selected contact id's, that includes to, cc and bcc contacts
+   * @var array
+   */
+  public $_allContactIds = [];
+
+  /**
+   * Store only "to" contact ids.
+   * @var array
+   */
+  public $_toContactIds = [];
+
+  /**
+   * Store only "cc" contact ids.
+   * @var array
+   */
+  public $_ccContactIds = [];
+
+  /**
+   * Store only "bcc" contact ids.
+   * @var array
+   */
+  public $_bccContactIds = [];
+
+  /**
    * Process the form after the input has been submitted and validated.
    *
    * @throws \CRM_Core_Exception
