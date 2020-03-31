@@ -106,6 +106,9 @@ class CRM_Contact_Form_Task_EmailCommon {
     $cc = $form->add('text', 'cc_id', ts('CC'), $emailAttributes);
     $bcc = $form->add('text', 'bcc_id', ts('BCC'), $emailAttributes);
 
+    if ($to->getValue()) {
+      $form->_toContactIds = $form->_contactIds = [];
+    }
     $setDefaults = TRUE;
     if (property_exists($form, '_context') && $form->_context == 'standalone') {
       $setDefaults = FALSE;
@@ -115,13 +118,10 @@ class CRM_Contact_Form_Task_EmailCommon {
     $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
     foreach ($elements as $element) {
       if ($$element->getValue()) {
-        $allEmails = explode(',', $$element->getValue());
-        if ($element == 'to') {
-          $form->_toContactIds = $form->_contactIds = [];
-        }
 
-        foreach ($allEmails as $value) {
-          list($contactId, $email) = explode('::', $value);
+        foreach (self::getEmails($$element) as $value) {
+          $contactId = $value['contact_id'];
+          $email = $value['email'];
           if ($contactId) {
             switch ($element) {
               case 'to':
@@ -592,6 +592,23 @@ class CRM_Contact_Form_Task_EmailCommon {
         [1 => $limit]
       ));
     }
+  }
+
+  /**
+   * Get the emails from the added element.
+   *
+   * @param HTML_QuickForm_Element $element
+   *
+   * @return array
+   */
+  protected static function getEmails($element): array {
+    $allEmails = explode(',', $element->getValue());
+    $return = [];
+    foreach ($allEmails as $value) {
+      $values = explode('::', $value);
+      $return[] = ['contact_id' => $values[0], 'email' => $values[1]];
+    }
+    return $return;
   }
 
 }
