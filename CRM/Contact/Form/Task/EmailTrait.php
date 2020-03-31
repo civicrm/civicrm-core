@@ -63,9 +63,23 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
   /**
    * Store only "bcc" contact ids.
+   *
    * @var array
    */
   public $_bccContactIds = [];
+
+  /**
+   * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function buildQuickForm() {
+    // Suppress form might not be required but perhaps there was a risk some other  process had set it to TRUE.
+    $this->assign('suppressForm', FALSE);
+    $this->assign('emailTask', TRUE);
+
+    CRM_Contact_Form_Task_EmailCommon::buildQuickForm($this);
+  }
 
   /**
    * Process the form after the input has been submitted and validated.
