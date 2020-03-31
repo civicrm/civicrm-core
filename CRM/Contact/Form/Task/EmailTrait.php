@@ -105,4 +105,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
 
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    return CRM_Core_SelectValues::contactTokens();
+  }
+
 }
