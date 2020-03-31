@@ -23,24 +23,6 @@ class CRM_Member_Form_Task_Email extends CRM_Member_Form_Task {
   use CRM_Contact_Form_Task_EmailTrait;
 
   /**
-   * Build all the data structures needed to build the form.
-   *
-   * @return void
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function preProcess() {
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
-    parent::preProcess();
-
-    // we have all the membership ids, so now we get the contact ids
-    parent::setContactIDs();
-
-    $this->assign('single', $this->_single);
-  }
-
-  /**
    * List available tokens for this form.
    *
    * @return array
