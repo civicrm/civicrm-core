@@ -22,18 +22,6 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
   use CRM_Contact_Form_Task_EmailTrait;
 
   /**
-   * Build all the data structures needed to build the form.
-   *
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function preProcess() {
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
-    parent::preProcess();
-    $this->setContactIDs();
-    $this->assign('single', $this->_single);
-  }
-
-  /**
    * List available tokens for this form.
    *
    * @return array
