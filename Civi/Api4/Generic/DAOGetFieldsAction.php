@@ -64,6 +64,10 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       'data_type' => 'String',
     ];
     $fields[] = [
+      'name' => 'column_name',
+      'data_type' => 'String',
+    ];
+    $fields[] = [
       'name' => 'custom_field_id',
       'data_type' => 'Integer',
     ];
