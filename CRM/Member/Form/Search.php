@@ -263,7 +263,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       return;
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String');
+    // @todo Most of the  below is likely no longer required.
+    $status = CRM_Utils_Request::retrieve('membership_status_id', 'String');
     if ($status) {
       $status = explode(',', $status);
       $this->_formValues['membership_status_id'] = $this->_defaults['membership_status_id'] = (array) $status;
