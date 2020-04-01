@@ -130,7 +130,7 @@ CRM.$(function($) {
   {literal}
   emailSelect('#to', toContact);
   emailSelect('#cc_id', ccContact);
-  emailSelect('#bcc_id', bccContact);
+  //emailSelect('#bcc_id', bccContact);
 });
 
 

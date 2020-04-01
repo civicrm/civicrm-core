@@ -156,8 +156,12 @@ trait CRM_Contact_Form_Task_EmailTrait {
     ];
     $to = $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
     $cc = $this->add('text', 'cc_id', ts('CC'), $emailAttributes);
-    $bcc = $this->add('text', 'bcc_id', ts('BCC'), $emailAttributes);
 
+    $this->addEntityRef('bcc_id',  ts('BCC'), [
+      'entity' => 'Email',
+      'multiple' => TRUE,
+      'api'=> ['params' => ['on_hold' => 0, 'contact_id.do_not_email' => 0]]
+    ]);
     $setDefaults = TRUE;
     if (property_exists($this, '_context') && $this->_context === 'standalone') {
       $setDefaults = FALSE;
@@ -183,13 +187,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
       }
     }
 
-    if ($bcc->getValue()) {
-      foreach ($this->getEmails($bcc) as $value) {
-        if (!empty($value['contact_id'])) {
-          $this->_bccContactIds[] = $value['contact_id'];
-        }
-      }
-    }
     $this->_allContactIds = array_unique(array_merge($this->_contactIds, $this->_ccContactIds, $this->_bccContactIds));
     $setDefaults = empty($this->_allContactIds) ? $setDefaults: TRUE;
 
