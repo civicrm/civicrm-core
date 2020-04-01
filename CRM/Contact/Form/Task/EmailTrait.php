@@ -69,16 +69,60 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $_bccContactIds = [];
 
   /**
+   * Is the form being loaded from a search action.
+   *
+   * @var bool
+   */
+  public $isSearchContext = TRUE;
+
+  /**
+   * Getter for isSearchContext.
+   *
+   * @return bool
+   */
+  public function isSearchContext(): bool {
+    return $this->isSearchContext;
+  }
+
+  /**
+   * Setter for isSearchContext.
+   *
+   * @param bool $isSearchContext
+   */
+  public function setIsSearchContext(bool $isSearchContext) {
+    $this->isSearchContext = $isSearchContext;
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
+    $this->traitPreProcess();
+  }
+
+  /**
+   * Call trait preProcess function.
+   *
+   * This function exists as a transitional arrangement so classes overriding
+   * preProcess can still call it. Ideally it will be melded into preProcess later.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function traitPreProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
-    parent::preProcess();
+    if ($this->isSearchContext()) {
+      // Currently only the contact email form is callable outside search context.
+      parent::preProcess();
+    }
     $this->setContactIDs();
     $this->assign('single', $this->_single);
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $this->assign('isAdmin', 1);
+    }
   }
 
   /**
