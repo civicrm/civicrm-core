@@ -814,10 +814,14 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * Since this is used from the batched script caching helps.
    *
+   * Caching is by domain - if that hits any issues we should add a new function getDomainMembershipTypes
+   * or similar rather than 'just add another param'! but this is closer to earlier behaviour so 'should' be OK.
+   *
    * @throws \CiviCRM_API3_Exception
    */
   public static function getAllMembershipTypes() {
-    if (!Civi::cache('metadata')->has(__CLASS__ . __FUNCTION__)) {
+    $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID();
+    if (!Civi::cache('metadata')->has($cacheString)) {
       $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related'];
@@ -840,9 +844,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         }
         $types[$id]['minimum_fee_with_tax'] = (float) $types[$id]['minimum_fee'] * $multiplier;
       }
-      Civi::cache('metadata')->set(__CLASS__ . __FUNCTION__, $types);
+      Civi::cache('metadata')->set($cacheString, $types);
     }
-    return Civi::cache('metadata')->get(__CLASS__ . __FUNCTION__);
+    return Civi::cache('metadata')->get($cacheString);
   }
 
   /**

@@ -178,6 +178,22 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Set defaults.
+   *
+   * @return array
+   * @throws \Exception
+   */
+  public function setDefaultValues() {
+    $this->_defaults = parent::setDefaultValues();
+    //LCD also allow restrictions to membership owner via GET
+    $owner = CRM_Utils_Request::retrieve('owner', 'String');
+    if (in_array($owner, ['0', '1'])) {
+      $this->_defaults['member_is_primary'] = $owner;
+    }
+    return $this->_defaults;
+  }
+
+  /**
    * The post processing of the form gets done here.
    *
    * Key things done during post processing are
@@ -263,7 +279,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       return;
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String');
+    // @todo Most of the  below is likely no longer required.
+    $status = CRM_Utils_Request::retrieve('membership_status_id', 'String');
     if ($status) {
       $status = explode(',', $status);
       $this->_formValues['membership_status_id'] = $this->_defaults['membership_status_id'] = (array) $status;
@@ -317,12 +334,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive',
       $this
     );
-
-    //LCD also allow restrictions to membership owner via GET
-    $owner = CRM_Utils_Request::retrieve('owner', 'String');
-    if (in_array($owner, ['0', '1'])) {
-      $this->_formValues['member_is_primary'] = $this->_defaults['member_is_primary'] = $owner;
-    }
   }
 
   /**

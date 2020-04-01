@@ -973,6 +973,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     ];
     //CRM-6161 fix for customdata export
     $fields = array_merge($fields, $membershipStatus, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));
+    $fields['membership_status_id'] = $membershipStatus['membership_status'];
     return $fields;
   }
 
