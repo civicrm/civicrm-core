@@ -23,36 +23,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   use CRM_Contact_Form_Task_EmailTrait;
 
   /**
-   * Store "to" contact details.
-   * @var array
-   */
-  public $_toContactDetails = [];
-
-  /**
-   * Store all selected contact id's, that includes to, cc and bcc contacts
-   * @var array
-   */
-  public $_allContactIds = [];
-
-  /**
-   * Store only "to" contact ids.
-   * @var array
-   */
-  public $_toContactIds = [];
-
-  /**
-   * Store only "cc" contact ids.
-   * @var array
-   */
-  public $_ccContactIds = [];
-
-  /**
-   * Store only "bcc" contact ids.
-   * @var array
-   */
-  public $_bccContactIds = [];
-
-  /**
    * Build all the data structures needed to build the form.
    *
    * @throws \CiviCRM_API3_Exception
