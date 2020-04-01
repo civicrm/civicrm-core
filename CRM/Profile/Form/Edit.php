@@ -146,7 +146,7 @@ SELECT module,is_reserved
 
     }
     else {
-      $groupTitle = $this->_ufGroup['title'];
+      $groupTitle = CRM_Core_BAO_UFGroup::getFrontEndTitle($this->_ufGroup['id']);
     }
     CRM_Utils_System::setTitle($groupTitle);
     $this->assign('recentlyViewed', FALSE);
