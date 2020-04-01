@@ -356,6 +356,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function postProcess(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('This code is no longer used in core and will be removed');
+
     self::bounceIfSimpleMailLimitExceeded(count($form->_contactIds));
 
     // check and ensure that
@@ -376,6 +378,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function submit(&$form, $formValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('This code is no longer used in core and will be removed');
+
     self::saveMessageTemplate($formValues);
 
     $from = $formValues['from_email_address'] ?? NULL;
@@ -559,6 +563,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected static function saveMessageTemplate($formValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('This code is no longer used in core and will be removed');
+
     if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
       $messageTemplate = [
         'msg_text' => $formValues['text_message'],
@@ -587,6 +593,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    *  The number of emails the user is attempting to send
    */
   public static function bounceIfSimpleMailLimitExceeded($count) {
+    CRM_Core_Error::deprecatedFunctionWarning('This code is no longer used in core and will be removed');
+
     $limit = Civi::settings()->get('simple_mail_limit');
     if ($count > $limit) {
       CRM_Core_Error::statusBounce(ts('Please do not use this task to send a lot of emails (greater than %1). Many countries have legal requirements when sending bulk emails and the CiviMail framework has opt out functionality and domain tokens to help meet these.',
@@ -603,6 +611,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @return array
    */
   protected static function getEmails($element): array {
+    CRM_Core_Error::deprecatedFunctionWarning('This code is no longer used in core and will be removed');
+
     $allEmails = explode(',', $element->getValue());
     $return = [];
     foreach ($allEmails as $value) {
