@@ -413,8 +413,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
     }
-    $optionContext = $extra['option_context'] ?? NULL;
-    unset($extra['option_context']);
+    $optionContext = NULL;
+    if (!empty($extra['option_context'])) {
+      $optionContext = $extra['option_context'];
+      unset($extra['option_context']);
+    }
 
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
