@@ -407,7 +407,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public function submit($formValues) {
     $this->saveMessageTemplate($formValues);
 
-    $from = $formValues['from_email_address'] ?? NULL;
     // dev/core#357 User Emails are keyed by their id so that the Signature is able to be added
     // If we have had a contact email used here the value returned from the line above will be the
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>
