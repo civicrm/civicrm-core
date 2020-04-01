@@ -134,6 +134,11 @@ trait DAOActionTrait {
         $item['contact_id'] = $entityId;
       }
 
+      // FIXME: Weird thing the Contribution BAO expects
+      if ($this->getEntityName() == 'Contribution') {
+        $item['skipCleanMoney'] = TRUE;
+      }
+
       if ($this->getCheckPermissions()) {
         $this->checkContactPermissions($baoName, $item);
       }
