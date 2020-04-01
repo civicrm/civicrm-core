@@ -84,10 +84,8 @@ class CRM_Api4_Services {
       if (!file_exists($path) || !is_dir($path)) {
         $resource = new \Symfony\Component\Config\Resource\FileExistenceResource($path);
         $container->addResource($resource);
-        continue;
       }
-
-      try {
+      else {
         $resource = new \Symfony\Component\Config\Resource\DirectoryResource($path, ';\.php$;');
         foreach (glob("$path*.php") as $file) {
           $matches = [];
@@ -100,15 +98,6 @@ class CRM_Api4_Services {
           }
         }
         $container->addResource($resource);
-      }
-      catch (\InvalidArgumentException $e) {
-        //Directory is not found so lets not do anything i suppose.
-
-        // FIXME: The above comment implies that the try/catch is specifically
-        // about the directory's existence, which would make it redundant with the
-        // newer "file_exists()" guard. However, the actual "catch()" seems broader,
-        // and I don't see anything in DirectoryResource that throws the exception.
-        // So... maybe it's not needed, or maybe there's some additional purpose.
       }
     }
   }
