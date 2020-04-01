@@ -20,29 +20,7 @@
  */
 class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
 
-  /**
-   * Are we operating in "single mode".
-   *
-   * Single mode means sending email to one specific contact.
-   *
-   * @var bool
-   */
-  public $_single = FALSE;
-
-  /**
-   * Are we operating in "single mode", i.e. sending email to one
-   * specific contact?
-   *
-   * @var bool
-   */
-  public $_noEmails = FALSE;
-
-  /**
-   * All the existing templates in the system.
-   *
-   * @var array
-   */
-  public $_templates = NULL;
+  use CRM_Contact_Form_Task_EmailTrait;
 
   /**
    * Store "to" contact details.
@@ -137,13 +115,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     $this->assign('emailTask', TRUE);
 
     CRM_Contact_Form_Task_EmailCommon::buildQuickForm($this);
-  }
-
-  /**
-   * Process the form after the input has been submitted and validated.
-   */
-  public function postProcess() {
-    CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
 
   /**
