@@ -81,9 +81,12 @@ class CRM_Api4_Services {
     );
     foreach ($locations as $location) {
       $path = \CRM_Utils_File::addTrailingSlash(dirname($location)) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
-      try {
-        $resource = new \Symfony\Component\Config\Resource\DirectoryResource($path, ';\.php$;');
+      if (!file_exists($path) || !is_dir($path)) {
+        $resource = new \Symfony\Component\Config\Resource\FileExistenceResource($path);
         $container->addResource($resource);
+      }
+      else {
+        $resource = new \Symfony\Component\Config\Resource\DirectoryResource($path, ';\.php$;');
         foreach (glob("$path*.php") as $file) {
           $matches = [];
           preg_match('/(\w*)\.php$/', $file, $matches);
@@ -94,9 +97,7 @@ class CRM_Api4_Services {
             $definition->addTag($tag);
           }
         }
-      }
-      catch (\InvalidArgumentException $e) {
-        //Directory is not found so lets not do anything i suppose.
+        $container->addResource($resource);
       }
     }
   }
