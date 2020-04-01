@@ -81,7 +81,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     // so register it again. See packages/HTML/QuickForm/file.php.
     $form->registerRule('maxfilesize', 'callback', '_ruleCheckMaxFileSize', 'HTML_QuickForm_file');
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
-    CRM_Contact_Form_Task_EmailCommon::buildQuickForm($form);
+    $form->buildQuickForm();
     CRM_Contact_Form_Task_EmailCommon::submit($form, array_merge($form->_defaultValues, [
       'from_email_address' => $loggedInEmail['id'],
       'subject' => 'Really interesting stuff',

@@ -87,6 +87,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @throws \CRM_Core_Exception
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('This code is no longer used in core and will be removed');
     $toArray = $ccArray = $bccArray = [];
     $suppressedEmails = 0;
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
