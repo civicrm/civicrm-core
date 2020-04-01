@@ -44,6 +44,13 @@ class DAOGetAction extends AbstractGetAction {
    */
   protected $select = [];
 
+  /**
+   * Field(s) by which to group the results.
+   *
+   * @var array
+   */
+  protected $groupBy = [];
+
   public function _run(Result $result) {
     $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
@@ -61,6 +68,31 @@ class DAOGetAction extends AbstractGetAction {
       \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
     }
     return $result;
+  }
+
+  /**
+   * @return array
+   */
+  public function getGroupBy(): array {
+    return $this->groupBy;
+  }
+
+  /**
+   * @param array $groupBy
+   * @return $this
+   */
+  public function setGroupBy(array $groupBy) {
+    $this->groupBy = $groupBy;
+    return $this;
+  }
+
+  /**
+   * @param string $field
+   * @return $this
+   */
+  public function addGroupBy(string $field) {
+    $this->groupBy[] = $field;
+    return $this;
   }
 
 }
