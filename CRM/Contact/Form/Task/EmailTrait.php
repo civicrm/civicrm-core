@@ -38,6 +38,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $_templates;
 
   /**
+   * Array of contacts to emai.
+   */
+  public $emailContactIDs = [];
+  /**
    * Store "to" contact details.
    * @var array
    */
@@ -154,45 +158,40 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $cc = $this->add('text', 'cc_id', ts('CC'), $emailAttributes);
     $bcc = $this->add('text', 'bcc_id', ts('BCC'), $emailAttributes);
 
-    if ($to->getValue()) {
-      $this->_toContactIds = $this->_contactIds = [];
-    }
     $setDefaults = TRUE;
     if (property_exists($this, '_context') && $this->_context === 'standalone') {
       $setDefaults = FALSE;
     }
 
-    $elements = ['to', 'cc', 'bcc'];
     $this->_allContactIds = $this->_toContactIds = $this->_contactIds;
-    foreach ($elements as $element) {
-      if ($$element->getValue()) {
-
-        foreach ($this->getEmails($$element) as $value) {
-          $contactId = $value['contact_id'];
-          $email = $value['email'];
-          if ($contactId) {
-            switch ($element) {
-              case 'to':
-                $this->_contactIds[] = $this->_toContactIds[] = $contactId;
-                $this->_toContactEmails[] = $email;
-                break;
-
-              case 'cc':
-                $this->_ccContactIds[] = $contactId;
-                break;
-
-              case 'bcc':
-                $this->_bccContactIds[] = $contactId;
-                break;
-            }
-
-            $this->_allContactIds[] = $contactId;
-          }
+    if ($to->getValue()) {
+      $this->_toContactIds = $this->_contactIds = [];
+      foreach ($this->getEmails($to) as $value) {
+        if (!empty($value['contact_id'])) {
+          $this->_contactIds[] = $this->_toContactIds[] = $value['contact_id'];
+          $this->_toContactEmails[] = $value['email'];
         }
 
-        $setDefaults = TRUE;
       }
     }
+    if ($cc->getValue()) {
+      foreach ($this->getEmails($cc) as $value) {
+        if (!empty($value['contact_id'])) {
+          $this->_ccContactIds[] = $value['contact_id'];
+        }
+
+      }
+    }
+
+    if ($bcc->getValue()) {
+      foreach ($this->getEmails($bcc) as $value) {
+        if (!empty($value['contact_id'])) {
+          $this->_bccContactIds[] = $value['contact_id'];
+        }
+      }
+    }
+    $this->_allContactIds = array_unique(array_merge($this->_contactIds, $this->_ccContactIds, $this->_bccContactIds));
+    $setDefaults = empty($this->_allContactIds) ? $setDefaults: TRUE;
 
     //get the group of contacts as per selected by user in case of Find Activities
     if (!empty($this->_activityHolderIds)) {
