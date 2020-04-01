@@ -301,7 +301,7 @@
         var taxRates = {/literal}{$taxRates}{literal};
         var taxTerm = {/literal}{$taxTerm|@json_encode}{literal};
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
-        var currency = {/literal}{$currency|@json_encode}{literal};
+        var currency = {/literal}{$currency_symbol|@json_encode}{literal};
         var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if (term) {
