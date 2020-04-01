@@ -392,7 +392,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   public function buildQuickForm() {
 
     $this->buildQuickEntityForm();
-    $this->assign('currency', CRM_Core_BAO_Country::defaultCurrencySymbol());
+    $this->assign('currency_symbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
     $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     // build price set form.
     $buildPriceSet = FALSE;
@@ -1617,8 +1617,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if (!empty($lineItem[$this->_priceSetId])) {
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $invoicing = $invoiceSettings['invoicing'] ?? NULL;
+      $invoicing = Civi::settings()->get('invoicing');
       $taxAmount = FALSE;
       $totalTaxAmount = 0;
       foreach ($lineItem[$this->_priceSetId] as & $priceFieldOp) {
