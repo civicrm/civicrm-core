@@ -409,22 +409,63 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getUFLocale() {
-    // Polylang plugin
-    if (function_exists('pll_current_language')) {
-      $language = pll_current_language();
-    }
-    // WPML plugin
-    elseif (defined('ICL_LANGUAGE_CODE')) {
-      $language = ICL_LANGUAGE_CODE;
-    }
-    // Wordpress "standard" single language mode
-    // We still have to check if the function exists as it may not during bootstrap
-    elseif (function_exists('get_locale')) {
-      $language = get_locale();
+    // Bail early if method is called when WordPress isn't bootstrapped.
+    // Additionally, the function checked here is located in pluggable.php
+    // and is required by wp_get_referer() - so this also bails early if it is
+    // called too early in the request lifecycle.
+    // @see https://core.trac.wordpress.org/ticket/25294
+    if (!function_exists('wp_validate_redirect')) {
+      return NULL;
     }
 
-    if (!empty($language)) {
-      return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
+    // Default to WordPress User locale.
+    $locale = get_user_locale();
+
+    // Is this a "back-end" AJAX call?
+    $is_backend = FALSE;
+    if (wp_doing_ajax() && FALSE !== strpos(wp_get_referer(), admin_url())) {
+      $is_backend = TRUE;
+    }
+
+    // Ignore when in WordPress admin or it's a "back-end" AJAX call.
+    if (!(is_admin() || $is_backend)) {
+
+      // Reaching here means it is very likely to be a front-end context.
+
+      // Default to WordPress locale.
+      $locale = get_locale();
+
+      // Maybe override with the locale that Polylang reports.
+      if (function_exists('pll_current_language')) {
+        $pll_locale = pll_current_language('locale');
+        if (!empty($pll_locale)) {
+          $locale = $pll_locale;
+        }
+      }
+
+      // Maybe override with the locale that WPML reports.
+      elseif (defined('ICL_LANGUAGE_CODE')) {
+        $languages = apply_filters('wpml_active_languages', NULL);
+        foreach ($languages as $language) {
+          if ($language['active']) {
+            $locale = $language['default_locale'];
+            break;
+          }
+        }
+      }
+
+      // TODO: Set locale for other WordPress plugins.
+      // @see https://wordpress.org/plugins/tags/multilingual/
+      // A hook would be nice here.
+
+    }
+
+    if (!empty($locale)) {
+      // If for some reason only we get a language code, convert it to a locale.
+      if (2 === strlen($locale)) {
+        $locale = CRM_Core_I18n_PseudoConstant::longForShort($locale);
+      }
+      return $locale;
     }
     else {
       return NULL;
