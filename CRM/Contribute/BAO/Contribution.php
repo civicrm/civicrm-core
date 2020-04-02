@@ -103,30 +103,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       throw new CRM_Core_Exception($message);
     }
 
-    // first clean up all the money fields
-    $moneyFields = [
-      'total_amount',
-      'net_amount',
-      'fee_amount',
-      'non_deductible_amount',
-    ];
-
-    //if priceset is used, no need to cleanup money
-    if (!empty($params['skipCleanMoney'])) {
-      $moneyFields = [];
-    }
-    else {
-      // @todo put a deprecated here - this should be done in the form layer.
-      $params['skipCleanMoney'] = FALSE;
-      Civi::log()->warning('Deprecated code path. Money should always be clean before it hits the BAO.', array('civi.tag' => 'deprecated'));
-    }
-
-    foreach ($moneyFields as $field) {
-      if (isset($params[$field])) {
-        $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
-      }
-    }
-
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
