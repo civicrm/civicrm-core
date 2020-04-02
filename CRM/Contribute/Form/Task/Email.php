@@ -35,16 +35,6 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form object.
-   */
-  public function buildQuickForm() {
-    //enable form element
-    $this->assign('emailTask', TRUE);
-
-    CRM_Contact_Form_Task_EmailCommon::buildQuickForm($this);
-  }
-
-  /**
    * List available tokens for this form.
    *
    * @return array
