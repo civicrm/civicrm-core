@@ -282,6 +282,17 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
+    <name>serialize</name>
+    <type>int unsigned</type>
+    <title>Serialize</title>
+    <length>255</length>
+    <comment>Serialization method - a non-null value indicates a multi-valued field.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::fieldSerialization</callback>
+    </pseudoconstant>
+    <add>5.26</add>
+  </field>
+  <field>
     <name>filter</name>
     <type>varchar</type>
     <title>Field Filter</title>
