@@ -909,7 +909,7 @@ class InstallRequirements {
         $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk. The preferred version is %3.', array(
           1 => $phpVersion,
           2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-          3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
+          3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
         ));
         $this->warning($testDetails);
       }
