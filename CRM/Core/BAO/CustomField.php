@@ -396,6 +396,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.date_format,
                             $cfTable.time_format,
                             $cgTable.is_multiple,
+                            $cfTable.serialize,
                             $cgTable.table_name,
                             og.name as option_group_name
                      FROM $cfTable
@@ -478,6 +479,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['is_required'] = $dao->is_required;
           $fields[$dao->id]['table_name'] = $dao->table_name;
           $fields[$dao->id]['column_name'] = $dao->column_name;
+          $fields[$dao->id]['serialize'] = $dao->serialize;
           $fields[$dao->id]['where'] = $dao->table_name . '.' . $dao->column_name;
           // Probably we should use a different fn to get the extends tables but this is a refactor so not changing that now.
           $fields[$dao->id]['extends_table'] = array_key_exists($dao->extends, CRM_Core_BAO_CustomQuery::$extendsMap) ? CRM_Core_BAO_CustomQuery::$extendsMap[$dao->extends] : '';
@@ -2523,15 +2525,20 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
   /**
    * Does this field store a serialized string?
    *
-   * @param array|object $field
+   * @param CRM_Core_DAO_CustomField|array $field
    *
    * @return bool
    */
   public static function isSerialized($field) {
     // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
     $html_type = is_object($field) ? $field->html_type : $field['html_type'];
-    // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
-    return ($html_type === 'CheckBox' || strpos($html_type, 'Multi') !== FALSE);
+    // APIv3 has a "legacy" mode where it returns old-style html_type of "Multi-Select"
+    // If anyone is using this function in conjunction with legacy api output, we'll accomodate:
+    if ($html_type === 'CheckBox' || strpos($html_type, 'Multi') !== FALSE) {
+      return TRUE;
+    }
+    // Otherwise this is the new standard as of 5.26
+    return is_object($field) ? !empty($field->serialize) : !empty($field['serialize']);
   }
 
   /**
