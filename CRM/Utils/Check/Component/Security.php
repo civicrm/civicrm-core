@@ -223,6 +223,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         "{$civicrm_root}/packages/html2text/class.html2text.inc",
         \Psr\Log\LogLevel::CRITICAL,
       ],
+      [
+        // MOSS CIV-01-002: The "demo.html" is problematic. Other unnecessary files should be deleted as a precaution. Consider deleting the folder and re-running 'composer install'.
+        Civi::paths()->getPath('[civicrm.bower]/google-code-prettify/styles/demo.html'),
+        \Psr\Log\LogLevel::CRITICAL,
+      ],
+      [
+        // MOSS CIV-01-002: Certain QUnit addons are problematic. Other unnecessary files should be deleted as a precaution. Consider deleting the folder and re-running 'composer install'.
+        Civi::paths()->getPath('[civicrm.bower]/qunit/addons'),
+        \Psr\Log\LogLevel::CRITICAL,
+      ],
     ];
     foreach ($files as $file) {
       if (file_exists($file[0])) {
