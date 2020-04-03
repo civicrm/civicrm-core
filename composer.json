@@ -201,7 +201,7 @@
       },
       "google-code-prettify": {
         "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
-        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile", "demo.html"]
+        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile", "examples", "*.html", "run_prettify*js"]
       },
       "jquery": {
         "url": "https://github.com/civicrm/jquery/archive/1.12.4-civicrm-1.2.zip"
