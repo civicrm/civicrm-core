@@ -105,7 +105,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $gid = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'testAllFormInputs']);
 
     $dtype = CRM_Core_BAO_CustomField::dataType();
-    $htype = CRM_Core_BAO_CustomField::dataToHtml();
+    $htype = CRM_Custom_Form_Field::$_dataToHTML;
 
     $n = 0;
     foreach ($dtype as $dkey => $dvalue) {

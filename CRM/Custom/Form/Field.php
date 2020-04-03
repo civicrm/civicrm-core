@@ -62,9 +62,35 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   private static $_dataTypeValues = NULL;
   private static $_dataTypeKeys = NULL;
 
-  private static $_dataToHTML = NULL;
-
   private static $_dataToLabels = NULL;
+
+  /**
+   * Used for mapping data types to html type options.
+   *
+   * Each item in this array corresponds to the same index in the dataType array
+   * @var array
+   */
+  public static $_dataToHTML = [
+    [
+      'Text' => 'Text',
+      'Select' => 'Select',
+      'Radio' => 'Radio',
+      'CheckBox' => 'CheckBox',
+      'Multi-Select' => 'Multi-Select',
+      'Autocomplete-Select' => 'Autocomplete-Select',
+    ],
+    ['Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'],
+    ['Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'],
+    ['Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'],
+    ['TextArea' => 'TextArea', 'RichTextEditor' => 'RichTextEditor'],
+    ['Date' => 'Select Date'],
+    ['Radio' => 'Radio'],
+    ['StateProvince' => 'Select State/Province', 'Multi-Select' => 'Multi-Select State/Province'],
+    ['Country' => 'Select Country', 'Multi-Select' => 'Multi-Select Country'],
+    ['File' => 'File'],
+    ['Link' => 'Link'],
+    ['ContactReference' => 'Autocomplete-Select'],
+  ];
 
   /**
    * Set variables up before form is built.
@@ -75,10 +101,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if (!(self::$_dataTypeKeys)) {
       self::$_dataTypeKeys = array_keys(CRM_Core_BAO_CustomField::dataType());
       self::$_dataTypeValues = array_values(CRM_Core_BAO_CustomField::dataType());
-    }
-
-    if (!self::$_dataToHTML) {
-      self::$_dataToHTML = CRM_Core_BAO_CustomField::dataToHtml();
     }
 
     //custom field id

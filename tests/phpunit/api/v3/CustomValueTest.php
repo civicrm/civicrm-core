@@ -94,7 +94,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->_customFieldID = $this->_customField['id'];
 
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
-    $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
+    $dataToHtmlTypes = CRM_Custom_Form_Field::$_dataToHTML;
     $count = 0;
     $optionSupportingHTMLTypes = ['Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Multi-Select'];
 
