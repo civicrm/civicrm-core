@@ -75,7 +75,21 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
    * @throws \CiviCRM_API3_Exception
    */
   public static function installCreditNotes(CRM_Queue_TaskContext $ctx) {
-    civicrm_api3('Extension', 'install', ['keys' => 'sequentialcreditnotes']);
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic.
+    // (2) On new installs, the extension is activated purely via default SQL INSERT.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'sequentialcreditnotes',
+      'name' => 'Sequential credit notes',
+      'label' => 'Sequential credit notes',
+      'file' => 'sequentialcreditnotes',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
     return TRUE;
   }
 
