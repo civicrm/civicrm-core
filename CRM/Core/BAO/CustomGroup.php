@@ -1296,10 +1296,10 @@ ORDER BY civicrm_custom_group.weight,
         continue;
       }
       foreach ($group['fields'] as $field) {
-        if (CRM_Utils_Array::value('element_value', $field) !== NULL) {
+        if (isset($field['element_value'])) {
           $value = $field['element_value'];
         }
-        elseif (CRM_Utils_Array::value('default_value', $field) !== NULL &&
+        elseif (isset($field['default_value']) &&
           ($action != CRM_Core_Action::UPDATE ||
             // CRM-7548
             !array_key_exists('element_value', $field)
