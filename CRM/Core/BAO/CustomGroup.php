@@ -1316,10 +1316,10 @@ ORDER BY civicrm_custom_group.weight,
         }
 
         $elementName = $field['element_name'];
+        $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
 
-        switch ($field['html_type']) {
-          case 'Multi-Select':
-          case 'CheckBox':
+        if ($serialize) {
+          if ($field['data_type'] != 'Country' && $field['data_type'] != 'StateProvince') {
             $defaults[$elementName] = [];
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($field['id'], $inactiveNeeded);
             if ($viewMode) {
@@ -1377,10 +1377,8 @@ ORDER BY civicrm_custom_group.weight,
                 }
               }
             }
-            break;
-
-          case 'Multi-Select Country':
-          case 'Multi-Select State/Province':
+          }
+          else {
             if (isset($value)) {
               $checkedValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
               foreach ($checkedValue as $val) {
@@ -1389,9 +1387,10 @@ ORDER BY civicrm_custom_group.weight,
                 }
               }
             }
-            break;
-
-          case 'Select Country':
+          }
+        }
+        else {
+          if ($field['data_type'] == 'Country') {
             if ($value) {
               $defaults[$elementName] = $value;
             }
@@ -1399,9 +1398,8 @@ ORDER BY civicrm_custom_group.weight,
               $config = CRM_Core_Config::singleton();
               $defaults[$elementName] = $config->defaultContactCountry;
             }
-            break;
-
-          default:
+          }
+          else {
             if ($field['data_type'] == "Float") {
               $defaults[$elementName] = (float) $value;
             }
@@ -1413,6 +1411,7 @@ ORDER BY civicrm_custom_group.weight,
             else {
               $defaults[$elementName] = $value;
             }
+          }
         }
       }
     }
