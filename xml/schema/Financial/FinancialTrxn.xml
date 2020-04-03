@@ -276,7 +276,7 @@
   <field>
     <name>pan_truncation</name>
     <uniqueName>financial_trxn_pan_truncation</uniqueName>
-    <title>Pan Truncation</title>
+    <title>PAN Truncation</title>
     <type>varchar</type>
     <length>4</length>
     <html>
