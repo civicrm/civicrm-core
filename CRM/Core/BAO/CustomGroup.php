@@ -1419,7 +1419,8 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * PostProcess function.
+   * Old function only called from one place...
+   * @see CRM_Dedupe_Finder::formatParams
    *
    * @param array $groupTree
    * @param array $params
@@ -1427,19 +1428,16 @@ ORDER BY civicrm_custom_group.weight,
    */
   public static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
     // Get the Custom form values and groupTree
-    // first reset all checkbox and radio data
     foreach ($groupTree as $groupID => $group) {
       if ($groupID === 'info') {
         continue;
       }
       foreach ($group['fields'] as $field) {
         $fieldId = $field['id'];
+        $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
 
-        //added Multi-Select option in the below if-statement
-        if ($field['html_type'] == 'CheckBox' ||
-          $field['html_type'] == 'Radio' ||
-          $field['html_type'] == 'Multi-Select'
-        ) {
+        // Reset all checkbox, radio and multiselect data
+        if ($field['html_type'] == 'Radio' || $serialize) {
           $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = 'NULL';
         }
 
@@ -1457,31 +1455,13 @@ ORDER BY civicrm_custom_group.weight,
           $groupTree[$groupID]['fields'][$fieldId]['customValue'] = [];
         }
 
-        switch ($groupTree[$groupID]['fields'][$fieldId]['html_type']) {
+        // Serialize checkbox and multi-select data (using array keys for checkbox)
+        if ($serialize) {
+          $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
+          $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
+        }
 
-          // added for CheckBox
-          case 'CheckBox':
-            if (!empty($v)) {
-              $customValue = array_keys($v);
-              $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = CRM_Core_DAO::VALUE_SEPARATOR
-                . implode(CRM_Core_DAO::VALUE_SEPARATOR, $customValue)
-                . CRM_Core_DAO::VALUE_SEPARATOR;
-            }
-            else {
-              $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = NULL;
-            }
-            break;
-
-          case 'Multi-Select':
-            if (!empty($v)) {
-              $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = CRM_Core_DAO::VALUE_SEPARATOR
-                . implode(CRM_Core_DAO::VALUE_SEPARATOR, $v)
-                . CRM_Core_DAO::VALUE_SEPARATOR;
-            }
-            else {
-              $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = NULL;
-            }
-            break;
+        switch ($field['html_type']) {
 
           case 'Select Date':
             $date = CRM_Utils_Date::processDate($v);
