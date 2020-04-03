@@ -1595,9 +1595,7 @@ ORDER BY civicrm_custom_group.weight,
           ) {
             $valid = CRM_Core_BAO_CustomValue::typecheck($field['data_type'], $value);
           }
-          if ($field['html_type'] == 'CheckBox' ||
-            $field['html_type'] == 'Multi-Select'
-          ) {
+          if (CRM_Core_BAO_CustomField::isSerialized($field)) {
             $value = str_replace("|", ",", $value);
             $mulValues = explode(',', $value);
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($key, TRUE);
