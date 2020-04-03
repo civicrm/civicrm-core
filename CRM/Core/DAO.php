@@ -2049,9 +2049,8 @@ SELECT contact_id
       foreach ($fields as $fieldName => $fieldDef) {
         $dbName = $fieldDef['name'];
         $FKClassName = $fieldDef['FKClassName'] ?? NULL;
-        $required = $fieldDef['required'] ?? NULL;
 
-        if (CRM_Utils_Array::value($dbName, $params) !== NULL && !is_array($params[$dbName])) {
+        if (isset($params[$dbName]) && !is_array($params[$dbName])) {
           $object->$dbName = $params[$dbName];
         }
 
