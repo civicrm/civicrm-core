@@ -454,7 +454,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
         'financial_trxn_pan_truncation' => [
           'name' => 'pan_truncation',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Pan Truncation'),
+          'title' => ts('PAN Truncation'),
           'description' => ts('Last 4 digits of credit card'),
           'maxlength' => 4,
           'size' => 4,
