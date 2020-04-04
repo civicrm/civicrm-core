@@ -817,6 +817,43 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check if participant is transferred correctly.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testTransferParticipantRegistration() {
+    //Register a contact to a sample event.
+    $this->createParticipantRecordsFromTwoFieldPriceSet();
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    //Check line item count of the contribution id before transfer.
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
+    $this->assertEquals(count($lineItems), 2);
+    $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $contribution['id'], 'participant_id', 'contribution_id');
+    /* @var CRM_Event_Form_SelfSvcTransfer $form */
+    $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
+    $toContactId = $this->individualCreate();
+    $form->transferParticipantRegistration($toContactId, $participantId, CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'event_id'));
+
+    //Assert participant is transferred to $toContactId.
+    $participant = $this->callAPISuccess('Participant', 'getsingle', [
+      'return' => ["transferred_to_contact_id"],
+      'id' => $participantId,
+    ]);
+    $this->assertEquals($participant['transferred_to_contact_id'], $toContactId);
+
+    //Assert $toContactId has a new registration.
+    $toParticipant = $this->callAPISuccess('Participant', 'getsingle', [
+      'contact_id' => $toContactId,
+    ]);
+    $this->assertEquals($toParticipant['participant_registered_by_id'], $participantId);
+
+    //Check line item count of the contribution id remains the same.
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
+    $this->assertEquals(count($lineItems), 2);
+  }
+
+  /**
    * Get the id of the created event.
    *
    * @return int
