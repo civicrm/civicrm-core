@@ -295,7 +295,7 @@ function _civicrm_api3_payment_create_spec(&$params) {
     'pan_truncation' => [
       'name' => 'pan_truncation',
       'type' => CRM_Utils_Type::T_STRING,
-      'title' => ts('Pan Truncation'),
+      'title' => ts('PAN Truncation'),
       'description' => ts('Last 4 digits of credit card'),
       'maxlength' => 4,
       'size' => 4,
