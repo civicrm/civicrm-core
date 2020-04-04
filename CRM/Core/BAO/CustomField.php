@@ -21,20 +21,6 @@
 class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
-   * Array for valid combinations of data_type & descriptions.
-   *
-   * @var array
-   */
-  public static $_dataType = NULL;
-
-  /**
-   * Array for valid combinations of data_type & html_type.
-   *
-   * @var array
-   */
-  public static $_dataToHtml = NULL;
-
-  /**
    * Array to hold (formatted) fields for import
    *
    * @var array
@@ -47,24 +33,21 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return array
    *   Data type => Description
    */
-  public static function &dataType() {
-    if (!(self::$_dataType)) {
-      self::$_dataType = [
-        'String' => ts('Alphanumeric'),
-        'Int' => ts('Integer'),
-        'Float' => ts('Number'),
-        'Money' => ts('Money'),
-        'Memo' => ts('Note'),
-        'Date' => ts('Date'),
-        'Boolean' => ts('Yes or No'),
-        'StateProvince' => ts('State/Province'),
-        'Country' => ts('Country'),
-        'File' => ts('File'),
-        'Link' => ts('Link'),
-        'ContactReference' => ts('Contact Reference'),
-      ];
-    }
-    return self::$_dataType;
+  public static function dataType() {
+    return [
+      'String' => ts('Alphanumeric'),
+      'Int' => ts('Integer'),
+      'Float' => ts('Number'),
+      'Money' => ts('Money'),
+      'Memo' => ts('Note'),
+      'Date' => ts('Date'),
+      'Boolean' => ts('Yes or No'),
+      'StateProvince' => ts('State/Province'),
+      'Country' => ts('Country'),
+      'File' => ts('File'),
+      'Link' => ts('Link'),
+      'ContactReference' => ts('Contact Reference'),
+    ];
   }
 
   /**
@@ -89,40 +72,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       'ContactReference' => CRM_Utils_Type::T_INT,
       'Country' => CRM_Utils_Type::T_INT,
     ];
-  }
-
-  /**
-   * Get data to html array.
-   *
-   * (Does this caching achieve anything?)
-   *
-   * @return array
-   */
-  public static function dataToHtml() {
-    if (!self::$_dataToHtml) {
-      self::$_dataToHtml = [
-        [
-          'Text' => 'Text',
-          'Select' => 'Select',
-          'Radio' => 'Radio',
-          'CheckBox' => 'CheckBox',
-          'Multi-Select' => 'Multi-Select',
-          'Autocomplete-Select' => 'Autocomplete-Select',
-        ],
-        ['Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'],
-        ['Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'],
-        ['Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'],
-        ['TextArea' => 'TextArea', 'RichTextEditor' => 'RichTextEditor'],
-        ['Date' => 'Select Date'],
-        ['Radio' => 'Radio'],
-        ['StateProvince' => 'Select State/Province', 'Multi-Select' => 'Multi-Select State/Province'],
-        ['Country' => 'Select Country', 'Multi-Select' => 'Multi-Select Country'],
-        ['File' => 'File'],
-        ['Link' => 'Link'],
-        ['ContactReference' => 'Autocomplete-Select'],
-      ];
-    }
-    return self::$_dataToHtml;
   }
 
   /**
