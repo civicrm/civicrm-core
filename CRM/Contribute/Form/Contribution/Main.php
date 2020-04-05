@@ -93,7 +93,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $contribFields = CRM_Contribute_BAO_Contribution::getContributionFields();
 
       // remove component related fields
-      foreach ($this->_fields as $name => $dontCare) {
+      foreach ($this->_fields as $name => $fieldInfo) {
         //don't set custom data Used for Contribution (CRM-1344)
         if (substr($name, 0, 7) == 'custom_') {
           $id = substr($name, 7);
@@ -105,7 +105,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         elseif (array_key_exists($name, $contribFields) || (substr($name, 0, 11) == 'membership_') || (substr($name, 0, 13) == 'contribution_')) {
           continue;
         }
-        $fields[$name] = 1;
+        $fields[$name] = $fieldInfo;
       }
 
       if (!empty($fields)) {
