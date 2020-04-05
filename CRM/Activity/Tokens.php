@@ -145,7 +145,7 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
     ];
 
     // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
-    $activityId = $row->context['actionSearchResult']->entityID ?? $row->context[$this->getEntityContextSchema()];
+    $activityId = $row->context[$this->getEntityContextSchema()];
 
     $activity = $prefetch['activity'][$activityId];
 
