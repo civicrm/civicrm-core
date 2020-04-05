@@ -243,6 +243,20 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
+   * @inheritDoc
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+    $options = parent::buildOptions($fieldName, $context, $props);
+    // This provides legacy support for APIv3, allowing no-longer-existent html types
+    if ($fieldName == 'html_type' && isset($props['version']) && $props['version'] == 3) {
+      $options['Multi-Select'] = 'Multi-Select';
+      $options['Multi-Select Country'] = 'Multi-Select Country';
+      $options['Multi-Select State/Province'] = 'Multi-Select State/Province';
+    }
+    return $options;
+  }
+
+  /**
    * Store and return an array of all active custom fields.
    *
    * @param string $customDataType
@@ -661,11 +675,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     // FIXME: Why are select state/country separate widget types?
     $isSelect = (in_array($widget, [
       'Select',
-      'Multi-Select',
       'Select State/Province',
-      'Multi-Select State/Province',
       'Select Country',
-      'Multi-Select Country',
       'CheckBox',
       'Radio',
     ]));
@@ -682,7 +693,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $selectAttributes = ['class' => 'crm-select2'];
 
       // Search field is always multi-select
-      if ($search || strpos($field->html_type, 'Multi') !== FALSE) {
+      if ($search || (self::isSerialized($field) && $widget === 'Select')) {
         $selectAttributes['class'] .= ' huge';
         $selectAttributes['multiple'] = 'multiple';
         $selectAttributes['placeholder'] = $placeholder;
@@ -1055,9 +1066,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Select Country':
       case 'Select State/Province':
       case 'CheckBox':
-      case 'Multi-Select':
-      case 'Multi-Select State/Province':
-      case 'Multi-Select Country':
         if ($field['data_type'] == 'ContactReference' && $value) {
           if (is_numeric($value)) {
             $display = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'display_name');

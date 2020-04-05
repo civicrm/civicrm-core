@@ -181,12 +181,9 @@ class CRM_Core_SelectValues {
       'Select Date' => ts('Select Date'),
       'File' => ts('File'),
       'Select State/Province' => ts('Select State/Province'),
-      'Multi-Select State/Province' => ts('Multi-Select State/Province'),
       'Select Country' => ts('Select Country'),
-      'Multi-Select Country' => ts('Multi-Select Country'),
       'RichTextEditor' => ts('Rich Text Editor'),
       'Autocomplete-Select' => ts('Autocomplete-Select'),
-      'Multi-Select' => ts('Multi-Select'),
       'Link' => ts('Link'),
       'ContactReference' => ts('Autocomplete-Select'),
     ];

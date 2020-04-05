@@ -76,7 +76,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'Select' => 'Select',
       'Radio' => 'Radio',
       'CheckBox' => 'CheckBox',
-      'Multi-Select' => 'Multi-Select',
       'Autocomplete-Select' => 'Autocomplete-Select',
     ],
     ['Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'],
@@ -85,8 +84,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     ['TextArea' => 'TextArea', 'RichTextEditor' => 'RichTextEditor'],
     ['Date' => 'Select Date'],
     ['Radio' => 'Radio'],
-    ['StateProvince' => 'Select State/Province', 'Multi-Select' => 'Multi-Select State/Province'],
-    ['Country' => 'Select Country', 'Multi-Select' => 'Multi-Select Country'],
+    ['StateProvince' => 'Select State/Province'],
+    ['Country' => 'Select Country'],
     ['File' => 'File'],
     ['Link' => 'Link'],
     ['ContactReference' => 'Autocomplete-Select'],
@@ -141,7 +140,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
           'Select' => ts('Select'),
           'Radio' => ts('Radio'),
           'CheckBox' => ts('CheckBox'),
-          'Multi-Select' => ts('Multi-Select'),
           'Autocomplete-Select' => ts('Autocomplete-Select'),
         ],
         [
@@ -162,8 +160,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         ['TextArea' => ts('TextArea'), 'RichTextEditor' => ts('Rich Text Editor')],
         ['Date' => ts('Select Date')],
         ['Radio' => ts('Radio')],
-        ['StateProvince' => ts('Select State/Province'), 'Multi-Select' => ts('Multi-Select State/Province')],
-        ['Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country')],
+        ['StateProvince' => ts('Select State/Province')],
+        ['Country' => ts('Select Country')],
         ['File' => ts('Select File')],
         ['Link' => ts('Link')],
         ['ContactReference' => ts('Autocomplete-Select')],
@@ -727,7 +725,7 @@ SELECT count(*)
     if (isset($fields['data_type'][1])) {
       $dataField = $fields['data_type'][1];
     }
-    $optionFields = ['Select', 'Multi-Select', 'CheckBox', 'Radio'];
+    $optionFields = ['Select', 'CheckBox', 'Radio'];
 
     if (isset($fields['option_type']) && $fields['option_type'] == 1) {
       //capture duplicate Custom option values
