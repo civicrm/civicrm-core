@@ -6,12 +6,14 @@ trait CRM_Core_TokenTrait {
   private $customFieldTokens;
 
   /**
-   * CRM_Entity_Tokens constructor.
+   * CRM_Core_TokenTrait constructor.
+   *
+   * @param int $entitySubType
    */
-  public function __construct() {
+  public function __construct($entitySubType = NULL) {
     parent::__construct($this->getEntityName(), array_merge(
       $this->getBasicTokens(),
-      $this->getCustomFieldTokens()
+      $this->getCustomFieldTokens($entitySubType)
     ));
   }
 
@@ -75,10 +77,13 @@ trait CRM_Core_TokenTrait {
    * Get the tokens for custom fields
    * @return array token name => token label
    */
-  protected function getCustomFieldTokens() {
-    if (!isset($this->customFieldTokens)) {
-      $this->customFieldTokens = \CRM_Utils_Token::getCustomFieldTokens(ucfirst($this->getEntityName()));
+  protected function getCustomFieldTokens($entitySubType = NULL) {
+    $customTokens = [];
+    $tokenName = 'custom_%d';
+    foreach (CRM_Core_BAO_CustomField::getFields(ucfirst($this->getEntityName()), FALSE, FALSE, $entitySubType) as $id => $info) {
+      $customTokens[sprintf($tokenName, $id)] = $info['label'];
     }
+    $this->customFieldTokens = $customTokens;
     return $this->customFieldTokens;
   }
 
