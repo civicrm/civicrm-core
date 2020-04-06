@@ -15,6 +15,16 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Key {
+
+  /**
+   * The length of the randomly-generated, per-session signing key.
+   *
+   * Expressed as number of bytes. (Ex: 128 bits = 16 bytes)
+   *
+   * @var int
+   */
+  const PRIVATE_KEY_LENGTH = 16;
+
   public static $_key = NULL;
 
   public static $_sessionID = NULL;
@@ -30,7 +40,7 @@ class CRM_Core_Key {
       $session = CRM_Core_Session::singleton();
       self::$_key = $session->get('qfPrivateKey');
       if (!self::$_key) {
-        self::$_key = md5(uniqid(mt_rand(), TRUE)) . md5(uniqid(mt_rand(), TRUE));
+        self::$_key = base64_encode(random_bytes(self::PRIVATE_KEY_LENGTH));
         $session->set('qfPrivateKey', self::$_key);
       }
     }
