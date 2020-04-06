@@ -14,13 +14,18 @@
   */
 class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
 
+  /**
+   * Set up for tests.
+   *
+   * @throws \CRM_Core_Exception
+   */
   protected function setUp() {
     parent::setUp();
     $this->_contactIds = [
       $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
       $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
     ];
-    $this->_optionValue = $this->callApiSuccess('optionValue', 'create', [
+    $this->_optionValue = $this->callAPISuccess('optionValue', 'create', [
       'label' => '"Seamus Lee" <seamus@example.com>',
       'option_group_id' => 'from_email_address',
     ]);
@@ -28,6 +33,8 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
 
   /**
    * Test generating domain emails
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testDomainEmailGeneration() {
     $emails = CRM_Core_BAO_Email::domainEmails();
@@ -39,6 +46,13 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->_optionValue['id']]['label']);
   }
 
+  /**
+   * Test email uses signature.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function testPostProcessWithSignature() {
     $mut = new CiviMailUtils($this, TRUE);
     Civi::settings()->set('allow_mail_from_logged_in_contact', 1);

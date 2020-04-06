@@ -495,4 +495,26 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals(1, $emails[$email2['id']]['is_bulkmail']);
   }
 
+  /**
+   * Test getlist.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetlist() {
+    $name = 'Scarabée';
+    $emailMatchContactID = $this->individualCreate(['last_name' => $name, 'email' => 'bob@bob.com']);
+    $emailMatchEmailID = $this->callAPISuccessGetValue('Email', ['return' => 'id', 'contact_id' => $emailMatchContactID]);
+    $this->individualCreate(['last_name' => $name, 'email' => 'bob@bob.com', 'is_deceased' => 1]);
+    $this->individualCreate(['last_name' => $name, 'email' => 'bob@bob.com', 'is_deleted' => 1]);
+    $this->individualCreate(['last_name' => $name, 'api.email.create' => ['email' => 'bob@bob.com', 'on_hold' => 1]]);
+    $this->individualCreate(['last_name' => $name, 'do_not_email' => 1, 'api.email.create' => ['email' => 'bob@bob.com']]);
+    $nameMatchContactID = $this->individualCreate(['last_name' => 'bob', 'email' => 'blah@example.com']);
+    $nameMatchEmailID = $this->callAPISuccessGetValue('Email', ['return' => 'id', 'contact_id' => $nameMatchContactID]);
+    // We should get only the active live email-able contact.
+    $result = $this->callAPISuccess('Email', 'getlist', ['input' => 'bob'])['values'];
+    $this->assertCount(2, $result);
+    $this->assertEquals($nameMatchEmailID, $result[0]['id']);
+    $this->assertEquals($emailMatchEmailID, $result[1]['id']);
+  }
+
 }
