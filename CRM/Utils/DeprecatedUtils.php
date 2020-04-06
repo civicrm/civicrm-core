@@ -435,29 +435,24 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
           $fields['Address'][$key] = NULL;
 
           $htmlType = $customFields[$customFieldID]['html_type'] ?? NULL;
-          switch ($htmlType) {
-            case 'CheckBox':
-            case 'Multi-Select':
-              if ($val) {
-                $mulValues = explode(',', $val);
-                $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-                $newValues[$key] = [];
-                foreach ($mulValues as $v1) {
-                  foreach ($customOption as $v2) {
-                    if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
-                      (strtolower($v2['value']) == strtolower(trim($v1)))
-                    ) {
-                      if ($htmlType == 'CheckBox') {
-                        $newValues[$key][$v2['value']] = 1;
-                      }
-                      else {
-                        $newValues[$key][] = $v2['value'];
-                      }
-                    }
+          if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]) && $val) {
+            $mulValues = explode(',', $val);
+            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+            $newValues[$key] = [];
+            foreach ($mulValues as $v1) {
+              foreach ($customOption as $v2) {
+                if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
+                  (strtolower($v2['value']) == strtolower(trim($v1)))
+                ) {
+                  if ($htmlType == 'CheckBox') {
+                    $newValues[$key][$v2['value']] = 1;
+                  }
+                  else {
+                    $newValues[$key][] = $v2['value'];
                   }
                 }
               }
-              break;
+            }
           }
         }
       }
