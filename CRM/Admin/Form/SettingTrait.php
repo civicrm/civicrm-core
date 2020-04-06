@@ -164,7 +164,7 @@ trait CRM_Admin_Form_SettingTrait {
       if (isset($quickFormType)) {
         $options = $props['options'] ?? NULL;
         if ($options) {
-          if ($props['html_type'] === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
+          if ($quickFormType === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
             // If the spec specifies the field is not required add a null option.
             // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
             // when it is true.
