@@ -1965,8 +1965,8 @@ WHERE  id IN ( %1, %2 )
       }
     }
 
-    // since we need to save option group id :)
-    if (!isset($params['attributes']) && strtolower($htmlType) == 'textarea') {
+    // Set default textarea attributes
+    if ($op == 'create' && !isset($params['attributes']) && $htmlType == 'TextArea') {
       $params['attributes'] = 'rows=4, cols=60';
     }
     return $params;
