@@ -140,6 +140,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
 
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
+    // $details[0] is an array of [ contactID => contactDetails ]
     $details = $details[0];
     $tokenFields = CRM_Contact_Form_Task_LabelCommon::getTokenData($details);
 

@@ -66,7 +66,7 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
       $mailing->getFlattenedTokens(),
       get_class($this)
     );
-
+    // $details[0] is an array of [ contactID => contactDetails ]
     $mime = &$mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
       TRUE, $details[0][$session->get('userID')], $attachments
     );

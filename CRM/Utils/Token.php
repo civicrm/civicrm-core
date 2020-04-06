@@ -1228,7 +1228,6 @@ class CRM_Utils_Token {
     }
 
     $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
-
     $contactDetails = &$details[0];
 
     foreach ($contactIDs as $contactID) {
@@ -1263,8 +1262,9 @@ class CRM_Utils_Token {
       }
     }
 
+    // $contactDetails = &$details[0] = is an array of [ contactID => contactDetails ]
     // also call a hook and get token details
-    CRM_Utils_Hook::tokenValues($details[0],
+    CRM_Utils_Hook::tokenValues($contactDetails,
       $contactIDs,
       $jobID,
       $tokens,
@@ -1291,9 +1291,7 @@ class CRM_Utils_Token {
    * @return array
    *   contactDetails with hooks swapped out
    */
-  public static function getAnonymousTokenDetails($contactIDs = [
-    0,
-  ],
+  public static function getAnonymousTokenDetails($contactIDs = [0],
                                            $returnProperties = NULL,
                                            $skipOnHold = TRUE,
                                            $skipDeceased = TRUE,
