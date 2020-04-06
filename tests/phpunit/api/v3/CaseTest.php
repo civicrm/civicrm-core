@@ -998,4 +998,18 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertNotEquals($case_2['created_date'], $case_2['modified_date']);
   }
 
+  /**
+   * Test create function without standard timeline
+   */
+  public function testCaseCreateWithoutActivities() {
+    $params = $this->_params;
+    $params['standard_timeline'] = 0;
+    $result = $this->callAPISuccess('case', 'create', $params);
+    $id = $result['id'];
+
+    // Check result
+    $result = $this->callAPISuccess('Activity', 'get', ['case_id' => $id]);
+    $this->assertEquals($result['count'], 0);
+  }
+
 }

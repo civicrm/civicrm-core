@@ -147,7 +147,7 @@ function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
   $xmlProcessorParams = [
     'clientID' => $params['contact_id'] ?? NULL,
     'creatorID' => $params['creator_id'] ?? NULL,
-    'standardTimeline' => 1,
+    'standardTimeline' => $params['standard_timeline'] ?? NULL,
     'activityTypeName' => 'Open Case',
     'caseID' => $params['id'] ?? NULL,
     'subject' => $params['subject'] ?? NULL,
@@ -217,6 +217,12 @@ function _civicrm_api3_case_create_spec(&$params) {
     'name' => 'medium_id',
     'title' => 'Activity Medium',
     'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['standard_timeline'] = [
+    'api.default' => 1,
+    'title' => 'Standard Timeline?',
+    'description' => 'Add activities from the Standard Timeline (default = yes). If No, the case will have no activities.',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
 }
 
