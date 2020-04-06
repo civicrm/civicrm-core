@@ -1876,52 +1876,40 @@ WHERE  id IN ( %1, %2 )
       }
     }
     else {
-      $params['column_name'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
-        $params['id'],
-        'column_name'
-      );
-    }
-
-    switch (CRM_Utils_Array::value('html_type', $params)) {
-      case 'Select Date':
-        if (empty($params['date_format'])) {
-          $config = CRM_Core_Config::singleton();
-          $params['date_format'] = $config->dateInputFormat;
-        }
-        break;
-
-      case 'CheckBox':
-      case 'Multi-Select':
-        if (isset($params['default_checkbox_option'])) {
-          $tempArray = array_keys($params['default_checkbox_option']);
-          $defaultArray = [];
-          foreach ($tempArray as $k => $v) {
-            if ($params['option_value'][$v]) {
-              $defaultArray[] = $params['option_value'][$v];
-            }
-          }
-
-          if (!empty($defaultArray)) {
-            // also add the separator before and after the value per new convention (CRM-1604)
-            $params['default_value'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultArray) . CRM_Core_DAO::VALUE_SEPARATOR;
-          }
-        }
-        else {
-          if (!empty($params['default_option']) && isset($params['option_value'][$params['default_option']])
-          ) {
-            $params['default_value'] = $params['option_value'][$params['default_option']];
-          }
-        }
-        break;
+      $params['column_name'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'column_name');
     }
 
     $htmlType = $params['html_type'] ?? NULL;
     $dataType = $params['data_type'] ?? NULL;
-    $allowedOptionTypes = ['String', 'Int', 'Float', 'Money'];
+
+    if ($htmlType === 'Select Date' && empty($params['date_format'])) {
+      $params['date_format'] = Civi::settings()->get('dateInputFormat');
+    }
+
+    if ($htmlType === 'CheckBox' || $htmlType === 'Multi-Select') {
+      if (isset($params['default_checkbox_option'])) {
+        $defaultArray = [];
+        foreach (array_keys($params['default_checkbox_option']) as $k => $v) {
+          if ($params['option_value'][$v]) {
+            $defaultArray[] = $params['option_value'][$v];
+          }
+        }
+
+        if (!empty($defaultArray)) {
+          // also add the separator before and after the value per new convention (CRM-1604)
+          $params['default_value'] = CRM_Utils_Array::implodePadded($defaultArray);
+        }
+      }
+      else {
+        if (!empty($params['default_option']) && isset($params['option_value'][$params['default_option']])) {
+          $params['default_value'] = $params['option_value'][$params['default_option']];
+        }
+      }
+    }
 
     // create any option group & values if required
-    if ($htmlType != 'Text' && in_array($dataType, $allowedOptionTypes)
-    ) {
+    $allowedOptionTypes = ['String', 'Int', 'Float', 'Money'];
+    if ($htmlType != 'Text' && in_array($dataType, $allowedOptionTypes)) {
       //CRM-16659: if option_value then create an option group for this custom field.
       if ($params['option_type'] == 1 && (empty($params['option_group_id']) || !empty($params['option_value']))) {
         // first create an option group for this custom group
@@ -1952,14 +1940,9 @@ WHERE  id IN ( %1, %2 )
       // retrieve it from one of the other custom fields which use this option group
       if (empty($params['default_value'])) {
         //don't insert only value separator as default value, CRM-4579
-        $defaultValue = self::getOptionGroupDefault($params['option_group_id'],
-          $htmlType
-        );
+        $defaultValue = self::getOptionGroupDefault($params['option_group_id'], $htmlType);
 
-        if (!CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR,
-          $defaultValue
-        ))
-        ) {
+        if (!CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultValue))) {
           $params['default_value'] = $defaultValue;
         }
       }
