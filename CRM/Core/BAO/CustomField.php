@@ -1233,28 +1233,23 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if ($customField->data_type == 'Money' && isset($value)) {
       $value = number_format($value, 2);
     }
-    switch ($customField->html_type) {
-      case 'CheckBox':
-      case 'Multi-Select':
-        $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldId, FALSE);
-        $defaults[$elementName] = [];
-        $checkedValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-          substr($value, 1, -1)
-        );
-        foreach ($customOption as $val) {
-          if (in_array($val['value'], $checkedValue)) {
-            if ($customField->html_type == 'CheckBox') {
-              $defaults[$elementName][$val['value']] = 1;
-            }
-            elseif ($customField->html_type == 'Multi-Select') {
-              $defaults[$elementName][$val['value']] = $val['value'];
-            }
+    if (self::isSerialized($customField)) {
+      $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldId, FALSE);
+      $defaults[$elementName] = [];
+      $checkedValue = CRM_Utils_Array::explodePadded($value);
+      foreach ($customOption as $val) {
+        if (in_array($val['value'], $checkedValue)) {
+          if ($customField->html_type == 'CheckBox') {
+            $defaults[$elementName][$val['value']] = 1;
+          }
+          else {
+            $defaults[$elementName][$val['value']] = $val['value'];
           }
         }
-        break;
-
-      default:
-        $defaults[$elementName] = $value;
+      }
+    }
+    else {
+      $defaults[$elementName] = $value;
     }
   }
 
