@@ -161,7 +161,7 @@
       <rows>8</rows>
       <cols>60</cols>
     </html>
-    <comment>Details about the meeting (agenda, notes, etc).</comment>
+    <comment>Details populated from Open Case. Only used in the CiviCase extension.</comment>
     <add>1.8</add>
   </field>
   <field>

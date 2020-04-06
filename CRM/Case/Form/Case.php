@@ -355,6 +355,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if (!empty($params['case_type_id'])) {
       $params['case_type'] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['case_type_id'], 'name', 'id');
       $params['subject'] = $params['activity_subject'];
+      // 'civicrm_case.details' is not used in core but is used in the CiviCase extension
       $params['details'] = $params['activity_details'];
     }
     $caseObj = CRM_Case_BAO_Case::create($params);
