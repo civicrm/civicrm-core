@@ -327,6 +327,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'return' => ['title'],
     ];
 
+    $this->add('checkbox', 'serialize', ts('Multi-Select'));
+
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
       if (!empty($this->_values['option_group_id'])) {
@@ -946,6 +948,17 @@ AND    option_group_id = %2";
     }
     else {
       $params['is_search_range'] = 0;
+    }
+
+    // Serialization cannot be changed on update
+    if ($this->_id) {
+      unset($params['serialize']);
+    }
+    elseif (strpos($params['html_type'], 'Select') === 0) {
+      $params['serialize'] = $params['serialize'] ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 'null';
+    }
+    else {
+      $params['serialize'] = $params['html_type'] == 'CheckBox' ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 'null';
     }
 
     $filter = 'null';

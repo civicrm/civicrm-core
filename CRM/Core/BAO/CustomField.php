@@ -1891,7 +1891,12 @@ WHERE  id IN ( %1, %2 )
       $params['date_format'] = Civi::settings()->get('dateInputFormat');
     }
 
-    if ($htmlType === 'CheckBox' || $htmlType === 'Multi-Select') {
+    // Checkboxes are always serialized in current schema
+    if ($htmlType == 'CheckBox') {
+      $params['serialize'] = CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
+    }
+
+    if (!empty($params['serialize'])) {
       if (isset($params['default_checkbox_option'])) {
         $defaultArray = [];
         foreach (array_keys($params['default_checkbox_option']) as $k => $v) {
