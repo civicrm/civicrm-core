@@ -19,6 +19,7 @@
  * @param array $apiRequest
  *
  * @return mixed
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_generic_getList($apiRequest) {
   $entity = _civicrm_api_get_entity_name_from_camel($apiRequest['entity']);
@@ -37,6 +38,23 @@ function civicrm_api3_generic_getList($apiRequest) {
 
   $request['params']['check_permissions'] = !empty($apiRequest['params']['check_permissions']);
   $result = civicrm_api3($entity, 'get', $request['params']);
+  if (!empty($request['input']) && !empty($defaults['search_field_fallback']) && $result['count'] < $request['params']['options']['limit']) {
+    // We support a field fallback. Note we don't do this as an OR query because that could easily
+    // bypass an index & kill the server. We just 'pad' the results if needed with the second
+    // query - this is effectively the same as what the old Ajax::getContactEmail function did.
+    // Since these queries should be quick & often only one should be needed this is a simpler alternative
+    // to constructing a UNION via the api.
+    $request['params'][$defaults['search_field_fallback']] = $request['params'][$defaults['search_field']];
+    unset($request['params'][$defaults['search_field']]);
+    $request['params']['options']['limit'] -= $result['count'];
+    $result2 = civicrm_api3($entity, 'get', $request['params']);
+    $result['values'] = array_merge($result['values'], $result2['values']);
+    $result['count'] = count($result['values']);
+  }
+  else {
+    // Re-index to sequential = 0.
+    $result['values'] = array_merge($result['values']);
+  }
 
   // Hey api, would you like to format the output?
   $fnName = "_civicrm_api3_{$entity}_getlist_output";
@@ -98,7 +116,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults
   $request += $apiDefaults + $defaults;
   // Default api params
   $params = [
-    'sequential' => 1,
+    'sequential' => 0,
     'options' => [],
   ];
   // When searching e.g. autocomplete

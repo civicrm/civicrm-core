@@ -23,6 +23,9 @@
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_email_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Email');
@@ -37,7 +40,6 @@ function civicrm_api3_email_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_email_create_spec(&$params) {
-  // TODO a 'clever' default should be introduced
   $params['is_primary']['api.default'] = 0;
   $params['email']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
@@ -55,6 +57,10 @@ function _civicrm_api3_email_create_spec(&$params) {
  *
  * @return array
  *   API result array.
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_email_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -71,4 +77,33 @@ function civicrm_api3_email_delete($params) {
  */
 function civicrm_api3_email_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Set default getlist parameters.
+ *
+ * @see _civicrm_api3_generic_getlist_defaults
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_email_getlist_defaults(&$request) {
+  return [
+    'description_field' => [
+      'contact_id.sort_name',
+      'email',
+    ],
+    'params' => [
+      'on_hold' => 0,
+      'contact_id.is_deleted' => 0,
+      'contact_id.is_deceased' => 0,
+      'contact_id.do_not_email' => 0,
+    ],
+    'label_field' => 'contact_id.display_name',
+    // If no results from sort_name try email.
+    'search_field' => 'contact_id.sort_name',
+    'search_field_fallback' => 'email',
+  ];
+
 }
