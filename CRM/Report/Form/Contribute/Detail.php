@@ -185,6 +185,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
               ],
             ],
             'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+            'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
             'thankyou_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
             'contribution_source' => [
               'title' => ts('Source'),
@@ -241,6 +242,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'contribution_status_id' => ['title' => ts('Contribution Status')],
             'payment_instrument_id' => ['title' => ts('Payment Method')],
             'receive_date' => ['title' => ts('Date Received')],
+            'receipt_date' => ['title' => ts('Receipt Date')],
             'thankyou_date' => ['title' => ts('Thank-you Date')],
           ],
           'group_bys' => [
