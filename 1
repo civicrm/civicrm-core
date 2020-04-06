@@ -1,0 +1,32 @@
+Add / make fit for purpose email.getlist api call
+
+The function CRM_Contact_Page_AJAX::getContactEmail is one of our  earlier  ajax attempts & this approach has been largely
+replaced with entity Reference fields. In order to switch over we need to bring Email.getlist api to parity which  means
+1) searching on sortname first, if less than 10 results on emails include emails
+2) appropriate respect for includeWildCardInName (this should already be in the generic getlist)
+3) filter out on_hold, is_deceased, do_not_email
+4) acl support (should already  be part of the api).
+
+The trickiest of these to support is the first - because we need to avoid using a non-performant OR
+My current solution is the idea of a fallback field to search if the search results are less than the limit.
+in most cases this won't require a second query but when it does it should be fairly quick.
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Mon Apr 6 15:48:00 2020 +1200
+#
+# On branch emailget
+# Changes to be committed:
+#	modified:   api/v3/Email.php
+#	modified:   api/v3/Generic/Getlist.php
+#	modified:   tests/phpunit/CRM/Contact/Form/Task/EmailCommonTest.php
+#	modified:   tests/phpunit/api/v3/ContactTest.php
+#	modified:   tests/phpunit/api/v3/EmailTest.php
+#
+# Changes not staged for commit:
+#	modified:   api/v3/Email.php
+#	modified:   templates/CRM/Contact/Form/Task/Email.tpl
+#	modified:   tests/phpunit/CRM/Contact/Form/Task/EmailCommonTest.php
+#	modified:   tests/phpunit/api/v3/EmailTest.php
+#
