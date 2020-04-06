@@ -2990,8 +2990,8 @@ class CRM_Contact_BAO_Query {
     // even one group might equate to multiple when looking at children so IN is simpler.
     // @todo - also look at != casting but there are rows below to review.
     $opReplacements = [
-      'EMPTY' => 'NULL',
-      'NOT EMPTY' => 'NOT NULL',
+      'IS EMPTY' => 'IS NULL',
+      'IS NOT EMPTY' => 'IS NOT NULL',
       '=' => 'IN',
     ];
     if (isset($opReplacements[$op])) {

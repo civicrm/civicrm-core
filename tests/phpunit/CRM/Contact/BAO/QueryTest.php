@@ -862,6 +862,10 @@ civicrm_relationship.is_active = 1 AND
     $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
     $resultDAO = $queryObj->searchQuery();
     $this->assertEquals(1, $resultDAO->N);
+
+    $queryObj = new CRM_Contact_BAO_Query([['group', 'IS NOT EMPTY', '', 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(1, $resultDAO->N);
   }
 
   /**
