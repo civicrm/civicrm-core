@@ -2337,8 +2337,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           elseif ($name == 'world_region') {
             $defaults[$fldName] = $details['worldregion_id'];
           }
-          elseif ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($name)) {
-            $defaults[$fldName] = self::reformatProfileDefaults($field, $details[$name]);
+          elseif (CRM_Core_BAO_CustomField::getKeyID($name)) {
+            $defaults[$fldName] = self::formatCustomValue($field, $details[$name]);
           }
           else {
             $defaults[$fldName] = $details[$name];
@@ -2417,19 +2417,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                         $defaults[$fldName] = $value[$fieldName];
                       }
                     }
-                    elseif (substr($fieldName, 0, 14) === 'address_custom' &&
-                      CRM_Utils_Array::value(substr($fieldName, 8), $value)
-                    ) {
-                      $defaults[$fldName] = self::reformatProfileDefaults($field, $value[substr($fieldName, 8)]);
+                    elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                      $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                     }
                   }
                 }
-                else {
-                  if (substr($fieldName, 0, 14) === 'address_custom' &&
-                    CRM_Utils_Array::value(substr($fieldName, 8), $value)
-                  ) {
-                    $defaults[$fldName] = self::reformatProfileDefaults($field, $value[substr($fieldName, 8)]);
-                  }
+                elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                  $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                 }
               }
             }
@@ -3590,48 +3584,31 @@ SELECT  group_id
   }
 
   /**
-   * This function is used to format the profile default values.
+   * Format custom field value for use in prepopulating a quickform profile field.
    *
    * @param array $field
-   *   Associated array of profile fields to render.
+   *   Field metadata.
    * @param string $value
-   *   Value to render
+   *   Raw value
    *
-   * @return $defaults
+   * @return mixed
    *   String or array, depending on the html type
    */
-  public static function reformatProfileDefaults($field, $value) {
-    $defaults = [];
+  private static function formatCustomValue($field, $value) {
+    if (CRM_Core_BAO_CustomField::isSerialized($field)) {
+      $value = CRM_Utils_Array::explodePadded($value);
 
-    switch ($field['html_type']) {
-      case 'Multi-Select State/Province':
-      case 'Multi-Select Country':
-      case 'Multi-Select':
-        $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($value));
-        foreach ($v as $item) {
-          if ($item) {
-            $defaults[$item] = $item;
-          }
+      if ($field['html_type'] === 'CheckBox') {
+        $checkboxes = [];
+        foreach (array_filter($value) as $item) {
+          $checkboxes[$item] = 1;
+          // CRM-2969 seems like we need this for QF style checkboxes in profile where its multiindexed
+          $checkboxes["[{$item}]"] = 1;
         }
-        break;
-
-      case 'CheckBox':
-        $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-        foreach ($v as $item) {
-          if ($item) {
-            $defaults[$item] = 1;
-            // seems like we need this for QF style checkboxes in profile where its multiindexed
-            // CRM-2969
-            $defaults["[{$item}]"] = 1;
-          }
-        }
-        break;
-
-      default:
-        $defaults = $value;
-        break;
+        return $checkboxes;
+      }
     }
-    return $defaults;
+    return $value;
   }
 
 }
