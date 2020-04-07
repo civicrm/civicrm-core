@@ -540,11 +540,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
   /**
    * Copy custom data of the initial contribution into its recurring contributions.
+   * @deprecated This is a broken function! It always copies from the first contribution, not the template or latest.
    *
    * @param int $recurId
    * @param int $targetContributionId
    */
   public static function copyCustomValues($recurId, $targetContributionId) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use the API to copy custom values for contributions');
     if ($recurId && $targetContributionId) {
       // get the initial contribution id of recur id
       $sourceContributionId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');

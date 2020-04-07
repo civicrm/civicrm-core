@@ -250,7 +250,6 @@ class CRM_Core_Payment_BaseIPN {
     //copy initial contribution custom fields for recurring contributions
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
@@ -334,7 +333,6 @@ class CRM_Core_Payment_BaseIPN {
     //copy initial contribution custom fields for recurring contributions
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
