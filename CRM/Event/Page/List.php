@@ -24,7 +24,7 @@ class CRM_Event_Page_List extends CRM_Core_Page {
     $this->assign('events', $info);
 
     // check if we're in shopping cart mode for events
-    $enable_cart = (boolean) Civi::settings()->get('enable_cart');
+    $enable_cart = (bool) Civi::settings()->get('enable_cart');
     $this->assign('eventCartEnabled', $enable_cart);
 
     if ($enable_cart) {

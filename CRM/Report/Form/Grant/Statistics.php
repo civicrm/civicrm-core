@@ -487,7 +487,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
                 "({$values['percentage']}%)";
             }
             $totalAmt = implode(', ', $totalAmount);
-            $count = (boolean) CRM_Utils_Array::value('count', $values, 0) ? $values['count'] . " ({$values['percentage']}%)" : '';
+            $count = empty($values['count']) ? '' : "{$values['count']} ({$values['percentage']}%)";
             $row[] = [
               'civicrm_grant_total_grants' => $field,
               'civicrm_grant_count' => $count,
