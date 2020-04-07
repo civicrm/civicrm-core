@@ -88,7 +88,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       // create relationships for the ones that are required
       foreach ($xml->CaseRoles as $caseRoleXML) {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
-          if ((int ) $relationshipTypeXML->creator == 1) {
+          if ($relationshipTypeXML->creator) {
             if (!$this->createRelationships($relationshipTypeXML,
               $params
             )
@@ -109,18 +109,14 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     foreach ($xml->ActivitySets as $activitySetsXML) {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
         if ($standardTimeline) {
-          if ((boolean ) $activitySetXML->timeline) {
-            return $this->processStandardTimeline($activitySetXML,
-              $params
-            );
+          if ($activitySetXML->timeline) {
+            return $this->processStandardTimeline($activitySetXML, $params);
           }
         }
         elseif ($activitySetName) {
-          $name = (string ) $activitySetXML->name;
+          $name = (string) $activitySetXML->name;
           if ($name == $activitySetName) {
-            return $this->processActivitySet($activitySetXML,
-              $params
-            );
+            return $this->processActivitySet($activitySetXML, $params);
           }
         }
       }
@@ -272,13 +268,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $result = [];
     foreach ($activityTypesXML as $activityTypeXML) {
       foreach ($activityTypeXML as $recordXML) {
-        $activityTypeName = (string ) $recordXML->name;
-        $maxInstances = (string ) $recordXML->max_instances;
+        $activityTypeName = (string) $recordXML->name;
+        $maxInstances = (string) $recordXML->max_instances;
         $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;
 
         if ($activityTypeInfo['id']) {
           if ($maskAction) {
-            if ($maskAction == 'edit' && '0' === (string ) $recordXML->editable) {
+            if ($maskAction == 'edit' && '0' === (string) $recordXML->editable) {
               $result[$maskAction][] = $activityTypeInfo['id'];
             }
           }
@@ -729,8 +725,8 @@ AND        a.is_deleted = 0
     $result = [];
     foreach ($activitySetsXML as $activitySetXML) {
       foreach ($activitySetXML as $recordXML) {
-        $activitySetName = (string ) $recordXML->name;
-        $activitySetLabel = (string ) $recordXML->label;
+        $activitySetName = (string) $recordXML->name;
+        $activitySetLabel = (string) $recordXML->label;
         $result[$activitySetName] = $activitySetLabel;
       }
     }
