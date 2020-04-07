@@ -1427,6 +1427,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     ];
 
     $this->assignTabs();
+    $this->sqlFormattedArray = [];
     $this->sqlArray[] = $sql;
     foreach ($this->sqlArray as $sql) {
       foreach (['LEFT JOIN'] as $term) {
