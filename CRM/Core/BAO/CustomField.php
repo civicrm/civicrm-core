@@ -1440,19 +1440,11 @@ SELECT id
         }
       }
     }
-
-    if ($customFields[$customFieldId]['html_type'] == 'Multi-Select') {
-      if ($value) {
-        $value = CRM_Utils_Array::implodePadded($value);
-      }
-      else {
-        $value = '';
-      }
+    elseif (self::isSerialized($customFields[$customFieldId])) {
+      $value = $value ? CRM_Utils_Array::implodePadded($value) : '';
     }
 
-    if (($customFields[$customFieldId]['html_type'] == 'Multi-Select' ||
-        $customFields[$customFieldId]['html_type'] == 'CheckBox'
-      ) &&
+    if (self::isSerialized($customFields[$customFieldId]) &&
       $customFields[$customFieldId]['data_type'] == 'String' &&
       !empty($customFields[$customFieldId]['text_length']) &&
       !empty($value)
@@ -2616,20 +2608,17 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
       }
       $params['fkName'] = $fkName;
     }
-    if ($field->data_type == 'Country' && $field->html_type == 'Select Country') {
+    if ($field->data_type == 'Country' && !self::isSerialized($field)) {
       $params['fk_table_name'] = 'civicrm_country';
       $params['fk_field_name'] = 'id';
       $params['fk_attributes'] = 'ON DELETE SET NULL';
     }
-    elseif ($field->data_type == 'Country' && $field->html_type == 'Multi-Select Country') {
-      $params['type'] = 'varchar(255)';
-    }
-    elseif ($field->data_type == 'StateProvince' && $field->html_type == 'Select State/Province') {
+    elseif ($field->data_type == 'StateProvince' && !self::isSerialized($field)) {
       $params['fk_table_name'] = 'civicrm_state_province';
       $params['fk_field_name'] = 'id';
       $params['fk_attributes'] = 'ON DELETE SET NULL';
     }
-    elseif ($field->data_type == 'StateProvince' && $field->html_type == 'Multi-Select State/Province') {
+    elseif ($field->data_type == 'StateProvince' || $field->data_type == 'Country') {
       $params['type'] = 'varchar(255)';
     }
     elseif ($field->data_type == 'File') {
