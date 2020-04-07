@@ -752,7 +752,8 @@
     $scope.saveDoc = function() {
       return {
         description: ts('Save API call as a smart group.'),
-        comment: ts('Allows you to create a SavedSearch containing the WHERE clause of this API call.'),
+        comment: ts('Create a SavedSearch using these API params to populate a smart group.') +
+          '\n\n' + ts('NOTE: you must select contact id as the only field.')
       };
     };
 
@@ -761,6 +762,15 @@
     writeCode();
 
     $scope.save = function() {
+      $scope.params.limit = $scope.params.offset = 0;
+      if ($scope.params.chain.length) {
+        CRM.alert(ts('Smart groups are not compatible with API chaining.'), ts('Error'), 'error', {expires: 5000});
+        return;
+      }
+      if ($scope.params.select.length !== 1 || !_.includes($scope.params.select[0], 'id')) {
+        CRM.alert(ts('To create a smart group, the API must select contact id and no other fields.'), ts('Error'), 'error', {expires: 5000});
+        return;
+      }
       var model = {
         title: '',
         description: '',
@@ -771,10 +781,11 @@
         params: JSON.parse(angular.toJson($scope.params))
       };
       model.params.version = 4;
-      delete model.params.select;
       delete model.params.chain;
       delete model.params.debug;
       delete model.params.limit;
+      delete model.params.offset;
+      delete model.params.orderBy;
       delete model.params.checkPermissions;
       var options = CRM.utils.adjustDialogDefaults({
         width: '500px',

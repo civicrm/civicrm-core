@@ -23,13 +23,14 @@ namespace api\v4\Entity;
 
 use api\v4\UnitTestCase;
 use Civi\Api4\Contact;
+use Civi\Api4\Email;
 
 /**
  * @group headless
  */
 class SavedSearchTest extends UnitTestCase {
 
-  public function testApi4SmartGroup() {
+  public function testContactSmartGroup() {
     $in = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'yes')->addValue('do_not_phone', TRUE)->execute()->first();
     $out = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'no')->addValue('do_not_phone', FALSE)->execute()->first();
 
@@ -44,12 +45,42 @@ class SavedSearchTest extends UnitTestCase {
         ],
       ],
       'chain' => [
-        'group' => ['Group', 'create', ['values' => ['title' => 'Hello Test', 'saved_search_id' => '$id']], 0],
+        'group' => ['Group', 'create', ['values' => ['title' => 'Contact Test', 'saved_search_id' => '$id']], 0],
       ],
     ])->first();
 
     // Oops we don't have an api4 syntax yet for selecting contacts in a group.
     $ins = civicrm_api3('Contact', 'get', ['group' => $savedSearch['group']['name'], 'options' => ['limit' => 0]]);
+    $this->assertEquals(1, count($ins['values']));
+    $this->assertArrayHasKey($in['id'], $ins['values']);
+    $this->assertArrayNotHasKey($out['id'], $ins['values']);
+  }
+
+  public function testEmailSmartGroup() {
+    $in = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'yep')->execute()->first();
+    $out = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'nope')->execute()->first();
+    $email = uniqid() . '@' . uniqid();
+    Email::create()->setCheckPermissions(FALSE)->addValue('email', $email)->addValue('contact_id', $in['id'])->execute();
+
+    $savedSearch = civicrm_api4('SavedSearch', 'create', [
+      'values' => [
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['contact_id'],
+          'where' => [
+            ['email', '=', $email],
+          ],
+        ],
+      ],
+      'chain' => [
+        'group' => ['Group', 'create', ['values' => ['title' => 'Email Test', 'saved_search_id' => '$id']], 0],
+      ],
+    ])->first();
+
+    // Oops we don't have an api4 syntax yet for selecting contacts in a group.
+    $ins = civicrm_api3('Contact', 'get', ['group' => $savedSearch['group']['name'], 'options' => ['limit' => 0]]);
+    $this->assertEquals(1, count($ins['values']));
     $this->assertArrayHasKey($in['id'], $ins['values']);
     $this->assertArrayNotHasKey($out['id'], $ins['values']);
   }
