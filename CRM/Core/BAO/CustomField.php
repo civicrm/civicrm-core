@@ -1950,7 +1950,7 @@ WHERE  id IN ( %1, %2 )
       // retrieve it from one of the other custom fields which use this option group
       if (empty($params['default_value'])) {
         //don't insert only value separator as default value, CRM-4579
-        $defaultValue = self::getOptionGroupDefault($params['option_group_id'], $htmlType);
+        $defaultValue = self::getOptionGroupDefault($params['option_group_id'], !empty($params['serialize']));
 
         if (!CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultValue))) {
           $params['default_value'] = $defaultValue;
@@ -2209,49 +2209,33 @@ WHERE  option_group_id = {$optionGroupId}";
    * Get option group default.
    *
    * @param int $optionGroupId
-   * @param string $htmlType
+   * @param bool $serialize
    *
    * @return null|string
    */
-  public static function getOptionGroupDefault($optionGroupId, $htmlType) {
+  public static function getOptionGroupDefault($optionGroupId, $serialize) {
     $query = "
-SELECT   default_value, html_type
+SELECT   default_value, serialize
 FROM     civicrm_custom_field
 WHERE    option_group_id = {$optionGroupId}
-AND      default_value IS NOT NULL
-ORDER BY html_type";
+AND      default_value IS NOT NULL";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-    $defaultValue = NULL;
-    $defaultHTMLType = NULL;
     while ($dao->fetch()) {
-      if ($dao->html_type == $htmlType) {
+      if ($dao->serialize == $serialize) {
         return $dao->default_value;
       }
-      if ($defaultValue == NULL) {
-        $defaultValue = $dao->default_value;
-        $defaultHTMLType = $dao->html_type;
-      }
+      $defaultValue = $dao->default_value;
     }
 
-    // some conversions are needed if either the old or new has a html type which has potential
-    // multiple default values.
-    if (($htmlType == 'CheckBox' || $htmlType == 'Multi-Select') &&
-      ($defaultHTMLType != 'CheckBox' && $defaultHTMLType != 'Multi-Select')
-    ) {
-      $defaultValue = CRM_Core_DAO::VALUE_SEPARATOR . $defaultValue . CRM_Core_DAO::VALUE_SEPARATOR;
+    // Convert serialization
+    if (isset($defaultValue) && $serialize) {
+      return CRM_Utils_Array::implodePadded([$defaultValue]);
     }
-    elseif (($defaultHTMLType == 'CheckBox' || $defaultHTMLType == 'Multi-Select') &&
-      ($htmlType != 'CheckBox' && $htmlType != 'Multi-Select')
-    ) {
-      $defaultValue = substr($defaultValue, 1, -1);
-      $values = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        substr($defaultValue, 1, -1)
-      );
-      $defaultValue = $values[0];
+    elseif (isset($defaultValue)) {
+      return CRM_Utils_Array::explodePadded($defaultValue)[0];
     }
-
-    return $defaultValue;
+    return NULL;
   }
 
   /**
