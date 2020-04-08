@@ -4494,8 +4494,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertNotContains('US Dollar', $result['values']);
   }
 
+  /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function testSetCustomDataInCreateAndHook() {
-    $this->createCustomGroupWithFieldsOfAllTypes();
+    $this->createCustomGroupWithFieldOfType([], 'int');
+    $this->ids['CustomField']['text'] = (int) $this->createTextCustomField(['custom_group_id' => $this->ids['CustomGroup']['Custom Group']])['id'];
     $this->hookClass->setHook('civicrm_post', [
       $this,
       'civicrmPostContributionCustom',
@@ -4507,10 +4513,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
       'return' => ['id', 'custom_' . $this->ids['CustomField']['text'], 'custom_' . $this->ids['CustomField']['int']],
     ]);
-    $this->assertEquals(5, $getContribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['int']]);
+    $this->assertEquals(5, $getContribution['values'][$contribution['id']][$this->getCustomFieldName('int')]);
     $this->assertEquals('Some Text', $getContribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['text']]);
   }
 
+  /**
+   * Implement post hook.
+   *
+   * @param string $op
+   * @param string $objectName
+   * @param int $objectId
+   * @param \CRM_Core_DAO $objectRef
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function civicrmPostContributionCustom($op, $objectName, $objectId, &$objectRef) {
     if ($objectName === 'Contribution' && $op === 'create') {
       $this->callAPISuccess('Contribution', 'create', [

@@ -3893,7 +3893,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test merging 2 contacts with custom fields.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMergeCustomFields() {
     $contact1 = $this->individualCreate();
@@ -3913,6 +3915,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $dateField = $this->getCustomFieldName('select_date');
     $selectField = $this->getCustomFieldName('select_string');
     $countryField = $this->getCustomFieldName('country');
+    $referenceField = $this->getCustomFieldName('contact_reference');
 
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
     $customFieldValues = [
@@ -3922,6 +3925,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $dateField => '2018-01-01 17:10:56',
       $selectField => 'G',
       $countryField => $countriesByName['New Zealand'],
+      $referenceField => $this->householdCreate(),
     ];
     $this->callAPISuccess('Contact', 'create', array_merge([
       'id' => $contact1,
