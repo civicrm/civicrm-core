@@ -238,6 +238,9 @@
 
     $scope.isSpecial = function(name) {
       var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy'];
+      if ($scope.availableParams.limit && $scope.availableParams.offset) {
+        specialParams.push('limit', 'offset');
+      }
       return _.contains(specialParams, name);
     };
 

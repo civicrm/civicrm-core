@@ -62,9 +62,9 @@ abstract class AbstractQueryAction extends AbstractAction {
   /**
    * Maximum number of $ENTITIES to return.
    *
-   * Defaults to unlimited.
+   * Defaults to `0` - unlimited.
    *
-   * Note: the Api Explorer sets this to 25 by default to avoid timeouts.
+   * Note: the Api Explorer sets this to `25` by default to avoid timeouts.
    * Change or remove this default for your application code.
    *
    * @var int
@@ -74,7 +74,7 @@ abstract class AbstractQueryAction extends AbstractAction {
   /**
    * Zero-based index of first $ENTITY to return.
    *
-   * Defaults to "0" - first $ENTITY found.
+   * Defaults to `0` - first $ENTITY found.
    *
    * @var int
    */

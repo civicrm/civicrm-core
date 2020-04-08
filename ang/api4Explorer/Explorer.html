@@ -112,7 +112,19 @@
               <input class="collapsible-optgroups form-control" ng-model="controls.orderBy" crm-ui-select="{data: fieldsAndJoins}" placeholder="Add orderBy" />
             </div>
           </fieldset>
-
+          <fieldset ng-if="availableParams.limit && availableParams.offset">
+            <div class="api4-input form-inline">
+              <span ng-mouseenter="help('limit', availableParams.limit)" ng-mouseleave="help()">
+                <label for="api4-param-limit">limit<span class="crm-marker" ng-if="availableParams.limit.required"> *</span></label>
+                <input class="form-control" type="number" min="0" id="api4-param-limit" ng-model="params.limit"/>
+              </span>
+              <span ng-mouseenter="help('offset', availableParams.offset)" ng-mouseleave="help()">
+                <label for="api4-param-offset">offset<span class="crm-marker" ng-if="availableParams.offset.required"> *</span></label>
+                <input class="form-control" type="number" min="0" id="api4-param-offset" ng-model="params.offset"/>
+              </span>
+              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times"></i></a>
+            </div>
+          </fieldset>
           <fieldset ng-if="availableParams.chain" ng-mouseenter="help('chain', availableParams.chain)" ng-mouseleave="help()">
             <legend>chain</legend>
             <div class="api4-input form-inline" ng-repeat="clause in params.chain" api4-exp-chain="clause" entities="entities" main-entity="entity" >
