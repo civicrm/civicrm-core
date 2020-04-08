@@ -29,6 +29,8 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
+    // @todo - more of the handling in this function should be move to the trait. Notably the title part is
+    //  not set on other forms that share the trait.
     // store case id if present
     $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'String', $this, FALSE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
@@ -64,17 +66,21 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     if ($this->_context === 'search') {
       $this->_single = TRUE;
     }
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
-
-    if (!$cid && $this->_context !== 'standalone') {
-      parent::preProcess();
+    if ($cid || $this->_context === 'standalone') {
+      // When search context is false the parent pre-process is not set. That avoids it changing the
+      // redirect url & attempting to set the search params of the form. It may have only
+      // historical significance.
+      $this->setIsSearchContext(FALSE);
     }
-
-    $this->assign('single', $this->_single);
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('isAdmin', 1);
-    }
+    $this->traitPreProcess();
   }
+
+  /**
+   * Stub function  as EmailTrait calls this.
+   *
+   * @todo move some code from preProcess into here.
+   */
+  public function setContactIDs() {}
 
   /**
    * List available tokens for this form.
