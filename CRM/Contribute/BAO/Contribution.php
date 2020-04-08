@@ -2623,9 +2623,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $contributionParams['tax_amount'] = $contribution->tax_amount;
       }
 
+      $customData = CRM_Contribute_BAO_ContributionRecur::getCustomDataForContribution($templateContribution['id']);
+      $contributionParams = array_merge($customData, $contributionParams);
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
       $contribution->id = $createContribution['id'];
-      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($contributionParams['contribution_recur_id'], $contribution->id);
       self::handleMembershipIDOverride($contribution->id, $input);
       return TRUE;
     }

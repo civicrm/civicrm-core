@@ -542,6 +542,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * @deprecated
    * Copy custom data of the initial contribution into its recurring contributions.
    *
    * @param int $recurId
@@ -584,6 +585,44 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         }
       }
     }
+  }
+
+  /**
+   * Copy custom data of the initial contribution into its recurring contributions.
+   * Returns data as an array formatted for API3 create (eg. custom_x = XX, custom_y = BB)
+   *
+   * @todo this could be made generic. also maybe it belongs in api3 somewhere. Similar to _civicrm_api3_custom_data_get()
+   *
+   * @param int $contributionID
+   *
+   * @return array
+   */
+  public static function getCustomDataForContribution($contributionID) {
+    // copy custom data
+    $extends = ['Contribution'];
+    $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+    if ($groupTree) {
+      foreach ($groupTree as $groupID => $group) {
+        foreach ($group['fields'] as $fieldID => $field) {
+          $table[$groupTree[$groupID]['table_name']][$fieldID] = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
+        }
+      }
+    }
+    foreach ($table as $tableName => $tableColumns) {
+      $select = 'SELECT ' . implode(', ', $tableColumns);
+      $from = ' FROM ' . $tableName;
+      $where = " WHERE {$tableName}.entity_id = {$contributionID}";
+      $query = $select . $from . $where;
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
+        foreach ($tableColumns as $fieldID => $column) {
+          if (property_exists($dao, $column)) {
+            $customData["custom_{$fieldID}"] = $dao->$column;
+          }
+        }
+      }
+    }
+    return $customData ?? [];
   }
 
   /**
