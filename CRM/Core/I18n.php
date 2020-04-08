@@ -193,7 +193,7 @@ class CRM_Core_I18n {
           if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
             $codes[] = $filename;
             if (!isset($all[$filename])) {
-              $all[$filename] = $labels[$filename];
+              $all[$filename] = $labels[$filename] ?? "($filename)";
             }
           }
         }
