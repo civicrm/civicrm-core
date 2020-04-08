@@ -161,10 +161,9 @@ abstract class SqlFunction extends SqlExpression {
    * Get the name of this sql function.
    * @return string
    */
-  public function getName(): string {
-    $className = get_class($this);
-    $pos = strrpos($className, 'SqlFunction');
-    return substr($className, $pos + 11);
+  public static function getName(): string {
+    $className = static::class;
+    return substr($className, strrpos($className, 'SqlFunction') + 11);
   }
 
   /**
