@@ -477,9 +477,7 @@ class CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction(&$input, &$ids, &$objects, &$transaction) {
-    $contribution = &$objects['contribution'];
-
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $contribution);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction);
   }
 
   /**
