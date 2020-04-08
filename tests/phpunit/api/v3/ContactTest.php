@@ -3683,6 +3683,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-15443 - ensure getlist api does not return deleted contacts.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetlistExcludeConditions() {
     $name = 'Scarabée';
