@@ -4416,7 +4416,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $transaction = new CRM_Core_Transaction();
     }
     $contribution = $objects['contribution'];
-    $primaryContributionID = $contribution->id ?? $objects['first_contribution']->id;
+
+    $recurContrib = $objects['contributionRecur'] ?? NULL;
+    $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
+    if ($recurringContributionID) {
+      $primaryContributionID = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($recurringContributionID)['id'];
+    }
+    else {
+      $primaryContributionID = $contribution->id ?? $objects['first_contribution']->id;
+    }
+
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id]);
@@ -4440,8 +4449,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $participant = $objects['participant'] ?? NULL;
-    $recurContrib = $objects['contributionRecur'] ?? NULL;
-    $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = $objects['event'] ?? NULL;
 
     $paymentProcessorId = '';
