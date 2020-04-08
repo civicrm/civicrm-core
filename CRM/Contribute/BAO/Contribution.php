@@ -906,10 +906,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * Get memberships related to the contribution.
    *
    * @param int $contributionID
+   * @param int $contributionRecurID
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
-  protected static function getRelatedMemberships($contributionID) {
+  protected static function getRelatedMemberships($contributionID, $contributionRecurID = NULL) {
     $membershipPayments = civicrm_api3('MembershipPayment', 'get', [
       'return' => 'membership_id',
       'contribution_id' => (int) $contributionID,
@@ -917,6 +919,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $membershipIDs = [];
     foreach ($membershipPayments as $membershipPayment) {
       $membershipIDs[] = $membershipPayment['membership_id'];
+    }
+    if (empty($membershipIDs) && !empty($contributionRecurID)) {
+      $memberships = civicrm_api3('Membership', 'get', [
+        'contribution_recur_id' => $contributionRecurID,
+      ])['values'];
+      foreach ($memberships as $membership) {
+        $membershipIDs[] = $membership['id'];
+      }
     }
     if (empty($membershipIDs)) {
       return [];
@@ -5217,8 +5227,9 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @throws \CiviCRM_API3_Exception
    */
   public static function updateMembershipBasedOnCompletionOfContribution($contribution, $primaryContributionID, $changeDate) {
-    $memberships = self::getRelatedMemberships($contribution->id);
+    $memberships = self::getRelatedMemberships($primaryContributionID, $contribution->contribution_recur_id ?? NULL);
     foreach ($memberships as $membership) {
+      civicrm_api3('MembershipPayment', 'create', ['membership_id' => $membership['id'], 'contribution_id' => $contribution->id]);
       $membershipParams = [
         'id' => $membership['id'],
         'contact_id' => $membership['contact_id'],
