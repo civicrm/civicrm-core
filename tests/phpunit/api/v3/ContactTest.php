@@ -3893,7 +3893,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test merging 2 contacts with custom fields.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMergeCustomFields() {
     $contact1 = $this->individualCreate();
@@ -3921,8 +3921,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $linkField => 'http://example.org',
       $dateField => '2018-01-01 17:10:56',
       $selectField => 'G',
-      // Currently broken.
-      //$countryField => $countriesByName['New Zealand'],
+      $countryField => $countriesByName['New Zealand'],
     ];
     $this->callAPISuccess('Contact', 'create', array_merge([
       'id' => $contact1,
