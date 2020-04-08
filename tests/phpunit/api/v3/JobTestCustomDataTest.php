@@ -399,24 +399,29 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
 
   /**
    * Check we get a conflict on the customs field when the data conflicts for booleans (reverse).
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeCustomFieldConflictsOneBlank() {
+  public function testBatchMergeCustomFieldNoConflictsOneBlank() {
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $this->individualCreate();
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
-    $this->assertEquals(1, count($result['values']['merged']));
-    $this->assertEquals(0, count($result['values']['skipped']));
+    $this->assertCount(1, $result['values']['merged']);
+    $this->assertCount(0, $result['values']['skipped']);
   }
 
   /**
    * Check we get a conflict on the customs field when the data conflicts for booleans (reverse).
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeCustomFieldConflictsOneBlankReverse() {
-    $this->individualCreate();
+  public function testBatchMergeCustomFieldNoConflictsOneBlankReverse() {
+    $contactID = $this->individualCreate();
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
-    $this->assertEquals(1, count($result['values']['merged']));
-    $this->assertEquals(0, count($result['values']['skipped']));
+    $this->assertCount(1, $result['values']['merged']);
+    $this->assertCount(0, $result['values']['skipped']);
+    $this->assertEquals(1, $this->callAPISuccessGetValue('Contact', ['id' => $contactID, 'return' => 'custom_' . $this->customBoolFieldID]));
   }
 
 }
