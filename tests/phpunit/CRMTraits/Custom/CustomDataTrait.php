@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\CustomGroup;
+
 /**
  * Trait Custom Data trait.
  *
@@ -20,6 +22,9 @@ trait CRMTraits_Custom_CustomDataTrait {
    * Create a custom group with fields of multiple types.
    *
    * @param array $groupParams
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createCustomGroupWithFieldsOfAllTypes($groupParams = []) {
     $this->createCustomGroup($groupParams);
@@ -32,6 +37,9 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @param array $params
    *
    * @return int
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createCustomGroup($params = []) {
     $params = array_merge([
@@ -42,7 +50,7 @@ trait CRMTraits_Custom_CustomDataTrait {
       'max_multiple' => 0,
     ], $params);
     $identifier = $params['name'] ?? $params['title'];
-    $this->ids['CustomGroup'][$identifier] = $this->callAPISuccess('CustomGroup', 'create', $params)['id'];
+    $this->ids['CustomGroup'][$identifier] = CustomGroup::create()->setCheckPermissions(FALSE)->setValues($params)->execute()->first()['id'];
     return $this->ids['CustomGroup'][$identifier];
   }
 
@@ -77,7 +85,9 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @param string $identifier
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL) {
     $supported = ['text', 'select', 'date', 'int'];
