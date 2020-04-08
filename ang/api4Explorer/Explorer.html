@@ -84,18 +84,19 @@
             <div class="api4-input form-inline">
               <input class="collapsible-optgroups form-control" ng-model="controls[name]" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: fieldList(name), placeholder: ts('Add %1', {1: name.slice(0, -1)})}"/>
             </div>
-          </fieldset><fieldset ng-if="availableParams.groupBy" ng-mouseenter="help('groupBy', availableParams.groupBy)" ng-mouseleave="help()">
-          <legend>groupBy<span class="crm-marker" ng-if="availableParams.groupBy.required"> *</span></legend>
-          <div ng-model="params.groupBy" ui-sortable="{axis: 'y'}">
-            <div class="api4-input form-inline" ng-repeat="(pos, field) in params.groupBy">
-              <i class="crm-i fa-arrows"></i>
-              <input class="collapsible-optgroups form-control" ng-model="params.groupBy[pos]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+          </fieldset>
+          <fieldset ng-if="availableParams.groupBy" ng-mouseenter="help('groupBy', availableParams.groupBy)" ng-mouseleave="help()">
+            <legend>groupBy<span class="crm-marker" ng-if="availableParams.groupBy.required"> *</span></legend>
+            <div ng-model="params.groupBy" ui-sortable="{axis: 'y'}">
+              <div class="api4-input form-inline" ng-repeat="(pos, field) in params.groupBy">
+                <i class="crm-i fa-arrows"></i>
+                <input class="collapsible-optgroups form-control" ng-model="params.groupBy[pos]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+              </div>
             </div>
-          </div>
-          <div class="api4-input form-inline">
-            <input class="collapsible-optgroups form-control" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoins}" placeholder="Add groupBy" />
-          </div>
-        </fieldset>
+            <div class="api4-input form-inline">
+              <input class="collapsible-optgroups form-control" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoins}" placeholder="Add groupBy" />
+            </div>
+          </fieldset>
           <fieldset ng-if="availableParams.orderBy" ng-mouseenter="help('orderBy', availableParams.orderBy)" ng-mouseleave="help()">
             <legend>orderBy<span class="crm-marker" ng-if="availableParams.orderBy.required"> *</span></legend>
             <div ng-model="params.orderBy" ui-sortable="{axis: 'y'}">
