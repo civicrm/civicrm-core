@@ -129,13 +129,13 @@
   top: -2px;
 }
 
-#bootstrap-theme.api4-explorer-page .api4-where-fieldset fieldset {
+#bootstrap-theme.api4-explorer-page .api4-clause-fieldset fieldset {
   float: right;
   width: calc(100% - 58px);
   margin-top: -8px;
 }
 
-#bootstrap-theme.api4-explorer-page .api4-where-fieldset.api4-sorting fieldset .api4-where-group-sortable {
+#bootstrap-theme.api4-explorer-page .api4-clause-fieldset.api4-sorting fieldset .api4-clause-group-sortable {
   min-height: 3.5em;
 }
 

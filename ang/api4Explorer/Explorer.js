@@ -790,12 +790,12 @@
     };
   });
 
-  angular.module('api4Explorer').directive('crmApi4WhereClause', function($timeout) {
+  angular.module('api4Explorer').directive('crmApi4Clause', function($timeout) {
     return {
       scope: {
-        data: '=crmApi4WhereClause'
+        data: '=crmApi4Clause'
       },
-      templateUrl: '~/api4Explorer/WhereClause.html',
+      templateUrl: '~/api4Explorer/Clause.html',
       link: function (scope, element, attrs) {
         var ts = scope.ts = CRM.ts();
         scope.newClause = '';
@@ -803,7 +803,7 @@
         scope.operators = CRM.vars.api4.operators;
 
         scope.addGroup = function(op) {
-          scope.data.where.push([op, []]);
+          scope.data.clauses.push([op, []]);
         };
 
         scope.removeGroup = function() {
@@ -811,7 +811,7 @@
         };
 
         scope.onSort = function(event, ui) {
-          $('.api4-where-fieldset').toggleClass('api4-sorting', event.type === 'sortstart');
+          $(element).closest('.api4-clause-fieldset').toggleClass('api4-sorting', event.type === 'sortstart');
           $('.api4-input.form-inline').css('margin-left', '');
         };
 
@@ -828,12 +828,12 @@
           var field = value;
           $timeout(function() {
             if (field) {
-              scope.data.where.push([field, '=', '']);
+              scope.data.clauses.push([field, '=', '']);
               scope.newClause = null;
             }
           });
         });
-        scope.$watch('data.where', function(values) {
+        scope.$watch('data.clauses', function(values) {
           // Remove empty values
           _.each(values, function(clause, index) {
             if (typeof clause !== 'undefined' && !clause[0]) {
