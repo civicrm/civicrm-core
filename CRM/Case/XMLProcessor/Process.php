@@ -156,11 +156,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         $this->createActivity($activityTypeXML, $params);
       }
     }
-
-    // @todo dev/core#1675 - This is a temporary regression fix. Needs a
-    // proper fix.
-    $tx = new CRM_Core_Transaction();
-    $tx->commit();
   }
 
   /**
