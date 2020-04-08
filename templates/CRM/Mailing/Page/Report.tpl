@@ -167,9 +167,7 @@
 <tr>
   <td class="label nowrap">{ts}HTML Message{/ts}</td>
   <td>
-    {$report.mailing.body_html|mb_truncate:30|escape|nl2br}
-    <br/>
-    <strong><a class="crm-popup" href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+    <a class="crm-popup" href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a>
   </td>
 </tr>
 {/if}
