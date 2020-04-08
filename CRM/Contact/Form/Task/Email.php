@@ -80,6 +80,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * List available tokens for this form.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
