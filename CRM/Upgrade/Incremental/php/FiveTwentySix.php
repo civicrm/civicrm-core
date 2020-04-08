@@ -52,21 +52,44 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_26_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add option value for nl_BE', 'addNLBEOptionValue');
+    // Additional tasks here...
+    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
+    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
+  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Add option value for nl_BE language.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   */
+  public static function addNLBEOptionValue(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'languages',
+      'name' => 'nl_BE',
+      'label' => ts('Dutch (Belgium)'),
+      'value' => 'nl',
+      'is_active' => 1,
+    ]);
+    // Update the existing nl_NL entry.
+    \Civi\Api4\OptionValue::update()
+      ->addWhere('name', '=', 'nl_NL')
+      // Adding check against label in case they've customized it, in which
+      // case we don't want to overwrite that. The ts() part is tricky since
+      // it depends if they installed it in English first.
+      ->addClause('OR', ['label', '=', 'Dutch'], ['label', '=', ts('Dutch')])
+      ->addValue('label', ts('Dutch (Netherlands)'))
+      ->setLimit(1)
+      ->setCheckPermissions(FALSE)
+      ->execute();
+    return TRUE;
+  }
 
 }
