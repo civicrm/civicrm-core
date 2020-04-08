@@ -531,7 +531,7 @@ class CRM_Core_Permission {
     if (empty($item['access_callback']) ||
       is_numeric($item['access_callback'])
     ) {
-      return (boolean ) $item['access_callback'];
+      return (bool) $item['access_callback'];
     }
 
     // check whether the following Ajax requests submitted the right key
