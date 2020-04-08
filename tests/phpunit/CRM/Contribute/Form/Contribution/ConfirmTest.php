@@ -138,6 +138,40 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertRegExp("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
     // check that contribution status is changed to 'Completed' from 'Pending'
     $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    //delete contribution.
+    $this->callAPISuccess('contribution', 'delete', [
+      'id' => $processConfirmResult['contribution']->id,
+    ]);
+
+    //Process on behalf contribution.
+    unset($form->_params['contribution_id']);
+    $form->_contactID = $form->_values['related_contact'] = $form->_params['onbehalf_contact_id'] = $contactID;
+    $form->_params['contact_id'] = $this->organizationCreate();
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $contactID,
+      'contact_id_b' => $form->_params['contact_id'],
+      'relationship_type_id' => 5,
+      'is_current_employer' => 1,
+    ]);
+    $processConfirmResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form,
+      $form->_params,
+      $form->_params['onbehalf_contact_id'],
+      $form->_values['financial_type_id'],
+      0, FALSE
+    );
+    //check if contribution is created on org.
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $form->_params['onbehalf_contact_id'],
+    ]);
+
+    $activity = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'source_record_id' => $contribution['id'],
+      'contact_id' => $form->_params['onbehalf_contact_id'],
+      'activity_type_id' => "Contribution",
+    ]);
+    $this->assertEquals(1, $activity['count']);
   }
 
 }

@@ -2885,6 +2885,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
+    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id);
+    if (!empty($relatedContact['individual_id'])) {
+      $ids['related_contact'] = $relatedContact['individual_id'];
+    }
+
     if ($paymentProcessorID) {
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
         $this->is_test ? 'test' : 'live'
@@ -4552,10 +4557,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (empty($contribution->_relatedObjects['participant']) && !empty($contribution->_relatedObjects['membership'])) {
       // @fixme Can we remove this if altogether? - we removed the participant if / else and left relatedObjects['participant'] to ensure behaviour didn't change but it is probably not required.
       // @todo - use getRelatedMemberships instead
-      $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
       $contribution->trxn_id = $input['trxn_id'] ?? NULL;
       $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     }
+    $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
 
     CRM_Core_Error::debug_log_message("Contribution record updated successfully");
     $transaction->commit();

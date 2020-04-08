@@ -1011,15 +1011,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
+    $actParams = [];
     $targetContactID = NULL;
-    if (!empty($params['hidden_onbehalf_profile'])) {
+    if (!empty($params['onbehalf_contact_id'])) {
+      $actParams = [
+        'source_contact_id' => $params['onbehalf_contact_id'],
+        'on_behalf' => TRUE,
+      ];
       $targetContactID = $contribution->contact_id;
-      $contribution->contact_id = $contactID;
     }
 
     // create an activity record
     if ($contribution) {
-      CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
+      CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID, $actParams);
     }
 
     $transaction->commit();
