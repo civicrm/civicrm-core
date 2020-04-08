@@ -676,7 +676,7 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
   $transaction = new CRM_Core_Transaction();
   return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction,
-     $contribution, CRM_Utils_Array::value('is_post_payment_create', $params));
+     CRM_Utils_Array::value('is_post_payment_create', $params));
 }
 
 /**

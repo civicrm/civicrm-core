@@ -1675,7 +1675,7 @@ WHERE      activity.id IN ($activityIds)";
    * Add activity for Membership/Event/Contribution.
    *
    * @param object $activity
-   *   (reference) particular component object.
+   *   particular component object.
    * @param string $activityType
    *   For Membership Signup or Renewal.
    * @param int $targetContactID
@@ -1685,7 +1685,7 @@ WHERE      activity.id IN ($activityIds)";
    * @return bool|NULL
    */
   public static function addActivity(
-    &$activity,
+    $activity,
     $activityType = 'Membership Signup',
     $targetContactID = NULL,
     $params = []
