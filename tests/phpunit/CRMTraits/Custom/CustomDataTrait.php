@@ -113,53 +113,14 @@ trait CRMTraits_Custom_CustomDataTrait {
   public function createCustomFieldsOfAllTypes() {
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $ids = [];
-    $customField = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
-    $ids['text'] = $customField['id'];
-
-    if ((!empty($this->entity) && $this->entity !== 'Contribution') || empty($this->entity)) {
-      $customField = $this->createSelectCustomField(['custom_group_id' => $customGroupID]);
-      $ids['select_string'] = $customField['id'];
-    }
-
-    $customField = $this->createDateCustomField(['custom_group_id' => $customGroupID]);
-    $ids['select_date'] = $customField['id'];
-
-    $customField = $this->createIntCustomField(['custom_group_id' => $customGroupID]);
-    $ids['int'] = $customField['id'];
-
-    $params = [
-      'custom_group_id' => $customGroupID,
-      'name' => 'test_link',
-      'label' => 'test_link',
-      'html_type' => 'Link',
-      'data_type' => 'Link',
-      'default_value' => 'http://civicrm.org',
-      'weight' => 4,
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
-    ];
-
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
-
-    $ids['link'] = $customField['id'];
-    $fileField = $this->customFieldCreate([
-      'custom_group_id' => $customGroupID,
-      'data_type' => 'File',
-      'html_type' => 'File',
-      'default_value' => '',
-    ]);
-
-    $ids['file'] = $fileField['id'];
-    $ids['country'] = $this->customFieldCreate([
-      'custom_group_id' => $customGroupID,
-      'data_type' => 'Country',
-      'html_type' => 'Select Country',
-      'default_value' => '',
-      'label' => 'Country',
-      'option_type' => 0,
-    ])['id'];
-
+    $ids['text'] = (int) $this->createTextCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['select_string'] = (int) $this->createSelectCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['select_date'] = (int) $this->createDateCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['int'] = (int) $this->createIntCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['link'] = (int) $this->createLinkCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['file'] = (int) $this->createFileCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['country'] = (int) $this->createCountryCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['contact_reference'] = $this->createContactReferenceCustomField(['custom_group_id' => $customGroupID])['id'];
     return $ids;
   }
 
@@ -202,18 +163,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return array
    */
   protected function createIntCustomField($params = []) {
-    $params = array_merge([
-      'label' => 'Enter integer here',
-      'html_type' => 'Text',
-      'data_type' => 'Int',
-      'default_value' => '4',
-      'weight' => 1,
-      'is_required' => 1,
-      'sequential' => 1,
-      'is_searchable' => 1,
-      'is_search_range' => 1,
-    ], $params);
-
+    $params = array_merge($this->getFieldsValuesByType('Int'), $params);
     return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
   }
 
@@ -225,20 +175,61 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createTextCustomField($params = []) {
-    $params = array_merge([
-      'label' => 'Enter text here',
-      'html_type' => 'Text',
-      'data_type' => 'String',
-      'default_value' => 'xyz',
-      'weight' => 1,
-      'is_required' => 1,
-      'sequential' => 1,
-      'is_searchable' => 1,
-      'text_length' => 300,
-    ], $params);
+  protected function createContactReferenceCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('ContactReference'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
 
-    return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
+  /**
+   * Create a custom text fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createTextCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('String'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom text fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createLinkCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('Link'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom text fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createCountryCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('Country'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom text fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createFileCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('File'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 
   /**
@@ -250,40 +241,8 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return array
    */
   protected function createSelectCustomField(array $params): array {
-    $optionValue = [
-      [
-        'label' => 'Red',
-        'value' => 'R',
-        'weight' => 1,
-        'is_active' => 1,
-      ],
-      [
-        'label' => 'Yellow',
-        'value' => 'Y',
-        'weight' => 2,
-        'is_active' => 1,
-      ],
-      [
-        'label' => 'Green',
-        'value' => 'G',
-        'weight' => 3,
-        'is_active' => 1,
-      ],
-    ];
-
-    $params = array_merge([
-      'label' => 'Pick Color',
-      'html_type' => 'Select',
-      'data_type' => 'String',
-      'weight' => 2,
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
-      'option_values' => $optionValue,
-    ], $params);
-
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
-    return $customField['values'][$customField['id']];
+    $params = array_merge($this->getFieldsValuesByType('String', 'Select'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 
   /**
@@ -294,20 +253,130 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return array
    */
   protected function createDateCustomField($params): array {
-    $params = array_merge([
-      'name' => 'test_date',
-      'label' => 'Test Date',
-      'html_type' => 'Select Date',
-      'data_type' => 'Date',
-      'default_value' => '20090711',
-      'weight' => 3,
-      'is_searchable' => 1,
-      'is_search_range' => 1,
-      'time_format' => 1,
-    ], $params);
+    $params = array_merge($this->getFieldsValuesByType('Date'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
 
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
-    return $customField['values'][$customField['id']];
+  /**
+   * Get default field values for the type of field.
+   *
+   * @param $dataType
+   * @param string $htmlType
+   *
+   * @return mixed
+   */
+  public function getFieldsValuesByType($dataType, $htmlType = 'default') {
+    $values = $this->getAvailableFieldCombinations()[$dataType];
+    return array_merge([
+      'is_searchable' => 1,
+      'sequential' => 1,
+      'default_value' => '',
+      'is_required' => 0,
+    ], array_merge($values['default'], $values[$htmlType])
+    );
+  }
+
+  /**
+   * Get data available for custom fields.
+   *
+   * The 'default' key holds general values. Where more than one html type is an option
+   * then the any values that  differ to the defaults are keyed by html key.
+   *
+   * The order below is consistent with the UI.
+   *
+   * @return array
+   */
+  protected function getAvailableFieldCombinations() {
+    return [
+      'String' => [
+        'default' => [
+          'label' => 'Enter text here',
+          'html_type' => 'Text',
+          'data_type' => 'String',
+          'default_value' => 'xyz',
+          'text_length' => 300,
+        ],
+        'Select' => [
+          'label' => 'Pick Color',
+          'html_type' => 'Select',
+          'data_type' => 'String',
+          'text_length' => '',
+          'default_value' => '',
+          'option_values' => [
+            [
+              'label' => 'Red',
+              'value' => 'R',
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Yellow',
+              'value' => 'Y',
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Green',
+              'value' => 'G',
+              'weight' => 3,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+      ],
+      'Int' => [
+        'default' => [
+          'label' => 'Enter integer here',
+          'html_type' => 'Text',
+          'data_type' => 'Int',
+          'default_value' => '4',
+          'is_search_range' => 1,
+        ],
+      ],
+      'Date' => [
+        'default' => [
+          'name' => 'test_date',
+          'label' => 'Test Date',
+          'html_type' => 'Select Date',
+          'data_type' => 'Date',
+          'default_value' => '20090711',
+          'weight' => 3,
+          'is_search_range' => 1,
+          'time_format' => 1,
+        ],
+      ],
+      'Country' => [
+        'default' => [
+          'data_type' => 'Country',
+          'html_type' => 'Select Country',
+          'label' => 'Country',
+          'option_type' => 0,
+        ],
+      ],
+      'File' => [
+        'default' => [
+          'label' => 'My file',
+          'data_type' => 'File',
+          'html_type' => 'File',
+        ],
+      ],
+      'Link' => [
+        'default' => [
+          'name' => 'test_link',
+          'label' => 'test_link',
+          'html_type' => 'Link',
+          'data_type' => 'Link',
+          'default_value' => 'http://civicrm.org',
+        ],
+      ],
+      'ContactReference' => [
+        'default' => [
+          'label' => 'Contact reference field',
+          'html_type' => 'Autocomplete-Select',
+          'data_type' => 'ContactReference',
+        ],
+      ],
+    ];
   }
 
 }
