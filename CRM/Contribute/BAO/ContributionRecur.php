@@ -826,13 +826,16 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *   Payment status - this correlates to the machine name of the contribution status ID ie
    *   - Completed
    *   - Failed
-   * @param string $effectiveDate
+   * @param string $contributionReceiveDate
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function updateOnNewPayment($recurringContributionID, $paymentStatus, $effectiveDate) {
+  public static function updateOnNewPayment($recurringContributionID, $paymentStatus, $contributionReceiveDate) {
+    // If contributionReceiveDate matches next_sched_contribution_date we update next_sched_contribution_date by one period
+    $contributionReceiveDate = $contributionReceiveDate
+      ? date('Y-m-d H:i:s', strtotime($contributionReceiveDate))
+      : date('Y-m-d') . '00:00:00';
 
-    $effectiveDate = $effectiveDate ? date('Y-m-d', strtotime($effectiveDate)) : date('Y-m-d');
     if (!in_array($paymentStatus, ['Completed', 'Failed'])) {
       return;
     }
@@ -866,8 +869,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       // Only update next sched date if it's empty or 'just now' because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help.
       if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
-        strtotime($effectiveDate)) {
-        $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit'], strtotime($effectiveDate)));
+        strtotime($contributionReceiveDate)) {
+        $params['next_sched_contribution_date'] = date('Y-m-d H:i:s', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit'], strtotime($contributionReceiveDate)));
       }
     }
     civicrm_api3('ContributionRecur', 'create', $params);
