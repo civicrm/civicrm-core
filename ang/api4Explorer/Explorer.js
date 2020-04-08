@@ -377,7 +377,7 @@
               deep: format === 'json'
             });
           }
-          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy') {
+          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select') {
             $scope.$watch('params.' + name, function(values) {
               // Remove empty values
               _.each(values, function(clause, index) {
@@ -390,7 +390,7 @@
               var field = value;
               $timeout(function() {
                 if (field) {
-                  if (name === 'groupBy') {
+                  if (name === 'groupBy' || name === 'select') {
                     $scope.params[name].push(field);
                   } else {
                     var defaultOp = _.cloneDeep(objectParams[name]);

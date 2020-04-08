@@ -143,6 +143,10 @@
   display: inline-block;
 }
 
+#bootstrap-theme.api4-explorer-page i.fa-arrows {
+  cursor: move;
+}
+
 #bootstrap-theme.api4-explorer-page .api4-clause-badge {
   width: 55px;
   display: inline-block;

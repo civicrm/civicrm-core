@@ -50,10 +50,18 @@
             </label>
             <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="params[name] !== null"><i class="crm-i fa-times"></i></a>
           </div>
-          <div class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select && !isSelectRowCount()">
-            <label for="api4-param-select">select<span class="crm-marker" ng-if="availableParams.select.required"> *</span></label>
-            <input class="collapsible-optgroups form-control" ng-list crm-ui-select="{data: selectFieldsAndJoins, multiple: true}" placeholder="*" id="api4-param-select" ng-model="params.select" style="width: 85%;"/>
-          </div>
+          <fieldset class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select && !isSelectRowCount()">
+            <legend>select<span class="crm-marker" ng-if="availableParams.select.required"> *</span></legend>
+            <div ng-model="params.select" ui-sortable="{axis: 'y'}">
+              <div class="api4-input form-inline" ng-repeat="item in params.select">
+                <i class="crm-i fa-arrows"></i>
+                <input class="collapsible-optgroups form-control" ng-model="item" crm-ui-select="{data: selectFieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+              </div>
+            </div>
+            <div class="api4-input form-inline">
+              <input class="collapsible-optgroups form-control" ng-model="controls.select" crm-ui-select="{data: selectFieldsAndJoins}" placeholder="Add select" />
+            </div>
+          </fieldset>
           <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()"ng-if="availableParams.fields">
             <label for="api4-param-fields">fields<span class="crm-marker" ng-if="availableParams.fields.required"> *</span></label>
             <input class="form-control" ng-list crm-ui-select="{data: fields, multiple: true}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
