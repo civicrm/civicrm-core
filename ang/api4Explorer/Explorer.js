@@ -26,7 +26,8 @@
     $scope.actions = actions;
     $scope.fields = [];
     $scope.fieldsAndJoins = [];
-    $scope.selectFieldsAndJoins = [];
+    $scope.fieldsAndJoinsAndFunctions = [];
+    $scope.fieldsAndJoinsAndFunctionsAndWildcards = [];
     $scope.availableParams = {};
     $scope.params = {};
     $scope.index = '';
@@ -232,8 +233,12 @@
         (row.description ? '<div class="crm-select2-row-description"><p>' + _.escape(row.description) + '</p></div>' : '');
     };
 
-    $scope.clearParam = function(name) {
-      $scope.params[name] = $scope.availableParams[name].default;
+    $scope.clearParam = function(name, idx) {
+      if (typeof idx === 'undefined') {
+        $scope.params[name] = $scope.availableParams[name].default;
+      } else {
+        $scope.params[name].splice(idx, 1);
+      }
     };
 
     $scope.isSpecial = function(name) {
@@ -327,7 +332,8 @@
     function selectAction() {
       $scope.action = $routeParams.api4action;
       $scope.fieldsAndJoins.length = 0;
-      $scope.selectFieldsAndJoins.length = 0;
+      $scope.fieldsAndJoinsAndFunctions.length = 0;
+      $scope.fieldsAndJoinsAndFunctionsAndWildcards.length = 0;
       if (!actions.length) {
         formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params']);
       }
@@ -336,12 +342,29 @@
         $scope.fields = getFieldList($scope.action);
         if (_.contains(['get', 'update', 'delete', 'replace'], $scope.action)) {
           $scope.fieldsAndJoins = addJoins($scope.fields);
-          $scope.selectFieldsAndJoins = addJoins($scope.fields, true);
+          var fieldsAndFunctions = _.cloneDeep($scope.fields);
+          // SQL functions are supported if HAVING is
+          if (actionInfo.params.having) {
+            fieldsAndFunctions.push({
+              text: ts('FUNCTION'),
+              description: ts('Calculate result of a SQL function'),
+              children: _.transform(CRM.vars.api4.functions, function(result, fn) {
+                result.push({
+                  id: fn.name + '() AS ' + fn.name.toLowerCase(),
+                  text: fn.name + '()',
+                  description: fn.name + '(' + describeSqlFn(fn.params) + ')'
+                });
+              })
+            });
+          }
+          $scope.fieldsAndJoinsAndFunctions = addJoins(fieldsAndFunctions, true);
+          $scope.fieldsAndJoinsAndFunctionsAndWildcards = addJoins(fieldsAndFunctions, true);
         } else {
           $scope.fieldsAndJoins = $scope.fields;
-          $scope.selectFieldsAndJoins = _.cloneDeep($scope.fields);
+          $scope.fieldsAndJoinsAndFunctions = $scope.fields;
+          $scope.fieldsAndJoinsAndFunctionsAndWildcards = _.cloneDeep($scope.fields);
         }
-        $scope.selectFieldsAndJoins.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
+        $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
         _.each(actionInfo.params, function (param, name) {
           var format,
             defaultVal = _.cloneDeep(param.default);
@@ -377,20 +400,22 @@
               deep: format === 'json'
             });
           }
-          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select') {
-            $scope.$watch('params.' + name, function(values) {
+          if (typeof objectParams[name] !== 'undefined' && name !== 'orderBy') {
+            $scope.$watch('params.' + name, function (values) {
               // Remove empty values
-              _.each(values, function(clause, index) {
+              _.each(values, function (clause, index) {
                 if (!clause || !clause[0]) {
-                  $scope.params[name].splice(index, 1);
+                  $scope.clearParam(name, index);
                 }
               });
             }, true);
+          }
+          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select') {
             $scope.$watch('controls.' + name, function(value) {
               var field = value;
               $timeout(function() {
                 if (field) {
-                  if (name === 'groupBy' || name === 'select') {
+                  if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
                   } else {
                     var defaultOp = _.cloneDeep(objectParams[name]);
@@ -410,6 +435,25 @@
         $scope.availableParams = actionInfo.params;
       }
       writeCode();
+    }
+
+    function describeSqlFn(params) {
+      var desc = ' ';
+      _.each(params, function(param) {
+        desc += ' ';
+        if (param.prefix) {
+          desc += _.filter(param.prefix).join('|') + ' ';
+        }
+        if (param.expr === 1) {
+          desc += 'expr ';
+        } else if (param.expr > 1) {
+          desc += 'expr, ... ';
+        }
+        if (param.suffix) {
+          desc += ' ' + _.filter(param.suffix).join('|') + ' ';
+        }
+      });
+      return desc.replace(/[ ]+/g, ' ');
     }
 
     function defaultValues(defaultVal) {

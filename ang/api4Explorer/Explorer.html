@@ -53,13 +53,14 @@
           <fieldset class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select && !isSelectRowCount()">
             <legend>select<span class="crm-marker" ng-if="availableParams.select.required"> *</span></legend>
             <div ng-model="params.select" ui-sortable="{axis: 'y'}">
-              <div class="api4-input form-inline" ng-repeat="item in params.select">
+              <div class="api4-input form-inline" ng-repeat="item in params.select track by $index">
                 <i class="crm-i fa-arrows"></i>
-                <input class="collapsible-optgroups form-control" ng-model="item" crm-ui-select="{data: selectFieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+                <input class="form-control huge" type="text" ng-model="params.select[$index]" />
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('select', $index)"><i class="crm-i fa-times"></i></a>
               </div>
             </div>
             <div class="api4-input form-inline">
-              <input class="collapsible-optgroups form-control" ng-model="controls.select" crm-ui-select="{data: selectFieldsAndJoins}" placeholder="Add select" />
+              <input class="collapsible-optgroups form-control huge" ng-model="controls.select" crm-ui-select="{data: fieldsAndJoinsAndFunctionsAndWildcards}" placeholder="Add select" />
             </div>
           </fieldset>
           <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()"ng-if="availableParams.fields">
@@ -96,13 +97,14 @@
           <fieldset ng-if="availableParams.groupBy" ng-mouseenter="help('groupBy', availableParams.groupBy)" ng-mouseleave="help()">
             <legend>groupBy<span class="crm-marker" ng-if="availableParams.groupBy.required"> *</span></legend>
             <div ng-model="params.groupBy" ui-sortable="{axis: 'y'}">
-              <div class="api4-input form-inline" ng-repeat="(pos, field) in params.groupBy">
+              <div class="api4-input form-inline" ng-repeat="item in params.groupBy track by $index">
                 <i class="crm-i fa-arrows"></i>
-                <input class="collapsible-optgroups form-control" ng-model="params.groupBy[pos]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+                <input class="form-control huge" type="text" ng-model="params.groupBy[$index]" />
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('groupBy', $index)"><i class="crm-i fa-times"></i></a>
               </div>
             </div>
             <div class="api4-input form-inline">
-              <input class="collapsible-optgroups form-control" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoins}" placeholder="Add groupBy" />
+              <input class="collapsible-optgroups form-control huge" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoinsAndFunctions}" placeholder="Add groupBy" />
             </div>
           </fieldset>
           <fieldset ng-if="availableParams.orderBy" ng-mouseenter="help('orderBy', availableParams.orderBy)" ng-mouseleave="help()">
@@ -110,15 +112,16 @@
             <div ng-model="params.orderBy" ui-sortable="{axis: 'y'}">
               <div class="api4-input form-inline" ng-repeat="clause in params.orderBy">
                 <i class="crm-i fa-arrows"></i>
-                <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+                <input class="form-control huge" type="text" ng-model="clause[0]" />
                 <select class="form-control" ng-model="clause[1]">
                   <option value="ASC">ASC</option>
                   <option value="DESC">DESC</option>
                 </select>
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('orderBy', $index)"><i class="crm-i fa-times"></i></a>
               </div>
             </div>
             <div class="api4-input form-inline">
-              <input class="collapsible-optgroups form-control" ng-model="controls.orderBy" crm-ui-select="{data: fieldsAndJoins}" placeholder="Add orderBy" />
+              <input class="collapsible-optgroups form-control huge" ng-model="controls.orderBy" crm-ui-select="{data: fieldsAndJoinsAndFunctions}" placeholder="Add orderBy" />
             </div>
           </fieldset>
           <fieldset ng-if="availableParams.limit && availableParams.offset">
