@@ -269,9 +269,12 @@ class CRM_Dedupe_Merger {
 
   /**
    * We treat multi-valued custom sets as "related tables" similar to activities, contributions, etc.
+   *
    * @param string $request
    *   'relTables' or 'cidRefs'.
+   *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    * @see CRM-13836
    */
   public static function getMultiValueCustomSets($request) {
@@ -445,22 +448,24 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * belongings of the other contact and of their relations.
    *
    * @param int $otherID
-   * @param bool $tables
+   * @param array $tables
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function removeContactBelongings($otherID, $tables) {
     // CRM-20421: Removing Inherited memberships when memberships of parent are not migrated to new contact.
-    if (in_array("civicrm_membership", $tables)) {
+    if (in_array('civicrm_membership', $tables, TRUE)) {
       $membershipIDs = CRM_Utils_Array::collect('id',
         CRM_Utils_Array::value('values',
-          civicrm_api3("Membership", "get", [
-            "contact_id" => $otherID,
-            "return" => "id",
+          civicrm_api3('Membership', "get", [
+            'contact_id' => $otherID,
+            'return' => 'id',
           ])
         )
       );
 
       if (!empty($membershipIDs)) {
-        civicrm_api3("Membership", "get", [
+        civicrm_api3('Membership', 'get', [
           'owner_membership_id' => ['IN' => $membershipIDs],
           'api.Membership.delete' => ['id' => '$value.id'],
         ]);
@@ -477,6 +482,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param bool $tables
    * @param array $tableOperations
    * @param array $customTableToCopyFrom
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function moveContactBelongings($mainId, $otherId, $tables, $tableOperations, array $customTableToCopyFrom) {
     $cidRefs = self::cidRefs();
