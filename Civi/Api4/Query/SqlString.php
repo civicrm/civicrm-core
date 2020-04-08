@@ -18,15 +18,15 @@ class SqlString extends SqlExpression {
 
   protected function initialize() {
     // Remove surrounding quotes
-    $str = substr($this->arg, 1, -1);
+    $str = substr($this->expr, 1, -1);
     // Unescape the outer quote character inside the string to prevent double-escaping in render()
-    $quot = substr($this->arg, 0, 1);
+    $quot = substr($this->expr, 0, 1);
     $backslash = chr(0) . 'backslash' . chr(0);
-    $this->arg = str_replace(['\\\\', "\\$quot", $backslash], [$backslash, $quot, '\\\\'], $str);
+    $this->expr = str_replace(['\\\\', "\\$quot", $backslash], [$backslash, $quot, '\\\\'], $str);
   }
 
   public function render(array $fieldList): string {
-    return '"' . \CRM_Core_DAO::escapeString($this->arg) . '"';
+    return '"' . \CRM_Core_DAO::escapeString($this->expr) . '"';
   }
 
 }

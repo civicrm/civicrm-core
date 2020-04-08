@@ -59,4 +59,42 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals(4, $agg['count']);
   }
 
+  public function testGroupHaving() {
+    $cid = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
+    Contribution::save()
+      ->setCheckPermissions(FALSE)
+      ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
+      ->setRecords([
+        ['total_amount' => 100, 'receive_date' => '2020-02-02'],
+        ['total_amount' => 200, 'receive_date' => '2020-02-02'],
+        ['total_amount' => 300, 'receive_date' => '2020-03-03'],
+        ['total_amount' => 400, 'receive_date' => '2020-04-04'],
+      ])
+      ->execute();
+    $result = Contribution::get()
+      ->setCheckPermissions(FALSE)
+      ->addGroupBy('contact_id')
+      ->addGroupBy('receive_date')
+      ->addSelect('contact_id')
+      ->addSelect('receive_date')
+      ->addSelect('AVG(total_amount) AS average')
+      ->addSelect('SUM(total_amount)')
+      ->addSelect('MAX(total_amount)')
+      ->addSelect('MIN(total_amount)')
+      ->addSelect('COUNT(*) AS count')
+      ->addOrderBy('receive_date')
+      ->addHaving('contact_id', '=', $cid)
+      ->addHaving('receive_date', '<', '2020-04-01')
+      ->execute();
+    $this->assertCount(2, $result);
+    $this->assertEquals(150, $result[0]['average']);
+    $this->assertEquals(300, $result[1]['average']);
+    $this->assertEquals(300, $result[0]['SUM:total_amount']);
+    $this->assertEquals(300, $result[1]['SUM:total_amount']);
+    $this->assertEquals(200, $result[0]['MAX:total_amount']);
+    $this->assertEquals(100, $result[0]['MIN:total_amount']);
+    $this->assertEquals(2, $result[0]['count']);
+    $this->assertEquals(1, $result[1]['count']);
+  }
+
 }

@@ -65,6 +65,11 @@ class Api4SelectQuery extends SelectQuery {
   public $groupBy = [];
 
   /**
+   * @var array
+   */
+  public $having = [];
+
+  /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
@@ -76,6 +81,7 @@ class Api4SelectQuery extends SelectQuery {
     $this->orderBy = $apiGet->getOrderBy();
     $this->limit = $apiGet->getLimit();
     $this->offset = $apiGet->getOffset();
+    $this->having = $apiGet->getHaving();
     if ($apiGet->getDebug()) {
       $this->debugOutput =& $apiGet->_debugOutput;
     }
@@ -106,6 +112,7 @@ class Api4SelectQuery extends SelectQuery {
     $this->buildOrderBy();
     $this->buildLimit();
     $this->buildGroupBy();
+    $this->buildHavingClause();
     return $this->query->toSQL();
   }
 
@@ -129,7 +136,7 @@ class Api4SelectQuery extends SelectQuery {
         break;
       }
       $results[$id] = [];
-      foreach ($this->selectAliases as $alias) {
+      foreach ($this->selectAliases as $alias => $expr) {
         $returnName = $alias;
         $alias = str_replace('.', '_', $alias);
         $results[$id][$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
@@ -186,7 +193,8 @@ class Api4SelectQuery extends SelectQuery {
         }
       }
       if ($valid) {
-        $alias = $this->selectAliases[] = $expr->getAlias();
+        $alias = $expr->getAlias();
+        $this->selectAliases[$alias] = $expr->getExpr();
         $this->query->select($expr->render($this->apiFieldSpec) . " AS `$alias`");
       }
     }
@@ -197,8 +205,18 @@ class Api4SelectQuery extends SelectQuery {
    */
   protected function buildWhereClause() {
     foreach ($this->where as $clause) {
-      $sql_clause = $this->treeWalkWhereClause($clause);
-      $this->query->where($sql_clause);
+      $this->query->where($this->treeWalkClauses($clause, 'WHERE'));
+    }
+  }
+
+  /**
+   * Build HAVING clause.
+   *
+   * Every expression referenced must also be in the SELECT clause.
+   */
+  protected function buildHavingClause() {
+    foreach ($this->having as $clause) {
+      $this->query->having($this->treeWalkClauses($clause, 'HAVING'));
     }
   }
 
@@ -244,25 +262,26 @@ class Api4SelectQuery extends SelectQuery {
    * Recursively validate and transform a branch or leaf clause array to SQL.
    *
    * @param array $clause
+   * @param string $type
+   *   WHERE|HAVING
    * @return string SQL where clause
    *
-   * @uses validateClauseAndComposeSql() to generate the SQL etc.
-   * @todo if an 'and' is nested within and 'and' (or or-in-or) then should
-   * flatten that to be a single list of clauses.
+   * @throws \API_Exception
+   * @uses composeClause() to generate the SQL etc.
    */
-  protected function treeWalkWhereClause($clause) {
+  protected function treeWalkClauses($clause, $type) {
     switch ($clause[0]) {
       case 'OR':
       case 'AND':
         // handle branches
         if (count($clause[1]) === 1) {
           // a single set so AND|OR is immaterial
-          return $this->treeWalkWhereClause($clause[1][0]);
+          return $this->treeWalkClauses($clause[1][0], $type);
         }
         else {
           $sql_subclauses = [];
           foreach ($clause[1] as $subclause) {
-            $sql_subclauses[] = $this->treeWalkWhereClause($subclause);
+            $sql_subclauses[] = $this->treeWalkClauses($subclause, $type);
           }
           return '(' . implode("\n" . $clause[0], $sql_subclauses) . ')';
         }
@@ -272,30 +291,48 @@ class Api4SelectQuery extends SelectQuery {
         if (!is_string($clause[1][0])) {
           $clause[1] = ['AND', $clause[1]];
         }
-        return 'NOT (' . $this->treeWalkWhereClause($clause[1]) . ')';
+        return 'NOT (' . $this->treeWalkClauses($clause[1], $type) . ')';
 
       default:
-        return $this->validateClauseAndComposeSql($clause);
+        return $this->composeClause($clause, $type);
     }
   }
 
   /**
    * Validate and transform a leaf clause array to SQL.
    * @param array $clause [$fieldName, $operator, $criteria]
+   * @param string $type
+   *   WHERE|HAVING
    * @return string SQL
    * @throws \API_Exception
    * @throws \Exception
    */
-  protected function validateClauseAndComposeSql($clause) {
+  protected function composeClause(array $clause, string $type) {
     // Pad array for unary operators
-    list($fieldName, $operator, $value) = array_pad($clause, 3, NULL);
-    $field = $this->getField($fieldName, TRUE);
+    list($expr, $operator, $value) = array_pad($clause, 3, NULL);
 
-    FormattingUtil::formatInputValue($value, $field, $this->getEntity());
+    // For WHERE clause, expr must be the name of a field.
+    if ($type === 'WHERE') {
+      $field = $this->getField($expr, TRUE);
+      FormattingUtil::formatInputValue($value, $field, $this->getEntity());
+      $fieldAlias = $field['sql_name'];
+    }
+    // For HAVING, expr must be an item in the SELECT clause
+    else {
+      if (isset($this->selectAliases[$expr])) {
+        $fieldAlias = $expr;
+      }
+      elseif (in_array($expr, $this->selectAliases)) {
+        $fieldAlias = array_search($expr, $this->selectAliases);
+      }
+      else {
+        throw new \API_Exception("Invalid expression in $type clause: '$expr'. Must use a value from SELECT clause.");
+      }
+    }
 
-    $sql_clause = \CRM_Core_DAO::createSQLFilter($field['sql_name'], [$operator => $value]);
+    $sql_clause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
     if ($sql_clause === NULL) {
-      throw new \API_Exception("Invalid value in where clause for field '$fieldName'");
+      throw new \API_Exception("Invalid value in $type clause for '$expr'");
     }
     return $sql_clause;
   }

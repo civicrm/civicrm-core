@@ -26,7 +26,7 @@ abstract class SqlFunction extends SqlExpression {
    * Parse the argument string into an array of function arguments
    */
   protected function initialize() {
-    $arg = $this->arg;
+    $arg = trim(substr($this->expr, strpos($this->expr, '(') + 1, -1));
     foreach ($this->getParams() as $param) {
       $prefix = $this->captureKeyword($param['prefix'], $arg);
       if ($param['expr'] && isset($prefix) || in_array('', $param['prefix']) || !$param['optional']) {
