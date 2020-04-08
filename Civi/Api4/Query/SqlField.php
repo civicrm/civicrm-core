@@ -17,14 +17,14 @@ namespace Civi\Api4\Query;
 class SqlField extends SqlExpression {
 
   protected function initialize() {
-    $this->fields[] = $this->arg;
+    $this->fields[] = $this->expr;
   }
 
   public function render(array $fieldList): string {
-    if (empty($fieldList[$this->arg])) {
-      throw new \API_Exception("Invalid field '{$this->arg}'");
+    if (empty($fieldList[$this->expr])) {
+      throw new \API_Exception("Invalid field '{$this->expr}'");
     }
-    return $fieldList[$this->arg]['sql_name'];
+    return $fieldList[$this->expr]['sql_name'];
   }
 
 }

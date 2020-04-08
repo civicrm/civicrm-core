@@ -49,7 +49,7 @@ class SqlExpressionParserTest extends UnitTestCase {
     $this->assertNotEmpty($params[0]['prefix']);
     $this->assertEmpty($params[0]['suffix']);
 
-    $sqlFn = new $className('total');
+    $sqlFn = new $className($fnName . '(total)');
     $this->assertEquals($fnName, $sqlFn->getName());
     $this->assertEquals(['total'], $sqlFn->getFields());
     $this->assertCount(1, $this->getArgs($sqlFn));

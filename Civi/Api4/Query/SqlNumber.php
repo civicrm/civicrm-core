@@ -17,11 +17,11 @@ namespace Civi\Api4\Query;
 class SqlNumber extends SqlExpression {
 
   protected function initialize() {
-    \CRM_Utils_Type::validate($this->arg, 'Float');
+    \CRM_Utils_Type::validate($this->expr, 'Float');
   }
 
   public function render(array $fieldList): string {
-    return $this->arg;
+    return $this->expr;
   }
 
 }

@@ -26,23 +26,24 @@ abstract class SqlExpression {
   protected $fields = [];
 
   /**
+   * The SELECT alias (if null it will be calculated by getAlias)
    * @var string|null
    */
   protected $alias;
 
   /**
-   * The argument string.
+   * The raw expression, minus the alias.
    * @var string
    */
-  protected $arg = '';
+  protected $expr = '';
 
   /**
    * SqlFunction constructor.
-   * @param string $arg
+   * @param string $expr
    * @param string|null $alias
    */
-  public function __construct(string $arg, $alias = NULL) {
-    $this->arg = $arg;
+  public function __construct(string $expr, $alias = NULL) {
+    $this->expr = $expr;
     $this->alias = $alias;
     $this->initialize();
   }
@@ -68,14 +69,13 @@ abstract class SqlExpression {
     $bracketPos = strpos($expr, '(');
     $firstChar = substr($expr, 0, 1);
     $lastChar = substr($expr, -1);
-    // Function
+    // If there are brackets but not the first character, we have a function
     if ($bracketPos && $lastChar === ')') {
       $fnName = substr($expr, 0, $bracketPos);
       if ($fnName !== strtoupper($fnName)) {
         throw new \API_Exception('Sql function must be uppercase.');
       }
       $className = 'SqlFunction' . $fnName;
-      $expr = substr($expr, $bracketPos + 1, -1);
     }
     // String expression
     elseif ($firstChar === $lastChar && in_array($firstChar, ['"', "'"], TRUE)) {
@@ -133,12 +133,19 @@ abstract class SqlExpression {
   abstract public function render(array $fieldList): string;
 
   /**
+   * @return string
+   */
+  public function getExpr(): string {
+    return $this->expr;
+  }
+
+  /**
    * Returns the alias to use for SELECT AS.
    *
    * @return string
    */
   public function getAlias(): string {
-    return $this->alias ?? $this->fields[0] ?? \CRM_Utils_String::munge($this->arg);
+    return $this->alias ?? $this->fields[0] ?? \CRM_Utils_String::munge($this->expr);
   }
 
 }
