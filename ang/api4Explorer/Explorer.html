@@ -107,6 +107,8 @@
               <input class="collapsible-optgroups form-control huge" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoinsAndFunctions}" placeholder="Add groupBy" />
             </div>
           </fieldset>
+          <fieldset ng-if="availableParams.having" class="api4-clause-fieldset" ng-mouseenter="help('having', availableParams.having)" ng-mouseleave="help()" crm-api4-clause="{type: 'having', clauses: params.having, required: availableParams.having.required, op: 'AND', label: 'having', fields: havingOptions}">
+          </fieldset>
           <fieldset ng-if="availableParams.orderBy" ng-mouseenter="help('orderBy', availableParams.orderBy)" ng-mouseleave="help()">
             <legend>orderBy<span class="crm-marker" ng-if="availableParams.orderBy.required"> *</span></legend>
             <div ng-model="params.orderBy" ui-sortable="{axis: 'y'}">

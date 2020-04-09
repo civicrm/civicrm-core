@@ -25,6 +25,7 @@
     $scope.entities = entities;
     $scope.actions = actions;
     $scope.fields = [];
+    $scope.havingOptions = [];
     $scope.fieldsAndJoins = [];
     $scope.fieldsAndJoinsAndFunctions = [];
     $scope.fieldsAndJoinsAndFunctionsAndWildcards = [];
@@ -107,15 +108,6 @@
         default:
           return str + 's';
       }
-    }
-
-    // Turn a flat array into a select2 array
-    function arrayToSelect2(array) {
-      var out = [];
-      _.each(array, function(item) {
-        out.push({id: item, text: item});
-      });
-      return out;
     }
 
     // Reformat an existing array of objects for compatibility with select2
@@ -242,7 +234,7 @@
     };
 
     $scope.isSpecial = function(name) {
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy'];
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having'];
       if ($scope.availableParams.limit && $scope.availableParams.offset) {
         specialParams.push('limit', 'offset');
       }
@@ -409,6 +401,16 @@
                 }
               });
             }, true);
+          }
+          if (name === 'select' && actionInfo.params.having) {
+            $scope.$watchCollection('params.select', function(values) {
+              $scope.havingOptions.length = 0;
+              _.each(values, function(item) {
+                var pieces = item.split(' AS '),
+                  alias = _.trim(pieces[pieces.length - 1]);
+                $scope.havingOptions.push({id: alias, text: alias});
+              });
+            });
           }
           if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select') {
             $scope.$watch('controls.' + name, function(value) {
