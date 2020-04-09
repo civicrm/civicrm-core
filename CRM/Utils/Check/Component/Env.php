@@ -471,7 +471,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'warning' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::WARNING) ,
         'critical' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::CRITICAL),
       ];
-      foreach ($vc->getVersionMessages() as $msg) {
+      foreach ($vc->getVersionMessages() ?? [] as $msg) {
         $messages[] = new CRM_Utils_Check_Message(__FUNCTION__ . '_' . $msg['name'],
           $msg['message'], $msg['title'], $severities[$msg['severity']], 'fa-cloud-upload');
       }
