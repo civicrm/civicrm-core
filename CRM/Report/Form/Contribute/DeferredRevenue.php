@@ -94,6 +94,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
           ],
+          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'cancel_date' => [
             'title' => ts('Cancel Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
