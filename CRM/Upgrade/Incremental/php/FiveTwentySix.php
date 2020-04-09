@@ -79,16 +79,16 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
       'is_active' => 1,
     ]);
     // Update the existing nl_NL entry.
-    \Civi\Api4\OptionValue::update()
-      ->addWhere('name', '=', 'nl_NL')
-      // Adding check against label in case they've customized it, in which
+    $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_option_value SET label = @newLabel WHERE option_group_id = #group AND name = @name AND label IN (@oldLabels)', [
+      'name' => 'nl_NL',
+      'newLabel' => ts('Dutch (Netherlands)'),
+      // Adding check against old label in case they've customized it, in which
       // case we don't want to overwrite that. The ts() part is tricky since
       // it depends if they installed it in English first.
-      ->addClause('OR', ['label', '=', 'Dutch'], ['label', '=', ts('Dutch')])
-      ->addValue('label', ts('Dutch (Netherlands)'))
-      ->setLimit(1)
-      ->setCheckPermissions(FALSE)
-      ->execute();
+      'oldLabels' => ['Dutch', ts('Dutch')],
+      'group' => CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_group WHERE name = "languages"'),
+    ]);
+    CRM_Core_DAO::executeQuery($sql);
     return TRUE;
   }
 
