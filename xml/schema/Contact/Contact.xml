@@ -695,6 +695,7 @@
     <type>boolean</type>
     <default>0</default>
     <add>1.1</add>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
     </html>
