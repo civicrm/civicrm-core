@@ -2471,6 +2471,7 @@ SELECT contact_id
     $fields = civicrm_api3('CustomField', 'get', [
       'return'    => ['column_name', 'custom_group_id.table_name'],
       'data_type' => 'ContactReference',
+      'options' => ['limit' => 0],
     ])['values'];
     foreach ($fields as $field) {
       $cidRefs[$field['custom_group_id.table_name']][] = $field['column_name'];

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\CustomGroup;
+
 /**
  *
  * @package CRM
@@ -479,24 +481,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param int $mainId
    * @param int $otherId
-   * @param bool $tables
+   * @param array $tables
    * @param array $tableOperations
-   * @param array $customTableToCopyFrom
    *
+   * @throws \API_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function moveContactBelongings($mainId, $otherId, $tables, $tableOperations, array $customTableToCopyFrom) {
+  public static function moveContactBelongings($mainId, $otherId, $tables, $tableOperations) {
     $cidRefs = self::cidRefs();
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
-
-    // getting all custom tables
-    $customTables = [];
-    // @todo this duplicates cidRefs?
-    CRM_Core_DAO::appendCustomTablesExtendingContacts($customTables);
-    CRM_Core_DAO::appendCustomContactReferenceFields($customTables);
-    $customTables = array_keys($customTables);
+    self::filterRowBasedCustomDataFromCustomTables($cidRefs);
 
     $affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
 
@@ -513,20 +510,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $mainId = (int) $mainId;
     $otherId = (int) $otherId;
-    $multi_value_tables = array_keys(CRM_Dedupe_Merger::getMultiValueCustomSets('cidRefs'));
 
     $sqls = [];
     foreach ($affected as $table) {
-      // skipping non selected single-value custom table's value migration
-      if (!in_array($table, $multi_value_tables)) {
-        if (in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)) {
-          if (isset($cidRefs[$table]) && ($delCol = array_search('entity_id', $cidRefs[$table])) !== FALSE) {
-            // remove entity_id from the field list
-            unset($cidRefs[$table][$delCol]);
-          }
-        }
-      }
-
       // Call custom processing function for objects that require it
       if (isset($cpTables[$table])) {
         foreach ($cpTables[$table] as $className => $fnName) {
@@ -553,16 +539,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
           $sqls = array_merge($sqls, $preOperationSqls);
-
-          if (in_array($table, $customTableToCopyFrom) && !self::customRecordExists($mainId, $table, $field) && $field == 'entity_id') {
-            // this is the entity_id column of a custom field group where:
-            // - the custom table should be copied as indicated by $customTableToCopyFrom
-            //   e.g. because a field in the group was selected in a form
-            // - AND no record exists yet for the $mainId contact
-            // we only do this for column "entity_id" as we wouldn't want to
-            // run this INSERT for ContactReference fields
-            $sqls[] = "INSERT INTO $table ($field) VALUES ($mainId)";
-          }
           $sqls[] = "UPDATE IGNORE $table SET $field = $mainId WHERE $field = $otherId";
           $sqls[] = "DELETE FROM $table WHERE $field = $otherId";
         }
@@ -583,6 +559,42 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE);
     }
     CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
+  }
+
+  /**
+   * Filter out custom tables from cidRefs unless they are there due to a contact reference or are a multiple set.
+   *
+   * The only fields where we want to move the data by sql is where entity reference fields
+   * on another contact refer to the contact being merged, or it is a multiple record set.
+   * The transference of custom data from one contact to another is done in 2 other places in the dedupe process but should
+   * not be done in moveAllContactData.
+   *
+   * Note it's a bit silly the way we build & then cull cidRefs - however, poor hook placement means that
+   * until we fully deprecate calling the hook from cidRefs we are stuck.
+   *
+   * It was deprecated in code (via deprecation notices if people altered it) in Mar 2019 but in docs only in Apri 2020.
+   *
+   * @param array $cidRefs
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected static function filterRowBasedCustomDataFromCustomTables(array &$cidRefs) {
+    $customTables = (array) CustomGroup::get()
+      ->setCheckPermissions(FALSE)
+      ->setSelect(['table_name'])
+      ->addWhere('is_multiple', '=', 0)
+      ->addWhere('extends', 'IN', CRM_Contact_BAO_ContactType::contactTypes())
+      ->execute()
+      ->indexBy('table_name');
+    foreach (array_intersect_key($cidRefs, $customTables) as $tableName => $cidSpec) {
+      if (in_array('entity_id', $cidSpec, TRUE)) {
+        unset($cidRefs[$tableName][array_search('entity_id', $cidSpec, TRUE)]);
+      }
+      if (empty($cidRefs[$tableName])) {
+        unset($cidRefs[$tableName]);
+      }
+    }
   }
 
   /**
@@ -1246,7 +1258,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Respect logged in user permissions.
    *
    * @return bool
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions = TRUE) {
     if (empty($migrationInfo)) {
@@ -1286,12 +1302,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     self::mergeLocations($mainId, $otherId, $migrationInfo);
 
     // **** Do contact related migrations
-    $customTablesToCopyValues = self::getAffectedCustomTables($submittedCustomFields);
     // @todo - move all custom field processing to the move class & eventually have an
     // overridable DAO class for it.
     $customFieldBAO = new CRM_Core_BAO_CustomField();
     $customFieldBAO->move($otherId, $mainId, $submittedCustomFields);
-    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, $moveTables, $tableOperations, $customTablesToCopyValues);
+    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, $moveTables, $tableOperations);
     unset($moveTables, $tableOperations);
 
     // **** Do table related removals
@@ -1420,39 +1435,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     self::createMergeActivities($mainId, $otherId);
 
     return TRUE;
-  }
-
-  /**
-   * Builds an Array of Custom tables for given custom field ID's.
-   *
-   * @param $customFieldIDs
-   *
-   * @return array
-   *   Array of custom table names
-   */
-  private static function getAffectedCustomTables($customFieldIDs) {
-    $customTableToCopyValues = [];
-
-    foreach ($customFieldIDs as $fieldID) {
-      if (!empty($fieldID)) {
-        $customField = civicrm_api3('custom_field', 'getsingle', [
-          'id' => $fieldID,
-          'is_active' => TRUE,
-        ]);
-        if (!civicrm_error($customField) && !empty($customField['custom_group_id'])) {
-          $customGroup = civicrm_api3('custom_group', 'getsingle', [
-            'id' => $customField['custom_group_id'],
-            'is_active' => TRUE,
-          ]);
-
-          if (!civicrm_error($customGroup) && !empty($customGroup['table_name'])) {
-            $customTableToCopyValues[] = $customGroup['table_name'];
-          }
-        }
-      }
-    }
-
-    return $customTableToCopyValues;
   }
 
   /**
