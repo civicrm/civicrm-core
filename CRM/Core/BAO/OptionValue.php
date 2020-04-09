@@ -38,7 +38,13 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     if (empty($params['id'])) {
       self::setDefaults($params);
     }
-    return CRM_Core_BAO_OptionValue::add($params);
+
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'OptionValue', $params['id'] ?? NULL, $params);
+    $optionValue = CRM_Core_BAO_OptionValue::add($params);
+    CRM_Utils_Hook::post($hook, 'OptionValue', $optionValue->id, $optionValue);
+
+    return $optionValue;
   }
 
   /**
