@@ -505,10 +505,7 @@ WHERE  id IN ( $groupIDs )
     self::clearGroupContactCache($groupID);
 
     foreach ($contactQueries as $contactQuery) {
-      if (empty($contactQuery['select']) || empty($contactQuery['from'])) {
-        continue;
-      }
-      if (CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) {$contactQuery['from']}") > 0) {
+      if (!empty($contactQuery['select']) && !empty($contactQuery['from'])) {
         CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) {$contactQuery['select']} {$contactQuery['from']}");
       }
     }
