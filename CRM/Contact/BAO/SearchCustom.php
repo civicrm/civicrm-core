@@ -86,7 +86,7 @@ class CRM_Contact_BAO_SearchCustom {
    * @param int $csID
    * @param int $ssID
    *
-   * @return mixed
+   * @return CRM_Contact_Form_Search_Custom_Base
    * @throws Exception
    */
   public static function customClass($csID, $ssID) {
