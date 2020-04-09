@@ -15,17 +15,29 @@
  */
 class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
 
+  /**
+   * Original value of civicrm_setting global.
+   * @var array
+   */
+  private $origSetting;
+
   public function setUp() {
     parent::setUp();
     global $civicrm_setting;
     $this->origSetting = $civicrm_setting;
-    CRM_Utils_Cache::singleton()->flush();
+    CRM_Utils_Cache::singleton()->clear();
   }
 
+  /**
+   * Clean up after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
     global $civicrm_setting;
     $civicrm_setting = $this->origSetting;
-    CRM_Utils_Cache::singleton()->flush();
+    $this->quickCleanup(['civicrm_contribution']);
+    CRM_Utils_Cache::singleton()->clear();
     parent::tearDown();
   }
 
@@ -225,6 +237,15 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     Civi::service('settings_manager')->useMandatory();
     $environment = CRM_Core_Config::environment();
     $this->assertEquals('Development', $environment);
+  }
+
+  /**
+   * Test that options defined as a pseudoconstant can be converted to options.
+   */
+  public function testPseudoConstants() {
+    $this->contributionPageCreate();
+    $metadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => ['default_invoice_page']], NULL, TRUE);
+    $this->assertEquals('Test Contribution Page', $metadata['default_invoice_page']['options'][1]);
   }
 
 }

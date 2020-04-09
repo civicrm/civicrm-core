@@ -147,15 +147,24 @@ class SettingsMetadata {
       if (empty($spec['pseudoconstant'])) {
         continue;
       }
+      $pseudoconstant = $spec['pseudoconstant'];
       // It would be nice if we could leverage CRM_Core_PseudoConstant::get() somehow,
       // but it's tightly coupled to DAO/field. However, if you really need to support
       // more pseudoconstant types, then probably best to refactor it. For now, KISS.
-      if (!empty($spec['pseudoconstant']['callback'])) {
-        $spec['options'] = Resolver::singleton()->call($spec['pseudoconstant']['callback'], []);
+      if (!empty($pseudoconstant['callback'])) {
+        $spec['options'] = Resolver::singleton()->call($pseudoconstant['callback'], []);
       }
-      elseif (!empty($spec['pseudoconstant']['optionGroupName'])) {
-        $keyColumn = \CRM_Utils_Array::value('keyColumn', $spec['pseudoconstant'], 'value');
-        $spec['options'] = \CRM_Core_OptionGroup::values($spec['pseudoconstant']['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn);
+      elseif (!empty($pseudoconstant['optionGroupName'])) {
+        $keyColumn = \CRM_Utils_Array::value('keyColumn', $pseudoconstant, 'value');
+        $spec['options'] = \CRM_Core_OptionGroup::values($pseudoconstant['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn);
+      }
+      if (!empty($pseudoconstant['table'])) {
+        $params = [
+          'condition' => $pseudoconstant['condition'] ?? [],
+          'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
+          'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
+        ];
+        $spec['options'] = \CRM_Core_PseudoConstant::renderOptionsFromTablePseudoconstant($pseudoconstant, $params, ($spec['localize_context'] ?? NULL), 'get');
       }
     }
   }
