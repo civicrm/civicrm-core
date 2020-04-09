@@ -28,6 +28,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
       'schema' => (array) \Civi\Api4\Entity::get()->setChain(['fields' => ['$name', 'getFields']])->execute(),
       'links' => (array) \Civi\Api4\Entity::getLinks()->execute(),
       'docs' => \Civi\Api4\Utils\ReflectionUtils::parseDocBlock($apiDoc->getDocComment()),
+      'functions' => self::getSqlFunctions(),
       'groupOptions' => array_column((array) $groupOptions, 'options', 'name'),
     ];
     Civi::resources()
@@ -47,6 +48,27 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
     ]);
     $loader->load();
     parent::run();
+  }
+
+  /**
+   * Gets info about all available sql functions
+   * @return array
+   */
+  public static function getSqlFunctions() {
+    $fns = [];
+    foreach (glob(Civi::paths()->getPath('[civicrm.root]/Civi/Api4/Query/SqlFunction*.php')) as $file) {
+      $matches = [];
+      if (preg_match('/(SqlFunction[A-Z_]+)\.php$/', $file, $matches)) {
+        $className = '\Civi\Api4\Query\\' . $matches[1];
+        if (is_subclass_of($className, '\Civi\Api4\Query\SqlFunction')) {
+          $fns[] = [
+            'name' => $className::getName(),
+            'params' => $className::getParams(),
+          ];
+        }
+      }
+    }
+    return $fns;
   }
 
 }

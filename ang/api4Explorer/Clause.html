@@ -4,11 +4,11 @@
     <i class="crm-i fa-trash"></i>
   </button>
 </div>
-<div class="api4-where-group-sortable" ng-model="data.where" ui-sortable="{axis: 'y', connectWith: '.api4-where-group-sortable', containment: '.api4-where-fieldset', over: onSortOver, start: onSort, stop: onSort}">
-  <div class="api4-input form-inline clearfix" ng-repeat="(index, clause) in data.where">
+<div class="api4-clause-group-sortable" ng-model="data.clauses" ui-sortable="{axis: 'y', connectWith: '.api4-clause-group-sortable', containment: '.api4-clause-fieldset', over: onSortOver}" ui-sortable-start="onSort" ui-sortable-stop="onSort">
+  <div class="api4-input form-inline clearfix" ng-repeat="(index, clause) in data.clauses">
     <div class="api4-clause-badge" title="{{ ts('Drag to reposition') }}">
       <span class="badge badge-info">
-        <span ng-if="!index && !data.groupParent">Where</span>
+        <span ng-if="!index && !data.groupParent">{{ data.type }}</span>
         <span ng-if="index || data.groupParent">{{ data.op }}</span>
         <i class="crm-i fa-arrows"></i>
       </span>
@@ -18,7 +18,7 @@
       <select class="form-control api4-operator" ng-model="clause[1]" ng-options="o for o in operators" ></select>
       <input class="form-control" ng-model="clause[2]" api4-exp-value="{field: clause[0], op: clause[1]}" />
     </div>
-    <fieldset class="clearfix" ng-if="clause[0] === 'AND' || clause[0] === 'OR' || clause[0] === 'NOT'" crm-api4-where-clause="{where: clause[1], op: clause[0], fields: data.fields, operators: data.operators, groupParent: data.where, groupIndex: index}">
+    <fieldset class="clearfix" ng-if="clause[0] === 'AND' || clause[0] === 'OR' || clause[0] === 'NOT'" crm-api4-clause="{type: data.type, clauses: clause[1], op: clause[0], fields: data.fields, groupParent: data.clauses, groupIndex: index}">
     </fieldset>
   </div>
 </div>

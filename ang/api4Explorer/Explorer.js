@@ -25,8 +25,10 @@
     $scope.entities = entities;
     $scope.actions = actions;
     $scope.fields = [];
+    $scope.havingOptions = [];
     $scope.fieldsAndJoins = [];
-    $scope.selectFieldsAndJoins = [];
+    $scope.fieldsAndJoinsAndFunctions = [];
+    $scope.fieldsAndJoinsAndFunctionsAndWildcards = [];
     $scope.availableParams = {};
     $scope.params = {};
     $scope.index = '';
@@ -106,15 +108,6 @@
         default:
           return str + 's';
       }
-    }
-
-    // Turn a flat array into a select2 array
-    function arrayToSelect2(array) {
-      var out = [];
-      _.each(array, function(item) {
-        out.push({id: item, text: item});
-      });
-      return out;
     }
 
     // Reformat an existing array of objects for compatibility with select2
@@ -232,12 +225,19 @@
         (row.description ? '<div class="crm-select2-row-description"><p>' + _.escape(row.description) + '</p></div>' : '');
     };
 
-    $scope.clearParam = function(name) {
-      $scope.params[name] = $scope.availableParams[name].default;
+    $scope.clearParam = function(name, idx) {
+      if (typeof idx === 'undefined') {
+        $scope.params[name] = $scope.availableParams[name].default;
+      } else {
+        $scope.params[name].splice(idx, 1);
+      }
     };
 
     $scope.isSpecial = function(name) {
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy'];
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having'];
+      if ($scope.availableParams.limit && $scope.availableParams.offset) {
+        specialParams.push('limit', 'offset');
+      }
       return _.contains(specialParams, name);
     };
 
@@ -324,7 +324,8 @@
     function selectAction() {
       $scope.action = $routeParams.api4action;
       $scope.fieldsAndJoins.length = 0;
-      $scope.selectFieldsAndJoins.length = 0;
+      $scope.fieldsAndJoinsAndFunctions.length = 0;
+      $scope.fieldsAndJoinsAndFunctionsAndWildcards.length = 0;
       if (!actions.length) {
         formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params']);
       }
@@ -333,12 +334,29 @@
         $scope.fields = getFieldList($scope.action);
         if (_.contains(['get', 'update', 'delete', 'replace'], $scope.action)) {
           $scope.fieldsAndJoins = addJoins($scope.fields);
-          $scope.selectFieldsAndJoins = addJoins($scope.fields, true);
+          var fieldsAndFunctions = _.cloneDeep($scope.fields);
+          // SQL functions are supported if HAVING is
+          if (actionInfo.params.having) {
+            fieldsAndFunctions.push({
+              text: ts('FUNCTION'),
+              description: ts('Calculate result of a SQL function'),
+              children: _.transform(CRM.vars.api4.functions, function(result, fn) {
+                result.push({
+                  id: fn.name + '() AS ' + fn.name.toLowerCase(),
+                  text: fn.name + '()',
+                  description: fn.name + '(' + describeSqlFn(fn.params) + ')'
+                });
+              })
+            });
+          }
+          $scope.fieldsAndJoinsAndFunctions = addJoins(fieldsAndFunctions, true);
+          $scope.fieldsAndJoinsAndFunctionsAndWildcards = addJoins(fieldsAndFunctions, true);
         } else {
           $scope.fieldsAndJoins = $scope.fields;
-          $scope.selectFieldsAndJoins = _.cloneDeep($scope.fields);
+          $scope.fieldsAndJoinsAndFunctions = $scope.fields;
+          $scope.fieldsAndJoinsAndFunctionsAndWildcards = _.cloneDeep($scope.fields);
         }
-        $scope.selectFieldsAndJoins.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
+        $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
         _.each(actionInfo.params, function (param, name) {
           var format,
             defaultVal = _.cloneDeep(param.default);
@@ -374,20 +392,32 @@
               deep: format === 'json'
             });
           }
-          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy') {
-            $scope.$watch('params.' + name, function(values) {
+          if (typeof objectParams[name] !== 'undefined' && name !== 'orderBy') {
+            $scope.$watch('params.' + name, function (values) {
               // Remove empty values
-              _.each(values, function(clause, index) {
+              _.each(values, function (clause, index) {
                 if (!clause || !clause[0]) {
-                  $scope.params[name].splice(index, 1);
+                  $scope.clearParam(name, index);
                 }
               });
             }, true);
+          }
+          if (name === 'select' && actionInfo.params.having) {
+            $scope.$watchCollection('params.select', function(values) {
+              $scope.havingOptions.length = 0;
+              _.each(values, function(item) {
+                var pieces = item.split(' AS '),
+                  alias = _.trim(pieces[pieces.length - 1]);
+                $scope.havingOptions.push({id: alias, text: alias});
+              });
+            });
+          }
+          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select') {
             $scope.$watch('controls.' + name, function(value) {
               var field = value;
               $timeout(function() {
                 if (field) {
-                  if (name === 'groupBy') {
+                  if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
                   } else {
                     var defaultOp = _.cloneDeep(objectParams[name]);
@@ -407,6 +437,25 @@
         $scope.availableParams = actionInfo.params;
       }
       writeCode();
+    }
+
+    function describeSqlFn(params) {
+      var desc = ' ';
+      _.each(params, function(param) {
+        desc += ' ';
+        if (param.prefix) {
+          desc += _.filter(param.prefix).join('|') + ' ';
+        }
+        if (param.expr === 1) {
+          desc += 'expr ';
+        } else if (param.expr > 1) {
+          desc += 'expr, ... ';
+        }
+        if (param.suffix) {
+          desc += ' ' + _.filter(param.suffix).join('|') + ' ';
+        }
+      });
+      return desc.replace(/[ ]+/g, ' ');
     }
 
     function defaultValues(defaultVal) {
@@ -787,12 +836,12 @@
     };
   });
 
-  angular.module('api4Explorer').directive('crmApi4WhereClause', function($timeout) {
+  angular.module('api4Explorer').directive('crmApi4Clause', function($timeout) {
     return {
       scope: {
-        data: '=crmApi4WhereClause'
+        data: '=crmApi4Clause'
       },
-      templateUrl: '~/api4Explorer/WhereClause.html',
+      templateUrl: '~/api4Explorer/Clause.html',
       link: function (scope, element, attrs) {
         var ts = scope.ts = CRM.ts();
         scope.newClause = '';
@@ -800,7 +849,7 @@
         scope.operators = CRM.vars.api4.operators;
 
         scope.addGroup = function(op) {
-          scope.data.where.push([op, []]);
+          scope.data.clauses.push([op, []]);
         };
 
         scope.removeGroup = function() {
@@ -808,7 +857,7 @@
         };
 
         scope.onSort = function(event, ui) {
-          $('.api4-where-fieldset').toggleClass('api4-sorting', event.type === 'sortstart');
+          $(element).closest('.api4-clause-fieldset').toggleClass('api4-sorting', event.type === 'sortstart');
           $('.api4-input.form-inline').css('margin-left', '');
         };
 
@@ -825,12 +874,12 @@
           var field = value;
           $timeout(function() {
             if (field) {
-              scope.data.where.push([field, '=', '']);
+              scope.data.clauses.push([field, '=', '']);
               scope.newClause = null;
             }
           });
         });
-        scope.$watch('data.where', function(values) {
+        scope.$watch('data.clauses', function(values) {
           // Remove empty values
           _.each(values, function(clause, index) {
             if (typeof clause !== 'undefined' && !clause[0]) {

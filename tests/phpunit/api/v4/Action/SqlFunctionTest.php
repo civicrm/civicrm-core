@@ -29,6 +29,14 @@ use Civi\Api4\Contribution;
  */
 class SqlFunctionTest extends UnitTestCase {
 
+  public function testGetFunctions() {
+    $functions = array_column(\CRM_Api4_Page_Api4Explorer::getSqlFunctions(), NULL, 'name');
+    $this->assertArrayHasKey('SUM', $functions);
+    $this->assertArrayNotHasKey('', $functions);
+    $this->assertArrayNotHasKey('SqlFunction', $functions);
+    $this->assertEquals(1, $functions['MAX']['params'][0]['expr']);
+  }
+
   public function testGroupAggregates() {
     $cid = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
     Contribution::save()
