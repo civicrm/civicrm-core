@@ -118,6 +118,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'default' => 'this.year',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ],
+          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'currency' => [
             'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,

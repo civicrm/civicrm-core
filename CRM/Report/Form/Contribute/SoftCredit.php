@@ -226,6 +226,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         'grouping' => 'softcredit-fields',
         'filters' => [
           'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'currency' => [
             'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,

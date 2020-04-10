@@ -132,6 +132,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
         ],
         'filters' => [
           'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'total_amount' => ['title' => ts('Amount Between')],
           'currency' => [
             'title' => ts('Currency'),
