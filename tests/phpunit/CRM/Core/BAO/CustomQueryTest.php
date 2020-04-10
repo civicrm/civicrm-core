@@ -95,7 +95,9 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * The conversion to date picker will result int these fields
    * being renamed _high & _low and needing to return correctly.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSearchCustomDataDateHighLow() {
     $this->createCustomGroupWithFieldOfType([], 'date');
@@ -127,7 +129,9 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * The conversion to date picker will result int these fields
    * being renamed _high & _low and needing to return correctly.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSearchCustomDataDateLowWithPermsInPlay() {
     $this->createLoggedInUser();
@@ -329,7 +333,7 @@ LEFT JOIN ' . $this->getCustomGroupTable() . ' ON ' . $this->getCustomGroupTable
       'default_value' => NULL,
     ]);
     $dateCustomFieldName = 'custom_' . $dateCustomField['id'];
-    $this->individualCreate([$dateCustomFieldName => "2015-01-01"]);
+    $this->individualCreate([$dateCustomFieldName => '2015-01-01']);
     // Assigning the relevant form value to be within a custom key is normally done in
     // build field params. It would be better if it were all done in convertFormValues
     // but for now we just imitate it.
@@ -348,7 +352,9 @@ LEFT JOIN ' . $this->getCustomGroupTable() . ' ON ' . $this->getCustomGroupTable
   /**
    * Test search builder style query including custom address fields.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testAddressCustomFields() {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'int');

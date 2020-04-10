@@ -81,6 +81,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * Create a custom group with a single field.
    *
    * @param array $groupParams
+   *   Params for the group to be created.
    * @param string $customFieldType
    *
    * @param string $identifier
@@ -90,31 +91,36 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL) {
-    $supported = ['text', 'select', 'date', 'int'];
+    $supported = ['text', 'select', 'date', 'int', 'contact_reference'];
     if (!in_array($customFieldType, $supported, TRUE)) {
       throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
     $groupParams['title'] = empty($groupParams['title']) ? $identifier . 'Group with field ' . $customFieldType : $groupParams['title'];
     $groupParams['name'] = $identifier ?? 'Custom Group';
     $this->createCustomGroup($groupParams);
+    $reference = &$this->ids['CustomField'][$identifier . $customFieldType];
+    $fieldParams = ['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]];
     switch ($customFieldType) {
       case 'text':
-        $customField = $this->createTextCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
-        break;
+        $reference = $this->createTextCustomField($fieldParams)['id'];
+        return;
 
       case 'select':
-        $customField = $this->createSelectCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
-        break;
+        $reference = $this->createSelectCustomField($fieldParams)['id'];
+        return;
 
       case 'int':
-        $customField = $this->createIntCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
-        break;
+        $reference = $this->createIntCustomField($fieldParams)['id'];
+        return;
 
       case 'date':
-        $customField = $this->createDateCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
-        break;
+        $reference = $this->createDateCustomField($fieldParams)['id'];
+        return;
+
+      case 'contact_reference':
+        $reference = $this->createContactReferenceCustomField($fieldParams)['id'];
+        return;
     }
-    $this->ids['CustomField'][$identifier . $customFieldType] = $customField['id'];
   }
 
   /**
@@ -130,7 +136,11 @@ trait CRMTraits_Custom_CustomDataTrait {
     $ids['link'] = (int) $this->createLinkCustomField(['custom_group_id' => $customGroupID])['id'];
     $ids['file'] = (int) $this->createFileCustomField(['custom_group_id' => $customGroupID])['id'];
     $ids['country'] = (int) $this->createCountryCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['multi_country'] = (int) $this->createMultiCountryCustomField(['custom_group_id' => $customGroupID])['id'];
     $ids['contact_reference'] = $this->createContactReferenceCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['state'] = (int) $this->createStateCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['multi_state'] = (int) $this->createMultiStateCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['boolean'] = (int) $this->createBooleanCustomField(['custom_group_id' => $customGroupID])['id'];
     return $ids;
   }
 
@@ -185,6 +195,19 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
+  protected function createBooleanCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('Boolean'), $params);
+    return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom text fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
   protected function createContactReferenceCustomField($params = []) {
     $params = array_merge($this->getFieldsValuesByType('ContactReference'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
@@ -217,7 +240,7 @@ trait CRMTraits_Custom_CustomDataTrait {
   }
 
   /**
-   * Create a custom text fields.
+   * Create a custom country fields.
    *
    * @param array $params
    *   Parameter overrides, must include custom_group_id.
@@ -226,6 +249,45 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createCountryCustomField($params = []) {
     $params = array_merge($this->getFieldsValuesByType('Country'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom multi select country fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createMultiCountryCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('Country', 'Multi-Select Country'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom state fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createStateCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('StateProvince'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom multi select state fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createMultiStateCustomField($params = []) {
+    $params = array_merge($this->getFieldsValuesByType('StateProvince', 'Multi-Select State/Province'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 
@@ -333,6 +395,114 @@ trait CRMTraits_Custom_CustomDataTrait {
             ],
           ],
         ],
+        'Radio' => [
+          'label' => 'Pick Color',
+          'html_type' => 'Radio',
+          'data_type' => 'String',
+          'text_length' => '',
+          'default_value' => '',
+          'option_values' => [
+            [
+              'label' => 'Red',
+              'value' => 'R',
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Yellow',
+              'value' => 'Y',
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Green',
+              'value' => 'G',
+              'weight' => 3,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+        'CheckBox' => [
+          'label' => 'Pick Color',
+          'html_type' => 'Checkbox',
+          'data_type' => 'String',
+          'text_length' => '',
+          'default_value' => '',
+          'option_values' => [
+            [
+              'label' => 'Red',
+              'value' => 'R',
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Yellow',
+              'value' => 'Y',
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Green',
+              'value' => 'G',
+              'weight' => 3,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+        'Multi-Select' => [
+          'label' => 'Pick Color',
+          'html_type' => 'Multi-Select',
+          'data_type' => 'String',
+          'text_length' => '',
+          'default_value' => '',
+          'option_values' => [
+            [
+              'label' => 'Red',
+              'value' => 'R',
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Yellow',
+              'value' => 'Y',
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Green',
+              'value' => 'G',
+              'weight' => 3,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+        'Autocomplete-Select' => [
+          'label' => 'Pick Color',
+          'html_type' => 'Autocomplete-Select',
+          'data_type' => 'String',
+          'text_length' => '',
+          'default_value' => '',
+          'option_values' => [
+            [
+              'label' => 'Red',
+              'value' => 'R',
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Yellow',
+              'value' => 'Y',
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Green',
+              'value' => 'G',
+              'weight' => 3,
+              'is_active' => 1,
+            ],
+          ],
+        ],
       ],
       'Int' => [
         'default' => [
@@ -341,6 +511,42 @@ trait CRMTraits_Custom_CustomDataTrait {
           'data_type' => 'Int',
           'default_value' => '4',
           'is_search_range' => 1,
+        ],
+        'Select' => [
+          'label' => 'Integer select',
+          'html_type' => 'Select',
+          'option_values' => [
+            [
+              'label' => '50',
+              'value' => 3,
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => '100',
+              'value' => 4,
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+        'Radio' => [
+          'label' => 'Integer radio',
+          'html_type' => 'Radio',
+          'option_values' => [
+            [
+              'label' => '50',
+              'value' => 3,
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => '100',
+              'value' => 4,
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+          ],
         ],
       ],
       'Date' => [
@@ -355,11 +561,133 @@ trait CRMTraits_Custom_CustomDataTrait {
           'time_format' => 1,
         ],
       ],
+      'Float' => [
+        'default' => [
+          'label' => 'Number',
+          'html_type' => 'Text',
+          'data_type' => 'Float',
+        ],
+        'Select' => [
+          'label' => 'Number select',
+          'html_type' => 'Select',
+          'option_values' => [
+            [
+              'label' => '50',
+              'value' => 3,
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => '100',
+              'value' => 4,
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+        'Radio' => [
+          'label' => 'Number radio',
+          'html_type' => 'Radio',
+          'option_values' => [
+            [
+              'label' => '50',
+              'value' => 3,
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => '100',
+              'value' => 4,
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+      ],
+      'Money' => [
+        'default' => [
+          'label' => 'Money',
+          'html_type' => 'Text',
+          'data_type' => 'Money',
+        ],
+        'Select' => [
+          'label' => 'Money select',
+          'html_type' => 'Select',
+          'option_values' => [
+            [
+              'label' => '50',
+              'value' => 3,
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => '100',
+              'value' => 4,
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+        'Radio' => [
+          'label' => 'Money radio',
+          'html_type' => 'Radio',
+          'option_values' => [
+            [
+              'label' => '50',
+              'value' => 3,
+              'weight' => 1,
+              'is_active' => 1,
+            ],
+            [
+              'label' => '100',
+              'value' => 4,
+              'weight' => 2,
+              'is_active' => 1,
+            ],
+          ],
+        ],
+      ],
+      'Memo' => [
+        'default' => [
+          'label' => 'Memo',
+          'html_type' => 'TextArea',
+          'data_type' => 'Memo',
+          'attributes' => 'rows=4, cols=60',
+        ],
+        'RichTextEditor' => [
+          'label' => 'Memo Rich Text Editor',
+          'html_type' => 'Memo',
+        ],
+      ],
+      'Boolean' => [
+        'default' => [
+          'data_type' => 'Boolean',
+          'html_type' => 'Radio',
+          'label' => 'Yes No',
+        ],
+      ],
+      'StateProvince' => [
+        'default' => [
+          'data_type' => 'StateProvince',
+          'html_type' => 'Select State/Province',
+          'label' => 'State',
+          'option_type' => 0,
+        ],
+        'Multi-Select State/Province' => [
+          'html_type' => 'Multi-Select State/Province',
+          'label' => 'State-multi',
+        ],
+      ],
       'Country' => [
         'default' => [
           'data_type' => 'Country',
           'html_type' => 'Select Country',
           'label' => 'Country',
+          'option_type' => 0,
+        ],
+        'Multi-Select Country' => [
+          'html_type' => 'Multi-Select Country',
+          'label' => 'Country-multi',
           'option_type' => 0,
         ],
       ],

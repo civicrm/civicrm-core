@@ -171,8 +171,10 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * In conjunction with testing our existing  function this  tests the methods we want to migrate to
    * to  clean it up.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testLoadSavedMappingDirect() {
     $this->entity = 'Contact';

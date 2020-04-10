@@ -3917,17 +3917,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $dateField = $this->getCustomFieldName('select_date');
     $selectField = $this->getCustomFieldName('select_string');
     $countryField = $this->getCustomFieldName('country');
+    $multiCountryField = $this->getCustomFieldName('multi_country');
     $referenceField = $this->getCustomFieldName('contact_reference');
+    $stateField = $this->getCustomFieldName('state');
+    $multiStateField = $this->getCustomFieldName('multi_state');
+    $booleanStateField = $this->getCustomFieldName('boolean');
 
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
+    $statesByName = array_flip(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE));
     $customFieldValues = [
-      // @todo fix the fatal bug on this & uncomment - see dev/core#723
       $fileField => $file['id'],
       $linkField => 'http://example.org',
       $dateField => '2018-01-01 17:10:56',
       $selectField => 'G',
       $countryField => $countriesByName['New Zealand'],
+      $multiCountryField => [$countriesByName['New Zealand'], $countriesByName['Australia']],
       $referenceField => $this->householdCreate(),
+      $stateField => $statesByName['Victoria'],
+      $multiStateField => [$statesByName['Victoria'], $statesByName['Tasmania']],
+      $booleanStateField => 1,
     ];
     $this->callAPISuccess('Contact', 'create', array_merge([
       'id' => $contact1,
@@ -3944,6 +3952,50 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     foreach ($customFieldValues as $key => $value) {
       $this->assertEquals($value, $contact[$key]);
     }
+  }
+
+  /**
+   * Test merging a contact that is the target of a contact reference field on another contact.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testMergeContactReferenceCustomFieldTarget() {
+    $this->createCustomGroupWithFieldOfType([], 'contact_reference');
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate();
+    $contact3 = $this->individualCreate([$this->getCustomFieldName('contact_reference') => $contact2]);
+    $this->callAPISuccess('contact', 'merge', [
+      'to_keep_id' => $contact1,
+      'to_remove_id' => $contact2,
+      'auto_flip' => FALSE,
+    ]);
+    $this->assertEquals($contact1, $this->callAPISuccessGetValue('Contact', ['id' => $contact3, 'return' => $this->getCustomFieldName('contact_reference')]));
+  }
+
+  /**
+   * Test merging when a multiple record set is in use.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testMergeMultipleCustomValues() {
+    $customGroupID = $this->createCustomGroup(['is_multiple' => TRUE]);
+    $this->ids['CustomField']['text'] = (int) $this->createTextCustomField(['custom_group_id' => $customGroupID])['id'];
+    $contact1 = $this->individualCreate([$this->getCustomFieldName('text') => 'blah']);
+    $contact2 = $this->individualCreate([$this->getCustomFieldName('text') => 'de blah']);
+    $this->callAPISuccess('contact', 'merge', [
+      'to_keep_id' => $contact1,
+      'to_remove_id' => $contact2,
+      'auto_flip' => FALSE,
+    ]);
+    $column = $this->getCustomFieldColumnName('text');
+    $table = $this->getCustomGroupTable();
+    $this->assertEquals('blah,de blah', CRM_Core_DAO::singleValueQuery(
+      "SELECT GROUP_CONCAT({$column}) FROM $table WHERE entity_id = $contact1"
+    ));
   }
 
   /**
@@ -4005,6 +4057,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Ensure format with return=group shows comma-separated group IDs.
    *
    * CRM-19426
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactGetReturnGroup() {
     // Set up a contact, asser that they were created.
