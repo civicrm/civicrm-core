@@ -91,4 +91,21 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals($testPhone['phone'], $firstPhone['phone']);
   }
 
+  public function testJoinWithLimit() {
+    $base = function() {
+      return Contact::get()
+        ->setCheckPermissions(FALSE)
+        ->addSelect('id', 'display_name', 'phones.phone')
+        ->addOrderBy('id', 'DESC');
+    };
+
+    $this->assertEquals(3, $base()->setLimit(3)->execute()->count());
+    $result3 = $base()->setLimit(3)->execute()->getArrayCopy();
+    $this->assertEquals(3, count($result3));
+
+    $this->assertEquals(5, $base()->setLimit(5)->execute()->count());
+    $result5 = $base()->setLimit(5)->execute()->getArrayCopy();
+    $this->assertEquals(5, count($result5));
+  }
+
 }
