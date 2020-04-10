@@ -39,6 +39,11 @@ class CRM_Utils_HTMLTest extends CiviUnitTestCase {
       '<div>{{ts("Good morning, Dave")}}</div>',
       ['Good morning, Dave'],
     ];
+    // angular one-time binding notation - great when there are no args
+    $cases[] = [
+      '<div>{{:: ts("One-time binding is more efficient!") }}</div>',
+      ['One-time binding is more efficient!'],
+    ];
     // text, with arg
     $cases[] = [
       '<div>{{ts("Hello world", {1: "whiz"})}}</div>',

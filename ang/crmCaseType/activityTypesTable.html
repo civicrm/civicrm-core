@@ -6,8 +6,8 @@ Required vars: caseType
   <thead>
   <tr>
     <th></th>
-    <th>{{ts('Activity Type')}}</th>
-    <th>{{ts('Max Instances')}}</th>
+    <th>{{:: ts('Activity Type') }}</th>
+    <th>{{:: ts('Max Instances') }}</th>
     <th></th>
   </tr>
   </thead>
@@ -25,7 +25,7 @@ Required vars: caseType
       <input class="crm-form-text number" type="text" ng-pattern="/^[1-9][0-9]*$/" ng-model="activityType.max_instances">
     </td>
     <td>
-      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)" title="{{ts('Remove')}}"></a>
+      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)" title="{{:: ts('Remove') }}"></a>
     </td>
   </tr>
   </tbody>
@@ -38,7 +38,7 @@ Required vars: caseType
            crm-options="activityTypeOptions"
            crm-var="newActivity"
            crm-on-add="addActivityType(newActivity)"
-           placeholder="{{ts('Add activity type')}}"
+           placeholder="{{:: ts('Add activity type') }}"
       ></span>
     </td>
   </tr>

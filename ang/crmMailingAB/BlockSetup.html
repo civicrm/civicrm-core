@@ -1,7 +1,7 @@
 <div class="crm-block" ng-form="setupForm" crm-ui-id-scope>
   <div class="crm-group">
     <div class="help" ng-if="fields.help">
-      {{ts('A/B testing allows you to send two test mailings to a random subset of your recipients. After collecting and comparing metrics, the more successful mailing will be sent to the remaining recipients.')}}
+      {{:: ts('A/B testing allows you to send two test mailings to a random subset of your recipients. After collecting and comparing metrics, the more successful mailing will be sent to the remaining recipients.') }}
     </div>
     <div crm-ui-field="{name: 'setupForm.abName', title: ts('Name'), help: hs('name')}" ng-if="fields.abName">
       <input type="text"
@@ -41,11 +41,11 @@
       <div crm-mailing-radio-date="schedule" ng-model="abtest.mailings.a.scheduled_date">
           <div>
             <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
-            <label for="schedule-send-now">{{ts('Send A/B test immediately')}}</label>
+            <label for="schedule-send-now">{{:: ts('Send A/B test immediately') }}</label>
           </div>
           <div>
             <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
-            <label for="schedule-send-at">{{ts('Send A/B test at:')}}</label>
+            <label for="schedule-send-at">{{:: ts('Send A/B test at:') }}</label>
             <input crm-ui-datepicker ng-model="schedule.datetime"/>
           </div>
       </div>
@@ -54,11 +54,11 @@
       <div crm-mailing-radio-date="assessSched" ng-model="abtest.ab.declare_winning_time">
         <div>
           <input ng-model="assessSched.mode" type="radio" name="assess" value="now" id="schedule-assess-now"/>
-          <label for="schedule-assess-now">{{ts('Assess A/B results on an on-going basis')}}</label>
+          <label for="schedule-assess-now">{{:: ts('Assess A/B results on an on-going basis') }}</label>
         </div>
         <div>
           <input ng-model="assessSched.mode" type="radio" name="assess" value="at" id="schedule-assess-at"/>
-          <label for="schedule-assess-at">{{ts('Assess A/B test at:')}}</label>
+          <label for="schedule-assess-at">{{:: ts('Assess A/B test at:') }}</label>
           <input crm-ui-datepicker ng-model="assessSched.datetime"/>
         </div>
       </div>

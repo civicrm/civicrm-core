@@ -1,7 +1,7 @@
 <div crm-ui-debug="mailing"></div>
 
 <div ng-show="isSubmitted()">
-  {{ts('This mailing has been submitted.')}}
+  {{:: ts('This mailing has been submitted.') }}
 </div>
 
 <form name="crmMailing" novalidate ng-hide="isSubmitted()" ng-include="mailingEditorUrl">

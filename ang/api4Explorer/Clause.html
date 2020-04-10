@@ -1,12 +1,12 @@
 <legend>{{ data.label || data.op + ' group' }}<span class="crm-marker" ng-if="data.required"> *</span></legend>
 <div class="btn-group btn-group-xs" ng-if="data.groupParent">
-  <button class="btn btn-danger-outline" ng-click="removeGroup()" title="{{ ts('Remove group') }}">
+  <button class="btn btn-danger-outline" ng-click="removeGroup()" title="{{:: ts('Remove group') }}">
     <i class="crm-i fa-trash"></i>
   </button>
 </div>
 <div class="api4-clause-group-sortable" ng-model="data.clauses" ui-sortable="{axis: 'y', connectWith: '.api4-clause-group-sortable', containment: '.api4-clause-fieldset', over: onSortOver}" ui-sortable-start="onSort" ui-sortable-stop="onSort">
   <div class="api4-input form-inline clearfix" ng-repeat="(index, clause) in data.clauses">
-    <div class="api4-clause-badge" title="{{ ts('Drag to reposition') }}">
+    <div class="api4-clause-badge" title="{{:: ts('Drag to reposition') }}">
       <span class="badge badge-info">
         <span ng-if="!index && !data.groupParent">{{ data.type }}</span>
         <span ng-if="index || data.groupParent">{{ data.op }}</span>

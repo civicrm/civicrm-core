@@ -5,10 +5,10 @@ Required vars: caseType
 <table>
   <thead>
 	  <tr>
-	    <th>{{ts('Display Label')}}</th>
-	    <th>{{ts('Assign to Creator')}}</th>
-	    <th>{{ts('Is Manager')}}</th>
-	    <th>{{ts('Restrict to Groups')}}</th>
+	    <th>{{:: ts('Display Label') }}</th>
+	    <th>{{:: ts('Assign to Creator') }}</th>
+	    <th>{{:: ts('Is Manager') }}</th>
+	    <th>{{:: ts('Restrict to Groups') }}</th>
 	    <th></th>
 	  </tr>
   </thead>
@@ -23,7 +23,7 @@ Required vars: caseType
 				ng-model="relType.groups"
 			/></td>
 	    <td>
-	      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.caseRoles,relType)" title="{{ts('Remove')}}"></a>
+	      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.caseRoles,relType)" title="{{:: ts('Remove') }}"></a>
 	    </td>
 	  </tr>
   </tbody>
@@ -35,7 +35,7 @@ Required vars: caseType
 	           crm-options="relationshipTypeOptions"
 	           crm-var="newRole"
 	           crm-on-add="addRole(caseType.definition.caseRoles, newRole)"
-             placeholder="{{ts('Add role')}}"
+             placeholder="{{:: ts('Add role') }}"
 	              ></span>
 	    </td>
 	  </tr>

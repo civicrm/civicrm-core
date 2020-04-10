@@ -6,7 +6,7 @@ Required vars: activitySet
   <thead>
   <tr>
     <th></th>
-    <th>{{ts('Activity')}}</th>
+    <th>{{:: ts('Activity') }}</th>
     <th></th>
   </tr>
   </thead>
@@ -21,7 +21,7 @@ Required vars: activitySet
       {{ activity.name }}
     </td>
     <td>
-      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)" title="{{ts('Remove')}}"></a>
+      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)" title="{{:: ts('Remove') }}"></a>
     </td>
   </tr>
   </tbody>
@@ -33,7 +33,7 @@ Required vars: activitySet
            crm-options="activityTypeOptions"
            crm-var="newActivity"
            crm-on-add="addActivity(activitySet, newActivity)"
-           placeholder="{{ts('Add activity')}}"
+           placeholder="{{:: ts('Add activity') }}"
       ></span>
     </td>
   </tr>
