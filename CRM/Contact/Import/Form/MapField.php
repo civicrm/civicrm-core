@@ -82,6 +82,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->_mapperFields = $this->get('fields');
     $this->_importTableName = $this->get('importTableName');
     $this->_onDuplicate = $this->get('onDuplicate');
+    $this->_contactSubType = $this->get('contactSubType');
     $highlightedFields = [];
     $highlightedFields[] = 'email';
     $highlightedFields[] = 'external_identifier';
