@@ -674,9 +674,8 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   }
   $input['card_type_id'] = $params['card_type_id'] ?? NULL;
   $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
-  $transaction = new CRM_Core_Transaction();
-  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction,
-     CRM_Utils_Array::value('is_post_payment_create', $params));
+  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, NULL,
+    $params['is_post_payment_create'] ?? NULL);
 }
 
 /**
