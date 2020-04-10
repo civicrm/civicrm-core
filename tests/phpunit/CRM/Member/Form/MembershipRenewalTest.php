@@ -89,6 +89,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
       'relationship_type_id' => 20,
+      'min_fee' => 100,
       'financial_type_id' => $this->financialTypeID,
     ])['id'];
 
@@ -201,6 +202,53 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
         'options' => NULL,
       ],
     ], CRM_Core_Session::singleton()->getStatus());
+  }
+
+  /**
+   * Test submitting with tax enabled.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmitWithTax() {
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount($this->financialTypeID);
+    $form = $this->getForm();
+
+    $form->testSubmit([
+      'cid' => $this->_individualId,
+      'join_date' => date('Y-m-d'),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => '1',
+      'source' => '',
+      'total_amount' => '50.00',
+      'financial_type_id' => $this->financialTypeID,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'receipt_text_signup' => 'Thank you text',
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '9',
+        'Y' => date('Y') + 2,
+      ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Test',
+      'billing_middlename' => 'Last',
+      'billing_street_address-5' => '10 Test St',
+      'billing_city-5' => 'Test',
+      'billing_state_province_id-5' => '1003',
+      'billing_postal_code-5' => '90210',
+      'billing_country_id-5' => '1228',
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId, 'is_test' => TRUE, 'return' => ['total_amount', 'tax_amount']]);
+    $this->assertEquals(50, $contribution['total_amount']);
+    $this->assertEquals(5, $contribution['tax_amount']);
   }
 
   /**
@@ -456,7 +504,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'return' => ['tax_amount', 'trxn_id'],
     ]);
     $this->assertEquals($contribution['trxn_id'], 777);
-    $this->assertEquals($contribution['tax_amount'], NULL);
+    $this->assertEquals(NULL, $contribution['tax_amount']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],

@@ -109,12 +109,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public function setDeleteMessage() {}
 
   /**
-   * Pre-process form.
-   *
-   * @throws \Exception
-   */
-
-  /**
    * Set the renewal notification status message.
    */
   public function setRenewalMessage() {
@@ -128,6 +122,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
   }
 
+  /**
+   * Preprocess form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function preProcess() {
 
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -597,22 +597,17 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       //create line items
       $lineItem = [];
       $this->_params = $this->setPriceSetParameters($this->_params);
-      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $this->_params, $lineItem[$this->_priceSetId], $this->_priceSetId
-      );
-      //CRM-11529 for quick config backoffice transactions
-      //when financial_type_id is passed in form, update the
-      //line items with the financial type selected in form
-      if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $this->_params)) {
-        foreach ($lineItem[$this->_priceSetId] as &$li) {
-          $li['financial_type_id'] = $submittedFinancialType;
-        }
-      }
 
-      if (!empty($lineItem)) {
-        $this->_params['lineItems'] = $lineItem;
-        $this->_params['processPriceSet'] = TRUE;
-      }
+      $order = new CRM_Financial_BAO_Order();
+      $order->setPriceSelectionFromUnfilteredInput($this->_params);
+      $order->setPriceSetID(self::getPriceSetID($this->_params));
+      $order->setOverrideTotalAmount($this->_params['total_amount']);
+      $order->setOverrideFinancialTypeID((int) $this->_params['financial_type_id']);
+
+      $this->_params['lineItems'][$this->_priceSetId] = $order->getLineItems();
+      // This is one of those weird & wonderful legacy params we aim to get rid of.
+      $this->_params['processPriceSet'] = TRUE;
+      $this->_params['tax_amount'] = $order->getTotalTaxAmount();
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
@@ -634,7 +629,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'contribution_recur_id' => $contributionRecurID,
       ]);
       //Remove `tax_amount` if it is not calculated.
-      if (CRM_Utils_Array::value('tax_amount', $temporaryParams) === 0) {
+      // ?? WHY - I haven't been able to figure out...
+      if (CRM_Utils_Array::value('tax_amount', $temporaryParams) === 0.0) {
         unset($temporaryParams['tax_amount']);
       }
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);

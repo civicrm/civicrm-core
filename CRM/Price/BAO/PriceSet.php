@@ -1693,7 +1693,7 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * @return array
    */
-  protected static function getLine(&$params, &$lineItem, $priceSetID, $field, $id, $totalPrice): array {
+  public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id, $totalPrice): array {
     $totalTax = 0;
     switch ($field['html_type']) {
       case 'Text':
