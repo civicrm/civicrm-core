@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9c8e8054f45d5bdd4e18f45701527d2b",
+    "content-hash": "8c2c313c105cf03bcd0c695548764e30",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -1850,6 +1850,60 @@
             "time": "2019-02-22T07:42:52+00:00"
         },
         {
+            "name": "soundintheory/php-sql-parser",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/soundintheory/php-sql-parser.git",
+                "reference": "dcb81216a13be124d21711b8fefb6e80db7af472"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/soundintheory/php-sql-parser/zipball/dcb81216a13be124d21711b8fefb6e80db7af472",
+                "reference": "dcb81216a13be124d21711b8fefb6e80db7af472",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPSQL": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "André Rothe",
+                    "email": "phosco@gmx.de",
+                    "homepage": "https://www.phosco.info",
+                    "role": "Committer"
+                },
+                {
+                    "name": "Justin Swanhart",
+                    "email": "greenlion@gmail.com",
+                    "homepage": "http://code.google.com/u/greenlion@gmail.com/",
+                    "role": "Owner"
+                },
+                {
+                    "name": "Andy White",
+                    "homepage": "https://github.com/soundintheory",
+                    "role": "maintainer"
+                },
+                {
+                    "name": "Dan Vande More",
+                    "homepage": "https://github.com/fimbulvetr",
+                    "role": "contributor"
+                }
+            ],
+            "description": "SQL parsing tools for PHP",
+            "time": "2013-08-09T21:16:50+00:00"
+        },
+        {
             "name": "symfony/config",
             "version": "v2.8.50",
             "source": {
@@ -2431,9 +2485,7 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
             },
             "require": {
                 "php": ">=5.3.0"
@@ -2721,5 +2773,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.1"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }
