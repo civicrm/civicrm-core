@@ -194,6 +194,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Form preProcess function.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -665,9 +666,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param array $files
    * @param CRM_Member_Form_Membership $self
    *
-   * @throws CiviCRM_API3_Exception
    * @return bool|array
    *   mixed true or array of errors
+   *
+   * @throws \CRM_Core_Exception
+   * @throws CiviCRM_API3_Exception
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
@@ -880,6 +883,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -925,10 +931,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Send email receipt.
    *
-   * @deprecated
-   *   This function is shared with Batch_Entry which has limited overlap
-   *   & needs rationalising.
-   *
    * @param CRM_Core_Form $form
    *   Form object.
    * @param array $formValues
@@ -938,6 +940,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    *
    * @return bool
    *   true if mail was sent successfully
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
+   *   This function is shared with Batch_Entry which has limited overlap
+   *   & needs rationalising.
+   *
    */
   public static function emailReceipt(&$form, &$formValues, &$membership, $customValues = NULL) {
     // retrieve 'from email id' for acknowledgement
@@ -1661,7 +1669,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($contributionId && !empty($membershipIds)) {
       $contributionDetails = CRM_Contribute_BAO_Contribution::getContributionDetails(
         CRM_Export_Form_Select::MEMBER_EXPORT, $this->_membershipIDs);
-      if ($contributionDetails[$membership->id]['contribution_status'] == 'Completed') {
+      if ($contributionDetails[$membership->id]['contribution_status'] === 'Completed') {
         $receiptSend = TRUE;
       }
     }
@@ -1703,6 +1711,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param CRM_Member_DAO_Membership $membership
    *     Updated membership object
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function updateContributionOnMembershipTypeChange($inputParams, $membership) {
     if (Civi::settings()->get('update_contribution_on_membership_type_change') &&
@@ -1784,7 +1794,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
 
-    if ($this->_context == 'standalone') {
+    if ($this->_context === 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/member/add',
           'reset=1&action=add&context=standalone'
@@ -1890,6 +1900,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isUpdateToExistingRecurringMembership() {
     $isRecur = FALSE;
@@ -1910,6 +1921,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param \CRM_Member_BAO_Membership $membership
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function emailMembershipReceipt($formValues, $membership) {
     $customValues = $this->getCustomValuesForReceipt($formValues, $membership);
@@ -1932,7 +1944,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       && !empty($this->_groupTree)
     ) {
       foreach ($this->_groupTree as $groupID => $group) {
-        if ($groupID == 'info') {
+        if ($groupID === 'info') {
           continue;
         }
         foreach ($group['fields'] as $k => $field) {
@@ -1944,7 +1956,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $members = [['member_id', '=', $membership->id, 0, 0]];
     // check whether its a test drive
-    if ($this->_mode == 'test') {
+    if ($this->_mode === 'test') {
       $members[] = ['member_test', '=', 1, 0, 0];
     }
 
