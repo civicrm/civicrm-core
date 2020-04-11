@@ -1,39 +1,3 @@
-
-Skip to content
-Pull requests
-Issues
-Marketplace
-Explore
-@vingle
-civicrm /
-civicrm-core
-
-19
-59
-366
-
-    702
-
-Code
-Pull requests 94
-Actions
-Projects 2
-Wiki
-Security
-Insights
-civicrm-core/css/joomla.css
-@seamuslee001 seamuslee001 dev/core#874 [UI] Fix styling of the menubar colour picker in joomla ddf4f83 on 24 Nov 2019
-@colemanw
-@vingle
-@kurund
-@alifrumin
-@lcdservices
-@totten
-@seamuslee001
-@mattwire
-@crusonweb
-@andrewpthompson
-401 lines (374 sloc) 6.75 KB
 /* joomla.css: Joomla-specific css directives for CiviCRM. */
 
 /*
