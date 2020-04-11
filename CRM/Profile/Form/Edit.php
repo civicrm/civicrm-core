@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  */
 
@@ -113,7 +97,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
       // CRM-16784: If there is no ID then this can't be an 'edit'
       else {
-        CRM_Core_Error::fatal(ts('No user/contact ID was specified, so the Profile cannot be used in edit mode.'));
+        CRM_Core_Error::statusBounce(ts('No user/contact ID was specified, so the Profile cannot be used in edit mode.'));
       }
 
     }
@@ -128,7 +112,7 @@ SELECT module,is_reserved
   WHERE civicrm_uf_group.id = %1
 ";
 
-    $params = array(1 => array($this->_gid, 'Integer'));
+    $params = [1 => [$this->_gid, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     $isProfile = FALSE;
@@ -141,8 +125,8 @@ SELECT module,is_reserved
 
     //Remove need for Profile module type when using reserved profiles [CRM-14488]
     if (!$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
-      CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
-        array(1 => $this->_gid)
+      CRM_Core_Error::statusBounce(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
+        [1 => $this->_gid]
       ));
     }
   }
@@ -153,7 +137,7 @@ SELECT module,is_reserved
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
-      CRM_Core_Error::fatal();
+      CRM_Core_Error::statusBounce(ts('Invalid'));
     }
 
     // set the title
@@ -162,7 +146,7 @@ SELECT module,is_reserved
 
     }
     else {
-      $groupTitle = $this->_ufGroup['title'];
+      $groupTitle = CRM_Core_BAO_UFGroup::getFrontEndTitle($this->_ufGroup['id']);
     }
     CRM_Utils_System::setTitle($groupTitle);
     $this->assign('recentlyViewed', FALSE);
@@ -204,7 +188,7 @@ SELECT module,is_reserved
       $this->_cancelURL = str_replace('&amp;', '&', $this->_cancelURL);
 
       // also retain error URL if set
-      $this->_errorURL = CRM_Utils_Array::value('errorURL', $_POST);
+      $this->_errorURL = $_POST['errorURL'] ?? NULL;
       if ($this->_errorURL) {
         // we do this gross hack since qf also does entity replacement
         $this->_errorURL = str_replace('&amp;', '&', $this->_errorURL);
@@ -242,15 +226,15 @@ SELECT module,is_reserved
       $buttonName = 'next';
     }
 
-    $buttons[] = array(
+    $buttons[] = [
       'type' => $buttonName,
       'name' => !empty($this->_ufGroup['submit_button_text']) ? $this->_ufGroup['submit_button_text'] : ts('Save'),
       'isDefault' => TRUE,
-    );
+    ];
 
     $this->addButtons($buttons);
 
-    $this->addFormRule(array('CRM_Profile_Form', 'formRule'), $this);
+    $this->addFormRule(['CRM_Profile_Form', 'formRule'], $this);
   }
 
   /**
@@ -262,13 +246,13 @@ SELECT module,is_reserved
 
     // Send back data for the EntityRef widget
     if ($this->returnExtra) {
-      $contact = civicrm_api3('Contact', 'getsingle', array(
+      $contact = civicrm_api3('Contact', 'getsingle', [
         'id' => $this->_id,
         'return' => $this->returnExtra,
-      ));
+      ]);
       foreach (explode(',', $this->returnExtra) as $field) {
         $field = trim($field);
-        $this->ajaxResponse['extra'][$field] = CRM_Utils_Array::value($field, $contact);
+        $this->ajaxResponse['extra'][$field] = $contact[$field] ?? NULL;
       }
     }
 
@@ -301,10 +285,10 @@ SELECT module,is_reserved
     }
     else {
       // Replace tokens from post URL
-      $contactParams = array(
+      $contactParams = [
         'contact_id' => $this->_id,
         'version' => 3,
-      );
+      ];
 
       $contact = civicrm_api('contact', 'get', $contactParams);
       $contact = reset($contact['values']);

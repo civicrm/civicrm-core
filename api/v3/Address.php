@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -42,7 +26,7 @@
  * @return array
  *   API result array
  */
-function civicrm_api3_address_create(&$params) {
+function civicrm_api3_address_create($params) {
   _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Address', $params);
   /**
    * If street_parsing, street_address has to be parsed into
@@ -103,28 +87,32 @@ function civicrm_api3_address_create(&$params) {
 function _civicrm_api3_address_create_spec(&$params) {
   $params['location_type_id']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
-  $params['street_parsing'] = array(
+  $params['street_parsing'] = [
     'title' => 'Street Address Parsing',
     'description' => 'Optional param to indicate you want the street_address field parsed into individual params',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
-  $params['skip_geocode'] = array(
+  ];
+  $params['skip_geocode'] = [
     'title' => 'Skip geocode',
     'description' => 'Optional param to indicate you want to skip geocoding (useful when importing a lot of addresses
       at once, the job \'Geocode and Parse Addresses\' can execute this task after the import)',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
-  $params['fix_address'] = array(
+  ];
+  $params['fix_address'] = [
     'title' => ts('Fix address'),
     'description' => ts('When true, apply various fixes to the address before insert. Default true.'),
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'api.default' => TRUE,
-  );
-  $params['world_region'] = array(
+  ];
+  $params['world_region'] = [
     'title' => ts('World Region'),
     'name' => 'world_region',
     'type' => CRM_Utils_Type::T_TEXT,
-  );
+  ];
+  $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+  if ($defaultLocation) {
+    $params['location_type_id']['api.default'] = $defaultLocation->id;
+  }
 }
 
 /**
@@ -134,11 +122,11 @@ function _civicrm_api3_address_create_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_address_get_spec(&$params) {
-  $params['world_region'] = array(
+  $params['world_region'] = [
     'title' => ts('World Region'),
     'name' => 'world_region',
     'type' => CRM_Utils_Type::T_TEXT,
-  );
+  ];
 }
 
 /**
@@ -163,6 +151,6 @@ function civicrm_api3_address_delete($params) {
  * @return array
  *   API result array
  */
-function civicrm_api3_address_get(&$params) {
+function civicrm_api3_address_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');
 }

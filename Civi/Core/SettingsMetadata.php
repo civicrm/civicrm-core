@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -32,8 +16,6 @@ namespace Civi\Core;
  * @package Civi\Core
  */
 class SettingsMetadata {
-
-  const ALL = 'all';
 
   /**
    * WARNING: This interface may change.
@@ -53,6 +35,7 @@ class SettingsMetadata {
    *
    * @param array $filters
    * @param int $domainID
+   * @param bool $loadOptions
    *
    * @return array
    *   the following information as appropriate for each setting
@@ -64,37 +47,31 @@ class SettingsMetadata {
    *   - is_contact
    *   - description
    *   - help_text
+   *   - options
+   *   - pseudoconstant
    */
-  public static function getMetadata($filters = array(), $domainID = NULL) {
+  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE) {
     if ($domainID === NULL) {
       $domainID = \CRM_Core_Config::domainID();
     }
 
     $cache = \Civi::cache('settings');
     $cacheString = 'settingsMetadata_' . $domainID . '_';
-    // the caching into 'All' seems to be a duplicate of caching to
-    // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
     $settingsMetadata = $cache->get($cacheString);
-    $cached = is_array($settingsMetadata);
 
-    if (!$cached) {
-      $settingsMetadata = $cache->get(self::ALL);
-      if (empty($settingsMetadata)) {
-        global $civicrm_root;
-        $metaDataFolders = array($civicrm_root . '/settings');
-        \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
-        $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
-        $cache->set(self::ALL, $settingsMetadata);
-      }
-    }
-
-    \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
-
-    if (!$cached) {
+    if (!is_array($settingsMetadata)) {
+      global $civicrm_root;
+      $metaDataFolders = [$civicrm_root . '/settings'];
+      \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
+      $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
+      \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
       $cache->set($cacheString, $settingsMetadata);
     }
 
     self::_filterSettingsSpecification($filters, $settingsMetadata);
+    if ($loadOptions) {
+      self::loadOptions($settingsMetadata);
+    }
 
     return $settingsMetadata;
   }
@@ -106,8 +83,8 @@ class SettingsMetadata {
    * @return array
    */
   protected static function loadSettingsMetaDataFolders($metaDataFolders) {
-    $settingsMetadata = array();
-    $loadedFolders = array();
+    $settingsMetadata = [];
+    $loadedFolders = [];
     foreach ($metaDataFolders as $metaDataFolder) {
       $realFolder = realpath($metaDataFolder);
       if (is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
@@ -126,7 +103,7 @@ class SettingsMetadata {
    * @return array
    */
   protected static function loadSettingsMetadata($metaDataFolder) {
-    $settingMetaData = array();
+    $settingMetaData = [];
     $settingsFiles = \CRM_Utils_File::findFiles($metaDataFolder, '*.setting.php');
     foreach ($settingsFiles as $file) {
       $settings = include $file;
@@ -145,20 +122,50 @@ class SettingsMetadata {
    *   Metadata to filter.
    */
   protected static function _filterSettingsSpecification($filters, &$settingSpec) {
-    if (empty($filters)) {
-      return;
+    if (!empty($filters['name'])) {
+      $settingSpec = array_intersect_key($settingSpec, array_flip((array) $filters['name']));
+      // FIXME: This is a workaround for settingsBag::setDb() called by unit tests with settings names that don't exist
+      $settingSpec += array_fill_keys((array) $filters['name'], []);
+      unset($filters['name']);
     }
-    elseif (array_keys($filters) == array('name')) {
-      $settingSpec = array($filters['name'] => \CRM_Utils_Array::value($filters['name'], $settingSpec, ''));
-      return;
-    }
-    else {
+    if (!empty($filters)) {
       foreach ($settingSpec as $field => $fieldValues) {
         if (array_intersect_assoc($fieldValues, $filters) != $filters) {
           unset($settingSpec[$field]);
         }
       }
-      return;
+    }
+  }
+
+  /**
+   * Retrieve options from settings metadata
+   *
+   * @param array $settingSpec
+   */
+  protected static function loadOptions(&$settingSpec) {
+    foreach ($settingSpec as &$spec) {
+      if (empty($spec['pseudoconstant'])) {
+        continue;
+      }
+      $pseudoconstant = $spec['pseudoconstant'];
+      // It would be nice if we could leverage CRM_Core_PseudoConstant::get() somehow,
+      // but it's tightly coupled to DAO/field. However, if you really need to support
+      // more pseudoconstant types, then probably best to refactor it. For now, KISS.
+      if (!empty($pseudoconstant['callback'])) {
+        $spec['options'] = Resolver::singleton()->call($pseudoconstant['callback'], []);
+      }
+      elseif (!empty($pseudoconstant['optionGroupName'])) {
+        $keyColumn = \CRM_Utils_Array::value('keyColumn', $pseudoconstant, 'value');
+        $spec['options'] = \CRM_Core_OptionGroup::values($pseudoconstant['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn);
+      }
+      if (!empty($pseudoconstant['table'])) {
+        $params = [
+          'condition' => $pseudoconstant['condition'] ?? [],
+          'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
+          'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
+        ];
+        $spec['options'] = \CRM_Core_PseudoConstant::renderOptionsFromTablePseudoconstant($pseudoconstant, $params, ($spec['localize_context'] ?? NULL), 'get');
+      }
     }
   }
 

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
@@ -47,149 +31,149 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
-  );
+  ];
 
-  public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
+  public $_drilldownReport = ['contact/detail' => 'Link to Detail Report'];
 
   /**
    * Class constructor.
    */
   public function __construct() {
 
-    $this->_columns = array(
-      'civicrm_employer' => array(
+    $this->_columns = [
+      'civicrm_employer' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'organization_name' => array(
+        'fields' => [
+          'organization_name' => [
             'title' => ts('Employer Name'),
             'required' => TRUE,
             'no_repeat' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'organization_name' => array(
+          ],
+        ],
+        'filters' => [
+          'organization_name' => [
             'title' => ts('Employer Name'),
             'operatorType' => CRM_Report_Form::OP_STRING,
-          ),
-        ),
-      ),
-      'civicrm_contact' => array(
+          ],
+        ],
+      ],
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Employee Name'),
             'required' => TRUE,
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
+          ],
+          'middle_name' => [
             'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
+          ],
+          'last_name' => [
             'title' => ts('Last Name'),
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'job_title' => array(
+          ],
+          'job_title' => [
             'title' => ts('Job Title'),
             'default' => TRUE,
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'title' => ts('Birth Date'),
-          ),
-          'age' => array(
+          ],
+          'age' => [
             'title' => ts('Age'),
             'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'contact_type' => array(
+          ],
+          'contact_type' => [
             'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
+          ],
+          'contact_sub_type' => [
             'title' => ts('Contact Subtype'),
-          ),
-        ),
-        'filters' => array_merge($this->getBasicContactFilters(), array('sort_name' => array('title' => ts('Employee Name')))),
+          ],
+        ],
+        'filters' => array_merge($this->getBasicContactFilters(), ['sort_name' => ['title' => ts('Employee Name')]]),
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_relationship' => array(
+      ],
+      'civicrm_relationship' => [
         'dao' => 'CRM_Contact_DAO_Relationship',
-        'fields' => array(
-          'start_date' => array(
+        'fields' => [
+          'start_date' => [
             'title' => ts('Employee Since'),
             'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'start_date' => array(
+          ],
+        ],
+        'filters' => [
+          'start_date' => [
             'title' => ts('Employee Since'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-        ),
-      ),
-      'civicrm_phone' => array(
+          ],
+        ],
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
         'grouping' => 'contact-fields',
-        'fields' => array(
-          'phone' => array(
+        'fields' => [
+          'phone' => [
             'title' => ts('Phone'),
             'default' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_email' => array(
+          ],
+        ],
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
         'grouping' => 'contact-fields',
-        'fields' => array(
-          'email' => array(
+        'fields' => [
+          'email' => [
             'title' => ts('Email'),
             'default' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_address' => array(
+          ],
+        ],
+      ],
+      'civicrm_address' => [
         'dao' => 'CRM_Core_DAO_Address',
         'grouping' => 'contact-fields',
-        'fields' => array(
+        'fields' => [
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-          'state_province_id' => array(
+          'state_province_id' => [
             'title' => ts('State/Province'),
-          ),
-          'country_id' => array(
+          ],
+          'country_id' => [
             'title' => ts('Country'),
-          ),
-        ),
-        'filters' => array(
-          'country_id' => array(
+          ],
+        ],
+        'filters' => [
+          'country_id' => [
             'title' => ts('Country'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::country(NULL, FALSE),
-          ),
-          'state_province_id' => array(
+          ],
+          'state_province_id' => [
             'title' => ts('State/Province'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::stateProvince(),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -202,7 +186,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   public function select() {
 
-    $select = $this->_columnHeaders = array();
+    $select = $this->_columnHeaders = [];
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -212,8 +196,8 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           ) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
           }
         }
       }
@@ -224,11 +208,11 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
   }
 
   public function from() {
-    $relType = civicrm_api3('RelationshipType', 'getvalue', array(
+    $relType = civicrm_api3('RelationshipType', 'getvalue', [
       'return' => "id",
       'name_a_b' => "Employee of",
       'name_b_a' => "Employer of",
-    ));
+    ]);
     $this->_from = "
 FROM civicrm_contact {$this->_aliases['civicrm_contact']}
 
@@ -248,21 +232,21 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
 
   public function where() {
 
-    $clauses = array();
+    $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
           ) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type']);
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
@@ -293,10 +277,10 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
   }
 
   public function groupBy() {
-    $groupBy = array(
+    $groupBy = [
       "{$this->_aliases['civicrm_employer']}.id",
       "{$this->_aliases['civicrm_contact']}.id",
-    );
+    ];
 
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
@@ -307,10 +291,10 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
 
   public function postProcess() {
     // get the acl clauses built before we assemble the query
-    $this->buildACLClause(array(
+    $this->buildACLClause([
       $this->_aliases['civicrm_contact'],
       $this->_aliases['civicrm_employer'],
-    ));
+    ]);
     parent::postProcess();
   }
 
@@ -324,7 +308,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
    *   Rows generated by SQL, with an array for each row.
    */
   public function alterDisplay(&$rows) {
-    $checkList = array();
+    $checkList = [];
     $entryFound = FALSE;
 
     foreach ($rows as $rowNum => $row) {
@@ -361,14 +345,6 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       // Handle ID to label conversion for contact fields
       $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/currentEmployer', 'View Contact Detail') ? TRUE : $entryFound;
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
-      // display birthday in the configured custom format
-      if (array_key_exists('civicrm_contact_birth_date', $row)) {
-        $birthDate = $row['civicrm_contact_birth_date'];
-        if ($birthDate) {
-          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
-        }
-        $entryFound = TRUE;
-      }
 
       // convert employee name to links
       if (array_key_exists('civicrm_contact_sort_name', $row) &&

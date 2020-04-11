@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -56,6 +40,7 @@ function _civicrm_api3_contribution_recur_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['create_date']['api.default'] = 'now';
   $params['frequency_interval']['api.required'] = 1;
+  $params['amount']['api.required'] = 1;
   $params['start_date']['api.default'] = 'now';
   $params['modified_date']['api.default'] = 'now';
 }
@@ -83,8 +68,23 @@ function civicrm_api3_contribution_recur_get($params) {
  *   returns true is successfully cancelled
  */
 function civicrm_api3_contribution_recur_cancel($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('id'));
-  return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
+  return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
+}
+
+/**
+ * Adjust Metadata for Cancel action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_contribution_recur_cancel_spec(&$params) {
+  $params['id'] = [
+    'title' => ts('Contribution Recur ID'),
+    'api.required' => TRUE,
+    'type' => CRM_Utils_Type::T_INT,
+  ];
 }
 
 /**

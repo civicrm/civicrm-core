@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -44,12 +28,13 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
 
   /**
    * Define tokens available for getting started
+   * @var array
    */
-  static $_tokens = array(
-    'crmurl' => array(
+  public static $_tokens = [
+    'crmurl' => [
       'configbackend' => 'civicrm/admin/configtask',
-    ),
-  );
+    ],
+  ];
 
   /**
    * Get the final, usable URL string (after interpolating any variables)
@@ -87,13 +72,15 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    * @return array
    */
   private function _gettingStarted() {
-    $value = Civi::cache('community_messages')->get('dashboard_gettingStarted');
+    $tsLocale = CRM_Core_I18n::getLocale();
+    $key = 'dashboard_gettingStarted_' . $tsLocale;
+    $value = Civi::cache('community_messages')->get($key);
 
     if (!$value) {
       $value = $this->_getHtml($this->gettingStartedUrl());
 
       if ($value) {
-        Civi::cache('community_messages')->set('dashboard_gettingStarted', $value, (60 * 60 * 24 * self::CACHE_DAYS));
+        Civi::cache('community_messages')->set($key, $value, (60 * 60 * 24 * self::CACHE_DAYS));
       }
     }
 
@@ -120,7 +107,6 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
     $this->replaceLinkToken($tokensList, $html);
     return $html;
   }
-
 
   /**
    * @param array $tokensList

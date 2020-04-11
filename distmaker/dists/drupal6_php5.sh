@@ -19,11 +19,11 @@ dm_reset_dirs "$TRG"
 cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
 dm_generate_version "$TRG/civicrm-version.php" Drupal6
 dm_install_core "$SRC" "$TRG"
+dm_install_coreext "$SRC" "$TRG" $(dm_core_exts)
 dm_install_packages "$SRC/packages" "$TRG/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
 dm_install_drupal "$SRC/drupal" "$TRG/drupal"
-dm_install_cvext org.civicrm.api4 "$TRG/ext/api4"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
 
 # gen tarball

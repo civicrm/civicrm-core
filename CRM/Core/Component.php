@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -30,7 +14,7 @@
  * CiviCRM components
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -42,17 +26,20 @@ class CRM_Core_Component {
    */
   const COMPONENT_INFO_CLASS = 'Info';
 
-  static $_contactSubTypes = NULL;
+  /**
+   * @var array
+   */
+  public static $_contactSubTypes = NULL;
 
   /**
    * @param bool $force
    *
-   * @return array|null
+   * @return CRM_Core_Component_Info[]
    */
   private static function &_info($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['info'])|| $force) {
-      Civi::$statics[__CLASS__]['info'] = array();
-      $c = array();
+      Civi::$statics[__CLASS__]['info'] = [];
+      $c = [];
 
       $config = CRM_Core_Config::singleton();
       $c = self::getComponents();
@@ -76,7 +63,7 @@ class CRM_Core_Component {
   public static function get($name, $attribute = NULL) {
     $comp = CRM_Utils_Array::value($name, self::_info());
     if ($attribute) {
-      return CRM_Utils_Array::value($attribute, $comp->info);
+      return $comp->info[$attribute] ?? NULL;
     }
     return $comp;
   }
@@ -84,12 +71,12 @@ class CRM_Core_Component {
   /**
    * @param bool $force
    *
-   * @return array
+   * @return CRM_Core_Component_Info[]
    * @throws Exception
    */
   public static function &getComponents($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['all']) || $force) {
-      Civi::$statics[__CLASS__]['all'] = array();
+      Civi::$statics[__CLASS__]['all'] = [];
 
       $cr = new CRM_Core_DAO_Component();
       $cr->find(FALSE);
@@ -117,7 +104,7 @@ class CRM_Core_Component {
    *   Array(string $name => int $id).
    */
   public static function &getComponentIDs() {
-    $componentIDs = array();
+    $componentIDs = [];
 
     $cr = new CRM_Core_DAO_Component();
     $cr->find(FALSE);
@@ -128,18 +115,18 @@ class CRM_Core_Component {
     return $componentIDs;
   }
 
-
   /**
    * @param bool $force
    *
-   * @return array|null
+   * @return CRM_Core_Component_Info[]
    */
-  static public function &getEnabledComponents($force = FALSE) {
+  public static function &getEnabledComponents($force = FALSE) {
     return self::_info($force);
   }
 
-  static public function flushEnabledComponents() {
+  public static function flushEnabledComponents() {
     unset(Civi::$statics[__CLASS__]);
+    CRM_Core_BAO_Navigation::resetNavigation();
   }
 
   /**
@@ -150,7 +137,7 @@ class CRM_Core_Component {
   public static function &getNames($translated = FALSE) {
     $allComponents = self::getComponents();
 
-    $names = array();
+    $names = [];
     foreach ($allComponents as $name => $comp) {
       if ($translated) {
         $names[$comp->componentID] = $comp->info['translatedName'];
@@ -208,7 +195,7 @@ class CRM_Core_Component {
     // lets build the menu for all components
     $info = self::getComponents(TRUE);
 
-    $files = array();
+    $files = [];
     foreach ($info as $name => $comp) {
       $files = array_merge($files,
         $comp->menuFiles()
@@ -223,7 +210,7 @@ class CRM_Core_Component {
    */
   public static function &menu() {
     $info = self::_info();
-    $items = array();
+    $items = [];
     foreach ($info as $name => $comp) {
       $mnu = $comp->getMenuObject();
 
@@ -275,7 +262,7 @@ class CRM_Core_Component {
    */
   public static function &getQueryFields($checkPermission = TRUE) {
     $info = self::_info();
-    $fields = array();
+    $fields = [];
     foreach ($info as $name => $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
@@ -383,11 +370,10 @@ class CRM_Core_Component {
    */
   public static function &contactSubTypes() {
     if (self::$_contactSubTypes == NULL) {
-      self::$_contactSubTypes = array();
+      self::$_contactSubTypes = [];
     }
     return self::$_contactSubTypes;
   }
-
 
   /**
    * @param $subType
@@ -431,7 +417,7 @@ class CRM_Core_Component {
    * @return array
    */
   public static function getComponentsFromFile($crmFolderDir) {
-    $components = array();
+    $components = [];
     //traverse CRM folder and check for Info file
     if (is_dir($crmFolderDir) && $dir = opendir($crmFolderDir)) {
       while ($subDir = readdir($dir)) {

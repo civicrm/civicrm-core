@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -88,8 +72,8 @@ class CRM_Core_BAO_CMSUser {
     $showCMS = FALSE;
 
     $isDrupal = $config->userSystem->is_drupal;
-    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
-    $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
+    $isJoomla = ucfirst($config->userFramework) == 'Joomla';
+    $isWordPress = $config->userFramework == 'WordPress';
 
     if (!$config->userSystem->isUserRegistrationPermitted()) {
       // Do not build form if CMS is not configured to allow creating users.
@@ -113,9 +97,9 @@ class CRM_Core_BAO_CMSUser {
     if ($isCMSUser && $emailPresent) {
       if ($showUserRegistration) {
         if ($isCMSUser != 2) {
-          $extra = array(
+          $extra = [
             'onclick' => "return showHideByValue('cms_create_account','','details','block','radio',false );",
-          );
+          ];
           $form->addElement('checkbox', 'cms_create_account', ts('Create an account?'), NULL, $extra);
           $required = FALSE;
         }
@@ -132,7 +116,7 @@ class CRM_Core_BAO_CMSUser {
             $form->add('password', 'cms_confirm_pass', ts('Confirm Password'));
           }
 
-          $form->addFormRule(array('CRM_Core_BAO_CMSUser', 'formRule'), $form);
+          $form->addFormRule(['CRM_Core_BAO_CMSUser', 'formRule'], $form);
         }
         $showCMS = TRUE;
       }
@@ -164,10 +148,10 @@ class CRM_Core_BAO_CMSUser {
     $config = CRM_Core_Config::singleton();
 
     $isDrupal = $config->userSystem->is_drupal;
-    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
-    $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
+    $isJoomla = ucfirst($config->userFramework) == 'Joomla';
+    $isWordPress = $config->userFramework == 'WordPress';
 
-    $errors = array();
+    $errors = [];
     if ($isDrupal || $isJoomla || $isWordPress) {
       $emailName = NULL;
       if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
@@ -213,11 +197,11 @@ class CRM_Core_BAO_CMSUser {
       }
 
       // now check that the cms db does not have the user name and/or email
-      if ($isDrupal OR $isJoomla OR $isWordPress) {
-        $params = array(
+      if ($isDrupal or $isJoomla or $isWordPress) {
+        $params = [
           'name' => $fields['cms_name'],
           'mail' => $fields[$emailName],
-        );
+        ];
       }
 
       $config->userSystem->checkUserNameEmailExists($params, $errors, $emailName);

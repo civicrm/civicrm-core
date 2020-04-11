@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -48,7 +32,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   protected function tearDown() {
-    $this->quickCleanup(array('civicrm_mapping_field', 'civicrm_mapping', 'civicrm_group', 'civicrm_saved_search'));
+    $this->quickCleanup(['civicrm_mapping_field', 'civicrm_mapping', 'civicrm_group', 'civicrm_saved_search']);
   }
 
   /**
@@ -56,18 +40,18 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    */
   public function testAddSimple() {
 
-    $checkParams = $params = array(
+    $checkParams = $params = [
       'title' => 'Group Uno',
       'description' => 'Group One',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    );
+    ];
 
     $group = CRM_Contact_BAO_Group::create($params);
 
     $this->assertDBCompareValues(
       'CRM_Contact_DAO_Group',
-      array('id' => $group->id),
+      ['id' => $group->id],
       $checkParams
     );
   }
@@ -81,38 +65,39 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     // 1. Create two parent group A and B and disable B
     // 2. Create a child group C
     // 3. Ensure that Group C is present in the group hierarchy
-    $params = array(
+    $params = [
       'name' => uniqid(),
       'title' => 'Parent Group A',
       'description' => 'Parent Group One',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    );
+    ];
     $group1 = CRM_Contact_BAO_Group::create($params);
 
-    $params = array_merge($params, array(
+    $params = array_merge($params, [
       'name' => uniqid(),
       'title' => 'Parent Group B',
       'description' => 'Parent Group Two',
-      'is_active' => 0, // disable
-    ));
+      // disable
+      'is_active' => 0,
+    ]);
     $group2 = CRM_Contact_BAO_Group::create($params);
 
-    $params = array_merge($params, array(
+    $params = array_merge($params, [
       'name' => uniqid(),
       'title' => 'Child Group C',
       'description' => 'Child Group C',
-      'parents' => array(
+      'parents' => [
         $group1->id => 1,
         $group2->id => 1,
-      ),
-    ));
+      ],
+    ]);
     $group3 = CRM_Contact_BAO_Group::create($params);
 
-    $params = array(
+    $params = [
       $group1->id => 1,
       $group3->id => 1,
-    );
+    ];
     $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
     // check if child group is present in the tree with formatted group title prepended with spacer '&nbsp;&nbsp;'
     $this->assertEquals('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
@@ -129,20 +114,20 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    */
   public function testAddSmart() {
 
-    $checkParams = $params = array(
+    $checkParams = $params = [
       'title' => 'Group Dos',
       'description' => 'Group Two',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-      'formValues' => array('sort_name' => 'Adams'),
-    );
+      'formValues' => ['sort_name' => 'Adams'],
+    ];
 
     $group = CRM_Contact_BAO_Group::createSmartGroup($params);
 
     unset($checkParams['formValues']);
     $this->assertDBCompareValues(
       'CRM_Contact_DAO_Group',
-      array('id' => $group->id),
+      ['id' => $group->id],
       $checkParams
     );
   }
@@ -156,7 +141,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
     $this->loadSavedSearches();
     $results = CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM civicrm_group WHERE saved_search_id IS NOT NULL');
-    return array(explode(',', $results));
+    return [explode(',', $results)];
   }
 
   /**
@@ -203,35 +188,35 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Ensure that when updating a group with a linked organisation record even tho that record's id doesn't match the group id no db error is produced
    */
   public function testGroupUpdateWithOrganization() {
-    $params = array(
+    $params = [
       'name' => uniqid(),
       'title' => 'Group A',
       'description' => 'Group One',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    );
+    ];
     $group1 = CRM_Contact_BAO_Group::create($params);
 
     $domain1 = $this->callAPISuccess('Domain', 'get', ['id' => 1]);
-    $params2 = array(
+    $params2 = [
       'name' => uniqid(),
       'title' => 'Group B',
       'description' => 'Group Two',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
       'organization_id' => $domain1['values'][1]['contact_id'],
-    );
+    ];
     $group2 = CRM_Contact_BAO_Group::create($params2);
 
     $domain2 = $this->callAPISuccess('Domain', 'get', ['id' => 2]);
-    $params3 = array(
+    $params3 = [
       'name' => uniqid(),
       'title' => 'Group C',
       'description' => 'Group Three',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
       'organization_id' => $domain2['values'][2]['contact_id'],
-    );
+    ];
     $group3 = CRM_Contact_BAO_Group::create($params3);
     $params2['id'] = $group2->id;
     $testUpdate = CRM_Contact_BAO_Group::create($params2);
@@ -242,12 +227,12 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    */
   public function testHiddenSmartGroup() {
     $customGroup = $this->customGroupCreate();
-    $fields = array(
+    $fields = [
       'label' => 'testFld',
       'data_type' => 'String',
       'html_type' => 'Text',
       'custom_group_id' => $customGroup['id'],
-    );
+    ];
     $customFieldID = CRM_Core_BAO_CustomField::create($fields)->id;
 
     $contactID = $this->individualCreate(['custom_' . $customFieldID => 'abc']);
@@ -262,16 +247,54 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     list($smartGroupID, $savedSearchID) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
 
     $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
-    $this->callAPISuccess('MailingGroup', 'create', array(
+    $this->callAPISuccess('MailingGroup', 'create', [
       'mailing_id' => $mailingID,
       'group_type' => 'Include',
       'entity_table' => 'civicrm_group',
       'entity_id' => $smartGroupID,
-    ));
+    ]);
 
     CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
     $this->assertEquals(1, $recipients['count'], 'Check recipient count');
+  }
+
+  /**
+   * Test updating a group with just description and check the recent items
+   * list has the right title.
+   */
+  public function testGroupUpdateDescription() {
+    // Create a group. Copied from $this->testAddSimple().
+    // Note we need $checkParams because the function call changes $params.
+    $checkParams = $params = [
+      'title' => 'Group Uno',
+      'description' => 'Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    ];
+    $group = CRM_Contact_BAO_Group::create($params);
+
+    // Update the group with just id and description.
+    $newParams = [
+      'id' => $group->id,
+      'description' => 'The first group',
+    ];
+    CRM_Contact_BAO_Group::create($newParams);
+
+    // Check it against original array, except description.
+    $result = $this->callAPISuccess('Group', 'getsingle', ['id' => $group->id]);
+    foreach ($checkParams as $key => $value) {
+      if ($key === 'description') {
+        $this->assertEquals($newParams[$key], $result[$key], "$key doesn't match");
+      }
+      else {
+        $this->assertEquals($checkParams[$key], $result[$key], "$key doesn't match");
+      }
+    }
+
+    // Check recent items list.
+    $recentItems = CRM_Utils_Recent::get();
+    $this->assertEquals($checkParams['title'], $recentItems[0]['title']);
   }
 
 }

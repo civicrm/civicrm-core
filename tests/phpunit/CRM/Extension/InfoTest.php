@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Extension_InfoTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     $this->file = NULL;
@@ -49,7 +50,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals('test.foo', $info->key);
     $this->assertEquals('foo', $info->file);
     $this->assertEquals('zamboni', $info->typeInfo['extra']);
-    $this->assertEquals(array(), $info->requires);
+    $this->assertEquals([], $info->requires);
   }
 
   public function testGood_string_extras() {
@@ -64,7 +65,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals('testbar', $info->file);
     $this->assertEquals('Civi\\', $info->classloader[0]['prefix']);
     $this->assertEquals('Civi', $info->classloader[0]['path']);
-    $this->assertEquals(array('org.civicrm.a', 'org.civicrm.b'), $info->requires);
+    $this->assertEquals(['org.civicrm.a', 'org.civicrm.b'], $info->requires);
   }
 
   public function testBad_string() {
@@ -79,6 +80,14 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc));
+  }
+
+  public function test_requirements() {
+    // Quicksearch requirement should get filtered out per extension-compatibility.json
+    $data = "<extension key='test.foo' type='module'><file>foo</file><requires><ext>example.test</ext><ext>com.ixiam.modules.quicksearch</ext></requires></extension>";
+
+    $info = CRM_Extension_Info::loadFromString($data);
+    $this->assertEquals(['example.test'], $info->requires);
   }
 
 }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -49,12 +33,12 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    *
    * @var array
    */
-  protected $_contributionContactIds = array();
+  protected $_contributionContactIds = [];
 
   /**
    * The flag to tell if there are soft credits included.
    *
-   * @var boolean
+   * @var bool
    */
   public $_includesSoftCredits = FALSE;
 
@@ -69,15 +53,15 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function preProcessCommon(&$form) {
-    $form->_contributionIds = array();
+    $form->_contributionIds = [];
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
-    $form->_task = CRM_Utils_Array::value('task', $values);
+    $form->_task = $values['task'] ?? NULL;
     $contributeTasks = CRM_Contribute_Task::tasks();
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $contributeTasks));
 
-    $ids = array();
+    $ids = [];
     if (isset($values['radio_ts']) && $values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -97,20 +81,20 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
         }
       }
       if (!$isTest) {
-        $queryParams[] = array(
+        $queryParams[] = [
           'contribution_test',
           '=',
           0,
           0,
           0,
-        );
+        ];
       }
-      $returnProperties = array('contribution_id' => 1);
+      $returnProperties = ['contribution_id' => 1];
       $sortOrder = $sortCol = NULL;
       if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
         $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
         //Include sort column in select clause.
-        $sortCol = trim(str_replace(array('`', 'asc', 'desc'), '', $sortOrder));
+        $sortCol = trim(str_replace(['`', 'asc', 'desc'], '', $sortOrder));
         $returnProperties[$sortCol] = 1;
       }
 
@@ -121,7 +105,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
       // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
       // can we remove? if not why not?
       if ($form->_includesSoftCredits) {
-        $contactIds = $contributionContactIds = array();
+        $contactIds = $contributionContactIds = [];
         $query->_rowCountClause = " count(civicrm_contribution.id)";
         $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
       }
@@ -137,7 +121,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
           $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
         }
       }
-      $result->free();
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
 
@@ -208,18 +191,17 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    * @param bool $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
 }

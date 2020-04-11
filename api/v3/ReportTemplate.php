@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -56,6 +40,8 @@ function civicrm_api3_report_template_get($params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -63,7 +49,7 @@ function civicrm_api3_report_template_create($params) {
     'CRM_Core_DAO_OptionGroup', 'report_template', 'id', 'name'
   );
   if (!empty($params['component_id']) && !is_numeric($params['component_id'])) {
-    $components = CRM_Core_PseudoConstant::get('CRM_Core_DAO_OptionValue', 'component_id', array('onlyActive' => FALSE, 'labelColumn' => 'name'));
+    $components = CRM_Core_PseudoConstant::get('CRM_Core_DAO_OptionValue', 'component_id', ['onlyActive' => FALSE, 'labelColumn' => 'name']);
     $params['component_id'] = array_search($params['component_id'], $components);
   }
   return civicrm_api3_option_value_create($params);
@@ -80,8 +66,8 @@ function civicrm_api3_report_template_create($params) {
 function _civicrm_api3_report_template_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
   _civicrm_api3_option_value_create_spec($params);
-  $params['value']['api.aliases'] = array('report_url');
-  $params['name']['api.aliases'] = array('class_name');
+  $params['value']['api.aliases'] = ['report_url'];
+  $params['name']['api.aliases'] = ['class_name'];
   $params['option_group_id']['api.default'] = CRM_Core_DAO::getFieldValue(
     'CRM_Core_DAO_OptionGroup', 'report_template', 'id', 'name'
   );
@@ -95,6 +81,8 @@ function _civicrm_api3_report_template_create_spec(&$params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_report_template_delete($params) {
   require_once 'api/v3/OptionValue.php';
@@ -111,7 +99,7 @@ function civicrm_api3_report_template_delete($params) {
  *   API result array
  */
 function civicrm_api3_report_template_getrows($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
+  civicrm_api3_verify_one_mandatory($params, NULL, ['report_id', 'instance_id']);
   list($rows, $instance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $instance->cleanUpTemporaryTables();
   return civicrm_api3_create_success($rows, $params, 'ReportTemplate', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
@@ -128,16 +116,17 @@ function civicrm_api3_report_template_getrows($params) {
  */
 function _civicrm_api3_report_template_getrows($params) {
   if (empty($params['report_id'])) {
-    $params['report_id'] = civicrm_api3('report_instance', 'getvalue', array('id' => $params['instance_id'], 'return' => 'report_id'));
+    $params['report_id'] = civicrm_api3('report_instance', 'getvalue', ['id' => $params['instance_id'], 'return' => 'report_id']);
   }
 
-  $class = (string) civicrm_api3('option_value', 'getvalue', array(
+  $class = (string) civicrm_api3('option_value', 'getvalue', [
     'option_group_name' => 'report_template',
     'return' => 'name',
     'value' => $params['report_id'],
-    )
+  ]
   );
 
+  /* @var \CRM_Report_Form $reportInstance */
   $reportInstance = new $class();
   if (!empty($params['instance_id'])) {
     $reportInstance->setID($params['instance_id']);
@@ -154,7 +143,7 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->beginPostProcessCommon();
   $sql = $reportInstance->buildQuery();
   $reportInstance->addToDeveloperTab($sql);
-  $rows = $metadata = $requiredMetadata  = array();
+  $rows = $metadata = $requiredMetadata = [];
   $reportInstance->buildRows($sql, $rows);
   $reportInstance->formatDisplay($rows);
 
@@ -174,7 +163,7 @@ function _civicrm_api3_report_template_getrows($params) {
       $metadata['metadata']['sql'] = $reportInstance->getReportSql();
     }
   }
-  return array($rows, $reportInstance, $metadata);
+  return [$rows, $reportInstance, $metadata];
 }
 
 /**
@@ -184,13 +173,21 @@ function _civicrm_api3_report_template_getrows($params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
+  if (isset($metadata['metadata']['sql'])) {
+    // Update for stats queries.
+    $metadata['metadata']['sql'] = $reportInstance->getReportSql();
+  }
   $reportInstance->cleanUpTemporaryTables();
   return civicrm_api3_create_success($stats, $params, 'ReportTemplate', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
+
 /**
  * Adjust metadata for template getrows action.
  *
@@ -198,9 +195,9 @@ function civicrm_api3_report_template_getstatistics($params) {
  *   Input parameters.
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
-  $params['report_id'] = array(
+  $params['report_id'] = [
     'title' => 'Report ID - eg. member/lapse',
-  );
+  ];
 }
 
 /* @codingStandardsIgnoreStart

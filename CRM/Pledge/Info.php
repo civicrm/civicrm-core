@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,11 +15,12 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Pledge_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'pledge';
@@ -49,15 +34,14 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *   collection of required component settings
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviPledge',
       'translatedName' => ts('CiviPledge'),
       'title' => ts('CiviCRM Pledge Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
-
 
   /**
    * @inheritDoc
@@ -76,20 +60,20 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *   collection of permissions, null if none
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviPledge' => array(
+    $permissions = [
+      'access CiviPledge' => [
         ts('access CiviPledge'),
         ts('View pledges'),
-      ),
-      'edit pledges' => array(
+      ],
+      'edit pledges' => [
         ts('edit pledges'),
         ts('Create and update pledges'),
-      ),
-      'delete in CiviPledge' => array(
+      ],
+      'delete in CiviPledge' => [
         ts('delete in CiviPledge'),
         ts('Delete pledges'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -110,13 +94,13 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *                    null if no element offered
    */
   public function getUserDashboardElement() {
-    return array(
+    return [
       'name' => ts('Pledges'),
       'title' => ts('Your Pledge(s)'),
       // we need to check this permission since you can click on contribution page link for making payment
-      'perm' => array('make online contributions'),
+      'perm' => ['make online contributions'],
       'weight' => 15,
-    );
+    ];
   }
 
   /**
@@ -129,11 +113,19 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *                    null if no element offered
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Pledges'),
       'url' => 'pledge',
       'weight' => 25,
-    );
+    ];
+  }
+
+  /**
+   * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-paper-plane';
   }
 
   /**
@@ -146,10 +138,10 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *                    null if no element offered
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Pledges'),
       'weight' => 25,
-    );
+    ];
   }
 
   /**
@@ -174,14 +166,14 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviPledge') &&
       CRM_Core_Permission::check('edit pledges')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array(
+      $shortCuts = array_merge($shortCuts, [
+        [
           'path' => 'civicrm/pledge/add',
           'query' => 'reset=1&action=add&context=standalone',
           'ref' => 'new-pledge',
           'title' => ts('Pledge'),
-        ),
-      ));
+        ],
+      ]);
     }
   }
 

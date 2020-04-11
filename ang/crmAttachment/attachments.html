@@ -42,5 +42,8 @@
   </div>
   <div>
     {{ts('Alternatively, you may add new files using drag/drop.')}}
+    <span ng-if="max_size">
+      {{ts('Each file must be less than %1M in size.', {1: max_size})}}
+    </span>
   </div>
 </div>

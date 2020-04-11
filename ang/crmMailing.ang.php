@@ -6,13 +6,13 @@
 // ODDITY: Only loads if you have CiviMail permissions.
 // ODDITY: Extra resources loaded via CRM_Mailing_Info::getAngularModules.
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array(
+  'js' => [
     'ang/crmMailing.js',
     'ang/crmMailing/*.js',
-  ),
-  'css' => array('ang/crmMailing.css'),
-  'partials' => array('ang/crmMailing'),
-  'requires' => array('crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService', 'crmResource'),
-);
+  ],
+  'css' => ['ang/crmMailing.css'],
+  'partials' => ['ang/crmMailing'],
+  'requires' => ['crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService', 'crmResource'],
+];

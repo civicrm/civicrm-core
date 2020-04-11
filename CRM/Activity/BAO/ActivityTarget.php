@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -69,7 +53,7 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
    * @return mixed
    */
   public static function retrieveTargetIdsByActivityId($activity_id) {
-    $targetArray = array();
+    $targetArray = [];
     if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
       return $targetArray;
     }
@@ -85,7 +69,12 @@ WHERE      activity_id = %1
 AND        record_type_id = $targetID
 AND        civicrm_contact.is_deleted = 0
 ";
-    $target = CRM_Core_DAO::executeQuery($sql, array(1 => array($activity_id, 'Integer')));
+    $target = CRM_Core_DAO::executeQuery($sql, [
+      1 => [
+        $activity_id,
+        'Integer',
+      ],
+    ]);
     while ($target->fetch()) {
       $targetArray[] = $target->contact_id;
     }
@@ -100,7 +89,7 @@ AND        civicrm_contact.is_deleted = 0
    * @return array
    */
   public static function getTargetNames($activityID) {
-    $targetNames = array();
+    $targetNames = [];
 
     if (empty($activityID)) {
       return $targetNames;
@@ -116,7 +105,7 @@ WHERE      civicrm_activity_contact.activity_id = %1
 AND        civicrm_activity_contact.record_type_id = $targetID
 AND        contact_a.is_deleted = 0
 ";
-    $queryParam = array(1 => array($activityID, 'Integer'));
+    $queryParam = [1 => [$activityID, 'Integer']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $queryParam);
     while ($dao->fetch()) {

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -43,14 +27,14 @@
 function _civicrm_api3_cxn_register_spec(&$spec) {
   $daoFields = CRM_Cxn_DAO_Cxn::fields();
   $spec['app_guid'] = $daoFields['app_guid'];
-  $spec['app_meta_url'] = array(
+  $spec['app_meta_url'] = [
     'name' => 'app_meta_url',
     'type' => CRM_Utils_Type::T_STRING,
     'title' => ts('Application Metadata URL'),
     'description' => 'Application Metadata URL',
     'maxlength' => 255,
     'size' => CRM_Utils_Type::HUGE,
-  );
+  ];
 }
 
 /**
@@ -79,9 +63,9 @@ function civicrm_api3_cxn_register($params) {
     }
   }
   elseif (!empty($params['app_guid'])) {
-    $appMeta = civicrm_api3('CxnApp', 'getsingle', array(
+    $appMeta = civicrm_api3('CxnApp', 'getsingle', [
       'appId' => $params['app_guid'],
-    ));
+    ]);
   }
 
   if (empty($appMeta) || !is_array($appMeta)) {
@@ -112,13 +96,13 @@ function _civicrm_api3_cxn_unregister_spec(&$spec) {
   $daoFields = CRM_Cxn_DAO_Cxn::fields();
   $spec['cxn_guid'] = $daoFields['cxn_guid'];
   $spec['app_guid'] = $daoFields['app_guid'];
-  $spec['force'] = array(
+  $spec['force'] = [
     'name' => 'force',
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'title' => ts('Force'),
     'description' => 'Destroy connection even if the remote application is non-responsive.',
     'default' => '0',
-  );
+  ];
 }
 
 /**
@@ -159,9 +143,9 @@ function _civicrm_api3_cxn_parseCxnId($params) {
     $cxnId = $params['cxn_guid'];
   }
   elseif (!empty($params['app_guid'])) {
-    $cxnId = CRM_Core_DAO::singleValueQuery('SELECT cxn_guid FROM civicrm_cxn WHERE app_guid = %1', array(
-      1 => array($params['app_guid'], 'String'),
-    ));
+    $cxnId = CRM_Core_DAO::singleValueQuery('SELECT cxn_guid FROM civicrm_cxn WHERE app_guid = %1', [
+      1 => [$params['app_guid'], 'String'],
+    ]);
     if (!$cxnId) {
       throw new API_Exception("The app_guid does not correspond to an active connection.");
     }
@@ -222,15 +206,15 @@ function _civicrm_api3_cxn_getlink_spec(&$spec) {
   $daoFields = CRM_Cxn_DAO_Cxn::fields();
   $spec['app_guid'] = $daoFields['app_guid'];
   $spec['cxn_guid'] = $daoFields['cxn_guid'];
-  $spec['page_name'] = array(
+  $spec['page_name'] = [
     'name' => 'page_name',
     'type' => CRM_Utils_Type::T_STRING,
     'title' => ts('Page Type'),
     'description' => 'The type of page (eg "settings")',
     'maxlength' => 63,
     'size' => CRM_Utils_Type::HUGE,
-    'api.aliases' => array('page'),
-  );
+    'api.aliases' => ['page'],
+  ];
 }
 
 /**
@@ -252,9 +236,9 @@ function civicrm_api3_cxn_getlink($params) {
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
   $client = \Civi::service('cxn_reg_client');
-  return $client->call($appMeta, 'Cxn', 'getlink', array(
+  return $client->call($appMeta, 'Cxn', 'getlink', [
     'page' => $params['page_name'],
-  ));
+  ]);
 }
 
 /**
@@ -264,12 +248,12 @@ function civicrm_api3_cxn_getlink($params) {
  * @throws Exception
  */
 function civicrm_api3_cxn_getcfg($params) {
-  $result = array(
+  $result = [
     'CIVICRM_CXN_CA' => defined('CIVICRM_CXN_CA') ? CIVICRM_CXN_CA : NULL,
     'CIVICRM_CXN_VIA' => defined('CIVICRM_CXN_VIA') ? CIVICRM_CXN_VIA : NULL,
     'CIVICRM_CXN_APPS_URL' => defined('CIVICRM_CXN_APPS_URL') ? CIVICRM_CXN_APPS_URL : NULL,
     'siteCallbackUrl' => CRM_Cxn_BAO_Cxn::getSiteCallbackUrl(),
-  );
+  ];
   return civicrm_api3_create_success($result);
 }
 
@@ -317,7 +301,7 @@ function civicrm_api3_cxn_create($params) {
     return civicrm_api3_create_success($result, $params, 'Cxn', 'create');
 
   }
-  catch(Exception $ex){
+  catch (Exception $ex) {
     throw $ex;
   }
 }

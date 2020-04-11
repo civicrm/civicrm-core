@@ -21,6 +21,7 @@
   </primaryKey>
   <field>
     <name>name</name>
+    <title>Mapping Name</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Name of Mapping</comment>
@@ -28,6 +29,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Description</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Description of Mapping.</comment>

@@ -7,9 +7,6 @@
 ===========================================================
 {$pay_later_receipt}
 ===========================================================
-{else}
-
-{ts}Please print this receipt for your records.{/ts}
 {/if}
 
 {if $membership_assign && !$useForMember}
@@ -113,12 +110,16 @@
 
 {/if}
 {if $is_recur}
-{if $contributeMode eq 'notify' or $contributeMode eq 'directIPN'}
-{ts 1=$cancelSubscriptionUrl}This membership will be renewed automatically. You can cancel the auto-renewal option by visiting this web page: %1.{/ts}
+{ts}This membership will be renewed automatically.{/ts}
+{if $cancelSubscriptionUrl}
+
+{ts 1=$cancelSubscriptionUrl}You can cancel the auto-renewal option by visiting this web page: %1.{/ts}
+
+{/if}
+
 {if $updateSubscriptionBillingUrl}
 
 {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
-{/if}
 {/if}
 {/if}
 
@@ -153,14 +154,7 @@
 {/foreach}
 {/if}
 
-{if !( $contributeMode eq 'notify' OR $contributeMode eq 'directIPN' ) and $is_monetary}
-{if $is_pay_later}
-===========================================================
-{ts}Registered Email{/ts}
-
-===========================================================
-{$email}
-{elseif $amount GT 0 OR $membership_amount GT 0 }
+{if $billingName}
 ===========================================================
 {ts}Billing Name and Address{/ts}
 
@@ -169,9 +163,14 @@
 {$address}
 
 {$email}
-{/if} {* End ! is_pay_later condition. *}
-{/if}
-{if $contributeMode eq 'direct' AND !$is_pay_later AND ( $amount GT 0 OR $membership_amount GT 0 ) }
+{elseif $email}
+===========================================================
+{ts}Registered Email{/ts}
+
+===========================================================
+{$email}
+{/if} {* End billingName or email *}
+{if $credit_card_type}
 
 ===========================================================
 {ts}Credit Card Information{/ts}

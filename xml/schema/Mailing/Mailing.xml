@@ -39,6 +39,12 @@
     <name>header_id</name>
     <title>Mailing Header</title>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_mailing_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+      <condition>component_type = "Header"</condition>
+    </pseudoconstant>
     <comment>FK to the header component.</comment>
   </field>
   <foreignKey>
@@ -51,6 +57,12 @@
     <name>footer_id</name>
     <title>Mailing Footer</title>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_mailing_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+      <condition>component_type = "Footer"</condition>
+    </pseudoconstant>
     <comment>FK to the footer component.</comment>
   </field>
   <foreignKey>
@@ -108,6 +120,7 @@
   </foreignKey>
   <field>
     <name>name</name>
+    <uniqueName>mailing_name</uniqueName>
     <title>Mailing Name</title>
     <type>varchar</type>
     <length>128</length>
@@ -252,7 +265,7 @@
     <type>boolean</type>
     <default>0</default>
     <add>2.2</add>
-    <comment>Should we overrite VERP address in Reply-To</comment>
+    <comment>Overwrite the VERP address in Reply-To</comment>
     <html>
       <type>CheckBox</type>
     </html>

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -54,36 +38,36 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
   }
 
   public function basicConsistencyExamples() {
-    $cases = array();
+    $cases = [];
 
-    $cases[0] = array(
+    $cases[0] = [
       '<div foo="bar"></div>',
       '<div foo="bar"></div>',
-    );
-    $cases[1] = array(
+    ];
+    $cases[1] = [
       '<div foo="bar"/>',
       '<div foo="bar"></div>',
-    );
-    $cases[2] = array(
+    ];
+    $cases[2] = [
       '<div foo=\'bar\'></div>',
       '<div foo="bar"></div>',
-    );
-    $cases[3] = array(
+    ];
+    $cases[3] = [
       '<div foo=\'ts("Hello world")\'></div>',
       '<div foo=\'ts("Hello world")\'></div>',
-    );
-    $cases[4] = array(
+    ];
+    $cases[4] = [
       '<div foo="ts(\'Hello world\')\"></div>',
       '<div foo="ts(\'Hello world\')\"></div>',
-    );
-    $cases[5] = array(
+    ];
+    $cases[5] = [
       '<a href="{{foo}}" title="{{bar}}"></a>',
       '<a href="{{foo}}" title="{{bar}}"></a>',
-    );
-    $cases[6] = array(
+    ];
+    $cases[6] = [
       '<div ng-if="a && b"></div>',
       '<div ng-if="a && b"></div>',
-    );
+    ];
 
     return $cases;
   }
@@ -102,7 +86,7 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
    */
   public function testAllPartials() {
     $coder = new \Civi\Angular\Coder();
-    $errors = array();
+    $errors = [];
     $count = 0;
     foreach ($this->angular->getModules() as $module => $moduleDefn) {
       $partials = $this->angular->getPartials($module);

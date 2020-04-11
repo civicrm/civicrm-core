@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -47,10 +31,10 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $values = $ids = array();
+    $values = $ids = [];
     $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $params = array('id' => $participantID);
+    $params = ['id' => $participantID];
 
     CRM_Event_BAO_Participant::getValues($params,
       $values,
@@ -103,22 +87,22 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     // CRM-20879: Show 'Transfer or Cancel' option beside 'Change fee selection'
     //  only if logged in user have 'edit event participants' permission and
     //  participant status is not Cancelled or Transferred
-    if (CRM_Core_Permission::check('edit event participants') && !in_array($status, array('Cancelled', 'Transferred'))) {
+    if (CRM_Core_Permission::check('edit event participants') && !in_array($status, ['Cancelled', 'Transferred'])) {
       $this->assign('transferOrCancelLink',
         CRM_Utils_System::url(
           'civicrm/event/selfsvcupdate',
-          array(
+          [
             'reset' => 1,
             'is_backoffice' => 1,
             'pid' => $participantID,
             'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf'),
-          )
+          ]
         )
       );
     }
 
     if ($values[$participantID]['is_test']) {
-      $values[$participantID]['status'] .= ' (test) ';
+      $values[$participantID]['status'] = CRM_Core_TestEntity::appendTestText($values[$participantID]['status']);
     }
 
     // Get Note
@@ -133,7 +117,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $values[$participantID]['lineItem'][] = $lineItem;
     }
 
-    $values[$participantID]['totalAmount'] = CRM_Utils_Array::value('fee_amount', $values[$participantID]);
+    $values[$participantID]['totalAmount'] = $values[$participantID]['fee_amount'] ?? NULL;
 
     // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
     if (!empty($values[$participantID]['participant_registered_by_id'])) {
@@ -155,8 +139,8 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
     $eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
     $allRoleIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $values[$participantID]['role_id']);
-    $groupTree = array();
-    $finalTree = array();
+    $groupTree = [];
+    $finalTree = [];
 
     foreach ($allRoleIDs as $k => $v) {
       $roleGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID, NULL, $v, $roleCustomDataTypeID);
@@ -192,7 +176,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       "action=view&reset=1&id={$values[$participantID]['id']}&cid={$values[$participantID]['contact_id']}&context=home"
     );
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::check('edit event participants')) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/participant',
         "action=update&reset=1&id={$values[$participantID]['id']}&cid={$values[$participantID]['contact_id']}&context=home"
@@ -207,9 +191,9 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
-    $participantCount = array();
+    $participantCount = [];
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
@@ -227,11 +211,11 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     CRM_Utils_System::setTitle(ts('View Event Registration for') . ' ' . $displayName);
 
-    $roleId = CRM_Utils_Array::value('role_id', $values[$participantID]);
+    $roleId = $values[$participantID]['role_id'] ?? NULL;
     $title = $displayName . ' (' . CRM_Utils_Array::value($roleId, $participantRoles) . ' - ' . $eventTitle . ')';
 
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-    $viewRoles = array();
+    $viewRoles = [];
     foreach (explode($sep, $values[$participantID]['role_id']) as $k => $v) {
       $viewRoles[] = $participantRoles[$v];
     }
@@ -254,15 +238,14 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'cancel',
+        'name' => ts('Done'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
 }

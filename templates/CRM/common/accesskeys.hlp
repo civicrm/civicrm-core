@@ -1,36 +1,41 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="accesskeys-title"}
-  {ts}Access Keys{/ts}
-{/htxt}
 {htxt id="accesskeys"}
-<p></p>
-<ul>
-  <li>ALT+SHIFT+E - <em>{ts}Edit Contact (View Contact Summary Page){/ts}</em></li>
-  <li>ALT+SHIFT+S - <em>{ts}Save Button{/ts}</em></li>
-  <li>ALT+SHIFT+N - <em>{ts}Add a new record in each tab (Activities, Tags,..etc){/ts}</em></li>
-</ul>
+  {php}
+    $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
+    if (strstr($ua, 'mac')) {
+      $key = '<span>CTRL</span>+<span>ALT</span>';
+    }
+    else {
+      $key = strstr($ua, 'firefox') ? '<span>ALT</span>+<span>SHIFT</span>' : '<span>ALT</span>';
+    }
+    $this->assign('accessKey', $key);
+  {/php}
+  <p></p>
+  <ul id="crmAccessKeyList">
+    <li>{$accessKey}+<span>E</span> - {ts}Edit Contact (View Contact Summary Page){/ts}</li>
+    <li>{$accessKey}+<span>S</span> - {ts}Save Button{/ts}</li>
+    <li>{$accessKey}+<span>N</span> - {ts}Add a new record in each tab (Activities, Tags,..etc){/ts}</li>
+    <li>{$accessKey}+<span>M</span> - {ts}Find menu item...{/ts}</li>
+    <li>{$accessKey}+<span>Q</span> - {ts}Quicksearch{/ts}</li>
+  </ul>
+  {literal}<style type="text/css">
+    #crmAccessKeyList li {
+      margin-top: 5px;
+    }
+    #crmAccessKeyList span {
+      display: inline-block;
+      background: grey;
+      font-size: 80%;
+      border: 2px groove #eee;
+      padding: 0 4px;
+    }
+  </style>{/literal}
 {/htxt}

@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,7 +20,7 @@
  */
 class CRM_Pledge_Task extends CRM_Core_Task {
 
-  static $objectType = 'pledge';
+  public static $objectType = 'pledge';
 
   /**
    * These tasks are the core set of tasks that the user can perform
@@ -47,26 +31,26 @@ class CRM_Pledge_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!self::$_tasks) {
-      self::$_tasks = array(
-        self::TASK_DELETE => array(
+      self::$_tasks = [
+        self::TASK_DELETE => [
           'title' => ts('Delete pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
-        ),
-        self::TASK_PRINT => array(
+        ],
+        self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
-        ),
-        self::TASK_EXPORT => array(
+        ],
+        self::TASK_EXPORT => [
           'title' => ts('Export pledges'),
-          'class' => array(
+          'class' => [
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
-          ),
+          ],
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       // CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviPledge')) {
@@ -89,16 +73,16 @@ class CRM_Pledge_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit pledges')
     ) {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = array(
+      $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-      );
+      ];
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviPledge')) {
         $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
@@ -121,7 +105,7 @@ class CRM_Pledge_Task extends CRM_Core_Task {
   public static function getTask($value) {
     self::tasks();
 
-    if (!CRM_Utils_Array::value($value, self::$_tasks)) {
+    if (empty(self::$_tasks[$value])) {
       // make it the print task by default
       $value = self::TASK_PRINT;
     }

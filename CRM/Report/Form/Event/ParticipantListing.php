@@ -1,36 +1,20 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
+class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -38,7 +22,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
   protected $_balance = FALSE;
-  protected $activeCampaigns;
+  protected $campaigns;
 
   protected $_customGroupExtends = array(
     'Participant',
@@ -55,15 +39,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
 
-    // Check if CiviCampaign is a) enabled and b) has active campaigns
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
-    }
-
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -75,7 +50,8 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'required' => TRUE,
             'no_repeat' => TRUE,
             'dbAlias' => 'contact_civireport.sort_name',
-          )),
+          ),
+        ),
           $this->getBasicContactFields(),
           array(
             'age_at_event' => array(
@@ -164,6 +140,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'registered_by_id' => array(
             'title' => ts('Registered by Participant ID'),
           ),
+          'registered_by_name' => array(
+            'title' => ts('Registered by Participant Name'),
+            'name' => 'registered_by_id',
+          ),
           'source' => array(
             'title' => ts('Source'),
           ),
@@ -189,7 +169,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
             'attributes' => array(
-              'entity' => 'event',
+              'entity' => 'Event',
               'select' => array('minimumInputLength' => 0),
             ),
           ),
@@ -294,6 +274,15 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
         ),
       ),
+      'civicrm_note' => array(
+        'dao' => 'CRM_Core_DAO_Note',
+        'fields' => array(
+          'participant_note' => array(
+            'name' => 'note',
+            'title' => ts('Participant Note'),
+          ),
+        ),
+      ),
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' => array(
@@ -348,7 +337,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => NULL,
           ),
         ),
@@ -389,22 +378,8 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     // & behaviour across reports but trying for no change at this point.
     $this->_columns['civicrm_contact']['fields']['sort_name']['no_display'] = TRUE;
 
-    // If we have active campaigns add those elements to both the fields and filters
-    if ($campaignEnabled && !empty($this->activeCampaigns)) {
-      $this->_columns['civicrm_participant']['fields']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'default' => 'false',
-      );
-      $this->_columns['civicrm_participant']['filters']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => $this->activeCampaigns,
-        'type' => CRM_Utils_Type::T_INT,
-      );
-      $this->_columns['civicrm_participant']['order_bys']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-      );
-    }
+    // If we have campaigns enabled, add those elements to both the fields, filters and sorting
+    $this->addCampaignFields('civicrm_participant', FALSE, TRUE);
 
     $this->_currencyColumn = 'civicrm_participant_fee_currency';
     parent::__construct();
@@ -471,16 +446,16 @@ ORDER BY  cv.label
             }
             $alias = "{$tableName}_{$fieldName}";
             $select[] = "{$field['dbAlias']} as $alias";
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = CRM_Utils_Array::value('no_display', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = $field['no_display'] ?? NULL;
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
             $this->_selectAliases[] = $alias;
           }
         }
       }
     }
     //add blank column at the end
-    $blankcols = CRM_Utils_Array::value('blank_column_end', $this->_params);
+    $blankcols = $this->_params['blank_column_end'] ?? NULL;
     if ($blankcols) {
       for ($i = 1; $i <= $blankcols; $i++) {
         $select[] = " '' as blankColumnEnd_{$i}";
@@ -519,6 +494,14 @@ ORDER BY  cv.label
     $this->joinPhoneFromContact();
     $this->joinEmailFromContact();
 
+    // Include participant note.
+    if ($this->isTableSelected('civicrm_note')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_note {$this->_aliases['civicrm_note']}
+                   ON ( {$this->_aliases['civicrm_note']}.entity_table = 'civicrm_participant' AND
+                   {$this->_aliases['civicrm_participant']}.id = {$this->_aliases['civicrm_note']}.entity_id )";
+    }
+
     if ($this->_contribField) {
       $this->_from .= "
              LEFT JOIN civicrm_participant_payment pp
@@ -554,19 +537,19 @@ ORDER BY  cv.label
           $clause = NULL;
 
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             if ($relative || $from || $to) {
               $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
             }
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
 
             if ($fieldName == 'rid') {
-              $value = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
+              $value = $this->_params["{$fieldName}_value"] ?? NULL;
               if (!empty($value)) {
                 $operator = '';
                 if ($op == 'notin') {
@@ -651,9 +634,8 @@ ORDER BY  cv.label
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $eventType = CRM_Core_OptionGroup::values('event_type');
-
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     foreach ($rows as $rowNum => $row) {
@@ -700,7 +682,18 @@ ORDER BY  cv.label
         $entryFound = TRUE;
       }
 
-      // Handel value seperator in Fee Level
+      // Handle registered by name
+      if (array_key_exists('civicrm_participant_registered_by_name', $row)) {
+        $registeredById = $row['civicrm_participant_registered_by_name'];
+        if ($registeredById) {
+          $registeredByContactId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant", $registeredById, 'contact_id', 'id');
+          $rows[$rowNum]['civicrm_participant_registered_by_name'] = CRM_Contact_BAO_Contact::displayName($registeredByContactId);
+          $rows[$rowNum]['civicrm_participant_registered_by_name_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $registeredByContactId, $this->_absoluteUrl);
+          $rows[$rowNum]['civicrm_participant_registered_by_name_hover'] = ts('View Contact Summary for Contact that registered the participant.');
+        }
+      }
+
+      // Handle value seperator in Fee Level
       if (array_key_exists('civicrm_participant_participant_fee_level', $row)) {
         $feeLevel = $row['civicrm_participant_participant_fee_level'];
         if ($feeLevel) {
@@ -711,9 +704,9 @@ ORDER BY  cv.label
       }
 
       // Convert display name to link
-      $displayName = CRM_Utils_Array::value('civicrm_contact_sort_name_linked', $row);
-      $cid = CRM_Utils_Array::value('civicrm_contact_id', $row);
-      $id = CRM_Utils_Array::value('civicrm_participant_participant_record', $row);
+      $displayName = $row['civicrm_contact_sort_name_linked'] ?? NULL;
+      $cid = $row['civicrm_contact_id'] ?? NULL;
+      $id = $row['civicrm_participant_participant_record'] ?? NULL;
 
       if ($displayName && $cid && $id) {
         $url = CRM_Report_Utils_Report::getNextUrl('contact/detail',
@@ -738,21 +731,8 @@ ORDER BY  cv.label
         $entryFound = TRUE;
       }
 
-      // Handle employer id
-      if (array_key_exists('civicrm_contact_employer_id', $row)) {
-        $employerId = $row['civicrm_contact_employer_id'];
-        if ($employerId) {
-          $rows[$rowNum]['civicrm_contact_employer_id'] = CRM_Contact_BAO_Contact::displayName($employerId);
-          $url = CRM_Utils_System::url('civicrm/contact/view',
-            'reset=1&cid=' . $employerId, $this->_absoluteUrl
-          );
-          $rows[$rowNum]['civicrm_contact_employer_id_link'] = $url;
-          $rows[$rowNum]['civicrm_contact_employer_id_hover'] = ts('View Contact Summary for this Contact.');
-        }
-      }
-
       // Convert campaign_id to campaign title
-      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_participant_campaign_id', $rowNum, $this->activeCampaigns);
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_participant_campaign_id', $rowNum, $this->campaigns);
 
       // handle contribution status
       $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contribution_contribution_status_id', $rowNum, $contributionStatus);
@@ -765,14 +745,6 @@ ORDER BY  cv.label
 
       $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'event/participantListing', 'View Event Income Details') ? TRUE : $entryFound;
 
-      // display birthday in the configured custom format
-      if (array_key_exists('civicrm_contact_birth_date', $row)) {
-        $birthDate = $row['civicrm_contact_birth_date'];
-        if ($birthDate) {
-          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
-        }
-        $entryFound = TRUE;
-      }
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'event/ParticipantListing', 'List all participant(s) for this ') ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't

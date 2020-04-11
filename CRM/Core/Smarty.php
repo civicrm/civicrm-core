@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -73,9 +57,13 @@ class CRM_Core_Smarty extends Smarty {
   static private $_singleton = NULL;
 
   /**
-   * @var array (string $name => mixed $value) a list of variables ot save temporarily
+   * Backup frames.
+   *
+   * A list of variables ot save temporarily in format (string $name => mixed $value).
+   *
+   * @var array
    */
-  private $backupFrames = array();
+  private $backupFrames = [];
 
   /**
    * Class constructor.
@@ -90,7 +78,7 @@ class CRM_Core_Smarty extends Smarty {
     $config = CRM_Core_Config::singleton();
 
     if (isset($config->customTemplateDir) && $config->customTemplateDir) {
-      $this->template_dir = array_merge(array($config->customTemplateDir),
+      $this->template_dir = array_merge([$config->customTemplateDir],
         $config->templateDir
       );
     }
@@ -130,15 +118,18 @@ class CRM_Core_Smarty extends Smarty {
       }
     }
 
-    $smartyDir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'packages' . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR;
+    $pkgsDir = Civi::paths()->getVariable('civicrm.packages', 'path');
+    $smartyDir = $pkgsDir . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR;
     $pluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
 
     if ($customPluginsDir) {
-      $this->plugins_dir = array($customPluginsDir, $smartyDir . 'plugins', $pluginsDir);
+      $this->plugins_dir = [$customPluginsDir, $smartyDir . 'plugins', $pluginsDir];
     }
     else {
-      $this->plugins_dir = array($smartyDir . 'plugins', $pluginsDir);
+      $this->plugins_dir = [$smartyDir . 'plugins', $pluginsDir];
     }
+
+    $this->compile_check = $this->isCheckSmartyIsCompiled();
 
     // add the session and the config here
     $session = CRM_Core_Session::singleton();
@@ -151,10 +142,10 @@ class CRM_Core_Smarty extends Smarty {
 
     // CRM-7163 hack: we don’t display langSwitch on upgrades anyway
     if (!CRM_Core_Config::isUpgradeMode()) {
-      $this->assign('langSwitch', CRM_Core_I18n::languages(TRUE));
+      $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    $this->register_function('crmURL', array('CRM_Utils_System', 'crmURL'));
+    $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
     $this->load_filter('pre', 'resetExtScope');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
@@ -259,7 +250,7 @@ class CRM_Core_Smarty extends Smarty {
       array_unshift($this->template_dir, $path);
     }
     else {
-      $this->template_dir = array($path, $this->template_dir);
+      $this->template_dir = [$path, $this->template_dir];
     }
 
   }
@@ -283,9 +274,9 @@ class CRM_Core_Smarty extends Smarty {
    */
   public function pushScope($vars) {
     $oldVars = $this->get_template_vars();
-    $backupFrame = array();
+    $backupFrame = [];
     foreach ($vars as $key => $value) {
-      $backupFrame[$key] = isset($oldVars[$key]) ? $oldVars[$key] : NULL;
+      $backupFrame[$key] = $oldVars[$key] ?? NULL;
     }
     $this->backupFrames[] = $backupFrame;
 
@@ -334,6 +325,16 @@ class CRM_Core_Smarty extends Smarty {
     }
 
     return 'en_US';
+  }
+
+  /**
+   * Get the compile_check value.
+   *
+   * @return bool
+   */
+  private function isCheckSmartyIsCompiled() {
+    // check for define in civicrm.settings.php as FALSE, otherwise returns TRUE
+    return CRM_Utils_Constant::value('CIVICRM_TEMPLATE_COMPILE_CHECK', TRUE);
   }
 
 }

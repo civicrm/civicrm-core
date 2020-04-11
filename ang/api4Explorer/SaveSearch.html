@@ -1,0 +1,26 @@
+<form id="bootstrap-theme">
+  <div ng-controller="SaveSearchCtrl">
+    <input class="form-control" id="api-save-search-select-group" ng-model="model.id" crm-entityref="groupEntityRefParams" >
+    <label ng-show="!model.id">{{ ts('Or') }}</label>
+    <input class="form-control" placeholder="Create new group" ng-model="model.title" ng-show="!model.id">
+    <hr />
+    <label>{{ ts('Description:') }}</label>
+    <textarea class="form-control" ng-model="model.description"></textarea>
+    <label>{{ ts('Group Type:') }}</label>
+    <div class="form-inline">
+      <div class="checkbox" ng-repeat="(key, label) in options.group_type">
+        <label>
+          <input type="checkbox" checklist-model="model.group_type" checklist-value="key">
+          {{ label }}
+        </label>
+      </div>
+    </div>
+    <label>{{ ts('Visibility:') }}</label>
+    <select class="form-control" ng-model="model.visibility" ng-options="name as value for (name, value) in options.visibility"></select>
+    <hr />
+    <div class="buttons pull-right">
+      <button type="button" ng-click="cancel()" class="btn btn-danger">{{ ts('Cancel') }}</button>
+      <button ng-click="save()" class="btn btn-primary" ng-disabled="!model.title && !model.id">{{ ts('Save') }}</button>
+    </div>
+  </div>
+</form>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,8 +20,9 @@
  */
 class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
     'max_attachments' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'max_attachments_backend' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_undelete' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'empoweredBy' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'logging' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -56,7 +41,8 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'dedupe_default_limit' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'remote_profile_submissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'allow_alert_autodismissal' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-  );
+    'prevNextBackend' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+  ];
 
   public $_uploadMaxSize;
 
@@ -69,15 +55,17 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     // This is a temp hack for the fact we really don't need to hard-code each setting in the tpl but
     // we haven't worked through NOT doing that. These settings have been un-hardcoded.
-    $this->assign('pure_config_settings', array(
+    $this->assign('pure_config_settings', [
       'empoweredBy',
       'max_attachments',
+      'max_attachments_backend',
       'maxFileSize',
       'secondDegRelPermissions',
       'recentItemsMaxCount',
       'recentItemsProviders',
       'dedupe_default_limit',
-    ));
+      'prevNextBackend',
+    ]);
   }
 
   /**
@@ -88,7 +76,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
     $this->assign('validTriggerPermission', CRM_Core_DAO::checkTriggerViewPermission(FALSE));
 
-    $this->addFormRule(array('CRM_Admin_Form_Setting_Miscellaneous', 'formRule'), $this);
+    $this->addFormRule(['CRM_Admin_Form_Setting_Miscellaneous', 'formRule'], $this);
 
     parent::buildQuickForm();
     $this->addRule('checksum_timeout', ts('Value should be a positive number'), 'positiveInteger');
@@ -108,7 +96,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $options) {
-    $errors = array();
+    $errors = [];
 
     // validate max file size
     if ($fields['maxFileSize'] > $options->_uploadMaxSize) {
@@ -117,7 +105,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
     // validate recent items stack size
     if ($fields['recentItemsMaxCount'] && ($fields['recentItemsMaxCount'] < 1 || $fields['recentItemsMaxCount'] > CRM_Utils_Recent::MAX_ITEMS)) {
-      $errors['recentItemsMaxCount'] = ts("Illegal stack size. Use values between 1 and %1.", array(1 => CRM_Utils_Recent::MAX_ITEMS));
+      $errors['recentItemsMaxCount'] = ts("Illegal stack size. Use values between 1 and %1.", [1 => CRM_Utils_Recent::MAX_ITEMS]);
     }
 
     if (!empty($fields['wkhtmltopdfPath'])) {

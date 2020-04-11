@@ -1,40 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * Joomla specific stuff goes here.
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+
   /**
    * Class constructor.
    */
@@ -76,7 +61,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // Prepare the values for a new Joomla user.
-    $values = array();
+    $values = [];
     $values['name'] = $fullname;
     $values['username'] = trim($params['cms_name']);
     $values['password1'] = $values['password2'] = $params['cms_pass'];
@@ -98,7 +83,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $ufID = CRM_Utils_Type::escape($ufID, 'Integer');
     $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
-    $values = array();
+    $values = [];
     $user = JUser::getInstance($ufID);
 
     $values['email'] = $ufName;
@@ -142,23 +127,23 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $db->setQuery($query, 0, 10);
     $users = $db->loadAssocList();
 
-    $row = array();
+    $row = [];
     if (count($users)) {
       $row = $users[0];
     }
 
     if (!empty($row)) {
-      $dbName = CRM_Utils_Array::value('username', $row);
-      $dbEmail = CRM_Utils_Array::value('email', $row);
+      $dbName = $row['username'] ?? NULL;
+      $dbEmail = $row['email'] ?? NULL;
       if (strtolower($dbName) == strtolower($name)) {
         $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.',
-          array(1 => $name)
+          [1 => $name]
         );
       }
       if (strtolower($dbEmail) == strtolower($email)) {
         $resetUrl = str_replace('administrator/', '', $config->userFrameworkBaseURL) . 'index.php?option=com_users&view=reset';
         $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
-          array(1 => $email, 2 => $resetUrl)
+          [1 => $email, 2 => $resetUrl]
         );
       }
     }
@@ -189,7 +174,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
         if (stripos($crumbs['url'], 'id%%')) {
-          $args = array('cid', 'mid');
+          $args = ['cid', 'mid'];
           foreach ($args as $a) {
             $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
               FALSE, NULL, $_GET
@@ -264,8 +249,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if ($config->userFrameworkFrontend) {
       $script = 'index.php';
-      if (JRequest::getVar("Itemid") && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
-        $Itemid = "{$separator}Itemid=" . JRequest::getVar("Itemid");
+
+      // Get Itemid using JInput::get()
+      $input = Joomla\CMS\Factory::getApplication()->input;
+      $itemIdNum = $input->get("Itemid");
+      if ($itemIdNum && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
+        $Itemid = "{$separator}Itemid=" . $itemIdNum;
       }
     }
 
@@ -317,8 +306,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     global $database;
     $query = $db->getQuery(TRUE);
     $query->select($db->quoteName('email'))
-          ->from($db->quoteName('#__users'))
-          ->where($db->quoteName('id') . ' = ' . $user->id);
+      ->from($db->quoteName('#__users'))
+      ->where($db->quoteName('id') . ' = ' . $user->id);
     $database->setQuery($query);
     $user->email = $database->loadResult();
   }
@@ -333,12 +322,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $user = NULL;
 
     if ($loadCMSBootstrap) {
-      $bootStrapParams = array();
+      $bootStrapParams = [];
       if ($name && $password) {
-        $bootStrapParams = array(
+        $bootStrapParams = [
           'name' => $name,
           'pass' => $password,
-        );
+        ];
       }
       CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, FALSE);
     }
@@ -357,7 +346,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $db->setQuery($query, 0, 0);
     $users = $db->loadObjectList();
 
-    $row = array();
+    $row = [];
     if (count($users)) {
       $row = $users[0];
     }
@@ -403,7 +392,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       if (!$contactID) {
         return FALSE;
       }
-      return array($contactID, $dbId, mt_rand());
+      return [$contactID, $dbId, mt_rand()];
     }
 
     return FALSE;
@@ -446,14 +435,20 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
     if (!empty($password)) {
       $instance = JFactory::getApplication('site');
-      $params = array(
+      $params = [
         'username' => $username,
         'password' => $password,
-      );
+      ];
       //perform the login action
       $instance->login($params);
     }
 
+    // Save details in Joomla session
+    $user = JFactory::getUser($uid);
+    $jsession = JFactory::getSession();
+    $jsession->set('user', $user);
+
+    // Save details in Civi session
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $uid);
     $session->set('userID', $contactID);
@@ -462,9 +457,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Use CMS-native approach
+   * @throws \CRM_Core_Exception.
    */
   public function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
   /**
@@ -547,15 +543,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @return bool
    */
-  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
+  public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
     $joomlaBase = self::getBasePath();
 
     // load BootStrap here if needed
     // We are a valid Joomla entry point.
+    // dev/core#1384 Use DS to ensure a correct JPATH_BASE in Windows
     if (!defined('_JEXEC') && $loadDefines) {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
-      define('JPATH_BASE', $joomlaBase . '/administrator');
+      define('JPATH_BASE', $joomlaBase . DS . 'administrator');
       require $joomlaBase . '/administrator/includes/defines.php';
     }
 
@@ -609,7 +606,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function isUserLoggedIn() {
     $user = JFactory::getUser();
-    return ($user->guest) ? FALSE : TRUE;
+    return !$user->guest;
   }
 
   /**
@@ -685,7 +682,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   CRM_Core_Module
    */
   public function getModules() {
-    $result = array();
+    $result = [];
 
     $db = JFactory::getDbo();
     $query = $db->getQuery(TRUE);
@@ -695,8 +692,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $plugins = $db->setQuery($query)->loadAssocList();
     foreach ($plugins as $plugin) {
       // question: is the folder really a critical part of the plugin's name?
-      $name = implode('.', array('joomla', $plugin['type'], $plugin['folder'], $plugin['element']));
-      $result[] = new CRM_Core_Module($name, $plugin['enabled'] ? TRUE : FALSE);
+      $name = implode('.', ['joomla', $plugin['type'], $plugin['folder'], $plugin['element']]);
+      $result[] = new CRM_Core_Module($name, !empty($plugin['enabled']));
     }
 
     return $result;
@@ -799,7 +796,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       '',
       $config->imageUploadDir
     );
-    return array($url, NULL, $siteRoot);
+    return [$url, NULL, $siteRoot];
   }
 
   /**
@@ -824,32 +821,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     if (JFactory::getUser()->authorise('core.create', 'com_users')) {
       return TRUE;
     }
-  }
-
-  /**
-   * Output code from error function.
-   * @param string $content
-   */
-  public function outputError($content) {
-    if (class_exists('JErrorPage')) {
-      $error = new Exception($content);
-      JErrorPage::render($error);
-    }
-    elseif (class_exists('JError')) {
-      JError::raiseError('CiviCRM-001', $content);
-    }
-    else {
-      parent::outputError($content);
-    }
-  }
-
-  /**
-   * Append Joomla js to coreResourcesList.
-   *
-   * @param array $list
-   */
-  public function appendCoreResources(&$list) {
-    $list[] = 'js/crm.joomla.js';
   }
 
   /**
@@ -899,16 +870,50 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       else {
         $contactMatching++;
       }
-      if (is_object($match)) {
-        $match->free();
-      }
     }
 
-    return array(
+    return [
       'contactCount' => $contactCount,
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
-    );
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason we take the hard way.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+    $baseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+    if (CRM_Utils_System::isSSL()) {
+      $baseURL = str_replace('http://', 'https://', $baseURL);
+    }
+
+    // For Joomla CiviCRM Core files always live within the admistrator folder and $base_url is different on the frontend compared to the backend.
+    if (strpos($baseURL, 'administrator') === FALSE) {
+      $userFrameworkResourceURL = $baseURL . "administrator/components/com_civicrm/civicrm/";
+    }
+    else {
+      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
+    }
+
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    ];
   }
 
 }

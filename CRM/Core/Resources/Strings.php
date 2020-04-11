@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,13 +13,14 @@
  * Manage translatable strings on behalf of resource files.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Resources_Strings {
 
   /**
-   * @var CRM_Utils_Cache_Interface|NULL
+   * Cache.
+   *
+   * @var CRM_Utils_Cache_Interface|null
    */
   private $cache = NULL;
 
@@ -63,20 +48,24 @@ class CRM_Core_Resources_Strings {
    *   File path.
    * @param string $format
    *   Type of file (e.g. 'text/javascript', 'text/html').
+   *
    * @return array
    *   List of translatable strings.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function get($bucket, $file, $format) {
-    $stringsByFile = $this->cache->get($bucket); // array($file => array(...strings...))
+    // array($file => array(...strings...))
+    $stringsByFile = $this->cache->get($bucket);
     if (!$stringsByFile) {
-      $stringsByFile = array();
+      $stringsByFile = [];
     }
     if (!isset($stringsByFile[$file])) {
       if ($file && is_readable($file)) {
         $stringsByFile[$file] = $this->extract($file, $format);
       }
       else {
-        $stringsByFile[$file] = array();
+        $stringsByFile[$file] = [];
       }
       $this->cache->set($bucket, $stringsByFile);
     }
@@ -92,7 +81,8 @@ class CRM_Core_Resources_Strings {
    *   Type of file (e.g. 'text/javascript', 'text/html').
    * @return array
    *   List of translatable strings.
-   * @throws Exception
+   *
+   * @throws CRM_Core_Exception
    */
   public function extract($file, $format) {
     switch ($format) {
@@ -104,7 +94,7 @@ class CRM_Core_Resources_Strings {
         return CRM_Utils_JS::parseStrings(file_get_contents($file));
 
       default:
-        throw new Exception("Cannot extract strings: Unrecognized file type.");
+        throw new CRM_Core_Exception('Cannot extract strings: Unrecognized file type.');
     }
   }
 

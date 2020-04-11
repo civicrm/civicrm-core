@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,13 +15,14 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Event_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'event';
@@ -47,13 +32,13 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviEvent',
       'translatedName' => ts('CiviEvent'),
       'title' => ts('CiviCRM Event Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
 
   /**
@@ -65,39 +50,39 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviEvent' => array(
+    $permissions = [
+      'access CiviEvent' => [
         ts('access CiviEvent'),
         ts('Create events, view all events, and view participant records (for visible contacts)'),
-      ),
-      'edit event participants' => array(
+      ],
+      'edit event participants' => [
         ts('edit event participants'),
         ts('Record and update backend event registrations'),
-      ),
-      'edit all events' => array(
+      ],
+      'edit all events' => [
         ts('edit all events'),
         ts('Edit events even without specific ACL granted'),
-      ),
-      'register for events' => array(
+      ],
+      'register for events' => [
         ts('register for events'),
         ts('Register for events online'),
-      ),
-      'view event info' => array(
+      ],
+      'view event info' => [
         ts('view event info'),
         ts('View online event information pages'),
-      ),
-      'view event participants' => array(
+      ],
+      'view event participants' => [
         ts('view event participants'),
-      ),
-      'delete in CiviEvent' => array(
+      ],
+      'delete in CiviEvent' => [
         ts('delete in CiviEvent'),
         ts('Delete participants and events that you can edit'),
-      ),
-      'manage event profiles' => array(
+      ],
+      'manage event profiles' => [
         ts('manage event profiles'),
         ts('Allow users to create, edit and copy event-related profile forms used for online event registration.'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -112,9 +97,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getAnonymousPermissionWarnings() {
-    return array(
+    return [
       'access CiviEvent',
-    );
+    ];
   }
 
   /**
@@ -122,12 +107,12 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getUserDashboardElement() {
-    return array(
+    return [
       'name' => ts('Events'),
       'title' => ts('Your Event(s)'),
-      'perm' => array('register for events'),
+      'perm' => ['register for events'],
       'weight' => 20,
-    );
+    ];
   }
 
   /**
@@ -135,12 +120,20 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Events'),
       'id' => 'participant',
       'url' => 'participant',
       'weight' => 40,
-    );
+    ];
+  }
+
+  /**
+   * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-calendar';
   }
 
   /**
@@ -148,10 +141,10 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Events'),
       'weight' => 40,
-    );
+    ];
   }
 
   /**
@@ -159,11 +152,11 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getActivityTypes() {
-    $types = array();
-    $types['Event'] = array(
+    $types = [];
+    $types['Event'] = [
       'title' => ts('Event'),
       'callback' => 'CRM_Event_Page_EventInfo::run()',
-    );
+    ];
     return $types;
   }
 
@@ -176,20 +169,20 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviEvent') &&
       CRM_Core_Permission::check('edit event participants')
     ) {
-      $shortCut[] = array(
+      $shortCut[] = [
         'path' => 'civicrm/participant/add',
         'query' => "reset=1&action=add&context=standalone",
         'ref' => 'new-participant',
         'title' => ts('Event Registration'),
-      );
+      ];
       if ($newCredit) {
         $title = ts('Event Registration') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCut[0]['shortCuts'][] = array(
+        $shortCut[0]['shortCuts'][] = [
           'path' => 'civicrm/participant/add',
           'query' => "reset=1&action=add&context=standalone&mode=live",
           'ref' => 'new-participant-cc',
           'title' => $title,
-        );
+        ];
       }
       $shortCuts = array_merge($shortCuts, $shortCut);
     }

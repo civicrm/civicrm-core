@@ -4,6 +4,7 @@
  * Class CRM_Event_Cart_Page_ViewCart
  */
 class CRM_Event_Cart_Page_ViewCart extends CRM_Core_Page {
+
   /**
    * @return string
    */

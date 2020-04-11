@@ -18,10 +18,6 @@ describe('crmCaseType', function() {
     CRM.resourceUrls = {
       'civicrm': ''
     };
-    // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    CRM.crmCaseType = {
-      'REL_TYPE_CNAME': 'label_b_a'
-    };
     module('crmCaseType');
     module('crmJsonComparator');
     inject(function(crmJsonComparator) {
@@ -35,6 +31,7 @@ describe('crmCaseType', function() {
     $httpBackend = _$httpBackend_;
     $q = _$q_;
     $rootScope = _$rootScope_;
+    $rootScope.ts = CRM.ts(null);
     $timeout = _$timeout_;
   }));
 
@@ -190,12 +187,37 @@ describe('crmCaseType', function() {
               "is_active": "1"
             },
             {
+              "id": "10",
+              "name_a_b": "Homeless Services Coordinator is",
+              "label_a_b": "Homeless Services Coordinator is",
+              "name_b_a": "Homeless Services Coordinator",
+              "label_b_a": "Homeless Services Coordinator",
+              "description": "Homeless Services Coordinator",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
+            },
+            {
               "id": "2",
               "name_a_b": "Spouse of",
               "label_a_b": "Spouse of",
               "name_b_a": "Spouse of",
               "label_b_a": "Spouse of",
               "description": "Spousal relationship.",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
+            },
+            // include one where name is different from label
+            {
+              "id": "27",
+              "name_a_b": "GA123ab",
+              "label_a_b": "Guardian Angel is",
+              "name_b_a": "GA123ba",
+              "label_b_a": "Guardian Angel for",
+              "description": "Guardian Angel.",
               "contact_type_a": "Individual",
               "contact_type_b": "Individual",
               "is_reserved": "0",
@@ -326,24 +348,58 @@ describe('crmCaseType', function() {
       expect(scope.defaultAssigneeTypeValues).toEqual(defaultAssigneeTypeValues);
     });
 
-    it('should store the default assignee relationship type options', function() {
-      var defaultRelationshipTypeOptions = _.transform(apiCalls.relTypes.values, function(result, relType) {
-        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
-
-        result.push({
-          label: relType.label_b_a,
-          value: relType.id + '_b_a'
-        });
-
-        if (!isBidirectionalRelationship) {
-          result.push({
-            label: relType.label_a_b,
-            value: relType.id + '_a_b'
-          });
+    it('should compute the relationship type options', function() {
+      var expectedRelationshipTypeOptions = [
+        {
+          "id": "14_a_b",
+          "text": "Benefits Specialist",
+          "xmlName": "Benefits Specialist is"
+        },
+        {
+          "id": "14_b_a",
+          "text": "Benefits Specialist is",
+          "xmlName": "Benefits Specialist"
+        },
+        {
+          "id": "9_a_b",
+          "text": "Case Coordinator",
+          "xmlName": "Case Coordinator is"
+        },
+        {
+          "id": "9_b_a",
+          "text": "Case Coordinator is",
+          "xmlName": "Case Coordinator"
+        },
+        {
+          "id": "10_a_b",
+          "text": "Homeless Services Coordinator",
+          "xmlName": "Homeless Services Coordinator is"
+        },
+        {
+          "id": "10_b_a",
+          "text": "Homeless Services Coordinator is",
+          "xmlName": "Homeless Services Coordinator"
+        },
+        // Bidirectional, so should only have the one direction in the list
+        {
+          "id": "2_a_b",
+          "text": "Spouse of",
+          "xmlName": "Spouse of"
+        },
+        // include one where name is different from label
+        {
+          "id": "27_a_b",
+          "text": "Guardian Angel for",
+          "xmlName": "GA123ab",
+        },
+        {
+          "id": "27_b_a",
+          "text": "Guardian Angel is",
+          "xmlName": "GA123ba",
         }
-      }, []);
+      ];
 
-      expect(scope.defaultRelationshipTypeOptions).toEqual(defaultRelationshipTypeOptions);
+      expect(scope.relationshipTypeOptions).toEqual(expectedRelationshipTypeOptions);
     });
 
     it('addActivitySet should add an activitySet to the case type', function() {
@@ -431,6 +487,241 @@ describe('crmCaseType', function() {
           status: 'Completed',
           default_assignee_type: defaultAssigneeDefaultValue.value
         }]);
+      });
+    });
+
+    describe('when adding a role', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles', function() {
+
+        // This line sort of simulates selecting a relationship type from the
+        // dropdown. It doesn't test that clicking picks the right value to
+        // add, just that if it did then the function that gets called does
+        // the right thing with it.
+        // Note the value returned by the dropdown is "backwards" to match
+        // historically what has been stored in the xml as name, e.g.
+        // for the client perspective direction the dropdown returns the other
+        // direction.
+        // So 9_b_a is "Case Coordinator", which means that they actually
+        // selected "Case Coordinator is".
+        scope.addRole(scope.caseType.definition.caseRoles, '9_b_a');
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Case Coordinator',
+              displayLabel: 'Case Coordinator is'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles when name and label are different', function() {
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displayLabel: 'Guardian Angel is'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles if choose non-client-perspective direction', function() {
+        // again, the dropdown returns the opposite direction
+        scope.addRole(scope.caseType.definition.caseRoles, '10_a_b');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Homeless Services Coordinator is',
+              displayLabel: 'Homeless Services Coordinator'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles non-client-perspective direction name/label different', function() {
+        scope.addRole(scope.caseType.definition.caseRoles, '27_a_b');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ab',
+              displayLabel: 'Guardian Angel for'
+            }
+          ]
+        );
+      });
+
+      it("doesn't add the same role twice", function() {
+        // This is in the mock casetype to start, so check if can add twice.
+        scope.addRole(scope.caseType.definition.caseRoles, '10_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            }
+          ]
+        );
+
+        // Try with name and label different. We already tested one time in
+        // another test so just go straight to twice.
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displayLabel: 'Guardian Angel is'
+            }
+          ]
+        );
+      });
+    });
+
+    describe('when adding a role on-the-fly', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles for unidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "33",
+          "name_a_b": "Some New Type is",
+          "label_a_b": "Some New Type is",
+          "name_b_a": "Some New Type for",
+          "label_b_a": "Some New Type for",
+          "description": "Some New Type",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Some New Type for',
+              displayLabel: 'Some New Type is'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-2)).toEqual(
+          [
+            {
+              xmlName: 'Some New Type is',
+              id: '33_a_b',
+              text: 'Some New Type for'
+            },
+            {
+              xmlName: 'Some New Type for',
+              id: '33_b_a',
+              text: 'Some New Type is'
+            }
+          ]
+        );
+      });
+
+      it('updates the case roles for bidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "34",
+          "name_a_b": "Friend of",
+          "label_a_b": "Friend of",
+          "name_b_a": "Friend of",
+          "label_b_a": "Friend of",
+          "description": "Friend",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Friend of',
+              displayLabel: 'Friend of'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-1)).toEqual(
+          [
+            {
+              xmlName: 'Friend of',
+              id: '34_a_b',
+              text: 'Friend of'
+            }
+          ]
+        );
+
+        // Check that it did NOT add two entries for this bidirectional type
+        expect(scope.relationshipTypeOptions.slice(-2,-1)).not.toEqual(
+          [
+            {
+              xmlName: 'Friend of',
+              id: '34_b_a',
+              text: 'Friend of'
+            }
+          ]
+        );
       });
     });
   });
@@ -769,5 +1060,1488 @@ describe('crmCaseType', function() {
         });
       });
     });
+
+    // Test show/hide for the various dropdown actions
+    describe('showandtell', function() {
+      var templateCache;
+      var template;
+
+      // $templateCache is populated by the nghtml2js plugin. See karma.conf.js
+      // I'm not sure why it can't be injected higher up in the hierarchy. It doesn't seem to work?
+      beforeEach(inject(function($templateCache) {
+        scope = $rootScope.$new();
+        templateCache = $templateCache;
+        template = templateCache.get('~/crmCaseType/list.html');
+      }));
+
+      // Helper function which we call repeatedly. It can't be in beforeEach
+      // because then the timing is wrong because we need different caseTypes
+      // in each test, which happens of course after beforeEach.
+      var compileTemplate = function(scope) {
+        var element = $compile(template)(scope);
+        scope.$digest();
+        return element;
+      };
+
+      // This is the workhorse function that does the actual test, called
+      // repeatedly for each case type variation from the `it()` below.
+      var doTest = function(inputCaseType, expected) {
+        // Mock up our case types based on input, merging some static info
+        // with the variable input.
+        var caseType = {
+          id: 1,
+          title: 'Housing Support',
+          name: 'housing_support'
+        };
+        // PhantomJS at the moment doesn't support ES6, so do a loop.
+        for (var memberVar in inputCaseType) {
+          caseType[memberVar] = inputCaseType[memberVar];
+        }
+        scope.caseTypes = {
+          1: caseType
+        };
+
+        // Render the template in the context of our scope now that the scope
+        // contains our mock case types.
+        var element = compileTemplate(scope);
+        //console.debug(element);
+
+        //
+        // Now verify the expected values
+        //
+
+        // Useful variable for displaying the inputs that caused failure
+        // in readable form.
+        var inputStr = JSON.stringify(inputCaseType);
+
+        expect(element.find('span.more-panel').hasClass('ng-hide')).toBe(expected.more_hidden, 'More link should be ' +
+          (expected.more_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-enable').hasClass('ng-hide')).toBe(expected.enable_hidden, 'Enable should be ' +
+          (expected.enable_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-disable').hasClass('ng-hide')).toBe(expected.disable_hidden, 'Disable should be ' +
+          (expected.disable_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-revert').hasClass('ng-hide')).toBe(expected.revert_hidden, 'Revert should be ' +
+          (expected.revert_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+
+        expect(element.find('li.panel-item-delete').hasClass('ng-hide')).toBe(expected.delete_hidden, 'Delete should be ' +
+          (expected.delete_hidden ? 'hidden' : 'visible') +
+          ' for ' + inputStr);
+      };
+
+      // Test show/hide for the various dropdown actions
+      //
+      // There's 625 assertions.
+      // Three variables: [is_active, is_forked, is_reserved],
+      // each with 5 possible values: [0, 1, "0", "1", undefined].
+      // Then, multiply that by 5 because there are 5 UI elements
+      // to be checked.
+      // So 125 possible input tuples, with 5 things to check in each test.
+      it('to be or not to be', function() {
+        var caseTypeSimulations = [
+          [
+            // input case type
+            {"is_active": "1", "is_reserved": "0"},
+            {
+              // should more link be hidden
+              "more_hidden": false,
+              // should enable choice be hidden
+              "enable_hidden": true,
+              // should disable choice be hidden
+              "disable_hidden": false,
+              // should revert choice be hidden
+              "revert_hidden": true,
+              // should delete choice be hidden
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_reserved":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":1},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_reserved":"1"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_reserved":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":1},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_reserved":"1"},
+            {
+              "more_hidden": true,
+              "enable_hidden": true,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_active":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": true,
+              "disable_hidden": false,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1,"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1","is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_reserved":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": true
+            }
+          ],
+
+          [
+            {"is_forked":0},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_forked":1},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_forked":"0"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {"is_forked":"1"},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": false,
+              "delete_hidden": false
+            }
+          ],
+
+          [
+            {},
+            {
+              "more_hidden": false,
+              "enable_hidden": false,
+              "disable_hidden": true,
+              "revert_hidden": true,
+              "delete_hidden": false
+            }
+          ],
+        ];
+        caseTypeSimulations.forEach(function(simulation) {
+          doTest(simulation[0], simulation[1]);
+        });
+      });
+    });
   });
+
 });

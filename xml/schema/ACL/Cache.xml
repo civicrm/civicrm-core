@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/ACL</base>
-  <class>Cache</class>
+  <class>ACLCache</class>
   <name>civicrm_acl_cache</name>
   <comment>Cache for acls and contacts</comment>
   <add>1.6</add>
@@ -23,6 +23,9 @@
     <title>Cache Contact</title>
     <type>int unsigned</type>
     <comment>Foreign Key to Contact</comment>
+    <html>
+      <type>EntityRef</type>
+    </html>
     <add>1.6</add>
   </field>
   <foreignKey>
@@ -38,6 +41,11 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign Key to ACL</comment>
+    <pseudoconstant>
+      <table>civicrm_acl</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <foreignKey>
@@ -60,4 +68,9 @@
     <comment>When was this cache entry last modified</comment>
     <add>1.6</add>
   </field>
+  <index>
+    <name>index_modified_date</name>
+    <fieldName>modified_date</fieldName>
+    <add>5.22</add>
+  </index>
 </table>

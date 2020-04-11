@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action & 1024}
@@ -63,7 +47,7 @@
         </div>
       {/if}
     {elseif $isPendingOutcome}
-      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing. Please print this page for your records.{/ts}</div>
+      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing.{/ts}</div>
         {if $is_email_receipt}
       <div>
         {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -74,7 +58,7 @@
       </div>
     {/if}
   {else}
-    <div>{ts}Your transaction has been processed successfully. Please print this page for your records.{/ts}</div>
+    <div>{ts}Your transaction has been processed successfully.{/ts}</div>
       {if $is_email_receipt}
         <div>
           {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -188,13 +172,13 @@
     </div>
   {/if}
 
-  {if $onbehalfProfile|@count}
+  {if $onbehalfProfile && $onbehalfProfile|@count}
     <div class="crm-group onBehalf_display-group label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
      </div>
   {/if}
 
-  {if $honoreeProfileFields|@count}
+  {if $honoreeProfileFields && $honoreeProfileFields|@count}
     <div class="crm-group honor_block-group">
       <div class="header-dark">
         {$soft_credit_type}

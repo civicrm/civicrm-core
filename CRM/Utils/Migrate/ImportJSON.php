@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Migrate_ImportJSON {
 
@@ -40,8 +24,8 @@ class CRM_Utils_Migrate_ImportJSON {
    * Class constructor.
    */
   public function __construct() {
-    $this->_lookupCache = array();
-    $this->_saveMapping = array();
+    $this->_lookupCache = [];
+    $this->_saveMapping = [];
   }
 
   /**
@@ -81,8 +65,8 @@ class CRM_Utils_Migrate_ImportJSON {
   public function contact(&$contact) {
     $this->restore($contact,
       'CRM_Contact_DAO_Contact',
-      array('id' => 'civicrm_contact'),
-      array('birth_date', 'deceased_date', 'created_date', 'modified_date')
+      ['id' => 'civicrm_contact'],
+      ['birth_date', 'deceased_date', 'created_date', 'modified_date']
     );
   }
 
@@ -92,7 +76,7 @@ class CRM_Utils_Migrate_ImportJSON {
   public function email(&$email) {
     $this->restore($email,
       'CRM_Core_DAO_Email',
-      array('contact_id' => 'civicrm_contact')
+      ['contact_id' => 'civicrm_contact']
     );
   }
 
@@ -102,7 +86,7 @@ class CRM_Utils_Migrate_ImportJSON {
   public function phone(&$phone) {
     $this->restore($phone,
       'CRM_Core_DAO_Phone',
-      array('contact_id' => 'civicrm_contact')
+      ['contact_id' => 'civicrm_contact']
     );
   }
 
@@ -112,7 +96,7 @@ class CRM_Utils_Migrate_ImportJSON {
   public function address(&$address) {
     $this->restore($address,
       'CRM_Core_DAO_Address',
-      array('contact_id' => 'civicrm_contact')
+      ['contact_id' => 'civicrm_contact']
     );
   }
 
@@ -122,8 +106,8 @@ class CRM_Utils_Migrate_ImportJSON {
   public function note(&$note) {
     $this->restore($note,
       'CRM_Core_DAO_Note',
-      array('contact_id' => 'civicrm_contact'),
-      array('modified_date')
+      ['contact_id' => 'civicrm_contact'],
+      ['modified_date']
     );
   }
 
@@ -133,10 +117,10 @@ class CRM_Utils_Migrate_ImportJSON {
   public function relationship(&$relationship) {
     $this->restore($relationship,
       'CRM_Contact_DAO_Relationship',
-      array(
+      [
         'contact_id_a' => 'civicrm_contact',
         'contact_id_b' => 'civicrm_contact',
-      )
+      ]
     );
   }
 
@@ -148,15 +132,15 @@ class CRM_Utils_Migrate_ImportJSON {
     $this->restore($activity,
       'CRM_Activity_DAO_Activity',
       NULL,
-      array('activity_date_time')
+      ['activity_date_time']
     );
 
     $this->restore($activityContacts,
       'CRM_Activity_DAO_ActivityContact',
-      array(
+      [
         'contact_id' => 'civicrm_contact',
         'activity_id' => 'civicrm_activity',
-      )
+      ]
     );
   }
 
@@ -168,15 +152,15 @@ class CRM_Utils_Migrate_ImportJSON {
     $this->restore($group,
       'CRM_Contact_DAO_Group',
       NULL,
-      array('cache_date', 'refresh_date')
+      ['cache_date', 'refresh_date']
     );
 
     $this->restore($groupContact,
       'CRM_Contact_DAO_GroupContact',
-      array(
+      [
         'group_id' => 'civicrm_group',
         'contact_id' => 'civicrm_contact',
-      )
+      ]
     );
   }
 
@@ -187,18 +171,18 @@ class CRM_Utils_Migrate_ImportJSON {
   public function tag($tag, $entityTag) {
     $this->restore($tag,
       'CRM_Core_DAO_Tag',
-      array(
+      [
         'created_id' => 'civicrm_contact',
         'parent_id' => 'civicrm_tag',
-      )
+      ]
     );
 
     $this->restore($entityTag,
       'CRM_Core_DAO_EntityTag',
-      array(
+      [
         'entity_id' => 'civicrm_contact',
         'tag_id' => 'civicrm_tag',
-      )
+      ]
     );
   }
 
@@ -216,7 +200,7 @@ class CRM_Utils_Migrate_ImportJSON {
       $lookUpMapping['id'] = $tableName;
     }
     else {
-      $lookUpMapping = array('id' => $tableName);
+      $lookUpMapping = ['id' => $tableName];
     }
 
     foreach ($lookUpMapping as $columnName => $tableName) {
@@ -269,7 +253,7 @@ class CRM_Utils_Migrate_ImportJSON {
         continue;
       }
 
-      $mapValues = array();
+      $mapValues = [];
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_migration_mapping where entity_table = '$tableName'");
       foreach ($values as $childID => $masterID) {
         $mapValues[] = "($masterID,$childID,'$tableName' )";
@@ -287,7 +271,7 @@ class CRM_Utils_Migrate_ImportJSON {
       return;
     }
 
-    $this->_lookupCache[$tableName] = array();
+    $this->_lookupCache[$tableName] = [];
     $this->_saveMapping[$tableName] = FALSE;
 
     $query = "SELECT master_id, slave_id

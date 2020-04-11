@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 namespace Civi\CCase;
@@ -38,7 +22,9 @@ class Analyzer {
   private $caseId;
 
   /**
-   * @var array per APIv3
+   * The "Case" data, formatted per APIv3.
+   *
+   * @var array
    */
   private $case;
 
@@ -48,7 +34,9 @@ class Analyzer {
   private $caseType;
 
   /**
-   * @var array per APIv3
+   * List of activities, formatted per APIv3.
+   *
+   * @var array
    */
   private $activities;
 
@@ -58,7 +46,12 @@ class Analyzer {
   private $xml;
 
   /**
-   * @var array<string,array>
+   * A list of activity indices, which sort the various activities by some set of keys.
+   *
+   * Each index is identified by its key-set - e.g. "activity_type_id;source_contact_id" would be a
+   * two-dimensional index listing activities by their type ID and their source.
+   *
+   * @var array
    */
   private $indices;
 
@@ -80,20 +73,20 @@ class Analyzer {
    * @return bool
    */
   public function hasActivity($type, $status = NULL) {
-    $idx = $this->getActivityIndex(array('activity_type_id', 'status_id'));
-    $activityTypeGroup = civicrm_api3('option_group', 'get', array('name' => 'activity_type'));
-    $activityType = array(
+    $idx = $this->getActivityIndex(['activity_type_id', 'status_id']);
+    $activityTypeGroup = civicrm_api3('option_group', 'get', ['name' => 'activity_type']);
+    $activityType = [
       'name' => $type,
       'option_group_id' => $activityTypeGroup['id'],
-    );
+    ];
     $activityTypeID = civicrm_api3('option_value', 'get', $activityType);
     $activityTypeID = $activityTypeID['values'][$activityTypeID['id']]['value'];
     if ($status) {
-      $activityStatusGroup = civicrm_api3('option_group', 'get', array('name' => 'activity_status'));
-      $activityStatus = array(
+      $activityStatusGroup = civicrm_api3('option_group', 'get', ['name' => 'activity_status']);
+      $activityStatus = [
         'name' => $status,
         'option_group_id' => $activityStatusGroup['id'],
-      );
+      ];
       $activityStatusID = civicrm_api3('option_value', 'get', $activityStatus);
       $activityStatusID = $activityStatusID['values'][$activityStatusID['id']]['value'];
     }
@@ -115,13 +108,13 @@ class Analyzer {
     if ($this->activities === NULL) {
       // TODO find batch-oriented API for getting all activities in a case
       $case = $this->getCase();
-      $activities = array();
+      $activities = [];
       if (isset($case['activities'])) {
         foreach ($case['activities'] as $actId) {
-          $result = civicrm_api3('Activity', 'get', array(
+          $result = civicrm_api3('Activity', 'get', [
             'id' => $actId,
             'is_current_revision' => 1,
-          ));
+          ]);
           $activities = array_merge($activities, $result['values']);
         }
       }
@@ -132,14 +125,15 @@ class Analyzer {
 
   /**
    * Get a single activity record by type.
+   * This function is only used by SequenceListenerTest
    *
    * @param string $type
    * @throws \Civi\CCase\Exception\MultipleActivityException
    * @return array|NULL, activity record (api/v3)
    */
   public function getSingleActivity($type) {
-    $idx = $this->getActivityIndex(array('activity_type_id', 'id'));
-    $actTypes = array_flip(\CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'));
+    $idx = $this->getActivityIndex(['activity_type_id', 'id']);
+    $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
     $typeId = $actTypes[$type];
     $count = isset($idx[$typeId]) ? count($idx[$typeId]) : 0;
 
@@ -168,7 +162,7 @@ class Analyzer {
    */
   public function getCase() {
     if ($this->case === NULL) {
-      $this->case = civicrm_api3('case', 'getsingle', array('id' => $this->caseId));
+      $this->case = civicrm_api3('case', 'getsingle', ['id' => $this->caseId]);
     }
     return $this->case;
   }
@@ -222,7 +216,7 @@ class Analyzer {
     $this->case = NULL;
     $this->caseType = NULL;
     $this->activities = NULL;
-    $this->indices = array();
+    $this->indices = [];
   }
 
 }

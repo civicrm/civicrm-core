@@ -19,19 +19,21 @@
   </primaryKey>
   <field>
     <name>name</name>
-    <title>Payment Processor variable name to be used in code</title>
+    <title>Payment Processor Type variable name to be used in code</title>
     <type>varchar</type>
     <length>64</length>
-    <comment>Payment Processor Name.</comment>
+    <comment>Payment Processor Type Name.</comment>
     <add>1.8</add>
+    <required>true</required>
   </field>
   <field>
     <name>title</name>
-    <title>Payment Processor Title</title>
+    <title>Payment Processor Type Title</title>
     <type>varchar</type>
     <length>127</length>
-    <comment>Payment Processor Name.</comment>
+    <comment>Payment Processor Type Title.</comment>
     <add>1.8</add>
+    <required>true</required>
   </field>
   <field>
     <name>description</name>
@@ -47,6 +49,7 @@
     <type>boolean</type>
     <comment>Is this processor active?</comment>
     <add>1.8</add>
+    <default>1</default>
   </field>
   <field>
     <name>is_default</name>
@@ -54,6 +57,7 @@
     <type>boolean</type>
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
+    <default>0</default>
   </field>
   <index>
     <name>UI_name</name>
@@ -95,6 +99,7 @@
     <type>varchar</type>
     <length>255</length>
     <add>1.8</add>
+    <required>true</required>
   </field>
   <field>
     <name>url_site_default</name>

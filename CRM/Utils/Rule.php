@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
@@ -108,7 +92,7 @@ class CRM_Utils_Rule {
     //   * Composed of alphanumeric chars, underscore and hyphens.
     //   * Maximum length of 64 chars.
     //   * Optionally surrounded by backticks, in which case spaces also OK.
-    if (!preg_match('/^((`[\w- ]{1,64}`|[\w-]{1,64})\.)?(`[\w- ]{1,64}`|[\w-]{1,64})$/i', $str)) {
+    if (!preg_match('/^((`[-\w ]{1,64}`|[-\w]{1,64})\.)?(`[-\w ]{1,64}`|[-\w]{1,64})$/i', $str)) {
       return FALSE;
     }
 
@@ -138,7 +122,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlOrderBy($str) {
-    $matches = array();
+    $matches = [];
     // Using the field function in order by is valid.
     // Look for a string like field(contribution_status_id,3,4,6).
     // or field(civicrm_contribution.contribution_status_id,3,4,6)
@@ -229,6 +213,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function url($url) {
+    if (!$url) {
+      // If this is required then that should be checked elsewhere - here we are not assuming it is required.
+      return TRUE;
+    }
     if (preg_match('/^\//', $url)) {
       // allow relative URL's (CRM-15598)
       $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;
@@ -320,9 +308,9 @@ class CRM_Utils_Rule {
   public static function currentDate($date, $monthRequired = TRUE) {
     $config = CRM_Core_Config::singleton();
 
-    $d = CRM_Utils_Array::value('d', $date);
-    $m = CRM_Utils_Array::value('M', $date);
-    $y = CRM_Utils_Array::value('Y', $date);
+    $d = $date['d'] ?? NULL;
+    $m = $date['M'] ?? NULL;
+    $y = $date['Y'] ?? NULL;
 
     if (!$d && !$m && !$y) {
       return TRUE;
@@ -330,7 +318,7 @@ class CRM_Utils_Rule {
 
     // CRM-9017 CiviContribute/CiviMember form with expiration date format 'm Y'
     if (!$m && !empty($date['m'])) {
-      $m = CRM_Utils_Array::value('m', $date);
+      $m = $date['m'] ?? NULL;
     }
 
     $day = $mon = 1;
@@ -461,7 +449,7 @@ class CRM_Utils_Rule {
    */
   public static function positiveInteger($value) {
     if (is_int($value)) {
-      return ($value < 0) ? FALSE : TRUE;
+      return !($value < 0);
     }
 
     // CRM-13460
@@ -470,11 +458,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    if (preg_match('/^\d+$/', $value)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return (bool) preg_match('/^\d+$/', $value);
   }
 
   /**
@@ -484,6 +468,8 @@ class CRM_Utils_Rule {
    */
   public static function commaSeparatedIntegers($value) {
     foreach (explode(',', $value) as $val) {
+      // Remove any Whitespace around the key.
+      $val = trim($val);
       if (!self::positiveInteger($val)) {
         return FALSE;
       }
@@ -502,7 +488,7 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    return preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value);
   }
 
   /**
@@ -523,7 +509,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function alphanumeric($value) {
-    return preg_match('/^[a-zA-Z0-9_-]*$/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/^[a-zA-Z0-9_-]*$/', $value);
   }
 
   /**
@@ -533,7 +519,17 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function numberOfDigit($value, $noOfDigit) {
-    return preg_match('/^\d{' . $noOfDigit . '}$/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/^\d{' . $noOfDigit . '}$/', $value);
+  }
+
+  /**
+   * Strict validation of 6-digit hex color notation per html5 <input type="color">
+   *
+   * @param $value
+   * @return bool
+   */
+  public static function color($value) {
+    return (bool) preg_match('/^#([\da-fA-F]{6})$/', $value);
   }
 
   /**
@@ -549,17 +545,17 @@ class CRM_Utils_Rule {
    */
   public static function cleanMoney($value) {
     // first remove all white space
-    $value = str_replace(array(' ', "\t", "\n"), '', $value);
+    $value = str_replace([' ', "\t", "\n"], '', $value);
 
     $config = CRM_Core_Config::singleton();
 
     //CRM-14868
     $currencySymbols = CRM_Core_PseudoConstant::get(
       'CRM_Contribute_DAO_Contribution',
-      'currency', array(
+      'currency', [
         'keyColumn' => 'name',
         'labelColumn' => 'symbol',
-      )
+      ]
     );
     $value = str_replace($currencySymbols, '', $value);
 
@@ -596,19 +592,6 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function money($value) {
-    $config = CRM_Core_Config::singleton();
-
-    // only edge case when we have a decimal point in the input money
-    // field and not defined in the decimal Point in config settings
-    if ($config->monetaryDecimalPoint &&
-      $config->monetaryDecimalPoint != '.' &&
-      // CRM-7122 also check for Thousands Separator in config settings
-      $config->monetaryThousandSeparator != '.' &&
-      substr_count($value, '.')
-    ) {
-      return FALSE;
-    }
-
     $value = self::cleanMoney($value);
 
     if (self::integer($value)) {
@@ -618,7 +601,7 @@ class CRM_Utils_Rule {
     // Allow values such as -0, 1.024555, -.1
     // We need to support multiple decimal places here, not just the number allowed by locale
     //  otherwise tax calculations break when you want the inclusive amount to be a round number (eg. £10 inc. VAT requires 8.333333333 here).
-    return preg_match('/(^-?\d+\.?\d*$)|(^-?\.\d+$)/', $value) ? TRUE : FALSE;
+    return (bool) preg_match('/(^-?\d+\.?\d*$)|(^-?\.\d+$)/', $value);
   }
 
   /**
@@ -902,13 +885,13 @@ class CRM_Utils_Rule {
   public static function qfDate($date) {
     $config = CRM_Core_Config::singleton();
 
-    $d = CRM_Utils_Array::value('d', $date);
-    $m = CRM_Utils_Array::value('M', $date);
-    $y = CRM_Utils_Array::value('Y', $date);
+    $d = $date['d'] ?? NULL;
+    $m = $date['M'] ?? NULL;
+    $y = $date['Y'] ?? NULL;
     if (isset($date['h']) ||
       isset($date['g'])
     ) {
-      $m = CRM_Utils_Array::value('M', $date);
+      $m = $date['M'] ?? NULL;
     }
 
     if (!$d && !$m && !$y) {
@@ -967,7 +950,7 @@ class CRM_Utils_Rule {
     $highDate = strtotime($fields[$fieldName . '_high']);
 
     if ($lowDate > $highDate) {
-      $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', array(1 => $title));
+      $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', [1 => $title]);
     }
   }
 

@@ -4,6 +4,10 @@
  * Class CRM_Event_Cart_Form_Cart
  */
 class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
+
+  /**
+   * @var \CRM_Event_Cart_BAO_Cart
+   */
   public $cart;
 
   public $_action;
@@ -13,7 +17,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   public $participants;
 
   public function preProcess() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_action = CRM_Utils_Request::retrieveValue('action', 'String');
     $this->_mode = 'live';
     $this->loadCart();
 
@@ -21,13 +25,13 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
 
     $this->assignBillingType();
 
-    $event_titles = array();
+    $event_titles = [];
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       $event_titles[] = $event_in_cart->event->title;
     }
-    $this->description = ts("Online Registration for %1", array(1 => implode(", ", $event_titles)));
+    $this->description = ts("Online Registration for %1", [1 => implode(", ", $event_titles)]);
     if (!isset($this->discounts)) {
-      $this->discounts = array();
+      $this->discounts = [];
     }
   }
 
@@ -47,11 +51,11 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
 
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       if (empty($event_in_cart->participants)) {
-        $participant_params = array(
+        $participant_params = [
           'cart_id' => $this->cart->id,
           'event_id' => $event_in_cart->event_id,
-          'contact_id' => self::find_or_create_contact($this->getContactID()),
-        );
+          'contact_id' => self::find_or_create_contact(),
+        ];
         $participant = CRM_Event_Cart_BAO_MerParticipant::create($participant_params);
         $participant->save();
         $event_in_cart->add_participant($participant);
@@ -93,22 +97,14 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   }
 
   /**
-   * @return bool
-   */
-  public static function is_administrator() {
-    global $user;
-    return CRM_Core_Permission::check('administer CiviCRM');
-  }
-
-  /**
-   * @return mixed
+   * @return int
+   * @throws \CRM_Core_Exception
    */
   public function getContactID() {
-    //XXX when do we query 'cid' ?
-    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $tempID = CRM_Utils_Request::retrieveValue('cid', 'Positive');
 
     //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    $userChecksum = CRM_Utils_Request::retrieveValue('cs', 'String');
     if ($userChecksum) {
       //check for anonymous user.
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
@@ -128,31 +124,30 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
    * @return mixed|null
    */
   public static function find_contact($fields) {
-    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', array(), FALSE);
+    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', [], FALSE);
   }
 
   /**
-   * @param int $registeringContactID
    * @param array $fields
    *
    * @return int|mixed|null
    */
-  public static function find_or_create_contact($registeringContactID = NULL, $fields = array()) {
+  public static function find_or_create_contact($fields = []) {
     $contact_id = self::find_contact($fields);
 
     if ($contact_id) {
       return $contact_id;
     }
-    $contact_params = array(
-      'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
-      'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
-      'last_name' => CRM_Utils_Array::value('last_name', $fields, NULL),
+    $contact_params = [
+      'email-Primary' => $fields['email'] ?? NULL,
+      'first_name' => $fields['first_name'] ?? NULL,
+      'last_name' => $fields['last_name'] ?? NULL,
       'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, TRUE),
-    );
-    $no_fields = array();
+    ];
+    $no_fields = [];
     $contact_id = CRM_Contact_BAO_Contact::createProfileContact($contact_params, $no_fields, NULL);
     if (!$contact_id) {
-      CRM_Core_Error::displaySessionError("Could not create or match a contact with that email address.  Please contact the webmaster.");
+      CRM_Core_Session::setStatus(ts("Could not create or match a contact with that email address. Please contact the webmaster."), '', 'error');
     }
     return $contact_id;
   }

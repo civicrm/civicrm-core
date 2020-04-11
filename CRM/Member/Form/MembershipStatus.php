@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -91,7 +75,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-    $this->deleteMessage = ts('You will not be able to delete this membership status if there are existing memberships with this status. You will need to check all your membership status rules afterwards to ensure that a valid status will always be available.') . " "  . ts('Do you want to continue?');
+    $this->deleteMessage = ts('You will not be able to delete this membership status if there are existing memberships with this status. You will need to check all your membership status rules afterwards to ensure that a valid status will always be available.') . " " . ts('Do you want to continue?');
   }
 
   public function preProcess() {
@@ -138,22 +122,22 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
       $this->assign('id', $this->_id);
     }
     $this->addRule('label', ts('A membership status with this label already exists. Please select another label.'),
-      'objectExists', array('CRM_Member_DAO_MembershipStatus', $this->_id, 'name')
+      'objectExists', ['CRM_Member_DAO_MembershipStatus', $this->_id, 'name']
     );
 
     $this->add('select', 'start_event', ts('Start Event'), CRM_Core_SelectValues::eventDate(), TRUE);
-    $this->add('select', 'start_event_adjust_unit', ts('Start Event Adjustment'), array('' => ts('- select -')) + CRM_Core_SelectValues::unitList());
+    $this->add('select', 'start_event_adjust_unit', ts('Start Event Adjustment'), ['' => ts('- select -')] + CRM_Core_SelectValues::unitList());
     $this->add('text', 'start_event_adjust_interval', ts('Start Event Adjust Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipStatus', 'start_event_adjust_interval')
     );
-    $this->add('select', 'end_event', ts('End Event'), array('' => ts('- select -')) + CRM_Core_SelectValues::eventDate());
-    $this->add('select', 'end_event_adjust_unit', ts('End Event Adjustment'), array('' => ts('- select -')) + CRM_Core_SelectValues::unitList());
+    $this->add('select', 'end_event', ts('End Event'), ['' => ts('- select -')] + CRM_Core_SelectValues::eventDate());
+    $this->add('select', 'end_event_adjust_unit', ts('End Event Adjustment'), ['' => ts('- select -')] + CRM_Core_SelectValues::unitList());
     $this->add('text', 'end_event_adjust_interval', ts('End Event Adjust Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipStatus', 'end_event_adjust_interval')
     );
     $this->add('checkbox', 'is_current_member', ts('Current Membership?'));
 
-    $this->add('text', 'weight', ts('Order'),
+    $this->add('number', 'weight', ts('Order'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipStatus', 'weight')
     );
     $this->add('checkbox', 'is_default', ts('Default?'));
@@ -197,7 +181,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
 
       $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
       CRM_Core_Session::setStatus(ts('The membership status \'%1\' has been saved.',
-        array(1 => $membershipStatus->label)
+        [1 => $membershipStatus->label]
       ), ts('Saved'), 'success');
     }
   }

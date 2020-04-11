@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
@@ -36,7 +20,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   protected $_relField = FALSE;
   protected $_exposeContactID = FALSE;
 
-  protected $_customGroupExtends = array('Case');
+  protected $_customGroupExtends = ['Case'];
 
   /**
    * Class constructor.
@@ -49,154 +33,151 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
       $this->rel_types[$relid] = $v['label_b_a'];
     }
 
-    $this->deleted_labels = array(
-      '' => ts('- select -'),
-      0 => ts('No'),
-      1 => ts('Yes'),
-    );
-
-    $this->_columns = array(
-      'civicrm_c2' => array(
+    $this->_columns = [
+      'civicrm_c2' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'client_name' => array(
+        'fields' => [
+          'client_name' => [
             'name' => 'sort_name',
             'title' => ts('Contact Name'),
             'required' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'order_bys' => array(
-          'client_name' => array(
+          ],
+        ],
+        'order_bys' => [
+          'client_name' => [
             'title' => ts('Contact Name'),
             'name' => 'sort_name',
-          ),
-        ),
+          ],
+        ],
         'grouping'  => 'case-fields',
-      ),
-      'civicrm_case' => array(
+      ],
+      'civicrm_case' => [
         'dao' => 'CRM_Case_DAO_Case',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Case ID'),
             'required' => TRUE,
-          ),
-          'subject' => array(
+          ],
+          'subject' => [
             'title' => ts('Case Subject'),
             'default' => TRUE,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
             'default' => TRUE,
-          ),
-          'case_type_id' => array(
+          ],
+          'case_type_id' => [
             'title' => ts('Case Type'),
             'default' => TRUE,
-          ),
-          'start_date' => array(
+          ],
+          'start_date' => [
             'title' => ts('Start Date'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'duration' => array(
+          ],
+          'duration' => [
             'title' => ts('Duration (Days)'),
             'default' => FALSE,
-          ),
-          'is_deleted' => array(
+          ],
+          'is_deleted' => [
             'title' => ts('Deleted?'),
             'default' => FALSE,
-            'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-        'filters' => array(
-          'start_date' => array(
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ],
+        ],
+        'filters' => [
+          'start_date' => [
             'title' => ts('Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'case_type_id' => array(
+          ],
+          'case_type_id' => [
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
-          ),
-          'status_id' => array(
+            'type' => CRM_Utils_Type::T_INT,
+          ],
+          'status_id' => [
             'title' => ts('Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
-          ),
-          'is_deleted' => array(
+          ],
+          'is_deleted' => [
             'title' => ts('Deleted?'),
-            'type' => CRM_Report_Form::OP_INT,
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => $this->deleted_labels,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
             'default' => 0,
-          ),
-        ),
-        'order_bys'  => array(
-          'start_date' => array(
+          ],
+        ],
+        'order_bys'  => [
+          'start_date' => [
             'title' => ts('Start Date'),
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
-          ),
-        ),
+          ],
+        ],
         'grouping'  => 'case-fields',
-      ),
-      'civicrm_contact' => array(
+      ],
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Staff Member'),
             'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => ts('Staff Member'),
-          ),
-        ),
-      ),
-      'civicrm_relationship' => array(
+          ],
+        ],
+      ],
+      'civicrm_relationship' => [
         'dao' => 'CRM_Contact_DAO_Relationship',
-        'filters' => array(
-          'relationship_type_id' => array(
+        'filters' => [
+          'relationship_type_id' => [
             'title' => ts('Staff Relationship'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
-          ),
-        ),
-      ),
-      'civicrm_relationship_type' => array(
+          ],
+          'is_active' => [
+            'title' => ts('Active Relationship?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ],
+        ],
+      ],
+      'civicrm_relationship_type' => [
         'dao' => 'CRM_Contact_DAO_RelationshipType',
-        'fields' => array(
-          'label_b_a' => array(
+        'fields' => [
+          'label_b_a' => [
             'title' => ts('Relationship'),
             'default' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_case_contact' => array(
+          ],
+        ],
+      ],
+      'civicrm_case_contact' => [
         'dao' => 'CRM_Case_DAO_CaseContact',
-      ),
-    );
+      ],
+    ];
 
     parent::__construct();
   }
@@ -206,8 +187,8 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -222,10 +203,13 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             if ($fieldName == 'duration') {
               $select[] = "IF({$table['fields']['end_date']['dbAlias']} Is Null, '', DATEDIFF({$table['fields']['end_date']['dbAlias']}, {$table['fields']['start_date']['dbAlias']})) as {$tableName}_{$fieldName}";
             }
+            elseif ($tableName == 'civicrm_relationship_type') {
+              $select[] = "  IF(contact_civireport.id = relationship_civireport.contact_id_a, relationship_type_civireport.label_b_a, relationship_type_civireport.label_a_b) as civicrm_relationship_type_label_b_a";
+            }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             }
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
           }
         }
@@ -244,7 +228,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
+    $errors = $grouping = [];
     if (empty($fields['relationship_type_id_value']) &&
       (array_key_exists('sort_name', $fields['fields']) ||
         array_key_exists('label_b_a', $fields['fields']))
@@ -270,10 +254,20 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     $crt = $this->_aliases['civicrm_relationship_type'];
     $ccc = $this->_aliases['civicrm_case_contact'];
 
+    foreach ($this->_columns['civicrm_relationship']['filters'] as $fieldName => $field) {
+      if (!empty($this->_params[$fieldName . '_op'])
+        && array_key_exists("{$fieldName}_value", $this->_params)
+        && !CRM_Utils_System::isNull($this->_params["{$fieldName}_value"])
+      ) {
+        $this->_relField = TRUE;
+        break;
+      }
+    }
+
     if ($this->_relField) {
       $this->_from = "
             FROM civicrm_contact $c
-inner join civicrm_relationship $cr on {$c}.id = ${cr}.contact_id_b
+inner join civicrm_relationship $cr on {$c}.id = ${cr}.contact_id_b OR {$c}.id = ${cr}.contact_id_a
 inner join civicrm_case $cc on ${cc}.id = ${cr}.case_id
 inner join civicrm_relationship_type $crt on ${crt}.id=${cr}.relationship_type_id
 inner join civicrm_case_contact $ccc on ${ccc}.case_id = ${cc}.id
@@ -289,63 +283,11 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
   }
 
-  public function where() {
-    $clauses = array();
-    $this->_having = '';
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if (CRM_Utils_Array::value("operatorType", $field) & CRM_Report_Form::OP_DATE
-          ) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to,
-              CRM_Utils_Array::value('type', $field)
-            );
-          }
-          else {
-
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($fieldName == 'case_type_id') {
-              $value = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
-              if (!empty($value)) {
-                $operator = '';
-                if ($op == 'notin') {
-                  $operator = 'NOT';
-                }
-
-                $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', $value) . "[[:cntrl:]]*";
-                $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
-              }
-              $op = NULL;
-            }
-
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
+  public function storeWhereHavingClauseArray() {
+    if (!empty($this->_params['fields']['label_b_a']) && $this->_params['fields']['label_b_a'] == 1) {
+      $this->_whereClauses[] = '(contact_civireport.sort_name != c2_civireport.sort_name)';
     }
-
-    if (empty($clauses)) {
-      $this->_where = "WHERE ( 1 ) ";
-    }
-    else {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
-    }
+    parent::storeWhereHavingClauseArray();
   }
 
   public function groupBy() {
@@ -358,7 +300,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
 
     $sql = $this->buildQuery(TRUE);
 
-    $rows = $graphRows = array();
+    $rows = $graphRows = [];
     $this->buildRows($sql, $rows);
 
     $this->formatDisplay($rows);
@@ -390,7 +332,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
       ) {
         $value = $row['civicrm_case_case_type_id'];
         $typeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-        $value = array();
+        $value = [];
         foreach ($typeIds as $typeId) {
           if ($typeId) {
             $value[$typeId] = $this->case_types[$typeId];
@@ -423,12 +365,6 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
         );
         $rows[$rowNum]['civicrm_case_subject_link'] = $url;
         $rows[$rowNum]['civicrm_case_subject_hover'] = ts("Manage Case");
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_case_is_deleted', $row)) {
-        $value = $row['civicrm_case_is_deleted'];
-        $rows[$rowNum]['civicrm_case_is_deleted'] = $this->deleted_labels[$value];
         $entryFound = TRUE;
       }
 

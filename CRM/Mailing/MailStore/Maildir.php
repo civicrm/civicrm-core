@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -47,18 +31,18 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
   public function __construct($dir) {
     $this->_dir = $dir;
 
-    $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
-          'CiviMail.ignored',
-          date('Y'),
-          date('m'),
-          date('d'),
-        )));
-    $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
-          'CiviMail.processed',
-          date('Y'),
-          date('m'),
-          date('d'),
-        )));
+    $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, [
+      'CiviMail.ignored',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
+    $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, [
+      'CiviMail.processed',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
   }
 
   /**
@@ -72,15 +56,15 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
    *   array of ezcMail objects
    */
   public function fetchNext($count = 0) {
-    $mails = array();
+    $mails = [];
     $parser = new ezcMailParser();
     // set property text attachment as file CRM-5408
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
 
-    foreach (array(
-               'cur',
-               'new',
-             ) as $subdir) {
+    foreach ([
+      'cur',
+      'new',
+    ] as $subdir) {
       $dir = $this->_dir . DIRECTORY_SEPARATOR . $subdir;
       foreach (scandir($dir) as $file) {
         if ($file == '.' or $file == '..') {
@@ -94,7 +78,7 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
 
         }
 
-        $set = new ezcMailFileSet(array($path));
+        $set = new ezcMailFileSet([$path]);
         $single = $parser->parseMail($set);
         $mails[$path] = $single[0];
       }

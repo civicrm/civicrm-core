@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -46,7 +30,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
 
-    $form->addElement('checkbox', 'updateLinkedCases', NULL, NULL, array('class' => 'select-row'));
+    $form->addElement('checkbox', 'updateLinkedCases', NULL, NULL, ['class' => 'select-row']);
 
     $caseID = CRM_Utils_Array::first($form->_caseId);
     $cases = CRM_Case_BAO_Case::getRelatedCases($caseID);
@@ -64,7 +48,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * @return array
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
     // Retrieve current case status
     $defaults['case_status_id'] = $form->_defaultCaseStatus;
 
@@ -78,17 +62,17 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
-    $caseTypes = array();
+    $caseTypes = [];
 
     $form->_caseStatus = CRM_Case_PseudoConstant::caseStatus();
     $statusNames = CRM_Case_PseudoConstant::caseStatus('name');
 
     // Limit case statuses to allowed types for these case(s)
-    $allCases = civicrm_api3('Case', 'get', array('return' => 'case_type_id', 'id' => array('IN' => (array) $form->_caseId)));
+    $allCases = civicrm_api3('Case', 'get', ['return' => 'case_type_id', 'id' => ['IN' => (array) $form->_caseId]]);
     foreach ($allCases['values'] as $case) {
       $caseTypes[$case['case_type_id']] = $case['case_type_id'];
     }
-    $caseTypes = civicrm_api3('CaseType', 'get', array('id' => array('IN' => $caseTypes)));
+    $caseTypes = civicrm_api3('CaseType', 'get', ['id' => ['IN' => $caseTypes]]);
     foreach ($caseTypes['values'] as $ct) {
       if (!empty($ct['definition']['statuses'])) {
         foreach ($form->_caseStatus as $id => $label) {
@@ -105,10 +89,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
 
     foreach ($form->_defaultCaseStatus as $keydefault => $valdefault) {
       if (!array_key_exists($valdefault, $form->_caseStatus)) {
-        $form->_caseStatus[$valdefault] = CRM_Core_OptionGroup::getLabel('case_status',
-          $valdefault,
-          FALSE
-        );
+        $form->_caseStatus[$valdefault] = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $valdefault);
       }
     }
     $element = $form->add('select', 'case_status_id', ts('Case Status'),
@@ -146,9 +127,9 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
-    $params['id'] = CRM_Utils_Array::value('case_id', $params);
+    $params['id'] = $params['case_id'] ?? NULL;
 
-    if ($params['updateLinkedCases'] === '1') {
+    if (CRM_Utils_Array::value('updateLinkedCases', $params) === '1') {
       $caseID = CRM_Utils_Array::first($form->_caseId);
       $cases = CRM_Case_BAO_Case::getRelatedCases($caseID);
 
@@ -168,24 +149,23 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * @param CRM_Activity_BAO_Activity $activity
    */
   public static function endPostProcess(&$form, &$params, $activity) {
-
     $groupingValues = CRM_Core_OptionGroup::values('case_status', FALSE, TRUE, FALSE, NULL, 'value');
 
     // Set case end_date if we're closing the case. Clear end_date if we're (re)opening it.
     if (CRM_Utils_Array::value($params['case_status_id'], $groupingValues) == 'Closed' && !empty($params['activity_date_time'])) {
-      $params['end_date'] = $params['activity_date_time'];
+      $params['end_date'] = CRM_Utils_Date::isoToMysql($params['activity_date_time']);
 
       // End case-specific relationships (roles)
       foreach ($params['target_contact_id'] as $cid) {
         $rels = CRM_Case_BAO_Case::getCaseRoles($cid, $params['case_id']);
-        // FIXME: Is there an existing function to close a relationship?
-        $query = 'UPDATE civicrm_relationship SET end_date=%2 WHERE id=%1';
         foreach ($rels as $relId => $relData) {
-          $relParams = array(
-            1 => array($relId, 'Integer'),
-            2 => array($params['end_date'], 'Timestamp'),
-          );
-          CRM_Core_DAO::executeQuery($query, $relParams);
+          $relationshipParams = [
+            'id' => $relId,
+            'end_date' => $params['end_date'],
+          ];
+          // @todo we can't switch directly to api because there is too much business logic and it breaks closing cases with organisations as client relationships
+          //civicrm_api3('Relationship', 'create', $relationshipParams);
+          CRM_Contact_BAO_Relationship::add($relationshipParams);
         }
       }
     }
@@ -195,11 +175,14 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
       // Reopen case-specific relationships (roles)
       foreach ($params['target_contact_id'] as $cid) {
         $rels = CRM_Case_BAO_Case::getCaseRoles($cid, $params['case_id'], NULL, FALSE);
-        // FIXME: Is there an existing function?
-        $query = 'UPDATE civicrm_relationship SET end_date=NULL WHERE id=%1';
         foreach ($rels as $relId => $relData) {
-          $relParams = array(1 => array($relId, 'Integer'));
-          CRM_Core_DAO::executeQuery($query, $relParams);
+          $relationshipParams = [
+            'id' => $relId,
+            'end_date' => 'null',
+          ];
+          // @todo we can't switch directly to api because there is too much business logic and it breaks closing cases with organisations as client relationships
+          //civicrm_api3('Relationship', 'create', $relationshipParams);
+          CRM_Contact_BAO_Relationship::add($relationshipParams);
         }
       }
     }
@@ -210,11 +193,10 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
 
     foreach ($form->_oldCaseStatus as $statuskey => $statusval) {
       if ($activity->subject == 'null') {
-        $activity->subject = ts('Case status changed from %1 to %2', array(
-            1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
-            2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus),
-          )
-        );
+        $activity->subject = ts('Case status changed from %1 to %2', [
+          1 => $form->_caseStatus[$statusval] ?? NULL,
+          2 => $form->_caseStatus[$params['case_status_id']] ?? NULL,
+        ]);
         $activity->save();
       }
     }

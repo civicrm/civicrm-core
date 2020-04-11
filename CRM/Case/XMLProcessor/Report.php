@@ -1,41 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
   /**
    * The default variable defined.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_isRedact;
 
@@ -44,30 +28,11 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   public function __construct() {
   }
 
-  /**
-   * @param int $clientID
-   * @param int $caseID
-   * @param string $activitySetName
-   * @param array $params
-   *
-   * @return mixed
-   */
-  public function run($clientID, $caseID, $activitySetName, $params) {
-    $contents = self::getCaseReport($clientID,
-      $caseID,
-      $activitySetName,
-      $params,
-      $this
-    );
-
-    return CRM_Case_Audit_Audit::run($contents, $clientID, $caseID);
-  }
-
   public function getRedactionRules() {
     foreach (array(
-               'redactionStringRules',
-               'redactionRegexRules',
-             ) as $key => $rule) {
+      'redactionStringRules',
+      'redactionRegexRules',
+    ) as $key => $rule) {
       $$rule = CRM_Case_PseudoConstant::redactionRule($key);
 
       if (!empty($$rule)) {
@@ -129,20 +94,9 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
       $case['subject'] = $dao->subject;
       $case['start_date'] = $dao->start_date;
       $case['end_date'] = $dao->end_date;
-      // FIXME: when we resolve if case_type_is single or multi-select
-      if (strpos($dao->case_type_id, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-        $caseTypeID = substr($dao->case_type_id, 1, -1);
-      }
-      else {
-        $caseTypeID = $dao->case_type_id;
-      }
-      $caseTypeIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        $dao->case_type_id
-      );
-
       $case['caseType'] = CRM_Case_BAO_Case::getCaseType($caseID);
       $case['caseTypeName'] = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
-      $case['status'] = CRM_Core_OptionGroup::getLabel('case_status', $dao->status_id, FALSE);
+      $case['status'] = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $dao->status_id);
     }
     return $case;
   }
@@ -158,11 +112,11 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
         if ((string ) $activitySetXML->name == $activitySetName) {
           $activityTypes = array();
-          $allActivityTypes = &$this->allActivityTypes();
+          $allActivityTypes = CRM_Case_PseudoConstant::caseActivityType(TRUE, TRUE);
           foreach ($activitySetXML->ActivityTypes as $activityTypesXML) {
             foreach ($activityTypesXML as $activityTypeXML) {
               $activityTypeName = (string ) $activityTypeXML->name;
-              $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $allActivityTypes);
+              $activityTypeInfo = $allActivityTypes[$activityTypeName] ?? NULL;
               if ($activityTypeInfo) {
                 $activityTypes[$activityTypeInfo['id']] = $activityTypeInfo;
               }
@@ -201,13 +155,6 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   public function getActivities($clientID, $caseID, $activityTypes, &$activities) {
     // get all activities for this case that in this activityTypes set
     foreach ($activityTypes as $aType) {
-      $map[$aType['id']] = $aType;
-    }
-
-    // get all core activities
-    $coreActivityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
-
-    foreach ($coreActivityTypes as $aType) {
       $map[$aType['id']] = $aType;
     }
 
@@ -347,7 +294,8 @@ WHERE      a.id = %1
       }
 
       $activity['fields'][] = array(
-        'label' => 'Client',
+        'name' => 'Client',
+        'label' => ts('Client'),
         'value' => $this->redact($client),
         'type' => 'String',
       );
@@ -361,9 +309,11 @@ WHERE      a.id = %1
       // Maybe not the best solution.
       $targetNames = CRM_Activity_BAO_ActivityContact::getNames($activityDAO->id, $targetID);
       $processTarget = FALSE;
+      $name = 'With Contact(s)';
       $label = ts('With Contact(s)');
       if (in_array($activityTypeInfo['name'], array('Email', 'Inbound Email'))) {
         $processTarget = TRUE;
+        $name = 'Recipient';
         $label = ts('Recipient');
       }
       if (!$processTarget) {
@@ -393,6 +343,7 @@ WHERE      a.id = %1
         }
 
         $activity['fields'][] = array(
+          'name' => $name,
           'label' => $label,
           'value' => implode('; ', $targetRedacted),
           'type' => 'String',
@@ -402,13 +353,20 @@ WHERE      a.id = %1
 
     // Activity Type info is a special field
     $activity['fields'][] = array(
+      'name' => 'Activity Type',
       'label' => ts('Activity Type'),
       'value' => $activityTypeInfo['label'],
       'type' => 'String',
     );
 
     $activity['fields'][] = array(
+      'name' => 'Subject',
       'label' => ts('Subject'),
+      // TODO: Why is this being escaped at this point in the flow? Should
+      // this just be done in the tpl where all the other fields get escaped?
+      // Is anything depending on this currently or is it just a result of
+      // the see-sawing and some double-escaping that went back and forth
+      // for a few years?
       'value' => htmlspecialchars($this->redact($activityDAO->subject)),
       'type' => 'Memo',
     );
@@ -421,6 +379,7 @@ WHERE      a.id = %1
       );
     }
     $activity['fields'][] = array(
+      'name' => 'Created By',
       'label' => ts('Created By'),
       'value' => $this->redact($creator),
       'type' => 'String',
@@ -450,6 +409,7 @@ WHERE      a.id = %1
     }
 
     $activity['fields'][] = array(
+      'name' => 'Reported By',
       'label' => ts('Reported By'),
       'value' => $this->redact($reporter),
       'type' => 'String',
@@ -468,6 +428,7 @@ WHERE      a.id = %1
       }
       $assigneeContacts = implode(', ', $assignee_contact_names);
       $activity['fields'][] = array(
+        'name' => 'Assigned to',
         'label' => ts('Assigned to'),
         'value' => $assigneeContacts,
         'type' => 'String',
@@ -476,27 +437,29 @@ WHERE      a.id = %1
 
     if ($activityDAO->medium_id) {
       $activity['fields'][] = array(
+        'name' => 'Medium',
         'label' => ts('Medium'),
-        'value' => CRM_Core_OptionGroup::getLabel('encounter_medium',
-          $activityDAO->medium_id, FALSE
-        ),
+        'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'medium_id', $activityDAO->medium_id),
         'type' => 'String',
       );
     }
 
     $activity['fields'][] = array(
+      'name' => 'Location',
       'label' => ts('Location'),
       'value' => $activityDAO->location,
       'type' => 'String',
     );
 
     $activity['fields'][] = array(
+      'name' => 'Date and Time',
       'label' => ts('Date and Time'),
       'value' => $activityDAO->activity_date_time,
       'type' => 'Date',
     );
 
     $activity['fields'][] = array(
+      'name' => 'Details',
       'label' => ts('Details'),
       'value' => $this->redact(CRM_Utils_String::stripAlternatives($activityDAO->details)),
       'type' => 'Memo',
@@ -505,12 +468,14 @@ WHERE      a.id = %1
     // Skip Duration field if empty (to avoid " minutes" output). Might want to do this for all fields at some point. dgg
     if ($activityDAO->duration) {
       $activity['fields'][] = array(
+        'name' => 'Duration',
         'label' => ts('Duration'),
         'value' => $activityDAO->duration . ' ' . ts('minutes'),
         'type' => 'Int',
       );
     }
     $activity['fields'][] = array(
+      'name' => 'Status',
       'label' => ts('Status'),
       'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_status_id',
         $activityDAO->status_id
@@ -519,8 +484,9 @@ WHERE      a.id = %1
     );
 
     $activity['fields'][] = array(
+      'name' => 'Priority',
       'label' => ts('Priority'),
-      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority',
+      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority_id',
         $activityDAO->priority_id
       ),
       'type' => 'String',
@@ -594,10 +560,11 @@ WHERE      a.id = %1
   /**
    * @param int $activityTypeID
    * @param null $dateFormat
+   * @param bool $onlyActive
    *
    * @return mixed
    */
-  public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL) {
+  public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL, $onlyActive = TRUE) {
     static $cache = array();
 
     if (is_null($activityTypeID)) {
@@ -621,6 +588,9 @@ WHERE  cf.custom_group_id = cg.id
 AND    cg.extends = 'Activity'
 AND " . CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW, 'cg.');
 
+      if ($onlyActive) {
+        $query .= " AND cf.is_active = 1 ";
+      }
       if ($activityTypeID) {
         $query .= "AND ( cg.extends_entity_column_value IS NULL OR cg.extends_entity_column_value LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . "%1" . CRM_Core_DAO::VALUE_SEPARATOR . "%' )";
       }
@@ -747,6 +717,24 @@ LIMIT  1
    */
   public static function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
 
+    $template = self::populateCaseReportTemplate($clientID, $caseID, $activitySetName, $params, $form);
+
+    // now run the template
+    $contents = $template->fetch('CRM/Case/XMLProcessor/Report.tpl');
+    return $contents;
+  }
+
+  /**
+   * @param int $clientID
+   * @param int $caseID
+   * @param string $activitySetName
+   * @param array $params
+   * @param CRM_Core_Form $form
+   *
+   * @return CRM_Core_Smarty
+   */
+  public static function populateCaseReportTemplate($clientID, $caseID, $activitySetName, $params, $form) {
+
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('caseId', $caseID);
@@ -766,7 +754,7 @@ LIMIT  1
     $case = $form->caseInfo($clientID, $caseID);
     $template->assign_by_ref('case', $case);
 
-    if ($params['include_activities'] == 1) {
+    if (CRM_Utils_Array::value('include_activities', $params) == 1) {
       $template->assign('includeActivities', 'All');
     }
     else {
@@ -776,14 +764,14 @@ LIMIT  1
     $xml = $form->retrieve($case['caseTypeName']);
 
     $activitySetNames = CRM_Case_XMLProcessor_Process::activitySets($xml->ActivitySets);
-    $pageTitle = CRM_Utils_Array::value($activitySetName, $activitySetNames);
+    $pageTitle = $activitySetNames[$activitySetName] ?? NULL;
     $template->assign('pageTitle', $pageTitle);
 
     if ($activitySetName) {
       $activityTypes = $form->getActivityTypes($xml, $activitySetName);
     }
     else {
-      $activityTypes = CRM_Case_XMLProcessor::allActivityTypes();
+      $activityTypes = CRM_Case_XMLProcessor::allActivityTypes(FALSE, TRUE);
     }
 
     if (!$activityTypes) {
@@ -803,9 +791,7 @@ LIMIT  1
     $form->getActivities($clientID, $caseID, $activityTypes, $activities);
     $template->assign_by_ref('activities', $activities);
 
-    // now run the template
-    $contents = $template->fetch('CRM/Case/XMLProcessor/Report.tpl');
-    return $contents;
+    return $template;
   }
 
   public static function printCaseReport() {
@@ -833,8 +819,8 @@ LIMIT  1
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($caseType, 'CaseRoles');
     foreach ($caseRelationships as $key => & $value) {
-      if (!empty($caseRoles[$value['relation_type']])) {
-        unset($caseRoles[$value['relation_type']]);
+      if (!empty($caseRoles[$value['relation_type'] . '_' . $value['relationship_direction']])) {
+        unset($caseRoles[$value['relation_type'] . '_' . $value['relationship_direction']]);
       }
       if ($isRedact) {
         if (!array_key_exists($value['name'], $report->_redactionStringRules)) {
@@ -998,7 +984,7 @@ LIMIT  1
       $params,
       $report
     );
-    $printReport = CRM_Case_Audit_Audit::run($contents, $clientID, $caseID, TRUE);
+    $printReport = CRM_Case_Audit_Audit::run($contents, $clientID, $caseID);
     echo $printReport;
     CRM_Utils_System::civiExit();
   }

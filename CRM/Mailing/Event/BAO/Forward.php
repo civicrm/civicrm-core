@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
@@ -72,7 +56,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
     $domain = CRM_Core_BAO_Domain::getDomain();
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
     $dao->query("
                 SELECT      $contact.id as contact_id,
                             $email.id as email_id,
@@ -105,25 +89,25 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     }
 
     require_once 'api/api.php';
-    $contactParams = array(
+    $contactParams = [
       'email' => $forward_email,
       'version' => 3,
-    );
+    ];
     $contactValues = civicrm_api('contact', 'get', $contactParams);
     $count = $contactValues['count'];
 
     if ($count == 0) {
       // If the contact does not exist, create one.
 
-      $formatted = array(
+      $formatted = [
         'contact_type' => 'Individual',
         'version' => 3,
-      );
+      ];
       $locationType = CRM_Core_BAO_LocationType::getDefault();
-      $value = array(
+      $value = [
         'email' => $forward_email,
         'location_type_id' => $locationType->id,
-      );
+      ];
       require_once 'CRM/Utils/DeprecatedUtils.php';
       _civicrm_api3_deprecated_add_formatted_param($value, $formatted);
       $formatted['onDuplicate'] = CRM_Import_Parser::DUPLICATE_SKIP;
@@ -144,11 +128,11 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
     // Create a new queue event.
 
-    $queue_params = array(
+    $queue_params = [
       'email_id' => $email_id,
       'contact_id' => $contact_id,
       'job_id' => $job_id,
-    );
+    ];
 
     $queue = CRM_Mailing_Event_BAO_Queue::create($queue_params);
 
@@ -195,11 +179,11 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       unset($errorScope);
     }
 
-    $params = array(
+    $params = [
       'event_queue_id' => $queue->id,
       'job_id' => $job_id,
       'hash' => $queue->hash,
-    );
+    ];
     if (is_a($result, 'PEAR_Error')) {
       // Register the bounce event.
 
@@ -298,7 +282,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $forward = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -362,7 +346,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
     $dao->query($query);
 
-    $results = array();
+    $results = [];
 
     while ($dao->fetch()) {
       $from_url = CRM_Utils_System::url('civicrm/contact/view',
@@ -371,12 +355,12 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       $dest_url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->dest_id}"
       );
-      $results[] = array(
+      $results[] = [
         'from_name' => "<a href=\"$from_url\">{$dao->from_name}</a>",
         'from_email' => $dao->from_email,
         'dest_email' => "<a href=\"$dest_url\">{$dao->dest_email}</a>",
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }

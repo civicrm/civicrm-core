@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -58,12 +42,12 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @return void
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (isset($this->_id)) {
-      $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_contribution_page');
+      $params = ['entity_id' => $this->_id, 'entity_table' => 'civicrm_contribution_page'];
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
-      $defaults['pcp_active'] = CRM_Utils_Array::value('is_active', $defaults);
+      $defaults['pcp_active'] = $defaults['is_active'] ?? NULL;
       // Assign contribution page ID to pageId for referencing in PCP.hlp - since $id is overwritten there. dgg
       $this->assign('pageId', $this->_id);
     }
@@ -92,10 +76,10 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $this->_last = TRUE;
     CRM_PCP_BAO_PCP::buildPCPForm($this);
 
-    $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this contribution page)'), NULL, array('onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"));
+    $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this contribution page)'), NULL, ['onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"]);
 
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_PCP_Form_Contribute', 'formRule'), $this);
+    $this->addFormRule(['CRM_PCP_Form_Contribute', 'formRule'], $this);
   }
 
   /**
@@ -111,7 +95,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    *   mixed true or array of errors
    */
   public static function formRule($params, $files, $self) {
-    $errors = array();
+    $errors = [];
     if (!empty($params['is_active'])) {
 
       if (!empty($params['is_tellfriend_enabled']) &&

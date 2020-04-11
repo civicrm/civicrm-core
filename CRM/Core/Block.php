@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -54,8 +38,9 @@ class CRM_Core_Block {
 
   /**
    * Template file names for the above blocks.
+   * @var array
    */
-  static $_properties = NULL;
+  public static $_properties = NULL;
 
   /**
    * Class constructor.
@@ -190,7 +175,7 @@ class CRM_Core_Block {
     if (!(self::$_properties)) {
       self::initProperties();
     }
-    return isset(self::$_properties[$id][$property]) ? self::$_properties[$id][$property] : NULL;
+    return self::$_properties[$id][$property] ?? NULL;
   }
 
   /**
@@ -454,7 +439,7 @@ class CRM_Core_Block {
       $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
     }
     $value['title'] = $short['title'];
-    $value['ref'] = isset($short['ref']) ? $short['ref'] : '';
+    $value['ref'] = $short['ref'] ?? '';
     if (!empty($short['shortCuts'])) {
       foreach ($short['shortCuts'] as $shortCut) {
         $value['shortCuts'][] = self::setShortcutValues($shortCut);
@@ -492,7 +477,7 @@ class CRM_Core_Block {
         $value['url'] = CRM_Utils_System::url($dash['path'], $dash['query'], FALSE);
       }
       $value['title'] = $dash['title'];
-      $value['key'] = CRM_Utils_Array::value('key', $dash);
+      $value['key'] = $dash['key'] ?? NULL;
       $values[] = $value;
     }
     self::setProperty(self::DASHBOARD, 'templateValues', array('dashboardLinks' => $values));
@@ -527,19 +512,6 @@ class CRM_Core_Block {
       $values[] = $value;
     }
     self::setProperty(self::MAIL, 'templateValues', array('shortCuts' => $values));
-  }
-
-  /**
-   * Create the list of shortcuts for the application and format is as a block.
-   */
-  private static function setTemplateMenuValues() {
-    $config = CRM_Core_Config::singleton();
-
-    $path = 'navigation';
-    $values = CRM_Core_Menu::getNavigation();
-    if ($values) {
-      self::setProperty(self::MENU, 'templateValues', array('menu' => $values));
-    }
   }
 
   /**

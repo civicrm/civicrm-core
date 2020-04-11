@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action eq 2 || $action eq 16}
@@ -282,6 +266,7 @@
       });
 
       $(".crm-dedupe-flip-selections").on('click', function(e) {
+        e.preventDefault();
         var ids = [];
         $('.crm-row-selected').each(function() {
           var ele = CRM.$('input.crm-dedupe-select', this);
@@ -289,7 +274,8 @@
         });
         if (ids.length > 0) {
           var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
-          CRM.$.post(dataUrl, {pnid: ids}, function (response) {
+          var request = $.post(dataUrl, {pnid: ids});
+          request.done(function(dt) {
             var mapper = {1:3, 2:4, 5:6, 7:8, 9:10}
             $('.crm-row-selected').each(function() {
               var idx = $('table#dupePairs').DataTable().row(this).index();
@@ -302,7 +288,7 @@
               // keep the checkbox checked if needed
               $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
             });
-          }, 'json');
+          });
         }
       });
     });

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -63,9 +47,9 @@ class CRM_Contact_Form_Task_ProximityCommon {
    * @param CRM_Core_Form $form
    * @param int $proxSearch
    */
-  static public function buildQuickForm($form, $proxSearch) {
+  public static function buildQuickForm($form, $proxSearch) {
     // is proximity search required (2) or optional (1)?
-    $proxRequired = ($proxSearch == 2 ? TRUE : FALSE);
+    $proxRequired = ($proxSearch == 2);
     $form->assign('proximity_search', TRUE);
 
     $form->add('text', 'prox_street_address', ts('Street Address'), NULL, FALSE);
@@ -74,18 +58,18 @@ class CRM_Contact_Form_Task_ProximityCommon {
 
     $form->add('text', 'prox_postal_code', ts('Postal Code'), NULL, FALSE);
 
-    $form->addChainSelect('prox_state_province_id', array('required' => $proxRequired));
+    $form->addChainSelect('prox_state_province_id', ['required' => $proxRequired]);
 
-    $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
+    $country = ['' => ts('- select -')] + CRM_Core_PseudoConstant::country();
     $form->add('select', 'prox_country_id', ts('Country'), $country, $proxRequired);
 
     $form->add('text', 'prox_distance', ts('Distance'), NULL, $proxRequired);
 
-    $proxUnits = array('km' => ts('km'), 'miles' => ts('miles'));
+    $proxUnits = ['km' => ts('km'), 'miles' => ts('miles')];
     $form->add('select', 'prox_distance_unit', ts('Units'), $proxUnits, $proxRequired);
     // prox_distance_unit
 
-    $form->addFormRule(array('CRM_Contact_Form_Task_ProximityCommon', 'formRule'), $form);
+    $form->addFormRule(['CRM_Contact_Form_Task_ProximityCommon', 'formRule'], $form);
   }
 
   /**
@@ -101,15 +85,13 @@ class CRM_Contact_Form_Task_ProximityCommon {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
     // If Distance is present, make sure state, country and city or postal code are populated.
     if (!empty($fields['prox_distance'])) {
       if (empty($fields['prox_state_province_id']) || empty($fields['prox_country_id'])) {
         $errors["prox_state_province_id"] = ts("Country AND State/Province are required to search by distance.");
       }
-      if (!CRM_Utils_Array::value('prox_postal_code', $fields) AND
-        !CRM_Utils_Array::value('prox_city', $fields)
-      ) {
+      if (empty($fields['prox_postal_code']) && empty($fields['prox_city'])) {
         $errors["prox_distance"] = ts("City OR Postal Code are required to search by distance.");
       }
     }
@@ -125,8 +107,8 @@ class CRM_Contact_Form_Task_ProximityCommon {
    * @return array
    *   the default array reference
    */
-  static public function setDefaultValues($form) {
-    $defaults = array();
+  public static function setDefaultValues($form) {
+    $defaults = [];
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
 

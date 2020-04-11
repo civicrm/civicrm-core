@@ -31,9 +31,7 @@
     <title>Namespace reserved for component.</title>
     <type>varchar</type>
     <length>128</length>
-    <comment>Path to components main directory in a form of a class
-      namespace.
-    </comment>
+    <comment>Path to components main directory in a form of a class namespace.</comment>
     <add>2.0</add>
   </field>
 </table>

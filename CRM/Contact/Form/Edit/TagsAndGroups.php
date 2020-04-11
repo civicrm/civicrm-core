@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Edit_TagsAndGroups {
 
@@ -73,7 +57,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $groupElementType = 'checkbox'
   ) {
     if (!isset($form->_tagGroup)) {
-      $form->_tagGroup = array();
+      $form->_tagGroup = [];
     }
 
     // NYSS 5670
@@ -89,9 +73,9 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         $fName = $fieldName;
       }
 
-      $groupID = isset($form->_grid) ? $form->_grid : NULL;
+      $groupID = $form->_grid ?? NULL;
       if ($groupID && $visibility) {
-        $ids = array($groupID => $groupID);
+        $ids = [$groupID => $groupID];
       }
       else {
         if ($visibility) {
@@ -107,8 +91,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         $groups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids);
 
         $attributes['skiplabel'] = TRUE;
-        $elements = array();
-        $groupsOptions = array();
+        $elements = [];
+        $groupsOptions = [];
         foreach ($groups as $id => $group) {
           // make sure that this group has public visibility
           if ($visibility &&
@@ -128,7 +112,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
           $form->add('select', $fName, $groupName, $groupsOptions, FALSE,
-            array('id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2 twenty')
+            ['id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2 twenty']
           );
           $form->assign('groupCount', count($groupsOptions));
         }
@@ -137,7 +121,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           $form->addGroup($elements, $fName, $groupName, '&nbsp;<br />');
           $form->assign('groupCount', count($elements));
           if ($isRequired) {
-            $form->addRule($fName, ts('%1 is a required field.', array(1 => $groupName)), 'required');
+            $form->addRule($fName, ts('%1 is a required field.', [1 => $groupName]), 'required');
           }
         }
         $form->assign('groupElementType', $groupElementType);
@@ -148,7 +132,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_contact');
 
       if (!empty($tags)) {
-        $form->add('select2', 'tag', ts('Tag(s)'), $tags, FALSE, array('class' => 'huge', 'placeholder' => ts('- select -'), 'multiple' => TRUE));
+        $form->add('select2', 'tag', ts('Tag(s)'), $tags, FALSE, ['class' => 'huge', 'placeholder' => ts('- select -'), 'multiple' => TRUE]);
       }
 
       // build tag widget

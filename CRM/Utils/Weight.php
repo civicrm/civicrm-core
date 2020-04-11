@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -30,13 +14,15 @@
  */
 class CRM_Utils_Weight {
   /**
-   * @var array, list of GET fields which must be validated
+   * List of GET fields which must be validated
    *
    * To reduce the size of this patch, we only sign the exploitable fields
    * which make up "$baseURL" in addOrder() (eg 'filter' or 'dao').
    * Less-exploitable fields (eg 'dir') are left unsigned.
+   * 'id','src','dst','dir'
+   * @var array
    */
-  static $SIGNABLE_FIELDS = array('reset', 'dao', 'idName', 'url', 'filter'); // 'id','src','dst','dir'
+  public static $SIGNABLE_FIELDS = ['reset', 'dao', 'idName', 'url', 'filter'];
 
   /**
    * Correct duplicate weight entries by putting them (duplicate weights) in sequence.
@@ -205,7 +191,7 @@ class CRM_Utils_Weight {
     $selectField = "id AS fieldID, $weightField AS weight";
     $field = CRM_Utils_Weight::query('SELECT', $daoName, $fieldValues, $selectField);
     $sameWeightCount = 0;
-    $weights = array();
+    $weights = [];
     while ($field->fetch()) {
       if (in_array($field->weight, $weights)) {
         $sameWeightCount++;
@@ -308,11 +294,11 @@ class CRM_Utils_Weight {
     $fields = &$dao->fields();
     $fieldlist = array_keys($fields);
 
-    $whereConditions = array();
+    $whereConditions = [];
     if ($additionalWhere) {
       $whereConditions[] = $additionalWhere;
     }
-    $params = array();
+    $params = [];
     $fieldNum = 0;
     if (is_array($fieldValues)) {
       foreach ($fieldValues as $fieldName => $value) {
@@ -323,7 +309,7 @@ class CRM_Utils_Weight {
         $fieldNum++;
         $whereConditions[] = "$fieldName = %$fieldNum";
         $fieldType = $fields[$fieldName]['type'];
-        $params[$fieldNum] = array($value, CRM_Utils_Type::typeToString($fieldType));
+        $params[$fieldNum] = [$value, CRM_Utils_Type::typeToString($fieldType)];
       }
     }
     $where = implode(' AND ', $whereConditions);
@@ -386,13 +372,13 @@ class CRM_Utils_Weight {
     $config = CRM_Core_Config::singleton();
     $imageURL = $config->userFrameworkResourceURL . 'i/arrow';
 
-    $queryParams = array(
+    $queryParams = [
       'reset' => 1,
       'dao' => $daoName,
       'idName' => $idName,
       'url' => $returnURL,
       'filter' => $filter,
-    );
+    ];
 
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
     $queryParams['_sgn'] = $signer->sign($queryParams);
@@ -403,7 +389,7 @@ class CRM_Utils_Weight {
       $prevID = $ids[$i - 1];
       $nextID = $ids[$i + 1];
 
-      $links = array();
+      $links = [];
       $url = "{$baseURL}&amp;src=$id";
 
       if ($prevID != 0) {
@@ -433,13 +419,17 @@ class CRM_Utils_Weight {
     }
   }
 
+  /**
+   *
+   * @throws CRM_Core_Exception
+   */
   public static function fixOrder() {
     $signature = CRM_Utils_Request::retrieve('_sgn', 'String');
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
 
     // Validate $_GET values b/c subsequent code reads $_GET (via CRM_Utils_Request::retrieve)
     if (!$signer->validate($signature, $_GET)) {
-      CRM_Core_Error::fatal('Request signature is invalid');
+      throw new CRM_Core_Exception('Request signature is invalid');
     }
 
     // Note: Ensure this list matches self::$SIGNABLE_FIELDS
@@ -461,17 +451,17 @@ class CRM_Utils_Weight {
     $tableName = $object->tableName();
 
     $query = "UPDATE $tableName SET weight = %1 WHERE $idName = %2";
-    $params = array(
-      1 => array($dstWeight, 'Integer'),
-      2 => array($src, 'Integer'),
-    );
+    $params = [
+      1 => [$dstWeight, 'Integer'],
+      2 => [$src, 'Integer'],
+    ];
     CRM_Core_DAO::executeQuery($query, $params);
 
     if ($dir == 'swap') {
-      $params = array(
-        1 => array($srcWeight, 'Integer'),
-        2 => array($dst, 'Integer'),
-      );
+      $params = [
+        1 => [$srcWeight, 'Integer'],
+        2 => [$dst, 'Integer'],
+      ];
       CRM_Core_DAO::executeQuery($query, $params);
     }
     elseif ($dir == 'first') {
@@ -480,10 +470,10 @@ class CRM_Utils_Weight {
       if ($filter) {
         $query .= " AND $filter";
       }
-      $params = array(
-        1 => array($src, 'Integer'),
-        2 => array($srcWeight, 'Integer'),
-      );
+      $params = [
+        1 => [$src, 'Integer'],
+        2 => [$srcWeight, 'Integer'],
+      ];
       CRM_Core_DAO::executeQuery($query, $params);
     }
     elseif ($dir == 'last') {
@@ -492,10 +482,10 @@ class CRM_Utils_Weight {
       if ($filter) {
         $query .= " AND $filter";
       }
-      $params = array(
-        1 => array($src, 'Integer'),
-        2 => array($srcWeight, 'Integer'),
-      );
+      $params = [
+        1 => [$src, 'Integer'],
+        2 => [$srcWeight, 'Integer'],
+      ];
       CRM_Core_DAO::executeQuery($query, $params);
     }
 
@@ -510,9 +500,9 @@ class CRM_Utils_Weight {
       CRM_Utils_System::redirect($url);
     }
 
-    CRM_Core_Page_AJAX::returnJsonResponse(array(
+    CRM_Core_Page_AJAX::returnJsonResponse([
       'userContext' => $url,
-    ));
+    ]);
   }
 
 }

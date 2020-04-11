@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -38,7 +22,10 @@
  */
 class CRM_Core_Permission_Base {
 
-  // permission mapping to stub check() calls
+  /**
+   * permission mapping to stub check() calls
+   * @var array
+   */
   public $permissions = NULL;
 
   /**
@@ -240,10 +227,10 @@ class CRM_Core_Permission_Base {
    * @see CRM_Core_Permission::getCorePermissions
    */
   public static function getModulePermissions($module) {
-    $return_permissions = array();
+    $return_permissions = [];
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {
-      $module_permissions = array();
+      $module_permissions = [];
       $fn_name($module_permissions);
       $return_permissions = $module_permissions;
     }
@@ -260,12 +247,12 @@ class CRM_Core_Permission_Base {
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   public function getAllModulePermissions($descriptions = FALSE) {
-    $permissions = array();
+    $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
     if ($descriptions) {
       foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? $label : array($label);
+        $permissions[$permission] = (is_array($label)) ? $label : [$label];
       }
     }
     else {

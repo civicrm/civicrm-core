@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'TbsZip/tbszip.php';
@@ -38,20 +22,20 @@ require_once 'TbsZip/tbszip.php';
  */
 class CRM_Utils_PDF_Document {
 
-  public static $ooxmlMap = array(
-    'docx' => array(
+  public static $ooxmlMap = [
+    'docx' => [
       'dataFile' => 'word/document.xml',
       'startTag' => '<w:body>',
       'pageBreak' => '<w:p><w:pPr><w:pStyle w:val="Normal"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr></w:r><w:r><w:br w:type="page"/></w:r></w:p>',
       'endTag' => '</w:body></w:document>',
-    ),
-    'odt' => array(
+    ],
+    'odt' => [
       'dataFile' => 'content.xml',
       'startTag' => '<office:body>',
       'pageBreak' => '<text:p text:style-name="Standard"></text:p>',
       'endTag' => '</office:body></office:document-content>',
-    ),
-  );
+    ],
+  ];
 
   /**
    * Convert html to a Doc file.
@@ -63,7 +47,7 @@ class CRM_Utils_PDF_Document {
    *   Ex: "HelloWorld.odt".
    * @param array|int $format
    */
-  public static function html2doc($pages, $fileName, $format = array()) {
+  public static function html2doc($pages, $fileName, $format = []) {
     if (is_array($format)) {
       // PDF Page Format parameters passed in - merge with defaults
       $format += CRM_Core_BAO_PdfFormat::getDefaultValues();
@@ -75,7 +59,7 @@ class CRM_Utils_PDF_Document {
     $paperSize = CRM_Core_BAO_PaperSize::getByName($format['paper_size']);
 
     $metric = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
-    $pageStyle = array(
+    $pageStyle = [
       'orientation' => CRM_Core_BAO_PdfFormat::getValue('orientation', $format),
       'pageSizeW' => self::toTwip($paperSize['width'], $paperSize['metric']),
       'pageSizeH' => self::toTwip($paperSize['height'], $paperSize['metric']),
@@ -83,7 +67,7 @@ class CRM_Utils_PDF_Document {
       'marginRight' => self::toTwip(CRM_Core_BAO_PdfFormat::getValue('margin_right', $format), $metric),
       'marginBottom' => self::toTwip(CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format), $metric),
       'marginLeft' => self::toTwip(CRM_Core_BAO_PdfFormat::getValue('margin_left', $format), $metric),
-    );
+    ];
 
     $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 
@@ -93,7 +77,7 @@ class CRM_Utils_PDF_Document {
       ->setCreator(CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_Contact', CRM_Core_Session::getLoggedInContactID(), 'display_name'));
 
     foreach ((array) $pages as $page => $html) {
-      $section = $phpWord->addSection($pageStyle + array('breakType' => 'nextPage'));
+      $section = $phpWord->addSection($pageStyle + ['breakType' => 'nextPage']);
       \PhpOffice\PhpWord\Shared\Html::addHtml($section, $html);
     }
 
@@ -112,19 +96,20 @@ class CRM_Utils_PDF_Document {
    *   Ex: "/var/lib/data/HelloWorld.odt".
    */
   public static function printDoc($phpWord, $ext, $fileName) {
-    $formats = array(
+    $formats = [
       'docx' => 'Word2007',
       'odt' => 'ODText',
       'html' => 'HTML',
       // todo
       'pdf' => 'PDF',
-    );
+    ];
 
     if (realpath($fileName)) {
       $phpWord = \PhpOffice\PhpWord\IOFactory::load($fileName, $formats[$ext]);
     }
 
-    \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(TRUE); //CRM-20015
+    //CRM-20015
+    \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(TRUE);
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, $formats[$ext]);
 
     CRM_Utils_System::setHttpHeader('Content-Type', "application/$ext");
@@ -147,7 +132,7 @@ class CRM_Utils_PDF_Document {
    * @param string $type  File type
    *
    * @return array
-   *    Return extracted content of document in HTML and document type
+   *   Return extracted content of document in HTML and document type
    */
   public static function docReader($path, $type) {
     $type = array_search($type, CRM_Core_SelectValues::documentApplicationType());
@@ -157,7 +142,7 @@ class CRM_Utils_PDF_Document {
     $phpWordHTML = new \PhpOffice\PhpWord\Writer\HTML($phpWord);
 
     // return the html content for tokenreplacment and eventually used for document download
-    return array($phpWordHTML->getWriterPart('Body')->write(), $type);
+    return [$phpWordHTML->getWriterPart('Body')->write(), $type];
   }
 
   /**
@@ -176,7 +161,7 @@ class CRM_Utils_PDF_Document {
     $zip->Open($filePath);
     $content = $zip->FileRead($dataFile);
 
-    return array($content, $zip);
+    return [$content, $zip];
   }
 
   /**

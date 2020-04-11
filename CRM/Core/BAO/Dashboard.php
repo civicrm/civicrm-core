@@ -1,40 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * Class contains Contact dashboard related functions.
  */
 class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
+
   /**
    * Add Dashboard.
    *
@@ -64,7 +49,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *   array of dashlets
    */
   public static function getDashlets($all = TRUE, $checkPermission = TRUE) {
-    $dashlets = array();
+    $dashlets = [];
     $dao = new CRM_Core_DAO_Dashboard();
 
     if (!$all) {
@@ -79,7 +64,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         continue;
       }
 
-      $values = array();
+      $values = [];
       CRM_Core_DAO::storeValues($dao, $values);
       $dashlets[$dao->id] = $values;
     }
@@ -101,15 +86,16 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    */
   public static function getContactDashlets($contactID = NULL) {
     $contactID = $contactID ? $contactID : CRM_Core_Session::getLoggedInContactID();
-    $dashlets = array();
+    $dashlets = [];
 
     // Get contact dashboard dashlets.
-    $results = civicrm_api3('DashboardContact', 'get', array(
+    $results = civicrm_api3('DashboardContact', 'get', [
       'contact_id' => $contactID,
       'is_active' => 1,
       'dashboard_id.is_active' => 1,
-      'options' => array('sort' => 'weight', 'limit' => 0),
-      'return' => array(
+      'dashboard_id.domain_id' => CRM_Core_Config::domainID(),
+      'options' => ['sort' => 'weight', 'limit' => 0],
+      'return' => [
         'id',
         'weight',
         'column_no',
@@ -121,12 +107,12 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         'dashboard_id.cache_minutes',
         'dashboard_id.permission',
         'dashboard_id.permission_operator',
-      ),
-    ));
+      ],
+    ]);
 
     foreach ($results['values'] as $item) {
       if (self::checkPermission(CRM_Utils_Array::value('dashboard_id.permission', $item), CRM_Utils_Array::value('dashboard_id.permission_operator', $item))) {
-        $dashlets[$item['id']] = array(
+        $dashlets[$item['id']] = [
           'dashboard_id' => $item['dashboard_id'],
           'weight' => $item['weight'],
           'column_no' => $item['column_no'],
@@ -134,15 +120,15 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
           'label' => $item['dashboard_id.label'],
           'url' => $item['dashboard_id.url'],
           'cache_minutes' => $item['dashboard_id.cache_minutes'],
-          'fullscreen_url' => CRM_Utils_Array::value('dashboard_id.fullscreen_url', $item),
-        );
+          'fullscreen_url' => $item['dashboard_id.fullscreen_url'] ?? NULL,
+        ];
       }
     }
 
     // If empty, then initialize default dashlets for this user.
     if (!$results['count']) {
       // They may just have disabled all their dashlets. Check if any records exist for this contact.
-      if (!civicrm_api3('DashboardContact', 'getcount', array('contact_id' => $contactID))) {
+      if (!civicrm_api3('DashboardContact', 'getcount', ['contact_id' => $contactID, 'dashboard_id.domain_id' => CRM_Core_Config::domainID()])) {
         $dashlets = self::initializeDashlets();
       }
     }
@@ -154,16 +140,16 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @return array
    */
   public static function getContactDashletsForJS() {
-    $data = array(array(), array());
+    $data = [[], []];
     foreach (self::getContactDashlets() as $item) {
-      $data[$item['column_no']][] = array(
+      $data[$item['column_no']][] = [
         'id' => (int) $item['dashboard_id'],
         'name' => $item['name'],
         'title' => $item['label'],
         'url' => self::parseUrl($item['url']),
         'cacheMinutes' => $item['cache_minutes'],
         'fullscreenUrl' => self::parseUrl($item['fullscreen_url']),
-      );
+      ];
     }
     return $data;
   }
@@ -175,27 +161,27 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * the default dashlets.
    *
    * @return array
-   *    Array of dashboard_id's
+   *   Array of dashboard_id's
    * @throws \CiviCRM_API3_Exception
    */
   public static function initializeDashlets() {
-    $dashlets = array();
-    $getDashlets = civicrm_api3("Dashboard", "get", array(
-        'domain_id' => CRM_Core_Config::domainID(),
-        'option.limit' => 0,
-      ));
+    $dashlets = [];
+    $getDashlets = civicrm_api3("Dashboard", "get", [
+      'domain_id' => CRM_Core_Config::domainID(),
+      'option.limit' => 0,
+    ]);
     $contactID = CRM_Core_Session::getLoggedInContactID();
-    $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
-    $defaultDashlets = array();
-    $defaults = array('blog' => 1, 'getting-started' => '0');
+    $allDashlets = CRM_Utils_Array::index(['name'], $getDashlets['values']);
+    $defaultDashlets = [];
+    $defaults = ['blog' => 1, 'getting-started' => '0'];
     foreach ($defaults as $name => $column) {
       if (!empty($allDashlets[$name]) && !empty($allDashlets[$name]['id'])) {
-        $defaultDashlets[$name] = array(
+        $defaultDashlets[$name] = [
           'dashboard_id' => $allDashlets[$name]['id'],
           'is_active' => 1,
           'column_no' => $column,
           'contact_id' => $contactID,
-        );
+        ];
       }
     }
     CRM_Utils_Hook::dashboard_defaults($allDashlets, $defaultDashlets);
@@ -209,7 +195,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         else {
           $assignDashlets = civicrm_api3("dashboard_contact", "create", $defaultDashlet);
           $values = $assignDashlets['values'][$assignDashlets['id']];
-          $dashlets[$assignDashlets['id']] = array(
+          $dashlets[$assignDashlets['id']] = [
             'dashboard_id' => $values['dashboard_id'],
             'weight' => $values['weight'],
             'column_no' => $values['column_no'],
@@ -217,8 +203,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
             'label' => $dashlet['label'],
             'cache_minutes' => $dashlet['cache_minutes'],
             'url' => $dashlet['url'],
-            'fullscreen_url' => CRM_Utils_Array::value('fullscreen_url', $dashlet),
-          );
+            'fullscreen_url' => $dashlet['fullscreen_url'] ?? NULL,
+          ];
         }
       }
     }
@@ -271,10 +257,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         }
 
         // hack to handle case permissions
-        if (!$componentName && in_array($key, array(
-            'access my cases and activities',
-            'access all cases and activities',
-          ))
+        if (!$componentName
+          && in_array($key, ['access my cases and activities', 'access all cases and activities'])
         ) {
           $componentName = 'CiviCase';
         }
@@ -335,7 +319,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       throw new RuntimeException("Failed to determine contact ID");
     }
 
-    $dashletIDs = array();
+    $dashletIDs = [];
     if (is_array($columns)) {
       foreach ($columns as $colNo => $dashlets) {
         if (!is_int($colNo)) {
@@ -357,13 +341,39 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       }
     }
 
-    // Disable inactive widgets
-    $dashletClause = $dashletIDs ? "dashboard_id NOT IN  (" . implode(',', $dashletIDs) . ")" : '(1)';
+    // Find dashlets in this domain.
+    $domainDashlets = civicrm_api3('Dashboard', 'get', [
+      'return' => array('id'),
+      'domain_id' => CRM_Core_Config::domainID(),
+      'options' => ['limit' => 0],
+    ]);
+
+    // Get the array of IDs.
+    $domainDashletIDs = [];
+    if ($domainDashlets['is_error'] == 0) {
+      $domainDashletIDs = CRM_Utils_Array::collect('id', $domainDashlets['values']);
+    }
+
+    // Restrict query to Dashlets in this domain.
+    $domainDashletClause = !empty($domainDashletIDs) ? "dashboard_id IN (" . implode(',', $domainDashletIDs) . ")" : '(1)';
+
+    // Target only those Dashlets which are inactive.
+    $dashletClause = $dashletIDs ? "dashboard_id NOT IN (" . implode(',', $dashletIDs) . ")" : '(1)';
+
+    // Build params.
+    $params = [
+      1 => [$contactID, 'Integer'],
+    ];
+
+    // Build query.
     $updateQuery = "UPDATE civicrm_dashboard_contact
                     SET is_active = 0
-                    WHERE $dashletClause AND contact_id = {$contactID}";
+                    WHERE $domainDashletClause
+                    AND $dashletClause
+                    AND contact_id = %1";
 
-    CRM_Core_DAO::executeQuery($updateQuery);
+    // Disable inactive widgets.
+    CRM_Core_DAO::executeQuery($updateQuery, $params);
   }
 
   /**
@@ -377,7 +387,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   public static function addDashlet(&$params) {
 
     // special case to handle duplicate entries for report instances
-    $dashboardID = CRM_Utils_Array::value('id', $params);
+    $dashboardID = $params['id'] ?? NULL;
 
     if (!empty($params['instanceURL'])) {
       $query = "SELECT id
@@ -389,26 +399,20 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashlet = new CRM_Core_DAO_Dashboard();
 
     if (!$dashboardID) {
-      // check url is same as exiting entries, if yes just update existing
-      if (!empty($params['name'])) {
-        $dashlet->name = CRM_Utils_Array::value('name', $params);
+      // Assign domain before search to allow identical dashlets in different domains.
+      $dashlet->domain_id = $params['domain_id'] ?? CRM_Core_Config::domainID();
+
+      // Try and find an existing dashlet - it will be updated if found.
+      if (!empty($params['name']) || !empty($params['url'])) {
+        $dashlet->name = $params['name'] ?? NULL;
+        $dashlet->url = $params['url'] ?? NULL;
         $dashlet->find(TRUE);
-      }
-      else {
-        $dashlet->url = CRM_Utils_Array::value('url', $params);
-        $dashlet->find(TRUE);
-      }
-      if (empty($params['domain_id'])) {
-        $dashlet->domain_id = CRM_Core_Config::domainID();
       }
     }
     else {
       $dashlet->id = $dashboardID;
     }
 
-    if (is_array(CRM_Utils_Array::value('permission', $params))) {
-      $params['permission'] = implode(',', $params['permission']);
-    }
     $dashlet->copyValues($params);
     $dashlet->save();
 
@@ -428,7 +432,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     // if dashlet is created by admin then you need to add it all contacts.
     // else just add to contact who is creating this dashlet
-    $contactIDs = array();
+    $contactIDs = [];
     if ($admin) {
       $query = "SELECT distinct( contact_id )
                         FROM civicrm_dashboard_contact";
@@ -475,11 +479,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    */
   public static function addContactDashletToDashboard(&$params) {
     $valuesString = NULL;
-    $columns = array();
+    $columns = [];
     foreach ($params as $dashboardIDs) {
-      $contactID = CRM_Utils_Array::value('contact_id', $dashboardIDs);
-      $dashboardID = CRM_Utils_Array::value('dashboard_id', $dashboardIDs);
-      $column = CRM_Utils_Array::value('column_no', $dashboardIDs, 0);
+      $contactID = $dashboardIDs['contact_id'] ?? NULL;
+      $dashboardID = $dashboardIDs['dashboard_id'] ?? NULL;
+      $column = $dashboardIDs['column_no'] ?? 0;
       $columns[$column][$dashboardID] = 0;
     }
     self::saveDashletChanges($columns, $contactID);
@@ -487,19 +491,18 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Delete Dashlet.
-   *
+   * @deprecated
    * @param int $dashletID
-   *
    * @return bool
    */
   public static function deleteDashlet($dashletID) {
-    $dashlet = new CRM_Core_DAO_Dashboard();
-    $dashlet->id = $dashletID;
-    if (!$dashlet->find(TRUE)) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_Dashboard::deleteRecord');
+    try {
+      CRM_Core_DAO_Dashboard::deleteRecord(['id' => $dashletID]);
+    }
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
-    $dashlet->delete();
     return TRUE;
   }
 

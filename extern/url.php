@@ -4,17 +4,17 @@ require_once 'CRM/Core/Config.php';
 require_once 'CRM/Core/Error.php';
 require_once 'CRM/Utils/Array.php';
 
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 
 // To keep backward compatibility for URLs generated
 // by CiviCRM < 1.7, we check for the q variable as well.
 if (isset($_GET['qid'])) {
-  $queue_id = CRM_Utils_Array::value('qid', $_GET);
+  $queue_id = $_GET['qid'] ?? NULL;
 }
 else {
-  $queue_id = CRM_Utils_Array::value('q', $_GET);
+  $queue_id = $_GET['q'] ?? NULL;
 }
-$url_id = CRM_Utils_Array::value('u', $_GET);
+$url_id = $_GET['u'] ?? NULL;
 
 if (!$url_id) {
   echo "Missing input parameters\n";

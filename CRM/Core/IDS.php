@@ -1,45 +1,30 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_IDS {
 
   /**
    * Define the threshold for the ids reactions.
+   * @var array
    */
-  private $threshold = array(
+  private $threshold = [
     'log' => 25,
     'warn' => 50,
     'kick' => 75,
-  );
+  ];
 
   /**
    * @var string
@@ -62,7 +47,7 @@ class CRM_Core_IDS {
     }
 
     // lets bypass a few civicrm urls from this check
-    $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
+    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates'];
     CRM_Utils_Hook::idsException($skip);
     $this->path = $route['path'];
     if (in_array($this->path, $skip)) {
@@ -117,20 +102,20 @@ class CRM_Core_IDS {
    */
   public static function createBaseConfig() {
     $config = \CRM_Core_Config::singleton();
-    $tmpDir = empty($config->uploadDir) ? CIVICRM_TEMPLATE_COMPILEDIR : $config->uploadDir;
-    global $civicrm_root;
+    $tmpDir = empty($config->uploadDir) ? Civi::paths()->getVariable('civicrm.compile', 'path') : $config->uploadDir;
+    $pkgs = Civi::paths()->getVariable('civicrm.packages', 'path');
 
-    return array(
-      'General' => array(
+    return [
+      'General' => [
         'filter_type' => 'xml',
-        'filter_path' => "{$civicrm_root}/packages/IDS/default_filter.xml",
+        'filter_path' => "{$pkgs}/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
-        'HTML_Purifier_Path' => 'IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
+        'HTML_Purifier_Path' => $pkgs . '/IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
-        'exceptions' => array('__utmz', '__utmc'),
-      ),
-    );
+        'exceptions' => ['__utmz', '__utmc'],
+      ],
+    ];
   }
 
   /**
@@ -139,7 +124,7 @@ class CRM_Core_IDS {
    * @return array
    */
   public static function createStandardConfig() {
-    $excs = array(
+    $excs = [
       'widget_code',
       'html_message',
       'text_message',
@@ -173,7 +158,7 @@ class CRM_Core_IDS {
       'suggested_message',
       'page_text',
       'details',
-    );
+    ];
 
     $result = self::createBaseConfig();
 
@@ -191,10 +176,10 @@ class CRM_Core_IDS {
    */
   public static function createRouteConfig($route) {
     $config = \CRM_Core_IDS::createStandardConfig();
-    foreach (array('json', 'html', 'exceptions') as $section) {
+    foreach (['json', 'html', 'exceptions'] as $section) {
       if (isset($route['ids_arguments'][$section])) {
         if (!isset($config['General'][$section])) {
-          $config['General'][$section] = array();
+          $config['General'][$section] = [];
         }
         foreach ($route['ids_arguments'][$section] as $v) {
           $config['General'][$section][] = $v;
@@ -246,15 +231,13 @@ class CRM_Core_IDS {
    * @return bool
    */
   private function log($result, $reaction = 0) {
-    $ip = (isset($_SERVER['SERVER_ADDR']) &&
-      $_SERVER['SERVER_ADDR'] != '127.0.0.1') ? $_SERVER['SERVER_ADDR'] : (
-      isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '127.0.0.1'
-      );
+    // Include X_FORWARD_FOR ip address if set as per IDS patten.
+    $ip = $_SERVER['REMOTE_ADDR'] . (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? ' (' . $_SERVER['HTTP_X_FORWARDED_FOR'] . ')' : '');
 
-    $data = array();
+    $data = [];
     $session = CRM_Core_Session::singleton();
     foreach ($result as $event) {
-      $data[] = array(
+      $data[] = [
         'name' => $event->getName(),
         'value' => stripslashes($event->getValue()),
         'page' => $_SERVER['REQUEST_URI'],
@@ -263,7 +246,7 @@ class CRM_Core_IDS {
         'ip' => $ip,
         'reaction' => $reaction,
         'impact' => $result->getImpact(),
-      );
+      ];
     }
 
     CRM_Core_Error::debug_var('IDS Detector Details', $data);
@@ -294,18 +277,18 @@ class CRM_Core_IDS {
 
     if (in_array(
       $this->path,
-      array("civicrm/ajax/rest", "civicrm/api/json")
+      ["civicrm/ajax/rest", "civicrm/api/json"]
     )) {
       require_once "api/v3/utils.php";
       $error = civicrm_api3_create_error(
         $msg,
-        array(
+        [
           'IP' => $_SERVER['REMOTE_ADDR'],
           'error_code' => 'IDS_KICK',
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],
           'reason' => 'XSS suspected',
-        )
+        ]
       );
       CRM_Utils_JSON::output($error);
     }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
@@ -37,7 +21,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Class constructor.
@@ -173,7 +157,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
         }
       }
     }
-    $paymentParams['status_id'] = CRM_Utils_Array::value('status_id', $params);
+    $paymentParams['status_id'] = $params['status_id'] ?? NULL;
 
     $pledge = self::add($params);
     if (is_a($pledge, 'CRM_Core_Error')) {
@@ -211,7 +195,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
         'actual_amount',
       );
       foreach ($paymentKeys as $key) {
-        $paymentParams[$key] = CRM_Utils_Array::value($key, $params, NULL);
+        $paymentParams[$key] = $params[$key] ?? NULL;
       }
       CRM_Pledge_BAO_PledgePayment::create($paymentParams);
     }
@@ -540,14 +524,14 @@ GROUP BY  currency
             $contributionParams, $contributionStatus, $returnProperties
           );
           $contributionValue = array(
-            'status' => CRM_Utils_Array::value('contribution_status_id', $contributionStatus),
-            'receive_date' => CRM_Utils_Array::value('receive_date', $contributionStatus),
+            'status' => $contributionStatus['contribution_status_id'] ?? NULL,
+            'receive_date' => $contributionStatus['receive_date'] ?? NULL,
           );
         }
         $payments[$payID] = array_merge($contributionValue,
           array(
-            'amount' => CRM_Utils_Array::value('scheduled_amount', $values),
-            'due_date' => CRM_Utils_Array::value('scheduled_date', $values),
+            'amount' => $values['scheduled_amount'] ?? NULL,
+            'due_date' => $values['scheduled_date'] ?? NULL,
           )
         );
 
@@ -642,8 +626,8 @@ GROUP BY  currency
 
     // check for online pledge.
     if (!empty($params['receipt_from_email'])) {
-      $userName = CRM_Utils_Array::value('receipt_from_name', $params);
-      $userEmail = CRM_Utils_Array::value('receipt_from_email', $params);
+      $userName = $params['receipt_from_name'] ?? NULL;
+      $userEmail = $params['receipt_from_email'] ?? NULL;
     }
     elseif (!empty($params['from_email_id'])) {
       $receiptFrom = $params['from_email_id'];
@@ -654,8 +638,8 @@ GROUP BY  currency
     }
     else {
       // set the domain values.
-      $userName = CRM_Utils_Array::value('name', $domainValues);
-      $userEmail = CRM_Utils_Array::value('email', $domainValues);
+      $userName = $domainValues['name'] ?? NULL;
+      $userEmail = $domainValues['email'] ?? NULL;
     }
 
     if (!isset($receiptFrom)) {
@@ -699,7 +683,7 @@ GROUP BY  currency
         'is_test' => $params['is_test'],
         'status_id' => 2,
         'details' => $details,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
+        'campaign_id' => $params['campaign_id'] ?? NULL,
       );
 
       // lets insert assignee record.
@@ -798,10 +782,10 @@ GROUP BY  currency
 
     // get pending and in progress status
     foreach (array(
-               'Pending',
-               'In Progress',
-               'Overdue',
-             ) as $name) {
+      'Pending',
+      'In Progress',
+      'Overdue',
+    ) as $name) {
       if ($statusId = array_search($name, $pledgeStatuses)) {
         $status[] = $statusId;
       }
@@ -1106,7 +1090,7 @@ SELECT  pledge.contact_id              as contact_id,
    *   Array of int (civicrm_pledge_payment.id)
    */
   public static function findCancelablePayments($pledgeID) {
-    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());
+    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'));
 
     $paymentDAO = new CRM_Pledge_DAO_PledgePayment();
     $paymentDAO->pledge_id = $pledgeID;
@@ -1145,7 +1129,7 @@ SELECT  pledge.contact_id              as contact_id,
 
     return civicrm_api3('pledge_payment', 'getcount', array(
       'pledge_id' => $pledgeID,
-      'contribution_id' => array('NOT NULL' => TRUE),
+      'contribution_id' => array('IS NOT NULL' => TRUE),
     ));
   }
 
@@ -1174,7 +1158,6 @@ SELECT  pledge.contact_id              as contact_id,
     return array_flip(array_intersect($paymentStatus, array('Overdue', 'Pending')));
   }
 
-
   /**
    * Create array for recur record for pledge.
    * @return array
@@ -1201,7 +1184,7 @@ SELECT  pledge.contact_id              as contact_id,
   public static function getPledgeStartDate($date, $pledgeBlock) {
     $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
     foreach ($startDate as $field => $value) {
-      if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+      if (!empty($date) && empty($pledgeBlock['is_pledge_start_date_editable'])) {
         return $date;
       }
       if (empty($date)) {

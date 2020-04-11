@@ -87,9 +87,12 @@
   </index>
   <field>
     <name>is_primary</name>
-    <title>Is IM Primary?</title>
+    <title>Primary IM</title>
     <type>boolean</type>
     <default>0</default>
+    <html>
+      <type>Radio</type>
+    </html>
     <comment>Is this the primary IM for this contact and location.</comment>
     <add>1.1</add>
   </field>

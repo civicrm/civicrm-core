@@ -1,0 +1,11 @@
+{htxt id="activityAsgmtGrps"}
+  <p>
+    {ts}Selecting one or more groups here will limit the choices when assigning an activity.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="restrictActivityAsgmtToCmsUser"}
+  <p>
+    {ts}This will limit the choices when selecting an activity assignee to contacts with a user account on this website.{/ts}
+  </p>
+{/htxt}

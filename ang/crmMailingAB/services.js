@@ -147,11 +147,12 @@
       // Schedule the final mailing
       // @return Promise CrmMailingAB
       // Note: Submission may cause the server state to change. Consider abtest.submit().then(...abtest.load()...)
-      submitFinal: function submitFinal() {
+      submitFinal: function submitFinal(winner_id) {
         var crmMailingAB = this;
         var params = {
           id: this.ab.id,
           status: 'Final',
+          winner_id: winner_id,
           approval_date: 'now',
           scheduled_date: this.mailings.c.scheduled_date ? this.mailings.c.scheduled_date : 'now'
         };

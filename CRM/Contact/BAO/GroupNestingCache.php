@@ -1,46 +1,30 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_GroupNestingCache {
 
   /**
    * Update cache.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
-  static public function update() {
+  public static function update() {
     // lets build the tree in memory first
 
-    $sql = "
+    $sql = '
 SELECT n.child_group_id  as child ,
        n.parent_group_id as parent
 FROM   civicrm_group_nesting n,
@@ -48,24 +32,24 @@ FROM   civicrm_group_nesting n,
        civicrm_group gp
 WHERE  n.child_group_id  = gc.id
   AND  n.parent_group_id = gp.id
-";
+';
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $tree = array();
+    $tree = [];
     while ($dao->fetch()) {
       if (!array_key_exists($dao->child, $tree)) {
-        $tree[$dao->child] = array(
-          'children' => array(),
-          'parents' => array(),
-        );
+        $tree[$dao->child] = [
+          'children' => [],
+          'parents' => [],
+        ];
       }
 
       if (!array_key_exists($dao->parent, $tree)) {
-        $tree[$dao->parent] = array(
-          'children' => array(),
-          'parents' => array(),
-        );
+        $tree[$dao->parent] = [
+          'children' => [],
+          'parents' => [],
+        ];
       }
 
       $tree[$dao->child]['parents'][] = $dao->parent;
@@ -73,18 +57,18 @@ WHERE  n.child_group_id  = gc.id
     }
 
     if (self::checkCyclicGraph($tree)) {
-      CRM_Core_Error::fatal(ts("We detected a cycle which we can't handle. aborting"));
+      throw new CRM_Core_Exception(ts('We detected a cycle which we can\'t handle. aborting'));
     }
 
     // first reset the current cache entries
-    $sql = "
+    $sql = '
 UPDATE civicrm_group
 SET    parents  = null,
        children = null
-";
+';
     CRM_Core_DAO::executeQuery($sql);
 
-    $values = array();
+    $values = [];
     foreach (array_keys($tree) as $id) {
       $parents = implode(',', $tree[$id]['parents']);
       $children = implode(',', $tree[$id]['children']);
@@ -100,7 +84,7 @@ WHERE  id = $id
     }
 
     // this tree stuff is quite useful, so lets store it in the cache
-    CRM_Core_BAO_Cache::setItem($tree, 'contact groups', 'nestable tree hierarchy');
+    Civi::cache('groups')->set('nestable tree hierarchy', $tree);
   }
 
   /**
@@ -129,7 +113,7 @@ WHERE  id = $id
    * @return bool
    */
   public static function isCyclic(&$tree, $id) {
-    $parents = $children = array();
+    $parents = $children = [];
     self::getAll($parent, $tree, $id, 'parents');
     self::getAll($child, $tree, $id, 'children');
 
@@ -148,16 +132,17 @@ WHERE  id = $id
 
   /**
    * @param int $id
-   * @param $groups
+   * @param array $groups
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getPotentialCandidates($id, &$groups) {
-    $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+    $tree = Civi::cache('groups')->get('nestable tree hierarchy');
 
     if ($tree === NULL) {
       self::update();
-      $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+      $tree = Civi::cache('groups')->get('nestable tree hierarchy');
     }
 
     $potential = $groups;
@@ -217,13 +202,15 @@ WHERE  id = $id
 
   /**
    * @return string
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function json() {
-    $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+    $tree = Civi::cache('groups')->get('nestable tree hierarchy');
 
     if ($tree === NULL) {
       self::update();
-      $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+      $tree = Civi::cache('groups')->get('nestable tree hierarchy');
     }
 
     // get all the groups
@@ -232,7 +219,7 @@ WHERE  id = $id
     foreach ($groups as $id => $name) {
       $string = "id:'$id', name:'$name'";
       if (isset($tree[$id])) {
-        $children = array();
+        $children = [];
         if (!empty($tree[$id]['children'])) {
           foreach ($tree[$id]['children'] as $child) {
             $children[] = "{_reference:'$child'}";

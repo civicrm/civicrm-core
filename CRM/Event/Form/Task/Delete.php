@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -44,7 +28,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
    * Are we operating in "single mode", i.e. deleting one
    * specific participation?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
@@ -57,7 +41,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
 
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviEvent', CRM_Core_Action::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     parent::preProcess();
     foreach ($this->_participantIds as $participantId) {
@@ -74,13 +58,13 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $deleteParticipants = array(
+    $deleteParticipants = [
       1 => ts('Delete this participant record along with associated participant record(s).'),
       2 => ts('Delete only this participant record.'),
-    );
+    ];
 
     $this->addRadio('delete_participant', NULL, $deleteParticipants, NULL, '<br />');
-    $this->setDefaults(array('delete_participant' => 1));
+    $this->setDefaults(['delete_participant' => 1]);
 
     $this->addDefaultButtons(ts('Delete Participations'), 'done');
   }
@@ -96,7 +80,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
 
     $participantLinks = NULL;
     if (CRM_Utils_Array::value('delete_participant', $params) == 2) {
-      $links = array();
+      $links = [];
       foreach ($this->_participantIds as $participantId) {
         $additionalId = (CRM_Event_BAO_Participant::getAdditionalParticipantIds($participantId));
         $participantLinks = (CRM_Event_BAO_Participant::getAdditionalParticipantUrl($additionalId));
@@ -131,7 +115,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
       $deletedParticipants += $additionalCount;
     }
 
-    $status = ts('%count participant deleted.', array('plural' => '%count participants deleted.', 'count' => $deletedParticipants));
+    $status = ts('%count participant deleted.', ['plural' => '%count participants deleted.', 'count' => $deletedParticipants]);
 
     if ($participantLinks) {
       $status .= '<p>' . ts('The following participants no longer have an event fee recorded. You can edit their registration and record a replacement contribution by clicking the links below:')

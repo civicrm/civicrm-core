@@ -1,10 +1,8 @@
 // http://civicrm.org/licensing
-CRM.$(function($) {
-  $('#admin-bar').css('display', 'none');
-  $('.crm-hidemenu').click(function(e) {
-    $('#admin-bar').css('display', 'block');
+(function($) {
+  $(document).on('crmLoad', '#civicrm-menu', function() {
+    if (Backdrop.settings.admin_bar && !Backdrop.settings.admin_bar.position_fixed) {
+      $('body').addClass('backdrop-admin-bar-position-absolute');
+    }
   });
-  $('#crm-notification-container').on('click', '#crm-restore-menu', function() {
-    $('#admin-bar').css('display', 'none');
-  });
-});
+})(CRM.$);

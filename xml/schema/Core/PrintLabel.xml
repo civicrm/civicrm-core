@@ -22,7 +22,7 @@
     <title>Title</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>User title for for this label layout</comment>
+    <comment>User title for this label layout</comment>
     <add>4.4</add>
   </field>
   <field>

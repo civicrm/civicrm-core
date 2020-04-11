@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -35,7 +19,7 @@
  * if introducing additional functionality
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Sort {
 
@@ -116,15 +100,15 @@ class CRM_Utils_Sort {
    * @return \CRM_Utils_Sort
    */
   public function __construct(&$vars, $defaultSortOrder = NULL) {
-    $this->_vars = array();
-    $this->_response = array();
+    $this->_vars = [];
+    $this->_response = [];
 
     foreach ($vars as $weight => $value) {
-      $this->_vars[$weight] = array(
+      $this->_vars[$weight] = [
         'name' => CRM_Utils_Type::validate($value['sort'], 'MysqlColumnNameOrAlias'),
-        'direction' => CRM_Utils_Array::value('direction', $value),
+        'direction' => $value['direction'] ?? NULL,
         'title' => $value['name'],
-      );
+      ];
     }
 
     $this->_currentSortID = 1;
@@ -219,12 +203,12 @@ class CRM_Utils_Sort {
   public function initialize($defaultSortOrder) {
     $this->initSortID($defaultSortOrder);
 
-    $this->_response = array();
+    $this->_response = [];
 
     $current = $this->_currentSortID;
     foreach ($this->_vars as $index => $item) {
       $name = $item['name'];
-      $this->_response[$name] = array();
+      $this->_response[$name] = [];
 
       $newDirection = ($item['direction'] == self::ASCENDING) ? self::DESCENDING : self::ASCENDING;
 
@@ -274,7 +258,7 @@ class CRM_Utils_Sort {
    *   (-1 or 1)
    */
   public static function cmpFunc($a, $b) {
-    $cmp_order = array('weight', 'id', 'title', 'name');
+    $cmp_order = ['weight', 'id', 'title', 'name'];
     foreach ($cmp_order as $attribute) {
       if (isset($a[$attribute]) && isset($b[$attribute])) {
         if ($a[$attribute] < $b[$attribute]) {

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
 
@@ -42,97 +26,97 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
     $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     asort($this->activityTypes);
 
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Modified By'),
             'required' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => ts('Modified By'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_contact_touched' => array(
+      ],
+      'civicrm_contact_touched' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name_touched' => array(
+        'fields' => [
+          'sort_name_touched' => [
             'title' => ts('Touched Contact'),
             'name' => 'sort_name',
             'required' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sort_name_touched' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name_touched' => [
             'title' => ts('Touched Contact'),
             'name' => 'sort_name',
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_activity' => array(
+      ],
+      'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Activity ID'),
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'subject' => array(
+          ],
+          'subject' => [
             'title' => ts('Touched Activity'),
             'required' => TRUE,
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => ts('Activity Type'),
             'required' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_activity_source' => array(
+          ],
+        ],
+      ],
+      'civicrm_activity_source' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-          'contact_id' => array(
+        'fields' => [
+          'contact_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_log' => array(
+          ],
+        ],
+      ],
+      'civicrm_log' => [
         'dao' => 'CRM_Core_DAO_Log',
-        'fields' => array(
-          'modified_date' => array(
+        'fields' => [
+          'modified_date' => [
             'title' => ts('Modified Date'),
             'required' => TRUE,
-          ),
-          'data' => array(
+          ],
+          'data' => [
             'title' => ts('Description'),
-          ),
-        ),
-        'filters' => array(
-          'modified_date' => array(
+          ],
+        ],
+        'filters' => [
+          'modified_date' => [
             'title' => ts('Modified Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
             'default' => 'this.week',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
 
     parent::__construct();
   }
@@ -142,8 +126,8 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -152,7 +136,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
           ) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
           }
         }
@@ -170,7 +154,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
+    $errors = $grouping = [];
     return $errors;
   }
 
@@ -189,7 +173,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
     $this->_having = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -197,14 +181,14 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
           $clause = NULL;
           if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
           ) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to);
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,

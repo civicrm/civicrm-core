@@ -24,6 +24,11 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_price_set</comment>
+    <pseudoconstant>
+      <table>civicrm_price_set</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>1.8</add>
   </field>
   <foreignKey>
@@ -174,7 +179,8 @@
     <comment>If non-zero, do not show this field before the date specified</comment>
     <add>1.8</add>
     <html>
-      <type>CheckBox</type>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -186,6 +192,7 @@
     <add>1.8</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -222,4 +229,3 @@
     <drop>3.3</drop>
   </field>
 </table>
-

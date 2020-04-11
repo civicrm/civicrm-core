@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -36,102 +20,101 @@
  * Settings metadata file
  */
 
-return array(
-  'uploadDir' => array(
+return [
+  'uploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'uploadDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Temporary Files Directory',
+    'title' => ts('Temporary Files Directory'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => 'File system path where temporary CiviCRM files - such as import data files - are uploaded.',
-  ),
-  'imageUploadDir' => array(
+  ],
+  'imageUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'imageUploadDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Image Directory',
+    'title' => ts('Image Directory'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'File system path where image files are uploaded. Currently, this path is used for images associated with premiums (CiviContribute thank-you gifts).',
+    'description' => ts('File system path where image files are uploaded. Currently, this path is used for images associated with premiums (CiviContribute thank-you gifts).'),
     'help_text' => NULL,
-  ),
-  'customFileUploadDir' => array(
+  ],
+  'customFileUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customFileUploadDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Custom Files Directory',
+    'title' => ts('Custom Files Directory'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using \'file\' type custom fields.',
+    'description' => ts('Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using \'file\' type custom fields.'),
     'help_text' => NULL,
-  ),
-  'customTemplateDir' => array(
+  ],
+  'customTemplateDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customTemplateDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Custom Template Directory',
+    'title' => ts('Custom Template Directory'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named templateFile.extra.tpl. (learn more...)',
+    'description' => ts('Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named templateFile.extra.tpl. (learn more...)'),
     'help_text' => NULL,
-  ),
-  'customPHPPathDir' => array(
+  ],
+  'customPHPPathDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customPHPPathDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Custom PHP Directory',
+    'title' => ts('Custom PHP Directory'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Path where site specific PHP code files are stored if any. This directory is searched first if set.',
+    'description' => ts('Path where site specific PHP code files are stored if any. This directory is searched first if set.'),
     'help_text' => NULL,
-  ),
-  'extensionsDir' => array(
+  ],
+  'extensionsDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'extensionsDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Extensions Directory',
+    'title' => ts('Extensions Directory'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Path where CiviCRM extensions are stored.',
+    'description' => ts('Path where CiviCRM extensions are stored.'),
     'help_text' => NULL,
-  ),
+  ],
 
-);
+];

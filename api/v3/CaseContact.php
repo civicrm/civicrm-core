@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -84,21 +68,21 @@ function civicrm_api3_case_contact_delete($params) {
  * @return array
  */
 function _civicrm_api3_case_contact_getlist_output($result, $request, $entity, $fields) {
-  $output = array();
+  $output = [];
   if (!empty($result['values'])) {
     foreach ($result['values'] as $row) {
-      $data = array(
+      $data = [
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']] . ' - ' . $row['case_id.case_type_id.title'],
-      );
+      ];
       $status = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $row['case_id.status_id']);
       $date = CRM_Utils_Date::customFormat($row['case_id.start_date']);
-      $data['description'] = array(
-        "#{$row['case_id']}: $status " . ts('(opened %1)', array(1 => $date)),
+      $data['description'] = [
+        "#{$row['case_id']}: $status " . ts('(opened %1)', [1 => $date]),
         $row['case_id.subject'],
-      );
+      ];
       if (!empty($request['image_field'])) {
-        $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
+        $data['image'] = $row[$request['image_field']] ?? '';
       }
       $output[] = $data;
     }

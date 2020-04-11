@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
@@ -38,7 +22,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   protected $_paymentProcessorID;
   protected $currency;
 
-  public $_values = array();
+  public $_values = [];
 
   /**
    * @var array
@@ -51,7 +35,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public $isBackOffice = FALSE;
 
   /**
-   * @var String
+   * @var string
    */
   public $_formName = '';
 
@@ -79,11 +63,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
-    self::addCreditCardJs($this->_paymentProcessorID);
-
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
-    $this->assign('currency', $this->currency);
-
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
   }
@@ -96,7 +75,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    *
    * @return string
    */
-  public function getCurrency($submittedValues = array()) {
+  public function getCurrency($submittedValues = []) {
     return $this->currency;
   }
 
@@ -124,7 +103,19 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    */
   public static function addCreditCardJs($paymentProcessorID = NULL, $region = 'billing-block') {
     $creditCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessorID);
-    $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames($creditCards);
+    if (empty($creditCards)) {
+      $creditCards = CRM_Contribute_PseudoConstant::creditCard();
+    }
+    $creditCardTypes = [];
+    foreach ($creditCards as $name => $label) {
+      $creditCardTypes[$name] = [
+        'label' => $label,
+        'name' => $name,
+        'css_key' => self::getCssLabelFriendlyName($name),
+        'pattern' => self::getCardPattern($name),
+      ];
+    }
+
     CRM_Core_Resources::singleton()
       // CRM-20516: add BillingBlock script on billing-block region
       //  to support this feature in payment form snippet too.
@@ -132,6 +123,51 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
       // workaround for CRM-13634
       // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
       ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';', '-9999', $region);
+  }
+
+  /**
+   * Get css friendly labels for credit cards.
+   *
+   * We add the icons based on these css names which are lower cased
+   * and only AlphaNumeric (+ _).
+   *
+   * @param $key
+   *
+   * @return string
+   */
+  protected static function getCssLabelFriendlyName($key) {
+    $key = str_replace(' ', '', $key);
+    $key = preg_replace('/[^a-zA-Z0-9]/', '_', $key);
+    $key = strtolower($key);
+
+    return $key;
+  }
+
+  /**
+   * Get the pattern that can be used to determine the card type.
+   *
+   * We do a strotolower comparison as we don't know what case people might have if they
+   * are using a non-std one like dinersclub.
+   *
+   * @param $key
+   *
+   * Based on http://davidwalsh.name/validate-credit-cards
+   * See also https://en.wikipedia.org/wiki/Credit_card_numbers
+   *
+   * @return string
+   */
+  protected static function getCardPattern($key) {
+    $cardMappings = [
+      'mastercard' => '(5[1-5][0-9]{2}|2[3-6][0-9]{2}|22[3-9][0-9]|222[1-9]|27[0-1][0-9]|2720)[0-9]{12}',
+      'visa' => '4(?:[0-9]{12}|[0-9]{15})',
+      'amex' => '3[47][0-9]{13}',
+      'dinersclub' => '3(?:0[0-5][0-9]{11}|[68][0-9]{12})',
+      'carteblanche' => '3(?:0[0-5][0-9]{11}|[68][0-9]{12})',
+      'discover' => '6011[0-9]{12}',
+      'jcb' => '(?:3[0-9]{15}|(2131|1800)[0-9]{11})',
+      'unionpay' => '62(?:[0-9]{14}|[0-9]{17})',
+    ];
+    return isset($cardMappings[strtolower($key)]) ? $cardMappings[strtolower($key)] : '';
   }
 
 }

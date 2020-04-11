@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,12 +15,13 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Case_Info extends CRM_Core_Component_Info {
 
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'case';
@@ -46,13 +31,13 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviCase',
       'translatedName' => ts('CiviCase'),
       'title' => ts('CiviCase Engine'),
       'search' => 1,
-      'showActivitiesInCore' => 0,
-    );
+      'showActivitiesInCore' => Civi::settings()->get('civicaseShowCaseActivities') ?? 0,
+    ];
   }
 
   /**
@@ -61,7 +46,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   public function getAngularModules() {
     global $civicrm_root;
 
-    $result = array();
+    $result = [];
     $result['crmCaseType'] = include "$civicrm_root/ang/crmCaseType.ang.php";
     return $result;
   }
@@ -89,28 +74,28 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'delete in CiviCase' => array(
+    $permissions = [
+      'delete in CiviCase' => [
         ts('delete in CiviCase'),
         ts('Delete cases'),
-      ),
-      'administer CiviCase' => array(
+      ],
+      'administer CiviCase' => [
         ts('administer CiviCase'),
         ts('Define case types, access deleted cases'),
-      ),
-      'access my cases and activities' => array(
+      ],
+      'access my cases and activities' => [
         ts('access my cases and activities'),
         ts('View and edit only those cases managed by this user'),
-      ),
-      'access all cases and activities' => array(
+      ],
+      'access all cases and activities' => [
         ts('access all cases and activities'),
         ts('View and edit all cases (for visible contacts)'),
-      ),
-      'add cases' => array(
+      ],
+      'add cases' => [
         ts('add cases'),
         ts('Open a new case'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -125,7 +110,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @inheritDoc
    */
   public function getReferenceCounts($dao) {
-    $result = array();
+    $result = [];
     if ($dao instanceof CRM_Core_DAO_OptionValue) {
       /** @var $dao CRM_Core_DAO_OptionValue */
       $activity_type_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_type', 'id', 'name');
@@ -133,24 +118,30 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
         $count = CRM_Case_XMLRepository::singleton()
           ->getActivityReferenceCount($dao->name);
         if ($count > 0) {
-          $result[] = array(
+          $result[] = [
             'name' => 'casetypexml:activities',
             'type' => 'casetypexml',
             'count' => $count,
-          );
+          ];
         }
       }
     }
     elseif ($dao instanceof CRM_Contact_DAO_RelationshipType) {
       /** @var $dao CRM_Contact_DAO_RelationshipType */
-      $count = CRM_Case_XMLRepository::singleton()
-        ->getRelationshipReferenceCount($dao->{CRM_Case_XMLProcessor::REL_TYPE_CNAME});
+
+      // Need to look both directions, but no need to translate case role
+      // direction from XML perspective to client-based perspective
+      $xmlRepo = CRM_Case_XMLRepository::singleton();
+      $count = $xmlRepo->getRelationshipReferenceCount($dao->label_a_b);
+      if ($dao->label_a_b != $dao->label_b_a) {
+        $count += $xmlRepo->getRelationshipReferenceCount($dao->label_b_a);
+      }
       if ($count > 0) {
-        $result[] = array(
+        $result[] = [
           'name' => 'casetypexml:relationships',
           'type' => 'casetypexml',
           'count' => $count,
-        );
+        ];
       }
     }
     return $result;
@@ -161,7 +152,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getUserDashboardElement() {
-    return array();
+    return [];
   }
 
   /**
@@ -169,11 +160,19 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Cases'),
       'url' => 'case',
       'weight' => 50,
-    );
+    ];
+  }
+
+  /**
+   * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-folder-open-o';
   }
 
   /**
@@ -181,10 +180,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Cases'),
       'weight' => 50,
-    );
+    ];
   }
 
   /**
@@ -205,14 +204,14 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     ) {
       $activityType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       if ($activityType) {
-        $shortCuts = array_merge($shortCuts, array(
-          array(
+        $shortCuts = array_merge($shortCuts, [
+          [
             'path' => 'civicrm/case/add',
             'query' => "reset=1&action=add&atype={$activityType}&context=standalone",
             'ref' => 'new-case',
             'title' => ts('Case'),
-          ),
-        ));
+          ],
+        ]);
       }
     }
   }
@@ -237,10 +236,66 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
       $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
+      self::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
         $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
         CRM_Core_Error::fatal($msg);
+      }
+    }
+  }
+
+  /**
+   * Load case sample data.
+   *
+   * @param string $fileName
+   * @param bool $lineMode
+   */
+  public static function loadCaseSampleData($fileName, $lineMode = FALSE) {
+    $dao = new CRM_Core_DAO();
+    $db = $dao->getDatabaseConnection();
+
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $multiLingual = (bool) $domain->locales;
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('multilingual', $multiLingual);
+    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
+
+    if (!$lineMode) {
+
+      $string = $smarty->fetch($fileName);
+      // change \r\n to fix windows issues
+      $string = str_replace("\r\n", "\n", $string);
+
+      //get rid of comments starting with # and --
+
+      $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
+      $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
+
+      $queries = preg_split('/;$/m', $string);
+      foreach ($queries as $query) {
+        $query = trim($query);
+        if (!empty($query)) {
+          $res = &$db->query($query);
+          if (PEAR::isError($res)) {
+            die("Cannot execute $query: " . $res->getMessage());
+          }
+        }
+      }
+    }
+    else {
+      $fd = fopen($fileName, "r");
+      while ($string = fgets($fd)) {
+        $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
+        $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
+
+        $string = trim($string);
+        if (!empty($string)) {
+          $res = &$db->query($string);
+          if (PEAR::isError($res)) {
+            die("Cannot execute $string: " . $res->getMessage());
+          }
+        }
       }
     }
   }
@@ -250,11 +305,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   Array(string $value => string $label).
    */
   public static function getRedactOptions() {
-    return array(
+    return [
       'default' => ts('Default'),
       '0' => ts('Do not redact emails'),
       '1' => ts('Redact emails'),
-    );
+    ];
   }
 
   /**
@@ -262,11 +317,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   Array(string $value => string $label).
    */
   public static function getMultiClientOptions() {
-    return array(
+    return [
       'default' => ts('Default'),
       '0' => ts('Single client per case'),
       '1' => ts('Multiple client per case'),
-    );
+    ];
   }
 
   /**
@@ -274,11 +329,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   Array(string $value => string $label).
    */
   public static function getSortOptions() {
-    return array(
+    return [
       'default' => ts('Default'),
       '0' => ts('Definition order'),
       '1' => ts('Alphabetical order'),
-    );
+    ];
   }
 
 }

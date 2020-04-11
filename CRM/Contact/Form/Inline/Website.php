@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -38,11 +22,13 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
 
   /**
    * Websitess of the contact that is been viewed.
+   * @var array
    */
-  private $_websites = array();
+  private $_websites = [];
 
   /**
    * No of website blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 
@@ -53,8 +39,8 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
     parent::preProcess();
 
     //get all the existing websites
-    $params = array('contact_id' => $this->_contactId);
-    $values = array();
+    $params = ['contact_id' => $this->_contactId];
+    $values = [];
     $this->_websites = CRM_Core_BAO_Website::getValues($params, $values);
   }
 
@@ -87,6 +73,8 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Website::buildQuickForm($this, $blockId, TRUE);
     }
 
+    $this->addFormRule(['CRM_Contact_Form_Inline_Website', 'formRule'], $this);
+
   }
 
   /**
@@ -95,7 +83,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_websites)) {
       foreach ($this->_websites as $id => $value) {
         $defaults['website'][$id] = $value;
@@ -126,6 +114,40 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
 
     $this->log();
     $this->response();
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
+   * @param CRM_Contact_Form_Inline_Website $form
+   *
+   * @return array
+   */
+  public static function formRule($fields, $errors, $form) {
+    $hasData = $errors = [];
+    if (!empty($fields['website']) && is_array($fields['website'])) {
+      $types = [];
+      foreach ($fields['website'] as $instance => $blockValues) {
+        $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
+
+        if ($dataExists) {
+          $hasData[] = $instance;
+          if (!empty($blockValues['website_type_id'])) {
+            if (empty($types[$blockValues['website_type_id']])) {
+              $types[$blockValues['website_type_id']] = $blockValues['website_type_id'];
+            }
+            else {
+              $errors["website[" . $instance . "][website_type_id]"] = ts('Contacts may only have one website of each type at most.');
+            }
+          }
+        }
+      }
+    }
+    return $errors;
   }
 
 }

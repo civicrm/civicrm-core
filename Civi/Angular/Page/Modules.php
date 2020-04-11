@@ -24,6 +24,8 @@ class Modules extends \CRM_Core_Page {
    * "civicrm/ajax/anulgar-modules" route).
    *
    * @deprecated
+   *
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     /**
@@ -56,7 +58,7 @@ class Modules extends \CRM_Core_Page {
         break;
 
       default:
-        \CRM_Core_Error::fatal("Unrecognized format");
+        throw new \CRM_Core_Exception("Unrecognized format");
     }
 
     \CRM_Utils_System::civiExit();
@@ -75,19 +77,19 @@ class Modules extends \CRM_Core_Page {
 
     switch ($event->asset) {
       case 'angular-modules.json':
-        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'application/json';
         $event->content = json_encode($page->getMetadata($moduleNames, $angular));
         break;
 
       case 'angular-modules.js':
-        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'application/javascript';
         $event->content = $page->digestJs($angular->getResources($moduleNames, 'js', 'path'));
         break;
 
       case 'angular-modules.css':
-        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'text/css';
         $event->content = \CRM_Utils_File::concat($angular->getResources($moduleNames, 'css', 'path'), "\n");
 
@@ -102,14 +104,14 @@ class Modules extends \CRM_Core_Page {
    * @return string
    */
   public function digestJs($files) {
-    $scripts = array();
+    $scripts = [];
     foreach ($files as $file) {
       $scripts[] = file_get_contents($file);
     }
     $scripts = \CRM_Utils_JS::dedupeClosures(
       $scripts,
-      array('angular', '$', '_'),
-      array('angular', 'CRM.$', 'CRM._')
+      ['angular', '$', '_'],
+      ['angular', 'CRM.$', 'CRM._']
     );
     // This impl of stripComments currently adds 10-20ms and cuts ~7%
     return \CRM_Utils_JS::stripComments(implode("\n", $scripts));
@@ -144,10 +146,10 @@ class Modules extends \CRM_Core_Page {
    */
   public function getMetadata($moduleNames, $angular) {
     $modules = $angular->getModules();
-    $result = array();
+    $result = [];
     foreach ($moduleNames as $moduleName) {
       if (isset($modules[$moduleName])) {
-        $result[$moduleName] = array();
+        $result[$moduleName] = [];
         $result[$moduleName]['domain'] = $modules[$moduleName]['ext'];
         $result[$moduleName]['js'] = $angular->getResources($moduleName, 'js', 'rawUrl');
         $result[$moduleName]['css'] = $angular->getResources($moduleName, 'css', 'rawUrl');

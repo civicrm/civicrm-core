@@ -65,12 +65,12 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes xml ; do
+  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes xml setup ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,CONTRIBUTORS}.txt
-  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md release-notes.md
+  dm_install_files "$repo" "$to" composer.json composer.lock package.json Civi.php README.md release-notes.md extension-compatibility.json
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
@@ -89,6 +89,26 @@ function dm_install_core() {
   set -e
 }
 
+## Copy built-in extensions
+## usage: dm_install_core <core_repo_path> <to_path> <ext-dirs...>
+function dm_install_coreext() {
+  local repo="$1"
+  local to="$2"
+  shift
+  shift
+
+  for relext in "$@" ; do
+    [ ! -d "$to/$relext" ] && mkdir -p "$to/$relext"
+    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/$relext/./" "$to/$relext/./"
+  done
+}
+
+## Get a list of default/core extension directories (space-delimited)
+## reldirs=$(dm_core_exts)
+function dm_core_exts() {
+  echo ext/sequentialcreditnotes
+}
+
 ## Copy all packages
 ## usage: dm_install_packages <packages_repo_path> <to_path>
 function dm_install_packages() {
@@ -96,7 +116,7 @@ function dm_install_packages() {
   local to="$2"
 
   local excludes_rsync=""
-  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents amavisd-new git-footnote PHP/CodeCoverage ; do
+  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents git-footnote PHP/CodeCoverage ; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
@@ -190,17 +210,7 @@ function dm_install_wordpress() {
   ## Need --exclude=civicrm for self-building on WP site
 
   dm_preg_edit '/^Version: [0-9\.]+/m' "Version: $DM_VERSION" "$to/civicrm.php"
-}
-
-
-## Generate the "bower_components" folder.
-## usage: dm_generate_bower <repo_path>
-function dm_generate_bower() {
-  local repo="$1"
-  pushd "$repo"
-    ${DM_NPM:-npm} install
-    ${DM_NODE:-node} node_modules/bower/bin/bower install
-  popd
+  dm_preg_edit "/^define\( \'CIVICRM_PLUGIN_VERSION\',\W'[0-9\.]+/m" "define( 'CIVICRM_PLUGIN_VERSION', '$DM_VERSION" "$to/civicrm.php"
 }
 
 ## Generate the composer "vendor" folder

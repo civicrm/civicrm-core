@@ -1,11 +1,14 @@
-Dear {$contactDisplayName}
+{if $emailGreeting}{$emailGreeting},
+{/if}
+
 {if $isRefund}
 {ts}A refund has been issued based on changes in your registration selections.{/ts}
 {else}
-{ts}A payment has been received.{/ts}
+{ts}Below you will find a receipt for this payment.{/ts}
 {/if}
-
-{ts}Please print this confirmation for your records.{/ts}
+{if $paymentsComplete}
+{ts}Thank you for completing this payment.{/ts}
+{/if}
 
 {if $isRefund}
 ===============================================================================
@@ -13,10 +16,8 @@ Dear {$contactDisplayName}
 {ts}Refund Details{/ts}
 
 ===============================================================================
-{ts}Total Fees{/ts}: {$totalAmount|crmMoney}
-{ts}You Paid{/ts}: {$totalPaid|crmMoney}
+{ts}This Refund Amount{/ts}: {$refundAmount|crmMoney}
 ------------------------------------------------------------------------------------
-{ts}Refund Amount{/ts}: {$refundAmount|crmMoney}
 
 {else}
 ===============================================================================
@@ -24,15 +25,8 @@ Dear {$contactDisplayName}
 {ts}Payment Details{/ts}
 
 ===============================================================================
-{ts}Total Fees{/ts}: {$totalAmount|crmMoney}
 {ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney}
 ------------------------------------------------------------------------------------
-{ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
-
-{if $paymentsComplete}
-
-{ts}Thank you for completing payment.{/ts}
-{/if}
 {/if}
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}
@@ -46,7 +40,18 @@ Dear {$contactDisplayName}
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode eq 'direct' and !$isAmountzero}
+
+===============================================================================
+
+{ts}Contribution Details{/ts}
+
+===============================================================================
+{ts}Total Fee{/ts}: {$totalAmount|crmMoney}
+{ts}Total Paid{/ts}: {$totalPaid|crmMoney}
+{ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
+
+
+{if $billingName || $address}
 
 ===============================================================================
 
@@ -58,7 +63,7 @@ Dear {$contactDisplayName}
 {$address}
 {/if}
 
-{if $contributeMode eq 'direct' and !$isAmountzero}
+{if $credit_card_number}
 ===========================================================
 {ts}Credit Card Information{/ts}
 

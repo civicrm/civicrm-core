@@ -1,41 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
   protected $mockObject;
 
   /**
-   * @var array $adhocHooks to call
+   * @var array
    */
   protected $adhocHooks;
   protected $civiModules = NULL;
@@ -45,7 +29,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    */
   public function reset() {
     $this->mockObject = NULL;
-    $this->adhocHooks = array();
+    $this->adhocHooks = [];
   }
 
   /**
@@ -104,14 +88,14 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
     // run standard hooks
     if ($this->civiModules === NULL) {
-      $this->civiModules = array();
+      $this->civiModules = [];
       $this->requireCiviModules($this->civiModules);
     }
     $fResult1 = $this->runHooks($this->civiModules, $fnSuffix, $numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
 
     // run mock object hooks
-    if ($this->mockObject && is_callable(array($this->mockObject, $fnSuffix))) {
-      $fResult2 = call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+    if ($this->mockObject && is_callable([$this->mockObject, $fnSuffix])) {
+      $fResult2 = call_user_func([$this->mockObject, $fnSuffix], $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
     }
 
     // run adhoc hooks
@@ -119,8 +103,8 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
       $fResult3 = call_user_func_array($this->adhocHooks[$fnSuffix], $params);
     }
 
-    $result = array();
-    foreach (array($fResult1, $fResult2, $fResult3) as $fResult) {
+    $result = [];
+    foreach ([$fResult1, $fResult2, $fResult3] as $fResult) {
       if (!empty($fResult) && is_array($fResult)) {
         $result = array_merge($result, $fResult);
       }

@@ -32,133 +32,158 @@
  */
 class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
 
+  /**
+   * @var int
+   */
+  private $relationshipTypeID;
+
+  /**
+   * @var int
+   */
+  private $organizationContactID;
+
+  /**
+   * @var int
+   */
+  private $financialTypeID;
+
+  /**
+   * @var int
+   */
+  private $membershipStatusID;
+
+  /**
+   * @var int
+   */
+  private $membershipTypeID;
+
+  /**
+   * Set up for test.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp() {
     parent::setUp();
 
-    $params = array(
+    $params = [
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',
       'name_a_b' => 'Test Employee of',
       'name_b_a' => 'Test Employer of',
-    );
-    $this->_relationshipTypeId = $this->relationshipTypeCreate($params);
-    $this->_orgContactID = $this->organizationCreate();
-    $this->_financialTypeId = 1;
+    ];
+    $this->relationshipTypeID = $this->relationshipTypeCreate($params);
+    $this->organizationContactID = $this->organizationCreate();
+    $this->financialTypeID = 1;
 
-    $params = array(
+    $params = [
       'name' => 'test type',
       'description' => NULL,
       'minimum_fee' => 10,
       'duration_unit' => 'year',
-      'member_of_contact_id' => $this->_orgContactID,
+      'member_of_contact_id' => $this->organizationContactID,
       'period_type' => 'fixed',
+      'fixed_period_start_day' => '0101',
+      'fixed_period_rollover_day' => '0101',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_financialTypeId,
-      'relationship_type_id' => $this->_relationshipTypeId,
+      'financial_type_id' => $this->financialTypeID,
+      'relationship_type_id' => $this->relationshipTypeID,
       'visibility' => 'Public',
       'is_active' => 1,
-    );
-    $ids = array();
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
-    $this->_membershipTypeID = $membershipType->id;
-    $this->_mebershipStatusID = $this->membershipStatusCreate('test status');
+    ];
+    $membershipType = CRM_Member_BAO_MembershipType::add($params);
+    $this->membershipTypeID = $membershipType->id;
+    $this->membershipStatusID = $this->membershipStatusCreate('test status');
   }
 
   /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
+   * Tears down the fixture.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
-    $this->relationshipTypeDelete($this->_relationshipTypeId);
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
-    $this->membershipStatusDelete($this->_mebershipStatusID);
-    $this->contactDelete($this->_orgContactID);
+    $this->relationshipTypeDelete($this->relationshipTypeID);
+    $this->quickCleanUpFinancialEntities();
+    $this->restoreMembershipTypes();
+    $this->contactDelete($this->organizationContactID);
+    parent::tearDown();
   }
 
   /**
-   *  Test add()
+   *  Test del function.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testadd() {
-    $contactId = $this->individualCreate();
-
-    $params = array(
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_mebershipStatusID,
-    );
-
-    $ids = array();
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
-    $this->assertDBNotNull('CRM_Member_BAO_MembershipLog', $membership->id,
-      'membership_id', 'id',
-      'Database checked on membershiplog record.'
-    );
-
-    $this->membershipDelete($membership->id);
-    $this->contactDelete($contactId);
-  }
-
-  /**
-   *  Test del()
-   */
-  public function testdel() {
-    $contactId = $this->individualCreate();
-
-    $params = array(
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', strtotime('2006-01-21')),
-      'start_date' => date('Ymd', strtotime('2006-01-21')),
-      'end_date' => date('Ymd', strtotime('2006-12-21')),
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_mebershipStatusID,
-    );
-    $ids = array(
-      'userId' => $contactId,
-    );
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
-    $membershipDelete = CRM_Member_BAO_MembershipLog::del($membership->id);
-    $this->assertDBNull('CRM_Member_BAO_MembershipLog', $membership->id, 'membership_id',
+  public function testDel() {
+    list($contactID, $membershipID) = $this->setupMembership();
+    CRM_Member_BAO_MembershipLog::del($membershipID);
+    $this->assertDBNull('CRM_Member_BAO_MembershipLog', $membershipID, 'membership_id',
       'id', 'Database check for deleted membership log.'
     );
 
-    $this->membershipDelete($membership->id);
-    $this->contactDelete($contactId);
+    $this->membershipDelete($membershipID);
+    $this->contactDelete($contactID);
   }
 
   /**
-   *  Test resetmodified()
+   *  Test reset modified ID.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testresetmodifiedId() {
-    $contactId = $this->individualCreate();
+  public function testResetModifiedID() {
+    list($contactID, $membershipID) = $this->setupMembership();
+    CRM_Member_BAO_MembershipLog::resetModifiedID($contactID);
+    $this->assertDBNull('CRM_Member_BAO_MembershipLog', $contactID, 'modified_id',
+      'modified_id', 'Database check for NULL modified id.'
+    );
 
-    $params = array(
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+    $this->membershipDelete($membershipID);
+    $this->contactDelete($contactID);
+  }
+
+  /**
+   * Test that the value for modified_id can be set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateMembershipWithPassedInModifiedID() {
+    $modifier = $this->individualCreate();
+    $membershipID = $this->setupMembership($modifier)[1];
+    $this->assertEquals($modifier, $this->callAPISuccessGetValue('MembershipLog', ['membership_id' => $membershipID, 'return' => 'modified_id']));
+  }
+
+  /**
+   * Set up membership.
+   *
+   * @param int|null $modifiedID
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function setupMembership($modifiedID = NULL): array {
+    $contactID = $this->individualCreate();
+    $modifiedID = $modifiedID ?? $contactID;
+
+    $params = [
+      'contact_id' => $contactID,
+      'membership_type_id' => $this->membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
-      'status_id' => $this->_mebershipStatusID,
-    );
-    $ids = array(
-      'userId' => $contactId,
-    );
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
-    $resetModifiedId = CRM_Member_BAO_MembershipLog::resetModifiedID($contactId);
-    $this->assertDBNull('CRM_Member_BAO_MembershipLog', $contactId, 'modified_id',
-      'modified_id', 'Database check for NULL modified id.'
-    );
+      'status_id' => $this->membershipStatusID,
+      'modified_id' => $modifiedID,
+    ];
 
-    $this->membershipDelete($membership->id);
-    $this->contactDelete($contactId);
+    $membershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
+    $this->assertEquals($modifiedID, CRM_Core_DAO::singleValueQuery(
+      'SELECT modified_id FROM civicrm_membership_log WHERE membership_id = %1',
+      [1 => [$membershipID, 'Integer']]
+    ));
+    return [$contactID, $membershipID];
   }
 
 }

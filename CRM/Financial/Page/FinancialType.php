@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -42,7 +26,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -62,36 +46,36 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::BROWSE => array(
+      self::$_links = [
+        CRM_Core_Action::BROWSE => [
           'name' => ts('Accounts'),
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'reset=1&action=browse&aid=%%id%%',
           'title' => ts('Accounts'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/financial/financialType',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/financial/financialType',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -104,29 +88,29 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
     ) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     // get all financial types sorted by weight
-    $financialType = array();
+    $financialType = [];
     $dao = new CRM_Financial_DAO_FinancialType();
     $dao->orderBy('name');
     $dao->find();
 
     while ($dao->fetch()) {
-      $financialType[$dao->id] = array();
+      $financialType[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $financialType[$dao->id]);
-      $defaults = $financialAccountId = array();
+      $defaults = $financialAccountId = [];
       $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
-      $financialAccountIds = array();
+      $financialAccountIds = [];
 
       $params['entity_id'] = $dao->id;
       $params['entity_table'] = 'civicrm_financial_type';
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, CRM_Core_DAO::$_nullArray, $financialAccountIds);
+      $null = [];
+      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $null, $financialAccountIds);
 
       foreach ($financialAccountIds as $key => $values) {
         if (!empty($financialAccounts[$values['financial_account_id']])) {
-          $financialAccountId[$values['financial_account_id']] = CRM_Utils_Array::value(
-            $values['financial_account_id'], $financialAccounts);
+          $financialAccountId[$values['financial_account_id']] = $financialAccounts[$values['financial_account_id']] ?? NULL;
         }
       }
 
@@ -153,7 +137,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       }
 
       $financialType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'financialType.manage.action',

@@ -1,40 +1,47 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * Api Explorer
  */
 class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
+
+  /**
+   * Return unique paths for checking for examples.
+   * @return array
+   */
+  private static function uniquePaths() {
+    // Ensure that paths with trailing slashes are properly dealt with
+    $paths = explode(PATH_SEPARATOR, get_include_path());
+    foreach ($paths as $id => $rawPath) {
+      $pathParts = explode(DIRECTORY_SEPARATOR, $rawPath);
+      foreach ($pathParts as $partId => $part) {
+        if (empty($part)) {
+          unset($pathParts[$partId]);
+        }
+      }
+      $newRawPath = implode(DIRECTORY_SEPARATOR, $pathParts);
+      if ($newRawPath != $rawPath) {
+        $paths[$id] = DIRECTORY_SEPARATOR . $newRawPath;
+      }
+    }
+    $paths = array_unique($paths);
+    return $paths;
+  }
 
   /**
    * Run page.
@@ -46,17 +53,25 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js')
       ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js', 99)
       ->addStyleFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.css', 99)
-      ->addVars('explorer', array('max_joins' => \Civi\API\Api3SelectQuery::MAX_JOINS));
+      ->addVars('explorer', ['max_joins' => \Civi\API\Api3SelectQuery::MAX_JOINS]);
 
     $this->assign('operators', CRM_Core_DAO::acceptedSQLOperators());
 
     // List example directories
-    $examples = array();
-    foreach (scandir(\Civi::paths()->getPath('[civicrm.root]/api/v3/examples')) as $item) {
-      if ($item && strpos($item, '.') === FALSE) {
-        $examples[] = $item;
+    // use get_include_path to ensure that extensions are captured.
+    $examples = [];
+    $paths = self::uniquePaths();
+    foreach ($paths as $path) {
+      $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples';
+      if (is_dir($dir)) {
+        foreach (scandir($dir) as $item) {
+          if ($item && strpos($item, '.') === FALSE && array_search($item, $examples) === FALSE) {
+            $examples[] = $item;
+          }
+        }
       }
     }
+    sort($examples);
     $this->assign('examples', $examples);
 
     return parent::run();
@@ -77,21 +92,32 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    */
   public static function getExampleFile() {
     if (!empty($_GET['entity']) && strpos($_GET['entity'], '.') === FALSE) {
-      $examples = array();
-      foreach (scandir(\Civi::paths()->getPath("[civicrm.root]/api/v3/examples/{$_GET['entity']}")) as $item) {
-        $item = str_replace('.php', '', $item);
-        if ($item && strpos($item, '.') === FALSE) {
-          $examples[] = array('key' => $item, 'value' => $item);
+      $examples = [];
+      $paths = self::uniquePaths();
+      foreach ($paths as $path) {
+        $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['entity'];
+        if (is_dir($dir)) {
+          foreach (scandir($dir) as $item) {
+            $item = str_replace('.ex.php', '', $item);
+            if ($item && strpos($item, '.') === FALSE) {
+              $examples[] = ['key' => $item, 'value' => $item];
+            }
+          }
         }
       }
       CRM_Utils_JSON::output($examples);
     }
     if (!empty($_GET['file']) && strpos($_GET['file'], '.') === FALSE) {
-      $fileName = \Civi::paths()->getPath("[civicrm.root]/api/v3/examples/{$_GET['file']}.php");
-      if (file_exists($fileName)) {
-        echo file_get_contents($fileName);
+      $paths = self::uniquePaths();
+      $fileFound = FALSE;
+      foreach ($paths as $path) {
+        $fileName = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['file'] . '.ex.php';
+        if (!$fileFound && file_exists($fileName)) {
+          $fileFound = TRUE;
+          echo file_get_contents($fileName);
+        }
       }
-      else {
+      if (!$fileFound) {
         echo "Not found.";
       }
       CRM_Utils_System::civiExit();
@@ -105,15 +131,15 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
   public static function getDoc() {
     // Verify the API handler we're talking to is valid.
     $entities = civicrm_api3('Entity', 'get');
-    $entity = CRM_Utils_Array::value('entity', $_GET);
+    $entity = $_GET['entity'] ?? NULL;
     if (!empty($entity) && in_array($entity, $entities['values']) && strpos($entity, '.') === FALSE) {
-      $action = CRM_Utils_Array::value('action', $_GET);
+      $action = $_GET['action'] ?? NULL;
       $doc = self::getDocblock($entity, $action);
-      $result = array(
+      $result = [
         'doc' => $doc ? self::formatDocBlock($doc[0]) : 'Not found.',
         'code' => $doc ? $doc[1] : NULL,
         'file' => $doc ? $doc[2] : NULL,
-      );
+      ];
       if (!$action) {
         $actions = civicrm_api3($entity, 'getactions');
         $result['actions'] = CRM_Utils_Array::makeNonAssociative(array_combine($actions['values'], $actions['values']));
@@ -141,11 +167,11 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       // Api does not exist
       return FALSE;
     }
-    $docblock = $code = array();
+    $docblock = $code = [];
     // Fetch docblock for the api file
     if (!$action) {
       if (preg_match('#/\*\*\n.*?\n \*/\n#s', $contents, $docblock)) {
-        return array($docblock[0], NULL, $file);
+        return [$docblock[0], NULL, $file];
       }
     }
     // Fetch block for a specific action
@@ -172,7 +198,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       if (preg_match('#(/\*\*(\n \*.*)*\n \*/\n)function[ ]+' . $fnName . '#i', $contents, $docblock)) {
         // Fetch the code in a separate regex to preserve sanity
         preg_match("#^function[ ]+$fnName.*?^}#ism", $contents, $code);
-        return array($docblock[1], $code[0], $file);
+        return [$docblock[1], $code[0], $file];
       }
     }
   }
@@ -191,13 +217,13 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     $text = implode("\n", $lines);
 
     // Get rid of comment stars
-    $text = str_replace(array("\n * ", "\n *\n", "\n */\n", "/**\n"), array("\n", "\n\n", '', ''), $text);
+    $text = str_replace(["\n * ", "\n *\n", "\n */\n", "/**\n"], ["\n", "\n\n", '', ''], $text);
 
     // Format for html
     $text = htmlspecialchars($text);
 
     // Extract code blocks - save for later to skip html conversion
-    $code = array();
+    $code = [];
     preg_match_all('#@code(.*?)@endcode#is', $text, $code);
     $text = preg_replace('#@code.*?@endcode#is', '<pre></pre>', $text);
 

@@ -226,6 +226,9 @@
     <length>64</length>
     <comment>date format for custom date</comment>
     <add>3.1</add>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getDatePluginInputFormats</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>time_format</name>
@@ -233,19 +236,22 @@
     <title>Field Time Format</title>
     <comment>time format for custom date</comment>
     <add>3.1</add>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getTimeFormats</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>note_columns</name>
     <type>int unsigned</type>
     <title>Field Note Columns</title>
-    <comment> Number of columns in Note Field </comment>
+    <comment>Number of columns in Note Field</comment>
     <add>1.4</add>
   </field>
   <field>
     <name>note_rows</name>
     <type>int unsigned</type>
     <title>Field Note Rows</title>
-    <comment> Number of rows in Note Field </comment>
+    <comment>Number of rows in Note Field</comment>
     <add>1.4</add>
   </field>
   <field>

@@ -26,7 +26,7 @@ class CRM_Utils_AutoCleanTest extends CiviUnitTestCase {
 
   public function nestedWithArrayCb() {
     $this->foo = 'arraycb';
-    $ac = CRM_Utils_AutoClean::with(array($this, 'setFoo'), 'orig');
+    $ac = CRM_Utils_AutoClean::with([$this, 'setFoo'], 'orig');
     $this->assertEquals('arraycb', $this->foo);
   }
 
@@ -42,7 +42,7 @@ class CRM_Utils_AutoCleanTest extends CiviUnitTestCase {
   }
 
   public function nestedSwap() {
-    $ac = CRM_Utils_AutoClean::swap(array($this, 'getFoo'), array($this, 'setFoo'), 'tmp');
+    $ac = CRM_Utils_AutoClean::swap([$this, 'getFoo'], [$this, 'setFoo'], 'tmp');
     $this->assertEquals('tmp', $this->foo);
   }
 

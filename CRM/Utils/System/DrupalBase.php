@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -40,10 +22,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Does this CMS / UF support a CMS specific logging mechanism?
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    * @var bool
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    */
-  var $supports_UF_Logging = TRUE;
+  public $supports_UF_Logging = TRUE;
 
   /**
    */
@@ -73,10 +55,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       $filesURL = $baseURL . "sites/default/files/civicrm/";
     }
 
-    return array(
+    return [
       'url' => $filesURL,
       'path' => CRM_Utils_File::baseFilePath(),
-    );
+    ];
   }
 
   /**
@@ -85,7 +67,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $siteName = $siteRoot = NULL;
-    $matches = array();
+    $matches = [];
     if (preg_match(
       '|/sites/([\w\.\-\_]+)/|',
       $config->templateCompileDir,
@@ -101,7 +83,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
     $url = $config->userFrameworkBaseURL;
-    return array($url, $siteName, $siteRoot);
+    return [$url, $siteName, $siteRoot];
   }
 
   /**
@@ -117,26 +99,24 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $internal = FALSE;
     $base = CRM_Core_Config::singleton()->resourceBase;
     global $base_url;
+    // Strip query string
+    $q = strpos($url, '?');
+    $url_path = $q ? substr($url, 0, $q) : $url;
     // Handle absolute urls
     // compares $url (which is some unknown/untrusted value from a third-party dev) to the CMS's base url (which is independent of civi's url)
     // to see if the url is within our drupal dir, if it is we are able to treated it as an internal url
-    if (strpos($url, $base_url) === 0) {
-      $file = trim(str_replace($base_url, '', $url), '/');
+    if (strpos($url_path, $base_url) === 0) {
+      $file = trim(str_replace($base_url, '', $url_path), '/');
       // CRM-18130: Custom CSS URL not working if aliased or rewritten
-      if (file_exists(DRUPAL_ROOT . $file)) {
+      if (file_exists(DRUPAL_ROOT . '/' . $file)) {
         $url = $file;
         $internal = TRUE;
       }
     }
     // Handle relative urls that are within the CiviCRM module directory
-    elseif (strpos($url, $base) === 0) {
+    elseif (strpos($url_path, $base) === 0) {
       $internal = TRUE;
-      $url = $this->appendCoreDirectoryToResourceBase(dirname(drupal_get_path('module', 'civicrm')) . '/') . trim(substr($url, strlen($base)), '/');
-    }
-    // Strip query string
-    $q = strpos($url, '?');
-    if ($q && $internal) {
-      $url = substr($url, 0, $q);
+      $url = $this->appendCoreDirectoryToResourceBase(dirname(drupal_get_path('module', 'civicrm')) . '/') . trim(substr($url_path, strlen($base)), '/');
     }
     return $internal;
   }
@@ -268,10 +248,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     if (CRM_Core_Session::singleton()
-        ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array(
-          'cms:administer users',
-          'cms:view user account',
-        ))
+      ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm([
+        'cms:administer users',
+        'cms:view user account',
+      ])
     ) {
       return $this->url('user/' . $uid);
     };
@@ -289,7 +269,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function logger($message) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging && function_exists('watchdog')) {
-      watchdog('civicrm', '%message', array('%message' => $message), NULL, WATCHDOG_DEBUG);
+      watchdog('civicrm', '%message', ['%message' => $message], NULL, WATCHDOG_DEBUG);
     }
   }
 
@@ -311,10 +291,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getModules() {
-    $result = array();
+    $result = [];
     $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     foreach ($q as $row) {
-      $result[] = new CRM_Core_Module('drupal.' . $row->name, ($row->status == 1) ? TRUE : FALSE);
+      $result[] = new CRM_Core_Module('drupal.' . $row->name, $row->status == 1);
     }
     return $result;
   }
@@ -333,7 +313,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $roles = user_roles(FALSE, $oldPerm);
     if (!empty($roles)) {
       foreach (array_keys($roles) as $rid) {
-        user_role_revoke_permissions($rid, array($oldPerm));
+        user_role_revoke_permissions($rid, [$oldPerm]);
         user_role_grant_permissions($rid, $newPerms);
       }
     }
@@ -494,7 +474,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * FIXME: Document values accepted/required by $params
    */
-  public function userLoginFinalize($params = array()) {
+  public function userLoginFinalize($params = []) {
     user_login_finalize($params);
   }
 
@@ -634,7 +614,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       include $confdir . "/sites.php";
     }
     else {
-      $sites = array();
+      $sites = [];
     }
 
     $uri = explode('/', $phpSelf);
@@ -663,6 +643,48 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   public function getCurrentLanguage() {
     global $language;
     return (!empty($language->language)) ? $language->language : $language;
+  }
+
+  /**
+   * Is a front end page being accessed.
+   *
+   * Generally this would be a contribution form or other public page as opposed to a backoffice page (like contact edit).
+   *
+   * See https://github.com/civicrm/civicrm-drupal/pull/546/files
+   *
+   * @return bool
+   */
+  public function isFrontEndPage() {
+    $path = CRM_Utils_System::getUrlPath();
+
+    // Get the menu for above URL.
+    $item = CRM_Core_Menu::get($path);
+    return !empty($item['is_public']);
+  }
+
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    if (function_exists('drupal_session_start')) {
+      // https://issues.civicrm.org/jira/browse/CRM-14356
+      if (!(isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
+        drupal_session_start();
+      }
+      $_SESSION = [];
+    }
+    else {
+      session_start();
+    }
+  }
+
+  /**
+   * Get role names
+   *
+   * @return array|null
+   */
+  public function getRoleNames() {
+    return array_combine(user_roles(), user_roles());
   }
 
 }

@@ -24,7 +24,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    * Build quick form.
    */
   public function buildQuickForm() {
-    $this->price_fields_for_event = array();
+    $this->price_fields_for_event = [];
     foreach ($this->cart->get_main_event_participants() as $participant) {
       $form = new CRM_Event_Cart_Form_MerParticipant($participant);
       $form->appendQuickForm($this);
@@ -37,20 +37,20 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     $this->assign('events_in_carts', $this->cart->get_main_events_in_carts());
     $this->assign('price_fields_for_event', $this->price_fields_for_event);
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'upload',
           'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
 
     if ($this->cid) {
-      $params = array('id' => $this->cid);
+      $params = ['id' => $this->cid];
       $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
-      $contact_values = array();
+      $contact_values = [];
       CRM_Core_DAO::storeValues($contact, $contact_values);
       $this->assign('contact', $contact_values);
     }
@@ -81,7 +81,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    * @return array
    */
   public function build_price_options($event) {
-    $price_fields_for_event = array();
+    $price_fields_for_event = [];
     $base_field_name = "event_{$event->id}_amount";
     $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event->id);
     //CRM-14492 display admin fields only if user is admin
@@ -128,7 +128,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         $priceField->price_set_id = $price_set_id;
         $priceField->find();
 
-        $check = array();
+        $check = [];
 
         while ($priceField->fetch()) {
           if (!empty($fields["event_{$event_in_cart->event_id}_price_{$priceField->id}"])) {
@@ -141,7 +141,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           $this->_errors['_qf_default'] = ts("Select at least one option from Price Levels.");
         }
 
-        $lineItem = array();
+        $lineItem = [];
         if (is_array($this->_values['fee']['fields'])) {
           CRM_Price_BAO_PriceSet::processAmount($this->_values['fee']['fields'], $fields, $lineItem);
           //XXX total...
@@ -149,6 +149,11 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
             $this->_errors['_qf_default'] = ts("Price Levels can not be less than zero. Please select the options accordingly");
           }
         }
+      }
+
+      // Validate if participant is already registered
+      if ($event_in_cart->event->allow_same_participant_emails) {
+        continue;
       }
 
       foreach ($event_in_cart->participants as $mer_participant) {
@@ -165,11 +170,11 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           while ($participant->fetch()) {
             if (array_key_exists($participant->status_id, $statusTypes)) {
               $form = $mer_participant->get_form();
-              $this->_errors[$form->html_field_name('email')] = ts("The participant %1 is already registered for %2 (%3).", array(
-                  1 => $participant_fields['email'],
-                  2 => $event_in_cart->event->title,
-                  3 => $event_in_cart->event->start_date,
-                ));
+              $this->_errors[$form->html_field_name('email')] = ts("The participant %1 is already registered for %2 (%3).", [
+                1 => $participant_fields['email'],
+                2 => $event_in_cart->event->title,
+                3 => $event_in_cart->event->start_date,
+              ]);
             }
           }
         }
@@ -186,16 +191,15 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
   public function setDefaultValues() {
     $this->loadCart();
 
-    $defaults = array();
+    $defaults = [];
     foreach ($this->cart->get_main_event_participants() as $participant) {
       $form = $participant->get_form();
       if (empty($participant->email)
-        && !CRM_Event_Cart_Form_Cart::is_administrator()
         && ($participant->get_participant_index() == 1)
         && ($this->cid != 0)
       ) {
-        $defaults = array();
-        $params = array('id' => $this->cid);
+        $defaults = [];
+        $params = ['id' => $this->cid];
         $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
         $participant->contact_id = $this->cid;
         $participant->save();
@@ -205,7 +209,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         && $participant->contact_id == self::getContactID()
       ) {
         $participant->email = NULL;
-        $participant->contact_id = self::find_or_create_contact($this->getContactID());
+        $participant->contact_id = self::find_or_create_contact();
       }
       $defaults += $form->setDefaultValues();
       //Set price defaults if any
@@ -216,7 +220,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
           $price_set  = $price_sets[$price_set_id];
           foreach ($price_set['fields'] as $field) {
-            $options = CRM_Utils_Array::value('options', $field);
+            $options = $field['options'] ?? NULL;
             if (!is_array($options)) {
               continue;
             }
@@ -246,21 +250,21 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       return;
     }
     // XXX de facto primary key
-    $email_to_contact_id = array();
+    $email_to_contact_id = [];
     foreach ($this->_submitValues['event'] as $event_id => $participants) {
       foreach ($participants['participant'] as $participant_id => $fields) {
         if (array_key_exists($fields['email'], $email_to_contact_id)) {
           $contact_id = $email_to_contact_id[$fields['email']];
         }
         else {
-          $contact_id = self::find_or_create_contact($this->getContactID(), $fields);
+          $contact_id = self::find_or_create_contact($fields);
           $email_to_contact_id[$fields['email']] = $contact_id;
         }
 
         $participant = $this->cart->get_event_in_cart_by_event_id($event_id)->get_participant_by_id($participant_id);
         if ($participant->contact_id && $contact_id != $participant->contact_id) {
-          $defaults = array();
-          $params = array('id' => $participant->contact_id);
+          $defaults = [];
+          $params = ['id' => $participant->contact_id];
           $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 
           foreach ($this->cart->get_subparticipants($participant) as $subparticipant) {
@@ -280,14 +284,14 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         }
 
         //TODO security check that participant ids are already in this cart
-        $participant_params = array(
+        $participant_params = [
           'id' => $participant_id,
           'cart_id' => $this->cart->id,
           'event_id' => $event_id,
           'contact_id' => $contact_id,
           //'registered_by_id' => $this->cart->user_id,
           'email' => $fields['email'],
-        );
+        ];
         $participant = new CRM_Event_Cart_BAO_MerParticipant($participant_params);
         $participant->save();
         $this->cart->add_participant_to_cart($participant);
@@ -296,6 +300,12 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           $custom_fields = array_merge($participant->get_form()->get_participant_custom_data_fields());
 
           CRM_Contact_BAO_Contact::createProfileContact($this->_submitValues['field'][$participant_id], $custom_fields, $contact_id);
+
+          CRM_Core_BAO_CustomValueTable::postProcess($this->_submitValues['field'][$participant_id],
+            'civicrm_participant',
+            $participant_id,
+           'Participant'
+          );
         }
       }
     }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -55,7 +39,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     // note we intentionally overwrite value since we use it as defaults
     // and its all pass by value
     // we need to figure out the type, so we can either set an array element
@@ -64,7 +48,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
       if (substr($key, 0, 7) == 'custom_' || $key == "preferred_communication_method") {
         if (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
           $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-          $value = array();
+          $value = [];
           foreach ($v as $item) {
             if ($item) {
               $value[$item] = $item;
@@ -74,15 +58,15 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
       }
       elseif ($key == 'group' || $key == 'tag') {
         $v = explode(',', $value);
-        $value = array();
+        $value = [];
         foreach ($v as $item) {
           $value[$item] = 1;
         }
       }
-      elseif (in_array($key, array(
+      elseif (in_array($key, [
         'birth_date',
         'deceased_date',
-      ))) {
+      ])) {
         list($value) = CRM_Utils_Date::setDateDefaults($value);
       }
 
@@ -104,13 +88,13 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
       CRM_Contact_Form_Task_ProximityCommon::buildQuickForm($this, $proxSearch);
     }
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'refresh',
         'name' => ts('Search'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     parent::buildQuickForm();
   }

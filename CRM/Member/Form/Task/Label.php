@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -68,9 +52,9 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    *   array of default values
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
-    $defaults['label_name'] = CRM_Utils_Array::value('name', $format);
+    $defaults['label_name'] = $format['name'] ?? NULL;
     $defaults['merge_same_address'] = 0;
     $defaults['merge_same_household'] = 0;
     $defaults['do_not_mail'] = 1;
@@ -86,11 +70,11 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   public function postProcess() {
     $formValues = $this->controller->exportValues($this->_name);
     $locationTypeID = $formValues['location_type_id'];
-    $respectDoNotMail = CRM_Utils_Array::value('do_not_mail', $formValues);
+    $respectDoNotMail = $formValues['do_not_mail'] ?? NULL;
     $labelName = $formValues['label_name'];
-    $mergeSameAddress = CRM_Utils_Array::value('merge_same_address', $formValues);
-    $mergeSameHousehold = CRM_Utils_Array::value('merge_same_household', $formValues);
-    $isPerMembership = CRM_Utils_Array::value('per_membership', $formValues);
+    $mergeSameAddress = $formValues['merge_same_address'] ?? NULL;
+    $mergeSameHousehold = $formValues['merge_same_household'] ?? NULL;
+    $isPerMembership = $formValues['per_membership'] ?? NULL;
     if ($isPerMembership && ($mergeSameAddress || $mergeSameHousehold)) {
       // this shouldn't happen  - perhaps is could if JS is disabled
       CRM_Core_Session::setStatus(ts('As you are printing one label per membership your merge settings are being ignored'));
@@ -115,7 +99,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
         $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
         $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-        $temp = array();
+        $temp = [];
         foreach ($val as $vals) {
           $temp[] = $comm[$vals];
         }
@@ -123,14 +107,14 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       }
       $row['id'] = $id;
       $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $tokenFields);
-      $rows[$id] = array($formatted);
+      $rows[$id] = [$formatted];
     }
     if ($isPerMembership) {
-      $labelRows = array();
-      $memberships = civicrm_api3('membership', 'get', array(
-        'id' => array('IN' => $this->_memberIds),
+      $labelRows = [];
+      $memberships = civicrm_api3('membership', 'get', [
+        'id' => ['IN' => $this->_memberIds],
         'return' => 'contact_id',
-      ));
+      ]);
       foreach ($memberships['values'] as $id => $membership) {
         if (isset($rows[$membership['contact_id']])) {
           $labelRows[$id] = $rows[$membership['contact_id']];

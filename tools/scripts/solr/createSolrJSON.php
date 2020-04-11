@@ -1,26 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This code is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 */
 
@@ -42,10 +27,10 @@ define('CHUNK_SIZE', 128);
 function &splitContactIDs(&$contactIDs) {
   // contactIDs could be a real large array, so we split it up into
   // smaller chunks and then general xml for each chunk
-  $chunks           = array();
-  $current          = 0;
-  $chunks[$current] = array();
-  $count            = 0;
+  $chunks = [];
+  $current = 0;
+  $chunks[$current] = [];
+  $count = 0;
 
   foreach ($contactIDs as $cid) {
     $chunks[$current][] = $cid;
@@ -53,7 +38,7 @@ function &splitContactIDs(&$contactIDs) {
 
     if ($count == CHUNK_SIZE) {
       $current++;
-      $chunks[$current] = array();
+      $chunks[$current] = [];
       $count = 0;
     }
   }
@@ -81,7 +66,7 @@ function &generateSolrJSON($values) {
 
     foreach ($tokens as $n => $v) {
       if (is_array($v)) {
-        $str = array();
+        $str = [];
         foreach ($v as $el) {
           $el = escapeJsonString($el);
           $str[] = "\"$el\"";
@@ -115,8 +100,8 @@ function &generateSolrJSON($values) {
  * @return mixed
  */
 function escapeJsonString($value) {
-  $escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
-  $replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b");
+  $escapers = ["\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c"];
+  $replacements = ["\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b"];
   return str_replace($escapers, $replacements, $value);
 }
 
@@ -127,10 +112,10 @@ function escapeJsonString($value) {
  * @return array
  */
 function getValues(&$contactIDs, &$values) {
-  $values = array();
+  $values = [];
 
   foreach ($contactIDs as $cid) {
-    $values[$cid] = array();
+    $values[$cid] = [];
   }
 
   getContactInfo($contactIDs, $values);
@@ -178,7 +163,8 @@ SELECT $selectString, $whereField as contact_id
  * @param $values
  */
 function getContactInfo(&$contactIDs, &$values) {
-  $fields = array('sort_name' => NULL,
+  $fields = [
+    'sort_name' => NULL,
     'display_name' => NULL,
     'contact_type' => NULL,
     'legal_identifier' => NULL,
@@ -190,7 +176,7 @@ function getContactInfo(&$contactIDs, &$values) {
     'organization_name' => NULL,
     'legal_name' => NULL,
     'job_title' => NULL,
-  );
+  ];
   getTableInfo($contactIDs, $values, 'civicrm_contact', $fields, 'id');
 }
 
@@ -312,10 +298,17 @@ LEFT  JOIN civicrm_country        co ON a.country_id        = co.id
 WHERE c.id IN ( $ids )
 ";
 
-  $fields = array('location_type', 'street_address', 'supplemental_address_1',
-    'supplemental_address_2', 'supplemental_address_3', 'city', 'postal_code',
-    'state', 'country',
-  );
+  $fields = [
+    'location_type',
+    'street_address',
+    'supplemental_address_1',
+    'supplemental_address_2',
+    'supplemental_address_3',
+    'city',
+    'postal_code',
+    'state',
+    'country',
+  ];
   $dao = &CRM_Core_DAO::executeQuery($sql);
   while ($dao->fetch()) {
     $address = '';
@@ -352,7 +345,7 @@ function appendValue(&$values, $contactID, $name, $value) {
   else {
     if (!is_array($values[$contactID][$name])) {
       $save = $values[$contactID][$name];
-      $values[$contactID][$name] = array();
+      $values[$contactID][$name] = [];
       $values[$contactID][$name][] = $save;
     }
     $values[$contactID][$name][] = $value;
@@ -366,14 +359,14 @@ function run(&$contactIDs) {
   $chunks = &splitContactIDs($contactIDs);
 
   foreach ($chunks as $chunk) {
-    $values = array();
+    $values = [];
     getValues($chunk, $values);
     $xml = &generateSolrJSON($values);
     echo $xml;
   }
 }
 
-$config = &CRM_Core_Config::singleton();
+$config = CRM_Core_Config::singleton();
 $config->userFramework = 'Soap';
 $config->userFrameworkClass = 'CRM_Utils_System_Soap';
 $config->userHookClass = 'CRM_Utils_Hook_Soap';
@@ -385,7 +378,7 @@ EOT;
 $dao = &CRM_Core_DAO::executeQuery($sql);
 
 
-$contactIDs = array();
+$contactIDs = [];
 while ($dao->fetch()) {
   $contactIDs[] = $dao->id;
 }

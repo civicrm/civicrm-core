@@ -1,41 +1,26 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Migrate_Export {
 
   const XML_VALUE_SEPARATOR = ":;:;:;";
 
   /**
-   * @var array description of export field mapping
+   * @var array
+   * Description of export field mapping
    *
    * @code
    * 'exampleEntityMappingName' => array(
@@ -54,114 +39,114 @@ class CRM_Utils_Migrate_Export {
    * Class constructor.
    */
   public function __construct() {
-    $this->_xml = array(
-      'customGroup' => array(
-        'data' => array(),
+    $this->_xml = [
+      'customGroup' => [
+        'data' => [],
         'name' => 'CustomGroup',
         'scope' => 'CustomGroups',
         'required' => FALSE,
-        'idNameFields' => array('id', 'name'),
-        'idNameMap' => array(),
-      ),
-      'customField' => array(
-        'data' => array(),
+        'idNameFields' => ['id', 'name'],
+        'idNameMap' => [],
+      ],
+      'customField' => [
+        'data' => [],
         'name' => 'CustomField',
         'scope' => 'CustomFields',
         'required' => FALSE,
-        'idNameFields' => array('id', 'column_name'),
-        'idNameMap' => array(),
-        'mappedFields' => array(
-          array('optionGroup', 'option_group_id', 'option_group_name'),
-          array('customGroup', 'custom_group_id', 'custom_group_name'),
-        ),
-      ),
-      'optionGroup' => array(
-        'data' => array(),
+        'idNameFields' => ['id', 'column_name'],
+        'idNameMap' => [],
+        'mappedFields' => [
+          ['optionGroup', 'option_group_id', 'option_group_name'],
+          ['customGroup', 'custom_group_id', 'custom_group_name'],
+        ],
+      ],
+      'optionGroup' => [
+        'data' => [],
         'name' => 'OptionGroup',
         'scope' => 'OptionGroups',
         'required' => FALSE,
-        'idNameMap' => array(),
-        'idNameFields' => array('id', 'name'),
-      ),
-      'relationshipType' => array(
-        'data' => array(),
+        'idNameMap' => [],
+        'idNameFields' => ['id', 'name'],
+      ],
+      'relationshipType' => [
+        'data' => [],
         'name' => 'RelationshipType',
         'scope' => 'RelationshipTypes',
         'required' => FALSE,
-        'idNameFields' => array('id', 'name_a_b'),
-        'idNameMap' => array(),
-      ),
-      'locationType' => array(
-        'data' => array(),
+        'idNameFields' => ['id', 'name_a_b'],
+        'idNameMap' => [],
+      ],
+      'locationType' => [
+        'data' => [],
         'name' => 'LocationType',
         'scope' => 'LocationTypes',
         'required' => FALSE,
-        'idNameFields' => array('id', 'name'),
-        'idNameMap' => array(),
-      ),
-      'optionValue' => array(
-        'data' => array(),
+        'idNameFields' => ['id', 'name'],
+        'idNameMap' => [],
+      ],
+      'optionValue' => [
+        'data' => [],
         'name' => 'OptionValue',
         'scope' => 'OptionValues',
         'required' => FALSE,
-        'idNameMap' => array(),
-        'idNameFields' => array('value', 'name', 'prefix'),
-        'mappedFields' => array(
-          array('optionGroup', 'option_group_id', 'option_group_name'),
-        ),
-      ),
-      'profileGroup' => array(
-        'data' => array(),
+        'idNameMap' => [],
+        'idNameFields' => ['value', 'name', 'prefix'],
+        'mappedFields' => [
+          ['optionGroup', 'option_group_id', 'option_group_name'],
+        ],
+      ],
+      'profileGroup' => [
+        'data' => [],
         'name' => 'ProfileGroup',
         'scope' => 'ProfileGroups',
         'required' => FALSE,
-        'idNameFields' => array('id', 'title'),
-        'idNameMap' => array(),
-      ),
-      'profileField' => array(
-        'data' => array(),
+        'idNameFields' => ['id', 'title'],
+        'idNameMap' => [],
+      ],
+      'profileField' => [
+        'data' => [],
         'name' => 'ProfileField',
         'scope' => 'ProfileFields',
         'required' => FALSE,
-        'idNameMap' => array(),
-        'mappedFields' => array(
-          array('profileGroup', 'uf_group_id', 'profile_group_name'),
-        ),
-      ),
-      'profileJoin' => array(
-        'data' => array(),
+        'idNameMap' => [],
+        'mappedFields' => [
+          ['profileGroup', 'uf_group_id', 'profile_group_name'],
+        ],
+      ],
+      'profileJoin' => [
+        'data' => [],
         'name' => 'ProfileJoin',
         'scope' => 'ProfileJoins',
         'required' => FALSE,
-        'idNameMap' => array(),
-        'mappedFields' => array(
-          array('profileGroup', 'uf_group_id', 'profile_group_name'),
-        ),
-      ),
-      'mappingGroup' => array(
-        'data' => array(),
+        'idNameMap' => [],
+        'mappedFields' => [
+          ['profileGroup', 'uf_group_id', 'profile_group_name'],
+        ],
+      ],
+      'mappingGroup' => [
+        'data' => [],
         'name' => 'MappingGroup',
         'scope' => 'MappingGroups',
         'required' => FALSE,
-        'idNameFields' => array('id', 'name'),
-        'idNameMap' => array(),
-        'mappedFields' => array(
-          array('optionValue', 'mapping_type_id', 'mapping_type_name', 'mapping_type'),
-        ),
-      ),
-      'mappingField' => array(
-        'data' => array(),
+        'idNameFields' => ['id', 'name'],
+        'idNameMap' => [],
+        'mappedFields' => [
+          ['optionValue', 'mapping_type_id', 'mapping_type_name', 'mapping_type'],
+        ],
+      ],
+      'mappingField' => [
+        'data' => [],
         'name' => 'MappingField',
         'scope' => 'MappingFields',
         'required' => FALSE,
-        'idNameMap' => array(),
-        'mappedFields' => array(
-          array('mappingGroup', 'mapping_id', 'mapping_group_name'),
-          array('locationType', 'location_type_id', 'location_type_name'),
-          array('relationshipType', 'relationship_type_id', 'relationship_type_name'),
-        ),
-      ),
-    );
+        'idNameMap' => [],
+        'mappedFields' => [
+          ['mappingGroup', 'mapping_id', 'mapping_group_name'],
+          ['locationType', 'location_type_id', 'location_type_name'],
+          ['relationshipType', 'relationship_type_id', 'relationship_type_name'],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -359,6 +344,7 @@ class CRM_Utils_Migrate_Export {
    *
    * @return string
    *   XML
+   * @throws CRM_Core_Exception
    */
   public function toXML() {
     $buffer = '<?xml version="1.0" encoding="iso-8859-1" ?>';
@@ -372,7 +358,7 @@ class CRM_Utils_Migrate_Export {
         $buffer .= "  </{$this->_xml[$key]['scope']}>\n";
       }
       elseif ($this->_xml[$key]['required']) {
-        CRM_Core_Error::fatal("No records in DB for $key");
+        throw new CRM_Core_Exception("No records in DB for $key");
       }
     }
     $buffer .= "</CustomData>\n";
@@ -385,7 +371,7 @@ class CRM_Utils_Migrate_Export {
    * @return array
    */
   public function toArray() {
-    $result = array();
+    $result = [];
     foreach (array_keys($this->_xml) as $key) {
       if (!empty($this->_xml[$key]['data'])) {
         $result[$this->_xml[$key]['name']] = array_values($this->_xml[$key]['data']);
@@ -400,8 +386,8 @@ class CRM_Utils_Migrate_Export {
    * @param null $sql
    */
   public function fetch($groupName, $daoName, $sql = NULL) {
-    $idNameFields = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
-    $mappedFields = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
+    $idNameFields = $this->_xml[$groupName]['idNameFields'] ?? NULL;
+    $mappedFields = $this->_xml[$groupName]['mappedFields'] ?? NULL;
 
     $dao = new $daoName();
     if ($sql) {
@@ -436,7 +422,7 @@ class CRM_Utils_Migrate_Export {
    *   new fields
    */
   public function computeMappedFields($mappedFields, $dao) {
-    $keyValues = array();
+    $keyValues = [];
     if ($mappedFields) {
       foreach ($mappedFields as $mappedField) {
         if (isset($dao->{$mappedField[1]})) {
@@ -465,7 +451,7 @@ class CRM_Utils_Migrate_Export {
     $dbFields = &$object->fields();
 
     // Filter the list of keys and values so that we only export interesting stuff
-    $keyValues = array();
+    $keyValues = [];
     foreach ($dbFields as $name => $dontCare) {
       // ignore all ids
       if ($name == 'id' || substr($name, -3, 3) == '_id') {
@@ -474,15 +460,15 @@ class CRM_Utils_Migrate_Export {
       if (isset($object->$name) && $object->$name !== NULL) {
         // hack for extends_entity_column_value
         if ($name == 'extends_entity_column_value') {
-          if (in_array($object->extends, array(
-              'Event',
-              'Activity',
-              'Relationship',
-              'Individual',
-              'Organization',
-              'Household',
-              'Case',
-            ))) {
+          if (in_array($object->extends, [
+            'Event',
+            'Activity',
+            'Relationship',
+            'Individual',
+            'Organization',
+            'Household',
+            'Case',
+          ])) {
             if ($object->extends == 'Event') {
               $key = 'event_type';
             }
@@ -496,16 +482,16 @@ class CRM_Utils_Migrate_Export {
               $key = 'case_type';
             }
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
-            $values = array();
-            if (in_array($object->extends, array('Individual', 'Organization', 'Household'))) {
+            $values = [];
+            if (in_array($object->extends, ['Individual', 'Organization', 'Household'])) {
               $key = 'contact_type';
               $values = $types;
             }
             else {
               foreach ($types as $type) {
-                if (in_array($key, array('activity_type', 'event_type', 'case_type'))) {
+                if (in_array($key, ['activity_type', 'event_type', 'case_type'])) {
                   $ogID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $key, 'id', 'name');
-                  $ovParams = array('option_group_id' => $ogID, 'value' => $type);
+                  $ovParams = ['option_group_id' => $ogID, 'value' => $type];
                   CRM_Core_BAO_OptionValue::retrieve($ovParams, $oValue);
                   $values[] = $oValue['name'];
                 }

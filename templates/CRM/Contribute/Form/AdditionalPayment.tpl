@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $transaction}
@@ -64,7 +48,7 @@
     <tr class="crm-payment-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
       <td>
-        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentType EQ 'refund'}{ts}Refund Due{/ts}{else}{ts}Balance Owed{/ts}{/if}:&nbsp;{$paymentAmt|crmMoney}</span>
+        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentType EQ 'refund' || $paymentAmt < 0}{ts}Refund Due :&nbsp;{$absolutePaymentAmount|crmMoney} {/ts}{else}{ts}Balance Owed{/ts} :&nbsp;{$paymentAmt|crmMoney}{/if}</span>
       </td>
       {if $email and $outBound_option != 2}
         <tr class="crm-payment-form-block-is_email_receipt">
@@ -110,8 +94,6 @@
           </tr>
           <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
-           <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
-            <span class="description">{ts}Net value of the payment (Total Amount minus Fee).{/ts}</span></td></tr>
         </table>
       </div>
       {/if}

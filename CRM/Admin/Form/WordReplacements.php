@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   protected $_numStrings = 10;
@@ -47,7 +31,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     // should rewrite this UI.
     CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
-    $this->_soInstance = CRM_Utils_Array::value('instance', $_GET);
+    $this->_soInstance = $_GET['instance'] ?? NULL;
     $this->assign('soInstance', $this->_soInstance);
   }
 
@@ -61,19 +45,19 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
       return $this->_defaults;
     }
 
-    $this->_defaults = array();
+    $this->_defaults = [];
 
     $config = CRM_Core_Config::singleton();
 
     $values = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($config->lcMessages);
     $i = 1;
 
-    $enableDisable = array(
+    $enableDisable = [
       1 => 'enabled',
       0 => 'disabled',
-    );
+    ];
 
-    $cardMatch = array('wildcardMatch', 'exactMatch');
+    $cardMatch = ['wildcardMatch', 'exactMatch'];
 
     foreach ($enableDisable as $key => $val) {
       foreach ($cardMatch as $kc => $vc) {
@@ -112,9 +96,9 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     }
 
     $soInstances = range(1, $this->_numStrings, 1);
-    $stringOverrideInstances = array();
+    $stringOverrideInstances = [];
     if ($this->_soInstance) {
-      $soInstances = array($this->_soInstance);
+      $soInstances = [$this->_soInstance];
     }
     elseif (!empty($_POST['old'])) {
       $soInstances = $stringOverrideInstances = array_keys($_POST['old']);
@@ -127,8 +111,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     }
     foreach ($soInstances as $instance) {
       $this->addElement('checkbox', "enabled[$instance]");
-      $this->add('textarea', "old[$instance]", NULL, array('rows' => 1, 'cols' => 40));
-      $this->add('textarea', "new[$instance]", NULL, array('rows' => 1, 'cols' => 40));
+      $this->add('text', "old[$instance]", NULL);
+      $this->add('text', "new[$instance]", NULL);
       $this->addElement('checkbox', "cb[$instance]");
     }
     $this->assign('numStrings', $this->_numStrings);
@@ -138,19 +122,18 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
     $this->assign('stringOverrideInstances', empty($stringOverrideInstances) ? FALSE : $stringOverrideInstances);
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
-    $this->addFormRule(array('CRM_Admin_Form_WordReplacements', 'formRule'), $this);
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
+    $this->addFormRule(['CRM_Admin_Form_WordReplacements', 'formRule'], $this);
   }
 
   /**
@@ -163,12 +146,12 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    *   list of errors to be posted back to the form
    */
   public static function formRule($values) {
-    $errors = array();
+    $errors = [];
 
-    $oldValues = CRM_Utils_Array::value('old', $values);
-    $newValues = CRM_Utils_Array::value('new', $values);
-    $enabled = CRM_Utils_Array::value('enabled', $values);
-    $exactMatch = CRM_Utils_Array::value('cb', $values);
+    $oldValues = $values['old'] ?? NULL;
+    $newValues = $values['new'] ?? NULL;
+    $enabled = $values['enabled'] ?? NULL;
+    $exactMatch = $values['cb'] ?? NULL;
 
     foreach ($oldValues as $k => $v) {
       if ($v && !$newValues[$k]) {
@@ -195,32 +178,32 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
     $this->_numStrings = count($params['old']);
 
-    $enabled['exactMatch'] = $enabled['wildcardMatch'] = $disabled['exactMatch'] = $disabled['wildcardMatch'] = array();
+    $enabled['exactMatch'] = $enabled['wildcardMatch'] = $disabled['exactMatch'] = $disabled['wildcardMatch'] = [];
     for ($i = 1; $i <= $this->_numStrings; $i++) {
       if (!empty($params['new'][$i]) && !empty($params['old'][$i])) {
         if (isset($params['enabled']) && !empty($params['enabled'][$i])) {
           if (!empty($params['cb']) && !empty($params['cb'][$i])) {
-            $enabled['exactMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $enabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
           else {
-            $enabled['wildcardMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $enabled['wildcardMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
         }
         else {
           if (isset($params['cb']) && is_array($params['cb']) && array_key_exists($i, $params['cb'])) {
-            $disabled['exactMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $disabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
           else {
-            $disabled['wildcardMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $disabled['wildcardMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
         }
       }
     }
 
-    $overrides = array(
+    $overrides = [
       'enabled' => $enabled,
       'disabled' => $disabled,
-    );
+    ];
 
     $config = CRM_Core_Config::singleton();
     CRM_Core_BAO_WordReplacement::setLocaleCustomStrings($config->lcMessages, $overrides);

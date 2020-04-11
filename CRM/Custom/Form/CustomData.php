@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -45,27 +29,40 @@ class CRM_Custom_Form_CustomData {
    *   $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, $this->getDefaultEntity());
    *
    * @param CRM_Core_Form $form
-   * @param null|string $subType values stored in civicrm_custom_group.extends_entity_column_value
+   * @param null|string $entitySubType values stored in civicrm_custom_group.extends_entity_column_value
    *   e.g Student for contact type
    * @param null|string $subName value in civicrm_custom_group.extends_entity_column_id
    * @param null|int $groupCount number of entities that could have custom data
+   * @param null|int $contact_id contact ID associated with the custom data.
    *
    * @throws \CRM_Core_Exception
    */
-  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1) {
+  public static function addToForm(&$form, $entitySubType = NULL, $subName = NULL, $groupCount = 1, $contact_id = NULL) {
     $entityName = $form->getDefaultEntity();
     $entityID = $form->getEntityId();
+    // If the form has been converted to use entityFormTrait then getEntitySubTypeId() will exist.
+    if (method_exists($form, 'getEntitySubTypeId') && empty($entitySubType)) {
+      $entitySubType = $form->getEntitySubTypeId();
+    }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      self::preProcess($form, $subName, $subType, $groupCount, $entityName, $entityID);
-      self::buildQuickForm($form);
-      self::setDefaultValues($form);
+    if ($form->getAction() == CRM_Core_Action::VIEW) {
+      // Viewing custom data (Use with {include file="CRM/Custom/Page/CustomDataView.tpl"} in template)
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityName, NULL, $entityID, 0, $entitySubType);
+      CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, FALSE, NULL, NULL, NULL, $entityID);
+    }
+    else {
+      // Editing custom data (Use with {include file="CRM/common/customDataBlock.tpl"} in template)
+      if (!empty($_POST['hidden_custom'])) {
+        self::preProcess($form, $subName, $entitySubType, $groupCount, $entityName, $entityID);
+        self::buildQuickForm($form);
+        self::setDefaultValues($form);
+      }
     }
     // need to assign custom data type and subtype to the template
     $form->assign('customDataType', $entityName);
-    $form->assign('customDataSubType', $subType);
+    $form->assign('customDataSubType', $entitySubType);
     $form->assign('entityID', $entityID);
+    $form->assign('cid', $contact_id);
   }
 
   /**
@@ -143,7 +140,7 @@ class CRM_Custom_Form_CustomData {
     }
 
     $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
-    $getCachedTree = isset($form->_getCachedTree) ? $form->_getCachedTree : TRUE;
+    $getCachedTree = $form->_getCachedTree ?? TRUE;
 
     $subType = $form->_subType;
     if (!is_array($subType) && strstr($subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
@@ -159,7 +156,7 @@ class CRM_Custom_Form_CustomData {
    * @return array
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
     CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
     return $defaults;
   }
@@ -174,15 +171,18 @@ class CRM_Custom_Form_CustomData {
   }
 
   /**
-   * @param $form
-   * @param $subType
-   * @param $gid
-   * @param $onlySubType
-   * @param $getCachedTree
+   * Add the group data as a formatted array to the form.
+   *
+   * @param CRM_Core_Form $form
+   * @param string $subType
+   * @param int $gid
+   * @param bool $onlySubType
+   * @param bool $getCachedTree
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
+  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = TRUE) {
     $singleRecord = NULL;
     if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = $form->_groupCount;
@@ -218,11 +218,11 @@ class CRM_Custom_Form_CustomData {
       foreach ($keys as $key) {
         $form->_groupTree[$key] = $groupTree[$key];
       }
-      return array($form, $groupTree);
+      return [$form, $groupTree];
     }
     else {
       $form->_groupTree = $groupTree;
-      return array($form, $groupTree);
+      return [$form, $groupTree];
     }
   }
 

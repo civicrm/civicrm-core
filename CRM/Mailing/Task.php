@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -38,7 +22,7 @@
  */
 class CRM_Mailing_Task extends CRM_Core_Task {
 
-  static $objectType = 'mailing';
+  public static $objectType = 'mailing';
 
   /**
    * These tasks are the core set of tasks that the user can perform
@@ -49,13 +33,13 @@ class CRM_Mailing_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(
-        self::TASK_PRINT => array(
+      self::$_tasks = [
+        self::TASK_PRINT => [
           'title' => ts('Print Mailing Recipients'),
           'class' => 'CRM_Mailing_Form_Task_Print',
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       parent::tasks();
     }
@@ -73,8 +57,8 @@ class CRM_Mailing_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
-    $tasks = array();
+  public static function permissionedTaskTitles($permission, $params = []) {
+    $tasks = [];
 
     $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
     return $tasks;
@@ -96,10 +80,10 @@ class CRM_Mailing_Task extends CRM_Core_Task {
       $value = self::TASK_PRINT;
     }
 
-    return array(
+    return [
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
-    );
+    ];
   }
 
 }

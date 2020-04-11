@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -64,36 +48,36 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    */
   public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_actionLinks = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/uf/group/field/update',
           'qs' => 'reset=1&action=update&id=%%id%%&gid=%%gid%%',
           'title' => ts('Edit CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/uf/group/field',
           'qs' => 'action=preview&id=%%id%%&field=1',
           'title' => ts('Preview CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/uf/group/field',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Enable CiviCRM Profile Field'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_actionLinks;
   }
@@ -109,7 +93,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
     }
 
-    $ufField = array();
+    $ufField = [];
     $ufFieldBAO = new CRM_Core_BAO_UFField();
 
     // fkey is gid
@@ -128,13 +112,13 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
       $this->assign('skipCreate', TRUE);
     }
 
-    $locationType = array();
+    $locationType = [];
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     $fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE);
     $fields = array_merge(CRM_Contribute_BAO_Contribution::getContributionFields(), $fields);
 
-    $select = array();
+    $select = [];
     foreach ($fields as $name => $field) {
       if ($name) {
         $select[$name] = $field['title'];
@@ -145,7 +129,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
 
     $visibility = CRM_Core_SelectValues::ufVisibility();
     while ($ufFieldBAO->fetch()) {
-      $ufField[$ufFieldBAO->id] = array();
+      $ufField[$ufFieldBAO->id] = [];
       $phoneType = $locType = '';
       CRM_Core_DAO::storeValues($ufFieldBAO, $ufField[$ufFieldBAO->id]);
       $ufField[$ufFieldBAO->id]['visibility_display'] = $visibility[$ufFieldBAO->visibility];
@@ -168,10 +152,10 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
       $ufField[$ufFieldBAO->id]['order'] = $ufField[$ufFieldBAO->id]['weight'];
       $ufField[$ufFieldBAO->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
         $action,
-        array(
+        [
           'id' => $ufFieldBAO->id,
           'gid' => $this->_gid,
-        ),
+        ],
         ts('more'),
         FALSE,
         'ufField.row.actions',
@@ -240,7 +224,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
       $groupTitle = CRM_Core_BAO_UFGroup::getTitle($this->_gid);
       $this->assign('gid', $this->_gid);
       $this->assign('groupTitle', $groupTitle);
-      CRM_Utils_System::setTitle(ts('%1 - CiviCRM Profile Fields', array(1 => $groupTitle)));
+      CRM_Utils_System::setTitle(ts('%1 - CiviCRM Profile Fields', [1 => $groupTitle]));
     }
 
     // get the requested action

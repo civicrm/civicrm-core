@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -30,9 +14,7 @@
  * for a component to introduce itself to the system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 abstract class CRM_Core_Component_Info {
 
@@ -79,14 +61,16 @@ abstract class CRM_Core_Component_Info {
   const COMPONENT_MENU_XML = 'Menu';
 
   /**
-   * Stores component information.
-   * @var array component settings as key/value pairs
+   * Component settings as key/value pairs.
+   *
+   * @var array
    */
   public $info;
 
   /**
-   * Stores component keyword.
-   * @var string name of component keyword
+   * Component keyword.
+   *
+   * @var string
    */
   protected $keyword;
 
@@ -113,7 +97,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::angularModules
    */
   public function getAngularModules() {
-    return array();
+    return [];
   }
 
   /**
@@ -134,7 +118,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::managedEntities
    */
   public function getManagedEntities() {
-    return array();
+    return [];
   }
 
   /**
@@ -145,7 +129,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Component_Info::getPermissions
    */
   public function getAnonymousPermissionWarnings() {
-    return array();
+    return [];
   }
 
   /**
@@ -175,7 +159,7 @@ abstract class CRM_Core_Component_Info {
    *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
    */
   public function getReferenceCounts($dao) {
-    return array();
+    return [];
   }
 
   /**
@@ -197,6 +181,15 @@ abstract class CRM_Core_Component_Info {
    *                    null if no element offered
    */
   abstract public function registerTab();
+
+  /**
+   * Get icon font class representing this component.
+   *
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-puzzle-piece';
+  }
 
   /**
    * Provides information about advanced search pane
@@ -312,7 +305,7 @@ abstract class CRM_Core_Component_Info {
    *   true if component needs search integration
    */
   public function usesSearch() {
-    return $this->info['search'] ? TRUE : FALSE;
+    return (bool) $this->info['search'];
   }
 
   /**

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -54,11 +38,11 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     // thank you title and text (html allowed in text)
     $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_title'), TRUE);
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text') + array('class' => 'collapsed');
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text') + ['class' => 'collapsed'];
     $this->add('wysiwyg', 'thankyou_text', ts('Thank-you Message'), $attributes);
     $this->add('wysiwyg', 'thankyou_footer', ts('Thank-you Footer'), $attributes);
 
-    $this->addElement('checkbox', 'is_email_receipt', ts('Email Receipt to Contributor?'), NULL, array('onclick' => "showReceipt()"));
+    $this->addElement('checkbox', 'is_email_receipt', ts('Email Receipt to Contributor?'), NULL, ['onclick' => "showReceipt()"]);
     $this->add('text', 'receipt_from_name', ts('Receipt From Name'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_from_name'));
     $this->add('text', 'receipt_from_email', ts('Receipt From Email'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_from_email'));
     $this->add('textarea', 'receipt_text', ts('Receipt Message'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_text'));
@@ -70,7 +54,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     $this->addRule('bcc_receipt', ts('Please enter a valid list of comma delimited email addresses'), 'emailList');
 
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_ThankYou', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contribute_Form_ContributionPage_ThankYou', 'formRule'], $this);
   }
 
   /**
@@ -87,7 +71,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $options) {
-    $errors = array();
+    $errors = [];
 
     // if is_email_receipt is set, the receipt message must be non-empty
     if (!empty($fields['is_email_receipt'])) {

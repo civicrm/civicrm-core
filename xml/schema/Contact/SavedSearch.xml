@@ -71,6 +71,7 @@
     <title>Where Clause</title>
     <comment>the sql where clause if a saved search acl</comment>
     <add>1.6</add>
+    <drop>5.24</drop>
   </field>
   <field>
     <name>select_tables</name>
@@ -79,6 +80,7 @@
     <comment>the tables to be included in a select data</comment>
     <serialize>PHP</serialize>
     <add>1.6</add>
+    <drop>5.24</drop>
   </field>
   <field>
     <name>where_tables</name>
@@ -87,5 +89,22 @@
     <comment>the tables to be included in the count statement</comment>
     <serialize>PHP</serialize>
     <add>1.6</add>
+    <drop>5.24</drop>
+  </field>
+  <field>
+    <name>api_entity</name>
+    <type>varchar</type>
+    <title>Entity Name</title>
+    <length>255</length>
+    <comment>Entity name for API based search</comment>
+    <add>5.24</add>
+  </field>
+  <field>
+    <name>api_params</name>
+    <type>text</type>
+    <title>API Parameters</title>
+    <comment>Parameters for API based search</comment>
+    <serialize>JSON</serialize>
+    <add>5.24</add>
   </field>
 </table>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,7 +25,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *
    * @var array
    */
-  static $csv = array('contact_type', 'group', 'tag');
+  public static $csv = ['contact_type', 'group', 'tag'];
 
   /**
    * Build the form object.
@@ -54,12 +38,12 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     );
 
     if (!empty($searchOptions['contactType'])) {
-      $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
+      $contactTypes = ['' => ts('- any contact type -')] + CRM_Contact_BAO_ContactType::getSelectElements();
       $this->add('select', 'contact_type',
         ts('is...'),
         $contactTypes,
         FALSE,
-        array('class' => 'crm-select2')
+        ['class' => 'crm-select2']
       );
     }
 
@@ -67,22 +51,22 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     // Get hierarchical listing of groups, respecting ACLs for CRM-16836.
     $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;', TRUE);
     if (!empty($searchOptions['groups'])) {
-      $this->addField('group', array(
-          'entity' => 'group_contact',
-          'label' => ts('in'),
-          'placeholder' => ts('- any group -'),
-          'options' => $groupHierarchy,
-        ));
+      $this->addField('group', [
+        'entity' => 'group_contact',
+        'label' => ts('in'),
+        'placeholder' => ts('- any group -'),
+        'options' => $groupHierarchy,
+      ]);
     }
 
     if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
-        $this->addField('tag', array(
-            'entity' => 'entity_tag',
-            'label' => ts('with'),
-            'placeholder' => ts('- any tag -'),
-          ));
+        $this->addField('tag', [
+          'entity' => 'entity_tag',
+          'label' => ts('with'),
+          'placeholder' => ts('- any tag -'),
+        ]);
       }
     }
 
@@ -97,9 +81,9 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
-    $defaults['sort_name'] = CRM_Utils_Array::value('sort_name', $this->_formValues);
+    $defaults['sort_name'] = $this->_formValues['sort_name'] ?? NULL;
     foreach (self::$csv as $v) {
       if (!empty($this->_formValues[$v]) && is_array($this->_formValues[$v])) {
         $tmpArray = array_keys($this->_formValues[$v]);
@@ -125,7 +109,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Contact_Form_Search_Basic', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Search_Basic', 'formRule']);
   }
 
   /**
@@ -197,14 +181,16 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * If Go is pressed then we must select some checkboxes and an action.
    *
    * @param array $fields
+   * @param array $files
+   * @param object $form
    *
    * @return array|bool
    */
-  public static function formRule($fields) {
+  public static function formRule($fields, $files, $form) {
     // check actionName and if next, then do not repeat a search, since we are going to the next page
     if (array_key_exists('_qf_Search_next', $fields)) {
       if (empty($fields['task'])) {
-        return array('task' => 'Please select a valid action.');
+        return ['task' => 'Please select a valid action.'];
       }
 
       if (CRM_Utils_Array::value('task', $fields) == CRM_Contact_Task::SAVE_SEARCH) {
@@ -222,7 +208,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
           return TRUE;
         }
       }
-      return array('task' => 'Please select one or more checkboxes to perform the action on.');
+      return ['task' => 'Please select one or more checkboxes to perform the action on.'];
     }
     return TRUE;
   }
@@ -232,6 +218,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *
    * @return string
    */
+
   /**
    * @return string
    */

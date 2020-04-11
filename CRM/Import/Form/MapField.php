@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -121,7 +105,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    *
    * @return string
    */
-  public function defaultFromData(&$patterns, $index) {
+  public function defaultFromData($patterns, $index) {
     $best = '';
     $bestHits = 0;
     $n = count($this->_dataValues);
@@ -151,6 +135,39 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
       $this->_fieldUsed[$best] = TRUE;
     }
     return $best;
+  }
+
+  /**
+   * Add the saved mapping fields to the form.
+   *
+   * @param int|null $savedMappingID
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function buildSavedMappingFields($savedMappingID) {
+    //to save the current mappings
+    if (!$savedMappingID) {
+      $saveDetailsName = ts('Save this field mapping');
+      $this->applyFilter('saveMappingName', 'trim');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    else {
+      $savedMapping = $this->get('savedMapping');
+
+      $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
+      $this->set('loadedMapping', $savedMapping);
+      $this->assign('loadedMapping', $mappingName);
+      $this->assign('savedName', $mappingName);
+      $this->add('hidden', 'mappingId', $savedMappingID);
+
+      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
+      $saveDetailsName = ts('Save as a new field mapping');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
   }
 
 }

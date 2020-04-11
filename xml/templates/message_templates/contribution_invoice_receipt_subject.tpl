@@ -9,3 +9,4 @@
 {else}
   {ts}Invoice{/ts}
 {/if}
+ - {contact.display_name}

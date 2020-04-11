@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This form is for Contact Add/Edit interface *}
@@ -63,7 +47,7 @@
               </td>
               {if $contactId}
                 <td>
-                  <label for="internal_identifier_display">{ts}Contact ID{/ts} {help id="id-internal-id"}</label><br />
+                  <label for="internal_identifier_display">{ts}Contact ID{/ts} {help id="id-contact-id"}</label><br />
                   <input id="internal_identifier_display" type="text" class="crm-form-text six" size="6" readonly="readonly" value="{$contactId}">
                 </td>
               {/if}
@@ -301,7 +285,8 @@
           var params = {
             title: data.count == 1 ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}Similar Contacts Found{/ts}"{literal},
             info: "{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:",
-            contacts: data.values
+            contacts: data.values,
+            cid: cid
           };
           if (data.count) {
             openDupeAlert(params);
@@ -389,7 +374,8 @@
           info: data.count ?
             "{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:" :
             "{/literal}{ts escape='js'}No matches found using the default Supervised deduping rule.{/ts}{literal}",
-          contacts: data.values
+          contacts: data.values,
+          cid: cid
         };
         updateDupeAlert(params, data.count ? 'alert' : 'success');
       });
@@ -408,6 +394,10 @@
           <%- contact.display_name %>
         </a>
         <%- contact.email %>
+        <% if (cid) { %>
+          <% var params = {reset: 1, action: 'update', oid: contact.id > cid ? contact.id : cid, cid: contact.id > cid ? cid : contact.id }; %>
+          (<a href="<%= CRM.url('civicrm/contact/merge', params) %>">{/literal}{ts}Merge{/ts}{literal}</a>)
+        <% } %>
       </li>
     <% }); %>
   </ul>

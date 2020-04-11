@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
@@ -138,7 +122,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    */
   public static function getMailingTotalCount($mailingIDs) {
     $dao = new CRM_Core_DAO();
-    $openedCount = array();
+    $openedCount = [];
 
     $open = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -178,7 +162,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    */
   public static function getMailingContactCount($mailingIDs, $contactID) {
     $dao = new CRM_Core_DAO();
-    $openedCount = array();
+    $openedCount = [];
 
     $open = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -232,7 +216,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $contact_id = NULL
   ) {
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $open = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -241,12 +225,12 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $email = CRM_Core_BAO_Email::getTableName();
 
-    $selectClauses = array(
+    $selectClauses = [
       "$contact.display_name as display_name",
       "$contact.id as contact_id",
       "$email.email as email",
       ($is_distinct) ? "MIN({$open}.time_stamp) as date" : "{$open}.time_stamp as date",
-    );
+    ];
 
     if ($is_distinct) {
       $groupBy = " GROUP BY $queue.id ";
@@ -306,17 +290,17 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
     $dao->query($query);
 
-    $results = array();
+    $results = [];
 
     while ($dao->fetch()) {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[] = [
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }

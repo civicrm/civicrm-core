@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -50,7 +34,7 @@ class CRM_Core_Page_AJAX {
     }
 
     if (!$className) {
-      CRM_Core_Error::fatal(ts('Invalid className: %1', array(1 => $className)));
+      CRM_Core_Error::fatal(ts('Invalid className: %1', [1 => $className]));
     }
 
     $fnName = NULL;
@@ -64,7 +48,7 @@ class CRM_Core_Page_AJAX {
 
     switch ($type) {
       case 'method':
-        call_user_func(array($className, $fnName));
+        call_user_func([$className, $fnName]);
         break;
 
       case 'page':
@@ -102,7 +86,7 @@ class CRM_Core_Page_AJAX {
 
     // return false if $id is null and
     // $context is not civicrm_event or civicrm_contribution_page
-    if (!$id || !in_array($context, array('civicrm_event', 'civicrm_contribution_page'))) {
+    if (!$id || !in_array($context, ['civicrm_event', 'civicrm_contribution_page'])) {
       return FALSE;
     }
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($context, $id, NULL);
@@ -113,7 +97,7 @@ class CRM_Core_Page_AJAX {
        INNER JOIN {$context} ce ON cpse.entity_id = ce.id AND ce.id = %1
        SET cps.is_quick_config = 0, cps.financial_type_id = IF(cps.financial_type_id IS NULL, ce.financial_type_id, cps.financial_type_id)
       ";
-      CRM_Core_DAO::executeQuery($sql, array(1 => array($id, 'Integer')));
+      CRM_Core_DAO::executeQuery($sql, [1 => [$id, 'Integer']]);
 
       if ($context == 'civicrm_event') {
         CRM_Core_BAO_Discount::del($id, $context);
@@ -168,15 +152,15 @@ class CRM_Core_Page_AJAX {
   public static function returnJsonResponse($response) {
     // Allow lazy callers to not wrap content in an array
     if (is_string($response)) {
-      $response = array('content' => $response);
+      $response = ['content' => $response];
     }
     // Add session variables to response
     $session = CRM_Core_Session::singleton();
-    $response += array(
+    $response += [
       'status' => 'success',
       'userContext' => htmlspecialchars_decode($session->readUserContext()),
       'title' => CRM_Utils_System::$title,
-    );
+    ];
     // crmMessages will be automatically handled by our ajax preprocessor
     // @see js/Common.js
     if ($session->getStatus(FALSE)) {
@@ -198,7 +182,7 @@ class CRM_Core_Page_AJAX {
   /**
    * Set headers appropriate for a js file.
    *
-   * @param int|NULL $ttl
+   * @param int|null $ttl
    *   Time-to-live (seconds).
    */
   public static function setJsHeaders($ttl = NULL) {
@@ -222,11 +206,11 @@ class CRM_Core_Page_AJAX {
    * @return array
    */
   public static function defaultSortAndPagerParams($defaultOffset = 0, $defaultRowCount = 25, $defaultSort = NULL, $defaultsortOrder = 'asc') {
-    $params = array(
-      '_raw_values' => array(),
-    );
+    $params = [
+      '_raw_values' => [],
+    ];
 
-    $sortMapper = array();
+    $sortMapper = [];
     if (isset($_GET['columns'])) {
       foreach ($_GET['columns'] as $key => $value) {
         $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnNameOrAlias');
@@ -261,16 +245,23 @@ class CRM_Core_Page_AJAX {
    *
    * @return array
    */
-  public static function validateParams($requiredParams = array(), $optionalParams = array()) {
-    $params = array();
+  public static function validateParams($requiredParams = [], $optionalParams = []) {
+    $params = [];
 
     foreach ($requiredParams as $param => $type) {
       $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
     }
 
     foreach ($optionalParams as $param => $type) {
-      if (CRM_Utils_Array::value($param, $_GET)) {
-        $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
+      if (!empty($_GET[$param])) {
+        if (!is_array($_GET[$param])) {
+          $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
+        }
+        else {
+          foreach ($_GET[$param] as $index => $value) {
+            $params[$param][$index] = CRM_Utils_Type::validate($value, $type);
+          }
+        }
       }
     }
 

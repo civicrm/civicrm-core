@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
 
@@ -39,7 +23,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -59,30 +43,30 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/acl/entityrole',
           'qs' => 'action=update&id=%%id%%',
           'title' => ts('Edit ACL Role Assignment'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL Role Assignment'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable ACL Role Assignment'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/acl/entityrole',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete ACL Role Assignment'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -98,14 +82,12 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     $id = $this->getIdAndAction();
 
     // set breadcrumb to append to admin/access
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Access Control'),
-        'url' => CRM_Utils_System::url('civicrm/admin/access',
-          'reset=1'
-        ),
-      ),
-    );
+        'url' => CRM_Utils_System::url('civicrm/admin/access', 'reset=1'),
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Assign Users to Roles'));
 
@@ -134,7 +116,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
   public function browse() {
 
     // get all acl's sorted by weight
-    $entityRoles = array();
+    $entityRoles = [];
     $dao = new CRM_ACL_DAO_EntityRole();
     $dao->find();
 
@@ -142,10 +124,10 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     $groups = CRM_Core_PseudoConstant::staticGroup();
 
     while ($dao->fetch()) {
-      $entityRoles[$dao->id] = array();
+      $entityRoles[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $entityRoles[$dao->id]);
 
-      $entityRoles[$dao->id]['acl_role'] = CRM_Utils_Array::value($dao->acl_role_id, $aclRoles);
+      $entityRoles[$dao->id]['acl_role'] = $aclRoles[$dao->acl_role_id] ?? NULL;
       $entityRoles[$dao->id]['entity'] = $groups[$dao->entity_id];
 
       // form all action links
@@ -160,7 +142,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
       $entityRoles[$dao->id]['action'] = CRM_Core_Action::formLink(
         self::links(),
         $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'entityRole.manage.action',

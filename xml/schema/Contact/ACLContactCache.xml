@@ -25,13 +25,6 @@
     <comment>FK to civicrm_contact (could be null for anon user)</comment>
     <add>3.1</add>
   </field>
-  <foreignKey>
-    <name>user_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>3.1</add>
-    <onDelete>CASCADE</onDelete>
-  </foreignKey>
   <field>
     <name>contact_id</name>
     <title>Contact ID</title>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -85,6 +69,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Status of personal campaign page
    * @var array
+   * @deprecated
    */
   private static $pcpStatus;
 
@@ -124,7 +109,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$financialType);
+      $result = self::$financialType[$id] ?? NULL;
       return $result;
     }
     return self::$financialType;
@@ -165,7 +150,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 
     }
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$financialAccount[$cacheKey]);
+      $result = self::$financialAccount[$cacheKey][$id] ?? NULL;
       return $result;
     }
     return self::$financialAccount[$cacheKey];
@@ -213,7 +198,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       );
     }
     if ($id) {
-      $pageTitle = CRM_Utils_Array::value($id, $cacheVarToUse);
+      $pageTitle = $cacheVarToUse[$id] ?? NULL;
       return $pageTitle;
     }
     return $cacheVarToUse;
@@ -260,7 +245,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array of all Premiums if any
    */
   public static function products($pageID = NULL) {
-    $products = array();
+    $products = [];
     $dao = new CRM_Contribute_DAO_Product();
     $dao->is_active = 1;
     $dao->orderBy('id');
@@ -276,7 +261,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       $dao->find(TRUE);
       $premiumID = $dao->id;
 
-      $productID = array();
+      $productID = [];
 
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->premiums_id = $premiumID;
@@ -285,7 +270,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
         $productID[$dao->product_id] = $dao->product_id;
       }
 
-      $tempProduct = array();
+      $tempProduct = [];
       foreach ($products as $key => $value) {
         if (!array_key_exists($key, $productID)) {
           $tempProduct[$key] = $value;
@@ -316,7 +301,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     $result = self::$contributionStatus[$cacheKey];
     if ($id) {
-      $result = CRM_Utils_Array::value($id, $result);
+      $result = $result[$id] ?? NULL;
     }
 
     return $result;
@@ -347,7 +332,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     $result = self::$pcPage[$pageType];
     if ($id) {
-      return $result = CRM_Utils_Array::value($id, $result);
+      return $result = $result[$id] ?? NULL;
     }
 
     return $result;
@@ -358,17 +343,18 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array pcpStatus is returned
    *
-   *
+   * @deprecated
    * @param string $column
    * @return array
    *   array reference of all PCP activity statuses
    */
   public static function &pcpStatus($column = 'label') {
+    CRM_Core_Error::deprecatedFunctionWarning('Function pcpStatus will be removed');
     if (NULL === self::$pcpStatus) {
-      self::$pcpStatus = array();
+      self::$pcpStatus = [];
     }
     if (!array_key_exists($column, self::$pcpStatus)) {
-      self::$pcpStatus[$column] = array();
+      self::$pcpStatus[$column] = [];
 
       self::$pcpStatus[$column] = CRM_Core_OptionGroup::values('pcp_status', FALSE,
         FALSE, FALSE, NULL, $column
@@ -390,11 +376,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return int
    */
   public static function getRelationalFinancialAccount($entityId, $accountRelationType, $entityTable = 'civicrm_financial_type', $returnField = 'financial_account_id') {
-    $params = array(
-      'return' => array($returnField),
+    $params = [
+      'return' => [$returnField],
       'entity_table' => $entityTable,
       'entity_id' => $entityId,
-    );
+    ];
     if ($accountRelationType) {
       $params['account_relationship.name'] = $accountRelationType;
     }
@@ -428,7 +414,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$batch);
+      $result = self::$batch[$id] ?? NULL;
       return $result;
     }
     return self::$batch;

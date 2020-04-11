@@ -1,4 +1,4 @@
-{contact.email_greeting}
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
 {$event.confirm_email_text}
 {/if}
@@ -32,9 +32,6 @@
 {$pay_later_receipt}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
-{else}
-
-{ts}Please print this confirmation for your records.{/ts}
 {/if}
 
 
@@ -195,7 +192,7 @@
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+{if $billingName}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
@@ -207,7 +204,7 @@
 {$address}
 {/if}
 
-{if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+{if $credit_card_type}
 ===========================================================
 {ts}Credit Card Information{/ts}
 

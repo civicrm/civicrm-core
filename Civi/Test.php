@@ -14,7 +14,38 @@ class Test {
   /**
    * @var array
    */
-  private static $singletons = array();
+  private static $singletons = [];
+
+  /**
+   * @var array
+   */
+  public static $statics = [];
+
+  /**
+   * Run code in a pre-boot fashion.
+   *
+   * @param callable $callback
+   * @return mixed
+   *   Pass through the result of the callback.
+   */
+  public static function asPreInstall($callback) {
+    $conn = \Civi\Test::pdo();
+
+    $oldEscaper = \CRM_Core_I18n::$SQL_ESCAPER;
+    \Civi::$statics['testPreInstall'] = (\Civi::$statics['testPreInstall'] ?? 0) + 1;
+    try {
+      \CRM_Core_I18n::$SQL_ESCAPER = function ($text) use ($conn) {
+        return substr($conn->quote($text), 1, -1);
+      };
+      return $callback();
+    } finally {
+      \CRM_Core_I18n::$SQL_ESCAPER = $oldEscaper;
+      \Civi::$statics['testPreInstall']--;
+      if (\Civi::$statics['testPreInstall'] <= 0) {
+        unset(\Civi::$statics['testPreInstall']);
+      }
+    }
+  }
 
   /**
    * Get the data source used for testing.
@@ -45,7 +76,7 @@ class Test {
   /**
    * Get a connection to the test database.
    *
-   * @return PDO
+   * @return \PDO
    */
   public static function pdo() {
     if (!isset(self::$singletons['pdo'])) {
@@ -55,7 +86,7 @@ class Test {
       try {
         self::$singletons['pdo'] = new PDO("mysql:host={$host}" . ($port ? ";port=$port" : ""),
           $dsninfo['username'], $dsninfo['password'],
-          array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE)
+          [PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE]
         );
       }
       catch (PDOException $e) {
@@ -88,7 +119,7 @@ class Test {
         echo "Installing {$dbName} schema\n";
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
-      ->sqlFile($civiRoot . "/sql/civicrm.mysql")
+      ->coreSchema()
       ->sql("DELETE FROM civicrm_extension")
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
@@ -127,6 +158,18 @@ class Test {
     return self::$singletons['schema'];
   }
 
+  /**
+   * @return \CRM_Core_CodeGen_Main
+   */
+  public static function codeGen() {
+    if (!isset(self::$singletons['codeGen'])) {
+      $civiRoot = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
+      $codeGen = new \CRM_Core_CodeGen_Main("$civiRoot/CRM/Core/DAO", "$civiRoot/sql", $civiRoot, "$civiRoot/templates", NULL, "UnitTests", NULL, "$civiRoot/xml/schema/Schema.xml", NULL);
+      $codeGen->init();
+      self::$singletons['codeGen'] = $codeGen;
+    }
+    return self::$singletons['codeGen'];
+  }
 
   /**
    * @return \Civi\Test\Data

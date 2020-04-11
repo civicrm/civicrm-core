@@ -11,8 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
-
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
   <!-- END HEADER -->
@@ -21,7 +20,8 @@
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    <p>{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}</p>
    </td>
   </tr>
   {if !$isAdditional and $participant.id}
@@ -33,14 +33,14 @@
    <tr>
     <td colspan="2" {$valueStyle}>
      {capture assign=confirmUrl}{crmURL p='civicrm/event/confirm' q="reset=1&participantId=`$participant.id`&cs=`$checksumValue`" a=true h=0 fe=1}{/capture}
-     <a href="{$confirmUrl}">Go to a web page where you can confirm your registration online</a>
+     <a href="{$confirmUrl}">{ts}Click here to confirm and complete your registration{/ts}</a>
     </td>
    </tr>
   {/if}
   {if $event.allow_selfcancelxfer }
-  This event allows for self-cancel or transfer
-  {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
-       <a href="{$selfService}">{ts}Self service cancel transfer{/ts}</a>
+  {ts}This event allows for{/ts}
+  {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}" h=0 a=1 fe=1}{/capture}
+       <a href="{$selfService}"> {ts}self service cancel or transfer{/ts}</a>
   {/if}
 
   <tr>

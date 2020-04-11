@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -74,7 +58,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
       }
 
       // preview for field
-      $specialFields = array(
+      $specialFields = [
         'address_name',
         'street_address',
         'supplemental_address_1',
@@ -91,7 +75,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
         'phone',
         'email',
         'im',
-      );
+      ];
 
       if ($fieldDAO->location_type_id) {
         $name .= '-' . $fieldDAO->location_type_id;
@@ -107,7 +91,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
       $fieldArray[$name] = $fields[$name];
 
       if ($fieldDAO->field_name == 'phone_and_ext') {
-        $phoneExtField = str_replace('phone', 'phone_ext', $name);;
+        $phoneExtField = str_replace('phone', 'phone_ext', $name);
         $fieldArray[$phoneExtField] = $fields[$phoneExtField];
       }
 
@@ -131,13 +115,13 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'cancel',
         'name' => ts('Done with Preview'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

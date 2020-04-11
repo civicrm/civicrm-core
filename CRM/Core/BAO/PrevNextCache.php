@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -51,29 +35,29 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
    */
   public static function getPositions($cacheKey, $id1, $id2, &$mergeId = NULL, $join = NULL, $where = NULL, $flip = FALSE) {
     if ($flip) {
-      list($id1, $id2) = array($id2, $id1);
+      list($id1, $id2) = [$id2, $id1];
     }
 
     if ($mergeId == NULL) {
       $query = "
 SELECT id
 FROM   civicrm_prevnext_cache
-WHERE  cacheKey     = %3 AND
+WHERE  cachekey     = %3 AND
        entity_id1 = %1 AND
        entity_id2 = %2 AND
        entity_table = 'civicrm_contact'
 ";
 
-      $params = array(
-        1 => array($id1, 'Integer'),
-        2 => array($id2, 'Integer'),
-        3 => array($cacheKey, 'String'),
-      );
+      $params = [
+        1 => [$id1, 'Integer'],
+        2 => [$id2, 'Integer'],
+        3 => [$cacheKey, 'String'],
+      ];
 
       $mergeId = CRM_Core_DAO::singleValueQuery($query, $params);
     }
 
-    $pos = array('foundEntry' => 0);
+    $pos = ['foundEntry' => 0];
     if ($mergeId) {
       $pos['foundEntry'] = 1;
 
@@ -82,12 +66,12 @@ WHERE  cacheKey     = %3 AND
         $where = " AND {$where}";
 
       }
-      $p = array(
-        1 => array($mergeId, 'Integer'),
-        2 => array($cacheKey, 'String'),
-      );
+      $p = [
+        1 => [$mergeId, 'Integer'],
+        2 => [$cacheKey, 'String'],
+      ];
       $sql = "SELECT pn.id, pn.entity_id1, pn.entity_id2, pn.data FROM civicrm_prevnext_cache pn {$join} ";
-      $wherePrev = " WHERE pn.id < %1 AND pn.cacheKey = %2 {$where} ORDER BY ID DESC LIMIT 1";
+      $wherePrev = " WHERE pn.id < %1 AND pn.cachekey = %2 {$where} ORDER BY ID DESC LIMIT 1";
       $sqlPrev = $sql . $wherePrev;
 
       $dao = CRM_Core_DAO::executeQuery($sqlPrev, $p);
@@ -98,7 +82,7 @@ WHERE  cacheKey     = %3 AND
         $pos['prev']['data'] = $dao->data;
       }
 
-      $whereNext = " WHERE pn.id > %1 AND pn.cacheKey = %2 {$where} ORDER BY ID ASC LIMIT 1";
+      $whereNext = " WHERE pn.id > %1 AND pn.cachekey = %2 {$where} ORDER BY ID ASC LIMIT 1";
       $sqlNext = $sql . $whereNext;
 
       $dao = CRM_Core_DAO::executeQuery($sqlNext, $p);
@@ -123,41 +107,41 @@ WHERE  cacheKey     = %3 AND
 
     //clear cache
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
-    $params = array(1 => array($entityTable, 'String'));
+    $params = [1 => [$entityTable, 'String']];
 
     if (is_numeric($id)) {
       $sql .= " AND ( entity_id1 = %2 OR entity_id2 = %2 )";
-      $params[2] = array($id, 'Integer');
+      $params[2] = [$id, 'Integer'];
     }
 
     if (isset($cacheKey)) {
-      $sql .= " AND cacheKey LIKE %3";
-      $params[3] = array("{$cacheKey}%", 'String');
+      $sql .= " AND cachekey LIKE %3";
+      $params[3] = ["{$cacheKey}%", 'String'];
     }
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
   /**
-   * Delete from the previous next cache table for a pair of ids.
+   * Delete pair from the previous next cache table to remove it from further merge consideration.
+   *
+   * The pair may have been flipped, so make sure we delete using both orders
    *
    * @param int $id1
    * @param int $id2
    * @param string $cacheKey
-   * @param bool $isViceVersa
-   * @param string $entityTable
    */
-  public static function deletePair($id1, $id2, $cacheKey = NULL, $isViceVersa = FALSE, $entityTable = 'civicrm_contact') {
-    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
-    $params = array(1 => array($entityTable, 'String'));
+  public static function deletePair($id1, $id2, $cacheKey = NULL) {
+    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = 'civicrm_contact'";
 
-    $pair = !$isViceVersa ? "entity_id1 = %2 AND entity_id2 = %3" : "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
+    $pair = "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
     $sql .= " AND ( {$pair} )";
-    $params[2] = array($id1, 'Integer');
-    $params[3] = array($id2, 'Integer');
+    $params[2] = [$id1, 'Integer'];
+    $params[3] = [$id2, 'Integer'];
 
     if (isset($cacheKey)) {
-      $sql .= " AND cacheKey LIKE %4";
-      $params[4] = array("{$cacheKey}%", 'String'); // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
+      $sql .= " AND cachekey LIKE %4";
+      // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
+      $params[4] = ["{$cacheKey}%", 'String'];
     }
 
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -170,10 +154,12 @@ WHERE  cacheKey     = %3 AND
    * @param int $id2
    * @param string $cacheKey
    * @param array $conflicts
+   * @param string $mode
    *
    * @return bool
+   * @throws CRM_Core_Exception
    */
-  public static function markConflict($id1, $id2, $cacheKey, $conflicts) {
+  public static function markConflict($id1, $id2, $cacheKey, $conflicts, $mode) {
     if (empty($cacheKey) || empty($conflicts)) {
       return FALSE;
     }
@@ -182,26 +168,47 @@ WHERE  cacheKey     = %3 AND
       FROM  civicrm_prevnext_cache pn
       WHERE
       ((pn.entity_id1 = %1 AND pn.entity_id2 = %2) OR (pn.entity_id1 = %2 AND pn.entity_id2 = %1)) AND
-      (cacheKey = %3 OR cacheKey = %4)";
-    $params = array(
-      1 => array($id1, 'Integer'),
-      2 => array($id2, 'Integer'),
-      3 => array("{$cacheKey}", 'String'),
-      4 => array("{$cacheKey}_conflicts", 'String'),
-    );
+      (cachekey = %3 OR cachekey = %4)";
+    $params = [
+      1 => [$id1, 'Integer'],
+      2 => [$id2, 'Integer'],
+      3 => ["{$cacheKey}", 'String'],
+      4 => ["{$cacheKey}_conflicts", 'String'],
+    ];
     $pncFind = CRM_Core_DAO::executeQuery($sql, $params);
+
+    $conflictTexts = [];
+
+    foreach ($conflicts as $entity => $entityConflicts) {
+      if ($entity === 'contact') {
+        foreach ($entityConflicts as $conflict) {
+          $conflictTexts[] = "{$conflict['title']}: '{$conflict[$id1]}' vs. '{$conflict[$id2]}'";
+        }
+      }
+      else {
+        foreach ($entityConflicts as $locationConflict) {
+          if (!is_array($locationConflict)) {
+            continue;
+          }
+          $displayField = CRM_Dedupe_Merger::getLocationBlockInfo()[$entity]['displayField'];
+          $conflictTexts[] = "{$locationConflict['title']}: '{$locationConflict[$displayField][$id1]}' vs. '{$locationConflict[$displayField][$id2]}'";
+        }
+      }
+    }
+    $conflictString = implode(', ', $conflictTexts);
 
     while ($pncFind->fetch()) {
       $data = $pncFind->data;
       if (!empty($data)) {
-        $data = unserialize($data);
-        $data['conflicts'] = implode(",", array_values($conflicts));
+        $data = CRM_Core_DAO::unSerializeField($data, CRM_Core_DAO::SERIALIZE_PHP);
+        $data['conflicts'] = $conflictString;
+        $data[$mode]['conflicts'] = $conflicts;
 
         $pncUp = new CRM_Core_DAO_PrevNextCache();
         $pncUp->id = $pncFind->id;
         if ($pncUp->find(TRUE)) {
           $pncUp->data     = serialize($data);
-          $pncUp->cacheKey = "{$cacheKey}_conflicts";
+          $pncUp->cachekey = "{$cacheKey}_conflicts";
           $pncUp->save();
         }
       }
@@ -232,30 +239,30 @@ WHERE  cacheKey     = %3 AND
    *
    * @return array
    */
-  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = array(), $orderByClause = '', $includeConflicts = TRUE, $params = array()) {
+  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = [], $orderByClause = '', $includeConflicts = TRUE, $params = []) {
     $selectString = 'pn.*';
 
     if (!empty($select)) {
-      $aliasArray = array();
+      $aliasArray = [];
       foreach ($select as $column => $alias) {
         $aliasArray[] = $column . ' as ' . $alias;
       }
       $selectString .= " , " . implode(' , ', $aliasArray);
     }
 
-    $params = array(
-      1 => array($cacheKey, 'String'),
-    ) + $params;
+    $params = [
+      1 => [$cacheKey, 'String'],
+    ] + $params;
 
     if (!empty($whereClause)) {
       $whereClause = " AND " . $whereClause;
     }
     if ($includeConflicts) {
-      $where = ' WHERE (pn.cacheKey = %1 OR pn.cacheKey = %2)' . $whereClause;
-      $params[2] = array("{$cacheKey}_conflicts", 'String');
+      $where = ' WHERE (pn.cachekey = %1 OR pn.cachekey = %2)' . $whereClause;
+      $params[2] = ["{$cacheKey}_conflicts", 'String'];
     }
     else {
-      $where = ' WHERE (pn.cacheKey = %1)' . $whereClause;
+      $where = ' WHERE (pn.cachekey = %1)' . $whereClause;
     }
 
     $query = "
@@ -275,28 +282,28 @@ FROM   civicrm_prevnext_cache pn
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $main  = array();
+    $main  = [];
     $count = 0;
     while ($dao->fetch()) {
       if (self::is_serialized($dao->data)) {
-        $main[$count] = unserialize($dao->data);
+        $main[$count] = CRM_Utils_String::unserialize($dao->data);
       }
       else {
         $main[$count] = $dao->data;
       }
 
       if (!empty($select)) {
-        $extraData = array();
+        $extraData = [];
         foreach ($select as $sfield) {
-          $extraData[$sfield]  = $dao->$sfield;
+          $extraData[$sfield] = $dao->$sfield;
         }
-        $main[$count] = array(
+        $main[$count] = [
           'prevnext_id' => $dao->id,
           'is_selected' => $dao->is_selected,
           'entity_id1'  => $dao->entity_id1,
           'entity_id2'  => $dao->entity_id2,
           'data'        => $main[$count],
-        );
+        ];
         $main[$count] = array_merge($main[$count], $extraData);
       }
       $count++;
@@ -311,18 +318,54 @@ FROM   civicrm_prevnext_cache pn
    * @return bool
    */
   public static function is_serialized($string) {
-    return (@unserialize($string) !== FALSE);
+    return (@CRM_Utils_String::unserialize($string) !== FALSE);
   }
 
   /**
-   * @param $values
+   * @param string $sqlValues string of SQLValues to insert
+   * @return array
    */
-  public static function setItem($values) {
-    $insert = "INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES \n";
-    $query = $insert . implode(",\n ", $values);
+  public static function convertSetItemValues($sqlValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
+    $closingBrace = strpos($sqlValues, ')') - strlen($sqlValues);
+    $valueArray = array_map('trim', explode(', ', substr($sqlValues, strpos($sqlValues, '(') + 1, $closingBrace - 1)));
+    foreach ($valueArray as $key => &$value) {
+      // remove any quotes from values.
+      if (substr($value, 0, 1) == "'") {
+        $valueArray[$key] = substr($value, 1, -1);
+      }
+    }
+    return $valueArray;
+  }
 
-    //dump the dedupe matches in the prevnext_cache table
-    CRM_Core_DAO::executeQuery($query);
+  /**
+   * @deprecated
+   *
+   * @param array|string $entity_table
+   * @param int $entity_id1
+   * @param int $entity_id2
+   * @param string $cacheKey
+   * @param string $data
+   */
+  public static function setItem($entity_table = NULL, $entity_id1 = NULL, $entity_id2 = NULL, $cacheKey = NULL, $data = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
+    // If entity table is an array we are passing in an older format where this function only had 1 param $values. We put a deprecation warning.
+    if (!empty($entity_table) && is_array($entity_table)) {
+      Civi::log()->warning('Deprecated code path. Values should not be set this is going away in the future in favour of specific function params for each column.', array('civi.tag' => 'deprecated'));
+      foreach ($values as $value) {
+        $valueArray = self::convertSetItemValues($value);
+        self::setItem($valueArray[0], $valueArray[1], $valueArray[2], $valueArray[3], $valueArray[4]);
+      }
+    }
+    else {
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
+        (%1, %2, %3, %4, '{$data}')", [
+          1 => [$entity_table, 'String'],
+          2 => [$entity_id1, 'Integer'],
+          3 => [$entity_id2, 'Integer'],
+          4 => [$cacheKey, 'String'],
+        ]);
+    }
   }
 
   /**
@@ -337,20 +380,20 @@ FROM   civicrm_prevnext_cache pn
    *
    * @return int
    */
-  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=", $params = array()) {
+  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=", $params = []) {
     $query = "
 SELECT COUNT(*) FROM civicrm_prevnext_cache pn
        {$join}
-WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
+WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
 ";
     if ($where) {
       $query .= " AND {$where}";
     }
 
-    $params = array(
-      1 => array($cacheKey, 'String'),
-      2 => array("{$cacheKey}_conflicts", 'String'),
-    ) + $params;
+    $params = [
+      1 => [$cacheKey, 'String'],
+      2 => ["{$cacheKey}_conflicts", 'String'],
+    ] + $params;
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }
 
@@ -359,7 +402,6 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
    *
    * @param int $rgid
    * @param int $gid
-   * @param NULL $cacheKeyString
    * @param array $criteria
    *   Additional criteria to filter by.
    *
@@ -371,47 +413,49 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
    *  The search methodology finds all matches for the searchedContacts so this limits
    *  the number of searched contacts, not the matches found.
    *
-   * @return bool
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions, $searchLimit = 0) {
-    if (!$cacheKeyString && $rgid) {
-      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
-    }
-
-    if (!$cacheKeyString) {
-      return FALSE;
-    }
+  public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);
 
     // 1. Clear cache if any
-    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cacheKey LIKE %1";
-    CRM_Core_DAO::executeQuery($sql, array(1 => array("{$cacheKeyString}%", 'String')));
+    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cachekey LIKE %1";
+    CRM_Core_DAO::executeQuery($sql, [1 => ["{$cacheKeyString}%", 'String']]);
 
     // FIXME: we need to start using temp tables / queries here instead of arrays.
     // And cleanup code in CRM/Contact/Page/DedupeFind.php
 
     // 2. FILL cache
-    $foundDupes = array();
+    $foundDupes = [];
     if ($rgid && $gid) {
       $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid, $searchLimit);
     }
     elseif ($rgid) {
-      $contactIDs = array();
+      $contactIDs = [];
       // The thing we really need to filter out is any chaining that would 'DO SOMETHING' to the DB.
       // criteria could be passed in via url so we want to ensure nothing could be in that url that
       // would chain to a delete. Limiting to getfields for 'get' limits us to declared fields,
       // although we might wish to revisit later to allow joins.
       $validFieldsForRetrieval = civicrm_api3('Contact', 'getfields', ['action' => 'get'])['values'];
-      if (!empty($criteria)) {
+      $filteredCriteria = isset($criteria['contact']) ? array_intersect_key($criteria['contact'], $validFieldsForRetrieval) : [];
+
+      if (!empty($criteria) || !empty($searchLimit)) {
         $contacts = civicrm_api3('Contact', 'get', array_merge([
-          'options' => ['limit' => 0],
+          'options' => ['limit' => $searchLimit],
           'return' => 'id',
           'check_permissions' => TRUE,
-        ], array_intersect_key($criteria['contact'], $validFieldsForRetrieval)));
+          'contact_type' => civicrm_api3('RuleGroup', 'getvalue', ['id' => $rgid, 'return' => 'contact_type']),
+        ], $filteredCriteria));
         $contactIDs = array_keys($contacts['values']);
+
+        if (empty($contactIDs)) {
+          // If there is criteria but no contacts were found then we should return now
+          // since we have no contacts to match.
+          return [];
+        }
       }
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions, $searchLimit);
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
     }
 
     if (!empty($foundDupes)) {
@@ -419,25 +463,15 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     }
   }
 
+  /**
+   * Old function to clean up he cache.
+   *
+   * @deprecated.
+   */
   public static function cleanupCache() {
-    // clean up all prev next caches older than $cacheTimeIntervalDays days
-    $cacheTimeIntervalDays = 2;
-
-    // first find all the cacheKeys that match this
-    $sql = "
-DELETE     pn, c
-FROM       civicrm_cache c
-INNER JOIN civicrm_prevnext_cache pn ON c.path = pn.cacheKey
-WHERE      c.group_name = %1
-AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
-";
-    $params = array(
-      1 => array('CiviCRM Search PrevNextCache', 'String'),
-      2 => array($cacheTimeIntervalDays, 'Integer'),
-    );
-    CRM_Core_DAO::executeQuery($sql, $params);
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
+    Civi::service('prevnext')->cleanup();
   }
-
 
   /**
    * Get the selections.
@@ -449,6 +483,7 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
    * @see CRM_Core_PrevNextCache_Sql::getSelection()
    */
   public static function getSelection($cacheKey, $action = 'get') {
+    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
     return Civi::service('prevnext')->getSelection($cacheKey, $action);
   }
 
@@ -467,9 +502,9 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
     foreach ($prevNextId as $id) {
       $dao->id = $id;
       if ($dao->find(TRUE)) {
-        $originalData = unserialize($dao->data);
-        $srcFields = array('ID', 'Name');
-        $swapFields = array('srcID', 'srcName', 'dstID', 'dstName');
+        $originalData = CRM_Utils_String::unserialize($dao->data);
+        $srcFields = ['ID', 'Name'];
+        $swapFields = ['srcID', 'srcName', 'dstID', 'dstName'];
         $data = array_diff_assoc($originalData, array_fill_keys($swapFields, 1));
         foreach ($srcFields as $key) {
           $data['src' . $key] = $originalData['dst' . $key];
@@ -481,6 +516,44 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
         $dao->save();
       }
     }
+  }
+
+  /**
+   * Get a list of available backend services.
+   *
+   * @return array
+   *   Array(string $id => string $label).
+   */
+  public static function getPrevNextBackends() {
+    return [
+      'default' => ts('Default (Auto-detect)'),
+      'sql' => ts('SQL'),
+      'redis' => ts('Redis'),
+    ];
+  }
+
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * This specifically supports testing the dedupe use case.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName === 'cachekey') {
+      $this->cachekey = 'merge_' . rand();
+      return;
+    }
+    if ($fieldName === 'data') {
+      $this->data = serialize([]);
+      return;
+    }
+    parent::assignTestValue($fieldName, $fieldDef, $counter);
   }
 
 }

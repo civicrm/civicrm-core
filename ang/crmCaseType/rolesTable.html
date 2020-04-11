@@ -5,17 +5,23 @@ Required vars: caseType
 <table>
   <thead>
 	  <tr>
-	    <th>{{ts('Name')}}</th>
+	    <th>{{ts('Display Label')}}</th>
 	    <th>{{ts('Assign to Creator')}}</th>
 	    <th>{{ts('Is Manager')}}</th>
+	    <th>{{ts('Restrict to Groups')}}</th>
 	    <th></th>
 	  </tr>
   </thead>
   <tbody>
-	  <tr ng-repeat="relType in caseType.definition.caseRoles | orderBy:'name'" ng-class-even="'crm-entity even-row even'" ng-class-odd="'crm-entity odd-row odd'">
-	    <td>{{relType.name}}</td>
+	  <tr ng-repeat="relType in caseType.definition.caseRoles | orderBy:'displayLabel'" ng-class-even="'crm-entity even-row even'" ng-class-odd="'crm-entity odd-row odd'">
+      <!-- display label (client-perspective) -->
+	    <td>{{relType.displayLabel}}</td>
 	    <td><input type="checkbox" ng-model="relType.creator" ng-true-value="'1'" ng-false-value="'0'"></td>
 	    <td><input type="radio" ng-model="relType.manager" value="1" ng-change="onManagerChange(relType)"></td>
+	    <td><input ng-list class="big"
+				crm-entityref="{entity: 'Group', api: {id_field: 'name', params: {is_hidden: 0, is_active: 1}}, select: {allowClear: true, multiple: true, placeholder: ts('Select Group')}}"
+				ng-model="relType.groups"
+			/></td>
 	    <td>
 	      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.caseRoles,relType)" title="{{ts('Remove')}}"></a>
 	    </td>

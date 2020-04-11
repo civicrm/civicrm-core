@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
 
@@ -50,7 +34,7 @@ SELECT count(*) as count
 FROM   civicrm_mailing_recipients
 WHERE  mailing_id = %1
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
@@ -73,13 +57,29 @@ WHERE  mailing_id = %1
       $limitString = "LIMIT $offset, $limit";
     }
 
+    $isSMSmode = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $mailingID, 'sms_provider_id', 'id');
+    $additionalJoin = '';
+    if (!$isSMSmode) {
+      // mailing_recipients added when mailing is submitted in UI by user.
+      // if any email is marked on_hold =1 or contact is deceased after mailing is submitted
+      // then it should be get skipped while preparing event_queue
+      // event_queue list is prepared when mailing job gets started.
+      $additionalJoin = " INNER JOIN civicrm_email e ON (r.email_id = e.id AND e.on_hold = 0)
+                          INNER JOIN civicrm_contact c on (c.id = r.contact_id AND c.is_deceased <> 1 AND c.do_not_email = 0 AND c.is_opt_out = 0)
+";
+    }
+    else {
+      $additionalJoin = "INNER JOIN civicrm_contact c on (c.id = r.contact_id AND c.is_deceased <> 1 AND c.do_not_sms = 0 AND c.is_opt_out = 0)";
+    }
+
     $sql = "
-SELECT contact_id, email_id, phone_id
-FROM   civicrm_mailing_recipients
-WHERE  mailing_id = %1
+SELECT r.contact_id, r.email_id, r.phone_id
+FROM   civicrm_mailing_recipients r
+{$additionalJoin}
+WHERE  r.mailing_id = %1
        $limitString
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
 
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
@@ -99,14 +99,13 @@ WHERE  mailing_id = %1
     if ($totalLimit) {
       $limitString = "LIMIT 0, $totalLimit";
     }
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS  srcMailing_$sourceMailingId");
+    $temporaryTable = CRM_Utils_SQL_TempTable::build()
+      ->setCategory('sr' . $sourceMailingId)
+      ->setMemory()
+      ->createWithColumns("mailing_recipient_id int unsigned, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id)");
+    $temporaryTableName = $temporaryTable->getName();
     $sql = "
-CREATE TEMPORARY TABLE srcMailing_$sourceMailingId
-            (mailing_recipient_id int unsigned, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
-            ENGINE=HEAP";
-    CRM_Core_DAO::executeQuery($sql);
-    $sql = "
-INSERT INTO srcMailing_$sourceMailingId (mailing_recipient_id)
+INSERT INTO {$temporaryTableName} (mailing_recipient_id)
 SELECT mr.id
 FROM   civicrm_mailing_recipients mr
 WHERE  mr.mailing_id = $sourceMailingId
@@ -116,10 +115,11 @@ $limitString
     CRM_Core_DAO::executeQuery($sql);
     $sql = "
 UPDATE civicrm_mailing_recipients mr
-INNER JOIN srcMailing_$sourceMailingId temp_mr ON temp_mr.mailing_recipient_id = mr.id
+INNER JOIN {$temporaryTableName} temp_mr ON temp_mr.mailing_recipient_id = mr.id
 SET mr.mailing_id = $newMailingID
      ";
     CRM_Core_DAO::executeQuery($sql);
+    $temporaryTable->drop();
   }
 
   /**

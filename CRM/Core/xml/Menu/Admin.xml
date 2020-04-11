@@ -275,7 +275,7 @@
   </item>
   <item>
      <path>civicrm/admin/scheduleReminders</path>
-     <title>Schedule Reminders</title>[A
+     <title>Schedule Reminders</title>
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_callback>1</access_callback>
@@ -550,7 +550,7 @@
   <item>
      <path>civicrm/admin/setting/preferences/multisite</path>
      <title>Multi Site Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Multisite</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/36.png</icon>
      <weight>130</weight>
@@ -558,12 +558,12 @@
   <item>
      <path>civicrm/admin/setting/preferences/campaign</path>
      <title>CiviCampaign Component Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Campaign</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
   </item>
   <item>
      <path>civicrm/admin/setting/preferences/event</path>
      <title>CiviEvent Component Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Event</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
   </item>
   <item>
      <path>civicrm/admin/setting/preferences/mailing</path>
@@ -633,9 +633,9 @@
      <weight>9000</weight>
   </item>
   <item>
-     <path>civicrm/ajax/menujs</path>
-     <page_callback>CRM_Admin_Page_AJAX::getNavigationMenu</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+    <path>civicrm/ajax/navmenu</path>
+    <page_callback>CRM_Admin_Page_AJAX::navMenu</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/menutree</path>
@@ -678,16 +678,6 @@
      <page_callback>CRM_Price_Page_Option</page_callback>
   </item>
   <item>
-     <path>civicrm/admin/tplstrings/add</path>
-     <page_callback>CRM_Admin_Form_Persistent</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/admin/tplstrings</path>
-     <page_callback>CRM_Admin_Page_Persistent</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
      <path>civicrm/ajax/mapping</path>
      <page_callback>CRM_Admin_Page_AJAX::mappingList</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
@@ -695,7 +685,7 @@
   <item>
      <path>civicrm/ajax/recipientListing</path>
      <page_callback>CRM_Admin_Page_AJAX::recipientListing</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
+     <access_arguments>access CiviEvent,access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/sms/provider</path>
@@ -719,6 +709,7 @@
      <path>civicrm/sms/callback</path>
      <page_callback>CRM_SMS_Page_Callback</page_callback>
      <access_callback>1</access_callback>
+     <is_public>true</is_public>
   </item>
   <item>
     <path>civicrm/admin/badgelayout</path>

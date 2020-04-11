@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 namespace Civi\Core\Lock;
@@ -37,7 +21,7 @@ use Civi\Core\Resolver;
  */
 class LockManager {
 
-  private $rules = array();
+  private $rules = [];
 
   /**
    * @param string $name
@@ -53,7 +37,7 @@ class LockManager {
     $factory = $this->getFactory($name);
     if ($factory) {
       /** @var LockInterface $lock */
-      $lock = call_user_func_array($factory, array($name));
+      $lock = call_user_func_array($factory, [$name]);
       return $lock;
     }
     else {
@@ -73,7 +57,7 @@ class LockManager {
    *
    *   Categories: worker|data|cache|...
    *   Component: core|mailing|member|contribute|...
-   * @param int|NULL $timeout
+   * @param int|null $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.
    * @return LockInterface
@@ -111,10 +95,10 @@ class LockManager {
    * @see Resolver
    */
   public function register($pattern, $factory) {
-    $this->rules[] = array(
+    $this->rules[] = [
       'pattern' => $pattern,
       'factory' => $factory,
-    );
+    ];
     return $this;
   }
 

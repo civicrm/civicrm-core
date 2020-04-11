@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                 |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,7 +25,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -62,20 +46,20 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
   public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/event/manage/settings',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Event Template'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/event/manage',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Event Template'),
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$_links;
@@ -86,13 +70,13 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    */
   public function browse() {
     //get all event templates.
-    $allEventTemplates = array();
+    $allEventTemplates = [];
 
     $eventTemplate = new CRM_Event_DAO_Event();
 
     $eventTypes = CRM_Event_PseudoConstant::eventType();
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
-    $participantListings = CRM_Event_PseudoConstant::participantListing();
+    $participantListings = CRM_Event_BAO_Event::buildOptions('participant_listing_id');
 
     //find all event templates.
     $eventTemplate->is_template = TRUE;
@@ -120,7 +104,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
       //add action links.
       $allEventTemplates[$eventTemplate->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $eventTemplate->id),
+        ['id' => $eventTemplate->id],
         ts('more'),
         FALSE,
         'eventTemplate.manage.action',

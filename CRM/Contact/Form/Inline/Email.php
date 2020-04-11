@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -38,11 +22,13 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
    * Email addresses of the contact that is been viewed.
+   * @var array
    */
-  private $_emails = array();
+  private $_emails = [];
 
   /**
    * No of email blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 
@@ -104,7 +90,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Email::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_Email', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Inline_Email', 'formRule'], $this);
   }
 
   /**
@@ -119,7 +105,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors, $form) {
-    $hasData = $hasPrimary = $errors = array();
+    $hasData = $hasPrimary = $errors = [];
     if (!empty($fields['email']) && is_array($fields['email'])) {
       foreach ($fields['email'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
@@ -152,7 +138,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_emails)) {
       foreach ($this->_emails as $id => $value) {
         $defaults['email'][$id] = $value;
@@ -191,7 +177,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
         if ($email['is_primary']) {
           CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name', $email['email']);
           CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'sort_name', $email['email']);
-          $this->ajaxResponse['reloadBlocks'] = array('#crm-contactname-content');
+          $this->ajaxResponse['reloadBlocks'] = ['#crm-contactname-content'];
           break;
         }
       }

@@ -370,7 +370,7 @@
           "theme": 'classic',
           "dots": false,
           "icons": false,
-          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+          "url": CRM.config.packagesBase + 'jquery/plugins/jstree/themes/classic/style.css'
         },
         'plugins': ['themes', 'json_data', 'ui', 'search']
       }).bind('loaded.jstree', function () {

@@ -1,32 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 use Civi\Payment\System;
 use Civi\Payment\Exception\PaymentProcessorException;
+use Civi\Payment\PropertyBag;
 
 /**
  * Class CRM_Core_Payment.
@@ -80,6 +65,9 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_START = 'START',
     RECURRING_PAYMENT_END = 'END';
 
+  /**
+   * @var array
+   */
   protected $_paymentProcessor;
 
   /**
@@ -108,9 +96,9 @@ abstract class CRM_Core_Payment {
    *
    * (Deprecated parameter but used in some messages).
    *
+   * @var string
    * @deprecated
    *
-   * @var string
    */
   public $_processorName;
 
@@ -147,6 +135,63 @@ abstract class CRM_Core_Payment {
   protected $backOffice = FALSE;
 
   /**
+   * This is only needed during the transitional phase. In future you should
+   * pass your own PropertyBag into the method you're calling.
+   *
+   * New code should NOT use $this->propertyBag.
+   *
+   * @var Civi\Payment\PropertyBag
+   */
+  protected $propertyBag;
+
+  /**
+   * Return the payment instrument ID to use.
+   *
+   * Note:
+   * We normally SHOULD be returning the payment instrument of the payment processor.
+   * However there is an outstanding case where this needs overriding, which is
+   * when using CRM_Core_Payment_Manual which uses the pseudoprocessor (id = 0).
+   *
+   * i.e. If you're writing a Payment Processor you should NOT be using
+   * setPaymentInstrumentID() at all.
+   *
+   * @todo
+   * Ideally this exception-to-the-rule should be handled outside of this class
+   * i.e. this class's getPaymentInstrumentID method should return it from the
+   * payment processor and CRM_Core_Payment_Manual could override it to provide 0.
+   *
+   * @return int
+   */
+  public function getPaymentInstrumentID() {
+    return isset($this->paymentInstrumentID)
+      ? $this->paymentInstrumentID
+      : (int) ($this->_paymentProcessor['payment_instrument_id'] ?? 0);
+  }
+
+  /**
+   * Getter for the id Payment Processor ID.
+   *
+   * @return int
+   */
+  public function getID() {
+    return (int) $this->_paymentProcessor['id'];
+  }
+
+  /**
+   * @deprecated Set payment Instrument id - see note on getPaymentInstrumentID.
+   *
+   * By default we actually ignore the form value. The manual processor takes
+   * it more seriously.
+   *
+   * @param int $paymentInstrumentID
+   */
+  public function setPaymentInstrumentID($paymentInstrumentID) {
+    $this->paymentInstrumentID = (int) $paymentInstrumentID;
+    // See note on getPaymentInstrumentID().
+    return $this->getPaymentInstrumentID();
+  }
+
+  /**
    * @return bool
    */
   public function isBackOffice() {
@@ -160,26 +205,6 @@ abstract class CRM_Core_Payment {
    */
   public function setBackOffice($isBackOffice) {
     $this->backOffice = $isBackOffice;
-  }
-
-  /**
-   * Get payment instrument id.
-   *
-   * @return int
-   */
-  public function getPaymentInstrumentID() {
-    return $this->paymentInstrumentID ? $this->paymentInstrumentID : $this->_paymentProcessor['payment_instrument_id'];
-  }
-
-  /**
-   * Set payment Instrument id.
-   *
-   * By default we actually ignore the form value. The manual processor takes it more seriously.
-   *
-   * @param int $paymentInstrumentID
-   */
-  public function setPaymentInstrumentID($paymentInstrumentID) {
-    $this->paymentInstrumentID = $this->_paymentProcessor['payment_instrument_id'];
   }
 
   /**
@@ -245,8 +270,6 @@ abstract class CRM_Core_Payment {
    * @todo move to factory class \Civi\Payment\System (or similar)
    *
    * @param array $params
-   *
-   * @return mixed
    */
   public static function logPaymentNotification($params) {
     $message = 'payment_notification ';
@@ -258,7 +281,14 @@ abstract class CRM_Core_Payment {
     }
 
     $log = new CRM_Utils_SystemLogger();
-    $log->alert($message, $_REQUEST);
+    // $_REQUEST doesn't handle JSON, to support providers that POST JSON we need the raw POST data.
+    $rawRequestData = file_get_contents("php://input");
+    if (CRM_Utils_JSON::isValidJSON($rawRequestData)) {
+      $log->alert($message, json_decode($rawRequestData, TRUE));
+    }
+    else {
+      $log->alert($message, $_REQUEST);
+    }
   }
 
   /**
@@ -324,7 +354,7 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsLiveMode() {
-    return TRUE;
+    return empty($this->_paymentProcessor['is_test']);
   }
 
   /**
@@ -333,7 +363,16 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsTestMode() {
-    return TRUE;
+    return !empty($this->_paymentProcessor['is_test']);
+  }
+
+  /**
+   * Does this payment processor support refund?
+   *
+   * @return bool
+   */
+  public function supportsRefund() {
+    return FALSE;
   }
 
   /**
@@ -404,6 +443,21 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does the processor work without an email address?
+   *
+   * The historic assumption is that all processors require an email address. This capability
+   * allows a processor to state it does not need to be provided with an email address.
+   * NB: when this was added (Feb 2020), the Manual processor class overrides this but
+   * the only use of the capability is in the webform_civicrm module.  It is not currently
+   * used in core but may be in future.
+   *
+   * @return bool
+   */
+  protected function supportsNoEmailProvided() {
+    return FALSE;
+  }
+
+  /**
    * Function to action pre-approval if supported
    *
    * @param array $params
@@ -413,7 +467,8 @@ abstract class CRM_Core_Payment {
    *   - pre_approval_parameters (this will be stored on the calling form & available later)
    *   - redirect_url (if set the browser will be redirected to this.
    */
-  public function doPreApproval(&$params) {}
+  public function doPreApproval(&$params) {
+  }
 
   /**
    * Get any details that may be available to the payment processor due to an approval process having happened.
@@ -426,7 +481,7 @@ abstract class CRM_Core_Payment {
    * @return array
    */
   public function getPreApprovalDetails($storedDetails) {
-    return array();
+    return [];
   }
 
   /**
@@ -496,6 +551,9 @@ abstract class CRM_Core_Payment {
    *   Only explicitly supported contexts are handled without error.
    *   Currently supported:
    *   - contributionPageRecurringHelp (params: is_recur_installments, is_email_receipt)
+   *   - contributionPageContinueText (params: amount, is_payment_to_existing)
+   *   - cancelRecurDetailText (params: mode, amount, currency, frequency_interval, frequency_unit, installments, {membershipType|only if mode=auto_renew})
+   *   - cancelRecurNotSupportedText
    *
    * @param array $params
    *   Parameters for the field, context specific.
@@ -509,7 +567,10 @@ abstract class CRM_Core_Payment {
     switch ($context) {
       case 'contributionPageRecurringHelp':
         // require exactly two parameters
-        if (array_keys($params) == array('is_recur_installments', 'is_email_receipt')) {
+        if (array_keys($params) == [
+          'is_recur_installments',
+          'is_email_receipt',
+        ]) {
           $gotText = ts('Your recurring contribution will be processed automatically.');
           if ($params['is_recur_installments']) {
             $gotText .= ' ' . ts('You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
@@ -518,9 +579,56 @@ abstract class CRM_Core_Payment {
             $gotText .= ' ' . ts('You will receive an email receipt for each recurring contribution.');
           }
         }
-        break;
+        return $gotText;
+
+      case 'contributionPageContinueText':
+        if ($params['amount'] <= 0) {
+          return ts('To complete this transaction, click the <strong>Continue</strong> button below.');
+        }
+        if ($this->_paymentProcessor['billing_mode'] == 4) {
+          return ts('Click the <strong>Continue</strong> button to go to %1, where you will select your payment method and complete the contribution.', [$this->_paymentProcessor['payment_processor_type']]);
+        }
+        if ($params['is_payment_to_existing']) {
+          return ts('To complete this transaction, click the <strong>Make Payment</strong> button below.');
+        }
+        return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
+
+      case 'cancelRecurDetailText':
+        if ($params['mode'] === 'auto_renew') {
+          return ts('Click the button below if you want to cancel the auto-renewal option for your %1 membership. This will not cancel your membership. However you will need to arrange payment for renewal when your membership expires.',
+            [1 => $params['membershipType']]
+          );
+        }
+        else {
+          $text = ts('Recurring Contribution Details: %1 every %2 %3', [
+            1 => CRM_Utils_Money::format($params['amount'], $params['currency']),
+            2 => $params['frequency_interval'],
+            3 => $params['frequency_unit'],
+          ]);
+          if (!empty($params['installments'])) {
+            $text .= ' ' . ts('for %1 installments', [1 => $params['installments']]) . '.';
+          }
+          $text = "<strong>{$text}</strong><div class='content'>";
+          $text .= ts('Click the button below to cancel this commitment and stop future transactions. This does not affect contributions which have already been completed.');
+          $text .= '</div>';
+          return $text;
+        }
+
+      case 'cancelRecurNotSupportedText':
+        return ts('Automatic cancellation is not supported for this payment processor. You or the contributor will need to manually cancel this recurring contribution using the payment processor website.');
+
     }
-    return $gotText;
+    CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
+    return '';
+  }
+
+  /**
+   * Get the title of the payment processor to display to the user
+   *
+   * @return string
+   */
+  public function getTitle() {
+    return $this->getPaymentProcessor()['title'] ?? $this->getPaymentProcessor()['name'];
   }
 
   /**
@@ -533,7 +641,7 @@ abstract class CRM_Core_Payment {
    * @return null
    */
   public function getVar($name) {
-    return isset($this->$name) ? $this->$name : NULL;
+    return $this->$name ?? NULL;
   }
 
   /**
@@ -551,7 +659,7 @@ abstract class CRM_Core_Payment {
    * @return string
    */
   public function getPaymentTypeLabel() {
-    return $this->_paymentProcessor['payment_type'] == 1 ? 'Credit Card' : 'Direct Debit';
+    return $this->_paymentProcessor['payment_type'] == 1 ? ts('Credit Card') : ts('Direct Debit');
   }
 
   /**
@@ -571,7 +679,7 @@ abstract class CRM_Core_Payment {
    */
   public function getPaymentFormFields() {
     if ($this->_paymentProcessor['billing_mode'] == 4) {
-      return array();
+      return [];
     }
     return $this->_paymentProcessor['payment_type'] == 1 ? $this->getCreditCardFormFields() : $this->getDirectDebitFormFields();
   }
@@ -603,8 +711,9 @@ abstract class CRM_Core_Payment {
    */
   public function getEditableRecurringScheduleFields() {
     if ($this->supports('changeSubscriptionAmount')) {
-      return array('amount');
+      return ['amount'];
     }
+    return [];
   }
 
   /**
@@ -627,7 +736,7 @@ abstract class CRM_Core_Payment {
    * @return array;
    */
   protected function getMandatoryFields() {
-    $mandatoryFields = array();
+    $mandatoryFields = [];
     foreach ($this->getAllFields() as $field_name => $field_spec) {
       if (!empty($field_spec['is_required'])) {
         $mandatoryFields[$field_name] = $field_spec;
@@ -640,24 +749,27 @@ abstract class CRM_Core_Payment {
    * Get the metadata of all the fields configured for this processor.
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function getAllFields() {
     $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
     $billingFields = array_intersect_key($this->getBillingAddressFieldsMetadata(), array_flip($this->getBillingAddressFields()));
     return array_merge($paymentFields, $billingFields);
   }
+
   /**
    * Get array of fields that should be displayed on the payment form for credit cards.
    *
    * @return array
    */
   protected function getCreditCardFormFields() {
-    return array(
+    return [
       'credit_card_type',
       'credit_card_number',
       'cvv2',
       'credit_card_exp_date',
-    );
+    ];
   }
 
   /**
@@ -666,12 +778,12 @@ abstract class CRM_Core_Payment {
    * @return array
    */
   protected function getDirectDebitFormFields() {
-    return array(
+    return [
       'account_holder',
       'bank_account_number',
       'bank_identification_number',
       'bank_name',
-    );
+    ];
   }
 
   /**
@@ -684,159 +796,164 @@ abstract class CRM_Core_Payment {
    */
   public function getPaymentFormFieldsMetadata() {
     //@todo convert credit card type into an option value
-    $creditCardType = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard();
+    $creditCardType = ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::creditCard();
     $isCVVRequired = Civi::settings()->get('cvv_backoffice_required');
     if (!$this->isBackOffice()) {
       $isCVVRequired = TRUE;
     }
-    return array(
-      'credit_card_number' => array(
+    return [
+      'credit_card_number' => [
         'htmlType' => 'text',
         'name' => 'credit_card_number',
         'title' => ts('Card Number'),
-        'attributes' => array(
+        'attributes' => [
           'size' => 20,
           'maxlength' => 20,
           'autocomplete' => 'off',
           'class' => 'creditcard',
-        ),
+        ],
         'is_required' => TRUE,
         // 'description' => '16 digit card number', // If you enable a description field it will be shown below the field on the form
-      ),
-      'cvv2' => array(
+      ],
+      'cvv2' => [
         'htmlType' => 'text',
         'name' => 'cvv2',
         'title' => ts('Security Code'),
-        'attributes' => array(
+        'attributes' => [
           'size' => 5,
           'maxlength' => 10,
           'autocomplete' => 'off',
-        ),
+        ],
         'is_required' => $isCVVRequired,
-        'rules' => array(
-          array(
+        'rules' => [
+          [
             'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
             'rule_name' => 'integer',
             'rule_parameters' => NULL,
-          ),
-        ),
-      ),
-      'credit_card_exp_date' => array(
+          ],
+        ],
+      ],
+      'credit_card_exp_date' => [
         'htmlType' => 'date',
         'name' => 'credit_card_exp_date',
         'title' => ts('Expiration Date'),
         'attributes' => CRM_Core_SelectValues::date('creditCard'),
         'is_required' => TRUE,
-        'rules' => array(
-          array(
+        'rules' => [
+          [
             'rule_message' => ts('Card expiration date cannot be a past date.'),
             'rule_name' => 'currentDate',
             'rule_parameters' => TRUE,
-          ),
-        ),
-      ),
-      'credit_card_type' => array(
+          ],
+        ],
+        'extra' => ['class' => 'crm-form-select'],
+      ],
+      'credit_card_type' => [
         'htmlType' => 'select',
         'name' => 'credit_card_type',
         'title' => ts('Card Type'),
         'attributes' => $creditCardType,
         'is_required' => FALSE,
-      ),
-      'account_holder' => array(
+      ],
+      'account_holder' => [
         'htmlType' => 'text',
         'name' => 'account_holder',
         'title' => ts('Account Holder'),
-        'attributes' => array(
+        'attributes' => [
           'size' => 20,
           'maxlength' => 34,
           'autocomplete' => 'on',
-        ),
+        ],
         'is_required' => TRUE,
-      ),
+      ],
       //e.g. IBAN can have maxlength of 34 digits
-      'bank_account_number' => array(
+      'bank_account_number' => [
         'htmlType' => 'text',
         'name' => 'bank_account_number',
         'title' => ts('Bank Account Number'),
-        'attributes' => array(
+        'attributes' => [
           'size' => 20,
           'maxlength' => 34,
           'autocomplete' => 'off',
-        ),
-        'rules' => array(
-          array(
+        ],
+        'rules' => [
+          [
             'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
             'rule_name' => 'nopunctuation',
             'rule_parameters' => NULL,
-          ),
-        ),
+          ],
+        ],
         'is_required' => TRUE,
-      ),
+      ],
       //e.g. SWIFT-BIC can have maxlength of 11 digits
-      'bank_identification_number' => array(
+      'bank_identification_number' => [
         'htmlType' => 'text',
         'name' => 'bank_identification_number',
         'title' => ts('Bank Identification Number'),
-        'attributes' => array(
+        'attributes' => [
           'size' => 20,
           'maxlength' => 11,
           'autocomplete' => 'off',
-        ),
+        ],
         'is_required' => TRUE,
-        'rules' => array(
-          array(
+        'rules' => [
+          [
             'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
             'rule_name' => 'nopunctuation',
             'rule_parameters' => NULL,
-          ),
-        ),
-      ),
-      'bank_name' => array(
+          ],
+        ],
+      ],
+      'bank_name' => [
         'htmlType' => 'text',
         'name' => 'bank_name',
         'title' => ts('Bank Name'),
-        'attributes' => array(
+        'attributes' => [
           'size' => 20,
           'maxlength' => 64,
           'autocomplete' => 'off',
-        ),
+        ],
         'is_required' => TRUE,
 
-      ),
-      'check_number' => array(
+      ],
+      'check_number' => [
         'htmlType' => 'text',
         'name' => 'check_number',
         'title' => ts('Check Number'),
         'is_required' => FALSE,
         'attributes' => NULL,
-      ),
-      'pan_truncation' => array(
+      ],
+      'pan_truncation' => [
         'htmlType' => 'text',
         'name' => 'pan_truncation',
         'title' => ts('Last 4 digits of the card'),
         'is_required' => FALSE,
-        'attributes' => array(
+        'attributes' => [
           'size' => 4,
           'maxlength' => 4,
           'minlength' => 4,
           'autocomplete' => 'off',
-        ),
-        'rules' => array(
-          array(
+        ],
+        'rules' => [
+          [
             'rule_message' => ts('Please enter valid last 4 digit card number.'),
             'rule_name' => 'numeric',
             'rule_parameters' => NULL,
-          ),
-        ),
-      ),
-      'payment_token' => array(
+          ],
+        ],
+      ],
+      'payment_token' => [
         'htmlType' => 'hidden',
         'name' => 'payment_token',
         'title' => ts('Authorization token'),
         'is_required' => FALSE,
-        'attributes' => ['size' => 10, 'autocomplete' => 'off', 'id' => 'payment_token'],
-      ),
-    );
+        'attributes' => [
+          'size' => 10,
+          'autocomplete' => 'off',
+          'id' => 'payment_token',
+        ],
+      ],
+    ];
   }
 
   /**
@@ -857,9 +974,9 @@ abstract class CRM_Core_Payment {
       $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     }
     if ($this->_paymentProcessor['billing_mode'] != 1 && $this->_paymentProcessor['billing_mode'] != 3) {
-      return array();
+      return [];
     }
-    return array(
+    return [
       'first_name' => 'billing_first_name',
       'middle_name' => 'billing_middle_name',
       'last_name' => 'billing_last_name',
@@ -868,7 +985,7 @@ abstract class CRM_Core_Payment {
       'country' => "billing_country_id-{$billingLocationID}",
       'state_province' => "billing_state_province_id-{$billingLocationID}",
       'postal_code' => "billing_postal_code-{$billingLocationID}",
-    );
+    ];
   }
 
   /**
@@ -877,7 +994,7 @@ abstract class CRM_Core_Payment {
    * @param int $billingLocationID
    *
    * @return array
-   *    Array of metadata for address fields.
+   *   Array of metadata for address fields.
    */
   public function getBillingAddressFieldsMetadata($billingLocationID = NULL) {
     if (!$billingLocationID) {
@@ -886,103 +1003,103 @@ abstract class CRM_Core_Payment {
       // So taking this as a param is possibly something to be removed in favour of the standard default.
       $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     }
-    $metadata = array();
-    $metadata['billing_first_name'] = array(
+    $metadata = [];
+    $metadata['billing_first_name'] = [
       'htmlType' => 'text',
       'name' => 'billing_first_name',
       'title' => ts('Billing First Name'),
       'cc_field' => TRUE,
-      'attributes' => array(
+      'attributes' => [
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
-      ),
+      ],
       'is_required' => TRUE,
-    );
+    ];
 
-    $metadata['billing_middle_name'] = array(
+    $metadata['billing_middle_name'] = [
       'htmlType' => 'text',
       'name' => 'billing_middle_name',
       'title' => ts('Billing Middle Name'),
       'cc_field' => TRUE,
-      'attributes' => array(
+      'attributes' => [
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
-      ),
+      ],
       'is_required' => FALSE,
-    );
+    ];
 
-    $metadata['billing_last_name'] = array(
+    $metadata['billing_last_name'] = [
       'htmlType' => 'text',
       'name' => 'billing_last_name',
       'title' => ts('Billing Last Name'),
       'cc_field' => TRUE,
-      'attributes' => array(
+      'attributes' => [
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
-      ),
+      ],
       'is_required' => TRUE,
-    );
+    ];
 
-    $metadata["billing_street_address-{$billingLocationID}"] = array(
+    $metadata["billing_street_address-{$billingLocationID}"] = [
       'htmlType' => 'text',
       'name' => "billing_street_address-{$billingLocationID}",
       'title' => ts('Street Address'),
       'cc_field' => TRUE,
-      'attributes' => array(
+      'attributes' => [
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
-      ),
+      ],
       'is_required' => TRUE,
-    );
+    ];
 
-    $metadata["billing_city-{$billingLocationID}"] = array(
+    $metadata["billing_city-{$billingLocationID}"] = [
       'htmlType' => 'text',
       'name' => "billing_city-{$billingLocationID}",
       'title' => ts('City'),
       'cc_field' => TRUE,
-      'attributes' => array(
+      'attributes' => [
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
-      ),
+      ],
       'is_required' => TRUE,
-    );
+    ];
 
-    $metadata["billing_state_province_id-{$billingLocationID}"] = array(
+    $metadata["billing_state_province_id-{$billingLocationID}"] = [
       'htmlType' => 'chainSelect',
       'title' => ts('State/Province'),
       'name' => "billing_state_province_id-{$billingLocationID}",
       'cc_field' => TRUE,
       'is_required' => TRUE,
-    );
+    ];
 
-    $metadata["billing_postal_code-{$billingLocationID}"] = array(
+    $metadata["billing_postal_code-{$billingLocationID}"] = [
       'htmlType' => 'text',
       'name' => "billing_postal_code-{$billingLocationID}",
       'title' => ts('Postal Code'),
       'cc_field' => TRUE,
-      'attributes' => array(
+      'attributes' => [
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
-      ),
+      ],
       'is_required' => TRUE,
-    );
+    ];
 
-    $metadata["billing_country_id-{$billingLocationID}"] = array(
+    $metadata["billing_country_id-{$billingLocationID}"] = [
       'htmlType' => 'select',
       'name' => "billing_country_id-{$billingLocationID}",
       'title' => ts('Country'),
       'cc_field' => TRUE,
-      'attributes' => array(
+      'attributes' => [
         '' => ts('- select -'),
-      ) + CRM_Core_PseudoConstant::country(),
+      ] + CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
-    );
+    ];
     return $metadata;
   }
 
@@ -1007,28 +1124,32 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get the currency for the transaction.
+   * Get the currency for the transaction from the params.
    *
-   * Handle any inconsistency about how it is passed in here.
+   * Legacy wrapper. Better for a method to work on its own PropertyBag.
+   *
+   * This code now uses PropertyBag to allow for old inputs like currencyID.
    *
    * @param $params
    *
    * @return string
    */
-  protected function getCurrency($params) {
-    return CRM_Utils_Array::value('currencyID', $params, CRM_Utils_Array::value('currency', $params));
+  protected function getCurrency($params = []) {
+    $localPropertyBag = new PropertyBag();
+    $localPropertyBag->mergeLegacyInputParams($params);
+    return $localPropertyBag->getCurrency();
   }
 
   /**
-   * Get the currency for the transaction.
+   * Legacy. Better for a method to work on its own PropertyBag,
+   * but also, this function does not do very much.
    *
-   * Handle any inconsistency about how it is passed in here.
-   *
-   * @param $params
+   * @param array $params
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  protected function getAmount($params) {
+  protected function getAmount($params = []) {
     return CRM_Utils_Money::format($params['amount'], NULL, NULL, TRUE);
   }
 
@@ -1046,20 +1167,20 @@ abstract class CRM_Core_Payment {
     }
 
     if ($this->_component == 'event') {
-      return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+      return CRM_Utils_System::url($this->getBaseReturnUrl(), [
         'reset' => 1,
         'cc' => 'fail',
         'participantId' => $participantID,
-      ),
+      ],
         TRUE, NULL, FALSE
       );
     }
 
-    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), [
       '_qf_Main_display' => 1,
       'qfKey' => $qfKey,
       'cancel' => 1,
-    ),
+    ],
       TRUE, NULL, FALSE
     );
   }
@@ -1076,10 +1197,10 @@ abstract class CRM_Core_Payment {
       return $this->successUrl;
     }
 
-    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), [
       '_qf_ThankYou_display' => 1,
       'qfKey' => $qfKey,
-    ),
+    ],
       TRUE, NULL, FALSE
     );
   }
@@ -1122,10 +1243,10 @@ abstract class CRM_Core_Payment {
    * @return string url
    */
   protected function getGoBackUrl($qfKey) {
-    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), [
       '_qf_Confirm_display' => 'true',
       'qfKey' => $qfKey,
-    ),
+    ],
       TRUE, NULL, FALSE
     );
   }
@@ -1142,17 +1263,18 @@ abstract class CRM_Core_Payment {
   protected function getNotifyUrl() {
     $url = CRM_Utils_System::url(
       'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
-      array(),
+      [],
       TRUE,
       NULL,
-      FALSE
+      FALSE,
+      TRUE
     );
     return (stristr($url, '.')) ? $url : '';
   }
 
   /**
    * Calling this from outside the payment subsystem is deprecated - use doPayment.
-   *
+   * @deprecated
    * Does a server to server payment transaction.
    *
    * @param array $params
@@ -1166,27 +1288,43 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Process payment - this function wraps around both doTransferCheckout and doDirectPayment.
+   * Processors may need to inspect, validate, cast and copy data that is
+   * specific to this Payment Processor from the input array to custom fields
+   * on the PropertyBag.
    *
-   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
-   * more agnostic.
-   *
-   * Payment processors should set payment_status_id. This function adds some historical defaults ie. the
-   * assumption that if a 'doDirectPayment' processors comes back it completed the transaction & in fact
-   * doTransferCheckout would not traditionally come back.
-   *
-   * doDirectPayment does not do an immediate payment for Authorize.net or Paypal so the default is assumed
-   * to be Pending.
-   *
-   * Once this function is fully rolled out then it will be preferred for processors to throw exceptions than to
-   * return Error objects
-   *
+   * @param Civi\Payment\PropertyBag $propertyBag
    * @param array $params
+   * @param string $component
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function extractCustomPropertiesForDoPayment(PropertyBag $propertyBag, array $params, $component = 'contribute') {
+    // example
+    // (validation and casting goes first)
+    // $propertyBag->setCustomProperty('myprocessor_customPropertyName', $value);
+  }
+
+  /**
+   * Process payment - this function wraps around both doTransferCheckout and doDirectPayment.
+   * Any processor that still implements the deprecated doTransferCheckout() or doDirectPayment() should be updated to use doPayment().
+   *
+   * This function adds some historical defaults ie. the assumption that if a 'doDirectPayment' processors comes back it completed
+   *   the transaction & in fact doTransferCheckout would not traditionally come back.
+   * Payment processors should throw exceptions and not return Error objects as they may have done with the old functions.
+   *
+   * Payment processors should set payment_status_id (which is really contribution_status_id) in the returned array. The default is assumed to be Pending.
+   *   In some cases the IPN will set the payment to "Completed" some time later.
+   *
+   * @fixme Creating a contribution record is inconsistent! We should always create a contribution BEFORE calling doPayment...
+   *  For the current status see: https://lab.civicrm.org/dev/financial/issues/53
+   * If we DO have a contribution ID, then the payment processor can (and should) update parameters on the contribution record as necessary.
+   *
+   * @param array|PropertyBag $params
    *
    * @param string $component
    *
    * @return array
-   *   Result array
+   *   Result array (containing at least the key payment_status_id)
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
@@ -1227,6 +1365,45 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Cancel a recurring subscription.
+   *
+   * Payment processor classes should override this rather than implementing cancelSubscription.
+   *
+   * A PaymentProcessorException should be thrown if the update of the contribution_recur
+   * record should not proceed (in many cases this function does nothing
+   * as the payment processor does not need to take any action & this should silently
+   * proceed. Note the form layer will only call this after calling
+   * $processor->supports('cancelRecurring');
+   *
+   * @param \Civi\Payment\PropertyBag $propertyBag
+   *
+   * @return array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doCancelRecurring(PropertyBag $propertyBag) {
+    if (method_exists($this, 'cancelSubscription')) {
+      $message = NULL;
+      if ($this->cancelSubscription($message, $propertyBag)) {
+        return ['message' => $message];
+      }
+      throw new PaymentProcessorException($message);
+    }
+    return ['message' => ts('Recurring contribution cancelled')];
+  }
+
+  /**
+   * Refunds payment
+   *
+   * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
+   *
+   * @param array $params
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doRefund(&$params) {}
+
+  /**
    * Query payment processor for details about a transaction.
    *
    * @param array $params
@@ -1241,7 +1418,7 @@ abstract class CRM_Core_Payment {
    *   - fee_amount Amount of fee paid
    */
   public function doQuery($params) {
-    return array();
+    return [];
   }
 
   /**
@@ -1286,14 +1463,23 @@ abstract class CRM_Core_Payment {
    * Page callback for civicrm/payment/ipn
    */
   public static function handleIPN() {
-    self::handlePaymentMethod(
-      'PaymentNotification',
-      array(
-        'processor_name' => @$_GET['processor_name'],
-        'processor_id' => @$_GET['processor_id'],
-        'mode' => @$_GET['mode'],
-      )
-    );
+    try {
+      self::handlePaymentMethod(
+        'PaymentNotification',
+        [
+          'processor_name' => CRM_Utils_Request::retrieveValue('processor_name', 'String'),
+          'processor_id' => CRM_Utils_Request::retrieveValue('processor_id', 'Integer'),
+          'mode' => CRM_Utils_Request::retrieveValue('mode', 'Alphanumeric'),
+        ]
+      );
+    }
+    catch (CRM_Core_Exception $e) {
+      Civi::log()->error('ipn_payment_callback_exception', [
+        'context' => [
+          'backtrace' => CRM_Core_Error::formatBacktrace(debug_backtrace()),
+        ],
+      ]);
+    }
     CRM_Utils_System::civiExit();
   }
 
@@ -1314,7 +1500,7 @@ abstract class CRM_Core_Payment {
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public static function handlePaymentMethod($method, $params = array()) {
+  public static function handlePaymentMethod($method, $params = []) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
       $q = explode('/', CRM_Utils_Array::value(CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET, ''));
       $lastParam = array_pop($q);
@@ -1337,25 +1523,25 @@ abstract class CRM_Core_Payment {
 
     if (isset($params['processor_id'])) {
       $sql .= " WHERE pp.id = %2";
-      $args[2] = array($params['processor_id'], 'Integer');
-      $notFound = ts("No active instances of payment processor %1 were found.", array(1 => $params['processor_id']));
+      $args[2] = [$params['processor_id'], 'Integer'];
+      $notFound = ts("No active instances of payment processor %1 were found.", [1 => $params['processor_id']]);
     }
     else {
       // This is called when processor_name is passed - passing processor_id instead is recommended.
       $sql .= " WHERE ppt.name = %2 AND pp.is_test = %1";
-      $args[1] = array(
+      $args[1] = [
         (CRM_Utils_Array::value('mode', $params) == 'test') ? 1 : 0,
         'Integer',
-      );
-      $args[2] = array($params['processor_name'], 'String');
-      $notFound = ts("No active instances of payment processor '%1' were found.", array(1 => $params['processor_name']));
+      ];
+      $args[2] = [$params['processor_name'], 'String'];
+      $notFound = ts("No active instances of payment processor '%1' were found.", [1 => $params['processor_name']]);
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, $args);
 
     // Check whether we found anything at all.
     if (!$dao->N) {
-      CRM_Core_Error::fatal($notFound);
+      throw new CRM_Core_Exception($notFound);
     }
 
     $method = 'handle' . $method;
@@ -1381,7 +1567,7 @@ abstract class CRM_Core_Payment {
 
       // Does PP implement this method, and can we call it?
       if (!method_exists($processorInstance, $method) ||
-        !is_callable(array($processorInstance, $method))
+        !is_callable([$processorInstance, $method])
       ) {
         // on the off chance there is a double implementation of this processor we should keep looking for another
         // note that passing processor_id is more reliable & we should work to deprecate processor_name
@@ -1393,10 +1579,16 @@ abstract class CRM_Core_Payment {
       $extension_instance_found = TRUE;
     }
 
+    // Call IPN postIPNProcess hook to allow for custom processing of IPN data.
+    $IPNParams = array_merge($_GET, $_REQUEST);
+    CRM_Utils_Hook::postIPNProcess($IPNParams);
     if (!$extension_instance_found) {
       $message = "No extension instances of the '%1' payment processor were found.<br />" .
         "%2 method is unsupported in legacy payment processors.";
-      CRM_Core_Error::fatal(ts($message, array(1 => $params['processor_name'], 2 => $method)));
+      throw new CRM_Core_Exception(ts($message, [
+        1 => $params['processor_name'],
+        2 => $method,
+      ]));
     }
   }
 
@@ -1461,6 +1653,9 @@ abstract class CRM_Core_Payment {
     // Set URL
     switch ($action) {
       case 'cancel':
+        if (!$this->supports('cancelRecurring')) {
+          return NULL;
+        }
         $url = 'civicrm/contribute/unsubscribe';
         break;
 
@@ -1473,6 +1668,9 @@ abstract class CRM_Core_Payment {
         break;
 
       case 'update':
+        if (!$this->supports('changeSubscriptionAmount') && !$this->supports('editRecurringContribution')) {
+          return NULL;
+        }
         $url = 'civicrm/contribute/updaterecur';
         break;
     }
@@ -1501,7 +1699,12 @@ abstract class CRM_Core_Payment {
       FROM civicrm_contribution_recur rec
 INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
      WHERE rec.id = %1";
-          $contactID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($entityID, 'Integer')));
+          $contactID = CRM_Core_DAO::singleValueQuery($sql, [
+            1 => [
+              $entityID,
+              'Integer',
+            ],
+          ]);
           $entityArg = 'crid';
           break;
       }
@@ -1522,7 +1725,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     }
 
     // Else default
-    return isset($this->_paymentProcessor['url_recur']) ? $this->_paymentProcessor['url_recur'] : '';
+    return $this->_paymentProcessor['url_recur'] ?? '';
   }
 
   /**
@@ -1539,23 +1742,20 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    *
    * @return string
    */
-  protected function getPaymentDescription($params, $length = 24) {
-    $parts = array('contactID', 'contributionID', 'description', 'billing_first_name', 'billing_last_name');
-    $validParts = array();
-    if (isset($params['description'])) {
-      $uninformativeStrings = array(ts('Online Event Registration: '), ts('Online Contribution: '));
-      $params['description'] = str_replace($uninformativeStrings, '', $params['description']);
-    }
-    foreach ($parts as $part) {
-      if ((!empty($params[$part]))) {
-        $validParts[] = $params[$part];
-      }
-    }
-    return substr(implode('-', $validParts), 0, $length);
+  protected function getPaymentDescription($params = [], $length = 24) {
+    $propertyBag = PropertyBag::cast($params);
+    $parts = [
+      $propertyBag->getter('contactID', TRUE),
+      $propertyBag->getter('contributionID', TRUE),
+      $propertyBag->getter('description', TRUE) ?: ($propertyBag->getter('isRecur', TRUE) ? ts('Recurring payment') : NULL),
+      $propertyBag->getter('billing_first_name', TRUE),
+      $propertyBag->getter('billing_last_name', TRUE),
+    ];
+    return substr(implode('-', array_filter($parts)), 0, $length);
   }
 
   /**
-   * Checks if backoffice recurring edit is allowed
+   * Checks if back-office recurring edit is allowed
    *
    * @return bool
    */

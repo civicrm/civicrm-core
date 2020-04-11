@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,7 +20,7 @@
  */
 class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
-  static $_links = NULL;
+  public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
   public $_id = NULL;
@@ -51,9 +35,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     }
 
     try {
-      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', array(
+      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', [
         'id' => $this->_id,
-      ));
+      ]);
     }
     catch (Exception $e) {
       CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->_id);
@@ -62,7 +46,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
       CRM_Utils_Array::value('payment_processor_id', $contributionRecur)
     );
-    $idFields = array('contribution_status_id', 'campaign_id', 'financial_type_id');
+    $idFields = ['contribution_status_id', 'campaign_id', 'financial_type_id'];
     foreach ($idFields as $idField) {
       if (!empty($contributionRecur[$idField])) {
         $contributionRecur[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $contributionRecur[$idField]);
@@ -70,9 +54,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     }
 
     // Add linked membership
-    $membership = civicrm_api3('Membership', 'get', array(
+    $membership = civicrm_api3('Membership', 'get', [
       'contribution_recur_id' => $contributionRecur['id'],
-    ));
+    ]);
     if (!empty($membership['count'])) {
       $membershipDetails = reset($membership['values']);
       $contributionRecur['membership_id'] = $membershipDetails['id'];

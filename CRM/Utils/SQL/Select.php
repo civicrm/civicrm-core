@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -78,20 +62,20 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
 
   private $insertInto = NULL;
   private $insertVerb = 'INSERT INTO ';
-  private $insertIntoFields = array();
-  private $selects = array();
+  private $insertIntoFields = [];
+  private $selects = [];
   private $from;
-  private $joins = array();
-  private $wheres = array();
-  private $groupBys = array();
-  private $havings = array();
-  private $orderBys = array();
+  private $joins = [];
+  private $wheres = [];
+  private $groupBys = [];
+  private $havings = [];
+  private $orderBys = [];
   private $limit = NULL;
   private $offset = NULL;
   private $distinct = NULL;
@@ -104,7 +88,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * @param array $options
    * @return CRM_Utils_SQL_Select
    */
-  public static function from($from, $options = array()) {
+  public static function from($from, $options = []) {
     return new self($from, $options);
   }
 
@@ -114,7 +98,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * @param array $options
    * @return CRM_Utils_SQL_Select
    */
-  public static function fragment($options = array()) {
+  public static function fragment($options = []) {
     return new self(NULL, $options);
   }
 
@@ -125,9 +109,9 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    *   Table-name and optional alias.
    * @param array $options
    */
-  public function __construct($from, $options = array()) {
+  public function __construct($from, $options = []) {
     $this->from = $from;
-    $this->mode = isset($options['mode']) ? $options['mode'] : self::INTERPOLATE_AUTO;
+    $this->mode = $options['mode'] ?? self::INTERPOLATE_AUTO;
   }
 
   /**
@@ -170,14 +154,14 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
       throw new RuntimeException("Cannot merge queries that use different interpolation modes ({$this->mode} vs {$other->mode}).");
     }
 
-    $arrayFields = array('insertIntoFields', 'selects', 'joins', 'wheres', 'groupBys', 'havings', 'orderBys', 'params');
+    $arrayFields = ['insertIntoFields', 'selects', 'joins', 'wheres', 'groupBys', 'havings', 'orderBys', 'params'];
     foreach ($arrayFields as $f) {
       if ($parts === NULL || in_array($f, $parts)) {
         $this->{$f} = array_merge($this->{$f}, $other->{$f});
       }
     }
 
-    $flatFields = array('insertInto', 'from', 'limit', 'offset');
+    $flatFields = ['insertInto', 'from', 'limit', 'offset'];
     foreach ($flatFields as $f) {
       if ($parts === NULL || in_array($f, $parts)) {
         if ($other->{$f} !== NULL) {
@@ -304,7 +288,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
       $evaluatedExpr = $this->interpolate($expr, $args);
-      $this->orderBys[$evaluatedExpr] = array('value' => $evaluatedExpr, 'weight' => $weight, 'guid' => $guid++);
+      $this->orderBys[$evaluatedExpr] = ['value' => $evaluatedExpr, 'weight' => $weight, 'guid' => $guid++];
     }
     return $this;
   }
@@ -356,7 +340,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * @return CRM_Utils_SQL_Select
    * @see insertIntoField
    */
-  public function insertInto($table, $fields = array()) {
+  public function insertInto($table, $fields = []) {
     $this->insertInto = $table;
     $this->insertIntoField($fields);
     return $this;
@@ -371,7 +355,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    *   The fields to fill in the other table (in order).
    * @return CRM_Utils_SQL_Select
    */
-  public function insertIgnoreInto($table, $fields = array()) {
+  public function insertIgnoreInto($table, $fields = []) {
     $this->insertVerb = "INSERT IGNORE INTO ";
     return $this->insertInto($table, $fields);
   }
@@ -384,11 +368,10 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * @param array $fields
    *   The fields to fill in the other table (in order).
    */
-  public function replaceInto($table, $fields = array()) {
+  public function replaceInto($table, $fields = []) {
     $this->insertVerb = "REPLACE INTO ";
     return $this->insertInto($table, $fields);
   }
-
 
   /**
    * @param array $fields
@@ -411,7 +394,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    */
   public function isEmpty($parts = NULL) {
     $empty = TRUE;
-    $fields = array(
+    $fields = [
       'insertInto',
       'insertIntoFields',
       'selects',
@@ -423,7 +406,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
       'orderBys',
       'limit',
       'offset',
-    );
+    ];
     if ($parts !== NULL) {
       $fields = array_intersect($fields, $parts);
     }
@@ -470,7 +453,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     }
     if ($this->orderBys) {
       $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys,
-        array('weight', 'guid'));
+        ['weight', 'guid']);
       $orderBys = CRM_Utils_Array::collect('value', $orderBys);
       $sql .= 'ORDER BY ' . implode(', ', $orderBys) . "\n";
     }
@@ -504,7 +487,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    */
   public function execute($daoName = NULL, $i18nRewrite = TRUE) {
     // Don't pass through $params. toSQL() handles interpolation.
-    $params = array();
+    $params = [];
 
     // Don't pass through $abort, $trapException. Just use straight-up exceptions.
     $abort = TRUE;

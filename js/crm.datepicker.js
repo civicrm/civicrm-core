@@ -24,6 +24,7 @@
         $dateField = $(),
         $timeField = $(),
         $clearLink = $(),
+        placeholder,
         hasDatepicker = settings.date !== false && settings.date !== 'yy',
         type = hasDatepicker ? 'text' : 'number';
 
@@ -33,22 +34,34 @@
       }
       if (settings.time !== false) {
         $timeField = $('<input>').insertAfter($dataField);
+        placeholder = settings.timePlaceholder || $dataField.attr('time-placeholder');
         CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled']);
         $timeField
           .addClass('crm-form-text crm-form-time')
-          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
-          .attr('aria-label', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
+          // Set default placeholder as clock icon (`fa-clock` is Unicode f017)
+          .attr('placeholder', placeholder === undefined ? '\uf017' : placeholder)
+          .attr('aria-label', placeholder === undefined ? ts('Time') : placeholder)
           .change(updateDataField)
           .timeEntry({
             spinnerImage: '',
             show24Hours: settings.time === true || settings.time === undefined ? CRM.config.timeIs24Hr : settings.time == '24'
           });
+        if (!placeholder) {
+          $timeField.addClass('crm-placeholder-icon');
+        }
       }
       if (settings.date !== false) {
         // Render "number" field for year-only format, calendar popup for all other formats
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
-        CRM.utils.copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled', 'aria-label']);
+        CRM.utils.copyAttributes($dataField, $dateField, ['style', 'class', 'disabled', 'aria-label']);
+        placeholder = settings.placeholder || $dataField.attr('placeholder');
         $dateField.addClass('crm-form-' + type);
+        if (!settings.minDate && !_.isUndefined(settings.start_date_years)) {
+          settings.minDate = '' + (new Date().getFullYear() - settings.start_date_years) + '-01-01';
+        }
+        if (!settings.maxDate && !_.isUndefined(settings.end_date_years)) {
+          settings.maxDate = '' + (new Date().getFullYear() + settings.end_date_years) + '-12-31';
+        }
         if (hasDatepicker) {
           settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
           settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
@@ -63,7 +76,11 @@
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
           $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');
         }
-        $dateField.change(updateDataField);
+        // Set placeholder as calendar icon (`fa-calendar` is Unicode f073)
+        $dateField.attr({placeholder: placeholder === undefined ? '\uF073' : placeholder}).change(updateDataField);
+        if (!placeholder) {
+          $dateField.addClass('crm-placeholder-icon');
+        }
       }
       // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
       function isValidDate() {

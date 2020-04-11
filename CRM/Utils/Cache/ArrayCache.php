@@ -1,48 +1,34 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * Class CRM_Utils_Cache_Arraycache
+ * Class CRM_Utils_Cache_ArrayCache
  */
-class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
+class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait;
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   const DEFAULT_TIMEOUT = 3600;
 
   /**
    * The cache storage container, an in memory array by default
+   * @var array
    */
   protected $_cache;
 
@@ -54,11 +40,11 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
    * @param array $config
    *   An array of configuration params.
    *
-   * @return \CRM_Utils_Cache_Arraycache
+   * @return \CRM_Utils_Cache_ArrayCache
    */
   public function __construct($config) {
-    $this->_cache = array();
-    $this->_expires = array();
+    $this->_cache = [];
+    $this->_expires = [];
   }
 
   /**
@@ -109,7 +95,7 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   public function flush() {
     unset($this->_cache);
     unset($this->_expires);
-    $this->_cache = array();
+    $this->_cache = [];
     return TRUE;
   }
 
@@ -118,7 +104,25 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   }
 
   private function reobjectify($value) {
-    return is_object($value) ? unserialize(serialize($value)) : $value;
+    if (is_object($value)) {
+      return unserialize(serialize($value));
+    }
+    if (is_array($value)) {
+      foreach ($value as $p) {
+        if (is_object($p)) {
+          return unserialize(serialize($value));
+        }
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * @param string $key
+   * @return int|null
+   */
+  public function getExpires($key) {
+    return $this->_expires[$key] ?: NULL;
   }
 
 }

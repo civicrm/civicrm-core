@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/editing/deleting offline Event Registrations *}
@@ -184,6 +168,16 @@
     {assign var=registerMode value="LIVE"}
   {/if}
   <div class="crm-block crm-form-block crm-participant-form-block">
+    {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
+      <div class="action-link css_right crm-link-credit-card-mode">
+        {if $contactId}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+        {else}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
+        {/if}
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card event registration{/ts}</a>
+      </div>
+    {/if}
     <div class="view-content">
       {if $participantMode}
         <div class="help">
@@ -217,17 +211,10 @@
         {else} {* If action is other than Delete *}
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
-          {if $single and $context neq 'standalone'}
-            <tr class="crm-participant-form-block-displayName">
-              <td class="label font-size12pt"><label>{ts}Participant{/ts}</label></td>
-              <td class="font-size12pt view-value">{$displayName}&nbsp;</td>
-            </tr>
-            {else}
-            <tr class="crm-participant-form-contact-id">
-              <td class="label">{$form.contact_id.label}</td>
-              <td>{$form.contact_id.html}</td>
-            </tr>
-          {/if}
+          <tr class="crm-participant-form-contact-id">
+            <td class="label">{$form.contact_id.label}</td>
+            <td>{$form.contact_id.html}</td>
+          </tr>
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
               <tr class="crm-participant-form-block-additionalParticipants">
@@ -268,13 +255,7 @@
           </tr>
           <tr class="crm-participant-form-block-register_date">
             <td class="label">{$form.register_date.label}</td>
-            <td>
-              {if $hideCalendar neq true}
-                    {include file="CRM/common/jcalendar.tpl" elementName=register_date}
-                  {else}
-                    {$form.register_date.value|crmDate}
-                  {/if}
-            </td>
+            <td>{$form.register_date.html}</td>
           </tr>
           <tr class="crm-participant-form-block-status_id">
             <td class="label">{$form.status_id.label}</td>
@@ -391,6 +372,7 @@
           {if $urlPathVar}
           dataUrl += '&' + '{$urlPathVar}';
           {/if}
+          dataUrl += '&' + 'is_backoffice=1';
 
           {literal}
           var eventId = $('[name=event_id], #event_id', $form).val();

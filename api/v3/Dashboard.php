@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -30,7 +14,6 @@
  *
  * @package CiviCRM_APIv3
  */
-
 
 /**
  * Creates or updates an Dashlet.
@@ -41,13 +24,12 @@
  *   Array containing 'is_error' to denote success or failure and details of the created activity
  */
 function civicrm_api3_dashboard_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array(
-      'name',
-      'label',
-      'url',
-      'fullscreen_url',
-    )
-  );
+  civicrm_api3_verify_one_mandatory($params, NULL, [
+    'name',
+    'label',
+    'url',
+    'fullscreen_url',
+  ]);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Dashboard');
 }
 
@@ -83,12 +65,8 @@ function civicrm_api3_dashboard_get($params) {
  *   Array holding 'id' of dashlet to be deleted.
  * @return array
  * @throws API_Exception
+ * @throws CiviCRM_API3_Exception
  */
 function civicrm_api3_dashboard_delete($params) {
-  if (CRM_Core_BAO_Dashboard::deleteDashlet($params['id'])) {
-    return civicrm_api3_create_success(1, $params, 'Dashboard', 'delete');
-  }
-  else {
-    throw new API_Exception('Could not delete dashlet');
-  }
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

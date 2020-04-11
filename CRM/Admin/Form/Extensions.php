@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -90,7 +74,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     return $defaults;
   }
 
@@ -101,53 +85,52 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
         $buttonName = ts('Install');
-        $title = ts('Install "%1"?', array(
+        $title = ts('Install "%1"?', [
           1 => $this->_key,
-        ));
+        ]);
         break;
 
       case CRM_Core_Action::UPDATE:
         $buttonName = ts('Download and Install');
-        $title = ts('Download and Install "%1"?', array(
+        $title = ts('Download and Install "%1"?', [
           1 => $this->_key,
-        ));
+        ]);
         break;
 
       case CRM_Core_Action::DELETE:
         $buttonName = ts('Uninstall');
-        $title = ts('Uninstall "%1"?', array(
+        $title = ts('Uninstall "%1"?', [
           1 => $this->_key,
-        ));
+        ]);
         break;
 
       case CRM_Core_Action::ENABLE:
         $buttonName = ts('Enable');
-        $title = ts('Enable "%1"?', array(
+        $title = ts('Enable "%1"?', [
           1 => $this->_key,
-        ));
+        ]);
         break;
 
       case CRM_Core_Action::DISABLE:
         $buttonName = ts('Disable');
-        $title = ts('Disable "%1"?', array(
+        $title = ts('Disable "%1"?', [
           1 => $this->_key,
-        ));
+        ]);
         break;
     }
 
     $this->assign('title', $title);
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => $buttonName,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => $buttonName,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -164,7 +147,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    *   true if no errors, else an array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
 
     return empty($errors) ? TRUE : $errors;
   }
@@ -177,7 +160,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Extension_System::singleton()->getManager()->uninstall(array($this->_key));
+        CRM_Extension_System::singleton()->getManager()->uninstall([$this->_key]);
         CRM_Core_Session::setStatus("", ts('Extension Uninstalled'), "success");
       }
       catch (CRM_Extension_Exception_DependencyException $e) {
@@ -187,26 +170,26 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      civicrm_api3('Extension', 'install', array('keys' => $this->_key));
+      civicrm_api3('Extension', 'install', ['keys' => $this->_key]);
       CRM_Core_Session::setStatus("", ts('Extension Installed'), "success");
     }
 
     if ($this->_action & CRM_Core_Action::ENABLE) {
-      civicrm_api3('Extension', 'enable', array('keys' => $this->_key));
+      civicrm_api3('Extension', 'enable', ['keys' => $this->_key]);
       CRM_Core_Session::setStatus("", ts('Extension Enabled'), "success");
     }
 
     if ($this->_action & CRM_Core_Action::DISABLE) {
-      CRM_Extension_System::singleton()->getManager()->disable(array($this->_key));
+      CRM_Extension_System::singleton()->getManager()->disable([$this->_key]);
       CRM_Core_Session::setStatus("", ts('Extension Disabled'), "success");
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $result = civicrm_api('Extension', 'download', array(
+      $result = civicrm_api('Extension', 'download', [
         'version' => 3,
         'key' => $this->_key,
-      ));
-      if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
+      ]);
+      if (empty($result['is_error'])) {
         CRM_Core_Session::setStatus("", ts('Extension Upgraded'), "success");
       }
       else {

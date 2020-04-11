@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -53,8 +37,8 @@ class CRM_Contact_Form_Inline_Lock {
     // - V1:open E1:open E1:submit V1.email:open V1.email:submit
     // - V1:open V1.email:open E1:open E1:submit V1.email:submit V1:lock
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
-    $form->addElement('hidden', 'oplock_ts', $timestamps['modified_date'], array('id' => 'oplock_ts'));
-    $form->addFormRule(array('CRM_Contact_Form_Inline_Lock', 'formRule'), $contactID);
+    $form->addElement('hidden', 'oplock_ts', $timestamps['modified_date'], ['id' => 'oplock_ts']);
+    $form->addFormRule(['CRM_Contact_Form_Inline_Lock', 'formRule'], $contactID);
   }
 
   /**
@@ -70,7 +54,7 @@ class CRM_Contact_Form_Inline_Lock {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
+    $errors = [];
 
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
     if ($fields['oplock_ts'] != $timestamps['modified_date']) {
@@ -93,7 +77,7 @@ class CRM_Contact_Form_Inline_Lock {
    */
   public static function getResponse($contactID) {
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
-    return array('oplock_ts' => $timestamps['modified_date']);
+    return ['oplock_ts' => $timestamps['modified_date']];
   }
 
 }

@@ -1,30 +1,15 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* View Case Activities *}
 <div class="crm-block crm-content-block crm-case-activity-view-block">
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top" linkButtons=$actionLinks}</div>
   {if $revs}
     {strip}
       <table class="crm-info-panel">
@@ -37,7 +22,7 @@
           <tr {if $row.id EQ $latestRevisionID}style="font-weight: bold;"{/if}>
             <td class="crm-case-activityview-form-block-name">{$row.name}</td>
             <td class="crm-case-activityview-form-block-date">{$row.date|crmDate}</td>
-            <td class="crm-case-activityview-form-block-{$row.id}"><a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid="}{$row.id}" title="{ts}View this revision of the activity record.{/ts}">{if $row.id != $latestRevisionID}View Prior Revision{else}View Current Revision{/if}</a></td>
+            <td class="crm-case-activityview-form-block-{$row.id}"><a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid="}{$row.id}" title="{ts}View this revision of the activity record.{/ts}">{if $row.id != $latestRevisionID}{ts}View{/ts}{else}{ts}View (Current Revision){/ts}{/if}</a></td>
           </tr>
         {/foreach}
       </table>
@@ -77,7 +62,7 @@
       </table>
     {/if}
   {/if}
-  <div class="crm-submit-buttons">
-    {crmButton p='civicrm/case' q="reset=1" class='cancel' icon='times'}{ts}Done{/ts}{/crmButton}
-  </div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom" linkButtons=$actionLinks}</div>
 </div>
+
+{include file="CRM/Case/Form/ActivityToCase.tpl"}

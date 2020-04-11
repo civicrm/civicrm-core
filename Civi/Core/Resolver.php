@@ -77,7 +77,7 @@ class Resolver {
         case 'call':
           // Callback: Object/method in container.
           $obj = \Civi::service($url['host']);
-          return array($obj, ltrim($url['path'], '/'));
+          return [$obj, ltrim($url['path'], '/')];
 
         case 'api3':
           // Callback: API.
@@ -91,7 +91,7 @@ class Resolver {
           throw new \RuntimeException("Unsupported callback scheme: " . $url['scheme']);
       }
     }
-    elseif (in_array($id, array('0', '1'))) {
+    elseif (in_array($id, ['0', '1'])) {
       // Callback: Constant value.
       return new ResolverConstantCallback((int) $id);
     }
@@ -184,7 +184,7 @@ class ResolverApi {
    * Fire an API call.
    */
   public function __invoke() {
-    $apiParams = array();
+    $apiParams = [];
     if (isset($this->url['query'])) {
       parse_str($this->url['query'], $apiParams);
     }
@@ -197,7 +197,7 @@ class ResolverApi {
     }
 
     $result = civicrm_api3($this->url['host'], ltrim($this->url['path'], '/'), $apiParams);
-    return isset($result['values']) ? $result['values'] : NULL;
+    return $result['values'] ?? NULL;
   }
 
   /**
@@ -212,7 +212,7 @@ class ResolverApi {
    *   (e.g. "@1" => "firstValue").
    */
   protected function createPlaceholders($prefix, $args) {
-    $result = array();
+    $result = [];
     foreach ($args as $offset => $arg) {
       $result[$prefix . (1 + $offset)] = $arg;
     }
@@ -250,7 +250,8 @@ class ResolverApi {
 }
 
 class ResolverGlobalCallback {
-  private $mode, $path;
+  private $mode;
+  private $path;
 
   /**
    * Class constructor.

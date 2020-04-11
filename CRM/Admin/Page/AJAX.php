@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -37,21 +21,76 @@
 class CRM_Admin_Page_AJAX {
 
   /**
-   * CRM-12337 Output navigation menu as executable javascript.
-   *
-   * @see smarty_function_crmNavigationMenu
+   * Outputs menubar data (json format) for the current user.
    */
-  public static function getNavigationMenu() {
-    $contactID = CRM_Core_Session::singleton()->get('userID');
-    if ($contactID) {
-      CRM_Core_Page_AJAX::setJsHeaders();
-      $smarty = CRM_Core_Smarty::singleton();
-      $smarty->assign('includeEmail', civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences')));
-      print $smarty->fetchWith('CRM/common/navigation.js.tpl', array(
-        'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
-      ));
+  public static function navMenu() {
+    if (CRM_Core_Session::getLoggedInContactID()) {
+
+      $menu = CRM_Core_BAO_Navigation::buildNavigationTree();
+      CRM_Core_BAO_Navigation::buildHomeMenu($menu);
+      CRM_Utils_Hook::navigationMenu($menu);
+      CRM_Core_BAO_Navigation::fixNavigationMenu($menu);
+      CRM_Core_BAO_Navigation::orderByWeight($menu);
+      CRM_Core_BAO_Navigation::filterByPermission($menu);
+      self::formatMenuItems($menu);
+
+      $output = [
+        'menu' => $menu,
+        'search' => CRM_Utils_Array::makeNonAssociative(self::getSearchOptions()),
+      ];
+      // Encourage browsers to cache for a long time - 1 year
+      $ttl = 60 * 60 * 24 * 364;
+      CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
+      CRM_Utils_System::setHttpHeader('Cache-Control', "max-age=$ttl, public");
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+      print (json_encode($output));
     }
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * @param array $menu
+   */
+  public static function formatMenuItems(&$menu) {
+    foreach ($menu as $key => &$item) {
+      $props = $item['attributes'];
+      unset($item['attributes']);
+      if (!empty($props['separator'])) {
+        $item['separator'] = ($props['separator'] == 1 ? 'bottom' : 'top');
+      }
+      if (!empty($props['icon'])) {
+        $item['icon'] = $props['icon'];
+      }
+      if (!empty($props['attr'])) {
+        $item['attr'] = $props['attr'];
+      }
+      if (!empty($props['url'])) {
+        $item['url'] = CRM_Utils_System::evalUrl(CRM_Core_BAO_Navigation::makeFullyFormedUrl($props['url']));
+      }
+      if (!empty($props['label'])) {
+        $item['label'] = ts($props['label'], ['context' => 'menu']);
+      }
+      $item['name'] = !empty($props['name']) ? $props['name'] : CRM_Utils_String::munge(CRM_Utils_Array::value('label', $props));
+      if (!empty($item['child'])) {
+        self::formatMenuItems($item['child']);
+      }
+    }
+    $menu = array_values($menu);
+  }
+
+  public static function getSearchOptions() {
+    $searchOptions = Civi::settings()->get('quicksearch_options');
+    $labels = CRM_Core_SelectValues::quicksearchOptions();
+    $result = [];
+    foreach ($searchOptions as $key) {
+      $label = $labels[$key];
+      if (strpos($key, 'custom_') === 0) {
+        $key = 'custom_' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
+        $label = array_slice(explode(': ', $label, 2), -1);
+      }
+      $result[$key] = $label;
+    }
+    return $result;
   }
 
   /**
@@ -68,16 +107,16 @@ class CRM_Admin_Page_AJAX {
     require_once 'api/v3/utils.php';
     $recordID = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
-    $ret = array();
+    $ret = [];
 
     if ($recordID && $entity && $recordBAO = _civicrm_api3_get_BAO($entity)) {
       switch ($recordBAO) {
         case 'CRM_Core_BAO_UFGroup':
           $method = 'getUFJoinRecord';
-          $result = array($recordBAO, $method);
-          $ufJoin = call_user_func_array(($result), array($recordID, TRUE));
+          $result = [$recordBAO, $method];
+          $ufJoin = call_user_func_array(($result), [$recordID, TRUE]);
           if (!empty($ufJoin)) {
-            $ret['content'] = ts('This profile is currently used for %1.', array(1 => implode(', ', $ufJoin))) . ' <br/><br/>' . ts('If you disable the profile - it will be removed from these forms and/or modules. Do you want to continue?');
+            $ret['content'] = ts('This profile is currently used for %1.', [1 => implode(', ', $ufJoin)]) . ' <br/><br/>' . ts('If you disable the profile - it will be removed from these forms and/or modules. Do you want to continue?');
           }
           else {
             $ret['content'] = ts('Are you sure you want to disable this profile?');
@@ -91,12 +130,12 @@ class CRM_Admin_Page_AJAX {
           if (!CRM_Utils_System::isNull($usedBy)) {
             $template = CRM_Core_Smarty::singleton();
             $template->assign('usedBy', $usedBy);
-            $comps = array(
+            $comps = [
               'Event' => 'civicrm_event',
               'Contribution' => 'civicrm_contribution_page',
               'EventTemplate' => 'civicrm_event_template',
-            );
-            $contexts = array();
+            ];
+            $contexts = [];
             foreach ($comps as $name => $table) {
               if (array_key_exists($table, $usedBy)) {
                 $contexts[] = $name;
@@ -106,12 +145,12 @@ class CRM_Admin_Page_AJAX {
 
             $ret['illegal'] = TRUE;
             $table = $template->fetch('CRM/Price/Page/table.tpl');
-            $ret['content'] = ts('Unable to disable the \'%1\' price set - it is currently in use by one or more active events, contribution pages or contributions.', array(
-                1 => $priceSet,
-              )) . "<br/> $table";
+            $ret['content'] = ts('Unable to disable the \'%1\' price set - it is currently in use by one or more active events, contribution pages or contributions.', [
+              1 => $priceSet,
+            ]) . "<br/> $table";
           }
           else {
-            $ret['content'] = ts('Are you sure you want to disable \'%1\' Price Set?', array(1 => $priceSet));
+            $ret['content'] = ts('Are you sure you want to disable \'%1\' Price Set?', [1 => $priceSet]);
           }
           break;
 
@@ -203,6 +242,7 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Contact_BAO_Group':
           $ret['content'] = ts('Are you sure you want to disable this Group?');
+          $ret['content'] .= '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
           break;
 
         case 'CRM_Core_BAO_OptionGroup':
@@ -215,7 +255,7 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Core_BAO_OptionValue':
           $label = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $recordID, 'label');
-          $ret['content'] = ts('Are you sure you want to disable the \'%1\' option ?', array(1 => $label));
+          $ret['content'] = ts('Are you sure you want to disable the \'%1\' option ?', [1 => $label]);
           $ret['content'] .= '<br /><br />' . ts('WARNING - Disabling an option which has been assigned to existing records will result in that option being cleared when the record is edited.');
           break;
 
@@ -234,7 +274,7 @@ class CRM_Admin_Page_AJAX {
       }
     }
     else {
-      $ret = array('status' => 'error', 'content' => 'Error: Unknown entity type.', 'illegal' => TRUE);
+      $ret = ['status' => 'error', 'content' => 'Error: Unknown entity type.', 'illegal' => TRUE];
     }
     CRM_Core_Page_AJAX::returnJsonResponse($ret);
   }
@@ -244,31 +284,31 @@ class CRM_Admin_Page_AJAX {
    *
    * This appears to be only used by scheduled reminders.
    */
-  static public function mappingList() {
+  public static function mappingList() {
     if (empty($_GET['mappingID'])) {
-      CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
+      CRM_Utils_JSON::output(['status' => 'error', 'error_msg' => 'required params missing.']);
     }
 
     $mapping = CRM_Core_BAO_ActionSchedule::getMapping($_GET['mappingID']);
-    $dateFieldLabels = $mapping ? $mapping->getDateFields() : array();
+    $dateFieldLabels = $mapping ? $mapping->getDateFields() : [];
 
     // The UX here is quirky -- for "Activity" types, there's a simple drop "Recipients"
     // dropdown which is always displayed. For other types, the "Recipients" drop down is
     // conditional upon the weird isLimit ('Limit To / Also Include / Neither') dropdown.
     $noThanksJustKidding = !$_GET['isLimit'];
     if ($mapping instanceof CRM_Activity_ActionMapping || !$noThanksJustKidding) {
-      $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : array();
+      $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : [];
     }
     else {
       $entityRecipientLabels = CRM_Core_BAO_ActionSchedule::getAdditionalRecipients();
     }
     $recipientMapping = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
 
-    $output = array(
+    $output = [
       'sel4' => CRM_Utils_Array::makeNonAssociative($dateFieldLabels),
       'sel5' => CRM_Utils_Array::makeNonAssociative($entityRecipientLabels),
       'recipientMapping' => $recipientMapping,
-    );
+    ];
 
     CRM_Utils_JSON::output($output);
   }
@@ -279,20 +319,20 @@ class CRM_Admin_Page_AJAX {
    * Ex: GET /civicrm/ajax/recipientListing?mappingID=contribpage&recipientType=
    */
   public static function recipientListing() {
-    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, array(
-      'options' => array(
+    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, [
+      'options' => [
         'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ),
-    ));
-    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, array(
-      'options' => array(
+      ],
+    ]);
+    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, [
+      'options' => [
         'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ),
-    ));
+      ],
+    ]);
 
-    CRM_Utils_JSON::output(array(
+    CRM_Utils_JSON::output([
       'recipients' => CRM_Utils_Array::makeNonAssociative(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
-    ));
+    ]);
   }
 
   /**
@@ -301,11 +341,11 @@ class CRM_Admin_Page_AJAX {
    * Used by jstree to incrementally load tags
    */
   public static function getTagTree() {
-    $parent = CRM_Utils_Type::escape(CRM_Utils_Array::value('parent_id', $_GET, 0), 'Integer');
+    $parent = CRM_Utils_Type::escape(($_GET['parent_id'] ?? 0), 'Integer');
     $substring = CRM_Utils_Type::escape(CRM_Utils_Array::value('str', $_GET), 'String');
-    $result = array();
+    $result = [];
 
-    $whereClauses = array('is_tagset <> 1');
+    $whereClauses = ['is_tagset <> 1'];
     $orderColumn = 'name';
 
     // fetch all child tags in Array('parent_tag' => array('child_tag_1', 'child_tag_2', ...)) format
@@ -327,10 +367,10 @@ class CRM_Admin_Page_AJAX {
     }
 
     $dao = CRM_Utils_SQL_Select::from('civicrm_tag')
-            ->where($whereClauses)
-            ->groupBy('id')
-            ->orderBy($orderColumn)
-            ->execute();
+      ->where($whereClauses)
+      ->groupBy('id')
+      ->orderBy($orderColumn)
+      ->execute();
 
     while ($dao->fetch()) {
       if (!empty($substring)) {
@@ -340,7 +380,7 @@ class CRM_Admin_Page_AJAX {
         }
       }
       else {
-        $hasChildTags = empty($childTagIDs[$dao->id]) ? FALSE : TRUE;
+        $hasChildTags = !empty($childTagIDs[$dao->id]);
         $usedFor = (array) explode(',', $dao->used_for);
         $tag = [
           'id' => $dao->id,

@@ -55,9 +55,6 @@ class ChangeSet implements ChangeSetInterface {
           if (preg_match($filter['regex'], $path)) {
             if ($doc === NULL) {
               $doc = \phpQuery::newDocument($html, 'text/html');
-              if (\CRM_Core_Config::singleton()->debug && !$coder->checkConsistentHtml($html)) {
-                throw new \CRM_Core_Exception("Cannot process $path: inconsistent markup. Use check-angular.php to investigate.");
-              }
             }
             call_user_func($filter['callback'], $doc, $path);
           }
@@ -82,7 +79,7 @@ class ChangeSet implements ChangeSetInterface {
    *     - resourceType: string
    *     - callback: function
    */
-  protected $resFilters = array();
+  protected $resFilters = [];
 
   /**
    * @var array
@@ -90,7 +87,7 @@ class ChangeSet implements ChangeSetInterface {
    *     - regex: string
    *     - callback: function
    */
-  protected $htmlFilters = array();
+  protected $htmlFilters = [];
 
   /**
    * @param string $name
@@ -115,7 +112,7 @@ class ChangeSet implements ChangeSetInterface {
     return $this->alterResource('requires',
       function ($values) use ($module, $dependencies) {
         if (!isset($values[$module])) {
-          $values[$module] = array();
+          $values[$module] = [];
         }
         $values[$module] = array_unique(array_merge($values[$module], $dependencies));
         return $values;
@@ -130,10 +127,10 @@ class ChangeSet implements ChangeSetInterface {
    * @return ChangeSet
    */
   public function alterResource($resourceType, $callback) {
-    $this->resFilters[] = array(
+    $this->resFilters[] = [
       'resourceType' => $resourceType,
       'callback' => $callback,
-    );
+    ];
     return $this;
   }
 
@@ -152,10 +149,10 @@ class ChangeSet implements ChangeSetInterface {
    * @return ChangeSet
    */
   public function alterHtml($file, $callback) {
-    $this->htmlFilters[] = array(
+    $this->htmlFilters[] = [
       'regex' => ($file{0} === ';') ? $file : $this->createRegex($file),
       'callback' => $callback,
-    );
+    ];
     return $this;
   }
 

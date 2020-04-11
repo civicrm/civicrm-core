@@ -1,41 +1,27 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 6379;
@@ -74,9 +60,10 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * @return Redis
    */
   public static function connect($config) {
-    $host = isset($config['host']) ? $config['host'] : self::DEFAULT_HOST;
-    $port = isset($config['port']) ? $config['port'] : self::DEFAULT_PORT;
-    $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD'); // Ugh.
+    $host = $config['host'] ?? self::DEFAULT_HOST;
+    $port = $config['port'] ?? self::DEFAULT_PORT;
+    // Ugh.
+    $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD');
     $id = implode(':', ['connect', $host, $port /* $pass is constant */]);
     if (!isset(Civi::$statics[__CLASS__][$id])) {
       // Ideally, we'd track the connection in the service-container, but the

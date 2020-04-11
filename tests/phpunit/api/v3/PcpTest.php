@@ -1,29 +1,12 @@
 <?php
-
 /*
- * +--------------------------------------------------------------------+
- * | CiviCRM version 5                                                  |
- * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2018                                |
- * +--------------------------------------------------------------------+
- * | This file is a part of CiviCRM.                                    |
- * |                                                                    |
- * | CiviCRM is free software; you can copy, modify, and distribute it  |
- * | under the terms of the GNU Affero General Public License           |
- * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- * |                                                                    |
- * | CiviCRM is distributed in the hope that it will be useful, but     |
- * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- * | See the GNU Affero General Public License for more details.        |
- * |                                                                    |
- * | You should have received a copy of the GNU Affero General Public   |
- * | License and the CiviCRM Licensing Exception along                  |
- * | with this program; if not, contact CiviCRM LLC                     |
- * | at info[AT]civicrm[DOT]org. If you have questions about the        |
- * | GNU Affero General Public License or the licensing of CiviCRM,     |
- * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- * +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -51,11 +34,12 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   public $DBResetRequired = TRUE;
 
   public function setUp() {
-    $this->params = array(
+    $this->params = [
       'title' => "Pcp title",
       'contact_id' => 1,
       'page_id' => 1,
-      'pcp_block_id' => 1);
+      'pcp_block_id' => 1,
+    ];
     parent::setUp();
   }
 
@@ -73,8 +57,8 @@ class api_v3_PcpTest extends CiviUnitTestCase {
    */
   public function testDisablePcp() {
     $result = civicrm_api3('Pcp', 'create', $this->params);
-    civicrm_api3('Pcp', 'create', array('id' => $result['id'], 'is_active' => 0));
-    $this->getAndCheck($this->params + array('is_active' => 0), $result['id'], $this->entity);
+    civicrm_api3('Pcp', 'create', ['id' => $result['id'], 'is_active' => 0]);
+    $this->getAndCheck($this->params + ['is_active' => 0], $result['id'], $this->entity);
   }
 
   /**
@@ -98,12 +82,12 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   public function testDeletePcp() {
     $entity = $this->createTestEntity();
     $checkCreated = $this->callAPISuccess($this->entity, 'get',
-      array('id' => $entity['id']));
+      ['id' => $entity['id']]);
     $this->assertEquals(1, $checkCreated['count']);
     $this->callAPIAndDocument('Pcp', 'delete',
-        array('id' => $entity['id']), __FUNCTION__, __FILE__);
+        ['id' => $entity['id']], __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get',
-        array('id' => $entity['id']));
+        ['id' => $entity['id']]);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
@@ -117,11 +101,11 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   public function testGetPcpChainDelete() {
     $description = "Demonstrates get + delete in the same call.";
     $subfile = 'ChainedGetDelete';
-    $params = array('title' => "Pcp title", 'api.Pcp.delete' => 1);
+    $params = ['title' => "Pcp title", 'api.Pcp.delete' => 1];
     $this->callAPISuccess('Pcp', 'create', $this->params);
     $this->callAPIAndDocument('Pcp', 'get', $params, __FUNCTION__,
         __FILE__, $description, $subfile);
-    $this->assertEquals(0, $this->callAPISuccess('Pcp', 'getcount', array()));
+    $this->assertEquals(0, $this->callAPISuccess('Pcp', 'getcount', []));
   }
 
 }

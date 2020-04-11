@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -44,8 +28,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @var int
    */
-  static $_contactType = NULL;
-
+  public static $_contactType = NULL;
 
   /**
    * Set variables up before form is built.
@@ -62,7 +45,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->assign('dataValues', $this->_dataValues);
 
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-    $this->_onDuplicate = $this->get('onDuplicate', isset($onDuplicate) ? $onDuplicate : "");
+    $this->_onDuplicate = $this->get('onDuplicate', $onDuplicate ?? "");
 
     $highlightedFields = array();
     if ($skipColumnHeader) {
@@ -130,9 +113,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $mappingName = $mappingName[1];
       $mappingContactType = $mappingContactType[1];
-      $mappingLocation = CRM_Utils_Array::value('1', $mappingLocation);
-      $mappingPhoneType = CRM_Utils_Array::value('1', $mappingPhoneType);
-      $mappingRelation = CRM_Utils_Array::value('1', $mappingRelation);
+      $mappingLocation = $mappingLocation['1'] ?? NULL;
+      $mappingPhoneType = $mappingPhoneType['1'] ?? NULL;
+      $mappingRelation = $mappingRelation['1'] ?? NULL;
 
       //mapping is to be loaded from database
 
@@ -378,7 +361,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     if (!empty($fields['saveMapping'])) {
-      $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
+      $nameField = $fields['saveMappingName'] ?? NULL;
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
       }
@@ -472,9 +455,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $updateMappingFields->column_number = $i;
 
         $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-        $id = isset($mapperKeyParts[0]) ? $mapperKeyParts[0] : NULL;
-        $first = isset($mapperKeyParts[1]) ? $mapperKeyParts[1] : NULL;
-        $second = isset($mapperKeyParts[2]) ? $mapperKeyParts[2] : NULL;
+        $id = $mapperKeyParts[0] ?? NULL;
+        $first = $mapperKeyParts[1] ?? NULL;
+        $second = $mapperKeyParts[2] ?? NULL;
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
       }
@@ -496,9 +479,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $saveMappingFields->column_number = $i;
 
         $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-        $id = isset($mapperKeyParts[0]) ? $mapperKeyParts[0] : NULL;
-        $first = isset($mapperKeyParts[1]) ? $mapperKeyParts[1] : NULL;
-        $second = isset($mapperKeyParts[2]) ? $mapperKeyParts[2] : NULL;
+        $id = $mapperKeyParts[0] ?? NULL;
+        $first = $mapperKeyParts[1] ?? NULL;
+        $second = $mapperKeyParts[2] ?? NULL;
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();
       }

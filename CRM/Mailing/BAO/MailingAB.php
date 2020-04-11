@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -55,7 +39,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    * @return object
    *   $mailingab      The new mailingab object
    */
-  public static function create(&$params, $ids = array()) {
+  public static function create(&$params, $ids = []) {
     $transaction = new CRM_Core_Transaction();
 
     $mailingab = self::add($params, $ids);
@@ -79,7 +63,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *
    * @return object
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('mailingab_id', $ids, CRM_Utils_Array::value('id', $params));
 
     if ($id) {
@@ -109,7 +93,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     return $result;
   }
 
-
   /**
    * Delete MailingAB and all its associated records.
    *
@@ -118,7 +101,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    */
   public static function del($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to MailingAB del function'));
     }
     CRM_Core_Transaction::create()->run(function () use ($id) {
       CRM_Utils_Hook::pre('delete', 'MailingAB', $id, CRM_Core_DAO::$_nullArray);
@@ -126,7 +109,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
       $dao = new CRM_Mailing_DAO_MailingAB();
       $dao->id = $id;
       if ($dao->find(TRUE)) {
-        $mailing_ids = array($dao->mailing_id_a, $dao->mailing_id_b, $dao->mailing_id_c);
+        $mailing_ids = [$dao->mailing_id_a, $dao->mailing_id_b, $dao->mailing_id_c];
         $dao->delete();
         foreach ($mailing_ids as $mailing_id) {
           if ($mailing_id) {
@@ -153,10 +136,10 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     $totalCount = CRM_Mailing_BAO_Recipients::mailingSize($dao->mailing_id_a);
     $totalSelected = max(1, round(($totalCount * $dao->group_percentage) / 100));
 
-    CRM_Mailing_BAO_Recipients::reassign($dao->mailing_id_a, array(
+    CRM_Mailing_BAO_Recipients::reassign($dao->mailing_id_a, [
       $dao->mailing_id_b => (2 * $totalSelected <= $totalCount) ? $totalSelected : $totalCount - $totalSelected,
       $dao->mailing_id_c => max(0, $totalCount - $totalSelected - $totalSelected),
-    ));
+    ]);
 
   }
 
@@ -174,7 +157,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
       OR ab.mailing_id_b = %1
       OR ab.mailing_id_c = %1)
       GROUP BY ab.id";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
     $abTest = CRM_Core_DAO::executeQuery($query, $params);
     $abTest->fetch();
     return $abTest;

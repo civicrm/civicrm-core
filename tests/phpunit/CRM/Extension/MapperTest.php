@@ -9,17 +9,32 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   /**
    * @var string
    */
-  protected $basedir, $basedir2;
+  protected $basedir;
+
+  /**
+   * @var string
+   */
+  protected $basedir2;
 
   /**
    * @var CRM_Extension_Container_Interface
    */
-  protected $container, $containerWithSlash;
+  protected $container;
+
+  /**
+   * @var CRM_Extension_Container_Interface
+   */
+  protected $containerWithSlash;
 
   /**
    * @var CRM_Extension_Mapper
    */
-  protected $mapper, $mapperWithSlash;
+  protected $mapper;
+
+  /**
+   * @var CRM_Extension_Mapper
+   */
+  protected $mapperWithSlash;
 
   public function setUp() {
     parent::setUp();
@@ -89,24 +104,29 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   }
 
   public function testGetKeysByPath() {
-    $mappers = array(
+    $mappers = [
       $this->basedir => $this->mapper,
       $this->basedir2 => $this->mapperWithSlash,
-    );
+    ];
     foreach ($mappers as $basedir => $mapper) {
       /** @var CRM_Extension_Mapper $mapper */
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir));
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird'));
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird/'));
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird//'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/*'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '//*'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/*'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar/'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar//'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar/*'));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir . '/weird'));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir . '/weird/'));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir . '/weird//'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/*'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '//*'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/*'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar/'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar//'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar/*'));
     }
+  }
+
+  public function testGetKeysByTag() {
+    $this->assertEquals([], $this->mapper->getKeysByTag('big-rock-candy-mountain'));
+    $this->assertEquals(['test.foo.bar'], $this->mapper->getKeysByTag('wakka'));
   }
 
   /**
@@ -128,10 +148,10 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/weird");
     mkdir("$basedir/weird/foobar");
-    file_put_contents("$basedir/weird/foobar/info.xml", "<extension key='test.foo.bar' type='report'><file>oddball</file></extension>");
+    file_put_contents("$basedir/weird/foobar/info.xml", "<extension key='test.foo.bar' type='report'><file>oddball</file><tags><tag>wakka</tag></tags></extension>");
     // not needed for now // file_put_contents("$basedir/weird/bar/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir . $appendPathGarbage, 'http://example/basedir' . $appendPathGarbage, $cache, $cacheKey);
-    return array($basedir, $c);
+    return [$basedir, $c];
   }
 
 }

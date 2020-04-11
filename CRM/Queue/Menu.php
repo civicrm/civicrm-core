@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -30,7 +14,7 @@
  * allows us to use these paths during upgrades.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -56,31 +40,31 @@ class CRM_Queue_Menu {
         $menuPath['title'] = 'Queue Runner';
         $menuPath['page_callback'] = 'CRM_Queue_Page_Runner';
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       case 'civicrm/queue/ajax/runNext':
       case 'civicrm/upgrade/queue/ajax/runNext':
         $menuPath['path'] = $path;
-        $menuPath['page_callback'] = array('CRM_Queue_Page_AJAX', 'runNext');
+        $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'runNext'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       case 'civicrm/queue/ajax/skipNext':
       case 'civicrm/upgrade/queue/ajax/skipNext':
         $menuPath['path'] = $path;
-        $menuPath['page_callback'] = array('CRM_Queue_Page_AJAX', 'skipNext');
+        $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'skipNext'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       case 'civicrm/queue/ajax/onEnd':
       case 'civicrm/upgrade/queue/ajax/onEnd':
         $menuPath['path'] = $path;
-        $menuPath['page_callback'] = array('CRM_Queue_Page_AJAX', 'onEnd');
+        $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'onEnd'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
-        $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
       default:

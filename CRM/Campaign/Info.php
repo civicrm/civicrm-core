@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,11 +15,12 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'campaign';
@@ -45,15 +30,14 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviCampaign',
       'translatedName' => ts('CiviCampaign'),
       'title' => ts('CiviCRM Campaign Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
-
 
   /**
    * @inheritDoc
@@ -64,35 +48,35 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'administer CiviCampaign' => array(
+    $permissions = [
+      'administer CiviCampaign' => [
         ts('administer CiviCampaign'),
         ts('Create new campaign, survey and petition types and their status'),
-      ),
-      'manage campaign' => array(
+      ],
+      'manage campaign' => [
         ts('manage campaign'),
         ts('Create new campaigns, surveys and petitions, reserve respondents'),
-      ),
-      'reserve campaign contacts' => array(
+      ],
+      'reserve campaign contacts' => [
         ts('reserve campaign contacts'),
         ts('Reserve campaign contacts for surveys and petitions'),
-      ),
-      'release campaign contacts' => array(
+      ],
+      'release campaign contacts' => [
         ts('release campaign contacts'),
         ts('Release reserved campaign contacts for surveys and petitions'),
-      ),
-      'interview campaign contacts' => array(
+      ],
+      'interview campaign contacts' => [
         ts('interview campaign contacts'),
         ts('Record survey and petition responses from their reserved contacts'),
-      ),
-      'gotv campaign contacts' => array(
+      ],
+      'gotv campaign contacts' => [
         ts('GOTV campaign contacts'),
         ts('Record that contacts voted'),
-      ),
-      'sign CiviCRM Petition' => array(
+      ],
+      'sign CiviCRM Petition' => [
         ts('sign CiviCRM Petition'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -102,7 +86,6 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
     return $permissions;
   }
-
 
   /**
    * @inheritDoc
@@ -132,6 +115,14 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-star-o';
+  }
+
+  /**
+   * @inheritDoc
    * @return null
    */
   public function registerAdvancedSearchPane() {
@@ -154,20 +145,20 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('manage campaign') ||
       CRM_Core_Permission::check('administer CiviCampaign')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array(
+      $shortCuts = array_merge($shortCuts, [
+        [
           'path' => 'civicrm/campaign/add',
           'query' => "reset=1&action=add",
           'ref' => 'new-campaign',
           'title' => ts('Campaign'),
-        ),
-        array(
+        ],
+        [
           'path' => 'civicrm/survey/add',
           'query' => "reset=1&action=add",
           'ref' => 'new-survey',
           'title' => ts('Survey'),
-        ),
-      ));
+        ],
+      ]);
     }
   }
 

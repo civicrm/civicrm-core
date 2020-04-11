@@ -1,26 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -41,11 +26,11 @@ class CRM_Upgrade_Incremental_php_FiveThree extends CRM_Upgrade_Incremental_Base
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '5.3.0') {
-      $params = array(
+      $params = [
         1 => 'edit user-driven message templates',
         2 => 'edit system workflow message templates',
         3 => 'edit message templates',
-      );
+      ];
       $preUpgradeMessage .= '<p>' . ts('New granular permissions called %1 and %2 have been added for %3 permission. These permissions help to limit user access per template', $params) . '</p>';
     }
     // Example: Generate a pre-upgrade message.
@@ -75,7 +60,7 @@ class CRM_Upgrade_Incremental_php_FiveThree extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_5_3_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('CRM-19948 - Add created_id column to civicrm_file', 'addFileCreatedIdColumn');
   }
 

@@ -1,38 +1,23 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
 
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
@@ -85,7 +70,7 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
   protected $_cache;
 
   /**
-   * @var NULL|array
+   * @var null|array
    *
    * This is the effective prefix. It may be bumped up whenever the dataset is flushed.
    *
@@ -227,7 +212,8 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
     $maxLen = self::MAX_KEY_LEN - strlen($truePrefix);
     $key = preg_replace('/\s+|\W+/', '_', $key);
     if (strlen($key) > $maxLen) {
-      $md5Key = md5($key);  // this should be 32 characters in length
+      // this should be 32 characters in length
+      $md5Key = md5($key);
       $subKeyLen = $maxLen - 1 - strlen($md5Key);
       $key = substr($key, 0, $subKeyLen) . "_" . $md5Key;
     }
@@ -256,7 +242,8 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
       $value = $this->_cache->get($key);
       if ($this->_cache->getResultCode() === Memcached::RES_NOTFOUND) {
         $value = uniqid();
-        $this->_cache->add($key, $value, 0); // Indefinite.
+        // Indefinite.
+        $this->_cache->add($key, $value, 0);
       }
       $this->_truePrefix = [
         'value' => $value,

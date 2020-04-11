@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -37,10 +21,10 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
 
   protected function setUp() {
     parent::setUp();
-    $this->_contactIds = array(
-      $this->individualCreate(array('first_name' => 'Antonia', 'last_name' => 'D`souza')),
-      $this->individualCreate(array('first_name' => 'Anthony', 'last_name' => 'Collins')),
-    );
+    $this->_contactIds = [
+      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
+      $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
+    ];
     $this->_docTypes = CRM_Core_SelectValues::documentApplicationType();
   }
 
@@ -48,13 +32,13 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
    * Test the documents got token replaced rightfully.
    */
   public function testPrintDocument() {
-    foreach (array('docx', 'odt') as $docType) {
-      $formValues = array(
-        'document_file' => array(
+    foreach (['docx', 'odt'] as $docType) {
+      $formValues = [
+        'document_file' => [
           'name' => __DIR__ . "/sample_documents/Template.$docType",
           'type' => $this->_docTypes[$docType],
-        ),
-      );
+        ],
+      ];
       $this->_testDocumentContent($formValues, $docType);
     }
   }
@@ -66,13 +50,13 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
    * @param array $type
    */
   public function _testDocumentContent($formValues, $type) {
-    $html = array();
+    $html = [];
     $form = new CRM_Contact_Form_Task_PDFLetterCommon();
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = $form->processMessageTemplate($formValues);
     list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
 
     foreach ($this->_contactIds as $item => $contactId) {
-      $params = array('contact_id' => $contactId);
+      $params = ['contact_id' => $contactId];
       list($contact) = CRM_Utils_Token::getTokenDetails($params,
         $returnProperties,
         FALSE,

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -44,7 +28,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   public $DBResetRequired = FALSE;
-  public $defaultParams = array();
+  public $defaultParams = [];
   private $_groupID;
 
   /**
@@ -60,15 +44,15 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $this->_groupID = $this->groupCreate();
     $this->createContactsInGroup(2, $this->_groupID);
 
-    $this->defaultParams = array(
+    $this->defaultParams = [
       'name' => 'mailing name',
       'created_id' => 1,
-      'groups' => array('include' => array($this->_groupID)),
+      'groups' => ['include' => [$this->_groupID]],
       'scheduled_date' => 'now',
-    );
+    ];
     $this->_mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('mail_settings', 'get',
-      array('api.mail_settings.create' => array('domain' => 'chaos.org')));
+      ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
   }
 
   /**
@@ -76,7 +60,8 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
-    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
+    // DGW
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
     parent::tearDown();
   }
 
@@ -84,10 +69,10 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * Generate a fully-formatted mailing with standard email headers.
    */
   public function testBasicHeaders() {
-    $allMessages = $this->runMailingSuccess(array(
+    $allMessages = $this->runMailingSuccess([
       'subject' => 'Accidents in cars cause children for {contact.display_name}!',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
-    ));
+    ]);
     foreach ($allMessages as $k => $message) {
       /** @var ezcMail $message */
 
@@ -110,12 +95,12 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * Generate a fully-formatted mailing (with body_text content).
    */
   public function testText() {
-    $allMessages = $this->runMailingSuccess(array(
+    $allMessages = $this->runMailingSuccess([
       'subject' => 'Accidents in cars cause children for {contact.display_name}!',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
       'open_tracking' => 1,
       // Note: open_tracking does nothing with text, but we'll just verify that it does nothing
-    ));
+    ]);
     foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $textPart */
@@ -125,9 +110,11 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('plain', $message->body->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for TEXT formatted content.\n" . // Default header
+        // Default header
+        "Sample Header for TEXT formatted content.\n" .
         "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
-        "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
+        // Default footer
+        "to unsubscribe: http.*civicrm/mailing/optout" .
         ";",
         $message->body->text
       );
@@ -138,12 +125,12 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * Generate a fully-formatted mailing (with body_html content).
    */
   public function testHtmlWithOpenTracking() {
-    $allMessages = $this->runMailingSuccess(array(
+    $allMessages = $this->runMailingSuccess([
       'subject' => 'Example Subject',
       'body_html' => '<p>You can go to <a href="http://example.net/first?{contact.checksum}">Google</a> or <a href="{action.optOutUrl}">opt out</a>.</p>',
       'open_tracking' => 1,
       'url_tracking' => 0,
-    ));
+    ]);
     foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $htmlPart */
@@ -156,10 +143,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for HTML formatted content.\n" . // Default header
+        // Default header
+        "Sample Header for HTML formatted content.\n" .
         // FIXME: CiviMail puts double " after hyperlink!
-        "<p>You can go to <a href=\"http://example.net/first\\?cs=[0-9a-f_]+\"\"?>Google</a> or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" . // body_html
-        "Sample Footer for HTML formatted content" . // Default footer
+        // body_html
+        "<p>You can go to <a href=\"http://example.net/first\\?cs=[0-9a-f_]+\"\"?>Google</a> or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" .
+        // Default footer
+        "Sample Footer for HTML formatted content" .
         ".*\n" .
         "<img src=\".*extern/open.php.*\"" .
         ";",
@@ -169,15 +159,18 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('plain', $textPart->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for TEXT formatted content.\n" . // Default header
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" . //  body_html, filtered
+        // Default header
+        "Sample Header for TEXT formatted content.\n" .
+        //  body_html, filtered
+        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
         "\n" .
         "Links:\n" .
         "------\n" .
         "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+\n" .
         "\\[2\\] http.*civicrm/mailing/optout.*\n" .
         "\n" .
-        "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
+        // Default footer
+        "to unsubscribe: http.*civicrm/mailing/optout" .
         ";",
         $textPart->text
       );
@@ -188,12 +181,12 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * Generate a fully-formatted mailing (with body_html content).
    */
   public function testHtmlWithOpenAndUrlTracking() {
-    $allMessages = $this->runMailingSuccess(array(
+    $allMessages = $this->runMailingSuccess([
       'subject' => 'Example Subject',
       'body_html' => '<p>You can go to <a href="http://example.net">Google</a> or <a href="{action.optOutUrl}">opt out</a>.</p>',
       'open_tracking' => 1,
       'url_tracking' => 1,
-    ));
+    ]);
     foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $htmlPart */
@@ -247,80 +240,80 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * @return array
    */
   public function urlTrackingExamples() {
-    $cases = array();
+    $cases = [];
 
     // Tracking disabled
-    $cases[] = array(
+    $cases[] = [
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href="http://example\.net/">Foo</a></p>;',
       ';\\[1\\] http://example\.net/;',
-      array('url_tracking' => 0),
-    );
-    $cases[] = array(
+      ['url_tracking' => 0],
+    ];
+    $cases[] = [
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       // FIXME: Legacy tracker adds extra quote after URL
       ';<p><a href="http://example\.net/\?id=\d+""?>Foo</a></p>;',
       ';\\[1\\] http://example\.net/\?id=\d+;',
-      array('url_tracking' => 0),
-    );
-    $cases[] = array(
+      ['url_tracking' => 0],
+    ];
+    $cases[] = [
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
       ';\\[1\\] http.*civicrm/mailing/optout.*;',
-      array('url_tracking' => 0),
-    );
-    $cases[] = array(
+      ['url_tracking' => 0],
+    ];
+    $cases[] = [
       '<p>Look at <img src="http://example.net/foo.png">.</p>',
       ';<p>Look at <img src="http://example\.net/foo\.png">\.</p>;',
       ';Look at \.;',
-      array('url_tracking' => 0),
-    );
-    $cases[] = array(
+      ['url_tracking' => 0],
+    ];
+    $cases[] = [
       // Plain-text URL's are tracked in plain-text emails...
       // but not in HTML emails.
       "<p>Please go to: http://example.net/</p>",
       ";<p>Please go to: http://example\.net/</p>;",
       ';Please go to: http://example\.net/;',
-      array('url_tracking' => 0),
-    );
+      ['url_tracking' => 0],
+    ];
 
     // Tracking enabled
-    $cases[] = array(
+    $cases[] = [
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href=[\'"].*extern/url\.php\?u=\d+.*[\'"]>Foo</a></p>;',
       ';\\[1\\] .*extern/url\.php\?u=\d+.*;',
-      array('url_tracking' => 1),
-    );
-    $cases[] = array(
+      ['url_tracking' => 1],
+    ];
+    $cases[] = [
       // FIXME: CiviMail URL tracking doesn't track tokenized links.
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       // FIXME: Legacy tracker adds extra quote after URL
       ';<p><a href="http://example\.net/\?id=\d+""?>Foo</a></p>;',
       ';\\[1\\] http://example\.net/\?id=\d+;',
-      array('url_tracking' => 1),
-    );
-    $cases[] = array(
+      ['url_tracking' => 1],
+    ];
+    $cases[] = [
       // It would be redundant/slow to track the action URLs?
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
       ';\\[1\\] http.*civicrm/mailing/optout.*;',
-      array('url_tracking' => 1),
-    );
-    $cases[] = array(
+      ['url_tracking' => 1],
+    ];
+    $cases[] = [
       // It would be excessive/slow to track every embedded image.
       '<p>Look at <img src="http://example.net/foo.png">.</p>',
       ';<p>Look at <img src="http://example\.net/foo\.png">\.</p>;',
       ';Look at \.;',
-      array('url_tracking' => 1),
-    );
-    $cases[] = array(
+      ['url_tracking' => 1],
+    ];
+    $cases[] = [
       // Plain-text URL's are tracked in plain-text emails...
       // but not in HTML emails.
       "<p>Please go to: http://example.net/</p>",
       ";<p>Please go to: http://example\.net/</p>;",
       ';Please go to: .*extern/url.php\?u=\d+&qid=\d+;',
-      array('url_tracking' => 1),
-    );
+      ['url_tracking' => 1],
+    ];
 
     return $cases;
   }
@@ -331,12 +324,12 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * @dataProvider urlTrackingExamples
    */
   public function testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params) {
-    $caseName = print_r(array('inputHtml' => $inputHtml, 'params' => $params), 1);
+    $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params], 1);
 
-    $allMessages = $this->runMailingSuccess($params + array(
+    $allMessages = $this->runMailingSuccess($params + [
       'subject' => 'Example Subject',
       'body_html' => $inputHtml,
-    ));
+    ]);
     foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $htmlPart */
@@ -371,15 +364,15 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $domain = 'nul.example.com'
   ) {
     for ($i = 1; $i <= $count; $i++) {
-      $contactID = $this->individualCreate(array(
+      $contactID = $this->individualCreate([
         'first_name' => "Foo{$i}",
         'email' => 'mail' . $i . '@' . $domain,
-      ));
-      $this->callAPISuccess('group_contact', 'create', array(
+      ]);
+      $this->callAPISuccess('group_contact', 'create', [
         'contact_id' => $contactID,
         'group_id' => $groupID,
         'status' => 'Added',
-      ));
+      ]);
     }
   }
 
@@ -388,13 +381,15 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    *
    * @param array $params
    *   List of parameters to send to Mailing.create API.
+   *
    * @return array<ezcMail>
+   * @throws \CRM_Core_Exception
    */
   protected function runMailingSuccess($params) {
     $mailingParams = array_merge($this->defaultParams, $params);
     $this->callAPISuccess('mailing', 'create', $mailingParams);
-    $this->_mut->assertRecipients(array());
-    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $this->_mut->assertRecipients([]);
+    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $this->_mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().

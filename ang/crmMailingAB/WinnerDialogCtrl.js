@@ -17,20 +17,11 @@
           text: ts('Submit final mailing'),
           icons: {primary: 'fa-paper-plane'},
           click: function() {
-            crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
-              'name',
-              'recipients',
-              'scheduled_date'
-            ]);
-            crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
-              .then(function() {
-                return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
-                  abtest.submitFinal().then(function(r) {
-                    delete abtest.$CrmMailingABReportCnt;
-                    return r;
-                  }));
-              })
-              .then(function() {
+            crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
+              abtest.submitFinal(abtest.mailings[mailingName].id).then(function (r) {
+                delete abtest.$CrmMailingABReportCnt;
+              }))
+              .then(function () {
                 dialogService.close('selectWinnerDialog', abtest);
               });
           }

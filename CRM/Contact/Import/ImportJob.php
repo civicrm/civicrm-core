@@ -1,34 +1,20 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2009 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
+ * $Id$
+ *
  */
 
 /**
@@ -147,11 +133,11 @@ class CRM_Contact_Import_ImportJob {
 
     foreach ($mapper as $key => $value) {
 
-      $fldName = CRM_Utils_Array::value(0, $mapper[$key]);
+      $fldName = $mapper[$key][0] ?? NULL;
       $header = array($this->_mapFields[$fldName]);
-      $selOne = CRM_Utils_Array::value(1, $mapper[$key]);
-      $selTwo = CRM_Utils_Array::value(2, $mapper[$key]);
-      $selThree = CRM_Utils_Array::value(3, $mapper[$key]);
+      $selOne = $mapper[$key][1] ?? NULL;
+      $selTwo = $mapper[$key][2] ?? NULL;
+      $selThree = $mapper[$key][3] ?? NULL;
       $this->_mapperKeys[$key] = $fldName;
 
       //need to differentiate non location elements.
@@ -179,8 +165,8 @@ class CRM_Contact_Import_ImportJob {
 
       $fldNameParts = explode('_', $fldName, 3);
       $id = $fldNameParts[0];
-      $first = isset($fldNameParts[1]) ? $fldNameParts[1] : NULL;
-      $second = isset($fldNameParts[2]) ? $fldNameParts[2] : NULL;
+      $first = $fldNameParts[1] ?? NULL;
+      $second = $fldNameParts[2] ?? NULL;
       if (($first == 'a' && $second == 'b') ||
         ($first == 'b' && $second == 'a')
       ) {
@@ -271,7 +257,7 @@ class CRM_Contact_Import_ImportJob {
       }
     }
 
-    if ($this->_newTagName || count($this->_tag)) {
+    if ($this->_newTagName || !empty($this->_tag)) {
       $tagAdditions = $this->_tagImportedContactsWithNewTag($contactIds,
         $this->_newTagName,
         $this->_newTagDesc
@@ -308,7 +294,7 @@ class CRM_Contact_Import_ImportJob {
 
     if ($newGroupName) {
       /* Create a new group */
-      $newGroupType = isset($newGroupType) ? $newGroupType : array();
+      $newGroupType = $newGroupType ?? array();
       $gParams = array(
         'title' => $newGroupName,
         'description' => $newGroupDesc,
@@ -401,26 +387,6 @@ class CRM_Contact_Import_ImportJob {
       return $tagAdditions;
     }
     return FALSE;
-  }
-
-  /**
-   * @return array
-   */
-  public static function getIncompleteImportTables() {
-    $dao = new CRM_Core_DAO();
-    $database = $dao->database();
-    $query = "SELECT   TABLE_NAME FROM INFORMATION_SCHEMA
-                  WHERE    TABLE_SCHEMA = ? AND
-                           TABLE_NAME LIKE 'civicrm_import_job_%'
-                  ORDER BY TABLE_NAME";
-    $result = CRM_Core_DAO::executeQuery($query, array($database));
-    $incompleteImportTables = array();
-    while ($importTable = $result->fetch()) {
-      if (!$this->isComplete($importTable)) {
-        $incompleteImportTables[] = $importTable;
-      }
-    }
-    return $incompleteImportTables;
   }
 
 }
