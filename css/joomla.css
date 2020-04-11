@@ -1,3 +1,39 @@
+
+Skip to content
+Pull requests
+Issues
+Marketplace
+Explore
+@vingle
+civicrm /
+civicrm-core
+
+19
+59
+366
+
+    702
+
+Code
+Pull requests 94
+Actions
+Projects 2
+Wiki
+Security
+Insights
+civicrm-core/css/joomla.css
+@seamuslee001 seamuslee001 dev/core#874 [UI] Fix styling of the menubar colour picker in joomla ddf4f83 on 24 Nov 2019
+@colemanw
+@vingle
+@kurund
+@alifrumin
+@lcdservices
+@totten
+@seamuslee001
+@mattwire
+@crusonweb
+@andrewpthompson
+401 lines (374 sloc) 6.75 KB
 /* joomla.css: Joomla-specific css directives for CiviCRM. */
 
 /*
@@ -155,9 +191,6 @@ br.clear {
 #header, #content {
   width: 100%;
 }
-#header {
-  background-color: #69c;
-}
 #logo {
   vertical-align: middle;
   border: 0;
@@ -294,10 +327,6 @@ br.clear {
 /* Joomla Admin Menu alterations */
 /* Moved from civicrm.css in v3.2 */
 
-ul#civicrm-menu {
-  position:relative;
-  z-index: 1;
-}
 
 div#toolbar-box div.m {
   padding: 0px !important;
@@ -310,9 +339,6 @@ div#toolbar-box, div#toolbar-box div.m{
   height: auto;
 }
 
-ul#civicrm-menu li#crm-qsearch {
-  height:0px;
-}
 .crm-tab-button,
 .ui-tabs .ui-tabs-nav li {
   border: 1px;
@@ -381,6 +407,11 @@ ul#civicrm-menu li#crm-qsearch {
   display: block;
 }
 
+/* dev/core#874 the width:auto styling above causes the menubar colour picker to be squeezed */
+.crm-container input.crm-form-color {
+  width: 3.6em;
+}
+
 /* Remove Joomla subhead toolbar & whitespace border */
 	
 body.admin.com_civicrm .subhead-collapse {
@@ -390,19 +421,32 @@ body.admin.com_civicrm .container-fluid.container-main {
 	padding: 0;
 	border-top: 1px solid #787878;
 }
+body.admin.com_civicrm.task-civicrmupgrade .container-fluid.container-main {
+	padding: 10px 25px 25px;
+}
 body.admin.com_civicrm #crm-nav-menu-container {
 	padding-bottom: 0 !important;
 }
 body.admin.com_civicrm #content-right {
 	padding: 12px;
 }
-body.admin.com_civicrm #civicrm-menu #crm-qsearch {
-  padding-left: 20px;
+
+/* Make footer admin bar hide behind popup windows (CRM-15723) */
+body.ui-dialog-open #status {
+  z-index: 100 !important;
 }
 
-/* Shoreditch-specific */
+    © 2020 GitHub, Inc.
+    Terms
+    Privacy
+    Security
+    Status
+    Help
 
-body.admin.com_civicrm {
-	padding-top: 0px !important;
-	margin-top: 30px !important; 
-}
+    Contact GitHub
+    Pricing
+    API
+    Training
+    Blog
+    About
+
