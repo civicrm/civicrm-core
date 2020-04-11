@@ -1,5 +1,5 @@
 <div ng-controller="SaveMsgTemplateDialogCtrl">
-  <p><em>{{ts('Save the current mailing as a template.')}}</em></p>
+  <p><em>{{:: ts('Save the current mailing as a template.') }}</em></p>
 
   <div ng-hide="!selected">
     <label for="saveopt-mode-update">
@@ -10,7 +10,7 @@
   <div>
     <label type="radio" for="saveopt-mode-add">
       <input type="radio" name="mode" ng-model="saveOpt.mode" value="add" id="saveopt-mode-add">
-      {{ts('Save as:')}}
+      {{:: ts('Save as:') }}
     </label>
     <input type="text" ng-model="saveOpt.newTitle" ng-click="saveOpt.mode='add'" ng-change="saveOpt.mode='add'" />
   </div>

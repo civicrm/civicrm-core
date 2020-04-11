@@ -1,10 +1,10 @@
 <table>
   <thead>
   <tr>
-    <th>{{ts('Entity')}}</th>
-    <th>{{ts('Action(s)')}}</th>
-    <th>{{ts('Filter(s)')}}</th>
-    <th>{{ts('Field(s)')}}</th>
+    <th>{{:: ts('Entity') }}</th>
+    <th>{{:: ts('Action(s)') }}</th>
+    <th>{{:: ts('Filter(s)') }}</th>
+    <th>{{:: ts('Field(s)') }}</th>
   </tr>
   </thead>
   <tbody>
@@ -12,13 +12,13 @@
       ng-class-even="'even-row even'"
       ng-class-odd="'odd-row odd'">
     <td>
-      <em ng-show="api.entity == '*'">{{ts('Any')}}</em>
+      <em ng-show="api.entity == '*'">{{:: ts('Any') }}</em>
       <code ng-hide="api.entity == '*'">{{api.entity}}</code>
     </td>
     <td>
       <div ng-switch="isString(api.actions)">
           <span ng-switch-when="true">
-            <em ng-show="api.actions == '*'">{{ts('Any')}}</em>
+            <em ng-show="api.actions == '*'">{{:: ts('Any') }}</em>
             <code ng-hide="api.actions == '*'">{{api.actions}}</code>
           </span>
           <span ng-switch-default="">
@@ -27,11 +27,11 @@
       </div>
     </td>
     <td>
-      <em ng-show="!hasRequiredFilters(api)">{{ts('Any')}}</em>
+      <em ng-show="!hasRequiredFilters(api)">{{:: ts('Any') }}</em>
       <div ng-repeat="(field,value) in api.required"><code>{{field}}</code> = "<code>{{value}}</code>"<span ng-show="!$last">, </span></div>
     </td>
     <td>
-      <em ng-show="api.fields == '*'">{{ts('Any')}}</em>
+      <em ng-show="api.fields == '*'">{{:: ts('Any') }}</em>
       <span ng-hide="api.fields == '*'" ng-repeat="field in api.fields"><code>{{field}}</code><span ng-show="!$last">, </span></span>
     </td>
   </tr>
