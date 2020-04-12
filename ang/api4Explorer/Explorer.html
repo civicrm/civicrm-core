@@ -31,7 +31,7 @@
         </div>
         <div class="panel-body">
           <div class="api4-input form-inline">
-            <label class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in availableParams" ng-if="::!isSpecial(name) && param.type[0] === 'bool' && param.default !== null">
+            <label class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && param.type[0] === 'bool' && param.default !== null">
               <input type="checkbox" id="api4-param-{{:: name }}" ng-model="params[name]"/>
               {{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span>
             </label>
@@ -41,7 +41,7 @@
             </label>
           </div>
           <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && param.type[0] === 'bool' && param.default === null">
-            <label>{{ name }}<span class="crm-marker" ng-if="param.required"> *</span></label>
+            <label>{{ name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
             <label class="radio-inline">
               <input type="radio" ng-model="params[name]" ng-value="true" />true
             </label>
@@ -63,7 +63,7 @@
               <input class="collapsible-optgroups form-control huge" ng-model="controls.select" crm-ui-select="{data: fieldsAndJoinsAndFunctionsAndWildcards}" placeholder="Add select" />
             </div>
           </fieldset>
-          <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()"ng-if="::availableParams.fields">
+          <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()" ng-if="::availableParams.fields">
             <label for="api4-param-fields">fields<span class="crm-marker" ng-if="::availableParams.fields.required"> *</span></label>
             <input class="form-control" ng-list crm-ui-select="::{data: fields, multiple: true}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
           </div>
@@ -85,7 +85,7 @@
           <fieldset ng-if="::availableParams.where" class="api4-clause-fieldset" ng-mouseenter="help('where', availableParams.where)" ng-mouseleave="help()" crm-api4-clause="{type: 'where', clauses: params.where, required: availableParams.where.required, op: 'AND', label: 'where', fields: fieldsAndJoins}">
           </fieldset>
           <fieldset ng-repeat="name in ['values', 'defaults']" ng-if="::availableParams[name]" ng-mouseenter="help(name, availableParams[name])" ng-mouseleave="help()">
-            <legend>{{ name }}<span class="crm-marker" ng-if="::availableParams[name].required"> *</span></legend>
+            <legend>{{:: name }}<span class="crm-marker" ng-if="::availableParams[name].required"> *</span></legend>
             <div class="api4-input form-inline" ng-repeat="clause in params[name]" ng-mouseenter="help('value: ' + clause[0], fieldHelp(clause[0]))" ng-mouseleave="help(name, availableParams[name])">
               <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: fieldList(name), allowClear: true, placeholder: 'Field'}" />
               <input class="form-control" ng-model="clause[1]" api4-exp-value="{field: clause[0], action: action === 'getFields' ? params.action || 'get' : action}" />
@@ -171,16 +171,16 @@
   <div class="api4-explorer-row">
       <div class="panel panel-warning explorer-code-panel">
         <ul class="panel-heading nav nav-tabs">
-          <li role="presentation" ng-repeat="tab in code" ng-class="{active: selectedTab.code === tab.lang}">
-            <a href ng-click="selectedTab.code = tab.lang">
-              {{ tab.lang }}
+          <li role="presentation" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
+            <a href ng-click="selectLang(lang)">
+              {{:: lang }}
             </a>
           </li>
         </ul>
         <div class="panel-body">
-          <table ng-repeat="tab in code" ng-show="selectedTab.code === tab.lang">
-            <tr ng-repeat="style in tab.style">
-              <td>{{ style.label }}</td>
+          <table>
+            <tr ng-repeat="style in code[selectedTab.code]">
+              <td>{{:: style.label }}</td>
               <td><pre class="prettyprint" ng-bind-html="style.code"></pre></td>
             </tr>
           </table>
@@ -190,10 +190,12 @@
         <ul class="panel-heading nav nav-tabs">
           <li role="presentation" ng-class="{active: selectedTab.result === 'result'}">
             <a href ng-click="selectedTab.result = 'result'">
-              <i class="fa fa-fw fa-circle-o" ng-if="status === 'default'"></i>
-              <i class="fa fa-fw fa-check-circle" ng-if="status === 'success'"></i>
-              <i class="fa fa-fw fa-minus-circle" ng-if="status === 'danger'"></i>
-              <i class="fa fa-fw fa-spinner fa-pulse" ng-if="status === 'warning'"></i>
+              <span ng-switch="status">
+                <i class="fa fa-fw fa-circle-o" ng-switch-when="default"></i>
+                <i class="fa fa-fw fa-check-circle" ng-switch-when="success"></i>
+                <i class="fa fa-fw fa-minus-circle" ng-switch-when="danger"></i>
+                <i class="fa fa-fw fa-spinner fa-pulse" ng-switch-when="warning"></i>
+              </span>
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
@@ -210,12 +212,14 @@
           </div>
           <div ng-if="::perm.accessDebugOutput" ng-show="selectedTab.result === 'debug'">
             <pre ng-if="debug" class="prettyprint" ng-bind-html="debug"></pre>
-            <p ng-if="!debug">
-              {{:: ts('To view debugging output, enable the debug param before executing.') }}
-            </p>
-            <p ng-if="!debug">
-              {{:: ts('Enable backtrace in system settings to see error backtraces.') }}
-            </p>
+            <div ng-if="!debug">
+              <p>
+                {{:: ts('To view debugging output, enable the debug param before executing.') }}
+              </p>
+              <p>
+                {{:: ts('Enable backtrace in system settings to see error backtraces.') }}
+              </p>
+            </div>
           </div>
         </div>
       </div>

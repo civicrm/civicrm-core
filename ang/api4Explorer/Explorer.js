@@ -51,35 +51,24 @@
     $scope.status = 'default';
     $scope.loading = false;
     $scope.controls = {};
-    $scope.code = [
-      {
-        lang: 'php',
-        style: [
-          {name: 'oop', label: ts('OOP Style'), code: ''},
-          {name: 'php', label: ts('Traditional'), code: ''}
-        ]
-      },
-      {
-        lang: 'js',
-        style: [
-          {name: 'js', label: ts('Single Call'), code: ''},
-          {name: 'js2', label: ts('Batch Calls'), code: ''}
-        ]
-      },
-      {
-        lang: 'ang',
-        style: [
-          {name: 'ang', label: ts('Single Call'), code: ''},
-          {name: 'ang2', label: ts('Batch Calls'), code: ''}
-        ]
-      },
-      {
-        lang: 'cli',
-        style: [
-          {name: 'cv', label: ts('CV'), code: ''}
-        ]
-      },
-    ];
+    $scope.langs = ['php', 'js', 'ang', 'cli'];
+    $scope.code = {
+      php: [
+        {name: 'oop', label: ts('OOP Style'), code: ''},
+        {name: 'php', label: ts('Traditional'), code: ''}
+      ],
+      js: [
+        {name: 'js', label: ts('Single Call'), code: ''},
+        {name: 'js2', label: ts('Batch Calls'), code: ''}
+      ],
+      ang: [
+        {name: 'ang', label: ts('Single Call'), code: ''},
+        {name: 'ang2', label: ts('Batch Calls'), code: ''}
+      ],
+      cli: [
+        {name: 'cv', label: ts('CV'), code: ''}
+      ]
+    };
 
     if (!entities.length) {
       formatForSelect2(schema, entities, 'name', ['description']);
@@ -255,6 +244,11 @@
 
     $scope.isSelectRowCount = function() {
       return isSelectRowCount($scope.params);
+    };
+
+    $scope.selectLang = function(lang) {
+      $scope.selectedTab.code = lang;
+      writeCode();
     };
 
     function isSelectRowCount(params) {
@@ -499,59 +493,67 @@
           results = result + 'Count';
         }
 
-        // Write javascript
-        var js = "'" + entity + "', '" + action + "', {";
-        _.each(params, function(param, key) {
-          js += "\n  " + key + ': ' + stringify(param) +
-            (++i < paramCount ? ',' : '');
-          if (key === 'checkPermissions') {
-            js += ' // IGNORED: permissions are always enforced from client-side requests';
-          }
-        });
-        js += "\n}";
-        if (index || index === 0) {
-          js += ', ' + JSON.stringify(index);
-        }
-        code.js = "CRM.api4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
-        code.js2 = "CRM.api4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
-        code.ang = "crmApi4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
-        code.ang2 = "crmApi4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
+        switch ($scope.selectedTab.code) {
+          case 'js':
+          case 'ang':
+            // Write javascript
+            var js = "'" + entity + "', '" + action + "', {";
+            _.each(params, function(param, key) {
+              js += "\n  " + key + ': ' + stringify(param) +
+                (++i < paramCount ? ',' : '');
+              if (key === 'checkPermissions') {
+                js += ' // IGNORED: permissions are always enforced from client-side requests';
+              }
+            });
+            js += "\n}";
+            if (index || index === 0) {
+              js += ', ' + JSON.stringify(index);
+            }
+            code.js = "CRM.api4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
+            code.js2 = "CRM.api4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
+            code.ang = "crmApi4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
+            code.ang2 = "crmApi4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
+            break;
 
-        // Write php code
-        code.php = '$' + results + " = civicrm_api4('" + entity + "', '" + action + "', [";
-        _.each(params, function(param, key) {
-          code.php += "\n  '" + key + "' => " + phpFormat(param, 4) + ',';
-        });
-        code.php += "\n]";
-        if (index || index === 0) {
-          code.php += ', ' + phpFormat(index);
-        }
-        code.php += ");";
+          case 'php':
+            // Write php code
+            code.php = '$' + results + " = civicrm_api4('" + entity + "', '" + action + "', [";
+            _.each(params, function(param, key) {
+              code.php += "\n  '" + key + "' => " + phpFormat(param, 4) + ',';
+            });
+            code.php += "\n]";
+            if (index || index === 0) {
+              code.php += ', ' + phpFormat(index);
+            }
+            code.php += ");";
 
-        // Write oop code
-        code.oop = '$' + results + " = " + formatOOP(entity, action, params, 2) + "\n  ->execute()";
-        if (isSelectRowCount(params)) {
-          code.oop += "\n  ->count()";
-        } else if (_.isNumber(index)) {
-          code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
-        } else if (index) {
-          if (_.isString(index) || (_.isPlainObject(index) && !index[0] && !index['0'])) {
-            code.oop += "\n  ->indexBy('" + (_.isPlainObject(index) ? _.keys(index)[0] : index) + "')";
-          }
-          if (_.isArray(index) || _.isPlainObject(index)) {
-            code.oop += "\n  ->column('" + (_.isArray(index) ? index[0] : _.values(index)[0]) + "')";
-          }
-        }
-        code.oop += ";\n";
-        if (!_.isNumber(index) && !isSelectRowCount(params)) {
-          code.oop += "foreach ($" + results + ' as $' + ((_.isString(index) && index) ? index + ' => $' : '') + result + ') {\n  // do something\n}';
-        }
+            // Write oop code
+            code.oop = '$' + results + " = " + formatOOP(entity, action, params, 2) + "\n  ->execute()";
+            if (isSelectRowCount(params)) {
+              code.oop += "\n  ->count()";
+            } else if (_.isNumber(index)) {
+              code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
+            } else if (index) {
+              if (_.isString(index) || (_.isPlainObject(index) && !index[0] && !index['0'])) {
+                code.oop += "\n  ->indexBy('" + (_.isPlainObject(index) ? _.keys(index)[0] : index) + "')";
+              }
+              if (_.isArray(index) || _.isPlainObject(index)) {
+                code.oop += "\n  ->column('" + (_.isArray(index) ? index[0] : _.values(index)[0]) + "')";
+              }
+            }
+            code.oop += ";\n";
+            if (!_.isNumber(index) && !isSelectRowCount(params)) {
+              code.oop += "foreach ($" + results + ' as $' + ((_.isString(index) && index) ? index + ' => $' : '') + result + ') {\n  // do something\n}';
+            }
+            break;
 
-        // Write cli code
-        code.cv = 'cv api4 ' + entity + '.' + action + " '" + stringify(params) + "'";
+          case 'cli':
+            // Write cli code
+            code.cv = 'cv api4 ' + entity + '.' + action + " '" + stringify(params) + "'";
+        }
       }
       _.each($scope.code, function(vals) {
-        _.each(vals.style, function(style) {
+        _.each(vals, function(style) {
           style.code = code[style.name] ? prettyPrintOne(code[style.name]) : '';
         });
       });
