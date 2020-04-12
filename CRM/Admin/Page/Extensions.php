@@ -130,6 +130,9 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $localExtensionRows = $this->formatLocalExtensionRows();
     $this->assign('localExtensionRows', $localExtensionRows);
 
+    $hiddenExtensionRows = $this->formatHiddenExtensionRows();
+    $this->assign('hiddenExtensionRows', $hiddenExtensionRows);
+
     $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
     $this->assign('remoteExtensionRows', $remoteExtensionRows);
   }
@@ -154,65 +157,106 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         continue;
       }
       try {
-        $obj = $mapper->keyToInfo($key);
+        $row = $this->formatExtensionRow($key);
       }
       catch (CRM_Extension_Exception $ex) {
         CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
         continue;
       }
-
-      $mapper = CRM_Extension_System::singleton()->getMapper();
-
-      $row = self::createExtendedInfo($obj);
-      $row['id'] = $obj->key;
-      $row['action'] = '';
-
-      // assign actions
-      $action = 0;
-      switch ($row['status']) {
-        case CRM_Extension_Manager::STATUS_UNINSTALLED:
-          if (!$manager->isIncompatible($row['id'])) {
-            $action += CRM_Core_Action::ADD;
-          }
-          break;
-
-        case CRM_Extension_Manager::STATUS_DISABLED:
-          if (!$manager->isIncompatible($row['id'])) {
-            $action += CRM_Core_Action::ENABLE;
-          }
-          $action += CRM_Core_Action::DELETE;
-          break;
-
-        case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
-          $action += CRM_Core_Action::DELETE;
-          break;
-
-        case CRM_Extension_Manager::STATUS_INSTALLED:
-        case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-          $action += CRM_Core_Action::DISABLE;
-          break;
-
-        default:
-      }
-      // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
-      // then $action += CRM_Core_Action::UPDATE
-      if ($action) {
-        $row['action'] = CRM_Core_Action::formLink(self::links(),
-          $action,
-          ['id' => $row['id'], 'key' => $obj->key],
-          ts('more'),
-          FALSE,
-          'extension.local.action',
-          'Extension',
-          $row['id']
-        );
-      }
-      // Key would be better to send, but it's not an integer.  Moreover, sending the
-      // values to hook_civicrm_links means that you can still get at the key
-
       $localExtensionRows[$row['id']] = $row;
     }
     return $localExtensionRows;
+  }
+
+  /**
+   * Get the list of system extensions (hidden) and format them as a table with
+   * status and action data.
+   *
+   * @return array
+   */
+  public function formatHiddenExtensionRows() {
+    $mapper = CRM_Extension_System::singleton()->getMapper();
+    $manager = CRM_Extension_System::singleton()->getManager();
+
+    // array($pseudo_id => extended_CRM_Extension_Info)
+    $extensionRows = [];
+    $keys = array_keys($manager->getStatuses());
+    sort($keys);
+    $hiddenExtensions = $mapper->getKeysByTag('mgmt:hidden');
+    foreach ($keys as $key) {
+      if (!in_array($key, $hiddenExtensions)) {
+        continue;
+      }
+      try {
+        $row = $this->formatExtensionRow($key);
+      }
+      catch (CRM_Extension_Exception $ex) {
+        CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
+        continue;
+      }
+      $extensionRows[$row['id']] = $row;
+    }
+    return $extensionRows;
+  }
+
+  /**
+   * Return a row.
+   * To be used in formatLocalExtensionsRows and formatSystemExtensionsRow.
+   *
+   * @param $key
+   *
+   * @return array
+   */
+  protected function formatExtensionRow($key) {
+    $mapper = CRM_Extension_System::singleton()->getMapper();
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $obj = $mapper->keyToInfo($key);
+
+    $row = self::createExtendedInfo($obj);
+    $row['id'] = $obj->key;
+    $row['action'] = '';
+
+    // assign actions
+    $action = 0;
+    switch ($row['status']) {
+      case CRM_Extension_Manager::STATUS_UNINSTALLED:
+        if (!$manager->isIncompatible($row['id'])) {
+          $action += CRM_Core_Action::ADD;
+        }
+        break;
+
+      case CRM_Extension_Manager::STATUS_DISABLED:
+        if (!$manager->isIncompatible($row['id'])) {
+          $action += CRM_Core_Action::ENABLE;
+        }
+        $action += CRM_Core_Action::DELETE;
+        break;
+
+      case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
+        $action += CRM_Core_Action::DELETE;
+        break;
+
+      case CRM_Extension_Manager::STATUS_INSTALLED:
+      case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
+        $action += CRM_Core_Action::DISABLE;
+        break;
+
+      default:
+    }
+    // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
+    // then $action += CRM_Core_Action::UPDATE
+    if ($action) {
+      $row['action'] = CRM_Core_Action::formLink(self::links(),
+        $action,
+        ['id' => $row['id'], 'key' => $obj->key],
+        ts('more'),
+        FALSE,
+        'extension.local.action',
+        'Extension',
+        $row['id']
+      );
+    }
+    return $row;
   }
 
   /**

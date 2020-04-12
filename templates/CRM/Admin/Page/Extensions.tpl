@@ -35,6 +35,12 @@
               <em>&nbsp;</em>
               </a>
             </li>
+            <li id="tab_summary" class="crm-tab-button">
+              <a href="#extensions-system" title="{ts}System Extensions{/ts}">
+              <span> </span> {ts}System Extensions{/ts}
+              <em>&nbsp;</em>
+            </a>
+            </li>
             <li id="tab_addnew" class="crm-tab-button">
               <a href="#extensions-addnew" title="{ts}Add New{/ts}">
               <span> </span> {ts}Add New{/ts}
@@ -45,6 +51,9 @@
 
         <div id="extensions-main" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
             {include file="CRM/Admin/Page/Extensions/Main.tpl"}
+        </div>
+        <div id="extensions-system" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+          {include file="CRM/Admin/Page/Extensions/System.tpl"}
         </div>
         <div id="extensions-addnew" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
             {if $extAddNewEnabled}
