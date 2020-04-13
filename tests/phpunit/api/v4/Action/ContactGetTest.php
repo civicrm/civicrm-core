@@ -58,4 +58,25 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertContains($del['id'], $contacts->column('id'));
   }
 
+  public function testGetWithLimit() {
+    $last_name = uniqid('getWithLimitTest');
+
+    $bob = Contact::create()
+      ->setValues(['first_name' => 'Bob', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jan = Contact::create()
+      ->setValues(['first_name' => 'Jan', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $dan = Contact::create()
+      ->setValues(['first_name' => 'Dan', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $num = Contact::get()->setCheckPermissions(FALSE)->selectRowCount()->execute()->count();
+    $this->assertCount($num - 1, Contact::get()->setCheckPermissions(FALSE)->setLimit(0)->setOffset(1)->execute());
+    $this->assertCount($num - 2, Contact::get()->setCheckPermissions(FALSE)->setLimit(0)->setOffset(2)->execute());
+    $this->assertCount(2, Contact::get()->setCheckPermissions(FALSE)->setLimit(2)->setOffset(0)->execute());
+  }
+
 }

@@ -241,7 +241,8 @@ class Api4SelectQuery extends SelectQuery {
    */
   protected function buildLimit() {
     if (!empty($this->limit) || !empty($this->offset)) {
-      $this->query->limit($this->limit, $this->offset);
+      // If limit is 0, mysql will actually return 0 results. Instead set to maximum possible.
+      $this->query->limit($this->limit ?: '18446744073709551615', $this->offset);
     }
   }
 
