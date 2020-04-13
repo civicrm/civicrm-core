@@ -35,6 +35,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function createDupeContacts() {
     // create a group to hold contacts, so that dupe checks don't consider any other contacts in the DB
     $params = [
@@ -834,6 +837,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * for a merge, only those values are merged, while all other fields of the
    * custom group retain their original value, specifically for a contact with
    * no records on the custom group table.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMigrationOfSomeCustomDataOnEmptyCustomRecord() {
     // Create Custom Fields
@@ -886,6 +891,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Test that ContactReference fields are updated to point to the main contact
    * after a merge is performed and the duplicate contact is deleted.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMigrationOfContactReferenceCustomField() {
     // Create Custom Fields
@@ -916,7 +926,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // pointing to the duplicate (to be deleted) contact
     $unrelatedContact = $this->individualCreate([
       'first_name'               => 'Unrelated',
-      'first_name'               => 'Contact',
+      'last_name'               => 'Contact',
       'email'                    => 'unrelated@example.com',
       "custom_{$refFieldContact['id']}" => $duplicateContactID,
     ]);
@@ -955,8 +965,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *   Array of fields to be merged from source into target contact, of the form
    *   ['move_<fieldName>' => <fieldValue>]
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function mergeContacts($originalContactID, $duplicateContactID, $params) {
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);
@@ -977,6 +989,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @param $contactID
    * @param $expectedValue
    * @param $customFieldName
+   *
+   * @throws \CRM_Core_Exception
    */
   private function assertCustomFieldValue($contactID, $expectedValue, $customFieldName) {
     $this->assertEntityCustomFieldValue('Contact', $contactID, $expectedValue, $customFieldName);
@@ -990,6 +1004,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @param $id
    * @param $expectedValue
    * @param $customFieldName
+   *
+   * @throws \CRM_Core_Exception
    */
   private function assertEntityCustomFieldValue($entity, $id, $expectedValue, $customFieldName) {
     $data = $this->callAPISuccess($entity, 'getsingle', [
@@ -1005,6 +1021,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @return array
    *   Data for the created custom group record
+   * @throws \CRM_Core_Exception
    */
   private function setupCustomGroupForIndividual() {
     $customGroup = $this->callAPISuccess('custom_group', 'get', [
@@ -1031,11 +1048,12 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Creates a custom field on the provided custom group with the given field
    * label.
    *
-   * @param $fieldLabel
-   * @param $createGroup
+   * @param string $fieldLabel
+   * @param array $createGroup
    *
    * @return array
    *   Data for the created custom field record
+   * @throws \CRM_Core_Exception
    */
   private function setupCustomField($fieldLabel, $createGroup) {
     return $this->callAPISuccess('custom_field', 'create', [
@@ -1048,6 +1066,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Set up some contacts for our matching.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setupMatchData() {
     $fixtures = [
