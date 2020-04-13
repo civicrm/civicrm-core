@@ -222,12 +222,25 @@
       }
     };
 
-    $scope.isSpecial = function(name) {
+    // Gets params that should be represented as generic input fields in the explorer
+    // This fn doesn't have to be particularly efficient as its output is cached in one-time bindings
+    $scope.getGenericParams = function(paramType, defaultNull) {
+      // Returns undefined if params are not yet set; one-time bindings will stabilize when this function returns a value
+      if (_.isEmpty($scope.availableParams)) {
+        return;
+      }
       var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having'];
       if ($scope.availableParams.limit && $scope.availableParams.offset) {
         specialParams.push('limit', 'offset');
       }
-      return _.contains(specialParams, name);
+      return _.transform($scope.availableParams, function(genericParams, param, name) {
+        if (!_.contains(specialParams, name) &&
+          !(typeof paramType !== 'undefined' && !_.contains(paramType, param.type[0])) &&
+          !(typeof defaultNull !== 'undefined' && ((param.default === null) !== defaultNull))
+        ) {
+          genericParams[name] = param;
+        }
+      });
     };
 
     $scope.selectRowCount = function() {

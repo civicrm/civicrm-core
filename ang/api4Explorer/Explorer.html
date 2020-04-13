@@ -31,7 +31,7 @@
         </div>
         <div class="panel-body">
           <div class="api4-input form-inline">
-            <label class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && param.type[0] === 'bool' && param.default !== null">
+            <label class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in ::getGenericParams(['bool'], false)">
               <input type="checkbox" id="api4-param-{{:: name }}" ng-model="params[name]"/>
               {{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span>
             </label>
@@ -40,7 +40,7 @@
               SelectRowCount
             </label>
           </div>
-          <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && param.type[0] === 'bool' && param.default === null">
+          <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['bool'], true)">
             <label>{{ name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
             <label class="radio-inline">
               <input type="radio" ng-model="params[name]" ng-value="true" />true
@@ -71,13 +71,13 @@
             <label for="api4-param-action">action<span class="crm-marker" ng-if="::availableParams.action.required"> *</span></label>
             <input class="form-control" crm-ui-select="{data: actions, allowClear: true, placeholder: 'None'}" id="api4-param-action" ng-model="params.action"/>
           </div>
-          <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && (param.type[0] === 'string' || param.type[0] === 'int')">
+          <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['string', 'int'])">
             <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
             <input class="form-control" ng-if="::!param.options" type="{{:: param.type[0] === 'int' && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
             <select class="form-control" ng-if="::param.options" ng-options="o for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
             <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times"></i></a>
           </div>
-          <div class="api4-input" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in availableParams" ng-if="!isSpecial(name) && (param.type[0] === 'array' || param.type[0] === 'mixed')">
+          <div class="api4-input" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['array', 'mixed'])">
             <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
             <textarea class="form-control" type="{{:: param.type[0] === 'int' && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]">
             </textarea>
