@@ -151,37 +151,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       }
     }
 
-    $path = "_qf_MapField_display=true";
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $path .= "&qfKey=$qfKey";
-    }
-
-    $previousURL = CRM_Utils_System::url('civicrm/import/contact', $path, FALSE, NULL, FALSE);
-    $cancelURL = CRM_Utils_System::url('civicrm/import/contact', 'reset=1');
-
-    $buttons = array(
-      array(
-        'type' => 'back',
-        'name' => ts('Previous'),
-        'js' => array('onclick' => "location.href='{$previousURL}'; return false;"),
-      ),
-      array(
-        'type' => 'next',
-        'name' => ts('Import Now'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-        'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-      ),
-    );
-
-    $this->addButtons($buttons);
-
     $this->addFormRule(array('CRM_Contact_Import_Form_Preview', 'formRule'), $this);
+
+    parent::buildQuickForm();
   }
 
   /**
