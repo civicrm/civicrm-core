@@ -91,7 +91,6 @@ function civicrm_api3_email_get($params) {
 function _civicrm_api3_email_getlist_defaults(&$request) {
   return [
     'description_field' => [
-      'contact_id.sort_name',
       'email',
     ],
     'params' => [
@@ -100,6 +99,10 @@ function _civicrm_api3_email_getlist_defaults(&$request) {
       'contact_id.is_deceased' => 0,
       'contact_id.do_not_email' => 0,
     ],
+    // Note that changing this to display name affects query performance. The label field is used
+    // for sorting & mysql will prefer to use the index on the ORDER BY field. So if this is changed
+    // to display name then the filtering will bypass the index. In testing this took around 30 times
+    // as long.
     'label_field' => 'contact_id.sort_name',
     // If no results from sort_name try email.
     'search_field' => 'contact_id.sort_name',
