@@ -442,7 +442,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         $$stateName->setOptions($options);
       }
       if (property_exists($$stateName, 'urlPath')) {
-        $$stateName->urlPath = explode('/', (string) CRM_Utils_System::getUrlPath());
+        $$stateName->urlPath = explode('/', (string) CRM_Utils_System::currentPath());
       }
       $this->addPage($$stateName);
       $this->addAction($stateName, new HTML_QuickForm_Action_Direct());
