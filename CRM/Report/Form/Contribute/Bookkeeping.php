@@ -318,6 +318,11 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'order_bys' => [
           'contribution_id' => ['title' => ts('Contribution #')],
           'contribution_status_id' => ['title' => ts('Contribution Status')],
+          'financial_type_id' => ['title' => ts('Financial Type')],
+          'payment_instrument_id' => ['title' => ts('Payment Method')],
+          'receive_date' => ['title' => ts('Date Received')],
+          'receipt_date' => ['title' => ts('Receipt Date')],
+          'thankyou_date' => ['title' => ts('Thank-you Date')],
         ],
         'grouping' => 'contri-fields',
       ],
