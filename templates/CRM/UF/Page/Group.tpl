@@ -142,7 +142,7 @@
         </div>{* reserved profile*}
 
   </div>
-{include file="CRM/common/TabSelected.tpl" defaultTab="user-profiles"}
+{include file="CRM/common/TabHeader.tpl"}
 
     {else}
     {if $action ne 1} {* When we are adding an item, we should not display this message *}
