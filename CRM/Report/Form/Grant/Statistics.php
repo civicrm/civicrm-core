@@ -388,8 +388,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (array_key_exists('civicrm_worldregion_name', $values)) {
-        $region = $values['civicrm_worldregion_name'] ?? NULL;
-        $region = ($region) ? $region : 'Unassigned';
+        $region = $values['civicrm_worldregion_name'] ?: 'Unassigned';
         $grantStatistics['civicrm_worldregion_name']['title'] = ts('By Region');
         self::getStatistics($grantStatistics['civicrm_worldregion_name'], $region, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -397,8 +396,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (array_key_exists('civicrm_address_country_id', $values)) {
-        $country = $countries[$values['civicrm_address_country_id']] ?? NULL;
-        $country = ($country) ? $country : 'Unassigned';
+        $country = $countries[$values['civicrm_address_country_id']] ?? 'Unassigned';
         $grantStatistics['civicrm_address_country_id']['title'] = ts('By Country');
         self::getStatistics($grantStatistics['civicrm_address_country_id'], $country, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -414,8 +412,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (array_key_exists('civicrm_contact_gender_id', $values)) {
-        $genderLabel = $gender[$values['civicrm_contact_gender_id']] ?? NULL;
-        $genderLabel = ($genderLabel) ? $genderLabel : 'Unassigned';
+        $genderLabel = $gender[$values['civicrm_contact_gender_id']] ?? 'Unassigned';
         $grantStatistics['civicrm_contact_gender_id']['title'] = ts('By Gender');
         self::getStatistics($grantStatistics['civicrm_contact_gender_id'], $genderLabel, $values,
           $awardedGrants, $awardedGrantsAmount
