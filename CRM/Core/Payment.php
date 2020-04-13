@@ -1502,7 +1502,7 @@ abstract class CRM_Core_Payment {
    */
   public static function handlePaymentMethod($method, $params = []) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
-      $q = explode('/', CRM_Utils_Array::value(CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET, ''));
+      $q = explode('/', CRM_Utils_System::currentPath());
       $lastParam = array_pop($q);
       if (is_numeric($lastParam)) {
         $params['processor_id'] = $_GET['processor_id'] = $lastParam;

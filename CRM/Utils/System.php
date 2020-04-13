@@ -81,19 +81,16 @@ class CRM_Utils_System {
    *   The URL fragment.
    */
   public static function makeURL($urlVar, $includeReset = FALSE, $includeForce = TRUE, $path = NULL, $absolute = FALSE) {
-    if (empty($path)) {
-      $config = CRM_Core_Config::singleton();
-      $path = $_GET[$config->userFrameworkURLVar] ?? NULL;
-      if (empty($path)) {
-        return '';
-      }
+    $path = $path ?: CRM_Utils_System::currentPath();
+    if (!$path) {
+      return '';
     }
 
     return self::url(
-        $path,
-        CRM_Utils_System::getLinksUrl($urlVar, $includeReset, $includeForce),
-        $absolute
-      );
+      $path,
+      CRM_Utils_System::getLinksUrl($urlVar, $includeReset, $includeForce),
+      $absolute
+    );
   }
 
   /**

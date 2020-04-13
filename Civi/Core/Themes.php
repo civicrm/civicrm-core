@@ -78,7 +78,7 @@ class Themes {
 
       \CRM_Utils_Hook::activeTheme($themeKey, [
         'themes' => $this,
-        'page' => \CRM_Utils_Array::value(\CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET),
+        'page' => \CRM_Utils_System::currentPath(),
       ]);
 
       $themes = $this->getAll();

@@ -31,8 +31,7 @@ class CRM_Report_Utils_Report {
       );
     }
     else {
-      $config = CRM_Core_Config::singleton();
-      $args = explode('/', $_GET[$config->userFrameworkURLVar]);
+      $args = explode('/', CRM_Utils_System::currentPath());
 
       // remove 'civicrm/report' from args
       array_shift($args);
@@ -298,15 +297,10 @@ WHERE  inst.report_id = %1";
    */
   public static function getInstanceID() {
 
-    $config = CRM_Core_Config::singleton();
-    $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
+    $arg = explode('/', CRM_Utils_System::currentPath());
 
-    if ($arg[1] == 'report' &&
-      CRM_Utils_Array::value(2, $arg) == 'instance'
-    ) {
-      if (CRM_Utils_Rule::positiveInteger($arg[3])) {
-        return $arg[3];
-      }
+    if (isset($arg[3]) && $arg[1] == 'report' && $arg[2] == 'instance' && CRM_Utils_Rule::positiveInteger($arg[3])) {
+      return $arg[3];
     }
   }
 
@@ -314,15 +308,11 @@ WHERE  inst.report_id = %1";
    * @return string
    */
   public static function getInstancePath() {
-    $config = CRM_Core_Config::singleton();
-    $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
+    $arg = explode('/', CRM_Utils_System::currentPath());
 
-    if ($arg[1] == 'report' &&
-      CRM_Utils_Array::value(2, $arg) == 'instance'
-    ) {
+    if (isset($arg[3]) && $arg[1] == 'report' && $arg[2] == 'instance') {
       unset($arg[0], $arg[1], $arg[2]);
-      $path = trim(CRM_Utils_Type::escape(implode('/', $arg), 'String'), '/');
-      return $path;
+      return trim(CRM_Utils_Type::escape(implode('/', $arg), 'String'), '/');
     }
   }
 
