@@ -38,13 +38,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     if (empty($params['id'])) {
       self::setDefaults($params);
     }
-
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'OptionValue', $params['id'] ?? NULL, $params);
-    $optionValue = CRM_Core_BAO_OptionValue::add($params);
-    CRM_Utils_Hook::post($hook, 'OptionValue', $optionValue->id, $optionValue);
-
-    return $optionValue;
+    return CRM_Core_BAO_OptionValue::add($params);
   }
 
   /**
@@ -163,6 +157,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       CRM_Core_Error::deprecatedFunctionWarning('$params[\'id\'] should be set, $ids is deprecated');
     }
     $id = $params['id'] ?? $ids['optionValue'] ?? NULL;
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'OptionValue', $params['id'] ?? NULL, $params);
+
     // CRM-10921: do not reset attributes to default if this is an update
     //@todo consider if defaults are being set in the right place. 'dumb' defaults like
     // these would be usefully set @ the api layer so they are visible to api users
@@ -258,6 +255,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
         CRM_Financial_BAO_FinancialTypeAccount::add($params);
       }
     }
+    CRM_Utils_Hook::post($hook, 'OptionValue', $optionValue->id, $optionValue);
     return $optionValue;
   }
 
@@ -270,17 +268,20 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    */
   public static function del($optionValueId) {
+    $res = FALSE;
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->id = $optionValueId;
     if (!$optionValue->find()) {
-      return FALSE;
+      return $res;
     }
+    CRM_Utils_Hook::pre('delete', 'OptionValue', $optionValueId, $optionValue);
     if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
       CRM_Core_PseudoConstant::flush();
       $optionValue->delete();
-      return TRUE;
+      $res = TRUE;
+      CRM_Utils_Hook::post('delete', 'OptionValue', $optionValueId, $optionValue);
     }
-    return FALSE;
+    return $res;
   }
 
   /**
