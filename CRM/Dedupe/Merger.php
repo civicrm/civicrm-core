@@ -584,7 +584,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       ->setCheckPermissions(FALSE)
       ->setSelect(['table_name'])
       ->addWhere('is_multiple', '=', 0)
-      ->addWhere('extends', 'IN', CRM_Contact_BAO_ContactType::contactTypes())
+      ->addWhere('extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::contactTypes()))
       ->execute()
       ->indexBy('table_name');
     foreach (array_intersect_key($cidRefs, $customTables) as $tableName => $cidSpec) {
@@ -702,6 +702,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = [], $checkPermissions = TRUE, $reloadCacheIfEmpty = NULL, $searchLimit = 0) {
     $redirectForPerformance = $batchLimit > 1;
