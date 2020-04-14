@@ -21,6 +21,8 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\Api4\Service\Schema\Joinable\Joinable;
+
 class ArrayInsertionUtil {
 
   /**
@@ -37,7 +39,7 @@ class ArrayInsertionUtil {
    */
   public static function insert(&$array, $parts, $values) {
     $key = key($parts);
-    $isMulti = array_shift($parts);
+    $isMulti = array_shift($parts) === Joinable::JOIN_TYPE_ONE_TO_MANY;
     if (!isset($array[$key])) {
       $array[$key] = $isMulti ? [] : NULL;
     }

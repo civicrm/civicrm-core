@@ -91,4 +91,24 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals($testPhone['phone'], $firstPhone['phone']);
   }
 
+  public function testJoinWithLimit() {
+    $base = function() {
+      return Contact::get()
+        ->setCheckPermissions(FALSE)
+        ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
+        ->addSelect('id', 'display_name', 'phones.phone')
+        ->setDebug(TRUE)
+        ->addOrderBy('id', 'DESC');
+    };
+
+    $result1 = $base()->setLimit(1)->execute();
+    $result2 = $base()->setLimit(2)->execute();
+    $this->assertCount(2, $result2);
+    $this->assertCount(1, $result1);
+    $this->assertNotContains('DISTINCT', $result1->debug['sql'][0]);
+    $this->assertContains('LIMIT', $result1->debug['sql'][0]);
+    // FIXME: secondary query should not contain LIMIT. Needs work.
+    // $this->assertNotContains('LIMIT', $result1->debug['sql'][1]);
+  }
+
 }

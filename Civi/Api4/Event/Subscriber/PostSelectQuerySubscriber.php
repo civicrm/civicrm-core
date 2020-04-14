@@ -113,7 +113,7 @@ class PostSelectQuerySubscriber implements EventSubscriberInterface {
     $joinedDotSelects = array_filter(
       $query->getSelect(),
       function ($select) use ($query) {
-        return strpos($select, '.') && array_filter($query->getPathJoinTypes($select));
+        return strpos($select, '.') && !is_numeric($select) && $query->isOneToManyField($select);
       }
     );
 

@@ -21,6 +21,7 @@
 
 namespace api\v4\Utils;
 
+use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Utils\ArrayInsertionUtil;
 use api\v4\UnitTestCase;
 
@@ -31,7 +32,7 @@ class ArrayInsertionServiceTest extends UnitTestCase {
 
   public function testInsertWillWork() {
     $arr = [];
-    $path = ['foo' => FALSE, 'bar' => FALSE];
+    $path = ['foo' => Joinable::JOIN_TYPE_ONE_TO_ONE, 'bar' => Joinable::JOIN_TYPE_ONE_TO_ONE];
     $inserter = new ArrayInsertionUtil();
     $inserter::insert($arr, $path, ['LALA']);
 
@@ -70,8 +71,8 @@ class ArrayInsertionServiceTest extends UnitTestCase {
       ],
     ];
 
-    $emailPath = ['emails' => TRUE];
-    $locationPath = ['emails' => TRUE, 'location' => FALSE];
+    $emailPath = ['emails' => Joinable::JOIN_TYPE_ONE_TO_MANY];
+    $locationPath = ['emails' => Joinable::JOIN_TYPE_ONE_TO_MANY, 'location' => Joinable::JOIN_TYPE_ONE_TO_ONE];
     $inserter = new ArrayInsertionUtil();
 
     foreach ($contacts as &$contact) {

@@ -72,23 +72,40 @@ class Joiner {
   }
 
   /**
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * Returns an array of join types for this path.
+   *
+   * @param string $baseTable
    * @param $joinPath
    *
-   * @return bool
+   * @return array|bool
+   * @throws \Exception
    */
-  public function canJoin(Api4SelectQuery $query, $joinPath) {
-    return !empty($this->getPath($query->getFrom(), $joinPath));
+  public function getJoinTypes(string $baseTable, $joinPath) {
+    $joinArray = explode('.', $joinPath);
+    // Discard last item in path - fieldname
+    array_pop($joinArray);
+    $path = $this->getPath($baseTable, implode('.', $joinArray));
+    if (!$path) {
+      return FALSE;
+    }
+    $joinTypes = array_fill_keys($joinArray, FALSE);
+    foreach ($path as $joinable) {
+      $alias = $joinable->getAlias();
+      if (isset($joinTypes[$alias])) {
+        $joinTypes[$alias] = $joinable->getJoinType();
+      }
+    }
+    return $joinTypes;
   }
 
   /**
    * @param string $baseTable
    * @param string $joinPath
    *
-   * @return array
+   * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
    * @throws \Exception
    */
-  protected function getPath($baseTable, $joinPath) {
+  public function getPath($baseTable, $joinPath) {
     $cacheKey = sprintf('%s.%s', $baseTable, $joinPath);
     if (!isset($this->cache[$cacheKey])) {
       $stack = explode('.', $joinPath);

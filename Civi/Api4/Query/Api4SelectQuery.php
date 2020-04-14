@@ -70,6 +70,11 @@ class Api4SelectQuery extends SelectQuery {
   public $having = [];
 
   /**
+   * @var bool
+   */
+  protected $distinct = FALSE;
+
+  /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
@@ -113,6 +118,8 @@ class Api4SelectQuery extends SelectQuery {
     $this->buildLimit();
     $this->buildGroupBy();
     $this->buildHavingClause();
+    // Set this last as joins may have influenced its value
+    $this->query->distinct($this->distinct);
     return $this->query->toSQL();
   }
 
@@ -169,8 +176,12 @@ class Api4SelectQuery extends SelectQuery {
       });
       foreach ($wildFields as $item) {
         $pos = array_search($item, array_values($this->select));
-        $this->joinFK($item);
-        $matches = SelectUtil::getMatchingFields($item, array_keys($this->apiFieldSpec));
+        $joinPath = substr($item, 0, strrpos($item, '.'));
+        $pattern = substr($item, strlen($joinPath) + 1);
+        $matches = [];
+        foreach (SelectUtil::getMatchingFields($pattern, $this->getJoinEntityFields($joinPath)) as $matchingField) {
+          $matches[] = $joinPath . '.' . $matchingField;
+        }
         array_splice($this->select, $pos, 1, $matches);
       }
       $this->select = array_unique($this->select);
@@ -179,17 +190,24 @@ class Api4SelectQuery extends SelectQuery {
       $expr = SqlExpression::convert($item, TRUE);
       $valid = TRUE;
       foreach ($expr->getFields() as $fieldName) {
-        $field = $this->getField($fieldName);
-        // Remove expressions with unknown fields without raising an error
-        if (!$field) {
-          $this->select = array_diff($this->select, [$item]);
-          if (is_array($this->debugOutput)) {
-            $this->debugOutput['undefined_fields'][] = $fieldName;
-          }
+        // Add join directly instead of allowing getField to handle it so we can filter out n-to-many joins
+        if (!isset($this->apiFieldSpec[$fieldName]) && strpos($fieldName, '.')) {
+          $this->joinFK($fieldName, FALSE);
+        }
+        // N-to-many join. Skip, but leave in select array for PostSelectQuerySubscriber to handle
+        if (!isset($this->apiFieldSpec[$fieldName]) && strpos($fieldName, '.')) {
           $valid = FALSE;
         }
-        elseif ($field['is_many']) {
-          $valid = FALSE;
+        else {
+          $field = $this->getField($fieldName);
+          // Remove expressions with unknown fields without raising an error
+          if (!$field) {
+            $this->select = array_diff($this->select, [$item]);
+            if (is_array($this->debugOutput)) {
+              $this->debugOutput['undefined_fields'][] = $fieldName;
+            }
+            $valid = FALSE;
+          }
         }
       }
       if ($valid) {
@@ -368,37 +386,51 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
+   * @param $joinPath
+   * @return array
+   * @throws \Exception
+   */
+  public function getJoinEntityFields($joinPath) {
+    /** @var \Civi\Api4\Service\Schema\Joiner $joiner */
+    $joiner = \Civi::container()->get('joiner');
+    $links = $joiner->getPath($this->getFrom(), $joinPath);
+    $lastLink = end($links);
+    return $lastLink->getEntityFieldNames();
+  }
+
+  /**
    * Joins a path and adds all fields in the joined eneity to apiFieldSpec
    *
    * @param $key
-   * @throws \API_Exception
+   * @param bool $allowMany
    * @throws \Exception
    */
-  protected function joinFK($key) {
+  protected function joinFK($key, $allowMany = TRUE) {
     if (isset($this->apiFieldSpec[$key])) {
       return;
     }
 
-    $pathArray = explode('.', $key);
-
     /** @var \Civi\Api4\Service\Schema\Joiner $joiner */
     $joiner = \Civi::container()->get('joiner');
+
+    $joinTypes = $joiner->getJoinTypes($this->getFrom(), $key);
+    $isMany = in_array(Joinable::JOIN_TYPE_ONE_TO_MANY, $joinTypes, TRUE);
+
+    if (!$joinTypes || (!$allowMany && $isMany)) {
+      return;
+    }
+
+    $pathArray = explode('.', $key);
     // The last item in the path is the field name. We don't care about that; we'll add all fields from the joined entity.
     array_pop($pathArray);
     $pathString = implode('.', $pathArray);
 
-    if (!$joiner->canJoin($this, $pathString)) {
-      return;
+    // If adding an n-to-many join without group by, set DISTINCT to avoid duplicate rows
+    if ($isMany && !$this->groupBy) {
+      $this->distinct = TRUE;
     }
 
     $joinPath = $joiner->join($this, $pathString);
-
-    $isMany = FALSE;
-    foreach ($joinPath as $joinable) {
-      if ($joinable->getJoinType() === Joinable::JOIN_TYPE_ONE_TO_MANY) {
-        $isMany = TRUE;
-      }
-    }
 
     /** @var \Civi\Api4\Service\Schema\Joinable\Joinable $lastLink */
     $lastLink = array_pop($joinPath);
@@ -581,7 +613,7 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Checks if a field either belongs to the main entity or is joinable 1-to-1.
+   * Checks if a field requires a one-to-many join.
    *
    * Used to determine if a field can be added to the SELECT of the main query,
    * or if it must be fetched post-query.
@@ -589,40 +621,24 @@ class Api4SelectQuery extends SelectQuery {
    * @param string $fieldPath
    * @return bool
    */
-  public function isOneToOneField(string $fieldPath) {
-    return strpos($fieldPath, '.') === FALSE || !array_filter($this->getPathJoinTypes($fieldPath));
+  public function isOneToManyField(string $fieldPath) {
+    return in_array(Joinable::JOIN_TYPE_ONE_TO_MANY, $this->getPathJoinTypes($fieldPath), TRUE);
   }
 
   /**
    * Separates a string like 'emails.location_type.label' into an array, where
    * each value in the array tells whether it is 1-1 or 1-n join type
    *
-   * @param string $pathString
+   * @param string $fieldPath
    *   Dot separated path to the field
    *
-   * @return array
-   *   Index is table alias and value is boolean whether is 1-to-many join
+   * @return array|bool
+   * @throws \Exception
    */
-  public function getPathJoinTypes($pathString) {
-    $pathParts = explode('.', $pathString);
-    // remove field
-    array_pop($pathParts);
-    $path = [];
-    $query = $this;
-    $isMultipleChecker = function($alias) use ($query) {
-      foreach ($query->getJoinedTables() as $table) {
-        if ($table->getAlias() === $alias) {
-          return $table->getJoinType() === Joinable::JOIN_TYPE_ONE_TO_MANY;
-        }
-      }
-      return FALSE;
-    };
-
-    foreach ($pathParts as $part) {
-      $path[$part] = $isMultipleChecker($part);
-    }
-
-    return $path;
+  public function getPathJoinTypes($fieldPath) {
+    /** @var \Civi\Api4\Service\Schema\Joiner $joiner */
+    $joiner = \Civi::container()->get('joiner');
+    return $joiner->getJoinTypes($this->getFrom(), $fieldPath);
   }
 
   /**
