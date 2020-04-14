@@ -45,11 +45,19 @@ function smarty_function_help($params, &$smarty) {
   if (empty($params['title'])) {
     $vars = $smarty->get_template_vars();
     $smarty->assign('id', $params['id'] . '-title');
+
     $name = trim($smarty->fetch($params['file'] . '.hlp'));
+    $extraoutput = '';
     $additionalTPLFile = $params['file'] . '.extra.hlp';
     if ($smarty->template_exists($additionalTPLFile)) {
-      $name .= trim($smarty->fetch($additionalTPLFile));
+      $extraoutput .= trim($smarty->fetch($additionalTPLFile));
+      // Allow override param to replace default text e.g. {hlp id='foo' override=1}
+      if ($smarty->get_template_vars('override_help_text')) {
+        $name = '';
+      }
     }
+    $name .= $extraoutput;
+
     // Ensure we didn't change any existing vars CRM-11900
     foreach ($vars as $key => $value) {
       if ($smarty->get_template_vars($key) !== $value) {
