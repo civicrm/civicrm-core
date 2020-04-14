@@ -28,8 +28,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2020
- * $Id$
- *
  */
 namespace Civi\Api4\Service\Spec\Provider;
 
