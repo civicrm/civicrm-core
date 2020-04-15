@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MessageTemplate;
+
 /**
  *
  * @package CRM
@@ -19,7 +21,7 @@
  * This class generates form components for Message templates
  * used by membership, contributions, event registrations, etc.
  */
-class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
+class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   /**
    * which (and whether) mailing workflow this template belongs to
    * @var int
@@ -28,20 +30,26 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Is document file is already loaded as default value?
+   *
    * @var bool
    */
   protected $_is_document = FALSE;
 
+  /**
+   * PreProcess form - load existing values.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 'add'
-    );
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->assign('action', $this->_action);
-
-    $this->_BAOName = 'CRM_Core_BAO_MessageTemplate';
-    $this->set('BAOName', $this->_BAOName);
-    parent::preProcess();
+    $this->_values = [];
+    if ($this->_id) {
+      $this->_values = (array) MessageTemplate::get()->addWhere('id', '=', $this->_id)->setSelect(['*'])->execute()->first();
+    }
   }
 
   /**
