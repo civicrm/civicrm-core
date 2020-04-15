@@ -78,7 +78,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       ],
       [
         'type' => 'done',
-        'icon' => 'fa-ban',
+        'icon' => 'fa-times',
         'name' => ts('Return to Search'),
       ],
       [
