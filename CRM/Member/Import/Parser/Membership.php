@@ -631,24 +631,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $values[$key] = $value;
         $type = $customFields[$customFieldID]['html_type'];
         if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
-          $mulValues = explode(',', $value);
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = [];
-          foreach ($mulValues as $v1) {
-            foreach ($customOption as $customValueID => $customLabel) {
-              $customValue = $customLabel['value'];
-              if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
-                (strtolower($customValue) == strtolower(trim($v1)))
-              ) {
-                if ($type == 'CheckBox') {
-                  $values[$key][$customValue] = 1;
-                }
-                else {
-                  $values[$key][] = $customValue;
-                }
-              }
-            }
-          }
+          $values[$key] = self::unserializeCustomValue($customFieldID, $value, $type);
         }
       }
 

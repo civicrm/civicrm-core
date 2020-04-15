@@ -135,24 +135,7 @@ function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $
       $values[$key] = $value;
       $type = $customFields[$customFieldID]['html_type'];
       if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
-        $mulValues = explode(',', $value);
-        $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-        $values[$key] = [];
-        foreach ($mulValues as $v1) {
-          foreach ($customOption as $customValueID => $customLabel) {
-            $customValue = $customLabel['value'];
-            if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
-              (strtolower(trim($customValue)) == strtolower(trim($v1)))
-            ) {
-              if ($type == 'CheckBox') {
-                $values[$key][$customValue] = 1;
-              }
-              else {
-                $values[$key][] = $customValue;
-              }
-            }
-          }
-        }
+        $values[$key] = CRM_Import_Parser::unserializeCustomValue($customFieldID, $value, $type);
       }
       elseif ($type == 'Select' || $type == 'Radio') {
         $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
