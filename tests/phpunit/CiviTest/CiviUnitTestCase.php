@@ -626,6 +626,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param string $name
    *
    * @return mixed
+   *
+   * @throws \CRM_Core_Exception
    */
   public function membershipStatusCreate($name = 'test member status') {
     $params['name'] = $name;
@@ -636,17 +638,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     $result = $this->callAPISuccess('MembershipStatus', 'Create', $params);
     CRM_Member_PseudoConstant::flush('membershipStatus');
-    return $result['id'];
+    return (int) $result['id'];
   }
 
   /**
+   * Delete the given membership status, deleting any memberships of the status first.
+   *
    * @param int $membershipStatusID
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function membershipStatusDelete($membershipStatusID) {
-    if (!$membershipStatusID) {
-      return;
-    }
-    $result = $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatusID]);
+  public function membershipStatusDelete(int $membershipStatusID) {
+    $this->callAPISuccess('Membership', 'get', ['status_id' => $membershipStatusID, 'api.Membership.delete' => 1]);
+    $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatusID]);
   }
 
   public function membershipRenewalDate($durationUnit, $membershipEndDate) {
