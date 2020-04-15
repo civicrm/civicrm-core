@@ -85,7 +85,7 @@
     </script>
     {/literal}
 
-    {include file="CRM/common/TabSelected.tpl" defaultTab="summary"}
+    {include file="CRM/common/TabHeader.tpl" defaultTab="summary"}
 
     {* Refresh buttons *}
     {literal}
