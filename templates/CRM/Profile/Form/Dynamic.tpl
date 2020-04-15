@@ -157,7 +157,9 @@
                 &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {$form.$n.html}
+                {if $field.html_type neq 'File' || ($field.html_type eq 'File' && !$field.is_view)}
+                   {$form.$n.html}
+                {/if}
                 {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
                     {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
@@ -170,7 +172,9 @@
 
           {if $form.$n.type eq 'file'}
             <div class="crm-section file_displayURL-section file_displayURL{$n}-section"><div class="content">{$customFiles.$n.displayURL}</div></div>
-            <div class="crm-section file_deleteURL-section file_deleteURL{$n}-section"><div class="content">{$customFiles.$n.deleteURL}</div></div>
+            {if !$fields.$n.is_view}
+               <div class="crm-section file_deleteURL-section file_deleteURL{$n}-section"><div class="content">{$customFiles.$n.deleteURL}</div></div>
+            {/if}
           {/if}
         {/if}
 
