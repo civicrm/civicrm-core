@@ -4208,6 +4208,147 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test repeatTransaction with installments and next_sched_contribution_date
+   *
+   * @dataProvider getRepeatTransactionNextSchedData
+   *
+   * @param array $dataSet
+   *
+   * @throws \Exception
+   */
+  public function testRepeatTransactionUpdateNextSchedContributionDate($dataSet) {
+    $paymentProcessorID = $this->paymentProcessorCreate();
+    // Create the contribution before the recur so it doesn't trigger the update of next_sched_contribution_date
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge(
+        $this->_params,
+        [
+          'contribution_status_id' => 'Completed',
+          'receive_date' => $dataSet['repeat'][0]['receive_date'],
+        ])
+    );
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
+      'contact_id' => $this->_individualId,
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 'Pending',
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $paymentProcessorID,
+    ], $dataSet['recur']));
+    // Link the existing contribution to the recur *after* creating the recur.
+    // If we just created the contribution now the next_sched_contribution_date would be automatically set
+    //   and we want to test the case when it is empty.
+    $contribution = $this->callAPISuccess('contribution', 'create', [
+      'id' => $contribution['id'],
+      'contribution_recur_id' => $contributionRecur['id'],
+    ]);
+
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', [
+      'id' => $contributionRecur['id'],
+      'return' => ['next_sched_contribution_date', 'contribution_status_id'],
+    ]);
+    // Check that next_sched_contribution_date is empty
+    $this->assertEquals('', $contributionRecur['next_sched_contribution_date'] ?? '');
+
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_status_id' => 'Completed',
+      'contribution_recur_id' => $contributionRecur['id'],
+      'receive_date' => $dataSet['repeat'][0]['receive_date'],
+    ]);
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', [
+      'id' => $contributionRecur['id'],
+      'return' => ['next_sched_contribution_date', 'contribution_status_id'],
+    ]);
+    // Check that recur has status "In Progress"
+    $this->assertEquals(
+      (string) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $dataSet['repeat'][0]['expectedRecurStatus']),
+      $contributionRecur['contribution_status_id']
+    );
+    // Check that next_sched_contribution_date has been set to 1 period after the contribution receive date (ie. 1 month)
+    $this->assertEquals($dataSet['repeat'][0]['expectedNextSched'], $contributionRecur['next_sched_contribution_date']);
+
+    // Now call Contribution.repeattransaction again and check that the next_sched_contribution_date has moved forward by 1 period again
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_status_id' => 'Completed',
+      'contribution_recur_id' => $contributionRecur['id'],
+      'receive_date' => $dataSet['repeat'][1]['receive_date'],
+    ]);
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', [
+      'id' => $contributionRecur['id'],
+      'return' => ['next_sched_contribution_date', 'contribution_status_id'],
+    ]);
+    // Check that recur has status "In Progress" or "Completed" depending on whether number of installments has been reached
+    $this->assertEquals(
+      (string) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $dataSet['repeat'][1]['expectedRecurStatus']),
+      $contributionRecur['contribution_status_id']
+    );
+    // Check that next_sched_contribution_date has been set to 1 period after the contribution receive date (ie. 1 month)
+    $this->assertEquals($dataSet['repeat'][1]['expectedNextSched'], $contributionRecur['next_sched_contribution_date'] ?? '');
+  }
+
+  /**
+   * Get dates for testing.
+   *
+   * @return array
+   */
+  public function getRepeatTransactionNextSchedData() {
+    // Both these tests handle/test the case that next_sched_contribution_date is empty when Contribution.repeattransaction
+    //   is called for the first time. Historically setting it was inconsistent but on new updates it should always be set.
+    /*
+     * This tests that calling Contribution.repeattransaction with installments does the following:
+     * - For the first call to repeattransaction the recur status is In Progress and next_sched_contribution_date is updated
+     *   to match next expected receive_date.
+     * - Once the 3rd contribution is created contributionRecur status = completed and next_sched_contribution_date = ''.
+     */
+    $result['receive_date_includes_time_with_installments']['2012-01-01-1-month'] = [
+      'recur' => [
+        'start_date' => '2012-01-01',
+        'frequency_interval' => 1,
+        'installments' => '3',
+        'frequency_unit' => 'month',
+      ],
+      'repeat' => [
+        [
+          'receive_date' => '2012-02-29 16:00:00',
+          'expectedNextSched' => '2012-03-29 16:00:00',
+          'expectedRecurStatus' => 'In Progress',
+        ],
+        [
+          'receive_date' => '2012-03-29 16:00:00',
+          'expectedNextSched' => '',
+          'expectedRecurStatus' => 'Completed',
+        ],
+      ],
+    ];
+    /*
+     * This tests that calling Contribution.repeattransaction with no installments does the following:
+     * - For the each call to repeattransaction the recur status is In Progress and next_sched_contribution_date is updated
+     *   to match next expected receive_date.
+     */
+    $result['receive_date_includes_time_no_installments']['2012-01-01-1-month'] = [
+      'recur' => [
+        'start_date' => '2012-01-01',
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+      ],
+      'repeat' => [
+        [
+          'receive_date' => '2012-02-29 16:00:00',
+          'expectedNextSched' => '2012-03-29 16:00:00',
+          'expectedRecurStatus' => 'In Progress',
+        ],
+        [
+          'receive_date' => '2012-03-29 16:00:00',
+          'expectedNextSched' => '2012-04-29 16:00:00',
+          'expectedRecurStatus' => 'In Progress',
+        ],
+      ],
+    ];
+    return $result;
+  }
+
+  /**
    * Test sending a mail via the API.
    */
   public function testSendMailWithAPISetFromDetails() {
