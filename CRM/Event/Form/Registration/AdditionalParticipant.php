@@ -700,7 +700,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     // CRM-11182 - Optional confirmation screen
       !$this->_values['event']['is_confirm_enabled']
       && !$this->_values['event']['is_monetary']
-      && CRM_Utils_Array::value('additional_participants', $this->_params[0])
+      && !empty($this->_params[0]['additional_participants'])
       && $this->isLastParticipant()
     ) {
       $this->processRegistration($this->_params);

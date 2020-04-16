@@ -573,7 +573,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
    * @param array $tables
    */
   public static function tableNames(&$tables) {
-    if (!empty($tables['civicrm_membership_log']) || !empty($tables['civicrm_membership_status']) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
+    if (!empty($tables['civicrm_membership_log']) || !empty($tables['civicrm_membership_status']) || !empty($tables['civicrm_membership_type'])) {
       $tables = array_merge(['civicrm_membership' => 1], $tables);
     }
   }

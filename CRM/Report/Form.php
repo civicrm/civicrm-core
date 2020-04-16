@@ -5835,7 +5835,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   protected function storeGroupByArray() {
 
-    if (!CRM_Utils_Array::value('group_bys', $this->_params)
+    if (empty($this->_params['group_bys'])
       || !is_array($this->_params['group_bys'])) {
       $this->_params['group_bys'] = [];
     }

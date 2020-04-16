@@ -180,7 +180,7 @@ class CRM_Contribute_Form_SoftCredit {
     // if honor roll fields are populated but no PCP is selected
     if (empty($fields['pcp_made_through_id'])) {
       if (!empty($fields['pcp_display_in_roll']) || !empty($fields['pcp_roll_nickname']) ||
-        CRM_Utils_Array::value('pcp_personal_note', $fields)
+        !empty($fields['pcp_personal_note'])
       ) {
         $errors['pcp_made_through_id'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');
       }

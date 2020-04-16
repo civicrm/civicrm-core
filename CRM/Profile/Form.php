@@ -1107,7 +1107,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $details = $contactDetails[$this->_id];
     }
     if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
-      CRM_Utils_Array::value('postal_greeting_id', $details)
+      !empty($details['postal_greeting_id'])
     )
     ) {
 

@@ -75,7 +75,7 @@ class CRM_Mailing_Task extends CRM_Core_Task {
    */
   public static function getTask($value) {
     self::tasks();
-    if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
+    if (!$value || empty(self::$_tasks[$value])) {
       // make the print task by default
       $value = self::TASK_PRINT;
     }

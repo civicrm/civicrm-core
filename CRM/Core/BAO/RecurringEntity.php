@@ -685,7 +685,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     if (empty($hasaRecurringRecord)) {
       // check if its a linked entity
       if (array_key_exists($obj->__table, self::$_linkedEntitiesInfo) &&
-        !CRM_Utils_Array::value('is_multirecord', self::$_linkedEntitiesInfo[$obj->__table])
+        empty(self::$_linkedEntitiesInfo[$obj->__table]['is_multirecord'])
       ) {
         $linkedDAO = new self::$_tableDAOMapper[$obj->__table]();
         $linkedDAO->id = $obj->id;
