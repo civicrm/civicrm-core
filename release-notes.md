@@ -15,6 +15,12 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.24.3
+
+Released April 15, 2020
+
+- **[Security advisories](release-notes/5.24.3.md#security)**
+
 ## CiviCRM 5.24.2
 
 Released April 9, 2020

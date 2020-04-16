@@ -3480,6 +3480,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that getquick doesn't work with field_name=api_key
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetQuickApiKey() {
+    $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'email' => 'apiuser@example.com',
+      'api_key' => 'hunter2',
+    ]);
+    $result = $this->callAPIFailure('Contact', 'getquick', [
+      'name' => '%',
+      'field_name' => 'api_key',
+    ], 'Illegal value "api_key" for parameter "field_name"');
+  }
+
+  /**
    * Set up some sample data for testing quicksearch.
    */
   public function getQuickSearchSampleData() {
@@ -4704,6 +4721,38 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $this->getCustomFieldName('text') => 'mummy loves me more',
     ]);
     return [$contact1, $contact2];
+  }
+
+  public function versionAndPrivacyOption() {
+    $version = [3, 4];
+    $fields = ['do_not_mail', 'do_not_email', 'do_not_sms', 'is_opt_out', 'do_not_trade'];
+    $tests = [];
+    foreach ($fields as $field) {
+      foreach ($version as $v) {
+        $tests[] = [$v, 1, $field, 1];
+        $tests[] = [$v, 0, $field, 3];
+        $tests[] = [$v, ['!=' => 1], $field, 3];
+        $tests[] = [$v, ['!=' => 0], $field, 1];
+      }
+    }
+    return $tests;
+  }
+
+ /**
+   * CRM-14743 - test api respects search operators.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionAndPrivacyOption
+   */
+  public function testGetContactsByPrivacyFlag($version, $query, $field, $expected) {
+    $this->_apiversion = $version;
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate([$field => 1]);
+    $contact = $this->callAPISuccess('Contact', 'get', [$field => $query]);
+    $this->assertEquals($expected, $contact['count']);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact1, 'skip_undelete' => 1]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact2, 'skip_undelete' => 1]);
   }
 
 }

@@ -241,6 +241,24 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'id', 'contact_id',
       'Database check for created activity target.'
     );
+
+    $paramOptions = ['0))+and+0+--+-f', ['0))+and+0+--+-f']];
+    $paramField = ['source_record_id', 'activity_type_id'];
+    foreach ($paramField as $field) {
+      foreach ($paramOptions as $paramOption) {
+        $params = [
+          $field => $paramOption,
+        ];
+        try {
+          CRM_Activity_BAO_Activity::deleteActivity($params);
+        }
+        catch (Exception $e) {
+          if ($e->getMessage() === 'DB Error: syntax error') {
+            $this->fail('Delete Activity function did not validate field: ' . $field);
+          }
+        }
+      }
+    }
     $params = [
       'source_contact_id' => $contactId,
       'source_record_id' => $contactId,

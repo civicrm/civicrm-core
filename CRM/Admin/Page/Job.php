@@ -58,10 +58,10 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Scheduled Job'),
         ),
-        CRM_Core_Action::EXPORT => array(
+        CRM_Core_Action::VIEW => array(
           'name' => ts('Execute Now'),
           'url' => 'civicrm/admin/job',
-          'qs' => 'action=export&id=%%id%%&reset=1',
+          'qs' => 'action=view&id=%%id%%&reset=1',
           'title' => ts('Execute Scheduled Job Now'),
         ),
         CRM_Core_Action::DISABLE => array(
@@ -118,12 +118,6 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       $this, FALSE, 0
     );
 
-    // FIXME: Why are we comparing an integer with a string here?
-    if ($this->_action == 'export') {
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
-    }
-
     if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
       try {
         $jobResult = civicrm_api3('Job', 'clone', array('id' => $this->_id));
@@ -149,14 +143,6 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     // check if non-prod mode is enabled.
     if (CRM_Core_Config::environment() != 'Production') {
       CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter.'), ts("Non-production Environment"), "warning", array('expires' => 0));
-    }
-
-    // using Export action for Execute. Doh.
-    if ($this->_action & CRM_Core_Action::EXPORT) {
-      $jm = new CRM_Core_JobManager();
-      $jm->executeJobById($this->_id);
-
-      CRM_Core_Session::setStatus(ts('Selected Scheduled Job has been executed. See the log for details.'), ts("Executed"), "success");
     }
 
     $sj = new CRM_Core_JobManager();
