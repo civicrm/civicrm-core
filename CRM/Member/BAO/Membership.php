@@ -254,12 +254,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // eg pay later membership, membership update cron CRM-3984
 
     if (empty($params['is_override']) && empty($params['skipStatusCal'])) {
-      $dates = ['start_date', 'end_date', 'join_date'];
-      // Declare these out of courtesy as IDEs don't pick up the setting of them below.
-      $start_date = $end_date = $join_date = NULL;
-      foreach ($dates as $date) {
-        $$date = $params[$date] = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
-      }
+      // @todo - we should be able to count on dates being correctly formatted by they time they hit the BAO.
+      // Maybe do some tests & throw some deprecation warnings if they aren't?
+      $params['start_date'] = trim($params['start_date']) ? date('Ymd', strtotime(trim($params['start_date']))) : 'null';
+      $params['end_date'] = trim($params['end_date']) ? date('Ymd', strtotime(trim($params['end_date']))) : 'null';
+      $params['join_date'] = trim($params['join_date']) ? date('Ymd', strtotime(trim($params['join_date']))) : 'null';
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
       $excludeIsAdmin = CRM_Utils_Array::value('exclude_is_admin', $params, FALSE);
@@ -269,15 +268,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
+      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($params['start_date'], $params['end_date'], $params['join_date'],
         'today', $excludeIsAdmin, CRM_Utils_Array::value('membership_type_id', $params), $params
       );
       if (empty($calcStatus)) {
-        throw new CRM_Core_Exception(ts(
-          "The membership cannot be saved because the status cannot be calculated for start_date: $start_date end_date $end_date join_date $join_date as at " . date('Y-m-d H:i:s')),
-          0,
-          $errorParams
-        );
+        throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . date('Y-m-d H:i:s')));
       }
       $params['status_id'] = $calcStatus['id'];
     }
