@@ -55,6 +55,23 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       return;
     }
 
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $this->assign('jobName', self::getJobName($this->_id)); 
+      $this->addButtons([
+        [
+          'type' => 'submit',
+          'name' => ts('Execute'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+      return;
+    }
+        
+
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Job');
 
     $this->add('text', 'name', ts('Name'),
@@ -172,6 +189,16 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       return;
     }
 
+    // using View action for Execute. Doh.
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $jm = new CRM_Core_JobManager();
+      $jm->executeJobById($this->_id);
+      $jobName = self::getJobName($this->_id);
+      CRM_Core_Session::setStatus(ts('%1 Scheduled Job has been executed. See the log for details.', [1 => $jobName]), ts("Executed"), "success");
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
+      return;
+    }
+
     $values = $this->controller->exportValues($this->_name);
     $domainID = CRM_Core_Config::domainID();
 
@@ -221,6 +248,19 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }
 
+  }
+
+  /**
+   * Get the API action aka Job Name for this scheduled job
+   * @param int $id - Id of the stored Job
+   *
+   * @return string
+   */
+  private static function getJobName($id) {
+    $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'api_entity');
+    $action = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'api_action');
+    $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'name');
+    return $name . ' (' . $entity . '.' . $action . ')';
   }
 
 }
