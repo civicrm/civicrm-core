@@ -200,7 +200,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertRegExp(
         ";" .
         // body_html
-        "<p>You can go to <a href=['\"].*extern/url\.php\?u=\d+&amp\\;qid=\d+['\"] rel='nofollow'>Google</a>" .
+        "<p>You can go to <a href=['\"].*civicrm/mailing/url\.php\?u=\d+&amp\\;qid=\d+['\"] rel='nofollow'>Google</a>" .
         " or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" .
         // Default footer
         "Sample Footer for HTML formatted content" .
@@ -219,7 +219,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "\n" .
         "Links:\n" .
         "------\n" .
-        "\\[1\\] .*extern/url\.php\?u=\d+&qid=\d+\n" .
+        "\\[1\\] http.*civicrm/mailing/url\.php\?u=\d+&qid=\d+\n" .
         "\\[2\\] http.*civicrm/mailing/optout.*\n" .
         "\n" .
         // Default footer
@@ -280,8 +280,8 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     // Tracking enabled
     $cases[] = [
       '<p><a href="http://example.net/">Foo</a></p>',
-      ';<p><a href=[\'"].*extern/url\.php\?u=\d+.*[\'"]>Foo</a></p>;',
-      ';\\[1\\] .*extern/url\.php\?u=\d+.*;',
+      ';<p><a href=[\'"].*civicrm/mailing/url\.php\?u=\d+.*[\'"]>Foo</a></p>;',
+      ';\\[1\\] .*civicrm/mailing/url\.php\?u=\d+.*;',
       ['url_tracking' => 1],
     ];
     $cases[] = [
@@ -311,7 +311,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       // but not in HTML emails.
       "<p>Please go to: http://example.net/</p>",
       ";<p>Please go to: http://example\.net/</p>;",
-      ';Please go to: .*extern/url.php\?u=\d+&qid=\d+;',
+      ';Please go to: .*civicrm/mailing.php\?u=\d+&qid=\d+;',
       ['url_tracking' => 1],
     ];
 
@@ -322,6 +322,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * Generate a fully-formatted mailing (with body_html content).
    *
    * @dataProvider urlTrackingExamples
+   * @throws \CRM_Core_Exception
    */
   public function testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params) {
     $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params], 1);

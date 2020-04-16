@@ -319,6 +319,31 @@ class CRM_Utils_System {
   }
 
   /**
+   * Generate a url for a url that used to be an externUrl, still calling the old hook.
+   *
+   * Note that the reason why these bypass the main website dates back to some assumptions about difficulty
+   * and speed from around 2007. However, the Rest path does have some added complexity.
+   *
+   * @param string $url
+   * @param array $query
+   *
+   * @return string
+   */
+  public static function previouslyExternUrl($url, array $query): string {
+    $parsedUrl = CRM_Utils_Url::parseUrl(CRM_Utils_System::url($url, $query, TRUE, NULL, FALSE, TRUE));
+    $event = \Civi\Core\Event\GenericHookEvent::create([
+      'url' => &$parsedUrl,
+      'path' => $url,
+      'query' => $query,
+      'absolute' => TRUE,
+    ]);
+    Civi::service('dispatcher')->dispatch('hook_civicrm_alterExternUrl', $event);
+    return $parsedUrl;
+  }
+
+  /**
+   * Path of the current page e.g. 'civicrm/contact/view'
+   *
    * @deprecated
    * @see \CRM_Utils_System::currentPath
    *

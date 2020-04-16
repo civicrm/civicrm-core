@@ -72,11 +72,11 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
       }
       $id = $tracker->id;
 
-      $redirect = CRM_Utils_System::externUrl('extern/url', "u=$id");
+      $redirect = CRM_Utils_System::previouslyExternUrl('civicrm/mailing/url', ['u=' => $id]);
       $urlCache[$mailing_id . $url] = $redirect;
     }
 
-    $returnUrl = CRM_Utils_System::externUrl('extern/url', "u=$id&qid=$queue_id");
+    $returnUrl = CRM_Utils_System::previouslyExternUrl('civicrm/mailing/url', ['u=' => $id, 'qid' => $queue_id]);
 
     if ($hrefExists) {
       $returnUrl = "href='{$returnUrl}' rel='nofollow'";
