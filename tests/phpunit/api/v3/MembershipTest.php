@@ -1169,6 +1169,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * CRM-18503 - Test membership join date is correctly set for fixed memberships.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipJoinDateFixed() {
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();
@@ -1185,9 +1187,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'skipStatusCal' => 1,
       'is_for_organization' => 1,
     ];
-    // @todo stop passing empty $ids
-    $ids = [];
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+    $membership = CRM_Member_BAO_Membership::create($params);
 
     // Update membership to 'Completed' and check the dates.
     $memParams = [
