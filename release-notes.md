@@ -19,7 +19,7 @@ Other resources for identifying changes are:
 
 Released April 15, 2020
 
-- **[Security advisories](release-notes/5.23.3.md#security)**
+- **[Security advisories](release-notes/5.24.3.md#security)**
 
 ## CiviCRM 5.24.2
 
