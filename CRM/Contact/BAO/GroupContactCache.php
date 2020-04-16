@@ -461,13 +461,17 @@ WHERE  id IN ( $groupIDs )
     $customClass = NULL;
     if ($savedSearchID) {
       $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
+      $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
+
+      $excludeClause = "NOT IN (
+                        SELECT contact_id FROM civicrm_group_contact
+                        WHERE civicrm_group_contact.status = 'Removed'
+                        AND civicrm_group_contact.group_id = $groupID )";
 
       if (!empty($ssParams['api_entity'])) {
-        $mainCol = 'a';
-        $sql = self::getApiSQL($savedSearchID, $ssParams);
+        $sql = self::getApiSQL($ssParams, $excludeClause);
       }
       else {
-        $mainCol = 'contact_a';
         // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
         if (!empty($ssParams)) {
           CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
@@ -478,12 +482,8 @@ WHERE  id IN ( $groupIDs )
         else {
           $sql = self::getQueryObjectSQL($savedSearchID, $ssParams);
         }
+        $sql['from'] .= " AND contact_a.id $excludeClause";
       }
-      $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
-      $sql['from'] .= " AND $mainCol.id NOT IN (
-                          SELECT contact_id FROM civicrm_group_contact
-                          WHERE civicrm_group_contact.status = 'Removed'
-                          AND   civicrm_group_contact.group_id = $groupID ) ";
     }
 
     if (!empty($sql['select'])) {
@@ -715,26 +715,33 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
-   * @param $savedSearchID
    * @param array $savedSearch
+   * @param string $excludeClause
    * @return array
    * @throws API_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws CRM_Core_Exception
    */
-  protected static function getApiSQL($savedSearchID, array $savedSearch): array {
-    $apiParams = ['select' => ['id'], 'checkPermissions' => FALSE] + $savedSearch['api_params'];
+  protected static function getApiSQL(array $savedSearch, string $excludeClause): array {
+    $apiParams = $savedSearch['api_params'] + ['select' => ['id'], 'checkPermissions' => FALSE];
+    list($select) = explode(' AS ', $apiParams['select'][0]);
+    $apiParams['select'][0] = $select . ' AS smart_group_contact_id';
     $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $apiParams);
     $query = new \Civi\Api4\Query\Api4SelectQuery($api);
+    $query->forceSelectId = FALSE;
+    $query->getQuery()->having('smart_group_contact_id ' . $excludeClause);
     $sql = $query->getSql();
     return [
-      'select' => substr($sql, 0, strpos($sql, 'FROM')),
-      'from' => substr($sql, strpos($sql, 'FROM')),
+      'select' => substr($sql, 0, strpos($sql, "\nFROM ")),
+      'from' => substr($sql, strpos($sql, "\nFROM ")),
     ];
   }
 
   /**
    * Get sql from a custom search.
+   *
+   * We split it up and store custom class
+   * so temp tables are not destroyed if they are used
    *
    * @param int $savedSearchID
    * @param array $ssParams
@@ -743,22 +750,16 @@ ORDER BY   gc.contact_id, g.children
    * @throws \Exception
    */
   protected static function getCustomSearchSQL($savedSearchID, array $ssParams): array {
-    // if custom search
-
-    // we split it up and store custom class
-    // so temp tables are not destroyed if they are used
-    // hence customClass is defined above at top of function
     $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
     $searchSQL = $customClass->contactIDs();
     $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
     if (strpos($searchSQL, 'WHERE') === FALSE) {
       $searchSQL .= " WHERE ( 1 ) ";
     }
-    $sql = [
+    return [
       'select' => substr($searchSQL, 0, strpos($searchSQL, 'FROM')),
       'from' => substr($searchSQL, strpos($searchSQL, 'FROM')),
     ];
-    return $sql;
   }
 
   /**
@@ -802,11 +803,10 @@ ORDER BY   gc.contact_id, g.children
       FALSE, FALSE,
       FALSE, TRUE
     );
-    $sql = [
+    return [
       'select' => $sqlParts['select'],
       'from' => "{$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}",
     ];
-    return $sql;
   }
 
 }

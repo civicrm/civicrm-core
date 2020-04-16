@@ -64,6 +64,8 @@ class Api4SelectQuery extends SelectQuery {
    */
   public $groupBy = [];
 
+  public $forceSelectId = TRUE;
+
   /**
    * @var array
    */
@@ -82,6 +84,8 @@ class Api4SelectQuery extends SelectQuery {
     $this->limit = $apiGet->getLimit();
     $this->offset = $apiGet->getOffset();
     $this->having = $apiGet->getHaving();
+    // Always select ID of main table unless grouping is used
+    $this->forceSelectId = !$this->groupBy;
     if ($apiGet->getDebug()) {
       $this->debugOutput =& $apiGet->_debugOutput;
     }
@@ -158,8 +162,7 @@ class Api4SelectQuery extends SelectQuery {
       return;
     }
     else {
-      // Always select ID (unless we're doing groupBy).
-      if (!$this->groupBy) {
+      if ($this->forceSelectId) {
         $this->select = array_merge(['id'], $this->select);
       }
 
