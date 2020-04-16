@@ -122,7 +122,6 @@ WHERE  email = %2
     }
 
     $contact_id = $q->contact_id;
-    $transaction = new CRM_Core_Transaction();
 
     $mailing_id = civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
@@ -262,7 +261,7 @@ WHERE  email = %2
         $groups[$do->group_id] = $do->title;
       }
     }
-
+    $transaction = new CRM_Core_Transaction();
     $contacts = [$contact_id];
     foreach ($groups as $group_id => $group_name) {
       $notremoved = FALSE;
