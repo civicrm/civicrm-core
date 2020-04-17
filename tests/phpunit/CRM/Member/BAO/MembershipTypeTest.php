@@ -308,8 +308,8 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    $membership = CRM_Member_BAO_Membership::create($params);
 
     $membershipRenewDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id);
 

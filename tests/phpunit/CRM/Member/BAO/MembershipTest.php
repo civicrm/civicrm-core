@@ -131,6 +131,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Now call create() to modify an existing Membership
     $params = [
+      'id' => $membershipId,
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -140,10 +141,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [
-      'membership' => $membershipId,
-    ];
-    CRM_Member_BAO_Membership::create($params, $ids);
+    CRM_Member_BAO_Membership::create($params);
 
     $membershipTypeId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId,
       'membership_type_id', 'contact_id',
@@ -176,8 +174,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
+    CRM_Member_BAO_Membership::create($params);
 
     $membershipId1 = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -193,8 +190,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 0,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
+
+    CRM_Member_BAO_Membership::create($params);
 
     $membershipId2 = $this->assertDBNotNull('CRM_Member_BAO_Membership', 'source123', 'id',
       'source', 'Database check for created membership.'
@@ -237,8 +234,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
+
+    CRM_Member_BAO_Membership::create($params);
 
     $membershipId1 = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -259,8 +256,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
+
+    CRM_Member_BAO_Membership::create($params);
 
     $membershipId2 = $this->assertDBNotNull('CRM_Member_BAO_Membership', 'PaySource', 'id',
       'source', 'Database check for created membership.'
@@ -410,8 +407,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    $membership = CRM_Member_BAO_Membership::create($params);
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
@@ -480,8 +477,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $statusId,
     ];
 
-    $ids = [];
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+    $membership = CRM_Member_BAO_Membership::create($params);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -551,8 +547,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_override_end_date' => date('Ymd', strtotime('-1 day')),
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    $createdMembership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    $createdMembership = CRM_Member_BAO_Membership::create($params);
 
     CRM_Member_BAO_Membership::updateAllMembershipStatus();
 
@@ -579,8 +575,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_override_end_date' => date('Ymd', time()),
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    $createdMembership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    $createdMembership = CRM_Member_BAO_Membership::create($params);
 
     CRM_Member_BAO_Membership::updateAllMembershipStatus();
 
@@ -606,8 +602,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    $createdMembership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    $createdMembership = CRM_Member_BAO_Membership::create($params);
 
     CRM_Member_BAO_Membership::updateAllMembershipStatus();
 
@@ -821,8 +817,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    CRM_Member_BAO_Membership::create($params, $ids);
+
+    CRM_Member_BAO_Membership::create($params);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
