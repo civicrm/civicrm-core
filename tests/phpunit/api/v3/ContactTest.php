@@ -1708,6 +1708,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test merging 2 organizations.
    *
    * CRM-20421: This test make sure that inherited memberships are deleted upon merging organization.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMergeOrganizations() {
     $organizationID1 = $this->organizationCreate([], 0);
@@ -1721,20 +1726,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $membershipParams = [
       'membership_type_id' => $membershipType["id"],
       'contact_id' => $organizationID1,
-      'start_date' => "01/01/2015",
-      'join_date' => "01/01/2010",
-      'end_date' => "12/31/2015",
+      'start_date' => '01/01/2015',
+      'join_date' => '01/01/2010',
+      'end_date' => '12/31/2015',
     ];
-    $ownermembershipid = $this->contactMembershipCreate($membershipParams);
+    $ownerMembershipID = $this->contactMembershipCreate($membershipParams);
 
-    $contactmembership = $this->callAPISuccess("membership", "getsingle", [
-      "contact_id" => $contact["id"],
-    ]);
+    $contactMembership = $this->callAPISuccessGetSingle('membership', ['contact_id' => $contact['id']]);
 
-    $this->assertEquals($ownermembershipid, $contactmembership["owner_membership_id"], "Contact membership must be inherited from Organization");
+    $this->assertEquals($ownerMembershipID, $contactMembership['owner_membership_id'], "Contact membership must be inherited from Organization");
 
     CRM_Dedupe_Merger::moveAllBelongings($organizationID2, $organizationID1, [
-      "move_rel_table_memberships" => "0",
+      'move_rel_table_memberships' => "0",
       "move_rel_table_relationships" => "1",
       "main_details" => [
         "contact_id" => $organizationID2,
@@ -1746,11 +1749,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $contactmembership = $this->callAPISuccess("membership", "get", [
+    $contactMembership = $this->callAPISuccess("membership", "get", [
       "contact_id" => $contact["id"],
     ]);
 
-    $this->assertEquals(0, $contactmembership["count"], "Contact membership must be deleted after merging organization without memberships.");
+    $this->assertEquals(0, $contactMembership["count"], "Contact membership must be deleted after merging organization without memberships.");
   }
 
   /**
@@ -4738,11 +4741,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     return $tests;
   }
 
- /**
+  /**
    * CRM-14743 - test api respects search operators.
    *
    * @param int $version
    *
+   * @param $query
+   * @param $field
+   * @param $expected
+   *
+   * @throws \CRM_Core_Exception
    * @dataProvider versionAndPrivacyOption
    */
   public function testGetContactsByPrivacyFlag($version, $query, $field, $expected) {
