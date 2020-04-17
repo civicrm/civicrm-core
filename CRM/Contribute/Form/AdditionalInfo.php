@@ -282,16 +282,8 @@ class CRM_Contribute_Form_AdditionalInfo {
       $params['receipt_date'] = $formatted['receipt_date'] = date('YmdHis');
     }
 
-    //special case to handle if all checkboxes are unchecked
-    $customFields = CRM_Core_BAO_CustomField::getFields('Contribution',
-      FALSE,
-      FALSE,
-      CRM_Utils_Array::value('financial_type_id',
-        $params
-      )
-    );
     $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      CRM_Utils_Array::value('id', $params, NULL),
+       $params['id'] ?? NULL,
       'Contribution'
     );
   }
@@ -307,6 +299,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *   is it credit card contribution.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');
@@ -368,7 +361,7 @@ class CRM_Contribute_Form_AdditionalInfo {
 
       $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
       $date = CRM_Utils_Date::mysqlToIso($date);
-      $form->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $params));
+      $form->assign('credit_card_type', $params['credit_card_type'] ?? NULL);
       $form->assign('credit_card_exp_date', $date);
       $form->assign('credit_card_number',
         CRM_Utils_System::mungeCreditCard($params['credit_card_number'])
