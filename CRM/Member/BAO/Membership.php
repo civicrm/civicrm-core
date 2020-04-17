@@ -1475,15 +1475,13 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $ids = [];
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
-          // @todo stop passing empty $ids
-          CRM_Member_BAO_Membership::create($params, $ids);
+          CRM_Member_BAO_Membership::create($params);
         }
         else {
           // related membership already exists, so this is just an update
           if (isset($params['id'])) {
             if ($numRelatedAvailable > 0) {
-              // @todo stop passing empty $ids
-              CRM_Member_BAO_Membership::create($params, $ids);
+              CRM_Member_BAO_Membership::create($params);
               $numRelatedAvailable--;
             }
             else {
@@ -1502,8 +1500,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         if ($numRelatedAvailable <= 0) {
           break;
         }
-        // @todo stop passing $ids - at this point it may be set by reference from earlier calls to CRM_Member_BAO_Membership::create
-        CRM_Member_BAO_Membership::create($params, $ids);
+        CRM_Member_BAO_Membership::create($params);
         $numRelatedAvailable--;
       }
     }
