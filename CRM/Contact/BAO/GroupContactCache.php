@@ -457,7 +457,6 @@ WHERE  id IN ( $groupIDs )
       return;
     }
 
-    $sql = NULL;
     $customClass = NULL;
     if ($savedSearchID) {
       $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
@@ -467,9 +466,10 @@ WHERE  id IN ( $groupIDs )
                         SELECT contact_id FROM civicrm_group_contact
                         WHERE civicrm_group_contact.status = 'Removed'
                         AND civicrm_group_contact.group_id = $groupID )";
+      $addSelect = "$groupID AS group_id";
 
       if (!empty($ssParams['api_entity'])) {
-        $sql = self::getApiSQL($ssParams, $excludeClause);
+        $sql = self::getApiSQL($ssParams, $addSelect, $excludeClause);
       }
       else {
         // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
@@ -477,17 +477,12 @@ WHERE  id IN ( $groupIDs )
           CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
         }
         if (isset($ssParams['customSearchID'])) {
-          $sql = self::getCustomSearchSQL($savedSearchID, $ssParams);
+          $sql = self::getCustomSearchSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
         }
         else {
-          $sql = self::getQueryObjectSQL($savedSearchID, $ssParams);
+          $sql = self::getQueryObjectSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
         }
-        $sql['from'] .= " AND contact_a.id $excludeClause";
       }
-    }
-
-    if (!empty($sql['select'])) {
-      $sql['select'] = preg_replace("/^\s*SELECT/", "SELECT $groupID as group_id, ", $sql['select']);
     }
 
     $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('gccache')->setMemory();
@@ -497,17 +492,15 @@ WHERE  id IN ( $groupIDs )
     $contactQueries[] = $sql;
     // lets also store the records that are explicitly added to the group
     // this allows us to skip the group contact LEFT JOIN
-    $contactQueries[] = [
-      'select' => "SELECT $groupID as group_id, contact_id as contact_id",
-      'from' => " FROM   civicrm_group_contact WHERE  civicrm_group_contact.status = 'Added' AND  civicrm_group_contact.group_id = $groupID ",
-    ];
+    $contactQueries[] =
+      "SELECT $groupID as group_id, contact_id as contact_id
+       FROM   civicrm_group_contact
+       WHERE  civicrm_group_contact.status = 'Added' AND civicrm_group_contact.group_id = $groupID ";
 
     self::clearGroupContactCache($groupID);
 
     foreach ($contactQueries as $contactQuery) {
-      if (!empty($contactQuery['select']) && !empty($contactQuery['from'])) {
-        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) {$contactQuery['select']} {$contactQuery['from']}");
-      }
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) {$contactQuery}");
     }
 
     if ($group->children) {
@@ -716,25 +709,25 @@ ORDER BY   gc.contact_id, g.children
 
   /**
    * @param array $savedSearch
+   * @param string $addSelect
    * @param string $excludeClause
-   * @return array
+   * @return string
    * @throws API_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws CRM_Core_Exception
    */
-  protected static function getApiSQL(array $savedSearch, string $excludeClause): array {
+  protected static function getApiSQL(array $savedSearch, string $addSelect, string $excludeClause) {
     $apiParams = $savedSearch['api_params'] + ['select' => ['id'], 'checkPermissions' => FALSE];
-    list($select) = explode(' AS ', $apiParams['select'][0]);
-    $apiParams['select'][0] = $select . ' AS smart_group_contact_id';
+    list($idField) = explode(' AS ', $apiParams['select'][0]);
+    $apiParams['select'] = [
+      $addSelect,
+      $idField . ' AS smart_group_contact_id',
+    ];
     $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $apiParams);
     $query = new \Civi\Api4\Query\Api4SelectQuery($api);
     $query->forceSelectId = FALSE;
     $query->getQuery()->having('smart_group_contact_id ' . $excludeClause);
-    $sql = $query->getSql();
-    return [
-      'select' => substr($sql, 0, strpos($sql, "\nFROM ")),
-      'from' => substr($sql, strpos($sql, "\nFROM ")),
-    ];
+    return $query->getSql();
   }
 
   /**
@@ -745,21 +738,22 @@ ORDER BY   gc.contact_id, g.children
    *
    * @param int $savedSearchID
    * @param array $ssParams
+   * @param string $addSelect
+   * @param string $excludeClause
    *
-   * @return array
+   * @return string
    * @throws \Exception
    */
-  protected static function getCustomSearchSQL($savedSearchID, array $ssParams): array {
-    $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
-    $searchSQL = $customClass->contactIDs();
+  protected static function getCustomSearchSQL($savedSearchID, array $ssParams, string $addSelect, string $excludeClause) {
+    $searchSQL = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID)->contactIDs();
     $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
     if (strpos($searchSQL, 'WHERE') === FALSE) {
-      $searchSQL .= " WHERE ( 1 ) ";
+      $searchSQL .= " WHERE contact_a.id $excludeClause";
     }
-    return [
-      'select' => substr($searchSQL, 0, strpos($searchSQL, 'FROM')),
-      'from' => substr($searchSQL, strpos($searchSQL, 'FROM')),
-    ];
+    else {
+      $searchSQL .= " AND contact_a.id $excludeClause";
+    }
+    return preg_replace("/^\s*SELECT /", "SELECT $addSelect, ", $searchSQL);
   }
 
   /**
@@ -767,12 +761,14 @@ ORDER BY   gc.contact_id, g.children
    *
    * @param int $savedSearchID
    * @param array $ssParams
+   * @param string $addSelect
+   * @param string $excludeClause
    *
-   * @return array
+   * @return string
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected static function getQueryObjectSQL($savedSearchID, array $ssParams): array {
+  protected static function getQueryObjectSQL($savedSearchID, array $ssParams, string $addSelect, string $excludeClause) {
     $returnProperties = NULL;
     if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
       $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
@@ -793,20 +789,20 @@ ORDER BY   gc.contact_id, g.children
       FALSE, FALSE, 1,
       TRUE, TRUE,
       FALSE,
-      CRM_Utils_Array::value('display_relationship_type', $formValues),
-      CRM_Utils_Array::value('operator', $formValues, 'AND')
+      $formValues['display_relationship_type'] ?? NULL,
+      $formValues['operator'] ?? 'AND'
     );
     $query->_useDistinct = FALSE;
     $query->_useGroupBy = FALSE;
     $sqlParts = $query->getSearchSQLParts(
       0, 0, NULL,
       FALSE, FALSE,
-      FALSE, TRUE
+      FALSE, TRUE,
+      "contact_a.id $excludeClause"
     );
-    return [
-      'select' => $sqlParts['select'],
-      'from' => "{$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}",
-    ];
+    $select = preg_replace("/^\s*SELECT /", "SELECT $addSelect, ", $sqlParts['select']);
+
+    return "$select {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['group_by']} {$sqlParts['having']}";
   }
 
 }
