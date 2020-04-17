@@ -17,9 +17,8 @@
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
   /**
-   * @var int
+   * @var string
    */
-  protected $_paymentProcessorID;
   protected $currency;
 
   public $_values = [];
