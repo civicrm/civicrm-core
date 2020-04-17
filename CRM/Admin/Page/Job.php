@@ -136,10 +136,8 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
 
   /**
    * Browse all jobs.
-   *
-   * @param null $action
    */
-  public function browse($action = NULL) {
+  public function browse() {
     // check if non-prod mode is enabled.
     if (CRM_Core_Config::environment() != 'Production') {
       CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter.'), ts("Non-production Environment"), "warning", array('expires' => 0));
