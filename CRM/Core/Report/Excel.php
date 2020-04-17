@@ -152,23 +152,20 @@ class CRM_Core_Report_Excel {
    *   An array of the headers.
    * @param array $rows
    *   An array of arrays of the table contents.
-   * @param bool $outputHeader
-   *   Should we output the header row.
    *
    * @return void
    */
-  public static function writeCSVFile($fileName, $header, $rows, $outputHeader = TRUE) {
-    if ($outputHeader) {
-      CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
-        'text/x-csv',
-        CRM_Core_DAO::$_nullObject,
-        'csv',
-        FALSE
-      );
-    }
+  public static function writeCSVFile($fileName, $header, $rows) {
+    $null = NULL;
+    CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
+      'text/x-csv',
+      $null,
+      'csv',
+      FALSE
+    );
 
     if (!empty($rows)) {
-      return self::makeCSVTable($header, $rows, $outputHeader);
+      return self::makeCSVTable($header, $rows, TRUE);
     }
   }
 
