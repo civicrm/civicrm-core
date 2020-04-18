@@ -378,6 +378,11 @@ WHERE ceft.entity_id = %1";
    * @throws \CRM_Core_Exception
    */
   public static function recordFees($params) {
+    // $params['fee_amount'] is the "authoritative" fee_amount that was passed back from doPayment()
+    if (empty($params['fee_amount'])) {
+      // We have no fee_amount to record
+      return;
+    }
     if (($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'))
       && $params['contribution']->is_pay_later) {
       // Don't record fees for pending (pay later) contributions
@@ -387,22 +392,9 @@ WHERE ceft.entity_id = %1";
       // Don't record fees for failed contributions
       return;
     }
-    // $params['fee_amount'] is the "authoritative" fee_amount that was passed back from doPayment()
-    if (empty($params['fee_amount'])) {
-      // We have no fee_amount to record
-      return;
-    }
 
     if (!empty($params['prevContribution']) && ($params['contribution']->fee_amount == $params['prevContribution']->fee_amount)) {
       // We already recorded the fee and it hasn't changed
-      return;
-    }
-
-    if (!empty($params['prevContribution'])) {
-      $amount = $params['prevContribution']->fee_amount;
-    }
-    $amount = $amount ?? $params['fee_amount'] ?? NULL;
-    if (!$amount) {
       return;
     }
 
@@ -417,7 +409,7 @@ WHERE ceft.entity_id = %1";
 
     $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
-    $params['trxnParams']['total_amount'] = $amount;
+    $params['trxnParams']['total_amount'] = $params['fee_amount'];
     // As this is a specific financialTrxn for a fee we record it in the total_amount field
     $params['trxnParams']['fee_amount'] = $params['trxnParams']['net_amount'] = 0;
     $params['trxnParams']['status_id'] = $params['contribution_status_id'];
@@ -434,7 +426,7 @@ WHERE ceft.entity_id = %1";
         'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
         'created_date' => date('YmdHis'),
         'transaction_date' => date('YmdHis'),
-        'amount' => $amount,
+        'amount' => $params['fee_amount'],
         'description' => 'Fee',
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
         'entity_table' => 'civicrm_financial_trxn',
