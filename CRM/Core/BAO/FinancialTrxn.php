@@ -30,8 +30,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
    * Takes an associative array and creates a financial transaction object.
    *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   * @param array $params FinancialTrxn params
    *
    * @return CRM_Financial_DAO_FinancialTrxn
    */
