@@ -1676,7 +1676,7 @@ WHERE      activity.id IN ($activityIds)";
   /**
    * Add activity for Membership/Event/Contribution.
    *
-   * @param object $activity
+   * @param CRM_Core_DAO $activity
    *   particular component object.
    * @param string $activityType
    *   For Membership Signup or Renewal.

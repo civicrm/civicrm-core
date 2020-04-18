@@ -187,15 +187,21 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $contribution->currency = CRM_Core_Config::singleton()->defaultCurrency;
       }
     }
-
-    $result = $contribution->save();
+    $contribution->save();
+    $params['contribution_id'] = $contribution->id;
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $params['contribution_id'];
+    $contribution->find(TRUE);
 
     // Add financial_trxn details as part of fix for CRM-4724
+    // @todo these params are not part of the contribution object - they should be removed
+    //   Any caller that needs them can get them from the payment linked to the contribution.
     $contribution->trxn_result_code = $params['trxn_result_code'] ?? NULL;
     $contribution->payment_processor = $params['payment_processor'] ?? NULL;
 
-    //add Account details
     $params['contribution'] = $contribution;
+
+    // add Account details
     if (empty($params['is_post_payment_create'])) {
       // If this is being called from the Payment.create api/ BAO then that Entity
       // takes responsibility for the financial transactions. In fact calling Payment.create
@@ -211,11 +217,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
         (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
         $contributionStatus,
-        CRM_Utils_Array::value('receive_date', $params)
+        $params['receive_date'] ?? NULL
       );
     }
-
-    $params['contribution_id'] = $contribution->id;
 
     if (!empty($params['custom']) &&
       is_array($params['custom'])
@@ -226,7 +230,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     CRM_Utils_Hook::post($action, 'Contribution', $contribution->id, $contribution);
-    return $result;
+    return $contribution;
   }
 
   /**
@@ -493,40 +497,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     $params['contribution_id'] = $contribution->id;
-    $session = CRM_Core_Session::singleton();
 
     if (!empty($params['note'])) {
       $noteParams = [
         'entity_table' => 'civicrm_contribution',
         'note' => $params['note'],
         'entity_id' => $contribution->id,
-        'contact_id' => $session->get('userID'),
+        'contact_id' => CRM_Core_Session::getLoggedInContactID(),
       ];
       if (!$noteParams['contact_id']) {
         $noteParams['contact_id'] = $params['contact_id'];
       }
       CRM_Core_BAO_Note::add($noteParams);
-    }
-
-    // make entry in batch entity batch table
-    if (!empty($params['batch_id'])) {
-      // in some update cases we need to get extra fields - ie an update that doesn't pass in all these params
-      $titleFields = [
-        'contact_id',
-        'total_amount',
-        'currency',
-        'financial_type_id',
-      ];
-      $retrieveRequired = 0;
-      foreach ($titleFields as $titleField) {
-        if (!isset($contribution->$titleField)) {
-          $retrieveRequired = 1;
-          break;
-        }
-      }
-      if ($retrieveRequired == 1) {
-        $contribution->find(TRUE);
-      }
     }
 
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
@@ -536,22 +518,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $activity = civicrm_api3('Activity', 'get', [
       'source_record_id' => $contribution->id,
       'options' => ['limit' => 1],
-      'sequential' => 1,
       'activity_type_id' => 'Contribution',
       'return' => ['id', 'campaign'],
     ]);
 
     //CRM-18406: Update activity when edit contribution.
-    if ($activity['count']) {
-      // CRM-13237 : if activity record found, update it with campaign id of contribution
-      // @todo compare campaign ids first.
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity['id'], 'campaign_id', $contribution->campaign_id);
+    if (!empty($activity['id'])) {
       $contribution->activity_id = $activity['id'];
     }
 
-    if (empty($contribution->contact_id)) {
-      $contribution->find(TRUE);
-    }
     CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution');
 
     // do not add to recent items for import, CRM-4399
@@ -559,25 +534,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
         "action=view&reset=1&id={$contribution->id}&cid={$contribution->contact_id}&context=home"
       );
-      // in some update cases we need to get extra fields - ie an update that doesn't pass in all these params
-      $titleFields = [
-        'contact_id',
-        'total_amount',
-        'currency',
-        'financial_type_id',
-      ];
-      $retrieveRequired = 0;
-      foreach ($titleFields as $titleField) {
-        if (!isset($contribution->$titleField)) {
-          $retrieveRequired = 1;
-          break;
-        }
-      }
-      if ($retrieveRequired == 1) {
-        $contribution->find(TRUE);
-      }
-      $financialType = CRM_Contribute_PseudoConstant::financialType($contribution->financial_type_id);
-      $title = CRM_Contact_BAO_Contact::displayName($contribution->contact_id) . ' - (' . CRM_Utils_Money::format($contribution->total_amount, $contribution->currency) . ' ' . ' - ' . $financialType . ')';
+      $financialTypeLabel = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $contribution->financial_type_id);
+      $title = CRM_Contact_BAO_Contact::displayName($contribution->contact_id) . ' - (' . CRM_Utils_Money::format($contribution->total_amount, $contribution->currency) . ' ' . ' - ' . $financialTypeLabel . ')';
 
       $recentOther = [];
       if (CRM_Core_Permission::checkActionPermission('CiviContribute', CRM_Core_Action::UPDATE)) {
@@ -1268,7 +1226,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    */
   protected static function getContributionTransactionInformation($contributionId, int $financialTypeID) {
     $rows = [];
-    $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Expense Account is');
+    $feeFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, 'Expense Account is');
 
     // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
     $sql = "
@@ -3613,7 +3571,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       $totalAmount = $params['total_amount'] ?? NULL;
       if (!isset($totalAmount) && !empty($params['prevContribution'])) {
-        $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
+        $totalAmount = $params['prevContribution']->total_amount;
       }
       //build financial transaction params
       $trxnParams = [
@@ -3802,7 +3760,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         self::recordAlwaysAccountsReceivable($trxnParams, $params);
         $trxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
-        $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+        $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
         if (empty($params['partial_payment_total']) && empty($params['partial_amount_to_pay'])) {
           self::$_trxnIDs[] = $financialTxn->id;
@@ -3839,7 +3797,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     unset($params['line_item']);
     self::$_trxnIDs = NULL;
-    return $return;
   }
 
   /**
