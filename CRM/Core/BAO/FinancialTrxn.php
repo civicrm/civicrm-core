@@ -378,23 +378,23 @@ WHERE ceft.entity_id = %1";
    * @throws \CRM_Core_Exception
    */
   public static function recordFees($params) {
-    // @todo: These two checks are extracted from CRM_Contribute_BAO_Contribution::recordFinancialAccounts() and should be simplified
-    //   This is the initial "no change" extraction.
-    if (($params['contribution_status_id'] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Failed'))
-      && (!($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
-        && !$params['contribution']->is_pay_later))
-    ) {
-      // Record the fees
-    }
-    else {
+    if (($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'))
+      && $params['contribution']->is_pay_later) {
+      // Don't record fees for pending (pay later) contributions
       return;
     }
-    if (!empty($params['fee_amount'])
-      && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount)
-    ) {
-      // Record the fees
+    if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Failed')) {
+      // Don't record fees for failed contributions
+      return;
     }
-    else {
+    // $params['fee_amount'] is the "authoritative" fee_amount that was passed back from doPayment()
+    if (empty($params['fee_amount'])) {
+      // We have no fee_amount to record
+      return;
+    }
+
+    if (!empty($params['prevContribution']) && ($params['contribution']->fee_amount == $params['prevContribution']->fee_amount)) {
+      // We already recorded the fee and it hasn't changed
       return;
     }
 
@@ -418,6 +418,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
     $params['trxnParams']['total_amount'] = $amount;
+    // As this is a specific financialTrxn for a fee we record it in the total_amount field
     $params['trxnParams']['fee_amount'] = $params['trxnParams']['net_amount'] = 0;
     $params['trxnParams']['status_id'] = $params['contribution_status_id'];
     $params['trxnParams']['contribution_id'] = $contributionId;
