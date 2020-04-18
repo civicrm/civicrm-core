@@ -1684,7 +1684,9 @@ WHERE      activity.id IN ($activityIds)";
    * @param array $params
    *   Activity params to override.
    *
-   * @return bool|NULL
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function addActivity(
     $activity,
@@ -1693,14 +1695,10 @@ WHERE      activity.id IN ($activityIds)";
     $params = []
   ) {
     $date = date('YmdHis');
-    if ($activity->__table == 'civicrm_membership') {
-      $component = 'Membership';
-    }
-    elseif ($activity->__table == 'civicrm_participant') {
+    if ($activity->__table == 'civicrm_participant') {
       if ($activityType != 'Email') {
         $activityType = 'Event Registration';
       }
-      $component = 'Event';
     }
     elseif ($activity->__table == 'civicrm_contribution') {
       // create activity record only for Completed Contributions
@@ -1708,7 +1706,7 @@ WHERE      activity.id IN ($activityIds)";
       if ($activity->contribution_status_id != $contributionCompletedStatusId) {
         return NULL;
       }
-      $activityType = $component = 'Contribution';
+      $activityType = 'Contribution';
 
       // retrieve existing activity based on source_record_id and activity_type
       if (empty($params['id'])) {
@@ -1759,12 +1757,10 @@ WHERE      activity.id IN ($activityIds)";
     if ($targetContactID) {
       $activityParams['target_contact_id'][] = $targetContactID;
     }
-    // @todo - use api - remove lots of wrangling above. Remove deprecated fatal & let form layer
-    // deal with any exceptions.
-    if (is_a(self::create($activityParams), 'CRM_Core_Error')) {
-      CRM_Core_Error::fatal("Failed creating Activity for $component of id {$activity->id}");
-      return FALSE;
-    }
+    \Civi\Api4\Activity::create()
+      ->setValues($activityParams)
+      ->setCheckPermissions(FALSE)
+      ->execute();
   }
 
   /**
