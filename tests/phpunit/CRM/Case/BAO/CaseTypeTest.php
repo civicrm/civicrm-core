@@ -28,6 +28,18 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
       'xml' => file_get_contents(__DIR__ . '/xml/empty-lists.xml'),
     ];
 
+    $fixtures['statuses'] = [
+      'json' => json_encode([
+        'activitySets' => [],
+        'activityTypes' => [],
+        'caseRoles' => [],
+        'statuses' => ['Ongoing', 'Completed', 'This & That'],
+        //'statuses' => ['Ongoing', 'Completed'],
+        'timelineActivityTypes' => [],
+      ]),
+      'xml' => file_get_contents(__DIR__ . '/xml/statuses.xml'),
+    ];
+
     $fixtures['one-item-in-each'] = [
       'json' => json_encode([
         'activityTypes' => [
@@ -177,6 +189,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
       'two-items-in-each',
       'forkable-0',
       'forkable-1',
+      'statuses',
     ] as $key) {
       $cases[] = [$key, $fixtures[$key]['json'], $fixtures[$key]['xml']];
     }

@@ -54,111 +54,111 @@ class CRM_Upgrade_Incremental_php_FiveTwentyTest extends CiviCaseTestCase {
      * don't get borked.
      */
     $newCaseTypeXml = <<<ENDXML
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <CaseType>
-<name>test_type</name>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<max_instances>1</max_instances>
-</ActivityType>
-<ActivityType>
-<name>Email</name>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-</ActivityType>
-<ActivityType>
-<name>Meeting</name>
-</ActivityType>
-<ActivityType>
-<name>Phone Call</name>
-</ActivityType>
-<ActivityType>
-<name>давид</name>
-</ActivityTypes>
-<ActivitySets>
-<ActivitySet>
-<name>standard_timeline</name>
-<label>Standard Timeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<status>Completed</status>
-<label>Open Case</label>
-<default_assignee_type>1</default_assignee_type>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-<ActivitySet>
-<name>timeline_1</name>
-<label>AnotherTimeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>7</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>14</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Benefits Specialist']}_a_b</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>21</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Spouse of']}_a_b</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>28</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Spouse of']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-</ActivitySets>
-<CaseRoles>
-<RelationshipType>
-<name>Senior Services Coordinator</name>
-<creator>1</creator>
-<manager>1</manager>
-</RelationshipType>
-<RelationshipType>
-<name>Spouse of</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist is</name>
-</RelationshipType>
-</CaseRoles>
-<RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
-</CaseType>
+ <name>test_type</name>
+ <ActivityTypes>
+  <ActivityType>
+   <name>Open Case</name>
+   <max_instances>1</max_instances>
+  </ActivityType>
+  <ActivityType>
+   <name>Email</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Follow up</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Meeting</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Phone Call</name>
+  </ActivityType>
+  <ActivityType>
+   <name>давид</name>
+  </ActivityTypes>
+  <ActivitySets>
+   <ActivitySet>
+    <name>standard_timeline</name>
+    <label>Standard Timeline</label>
+    <timeline>true</timeline>
+    <ActivityTypes>
+     <ActivityType>
+      <name>Open Case</name>
+      <status>Completed</status>
+      <label>Open Case</label>
+      <default_assignee_type>1</default_assignee_type>
+     </ActivityType>
+    </ActivityTypes>
+   </ActivitySet>
+   <ActivitySet>
+    <name>timeline_1</name>
+    <label>AnotherTimeline</label>
+    <timeline>true</timeline>
+    <ActivityTypes>
+     <ActivityType>
+      <name>Follow up</name>
+      <label>Follow up</label>
+      <status>Scheduled</status>
+      <reference_activity>Open Case</reference_activity>
+      <reference_offset>7</reference_offset>
+      <reference_select>newest</reference_select>
+      <default_assignee_type>2</default_assignee_type>
+      <default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
+      <default_assignee_contact></default_assignee_contact>
+     </ActivityType>
+     <ActivityType>
+      <name>Follow up</name>
+      <label>Follow up</label>
+      <status>Scheduled</status>
+      <reference_activity>Open Case</reference_activity>
+      <reference_offset>14</reference_offset>
+      <reference_select>newest</reference_select>
+      <default_assignee_type>2</default_assignee_type>
+      <default_assignee_relationship>{$relationshipTypeNames['Benefits Specialist']}_a_b</default_assignee_relationship>
+      <default_assignee_contact></default_assignee_contact>
+     </ActivityType>
+     <ActivityType>
+      <name>Follow up</name>
+      <label>Follow up</label>
+      <status>Scheduled</status>
+      <reference_activity>Open Case</reference_activity>
+      <reference_offset>21</reference_offset>
+      <reference_select>newest</reference_select>
+      <default_assignee_type>2</default_assignee_type>
+      <default_assignee_relationship>{$relationshipTypeNames['Spouse of']}_a_b</default_assignee_relationship>
+      <default_assignee_contact></default_assignee_contact>
+     </ActivityType>
+     <ActivityType>
+      <name>Follow up</name>
+      <label>Follow up</label>
+      <status>Scheduled</status>
+      <reference_activity>Open Case</reference_activity>
+      <reference_offset>28</reference_offset>
+      <reference_select>newest</reference_select>
+      <default_assignee_type>2</default_assignee_type>
+      <default_assignee_relationship>{$relationshipTypeNames['Spouse of']}_b_a</default_assignee_relationship>
+      <default_assignee_contact></default_assignee_contact>
+     </ActivityType>
+    </ActivityTypes>
+   </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+   <RelationshipType>
+    <name>Senior Services Coordinator</name>
+    <creator>1</creator>
+    <manager>1</manager>
+   </RelationshipType>
+   <RelationshipType>
+    <name>Spouse of</name>
+   </RelationshipType>
+   <RelationshipType>
+    <name>Benefits Specialist is</name>
+   </RelationshipType>
+  </CaseRoles>
+  <RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
+ </CaseType>
+
 ENDXML;
 
     $dao = new CRM_Case_DAO_CaseType();
@@ -344,173 +344,173 @@ ENDXML;
     switch ($stage) {
       case 1:
         $newCaseTypeXml = <<<ENDXMLSIMPLE
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <CaseType>
-<name>simple</name>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<max_instances>1</max_instances>
-</ActivityType>
-<ActivityType>
-<name>Email</name>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-</ActivityType>
-<ActivityType>
-<name>Meeting</name>
-</ActivityType>
-<ActivityType>
-<name>Phone Call</name>
-</ActivityType>
-</ActivityTypes>
-<ActivitySets>
-<ActivitySet>
-<name>standard_timeline</name>
-<label>Standard Timeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<status>Completed</status>
-<label>Open Case</label>
-<default_assignee_type>1</default_assignee_type>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-<ActivitySet>
-<name>timeline_1</name>
-<label>AnotherTimeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>7</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-</ActivitySets>
-<CaseRoles>
-<RelationshipType>
-<name>Senior Services Coordinator</name>
-<creator>1</creator>
-<manager>1</manager>
-</RelationshipType>
-<RelationshipType>
-<name>Spouse of</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist is</name>
-</RelationshipType>
-<RelationshipType>
-<name>is Wallet Inspector of</name>
-</RelationshipType>
-<RelationshipType>
-<name>has as Wallet Inspector</name>
-</RelationshipType>
-<RelationshipType>
-<name>абвгде</name>
-</RelationshipType>
-<RelationshipType>
-<name>αβγδ changed</name>
-</RelationshipType>
-</CaseRoles>
-<RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
+ <name>simple</name>
+ <ActivityTypes>
+  <ActivityType>
+   <name>Open Case</name>
+   <max_instances>1</max_instances>
+  </ActivityType>
+  <ActivityType>
+   <name>Email</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Follow up</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Meeting</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Phone Call</name>
+  </ActivityType>
+ </ActivityTypes>
+ <ActivitySets>
+  <ActivitySet>
+   <name>standard_timeline</name>
+   <label>Standard Timeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Open Case</name>
+     <status>Completed</status>
+     <label>Open Case</label>
+     <default_assignee_type>1</default_assignee_type>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+  <ActivitySet>
+   <name>timeline_1</name>
+   <label>AnotherTimeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Follow up</name>
+     <label>Follow up</label>
+     <status>Scheduled</status>
+     <reference_activity>Open Case</reference_activity>
+     <reference_offset>7</reference_offset>
+     <reference_select>newest</reference_select>
+     <default_assignee_type>2</default_assignee_type>
+     <default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
+     <default_assignee_contact></default_assignee_contact>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+ </ActivitySets>
+ <CaseRoles>
+  <RelationshipType>
+   <name>Senior Services Coordinator</name>
+   <creator>1</creator>
+   <manager>1</manager>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Spouse of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>is Wallet Inspector of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>has as Wallet Inspector</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>абвгде</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>αβγδ changed</name>
+  </RelationshipType>
+ </CaseRoles>
+ <RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
 </CaseType>
+
 ENDXMLSIMPLE;
 
         $expectedCaseTypeXml = <<<ENDXMLSIMPLEEXPECTED
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <CaseType>
-<name>simple</name>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<max_instances>1</max_instances>
-</ActivityType>
-<ActivityType>
-<name>Email</name>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-</ActivityType>
-<ActivityType>
-<name>Meeting</name>
-</ActivityType>
-<ActivityType>
-<name>Phone Call</name>
-</ActivityType>
-</ActivityTypes>
-<ActivitySets>
-<ActivitySet>
-<name>standard_timeline</name>
-<label>Standard Timeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<status>Completed</status>
-<label>Open Case</label>
-<default_assignee_type>1</default_assignee_type>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-<ActivitySet>
-<name>timeline_1</name>
-<label>AnotherTimeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>7</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-</ActivitySets>
-<CaseRoles>
-<RelationshipType>
-<name>Senior Services Coordinator</name>
-<creator>1</creator>
-<manager>1</manager>
-</RelationshipType>
-<RelationshipType>
-<name>Spouse of</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist is</name>
-</RelationshipType>
-<RelationshipType>
-<name>Wallet Inspector</name>
-</RelationshipType>
-<RelationshipType>
-<name>Wallet Inspector is</name>
-</RelationshipType>
-<RelationshipType>
-<name>абвгде</name>
-</RelationshipType>
-<RelationshipType>
-<name>αβγδ</name>
-</RelationshipType>
-</CaseRoles>
-<RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
+ <name>simple</name>
+ <ActivityTypes>
+  <ActivityType>
+   <name>Open Case</name>
+   <max_instances>1</max_instances>
+  </ActivityType>
+  <ActivityType>
+   <name>Email</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Follow up</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Meeting</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Phone Call</name>
+  </ActivityType>
+ </ActivityTypes>
+ <ActivitySets>
+  <ActivitySet>
+   <name>standard_timeline</name>
+   <label>Standard Timeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Open Case</name>
+     <status>Completed</status>
+     <label>Open Case</label>
+     <default_assignee_type>1</default_assignee_type>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+  <ActivitySet>
+   <name>timeline_1</name>
+   <label>AnotherTimeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Follow up</name>
+     <label>Follow up</label>
+     <status>Scheduled</status>
+     <reference_activity>Open Case</reference_activity>
+     <reference_offset>7</reference_offset>
+     <reference_select>newest</reference_select>
+     <default_assignee_type>2</default_assignee_type>
+     <default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
+     <default_assignee_contact></default_assignee_contact>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+ </ActivitySets>
+ <CaseRoles>
+  <RelationshipType>
+   <name>Senior Services Coordinator</name>
+   <creator>1</creator>
+   <manager>1</manager>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Spouse of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Wallet Inspector</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Wallet Inspector is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>абвгде</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>αβγδ</name>
+  </RelationshipType>
+ </CaseRoles>
+ <RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
 </CaseType>
+
 ENDXMLSIMPLEEXPECTED;
 
         $caseTypeId = $this->addCaseType('simple', $newCaseTypeXml);
@@ -525,185 +525,185 @@ ENDXMLSIMPLEEXPECTED;
         // unchanged if they choose to continue with the upgrade.
 
         $newCaseTypeXml = <<<ENDXMLMIXEDUP
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <CaseType>
-<name>mixedup</name>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<max_instances>1</max_instances>
-</ActivityType>
-<ActivityType>
-<name>Email</name>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-</ActivityType>
-<ActivityType>
-<name>Meeting</name>
-</ActivityType>
-<ActivityType>
-<name>Phone Call</name>
-</ActivityType>
-</ActivityTypes>
-<ActivitySets>
-<ActivitySet>
-<name>standard_timeline</name>
-<label>Standard Timeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<status>Completed</status>
-<label>Open Case</label>
-<default_assignee_type>1</default_assignee_type>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-<ActivitySet>
-<name>timeline_1</name>
-<label>AnotherTimeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>7</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-</ActivitySets>
-<CaseRoles>
-<RelationshipType>
-<name>Senior Services Coordinator</name>
-<creator>1</creator>
-<manager>1</manager>
-</RelationshipType>
-<RelationshipType>
-<name>Spouse of</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist is</name>
-</RelationshipType>
-<RelationshipType>
-<name>is Wallet Inspector of</name>
-</RelationshipType>
-<RelationshipType>
-<name>has as Wallet Inspector</name>
-</RelationshipType>
-<RelationshipType>
-<name>абвгде</name>
-</RelationshipType>
-<RelationshipType>
-<name>αβγδ changed</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist</name>
-</RelationshipType>
-<RelationshipType>
-<name>Mythical Unicorn</name>
-</RelationshipType>
-</CaseRoles>
-<RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
+ <name>mixedup</name>
+ <ActivityTypes>
+  <ActivityType>
+   <name>Open Case</name>
+   <max_instances>1</max_instances>
+  </ActivityType>
+  <ActivityType>
+   <name>Email</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Follow up</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Meeting</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Phone Call</name>
+  </ActivityType>
+ </ActivityTypes>
+ <ActivitySets>
+  <ActivitySet>
+   <name>standard_timeline</name>
+   <label>Standard Timeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Open Case</name>
+     <status>Completed</status>
+     <label>Open Case</label>
+     <default_assignee_type>1</default_assignee_type>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+  <ActivitySet>
+   <name>timeline_1</name>
+   <label>AnotherTimeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Follow up</name>
+     <label>Follow up</label>
+     <status>Scheduled</status>
+     <reference_activity>Open Case</reference_activity>
+     <reference_offset>7</reference_offset>
+     <reference_select>newest</reference_select>
+     <default_assignee_type>2</default_assignee_type>
+     <default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
+     <default_assignee_contact></default_assignee_contact>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+ </ActivitySets>
+ <CaseRoles>
+  <RelationshipType>
+   <name>Senior Services Coordinator</name>
+   <creator>1</creator>
+   <manager>1</manager>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Spouse of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>is Wallet Inspector of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>has as Wallet Inspector</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>абвгде</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>αβγδ changed</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Mythical Unicorn</name>
+  </RelationshipType>
+ </CaseRoles>
+ <RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
 </CaseType>
+
 ENDXMLMIXEDUP;
 
         $expectedCaseTypeXml = <<<ENDXMLMIXEDUPEXPECTED
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <CaseType>
-<name>mixedup</name>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<max_instances>1</max_instances>
-</ActivityType>
-<ActivityType>
-<name>Email</name>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-</ActivityType>
-<ActivityType>
-<name>Meeting</name>
-</ActivityType>
-<ActivityType>
-<name>Phone Call</name>
-</ActivityType>
-</ActivityTypes>
-<ActivitySets>
-<ActivitySet>
-<name>standard_timeline</name>
-<label>Standard Timeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<status>Completed</status>
-<label>Open Case</label>
-<default_assignee_type>1</default_assignee_type>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-<ActivitySet>
-<name>timeline_1</name>
-<label>AnotherTimeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>7</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-</ActivitySets>
-<CaseRoles>
-<RelationshipType>
-<name>Senior Services Coordinator</name>
-<creator>1</creator>
-<manager>1</manager>
-</RelationshipType>
-<RelationshipType>
-<name>Spouse of</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist is</name>
-</RelationshipType>
-<RelationshipType>
-<name>Wallet Inspector</name>
-</RelationshipType>
-<RelationshipType>
-<name>Wallet Inspector is</name>
-</RelationshipType>
-<RelationshipType>
-<name>абвгде</name>
-</RelationshipType>
-<RelationshipType>
-<name>αβγδ</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist</name>
-</RelationshipType>
-<RelationshipType>
-<name>Mythical Unicorn</name>
-</RelationshipType>
-</CaseRoles>
-<RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
+ <name>mixedup</name>
+ <ActivityTypes>
+  <ActivityType>
+   <name>Open Case</name>
+   <max_instances>1</max_instances>
+  </ActivityType>
+  <ActivityType>
+   <name>Email</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Follow up</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Meeting</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Phone Call</name>
+  </ActivityType>
+ </ActivityTypes>
+ <ActivitySets>
+  <ActivitySet>
+   <name>standard_timeline</name>
+   <label>Standard Timeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Open Case</name>
+     <status>Completed</status>
+     <label>Open Case</label>
+     <default_assignee_type>1</default_assignee_type>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+  <ActivitySet>
+   <name>timeline_1</name>
+   <label>AnotherTimeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Follow up</name>
+     <label>Follow up</label>
+     <status>Scheduled</status>
+     <reference_activity>Open Case</reference_activity>
+     <reference_offset>7</reference_offset>
+     <reference_select>newest</reference_select>
+     <default_assignee_type>2</default_assignee_type>
+     <default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
+     <default_assignee_contact></default_assignee_contact>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+ </ActivitySets>
+ <CaseRoles>
+  <RelationshipType>
+   <name>Senior Services Coordinator</name>
+   <creator>1</creator>
+   <manager>1</manager>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Spouse of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Wallet Inspector</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Wallet Inspector is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>абвгде</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>αβγδ</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Mythical Unicorn</name>
+  </RelationshipType>
+ </CaseRoles>
+ <RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
 </CaseType>
+
 ENDXMLMIXEDUPEXPECTED;
 
         $caseTypeId = $this->addCaseType('mixedup', $newCaseTypeXml);
@@ -713,179 +713,179 @@ ENDXMLMIXEDUPEXPECTED;
         ];
 
         $newCaseTypeXml = <<<ENDXMLDIFFNAME
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <CaseType>
-<name>diffname</name>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<max_instances>1</max_instances>
-</ActivityType>
-<ActivityType>
-<name>Email</name>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-</ActivityType>
-<ActivityType>
-<name>Meeting</name>
-</ActivityType>
-<ActivityType>
-<name>Phone Call</name>
-</ActivityType>
-</ActivityTypes>
-<ActivitySets>
-<ActivitySet>
-<name>standard_timeline</name>
-<label>Standard Timeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<status>Completed</status>
-<label>Open Case</label>
-<default_assignee_type>1</default_assignee_type>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-<ActivitySet>
-<name>timeline_1</name>
-<label>AnotherTimeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>7</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-</ActivitySets>
-<CaseRoles>
-<RelationshipType>
-<name>Senior Services Coordinator</name>
-<creator>1</creator>
-<manager>1</manager>
-</RelationshipType>
-<RelationshipType>
-<name>Spouse of</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist is</name>
-</RelationshipType>
-<RelationshipType>
-<name>is Wallet Inspector of</name>
-</RelationshipType>
-<RelationshipType>
-<name>has as Wallet Inspector</name>
-</RelationshipType>
-<RelationshipType>
-<name>абвгде</name>
-</RelationshipType>
-<RelationshipType>
-<name>αβγδ changed</name>
-</RelationshipType>
-<RelationshipType>
-<name>Archenemy of</name>
-</RelationshipType>
-</CaseRoles>
-<RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
+ <name>diffname</name>
+ <ActivityTypes>
+  <ActivityType>
+   <name>Open Case</name>
+   <max_instances>1</max_instances>
+  </ActivityType>
+  <ActivityType>
+   <name>Email</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Follow up</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Meeting</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Phone Call</name>
+  </ActivityType>
+ </ActivityTypes>
+ <ActivitySets>
+  <ActivitySet>
+   <name>standard_timeline</name>
+   <label>Standard Timeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Open Case</name>
+     <status>Completed</status>
+     <label>Open Case</label>
+     <default_assignee_type>1</default_assignee_type>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+  <ActivitySet>
+   <name>timeline_1</name>
+   <label>AnotherTimeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Follow up</name>
+     <label>Follow up</label>
+     <status>Scheduled</status>
+     <reference_activity>Open Case</reference_activity>
+     <reference_offset>7</reference_offset>
+     <reference_select>newest</reference_select>
+     <default_assignee_type>2</default_assignee_type>
+     <default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
+     <default_assignee_contact></default_assignee_contact>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+ </ActivitySets>
+ <CaseRoles>
+  <RelationshipType>
+   <name>Senior Services Coordinator</name>
+   <creator>1</creator>
+   <manager>1</manager>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Spouse of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>is Wallet Inspector of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>has as Wallet Inspector</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>абвгде</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>αβγδ changed</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Archenemy of</name>
+  </RelationshipType>
+ </CaseRoles>
+ <RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
 </CaseType>
+
 ENDXMLDIFFNAME;
 
         $expectedCaseTypeXml = <<<ENDXMLDIFFNAMEEXPECTED
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <CaseType>
-<name>diffname</name>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<max_instances>1</max_instances>
-</ActivityType>
-<ActivityType>
-<name>Email</name>
-</ActivityType>
-<ActivityType>
-<name>Follow up</name>
-</ActivityType>
-<ActivityType>
-<name>Meeting</name>
-</ActivityType>
-<ActivityType>
-<name>Phone Call</name>
-</ActivityType>
-</ActivityTypes>
-<ActivitySets>
-<ActivitySet>
-<name>standard_timeline</name>
-<label>Standard Timeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Open Case</name>
-<status>Completed</status>
-<label>Open Case</label>
-<default_assignee_type>1</default_assignee_type>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-<ActivitySet>
-<name>timeline_1</name>
-<label>AnotherTimeline</label>
-<timeline>true</timeline>
-<ActivityTypes>
-<ActivityType>
-<name>Follow up</name>
-<label>Follow up</label>
-<status>Scheduled</status>
-<reference_activity>Open Case</reference_activity>
-<reference_offset>7</reference_offset>
-<reference_select>newest</reference_select>
-<default_assignee_type>2</default_assignee_type>
-<default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
-<default_assignee_contact></default_assignee_contact>
-</ActivityType>
-</ActivityTypes>
-</ActivitySet>
-</ActivitySets>
-<CaseRoles>
-<RelationshipType>
-<name>Senior Services Coordinator</name>
-<creator>1</creator>
-<manager>1</manager>
-</RelationshipType>
-<RelationshipType>
-<name>Spouse of</name>
-</RelationshipType>
-<RelationshipType>
-<name>Benefits Specialist is</name>
-</RelationshipType>
-<RelationshipType>
-<name>Wallet Inspector</name>
-</RelationshipType>
-<RelationshipType>
-<name>Wallet Inspector is</name>
-</RelationshipType>
-<RelationshipType>
-<name>абвгде</name>
-</RelationshipType>
-<RelationshipType>
-<name>αβγδ</name>
-</RelationshipType>
-<RelationshipType>
-<name>Archenemy of</name>
-</RelationshipType>
-</CaseRoles>
-<RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
+ <name>diffname</name>
+ <ActivityTypes>
+  <ActivityType>
+   <name>Open Case</name>
+   <max_instances>1</max_instances>
+  </ActivityType>
+  <ActivityType>
+   <name>Email</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Follow up</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Meeting</name>
+  </ActivityType>
+  <ActivityType>
+   <name>Phone Call</name>
+  </ActivityType>
+ </ActivityTypes>
+ <ActivitySets>
+  <ActivitySet>
+   <name>standard_timeline</name>
+   <label>Standard Timeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Open Case</name>
+     <status>Completed</status>
+     <label>Open Case</label>
+     <default_assignee_type>1</default_assignee_type>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+  <ActivitySet>
+   <name>timeline_1</name>
+   <label>AnotherTimeline</label>
+   <timeline>true</timeline>
+   <ActivityTypes>
+    <ActivityType>
+     <name>Follow up</name>
+     <label>Follow up</label>
+     <status>Scheduled</status>
+     <reference_activity>Open Case</reference_activity>
+     <reference_offset>7</reference_offset>
+     <reference_select>newest</reference_select>
+     <default_assignee_type>2</default_assignee_type>
+     <default_assignee_relationship>{$relationshipTypeNames['Senior Services Coordinator']}_b_a</default_assignee_relationship>
+     <default_assignee_contact></default_assignee_contact>
+    </ActivityType>
+   </ActivityTypes>
+  </ActivitySet>
+ </ActivitySets>
+ <CaseRoles>
+  <RelationshipType>
+   <name>Senior Services Coordinator</name>
+   <creator>1</creator>
+   <manager>1</manager>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Spouse of</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Benefits Specialist is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Wallet Inspector</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Wallet Inspector is</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>абвгде</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>αβγδ</name>
+  </RelationshipType>
+  <RelationshipType>
+   <name>Archenemy of</name>
+  </RelationshipType>
+ </CaseRoles>
+ <RestrictActivityAsgmtToCmsUser>0</RestrictActivityAsgmtToCmsUser>
 </CaseType>
+
 ENDXMLDIFFNAMEEXPECTED;
 
         $caseTypeId = $this->addCaseType('diffname', $newCaseTypeXml);
