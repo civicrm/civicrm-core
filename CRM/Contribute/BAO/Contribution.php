@@ -3620,9 +3620,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $params['trxnParams'] = $trxnParams;
 
       if (!empty($params['prevContribution'])) {
+        // @fixme: At least for a contribution page submission Contribution.create is called twice
+        //   Once to create the pending contribution before payment
+        //   Then to change the pending to completed - so copying from prevContribution is always wrong!
+        //   Because fees etc. are only defined once payment has happened.
         $updated = FALSE;
-        $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
-        $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
+        if (!isset($params['trxnParams']['total_amount'])) {
+          $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
+        }
+        $params['trxnParams']['fee_amount'] = $params['trxnParams']['fee_amount'] ?? $params['prevContribution']->fee_amount;
         if (!isset($params['trxnParams']['trxn_id'])) {
           // Actually I have no idea why we are overwriting any values from the previous contribution.
           // (filling makes sense to me). However, only protecting this value as I really really know we
@@ -3630,8 +3636,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           // CRM-17751.
           $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
         }
-        $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
+        $params['trxnParams']['status_id'] = $params['trxnParams']['status_id'] ?? $params['prevContribution']->contribution_status_id;
 
+        // @fixme I think we can change this check to just fill if empty?
         if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
             || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatuses))
           && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses))
