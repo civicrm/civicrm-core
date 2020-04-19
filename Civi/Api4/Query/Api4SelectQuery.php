@@ -48,11 +48,6 @@ class Api4SelectQuery extends SelectQuery {
   protected $joinedTables = [];
 
   /**
-   * @var array
-   */
-  protected $selectAliases = [];
-
-  /**
    * If set to an array, this will start collecting debug info.
    *
    * @var null|array
@@ -129,10 +124,12 @@ class Api4SelectQuery extends SelectQuery {
         break;
       }
       $results[$id] = [];
-      foreach ($this->selectAliases as $alias) {
+      foreach ($this->select as $alias) {
         $returnName = $alias;
-        $alias = str_replace('.', '_', $alias);
-        $results[$id][$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
+        if ($this->isOneToOneField($alias)) {
+          $alias = str_replace('.', '_', $alias);
+          $results[$id][$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
+        }
       }
     }
     $event = new PostSelectQueryEvent($results, $this);
@@ -158,7 +155,7 @@ class Api4SelectQuery extends SelectQuery {
 
       // Expand wildcards in joins (the api wrapper already expanded non-joined wildcards)
       $wildFields = array_filter($this->select, function($item) {
-        return strpos($item, '*') !== FALSE && strpos($item, '.') !== FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
+        return strpos($item, '*') !== FALSE && strpos($item, '.') !== FALSE;
       });
       foreach ($wildFields as $item) {
         $pos = array_search($item, array_values($this->select));
@@ -168,26 +165,20 @@ class Api4SelectQuery extends SelectQuery {
       }
       $this->select = array_unique($this->select);
     }
-    foreach ($this->select as $item) {
-      $expr = SqlExpression::convert($item, TRUE);
-      $valid = TRUE;
-      foreach ($expr->getFields() as $fieldName) {
-        $field = $this->getField($fieldName);
-        // Remove expressions with unknown fields without raising an error
-        if (!$field) {
-          $this->select = array_diff($this->select, [$item]);
-          if (is_array($this->debugOutput)) {
-            $this->debugOutput['undefined_fields'][] = $fieldName;
-          }
-          $valid = FALSE;
-        }
-        elseif ($field['is_many']) {
-          $valid = FALSE;
+    foreach ($this->select as $fieldName) {
+      $field = $this->getField($fieldName);
+      // Remove unknown fields without raising an error
+      if (!$field) {
+        $this->select = array_diff($this->select, [$fieldName]);
+        if (is_array($this->debugOutput)) {
+          $this->debugOutput['undefined_fields'][] = $fieldName;
         }
       }
-      if ($valid) {
-        $alias = $this->selectAliases[] = $expr->getAlias();
-        $this->query->select($expr->render($this->apiFieldSpec) . " AS `$alias`");
+      elseif ($field['is_many']) {
+        continue;
+      }
+      elseif ($field) {
+        $this->query->select($field['sql_name'] . " AS `$fieldName`");
       }
     }
   }
@@ -206,15 +197,11 @@ class Api4SelectQuery extends SelectQuery {
    * @inheritDoc
    */
   protected function buildOrderBy() {
-    foreach ($this->orderBy as $item => $dir) {
+    foreach ($this->orderBy as $fieldName => $dir) {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
-        throw new \API_Exception("Invalid sort direction. Cannot order by $item $dir");
+        throw new \API_Exception("Invalid sort direction. Cannot order by $fieldName $dir");
       }
-      $expr = SqlExpression::convert($item);
-      foreach ($expr->getFields() as $fieldName) {
-        $this->getField($fieldName, TRUE);
-      }
-      $this->query->orderBy($expr->render($this->apiFieldSpec) . " $dir");
+      $this->query->orderBy($this->getField($fieldName, TRUE)['sql_name'] . " $dir");
     }
   }
 
@@ -228,15 +215,16 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Adds GROUP BY clause to query
+   *
    */
   protected function buildGroupBy() {
-    foreach ($this->groupBy as $item) {
-      $expr = SqlExpression::convert($item);
-      foreach ($expr->getFields() as $fieldName) {
-        $this->getField($fieldName, TRUE);
+    foreach ($this->groupBy as $field) {
+      if ($this->isOneToOneField($field) && $this->getField($field)) {
+        $this->query->groupBy($field['sql_name']);
       }
-      $this->query->groupBy($expr->render($this->apiFieldSpec));
+      else {
+        throw new \API_Exception("Invalid field. Cannot group by $field");
+      }
     }
   }
 
@@ -312,7 +300,6 @@ class Api4SelectQuery extends SelectQuery {
    *
    * @param string $fieldName
    * @param bool $strict
-   *   In strict mode, this will throw an exception if the field doesn't exist
    *
    * @return string|null
    * @throws \API_Exception
@@ -323,10 +310,13 @@ class Api4SelectQuery extends SelectQuery {
       $this->joinFK($fieldName);
     }
     $field = $this->apiFieldSpec[$fieldName] ?? NULL;
-    if ($strict && !$field) {
+    if ($field) {
+      return $field;
+    }
+    elseif ($strict) {
       throw new \API_Exception("Invalid field '$fieldName'");
     }
-    return $field;
+    return NULL;
   }
 
   /**
