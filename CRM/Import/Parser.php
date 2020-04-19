@@ -567,4 +567,41 @@ abstract class CRM_Import_Parser {
     return '';
   }
 
+  /**
+   * This is code extracted from 4 places where this exact snippet was being duplicated.
+   *
+   * FIXME: Extracting this was a first step, but there's also
+   *  1. Inconsistency in the way other select options are handled.
+   *     Contribution adds handling for Select/Radio/Autocomplete
+   *     Participant/Activity only handles Select/Radio and misses Autocomplete
+   *     Membership is missing all of it
+   *  2. Inconsistency with the way this works vs. how it's implemented in Contact import.
+   *
+   * @param $customFieldID
+   * @param $value
+   * @param $fieldType
+   * @return array
+   */
+  public static function unserializeCustomValue($customFieldID, $value, $fieldType) {
+    $mulValues = explode(',', $value);
+    $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+    $values = [];
+    foreach ($mulValues as $v1) {
+      foreach ($customOption as $customValueID => $customLabel) {
+        $customValue = $customLabel['value'];
+        if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
+          (strtolower(trim($customValue)) == strtolower(trim($v1)))
+        ) {
+          if ($fieldType == 'CheckBox') {
+            $values[$customValue] = 1;
+          }
+          else {
+            $values[] = $customValue;
+          }
+        }
+      }
+    }
+    return $values;
+  }
+
 }
