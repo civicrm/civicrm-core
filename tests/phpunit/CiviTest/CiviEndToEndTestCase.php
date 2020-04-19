@@ -23,6 +23,7 @@ class CiviEndToEndTestCase extends PHPUnit\Framework\TestCase implements \Civi\T
   }
 
   protected function tearDown() {
+    echo date('Y-m-d H:i:s') . "\n";
     $result = db_query_range('SELECT * FROM {watchdog} ORDER BY wid DESC', 0, 1);
     foreach ($result as $r) {
       if ($r->type === 'page not found') {
