@@ -490,14 +490,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->assertEquals([], CRM_Core_DAO::$_nullArray);
     $this->assertEquals(NULL, CRM_Core_DAO::$_nullObject);
 
-    echo date('Y-m-d H:i:s') . "\n";
-    //$result = db_query_range('SELECT * FROM {watchdog} ORDER BY wid DESC', 0, 1);
-    //foreach ($result as $r) {
-    //  if ($r->type === 'page not found') {
-    //    echo __CLASS__ . ": I didn't do it.\n";
-    //    watchdog('crm', 'entry to just prevent next test from triggering false positive');
-    //  }
-    //}
+    echo __CLASS__ . ": " . date('Y-m-d H:i:s') . "\n";
   }
 
   /**

@@ -124,6 +124,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       }
     }
     $this->restoreUFGroupOne();
+    echo date('Y-m-d H:i:s') . "\n";
   }
 
   /**

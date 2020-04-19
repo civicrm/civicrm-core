@@ -102,9 +102,11 @@ class CRM_Utils_PDF_Utils {
   </body>
 </html>";
     if (CRM_Core_Config::singleton()->wkhtmltopdfPath) {
+      echo date('Y-m-d H:i:s') . ": wkhtml: I didn't do it.\n";
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
+      echo date('Y-m-d H:i:s') . ": dompdf: I didn't do it.\n";
       return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
     }
   }
