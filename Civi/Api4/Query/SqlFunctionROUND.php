@@ -14,15 +14,20 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionMIN extends SqlFunction {
+class SqlFunctionROUND extends SqlFunction {
 
-  protected static $category = self::CATEGORY_AGGREGATE;
+  protected static $category = self::CATEGORY_MATH;
 
   protected static $params = [
     [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
       'expr' => 1,
-      'must_be' => ['SqlField'],
+      'optional' => FALSE,
+      'must_be' => ['SqlField', 'SqlNumber'],
+    ],
+    [
+      'expr' => 1,
+      'optional' => TRUE,
+      'must_be' => ['SqlNumber'],
     ],
   ];
 

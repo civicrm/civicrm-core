@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionMAX extends SqlFunction {
 
+  protected static $category = self::CATEGORY_AGGREGATE;
+
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
