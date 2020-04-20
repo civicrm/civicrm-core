@@ -36,7 +36,7 @@ class CRM_Contact_Page_Inline_Demographics extends CRM_Core_Page {
 
     if (!empty($defaults['gender_id'])) {
       $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-      $defaults['gender_display'] = $gender[CRM_Utils_Array::value('gender_id', $defaults)];
+      $defaults['gender_display'] = $gender[$defaults['gender_id']];
     }
     $this->assignFieldMetadataToTemplate('Contact');
 

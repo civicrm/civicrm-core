@@ -101,7 +101,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       $pledgeParams['create_date'] = $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date("Ymd");
       if (!empty($params['start_date'])) {
-        $pledgeParams['frequency_day'] = intval(date("d", strtotime(CRM_Utils_Array::value('start_date', $params))));
+        $pledgeParams['frequency_day'] = intval(date("d", strtotime($params['start_date'])));
         $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date('Ymd', strtotime(CRM_Utils_Array::value('start_date', $params)));
       }
       $pledgeParams['status_id'] = $contribution->contribution_status_id;
@@ -947,10 +947,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           foreach ($lineItemValue as $key => $value) {
             if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
               if (isset($dataArray[$value['tax_rate']])) {
-                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + $value['tax_amount'];
               }
               else {
-                $dataArray[$value['tax_rate']] = $value['tax_amount'] ?? NULL;
+                $dataArray[$value['tax_rate']] = $value['tax_amount'];
               }
             }
           }

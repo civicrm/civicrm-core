@@ -934,7 +934,7 @@ function civicrm_api3_contact_getquick($params) {
   // Contact's based of relationhip type
   $relType = NULL;
   if (!empty($params['rel'])) {
-    $relation = explode('_', CRM_Utils_Array::value('rel', $params));
+    $relation = explode('_', $params['rel']);
     $relType = CRM_Utils_Type::escape($relation[0], 'Integer');
     $rel = CRM_Utils_Type::escape($relation[2], 'String');
   }

@@ -40,7 +40,7 @@ class CRM_Contact_Page_Inline_CommunicationPreferences extends CRM_Core_Page {
     $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
     if (!empty($communicationStyle)) {
       if (!empty($defaults['communication_style_id'])) {
-        $defaults['communication_style_display'] = $communicationStyle[CRM_Utils_Array::value('communication_style_id', $defaults)];
+        $defaults['communication_style_display'] = $communicationStyle[$defaults['communication_style_id']];
       }
       else {
         // Make sure the field is displayed as long as it is active, even if it is unset for this contact.

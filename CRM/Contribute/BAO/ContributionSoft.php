@@ -562,7 +562,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     switch ($profileContactType) {
       case 'Individual':
         if (array_key_exists('prefix_id', $params)) {
-          $honorName = CRM_Utils_Array::value(CRM_Utils_Array::value('prefix_id', $params),
+          $honorName = CRM_Utils_Array::value($params['prefix_id'],
             CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
           );
           unset($profileFields['prefix_id']);
@@ -571,7 +571,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         unset($profileFields['first_name']);
         unset($profileFields['last_name']);
         if (array_key_exists('suffix_id', $params)) {
-          $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id', $params),
+          $honorName .= ' ' . CRM_Utils_Array::value($params['suffix_id'],
               CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
             );
           unset($profileFields['suffix_id']);
