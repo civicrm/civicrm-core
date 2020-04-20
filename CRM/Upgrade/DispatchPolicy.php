@@ -89,8 +89,8 @@ class CRM_Upgrade_DispatchPolicy {
       '/./' => 'run',
     ];
 
-    return $policies['upgrade.old'];
-    // return $policies[$phase];
+    // return $policies['upgrade.old'];
+    return $policies[$phase];
   }
 
 }
