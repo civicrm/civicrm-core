@@ -357,10 +357,6 @@
         var $selection = $('.crm-quickSearchField input:checked'),
           label = $selection.parent().text(),
           value = $selection.val();
-        // These fields are not supported by advanced search
-        if (!value || value === 'first_name' || value === 'last_name') {
-          value = 'sort_name';
-        }
         $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label});
       }
       $('.crm-quickSearchField').click(function() {

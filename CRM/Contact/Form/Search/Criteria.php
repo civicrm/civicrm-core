@@ -245,6 +245,8 @@ class CRM_Contact_Form_Search_Criteria {
   public static function getSearchFieldMetadata() {
     $fields = [
       'sort_name' => ['title' => ts('Complete OR Partial Name'), 'template_grouping' => 'basic'],
+      'first_name' => ['template_grouping' => 'basic'],
+      'last_name' => ['template_grouping' => 'basic'],
       'email' => ['title' => ts('Complete OR Partial Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
       'created_date' => ['name' => 'created_date', 'template_grouping' => 'changeLog'],
@@ -316,7 +318,9 @@ class CRM_Contact_Form_Search_Criteria {
     $userFramework = CRM_Core_Config::singleton()->userFramework;
     return [
       // For now an empty array is still left in place for ordering.
-      'sort_name' => [],
+      'sort_name' => [
+        'template' => 'CRM/Contact/Form/Search/Criteria/Fields/sort_name.tpl',
+      ],
       'email' => ['name' => 'email'],
       'contact_type' => ['name' => 'contact_type'],
       'group' => [
