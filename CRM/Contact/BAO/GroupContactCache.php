@@ -721,12 +721,12 @@ ORDER BY   gc.contact_id, g.children
     list($idField) = explode(' AS ', $apiParams['select'][0]);
     $apiParams['select'] = [
       $addSelect,
-      $idField . ' AS smart_group_contact_id',
+      $idField,
     ];
     $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $apiParams);
     $query = new \Civi\Api4\Query\Api4SelectQuery($api);
     $query->forceSelectId = FALSE;
-    $query->getQuery()->having('smart_group_contact_id ' . $excludeClause);
+    $query->getQuery()->having("$idField $excludeClause");
     return $query->getSql();
   }
 
