@@ -47,22 +47,6 @@ class DAOGetAction extends AbstractGetAction {
    */
   protected $select = [];
 
-  /**
-   * Field(s) by which to group the results.
-   *
-   * @var array
-   */
-  protected $groupBy = [];
-
-  /**
-   * Clause for filtering results after grouping and filters are applied.
-   *
-   * Each expression should correspond to an item from the SELECT array.
-   *
-   * @var array
-   */
-  protected $having = [];
-
   public function _run(Result $result) {
     $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
@@ -80,46 +64,6 @@ class DAOGetAction extends AbstractGetAction {
       \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
     }
     return $result;
-  }
-
-  /**
-   * @return array
-   */
-  public function getGroupBy(): array {
-    return $this->groupBy;
-  }
-
-  /**
-   * @param array $groupBy
-   * @return $this
-   */
-  public function setGroupBy(array $groupBy) {
-    $this->groupBy = $groupBy;
-    return $this;
-  }
-
-  /**
-   * @param string $field
-   * @return $this
-   */
-  public function addGroupBy(string $field) {
-    $this->groupBy[] = $field;
-    return $this;
-  }
-
-  /**
-   * @param string $expr
-   * @param string $op
-   * @param mixed $value
-   * @return $this
-   * @throws \API_Exception
-   */
-  public function addHaving(string $expr, string $op, $value = NULL) {
-    if (!in_array($op, \CRM_Core_DAO::acceptedSQLOperators())) {
-      throw new \API_Exception('Unsupported operator');
-    }
-    $this->having[] = [$expr, $op, $value];
-    return $this;
   }
 
 }
