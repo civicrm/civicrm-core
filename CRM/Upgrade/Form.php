@@ -769,10 +769,20 @@ SET    version = '$version'
   }
 
   public static function doFinish() {
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
+    $restore = \CRM_Utils_AutoClean::with(function() {
+      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
+    });
+
     $upgrade = new CRM_Upgrade_Form();
     list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
+
+    // TODO: Consider running a general system flush instead of piecemeal flushes.
+    // Historically, that would not have worked well because hooks are restricted
+    // in upgrade-mode. But the dispatch-policy for 'upgrade.finish' is probably
+    // more suitable.
 
     // Clear cached metadata.
     Civi::service('settings_manager')->flush();

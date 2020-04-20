@@ -152,35 +152,35 @@ abstract class CRM_Utils_Hook {
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
-    // Per https://github.com/civicrm/civicrm-core/pull/13551 we have had ongoing significant problems where hooks from modules are
-    // invoked during upgrade but not those from extensions. The issues are both that an incorrect module list & settings are cached and that
-    // some hooks REALLY need to run during upgrade - the loss of triggers during upgrade causes significant loss of data
-    // whereas loss of logTable hooks means that log tables are created for tables specifically excluded - e.g due to large
-    // quantities of low-importance data or the table not having an id field, which could cause a fatal error.
-    // Instead of not calling any hooks we only call those we know to be frequently important - if a particular extension wanted
-    // to avoid this they could do an early return on CRM_Core_Config::singleton()->isUpgradeMode
-    // Futther discussion is happening at https://lab.civicrm.org/dev/core/issues/1460
-    $upgradeFriendlyHooks = ['civicrm_alterSettingsFolders', 'civicrm_alterSettingsMetaData', 'civicrm_triggerInfo', 'civicrm_alterLogTables', 'civicrm_container', 'civicrm_permission', 'civicrm_managed', 'civicrm_config'];
-    if (CRM_Core_Config::singleton()->isUpgradeMode() && !in_array($fnSuffix, $upgradeFriendlyHooks)) {
-      return;
-    }
-    if (is_array($names) && !defined('CIVICRM_FORCE_LEGACY_HOOK') && \Civi\Core\Container::isContainerBooted()) {
-      $event = \Civi\Core\Event\GenericHookEvent::createOrdered(
-        $names,
-        array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6)
-      );
-      \Civi::dispatcher()->dispatch('hook_' . $fnSuffix, $event);
-      return $event->getReturnValues();
-    }
-    else {
-      // We need to ensure tht we will still run known bootstrap related hooks even if the container is not booted.
-      $prebootContainerHooks = array_merge($upgradeFriendlyHooks, ['civicrm_entityTypes', 'civicrm_config']);
-      if (!\Civi\Core\Container::isContainerBooted() && !in_array($fnSuffix, $prebootContainerHooks)) {
+    if (!\Civi\Core\Container::isContainerBooted()) {
+      $prebootHooks = ['civicrm_container', 'civicrm_entityTypes'];
+      // 'civicrm_config' ?
+      if (in_array($fnSuffix, $prebootHooks)) {
+        $count = is_array($names) ? count($names) : $names;
+        return $this->invokeViaUF($count, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
+      }
+      else {
+        // TODO: Emit a warning, eg
+        // error_log("Warning: hook_$fnSuffix fired prematurely. Dropped.");
         return;
       }
-      $count = is_array($names) ? count($names) : $names;
-      return $this->invokeViaUF($count, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
     }
+
+    if (!is_array($names)) {
+      // We were called with the old contract wherein $names is actually an int.
+      // Symfony dispatcher requires some kind of name.
+      // TODO: Emit a warning, eg
+      // error_log("Warning: hook_$fnSuffix does not give names for its parameters. It will present odd names to any Symfony event listeners.");
+      $compatNames = ['arg1', 'arg2', 'arg3', 'arg4', 'arg5', 'arg6'];
+      $names = array_slice($compatNames, 0, (int) $names);
+    }
+
+    $event = \Civi\Core\Event\GenericHookEvent::createOrdered(
+      $names,
+      array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6)
+    );
+    \Civi::dispatcher()->dispatch('hook_' . $fnSuffix, $event);
+    return $event->getReturnValues();
   }
 
   /**
@@ -355,11 +355,6 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function pre($op, $objectName, $id, &$params) {
-    // Dev/core#1449 DO not dispatch hook_civicrm_pre if we are in an upgrade as this cases the upgrade to fail
-    // Futher discussion is happening at https://lab.civicrm.org/dev/core/issues/1460
-    if (CRM_Core_Config::singleton()->isUpgradeMode()) {
-      return;
-    }
     $event = new \Civi\Core\Event\PreEvent($op, $objectName, $id, $params);
     \Civi::dispatcher()->dispatch('hook_civicrm_pre', $event);
     return $event->getReturnValues();
@@ -382,11 +377,6 @@ abstract class CRM_Utils_Hook {
    *                           an error message which aborts the operation
    */
   public static function post($op, $objectName, $objectId, &$objectRef = NULL) {
-    // Dev/core#1449 DO not dispatch hook_civicrm_post if we are in an upgrade as this cases the upgrade to fail
-    // Futher discussion is happening at https://lab.civicrm.org/dev/core/issues/1460
-    if (CRM_Core_Config::singleton()->isUpgradeMode()) {
-      return;
-    }
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
     \Civi::dispatcher()->dispatch('hook_civicrm_post', $event);
     return $event->getReturnValues();
