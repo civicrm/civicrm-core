@@ -81,7 +81,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    */
   protected function expandSelectClauseWildcards() {
     $wildFields = array_filter($this->select, function($item) {
-      return strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE;
+      return strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
     });
     foreach ($wildFields as $item) {
       $pos = array_search($item, array_values($this->select));
