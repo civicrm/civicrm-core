@@ -401,7 +401,7 @@ WHERE ceft.entity_id = %1";
     if (!empty($params['prevContribution'])) {
       $amount = $params['prevContribution']->fee_amount;
     }
-    $amount = $params['fee_amount'] - $amount;
+    $amount = $amount ?? $params['fee_amount'] ?? NULL;
     if (!$amount) {
       return;
     }

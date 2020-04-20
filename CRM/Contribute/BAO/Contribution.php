@@ -3623,7 +3623,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $updated = FALSE;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
-        $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
         if (!isset($params['trxnParams']['trxn_id'])) {
           // Actually I have no idea why we are overwriting any values from the previous contribution.
           // (filling makes sense to me). However, only protecting this value as I really really know we
