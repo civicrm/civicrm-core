@@ -2568,7 +2568,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4128, 1173, "03", "Braga"),
 (4129, 1173, "04", "Braganca"),
 (4130, 1173, "05", "Castelo Branco"),
-(4131, 1173, "06", "Colmbra"),
+(4131, 1173, "06", "Coimbra"),
 (4132, 1173, "07", "Ovora"),
 (4133, 1173, "08", "Faro"),
 (4134, 1173, "09", "Guarda"),
