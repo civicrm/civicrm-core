@@ -383,6 +383,7 @@ WHERE ceft.entity_id = %1";
       // We have no fee_amount to record
       return;
     }
+
     if (($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'))
       && $params['contribution']->is_pay_later) {
       // Don't record fees for pending (pay later) contributions
