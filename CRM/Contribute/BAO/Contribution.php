@@ -510,6 +510,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // make entry in batch entity batch table
     if (!empty($params['batch_id'])) {
+      throw new CRM_Core_Exception('find tested places where this happens');
       // in some update cases we need to get extra fields - ie an update that doesn't pass in all these params
       $titleFields = [
         'contact_id',
