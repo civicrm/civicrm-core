@@ -20,6 +20,7 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
@@ -468,6 +469,42 @@ abstract class AbstractAction implements \ArrayAccess {
       }
     }
     return $unmatched;
+  }
+
+  /**
+   * Replaces pseudoconstants in input values
+   *
+   * @param array $record
+   * @throws \API_Exception
+   */
+  protected function formatWriteValues(&$record) {
+    $optionFields = [];
+    // Collect fieldnames with a :pseudoconstant suffix & remove them from $record array
+    foreach (array_keys($record) as $expr) {
+      $suffix = strrpos($expr, ':');
+      if ($suffix) {
+        $fieldName = substr($expr, 0, $suffix);
+        $field = $this->entityFields()[$fieldName] ?? NULL;
+        if ($field) {
+          $optionFields[$fieldName] = [
+            'val' => $record[$expr],
+            'name' => empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'],
+            'suffix' => substr($expr, $suffix + 1),
+            'depends' => $field['input_attrs']['controlField'] ?? NULL,
+          ];
+          unset($record[$expr]);
+        }
+      }
+    }
+    // Sort option lookups by dependency, so e.g. country_id is processed first, then state_province_id, then county_id
+    uasort($optionFields, function ($a, $b) {
+      return $a['name'] === $b['depends'] ? -1 : 1;
+    });
+    // Replace pseudoconstants. Note this is a reverse lookup as we are evaluating input not output.
+    foreach ($optionFields as $fieldName => $info) {
+      $options = FormattingUtil::getPseudoconstantList($this->_entityName, $info['name'], $info['suffix'], $record, 'create');
+      $record[$fieldName] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+    }
   }
 
   /**

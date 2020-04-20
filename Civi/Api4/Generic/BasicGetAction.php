@@ -22,6 +22,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * Retrieve $ENTITIES based on criteria specified in the `where` parameter.
@@ -59,6 +60,7 @@ class BasicGetAction extends AbstractGetAction {
     $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
     $values = $this->getRecords();
+    $this->formatRawValues($values);
     $result->exchangeArray($this->queryArray($values));
   }
 
@@ -100,6 +102,33 @@ class BasicGetAction extends AbstractGetAction {
       return call_user_func($this->getter, $this);
     }
     throw new NotImplementedException('Getter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());
+  }
+
+  /**
+   * Evaluate :pseudoconstant suffix expressions and replace raw values with option values
+   *
+   * @param $records
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function formatRawValues(&$records) {
+    // Pad $records and $fields with pseudofields
+    $fields = $this->entityFields();
+    foreach ($records as &$values) {
+      foreach ($this->entityFields() as $field) {
+        if (!empty($field['options'])) {
+          foreach (array_keys(FormattingUtil::$pseudoConstantContexts) as $suffix) {
+            $pseudofield = $field['name'] . ':' . $suffix;
+            if (!isset($values[$pseudofield]) && isset($values[$field['name']]) && $this->_isFieldSelected($pseudofield)) {
+              $values[$pseudofield] = $values[$field['name']];
+              $fields[$pseudofield] = $field;
+            }
+          }
+        }
+      }
+    }
+    // Swap raw values with pseudoconstants
+    FormattingUtil::formatOutputValues($records, $fields, $this->getEntityName(), $this->getActionName());
   }
 
 }

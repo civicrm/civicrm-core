@@ -25,6 +25,12 @@ require_once 'api/v3/utils.php';
 
 class FormattingUtil {
 
+  public static $pseudoConstantContexts = [
+    'name' => 'validate',
+    'abbr' => 'abbreviate',
+    'label' => 'get',
+  ];
+
   /**
    * Massage values into the format the BAO expects for a write operation
    *
@@ -41,7 +47,7 @@ class FormattingUtil {
         if ($value === 'null') {
           $value = 'Null';
         }
-        self::formatInputValue($value, $field, $entity);
+        self::formatInputValue($value, $name, $field, $entity);
         // Ensure we have an array for serialized fields
         if (!empty($field['serialize'] && !is_array($value))) {
           $value = (array) $value;
@@ -73,15 +79,22 @@ class FormattingUtil {
    * This is used by read AND write actions (Get, Create, Update, Replace)
    *
    * @param $value
-   * @param $fieldSpec
+   * @param string $fieldName
+   * @param array $fieldSpec
    * @param string $entity
    *   Ex: 'Contact', 'Domain'
    * @throws \API_Exception
    */
-  public static function formatInputValue(&$value, $fieldSpec, $entity) {
-    if (is_array($value)) {
+  public static function formatInputValue(&$value, $fieldName, $fieldSpec, $entity) {
+    // Evaluate pseudoconstant suffix
+    $suffix = strpos($fieldName, ':');
+    if ($suffix) {
+      $options = self::getPseudoconstantList($fieldSpec['entity'], $fieldSpec['name'], substr($fieldName, $suffix + 1));
+      $value = self::replacePseudoconstant($options, $value, TRUE);
+    }
+    elseif (is_array($value)) {
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldSpec, $entity);
+        self::formatInputValue($val, $fieldName, $fieldSpec, $entity);
       }
       return;
     }
@@ -120,29 +133,98 @@ class FormattingUtil {
    * @param array $results
    * @param array $fields
    * @param string $entity
+   * @param string $action
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function formatOutputValues(&$results, $fields, $entity) {
+  public static function formatOutputValues(&$results, $fields, $entity, $action = 'get') {
+    $fieldOptions = [];
     foreach ($results as &$result) {
       // Remove inapplicable contact fields
       if ($entity === 'Contact' && !empty($result['contact_type'])) {
         \CRM_Utils_Array::remove($result, self::contactFieldsToRemove($result['contact_type']));
       }
-      foreach ($result as $field => $value) {
-        $dataType = $fields[$field]['data_type'] ?? ($field == 'id' ? 'Integer' : NULL);
-        if (!empty($fields[$field]['serialize'])) {
-          if (is_string($value)) {
-            $result[$field] = $value = \CRM_Core_DAO::unSerializeField($value, $fields[$field]['serialize']);
-            foreach ($value as $key => $val) {
-              $result[$field][$key] = self::convertDataType($val, $dataType);
+      foreach ($result as $fieldExpr => $value) {
+        $field = $fields[$fieldExpr] ?? NULL;
+        $dataType = $field['data_type'] ?? ($fieldExpr == 'id' ? 'Integer' : NULL);
+        if ($field) {
+          // Evaluate pseudoconstant suffixes
+          $suffix = strrpos($fieldExpr, ':');
+          if ($suffix) {
+            $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
+            $fieldOptions[$fieldExpr] = $fieldOptions[$fieldExpr] ?? self::getPseudoconstantList($field['entity'], $fieldName, substr($fieldExpr, $suffix + 1), $result, $action);
+            $dataType = NULL;
+          }
+          if (!empty($field['serialize'])) {
+            if (is_string($value)) {
+              $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
             }
           }
+          if (isset($fieldOptions[$fieldExpr])) {
+            $value = self::replacePseudoconstant($fieldOptions[$fieldExpr], $value);
+          }
         }
-        else {
-          $result[$field] = self::convertDataType($value, $dataType);
-        }
+        $result[$fieldExpr] = self::convertDataType($value, $dataType);
       }
     }
+  }
+
+  /**
+   * Retrieves pseudoconstant option list for a field.
+   *
+   * @param string $entity
+   *   Name of api entity
+   * @param string $fieldName
+   * @param string $optionValue
+   * @param array $params
+   *   Other values for this object
+   * @param string $action
+   * @return array
+   * @throws \API_Exception
+   */
+  public static function getPseudoconstantList($entity, $fieldName, $optionValue, $params = [], $action = 'get') {
+    $context = self::$pseudoConstantContexts[$optionValue] ?? NULL;
+    if (!$context) {
+      throw new \API_Exception('Illegal expression');
+    }
+    $baoName = CoreUtil::getBAOFromApiName($entity);
+    // Use BAO::buildOptions if possible
+    if ($baoName) {
+      $options = $baoName::buildOptions($fieldName, $context, $params);
+    }
+    // Fallback for non-bao based entities
+    if (!isset($options)) {
+      $options = civicrm_api4($entity, 'getFields', ['action' => $action, 'loadOptions' => TRUE, 'where' => [['name', '=', $fieldName]]])[0]['options'] ?? NULL;
+    }
+    if (is_array($options)) {
+      return $options;
+    }
+    throw new \API_Exception("No option list found for '$fieldName'");
+  }
+
+  /**
+   * Replaces value (or an array of values) with options from a pseudoconstant list.
+   *
+   * The direction of lookup defaults to transforming ids to option values for api output;
+   * for api input, set $reverse = TRUE to transform option values to ids.
+   *
+   * @param array $options
+   * @param string|string[] $value
+   * @param bool $reverse
+   *   Is this a reverse lookup (for transforming input instead of output)
+   * @return array|mixed|null
+   */
+  public static function replacePseudoconstant($options, $value, $reverse = FALSE) {
+    $matches = [];
+    foreach ((array) $value as $val) {
+      if (!$reverse && isset($options[$val])) {
+        $matches[] = $options[$val];
+      }
+      elseif ($reverse && array_search($val, $options) !== FALSE) {
+        $matches[] = array_search($val, $options);
+      }
+    }
+    return is_array($value) ? $matches : $matches[0] ?? NULL;
   }
 
   /**
@@ -151,7 +233,14 @@ class FormattingUtil {
    * @return mixed
    */
   public static function convertDataType($value, $dataType) {
-    if (isset($value)) {
+    if (isset($value) && $dataType) {
+      if (is_array($value)) {
+        foreach ($value as $key => $val) {
+          $value[$key] = self::convertDataType($val, $dataType);
+        }
+        return $value;
+      }
+
       switch ($dataType) {
         case 'Boolean':
           return (bool) $value;

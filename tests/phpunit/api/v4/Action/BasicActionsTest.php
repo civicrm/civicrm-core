@@ -49,22 +49,39 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertEquals('new', $result->first()['foo']);
 
     $result = MockBasicEntity::save()
-      ->addRecord(['id' => $id1, 'foo' => 'one updated'])
-      ->addRecord(['id' => $id2])
+      ->addRecord(['id' => $id1, 'foo' => 'one updated', 'weight' => '5'])
+      ->addRecord(['id' => $id2, 'group:label' => 'Second'])
       ->addRecord(['foo' => 'three'])
       ->addDefault('color', 'pink')
       ->setReload(TRUE)
       ->execute()
       ->indexBy('id');
 
+    $this->assertTrue(5 === $result[$id1]['weight']);
     $this->assertEquals('new', $result[$id2]['foo']);
+    $this->assertEquals('two', $result[$id2]['group']);
     $this->assertEquals('three', $result->last()['foo']);
     $this->assertCount(3, $result);
     foreach ($result as $item) {
       $this->assertEquals('pink', $item['color']);
     }
 
-    $this->assertEquals('one updated', MockBasicEntity::get()->addWhere('id', '=', $id1)->execute()->first()['foo']);
+    $ent1 = MockBasicEntity::get()->addWhere('id', '=', $id1)->execute()->first();
+    $this->assertEquals('one updated', $ent1['foo']);
+    $this->assertFalse(isset($ent1['group:label']));
+
+    $ent2 = MockBasicEntity::get()->addWhere('group:label', '=', 'Second')->addSelect('group:label', 'group')->execute()->first();
+    $this->assertEquals('two', $ent2['group']);
+    $this->assertEquals('Second', $ent2['group:label']);
+    // We didn't select this
+    $this->assertFalse(isset($ent2['group:name']));
+
+    // With no SELECT, all fields should be returned but not suffixy stuff like group:name
+    $ent2 = MockBasicEntity::get()->addWhere('group:label', '=', 'Second')->execute()->first();
+    $this->assertEquals('two', $ent2['group']);
+    $this->assertFalse(isset($ent2['group:name']));
+    // This one wasn't selected but did get used by the WHERE clause; ensure it isn't returned
+    $this->assertFalse(isset($ent2['group:label']));
 
     MockBasicEntity::delete()->addWhere('id', '=', $id2);
     $result = MockBasicEntity::get()->execute();

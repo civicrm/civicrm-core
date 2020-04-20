@@ -55,7 +55,7 @@ class CustomValueTest extends BaseCustomValueTest {
     CustomField::create()
       ->setCheckPermissions(FALSE)
       ->addValue('label', $colorField)
-      ->addValue('options', $optionValues)
+      ->addValue('option_values', $optionValues)
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Select')
       ->addValue('data_type', 'String')
@@ -64,7 +64,7 @@ class CustomValueTest extends BaseCustomValueTest {
     CustomField::create()
       ->setCheckPermissions(FALSE)
       ->addValue('label', $multiField)
-      ->addValue('options', $optionValues)
+      ->addValue('option_values', $optionValues)
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'CheckBox')
       ->addValue('data_type', 'String')
@@ -87,7 +87,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ->first()['id'];
 
     // Retrieve and check the fields of CustomValue = Custom_$group
-    $fields = CustomValue::getFields($group)->execute();
+    $fields = CustomValue::getFields($group)->setLoadOptions(TRUE)->setCheckPermissions(FALSE)->execute();
     $expectedResult = [
       [
         'custom_group' => $group,
@@ -97,6 +97,7 @@ class CustomValueTest extends BaseCustomValueTest {
         'data_type' => 'String',
         'fk_entity' => NULL,
         'serialize' => NULL,
+        'options' => $optionValues,
       ],
       [
         'custom_group' => $group,
@@ -106,6 +107,7 @@ class CustomValueTest extends BaseCustomValueTest {
         'data_type' => 'String',
         'fk_entity' => NULL,
         'serialize' => 1,
+        'options' => $optionValues,
       ],
       [
         'custom_group' => $group,
@@ -150,6 +152,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ->execute();
     // fetch custom values using API4 CustomValue::get
     $result = CustomValue::get($group)
+      ->addSelect('id', 'entity_id', $colorField, $colorField . ':label')
       ->addOrderBy($colorField, 'DESC')
       ->execute();
 
@@ -159,11 +162,13 @@ class CustomValueTest extends BaseCustomValueTest {
       [
         'id' => 2,
         $colorField => 'r',
+        $colorField . ':label' => 'Red',
         'entity_id' => $this->contactID,
       ],
       [
         'id' => 1,
         $colorField => 'g',
+        $colorField . ':label' => 'Green',
         'entity_id' => $this->contactID,
       ],
     ];
@@ -178,7 +183,7 @@ class CustomValueTest extends BaseCustomValueTest {
     // Update a records whose id is 1 and change the custom field (name = Color) value to 'Blue' from 'Green'
     CustomValue::update($group)
       ->addWhere("id", "=", 1)
-      ->addValue($colorField, 'b')
+      ->addValue($colorField . ':label', 'Blue')
       ->execute();
 
     // ensure that the value is changed for id = 1
@@ -200,19 +205,23 @@ class CustomValueTest extends BaseCustomValueTest {
     // Replace all the records which was created earlier with entity_id = first contact
     //  with custom record [$colorField => 'g', 'entity_id' => $secondContactID]
     CustomValue::replace($group)
-      ->setRecords([[$colorField => 'g', $multiField => ['r', 'g'], 'entity_id' => $secondContactID]])
+      ->setRecords([[$colorField => 'g', $multiField . ':label' => ['Red', 'Green'], 'entity_id' => $secondContactID]])
       ->addWhere('entity_id', '=', $this->contactID)
       ->execute();
 
     // Check the two records created earlier is replaced by new contact
-    $result = CustomValue::get($group)->execute();
+    $result = CustomValue::get($group)
+      ->addSelect('id', 'entity_id', $colorField, $colorField . ':label', $multiField, $multiField . ':label')
+      ->execute();
     $this->assertEquals(1, count($result));
 
     $expectedResult = [
       [
         'id' => 3,
         $colorField => 'g',
+        $colorField . ':label' => 'Green',
         $multiField => ['r', 'g'],
+        $multiField . ':label' => ['Red', 'Green'],
         'entity_id' => $secondContactID,
       ],
     ];

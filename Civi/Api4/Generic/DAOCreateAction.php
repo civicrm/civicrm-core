@@ -34,6 +34,7 @@ class DAOCreateAction extends AbstractCreateAction {
    * @inheritDoc
    */
   public function _run(Result $result) {
+    $this->formatWriteValues($this->values);
     $this->validateValues();
     $params = $this->values;
     $this->fillDefaults($params);

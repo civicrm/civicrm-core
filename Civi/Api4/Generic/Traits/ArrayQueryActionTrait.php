@@ -199,8 +199,17 @@ trait ArrayQueryActionTrait {
       $values = [['row_count' => count($values)]];
     }
     elseif ($this->getSelect()) {
+      // Return only fields specified by SELECT
       foreach ($values as &$value) {
         $value = array_intersect_key($value, array_flip($this->getSelect()));
+      }
+    }
+    else {
+      // With no SELECT specified, return all values that are keyed by plain field name; omit those with :pseudoconstant suffixes
+      foreach ($values as &$value) {
+        $value = array_filter($value, function($key) {
+          return strpos($key, ':') === FALSE;
+        }, ARRAY_FILTER_USE_KEY);
       }
     }
     return $values;
