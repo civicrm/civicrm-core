@@ -25,8 +25,6 @@ use api\v4\Traits\TestDataLoaderTrait;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 
-require_once 'api/Exception.php';
-
 /**
  * @group headless
  */
