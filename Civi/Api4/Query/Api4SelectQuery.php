@@ -197,6 +197,9 @@ class Api4SelectQuery extends SelectQuery {
       }
       if ($valid) {
         $alias = $expr->getAlias();
+        if ($alias != $expr->getExpr() && isset($this->apiFieldSpec[$alias])) {
+          throw new \API_Exception('Cannot use existing field name as alias');
+        }
         $this->selectAliases[$alias] = $expr->getExpr();
         $this->query->select($expr->render($this->apiFieldSpec) . " AS `$alias`");
       }
