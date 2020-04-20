@@ -3446,14 +3446,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @param array $params
    *   Contribution object, line item array and params for trxn.
-   *
-   *
    * @param array $financialTrxnValues
    *
-   * @return null|\CRM_Core_BAO_FinancialTrxn
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
-    $skipRecords = $update = $return = $isRelatedId = FALSE;
+    $update = $isRelatedId = FALSE;
 
     $additionalParticipantId = [];
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -3542,7 +3541,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if ($contributionStatus != 'Failed' &&
       !($contributionStatus == 'Pending' && !$params['contribution']->is_pay_later)
     ) {
-      $skipRecords = TRUE;
       $pendingStatus = [
         'Pending',
         'In Progress',
@@ -3783,10 +3781,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Batch_BAO_EntityBatch::create($entityParams);
     }
 
-    // when a fee is charged
-    if (!empty($params['fee_amount']) && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount) && $skipRecords) {
-      CRM_Core_BAO_FinancialTrxn::recordFees($params);
-    }
+    // Record any payment processor transaction fees
+    CRM_Core_BAO_FinancialTrxn::recordFees($params);
 
     if (!empty($params['prevContribution']) && $entityTable == 'civicrm_participant'
       && $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id

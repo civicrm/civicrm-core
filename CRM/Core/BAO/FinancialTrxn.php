@@ -38,31 +38,27 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
 
-    if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
-      if (!isset($params['total_amount'])) {
-        $trxn->fetch();
-        $params['total_amount'] = $trxn->total_amount;
-      }
-      $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
+    if (!isset($trxn->total_amount)) {
+      $trxn->fetch();
     }
+    $trxn->net_amount = ($trxn->total_amount ?? 0) - ($trxn->fee_amount ?? 0);
 
-    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
+    if (empty($trxn->id) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
       $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
-
     $trxn->save();
 
+    // For an update entity financial transaction record will already exist. Return early.
     if (!empty($params['id'])) {
-      // For an update entity financial transaction record will already exist. Return early.
       return $trxn;
     }
 
     // Save to entity_financial_trxn table.
     $entityFinancialTrxnParams = [
-      'entity_table' => CRM_Utils_Array::value('entity_table', $params, 'civicrm_contribution'),
-      'entity_id' => CRM_Utils_Array::value('entity_id', $params, CRM_Utils_Array::value('contribution_id', $params)),
+      'entity_table' => $params['entity_table'] ?? 'civicrm_contribution',
+      'entity_id' => $params['entity_id'] ?? $params['contribution_id'] ?? NULL,
       'financial_trxn_id' => $trxn->id,
-      'amount' => $params['total_amount'],
+      'amount' => $trxn->total_amount,
     ];
 
     $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
@@ -379,18 +375,37 @@ WHERE ceft.entity_id = %1";
    * @param array $params
    *   To create trxn entries.
    *
-   * @return bool|void
+   * @throws \CRM_Core_Exception
    */
   public static function recordFees($params) {
-    $domainId = CRM_Core_Config::domainID();
-    $amount = 0;
+    // @todo: These two checks are extracted from CRM_Contribute_BAO_Contribution::recordFinancialAccounts() and should be simplified
+    //   This is the initial "no change" extraction.
+    if (($params['contribution_status_id'] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Failed'))
+      && (!($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
+        && !$params['contribution']->is_pay_later))
+    ) {
+      // Record the fees
+    }
+    else {
+      return;
+    }
+    if (!empty($params['fee_amount'])
+      && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount)
+    ) {
+      // Record the fees
+    }
+    else {
+      return;
+    }
+
     if (!empty($params['prevContribution'])) {
       $amount = $params['prevContribution']->fee_amount;
     }
     $amount = $params['fee_amount'] - $amount;
     if (!$amount) {
-      return FALSE;
+      return;
     }
+
     $contributionId = $params['contribution']->id ?? $params['contribution_id'];
     if (empty($params['financial_type_id'])) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id', 'id');
@@ -415,7 +430,7 @@ WHERE ceft.entity_id = %1";
     $fItemParams
       = [
         'financial_account_id' => $financialAccount,
-        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
+        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
         'created_date' => date('YmdHis'),
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
