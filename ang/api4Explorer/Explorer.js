@@ -222,9 +222,25 @@
       }
     };
 
-    $scope.isSpecial = function(name) {
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain'];
-      return _.contains(specialParams, name);
+    // Gets params that should be represented as generic input fields in the explorer
+    // This fn doesn't have to be particularly efficient as its output is cached in one-time bindings
+    $scope.getGenericParams = function(paramType, defaultNull) {
+      // Returns undefined if params are not yet set; one-time bindings will stabilize when this function returns a value
+      if (_.isEmpty($scope.availableParams)) {
+        return;
+      }
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having'];
+      if ($scope.availableParams.limit && $scope.availableParams.offset) {
+        specialParams.push('limit', 'offset');
+      }
+      return _.transform($scope.availableParams, function(genericParams, param, name) {
+        if (!_.contains(specialParams, name) &&
+          !(typeof paramType !== 'undefined' && !_.contains(paramType, param.type[0])) &&
+          !(typeof defaultNull !== 'undefined' && ((param.default === null) !== defaultNull))
+        ) {
+          genericParams[name] = param;
+        }
+      });
     };
 
     $scope.selectRowCount = function() {
@@ -383,8 +399,8 @@
               deep: format === 'json'
             });
           }
-          if (typeof objectParams[name] !== 'undefined') {
-            $scope.$watch('params.' + name, function(values) {
+          if (typeof objectParams[name] !== 'undefined' && name !== 'orderBy') {
+            $scope.$watch('params.' + name, function (values) {
               // Remove empty values
               _.each(values, function (clause, index) {
                 if (!clause || !clause[0]) {
@@ -408,13 +424,17 @@
               var field = value;
               $timeout(function() {
                 if (field) {
-                  var defaultOp = _.cloneDeep(objectParams[name]);
-                  if (name === 'chain') {
-                    var num = $scope.params.chain.length;
-                    defaultOp[0] = field;
-                    field = 'name_me_' + num;
+                  if (typeof objectParams[name] === 'undefined') {
+                    $scope.params[name].push(field);
+                  } else {
+                    var defaultOp = _.cloneDeep(objectParams[name]);
+                    if (name === 'chain') {
+                      var num = $scope.params.chain.length;
+                      defaultOp[0] = field;
+                      field = 'name_me_' + num;
+                    }
+                    $scope.params[name].push([field, defaultOp]);
                   }
-                  $scope.params[name].push([field, defaultOp]);
                   $scope.controls[name] = null;
                 }
               });
