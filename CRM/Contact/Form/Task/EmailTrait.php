@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Email;
+
 /**
  * This class provides the common functionality for tasks that send emails.
  */
@@ -74,6 +76,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @var bool
    */
   public $isSearchContext = TRUE;
+
+  public $contactEmails = [];
 
   /**
    * Getter for isSearchContext.
@@ -135,7 +139,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $this->assign('suppressForm', FALSE);
     $this->assign('emailTask', TRUE);
 
-    $toArray = $ccArray = $bccArray = [];
+    $toArray = $ccArray = [];
     $suppressedEmails = 0;
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $this->get('cid');
@@ -152,7 +156,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
     ];
     $to = $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
     $cc = $this->add('text', 'cc_id', ts('CC'), $emailAttributes);
-    $bcc = $this->add('text', 'bcc_id', ts('BCC'), $emailAttributes);
+
+    $this->addEntityRef('bcc_id', ts('BCC'), [
+      'entity' => 'Email',
+      'multiple' => TRUE,
+    ]);
 
     if ($to->getValue()) {
       $this->_toContactIds = $this->_contactIds = [];
@@ -162,7 +170,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $setDefaults = FALSE;
     }
 
-    $elements = ['to', 'cc', 'bcc'];
+    $elements = ['to', 'cc'];
     $this->_allContactIds = $this->_toContactIds = $this->_contactIds;
     foreach ($elements as $element) {
       if ($$element->getValue()) {
@@ -179,10 +187,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
               case 'cc':
                 $this->_ccContactIds[] = $contactId;
-                break;
-
-              case 'bcc':
-                $this->_bccContactIds[] = $contactId;
                 break;
             }
 
@@ -253,12 +257,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
               'id' => "$contactId::{$email}",
             ];
           }
-          elseif (in_array($contactId, $this->_bccContactIds)) {
-            $bccArray[] = [
-              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
-              'id' => "$contactId::{$email}",
-            ];
-          }
         }
       }
 
@@ -269,7 +267,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $this->assign('toContact', json_encode($toArray));
     $this->assign('ccContact', json_encode($ccArray));
-    $this->assign('bccContact', json_encode($bccArray));
 
     $this->assign('suppressedEmails', $suppressedEmails);
 
@@ -403,6 +400,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \API_Exception
    */
   public function submit($formValues) {
     $this->saveMessageTemplate($formValues);
@@ -415,9 +413,9 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $subject = $formValues['subject'];
 
     // CRM-13378: Append CC and BCC information at the end of Activity Details and format cc and bcc fields
-    $elements = ['cc_id', 'bcc_id'];
+    $elements = ['cc_id'];
     $additionalDetails = NULL;
-    $ccValues = $bccValues = [];
+    $ccValues = [];
     foreach ($elements as $element) {
       if (!empty($formValues[$element])) {
         $allEmails = explode(',', $formValues[$element]);
@@ -430,24 +428,19 @@ trait CRM_Contact_Form_Task_EmailTrait {
               $ccValues['details'][] = "<a href='{$contactURL}'>" . $this->_contactDetails[$contactId]['display_name'] . "</a>";
               break;
 
-            case 'bcc_id':
-              $bccValues['email'][] = '"' . $this->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';
-              $bccValues['details'][] = "<a href='{$contactURL}'>" . $this->_contactDetails[$contactId]['display_name'] . "</a>";
-              break;
           }
         }
       }
     }
+    $cc = '';
 
-    $cc = $bcc = '';
     if (!empty($ccValues)) {
       $cc = implode(',', $ccValues['email']);
       $additionalDetails .= "\ncc : " . implode(", ", $ccValues['details']);
     }
-    if (!empty($bccValues)) {
-      $bcc = implode(',', $bccValues['email']);
-      $additionalDetails .= "\nbcc : " . implode(", ", $bccValues['details']);
-    }
+    $bccArray = explode(',', $formValues['bcc_id'] ?? '');
+    $bcc = $this->getEmailString($bccArray);
+    $additionalDetails .= empty($bccArray) ? '' : "\nbcc : " . $this->getEmailUrlString($bccArray);
 
     // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
     if (isset($this->_caseId) && is_numeric($this->_caseId)) {
@@ -633,6 +626,50 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $return[] = ['contact_id' => $values[0], 'email' => $values[1]];
     }
     return $return;
+  }
+
+  /**
+   * Get the string for the email IDs.
+   *
+   * @param array $emailIDs
+   *   Array of email IDs.
+   *
+   * @return string
+   *   e.g. "Smith, Bob<bob.smith@example.com>".
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getEmailString(array $emailIDs): string {
+    $emails = Email::get()
+      ->addWhere('id', 'IN', $emailIDs)
+      ->setCheckPermissions(FALSE)
+      ->setSelect(['contact_id', 'email', 'contact.sort_name', 'contact.display_name'])->execute();
+    $emailStrings = [];
+    foreach ($emails as $email) {
+      $this->contactEmails[$email['id']] = $email;
+      $emailStrings[] = '"' . $email['contact.sort_name'] . '" <' . $email['email'] . '>';
+    }
+    return implode(',', $emailStrings);
+  }
+
+  /**
+   * Get the url string.
+   *
+   * This is called after the contacts have been retrieved so we don't need to re-retrieve.
+   *
+   * @param array $emailIDs
+   *
+   * @return string
+   *   e.g. <a href='{$contactURL}'>Bob Smith</a>'
+   */
+  protected function getEmailUrlString(array $emailIDs): string {
+    $urlString = '';
+    foreach ($emailIDs as $email) {
+      $contactURL = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $this->contactEmails[$email]['contact_id']], TRUE);
+      $urlString .= "<a href='{$contactURL}'>" . $this->contactEmails[$email]['contact.display_name'] . '</a>';
+    }
+    return $urlString;
   }
 
 }

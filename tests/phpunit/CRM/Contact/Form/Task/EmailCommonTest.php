@@ -8,10 +8,13 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
- /**
-  * Test class for CRM_Contact_Form_Task_EmailCommon.
-  * @group headless
-  */
+
+use Civi\Api4\Activity;
+
+/**
+ * Test class for CRM_Contact_Form_Task_EmailCommon.
+ * @group headless
+ */
 class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
 
   /**
@@ -32,6 +35,16 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
   }
 
   /**
+   * Cleanup after test class.
+   *
+   * Make sure the  setting is returned to 'stock'.
+   */
+  public function tearDown() {
+    Civi::settings()->set('allow_mail_from_logged_in_contact', 0);
+    parent::tearDown();
+  }
+
+  /**
    * Test generating domain emails
    *
    * @throws \CRM_Core_Exception
@@ -49,17 +62,27 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
   /**
    * Test email uses signature.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testPostProcessWithSignature() {
     $mut = new CiviMailUtils($this, TRUE);
+    $bcc1 = $this->individualCreate(['email' => 'bcc1@example.com']);
+    $bcc2 = $this->individualCreate(['email' => 'bcc2@example.com']);
+    $emails = $this->callAPISuccess('Email', 'getlist', ['input' => 'bcc'])['values'];
+    $bcc  = [];
+    foreach ($emails as $email) {
+      $bcc[] = $email['id'];
+    }
+    $bcc = implode(',', $bcc);
+
     Civi::settings()->set('allow_mail_from_logged_in_contact', 1);
     $loggedInContactID = $this->createLoggedInUser();
-    $form = new CRM_Contact_Form_Task_Email();
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Core_Controller();
+    /* @var CRM_Contact_Form_Task_Email $form*/
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+
     for ($i = 0; $i < 27; $i++) {
       $email = 'spy' . $i . '@secretsquirrels.com';
       $contactID = $this->individualCreate(['email' => $email]);
@@ -85,12 +108,16 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     $form->submit(array_merge($form->_defaultValues, [
       'from_email_address' => $loggedInEmail['id'],
       'subject' => 'Really interesting stuff',
+      'bcc_id' => $bcc,
     ]));
     $mut->checkMailLog([
       'This is a test Signature',
     ]);
     $mut->stop();
-    Civi::settings()->set('allow_mail_from_logged_in_contact', 0);
+    $activity = Activity::get()->setCheckPermissions(FALSE)->setSelect(['details'])->execute()->first();
+    $bccUrl1 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $bcc1], TRUE);
+    $bccUrl2 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $bcc2], TRUE);
+    $this->assertContains("bcc : <a href='" . $bccUrl1 . "'>Mr. Anthony Anderson II</a><a href='" . $bccUrl2 . "'>Mr. Anthony Anderson II</a>", $activity['details']);
   }
 
 }

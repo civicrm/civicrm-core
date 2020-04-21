@@ -345,4 +345,24 @@ AND    reset_date IS NULL
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
   }
 
+  /**
+   * Get filters for entity reference fields.
+   *
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    $contactFields = CRM_Contact_BAO_Contact::getEntityRefFilters();
+    foreach ($contactFields as $index => &$contactField) {
+      if (!empty($contactField['entity'])) {
+        // For now email_getlist can't parse state, country etc.
+        unset($contactFields[$index]);
+      }
+      elseif ($contactField['key'] !== 'contact_id') {
+        $contactField['entity'] = 'Contact';
+        $contactField['key'] = 'contact_id.' . $contactField['key'];
+      }
+    }
+    return $contactFields;
+  }
+
 }

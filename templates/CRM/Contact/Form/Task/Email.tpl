@@ -125,12 +125,10 @@ CRM.$(function($) {
 
   {/literal}
   var toContact = {if $toContact}{$toContact}{else}''{/if},
-    ccContact = {if $ccContact}{$ccContact}{else}''{/if},
-    bccContact = {if $bccContact}{$bccContact}{else}''{/if};
+    ccContact = {if $ccContact}{$ccContact}{else}''{/if};
   {literal}
   emailSelect('#to', toContact);
   emailSelect('#cc_id', ccContact);
-  emailSelect('#bcc_id', bccContact);
 });
 
 
