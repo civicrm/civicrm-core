@@ -375,7 +375,7 @@ function updateContactInfo(blockNo, prefix) {
                 cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
-                cj('#field_' + blockNo + '_' + 'join_date').val(membershipJoinDate).trigger('change');
+                cj('#field_' + blockNo + '_' + 'membership_join_date').val(membershipJoinDate).trigger('change');
                 cj('#field_' + blockNo + '_' + 'membership_start_date').val(membershipStartDate).trigger('change');
               }
               });
