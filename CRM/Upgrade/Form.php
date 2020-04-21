@@ -779,17 +779,8 @@ SET    version = '$version'
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
 
-    // TODO: Consider running a general system flush instead of piecemeal flushes.
-    // Historically, that would not have worked well because hooks are restricted
-    // in upgrade-mode. But the dispatch-policy for 'upgrade.finish' is probably
-    // more suitable.
-
-    // Clear cached metadata.
-    Civi::service('settings_manager')->flush();
-
-    // cleanup caches CRM-8739
-    $config = CRM_Core_Config::singleton();
-    $config->cleanupCaches(1);
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, TRUE);
+    // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
 
     $versionCheck = new CRM_Utils_VersionCheck();
     $versionCheck->flushCache();
@@ -797,8 +788,6 @@ SET    version = '$version'
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
-
-    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile(TRUE);
   }
 
   /**
