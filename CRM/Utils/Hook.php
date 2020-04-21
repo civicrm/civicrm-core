@@ -662,7 +662,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function themes(&$themes) {
-    return self::singleton()->invoke(1, $themes,
+    return self::singleton()->invoke(['themes'], $themes,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_themes'
     );
@@ -1745,11 +1745,8 @@ abstract class CRM_Utils_Hook {
    * installation of unrelated modules).
    */
   public static function install() {
-    return self::singleton()->invoke(0, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_install'
-    );
+    // Actually invoke via CRM_Extension_Manager_Module::callHook
+    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -1758,11 +1755,8 @@ abstract class CRM_Utils_Hook {
    * uninstallation of unrelated modules).
    */
   public static function uninstall() {
-    return self::singleton()->invoke(0, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_uninstall'
-    );
+    // Actually invoke via CRM_Extension_Manager_Module::callHook
+    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -1771,11 +1765,8 @@ abstract class CRM_Utils_Hook {
    * re-enablement of unrelated modules).
    */
   public static function enable() {
-    return self::singleton()->invoke(0, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_enable'
-    );
+    // Actually invoke via CRM_Extension_Manager_Module::callHook
+    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -1784,11 +1775,8 @@ abstract class CRM_Utils_Hook {
    * disablement of unrelated modules).
    */
   public static function disable() {
-    return self::singleton()->invoke(0, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_disable'
-    );
+    // Actually invoke via CRM_Extension_Manager_Module::callHook
+    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
