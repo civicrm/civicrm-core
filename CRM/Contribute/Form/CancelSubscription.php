@@ -135,16 +135,20 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     // Determine if we can cancel recurring contribution via API with this processor
     $cancelSupported = $this->_paymentProcessorObj->supports('CancelRecurring');
     if ($cancelSupported) {
-      $searchRange = [];
-      $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
-      $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
+      // We check if we are using the manual processor as that does not support cancellation requests.
+      // It would be nice to improve the way this is handled instead of hardcoding the ID here.
+      if ($this->_paymentProcessorObj->getPaymentProcessor()['id'] !== 0) {
+        $searchRange = [];
+        $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
+        $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
 
-      $this->addGroup(
-        $searchRange,
-        'send_cancel_request',
-        ts('Send cancellation request to %1 ?',
-          [1 => $this->_paymentProcessorObj->getTitle()])
-      );
+        $this->addGroup(
+          $searchRange,
+          'send_cancel_request',
+          ts('Send cancellation request to %1 ?',
+            [1 => $this->_paymentProcessorObj->getTitle()])
+        );
+      }
     }
     else {
       $this->assign('cancelRecurNotSupportedText', $this->_paymentProcessorObj->getText('cancelRecurNotSupportedText', []));

@@ -19,6 +19,18 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   protected $result;
 
   /**
+   * Constructor.
+   *
+   * @param string $mode
+   *   The mode of operation: live or test (deprecated)
+   * @param array $paymentProcessor
+   */
+  public function __construct($mode, &$paymentProcessor) {
+    $this->_mode = $mode;
+    $this->_paymentProcessor = $paymentProcessor;
+  }
+
+  /**
    * This function checks to see if we have the right config values.
    */
   public function checkConfig() {}
@@ -263,7 +275,19 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
         }
         return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
 
+      default:
+        return parent::getText($context, $params);
+
     }
+  }
+
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return TRUE;
   }
 
 }
