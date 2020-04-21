@@ -3496,6 +3496,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
     $skipRecords = $update = $return = $isRelatedId = FALSE;
+    $isUpdate = !empty($params['prevContribution']);
 
     $additionalParticipantId = [];
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -3528,9 +3529,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // prevContribution appears to mean - original contribution object- ie copy of contribution from before the update started that is being updated
     if (empty($params['prevContribution'])) {
       $entityID = NULL;
-    }
-    else {
-      $update = TRUE;
     }
 
     $statusId = $params['contribution']->contribution_status_id;
@@ -3663,7 +3661,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       $params['trxnParams'] = $trxnParams;
 
-      if (!empty($params['prevContribution'])) {
+      if ($isUpdate) {
         $updated = FALSE;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
@@ -3796,7 +3794,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
 
-      if (!$update) {
+      else {
         // records finanical trxn and entity financial trxn
         // also make it available as return value
         self::recordAlwaysAccountsReceivable($trxnParams, $params);
@@ -3811,7 +3809,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
+      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $isUpdate);
     }
 
     // create batch entry if batch_id is passed and
