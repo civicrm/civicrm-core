@@ -17,7 +17,6 @@
             <span class="description">{ts}Non-deductible portion of this contribution.{/ts}</span></td></tr>
         <tr class="crm-contribution-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
-            <span class="description">{ts}Net value of the contribution (Total Amount minus Fee).{/ts}</span></td></tr>
         <tr class="crm-contribution-form-block-invoice_id"><td class="label">{$form.invoice_id.label}</td><td{$valueStyle}>{$form.invoice_id.html}<br />
             <span class="description">{ts}Unique internal reference ID for this contribution.{/ts}</span></td></tr>
         <tr class="crm-contribution-form-block-creditnote_id"><td class="label">{$form.creditnote_id.label}</td><td{$valueStyle}>{$form.creditnote_id.html}<br />
