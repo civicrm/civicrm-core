@@ -139,7 +139,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $this->assign('suppressForm', FALSE);
     $this->assign('emailTask', TRUE);
 
-    $toArray = $ccArray = [];
+    $toArray = [];
     $suppressedEmails = 0;
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $this->get('cid');
@@ -155,7 +155,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
       'class' => 'huge',
     ];
     $to = $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
-    $cc = $this->add('text', 'cc_id', ts('CC'), $emailAttributes);
+
+    $this->addEntityRef('cc_id', ts('CC'), [
+      'entity' => 'Email',
+      'multiple' => TRUE,
+    ]);
 
     $this->addEntityRef('bcc_id', ts('BCC'), [
       'entity' => 'Email',
@@ -170,7 +174,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $setDefaults = FALSE;
     }
 
-    $elements = ['to', 'cc'];
+    $elements = ['to'];
     $this->_allContactIds = $this->_toContactIds = $this->_contactIds;
     foreach ($elements as $element) {
       if ($$element->getValue()) {
@@ -185,9 +189,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
                 $this->_toContactEmails[] = $email;
                 break;
 
-              case 'cc':
-                $this->_ccContactIds[] = $contactId;
-                break;
             }
 
             $this->_allContactIds[] = $contactId;
@@ -251,12 +252,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
               'id' => "$contactId::{$email}",
             ];
           }
-          elseif (in_array($contactId, $this->_ccContactIds)) {
-            $ccArray[] = [
-              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
-              'id' => "$contactId::{$email}",
-            ];
-          }
         }
       }
 
@@ -266,7 +261,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     $this->assign('toContact', json_encode($toArray));
-    $this->assign('ccContact', json_encode($ccArray));
 
     $this->assign('suppressedEmails', $suppressedEmails);
 
@@ -412,33 +406,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $from = CRM_Utils_Mail::formatFromAddress($from);
     $subject = $formValues['subject'];
 
-    // CRM-13378: Append CC and BCC information at the end of Activity Details and format cc and bcc fields
-    $elements = ['cc_id'];
-    $additionalDetails = NULL;
-    $ccValues = [];
-    foreach ($elements as $element) {
-      if (!empty($formValues[$element])) {
-        $allEmails = explode(',', $formValues[$element]);
-        foreach ($allEmails as $value) {
-          list($contactId, $email) = explode('::', $value);
-          $contactURL = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$contactId}", TRUE);
-          switch ($element) {
-            case 'cc_id':
-              $ccValues['email'][] = '"' . $this->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';
-              $ccValues['details'][] = "<a href='{$contactURL}'>" . $this->_contactDetails[$contactId]['display_name'] . "</a>";
-              break;
+    $ccArray = $formValues['cc_id'] ? explode(',', $formValues['cc_id']) : [];
+    $cc = $this->getEmailString($ccArray);
+    $additionalDetails = empty($ccArray) ? '' : "\ncc : " . $this->getEmailUrlString($ccArray);
 
-          }
-        }
-      }
-    }
-    $cc = '';
-
-    if (!empty($ccValues)) {
-      $cc = implode(',', $ccValues['email']);
-      $additionalDetails .= "\ncc : " . implode(", ", $ccValues['details']);
-    }
-    $bccArray = explode(',', $formValues['bcc_id'] ?? '');
+    $bccArray = $formValues['bcc_id'] ? explode(',', $formValues['bcc_id']) : [];
     $bcc = $this->getEmailString($bccArray);
     $additionalDetails .= empty($bccArray) ? '' : "\nbcc : " . $this->getEmailUrlString($bccArray);
 
@@ -523,7 +495,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
             $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
             if ($sentFollowup) {
-              $followupStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
+              $followupStatus .= '<br />' . ts('A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).');
             }
           }
         }
@@ -641,6 +613,9 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getEmailString(array $emailIDs): string {
+    if (empty($emailIDs)) {
+      return '';
+    }
     $emails = Email::get()
       ->addWhere('id', 'IN', $emailIDs)
       ->setCheckPermissions(FALSE)

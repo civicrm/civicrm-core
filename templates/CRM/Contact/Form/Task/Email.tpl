@@ -128,7 +128,6 @@ CRM.$(function($) {
     ccContact = {if $ccContact}{$ccContact}{else}''{/if};
   {literal}
   emailSelect('#to', toContact);
-  emailSelect('#cc_id', ccContact);
 });
 
 
