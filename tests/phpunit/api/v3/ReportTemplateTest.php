@@ -1447,7 +1447,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $pcp2 = CRM_PCP_BAO_PCP::create($pcpParams);
 
     // Get soft credit types, with the name column as the key.
-    $soft_credit_types = CRM_Contribute_BAO_ContributionSoft::buildOptions("soft_credit_type_id", NULL, ["flip" => TRUE, 'labelColumn' => 'name']);
+    $soft_credit_types = CRM_Core_PseudoConstant::get('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', ['flip' => TRUE, 'labelColumn' => 'name']);
     $pcp_soft_credit_type_id = $soft_credit_types['pcp'];
 
     // Create two contributions assigned to this contribution page and

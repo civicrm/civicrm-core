@@ -286,7 +286,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     }
 
     $priceField = CRM_Price_BAO_PriceField::findById($fields['fieldId']);
-    $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, ['labelColumn' => 'name']);
+    $visibilityOptions = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceFieldValue', 'visibility_id', ['labelColumn' => 'name']);
 
     $publicCount = 0;
     $options = CRM_Price_BAO_PriceField::getOptions($priceField->id);

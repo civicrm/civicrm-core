@@ -955,31 +955,20 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
-   * Get options for the called BAO object's field.
-   *
-   * This function can be overridden by each BAO to add more logic related to context.
-   * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props
-   *   whatever is known about this bao object.
-   *
-   * @return array|bool
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-
+    $params = [];
     switch ($fieldName) {
       case 'payment_processor_id':
         if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'])) {
           return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'];
         }
         $baoName = 'CRM_Contribute_BAO_ContributionRecur';
-        $props['condition']['test'] = "is_test = 0";
-        $liveProcessors = CRM_Core_PseudoConstant::get($baoName, $fieldName, $props, $context);
-        $props['condition']['test'] = "is_test != 0";
-        $testProcessors = CRM_Core_PseudoConstant::get($baoName, $fieldName, $props, $context);
+        $params['condition']['test'] = "is_test = 0";
+        $liveProcessors = CRM_Core_PseudoConstant::get($baoName, $fieldName, $params, $context);
+        $params['condition']['test'] = "is_test != 0";
+        $testProcessors = CRM_Core_PseudoConstant::get($baoName, $fieldName, $params, $context);
         foreach ($testProcessors as $key => $value) {
           if ($context === 'validate') {
             // @fixme: Ideally the names would be different in the civicrm_payment_processor table but they are not.
@@ -995,7 +984,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'] = $allProcessors;
         return $allProcessors;
     }
-    return parent::buildOptions($fieldName, $context, $props);
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
 }
