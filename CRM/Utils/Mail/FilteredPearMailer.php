@@ -109,4 +109,11 @@ class CRM_Utils_Mail_FilteredPearMailer extends Mail {
     unset($this->_delegate->{$name});
   }
 
+  public function disconnect() {
+    if (is_callable([$this->_delegate, 'disconnect'])) {
+      return $this->_delegate->disconnect();
+    }
+    return TRUE;
+  }
+
 }
