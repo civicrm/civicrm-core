@@ -659,6 +659,54 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Relationship search with custom fields.
+   */
+  public function testReciprocalRelationshipWithCustomFields() {
+    $params = [
+      'extends' => 'Relationship',
+    ];
+    $customGroup = $this->customGroupCreate($params);
+    $customFieldId = $this->customFieldCreate(['custom_group_id' => $customGroup['id']])['id'];
+    $contactID_a = $this->individualCreate();
+    $contactID_b = $this->individualCreate();
+    $relationship = $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $contactID_a,
+      'contact_id_b' => $contactID_b,
+      'relationship_type_id' => 2,
+      'is_active' => 1,
+      "custom_{$customFieldId}" => 'testvalue',
+    ]);
+    $params = [
+      [
+        0 => 'relation_type_id',
+        1 => 'IN',
+        2 =>
+          [
+            0 => '2_a_b',
+          ],
+        3 => 0,
+        4 => 0,
+      ],
+      [
+        0 => "custom_{$customFieldId}",
+        1 => '=',
+        2 => 'testvalue',
+        3 => 0,
+        4 => 0,
+      ],
+    ];
+
+    $query = new CRM_Contact_BAO_Query($params);
+    $dao = $query->searchQuery();
+    $this->assertEquals('2', $dao->N);
+    $this->callAPISuccess('Relationship', 'delete', ['id' => $relationship['id']]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_a, 'skip_undelete' => 1]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_b, 'skip_undelete' => 1]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $customFieldId, 'skip_undelete' => 1]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $customGroup]);
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testReciprocalRelationshipTargetGroupIsCorrectResults() {
