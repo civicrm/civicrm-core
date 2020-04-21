@@ -929,6 +929,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int
    *   id of created pledge
+   *
+   * @throws \CRM_Core_Exception
    */
   public function pledgeCreate($params) {
     $params = array_merge([
@@ -954,6 +956,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Delete contribution.
    *
    * @param int $pledgeId
+   *
+   * @throws \CRM_Core_Exception
    */
   public function pledgeDelete($pledgeId) {
     $params = [

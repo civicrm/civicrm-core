@@ -149,6 +149,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test the batch merge.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeSelectedDuplicates() {
     $this->createDupeContacts();
@@ -283,23 +285,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetCidRefs() {
     $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'Contacts');
-    $this->assertEquals(array_merge($this->getStaticCIDRefs(), $this->getHackedInCIDRef()), CRM_Dedupe_Merger::cidRefs());
-    $this->assertEquals(array_merge($this->getCalculatedCIDRefs(), $this->getHackedInCIDRef()), CRM_Dedupe_Merger::cidRefs());
-  }
-
-  /**
-   * Get the list of not-really-cid-refs that are currently hacked in.
-   *
-   * This is hacked into getCIDs function.
-   *
-   * @return array
-   */
-  public function getHackedInCIDRef() {
-    return [
-      'civicrm_entity_tag' => [
-        0 => 'entity_id',
-      ],
-    ];
+    $this->assertEquals($this->getStaticCIDRefs(), CRM_Dedupe_Merger::cidRefs());
+    $this->assertEquals($this->getCalculatedCIDRefs(), CRM_Dedupe_Merger::cidRefs());
   }
 
   /**
@@ -307,6 +294,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * It turns out there are 2 code paths retrieving this data so my initial
    * focus is on ensuring they match.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetMatches() {
     $this->setupMatchData();
@@ -336,6 +325,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test results are returned when criteria are passed in.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesCriteriaMatched() {
     $this->setupMatchData();
@@ -348,6 +339,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test results are returned when criteria are passed in & limit is  respected.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesCriteriaMatchedWithLimit() {
     $this->setupMatchData();
@@ -361,6 +354,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test results are returned when criteria are passed in & limit is  respected.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesCriteriaMatchedWithSearchLimit() {
     $this->setupMatchData();
@@ -374,6 +369,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test getting matches where there are  no criteria.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesNoCriteria() {
     $this->setupMatchData();
@@ -385,6 +382,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test getting matches with a limit in play.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesNoCriteriaButLimit() {
     $this->setupMatchData();
@@ -614,6 +613,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * Note the handling is silly - we are testing to lock in over short term
    * changes not to imply any contract on the function.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetRowsElementsAndInfoSpecialInfo() {
     $contact1 = $this->individualCreate([
@@ -702,6 +704,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * CRM-19653 : Test that custom field data should/shouldn't be overriden on
    *   selecting/not selecting option to migrate data respectively
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCustomDataOverwrite() {
     // Create Custom Field
@@ -771,7 +775,16 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * dev/core#996 Ensure that the oldest created date is retained even if duplicates have been flipped
+   *
    * @dataProvider createdDateMergeCases
+   *
+   * @param $keepContactKey
+   * @param $duplicateContactKey
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testCreatedDatePostMerge($keepContactKey, $duplicateContactKey) {
     $this->setupMatchData();

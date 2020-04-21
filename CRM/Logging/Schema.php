@@ -1041,6 +1041,10 @@ COLS;
    */
   public function getLogTablesForContact() {
     $tables = array_keys(CRM_Core_DAO::getReferencesToContactTable());
+    // This additional hardcoding has been moved from getReferencesToContactTable
+    // to here as it is not needed in the other place where the function is called.
+    // It may not be needed here either...
+    $tables[] = 'civicrm_entity_tag';
     return array_intersect($tables, $this->tables);
   }
 
