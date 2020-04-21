@@ -22,18 +22,21 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Maximum profile fields that will be displayed.
+   *
    * @var int
    */
   protected $_rowCount = 1;
 
   /**
    * Batch id.
+   *
    * @var int
    */
   protected $_batchId;
 
   /**
    * Batch information.
+   *
    * @var array
    */
   protected $_batchInfo = [];
@@ -52,22 +55,26 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * When not to reset sort_name.
+   *
    * @var bool
    */
   protected $_preserveDefault = TRUE;
 
   /**
    * Contact fields.
+   *
    * @var array
    */
   protected $_contactFields = [];
 
   /**
    * Fields array of fields in the batch profile.
+   *
    * (based on the uf_field table data)
    * (this can't be protected as it is passed into the CRM_Contact_Form_Task_Batch::parseStreetAddress function
    * (although a future refactoring might hopefully change that so it uses the api & the function is not
    * required
+   *
    * @var array
    */
   public $_fields = [];
@@ -84,6 +91,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->_batchId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -120,6 +129,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     if (!$this->_profileId) {
@@ -132,7 +143,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // get the profile information
     if ($this->_batchInfo['type_id'] == $batchTypes['Contribution']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Contributions'));
-      $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Memberships'));
@@ -140,7 +150,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledge Payments'));
     }
-    $this->_fields = [];
+
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, CRM_Core_Action::VIEW);
 
     // remove file type field and then limit fields
@@ -367,6 +377,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -402,6 +414,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Process the form after the input has been submitted and validated.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -439,6 +454,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *   Associated array of submitted values.
    *
    * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   private function processContribution(&$params) {
 
@@ -928,6 +946,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @param array $params
    *
    * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessContribution($params) {
     return $this->processContribution($params);
