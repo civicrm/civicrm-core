@@ -9,3 +9,39 @@ UPDATE civicrm_state_province s
    on c.id = s.country_id AND c.name = 'Portugal'
      AND s.name = 'Colmbra'
 SET s.name = 'Coimbra';
+
+UPDATE civicrm_state_province s
+ INNER JOIN civicrm_country c
+   on c.id = s.country_id AND c.name = 'Portugal'
+     AND s.name = 'Braganca'
+SET s.name = 'Bragança';
+
+UPDATE civicrm_state_province s
+ INNER JOIN civicrm_country c
+   on c.id = s.country_id AND c.name = 'Portugal'
+     AND s.name = 'Ovora'
+SET s.name = 'Évora';
+
+UPDATE civicrm_state_province s
+ INNER JOIN civicrm_country c
+   on c.id = s.country_id AND c.name = 'Portugal'
+     AND s.name = 'Santarem'
+SET s.name = 'Santarém';
+
+UPDATE civicrm_state_province s
+ INNER JOIN civicrm_country c
+   on c.id = s.country_id AND c.name = 'Portugal'
+     AND s.name = 'Setubal'
+SET s.name = 'Setúbal';
+
+UPDATE civicrm_state_province s
+ INNER JOIN civicrm_country c
+   on c.id = s.country_id AND c.name = 'Portugal'
+     AND s.name = 'Regiao Autonoma dos Acores'
+SET s.name = 'Região Autónoma dos Açores';
+
+UPDATE civicrm_state_province s
+ INNER JOIN civicrm_country c
+   on c.id = s.country_id AND c.name = 'Portugal'
+     AND s.name = 'Regiao Autonoma da Madeira'
+SET s.name = 'Região Autónoma da Madeira';
