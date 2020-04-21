@@ -8,13 +8,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-use Civi\Payment\PropertyBag;
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
+use Civi\Payment\PropertyBag;
 
 /**
  * This class provides support for canceling recurring subscriptions.
@@ -24,6 +19,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
   protected $_userContext = NULL;
 
   protected $_mode = NULL;
+
+  /**
+   * The contributor email
+   *
+   * @var string
+   */
+  protected $_donorEmail = '';
 
   /**
    * Should custom data be suppressed on this form.
@@ -149,8 +151,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     }
     $this->assign('cancelSupported', $cancelSupported);
 
-    if ($this->_donorEmail) {
-      $this->add('checkbox', 'is_notify', ts('Notify Contributor?'));
+    if (!empty($this->_donorEmail)) {
+      $this->add('checkbox', 'is_notify', ts('Notify Contributor?') . " ({$this->_donorEmail})");
     }
     if ($this->_mid) {
       $cancelButton = ts('Cancel Automatic Membership Renewal');
@@ -205,7 +207,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         $params['send_cancel_request'] = 1;
       }
 
-      if ($this->_donorEmail) {
+      if (!empty($this->_donorEmail)) {
         $params['is_notify'] = 1;
       }
     }
