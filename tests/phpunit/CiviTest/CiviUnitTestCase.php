@@ -3271,19 +3271,18 @@ VALUES
   /**
    * Set the separators for thousands and decimal points.
    *
-   * Use setMonetaryDecimalPoint and setMonetaryThousandSeparator instead
+   * Note that this only covers some common scenarios.
+   *
+   * It does not cater for a situation where the thousand separator is a [space]
+   * Latter is the Norwegian localization. At least some tests need to
+   * use setMonetaryDecimalPoint and setMonetaryThousandSeparator directly
+   * to provide broader coverage.
    *
    * @param string $thousandSeparator
-   * @deprecated
    */
   protected function setCurrencySeparators($thousandSeparator) {
-    // Jaap Jansma: I do think the code below is a bit useless. It does an assumption
-    // that when the thousand separator is a comma, the decimal is point. It
-    // does not cater for a situation where the thousand separator is a [space]
-    // Latter is the Norwegian localization.
     Civi::settings()->set('monetaryThousandSeparator', $thousandSeparator);
-    Civi::settings()
-      ->set('monetaryDecimalPoint', ($thousandSeparator === ',' ? '.' : ','));
+    Civi::settings()->set('monetaryDecimalPoint', ($thousandSeparator === ',' ? '.' : ','));
   }
 
   /**
