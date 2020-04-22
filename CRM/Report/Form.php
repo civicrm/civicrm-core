@@ -195,6 +195,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $groupConcatTested = FALSE;
 
   /**
+   * Are we in print mode. Can be set by another outputMode, ex: sendmail.
+   *
+   * @var bool
+   */
+  public $printOnly = FALSE;
+
+  /**
    * An attribute for checkbox/radio form field layout
    *
    * @var array
@@ -217,9 +224,6 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   protected $_instanceButtonName = NULL;
   protected $_createNewButtonName = NULL;
-  protected $_printButtonName = NULL;
-  protected $_pdfButtonName = NULL;
-  protected $_csvButtonName = NULL;
   protected $_groupButtonName = NULL;
   protected $_chartButtonName = NULL;
   protected $_csvSupported = TRUE;
@@ -280,7 +284,13 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
-  protected $_absoluteUrl = FALSE;
+
+  /**
+   * Whether to generate absolute URLs (ex: in report emails).
+   *
+   * @var bool
+   */
+  public $_absoluteUrl = FALSE;
 
   /**
    * Flag to indicate if result-set is to be stored in a class variable which could be retrieved using getResultSet() method.
@@ -1092,6 +1102,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function setID($instanceID) {
     $this->_id = $instanceID;
+  }
+
+  /**
+   * Getter for $_id.
+   *
+   * @return int
+   */
+  public function getID() {
+    return $this->_id;
   }
 
   /**
@@ -2816,46 +2835,36 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         CRM_Core_DAO::$_nullObject
       );
 
-    $this->_absoluteUrl = FALSE;
-    $printOnly = FALSE;
-    $this->assign('printOnly', FALSE);
+    $this->assign('printOnly', $this->printOnly);
 
     if ($this->_outputMode == 'print' ||
       ($this->_sendmail && !$this->_outputMode)
     ) {
-      $this->assign('printOnly', TRUE);
-      $printOnly = TRUE;
+      $this->printOnly = TRUE;
       $this->addPaging = FALSE;
-      $this->assign('outputMode', 'print');
       $this->_outputMode = 'print';
       if ($this->_sendmail) {
         $this->_absoluteUrl = TRUE;
       }
     }
     elseif ($this->_outputMode == 'pdf') {
-      $printOnly = TRUE;
+      $this->printOnly = TRUE;
       $this->addPaging = FALSE;
       $this->_absoluteUrl = TRUE;
     }
     elseif ($this->_outputMode == 'csv') {
-      $printOnly = TRUE;
+      $this->printOnly = TRUE;
       $this->_absoluteUrl = TRUE;
       $this->addPaging = FALSE;
-    }
-    elseif ($this->_outputMode == 'group') {
-      $this->assign('outputMode', 'group');
-    }
-    elseif ($this->_outputMode == 'create_report' && $this->_criteriaForm) {
-      $this->assign('outputMode', 'create_report');
     }
     elseif ($this->_outputMode == 'copy' && $this->_criteriaForm) {
       $this->_createNew = TRUE;
     }
 
     $this->assign('outputMode', $this->_outputMode);
-    $this->assign('printOnly', $printOnly);
+    $this->assign('printOnly', $this->printOnly);
     // Get today's date to include in printed reports
-    if ($printOnly) {
+    if ($this->printOnly) {
       $reportDate = CRM_Utils_Date::customFormat(date('Y-m-d H:i'));
       $this->assign('reportDate', $reportDate);
     }
