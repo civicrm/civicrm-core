@@ -796,30 +796,50 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @param bool $revert
    *   Being able to revert if primarily for unit testing.
+   * @param array $patterns
+   *   Defaults to ['civicrm\_%'] but can be overridden to specify any pattern. eg ['civicrm\_%', 'civi%\_%', 'veda%\_%'].
+   * @param array $databaseList
+   *   Allows you to specify an alternative database to the configured CiviCRM database.
    *
    * @return bool
    */
-  public static function migrateUtf8mb4($revert = FALSE) {
+  public static function migrateUtf8mb4($revert = FALSE, $patterns = ['civicrm\_%'], $databaseList = NULL) {
     $newCharSet = $revert ? 'utf8' : 'utf8mb4';
     $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
     $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
     $tables = [];
     $dao = new CRM_Core_DAO();
-    $database = $dao->_database;
-    CRM_Core_DAO::executeQuery("ALTER DATABASE $database CHARACTER SET = $newCharSet COLLATE = $newCollation");
-    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS WHERE Engine = 'InnoDB' AND Name LIKE 'civicrm\_%'");
-    while ($dao->fetch()) {
-      $tables[$dao->Name] = [
-        'Engine' => $dao->Engine,
-      ];
+    $databases = $databaseList ?? [$dao->_database];
+
+    $tableNameLikePatterns = [];
+    $logTableNameLikePatterns = [];
+
+    foreach ($patterns as $pattern) {
+      $pattern = CRM_Utils_Type::escape($pattern, 'String');
+      $tableNameLikePatterns[] = "Name LIKE '{$pattern}'";
+      $logTableNameLikePatterns[] = "Name LIKE 'log\_{$pattern}'";
     }
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
-    $logging_database = $dsn['database'];
-    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `$logging_database` WHERE Engine <> 'MyISAM' AND Name LIKE 'log\_civicrm\_%'");
-    while ($dao->fetch()) {
-      $tables["$logging_database.{$dao->Name}"] = [
-        'Engine' => $dao->Engine,
-      ];
+
+    foreach ($databases as $database) {
+      CRM_Core_DAO::executeQuery("ALTER DATABASE $database CHARACTER SET = $newCharSet COLLATE = $newCollation");
+      $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$database}` WHERE Engine = 'InnoDB' AND (" . implode(' OR ', $tableNameLikePatterns) . ")");
+      while ($dao->fetch()) {
+        $tables["{$database}.{$dao->Name}"] = [
+          'Engine' => $dao->Engine,
+        ];
+      }
+    }
+    // If we specified a list of databases assume the user knows what they are doing.
+    // If they specify the database they should also specify the pattern.
+    if (!$databaseList) {
+      $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+      $logging_database = $dsn['database'];
+      $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$logging_database}` WHERE Engine <> 'MyISAM' AND (" . implode(' OR ', $logTableNameLikePatterns) . ")");
+      while ($dao->fetch()) {
+        $tables["{$logging_database}.{$dao->Name}"] = [
+          'Engine' => $dao->Engine,
+        ];
+      }
     }
     foreach ($tables as $table => $param) {
       $query = "ALTER TABLE $table";
