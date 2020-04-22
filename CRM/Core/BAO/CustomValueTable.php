@@ -47,25 +47,31 @@ class CRM_Core_BAO_CustomValueTable {
         $set = [];
         $params = [];
         $count = 1;
-        foreach ($fields as $field) {
-          if (!$sqlOP) {
-            $entityID = $field['entity_id'];
-            $hookID = $field['custom_group_id'];
-            $isMultiple = $field['is_multiple'];
-            if (array_key_exists('id', $field)) {
-              $sqlOP = "UPDATE $tableName ";
-              $where = " WHERE  id = %{$count}";
-              $params[$count] = [$field['id'], 'Integer'];
-              $count++;
-              $hookOP = 'edit';
-            }
-            else {
-              $sqlOP = "INSERT INTO $tableName ";
-              $where = NULL;
-              $hookOP = 'create';
-            }
-          }
 
+        $firstField = reset($fields);
+        $entityID = $firstField['entity_id'];
+        $hookID = $firstField['custom_group_id'];
+        $isMultiple = $firstField['is_multiple'];
+        if (array_key_exists('id', $firstField)) {
+          $sqlOP = "UPDATE $tableName ";
+          $where = " WHERE  id = %{$count}";
+          $params[$count] = [$firstField['id'], 'Integer'];
+          $count++;
+          $hookOP = 'edit';
+        }
+        else {
+          $sqlOP = "INSERT INTO $tableName ";
+          $where = NULL;
+          $hookOP = 'create';
+        }
+
+        CRM_Utils_Hook::customPre($hookOP,
+          $hookID,
+          $entityID,
+          $fields
+        );
+
+        foreach ($fields as $field) {
           // fix the value before we store it
           $value = $field['value'];
           $type = $field['type'];
