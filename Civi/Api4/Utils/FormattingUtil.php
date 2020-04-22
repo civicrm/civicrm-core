@@ -140,10 +140,7 @@ class FormattingUtil {
   public static function formatOutputValues(&$results, $fields, $entity, $action = 'get') {
     $fieldOptions = [];
     foreach ($results as &$result) {
-      // Remove inapplicable contact fields
-      if ($entity === 'Contact' && !empty($result['contact_type'])) {
-        \CRM_Utils_Array::remove($result, self::contactFieldsToRemove($result['contact_type']));
-      }
+      $contactTypePaths = [];
       foreach ($result as $fieldExpr => $value) {
         $field = $fields[$fieldExpr] ?? NULL;
         $dataType = $field['data_type'] ?? ($fieldExpr == 'id' ? 'Integer' : NULL);
@@ -163,8 +160,17 @@ class FormattingUtil {
           if (isset($fieldOptions[$fieldExpr])) {
             $value = self::replacePseudoconstant($fieldOptions[$fieldExpr], $value);
           }
+          // Keep track of contact types for self::contactFieldsToRemove
+          if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
+            $prefix = strrpos($fieldExpr, '.');
+            $contactTypePaths[$prefix ? substr($fieldExpr, 0, $prefix + 1) : ''] = $value;
+          }
         }
         $result[$fieldExpr] = self::convertDataType($value, $dataType);
+      }
+      // Remove inapplicable contact fields
+      foreach ($contactTypePaths as $prefix => $contactType) {
+        \CRM_Utils_Array::remove($result, self::contactFieldsToRemove($contactType, $prefix));
       }
     }
   }
@@ -257,19 +263,33 @@ class FormattingUtil {
   }
 
   /**
+   * Lists all field names (including suffixed variants) that should be removed for a given contact type.
+   *
    * @param string $contactType
+   *   Individual|Organization|Household
+   * @param string $prefix
+   *   Path at which these fields are found, e.g. "address.contact."
    * @return array
    */
-  public static function contactFieldsToRemove($contactType) {
+  public static function contactFieldsToRemove($contactType, $prefix) {
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$contactType])) {
       \Civi::$statics[__CLASS__][__FUNCTION__][$contactType] = [];
       foreach (\CRM_Contact_DAO_Contact::fields() as $field) {
         if (!empty($field['contactType']) && $field['contactType'] != $contactType) {
           \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'];
+          // Include suffixed variants like prefix_id:label
+          if (!empty($field['pseudoconstant'])) {
+            foreach (array_keys(self::$pseudoConstantContexts) as $suffix) {
+              \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'] . ':' . $suffix;
+            }
+          }
         }
       }
     }
-    return \Civi::$statics[__CLASS__][__FUNCTION__][$contactType];
+    // Add prefix paths
+    return array_map(function($name) use ($prefix) {
+      return $prefix . $name;
+    }, \Civi::$statics[__CLASS__][__FUNCTION__][$contactType]);
   }
 
 }
