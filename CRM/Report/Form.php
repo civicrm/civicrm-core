@@ -349,6 +349,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_outputMode;
 
   /**
+   * Output handler
+   *
+   * @var \CRM_Report_Output_Interface
+   */
+  protected $_outputHandler;
+
+  /**
    * Format of any chart in use.
    *
    * (it's unclear if this could be merged with outputMode at this stage)
@@ -1435,8 +1442,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!CRM_Core_Permission::check('view report sql')) {
       return;
     }
-    $ignored_output_modes = ['pdf', 'csv', 'print'];
-    if (in_array($this->_outputMode, $ignored_output_modes)) {
+    if ($this->_outputHandler && !$this->_outputHandler->supportsSqlDeveloperTab()) {
       return;
     }
     $this->tabs['Developer'] = [
@@ -3403,6 +3409,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $this->_resultSet = $rows;
     }
 
+    if ($this->_outputHandler) {
+      $this->_outputHandler->generateOutput($rows);
+    }
+
     if ($this->_outputMode == 'print' ||
       $this->_outputMode == 'pdf' ||
       $this->_sendmail
@@ -3471,25 +3481,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       elseif ($this->_outputMode == 'print') {
         echo $content;
       }
-      else {
-        // Nb. Once upon a time we used a package called Open Flash Charts to
-        // draw charts, and we had a feature whereby a browser could send the
-        // server a PNG version of the chart, which could then be included in a
-        // PDF by including <img> tags in the HTML for the conversion below.
-        //
-        // This feature stopped working when browsers stopped supporting Flash,
-        // and although we have a different client-side charting library in
-        // place, we decided not to reimplement the (rather convoluted)
-        // browser-sending-rendered-chart-to-server process.
-        //
-        // If this feature is required in future we should find a better way to
-        // render charts on the server side, e.g. server-created SVG.
-        CRM_Utils_PDF_Utils::html2pdf($content, "CiviReport.pdf", FALSE, ['orientation' => 'landscape']);
-      }
       CRM_Utils_System::civiExit();
-    }
-    elseif ($this->_outputMode == 'csv') {
-      CRM_Report_Utils_Report::export2csv($this, $rows);
     }
     elseif ($this->_outputMode == 'group') {
       $group = $this->_params['groups'];
@@ -5083,6 +5075,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
     if (isset($this->_params['task'])) {
       unset($this->_params['task']);
+    }
+
+    if (!empty($this->_outputMode) && empty($this->_outputHandler)) {
+      $className = 'CRM_Report_Output_' . ucfirst($this->_outputMode);
+      if (class_exists($className)) {
+        $this->_outputHandler = new $className($this);
+      }
     }
   }
 
