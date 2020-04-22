@@ -400,6 +400,19 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does the processor support the user having a choice as to whether to cancel the recurring with the processor?
+   *
+   * If this returns TRUE then there will be an option to send a cancellation request in the cancellation form.
+   *
+   * This would normally be false for processors where CiviCRM maintains the schedule.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurringNotifyOptional() {
+    return $this->supportsCancelRecurring();
+  }
+
+  /**
    * Does this processor support pre-approval.
    *
    * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
@@ -615,7 +628,10 @@ abstract class CRM_Core_Payment {
         }
 
       case 'cancelRecurNotSupportedText':
-        return ts('Automatic cancellation is not supported for this payment processor. You or the contributor will need to manually cancel this recurring contribution using the payment processor website.');
+        if (!$this->supportsCancelRecurring()) {
+          return ts('Automatic cancellation is not supported for this payment processor. You or the contributor will need to manually cancel this recurring contribution using the payment processor website.');
+        }
+        return '';
 
     }
     CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
@@ -1382,7 +1398,8 @@ abstract class CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doCancelRecurring(PropertyBag $propertyBag) {
-    if (method_exists($this, 'cancelSubscription')) {
+    if (method_exists($this, 'cancelSubscription')
+    && $propertyBag->getIsNotifyProcessorOnCancelRecur()) {
       $message = NULL;
       if ($this->cancelSubscription($message, $propertyBag)) {
         return ['message' => $message];

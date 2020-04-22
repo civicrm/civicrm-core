@@ -72,6 +72,7 @@ class PropertyBag implements \ArrayAccess {
     'transactionID'               => TRUE,
     'transaction_id'              => 'transactionID',
     'trxnResultCode'              => TRUE,
+    'isNotifyProcessorOnCancelRecur' => TRUE,
   ];
 
   /**
@@ -471,6 +472,8 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param string $input
    * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
    */
   public function setBillingCity($input, $label = 'default') {
     return $this->set('billingCity', $label, (string) $input);
@@ -781,6 +784,35 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("isRecur must be a bool, received NULL.");
     }
     return $this->set('isRecur', $label, (bool) $isRecur);
+  }
+
+  /**
+   * Set whether the user has selected to notify the processor of a cancellation request.
+   *
+   * When cancelling the user may be presented with an option to notify the processor. The payment
+   * processor can take their response, if present, into account.
+   *
+   * @param bool $value
+   * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
+   */
+  public function setIsNotifyProcessorOnCancelRecur($value, $label = 'default') {
+    return $this->set('isNotifyProcessorOnCancelRecur', $label, (bool) $value);
+  }
+
+  /**
+   * Get whether the user has selected to notify the processor of a cancellation request.
+   *
+   * When cancelling the user may be presented with an option to notify the processor. The payment
+   * processor can take their response, if present, into account.
+   *
+   * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
+   */
+  public function getIsNotifyProcessorOnCancelRecur($label = 'default') {
+    return $this->get('isNotifyProcessorOnCancelRecur', $label);
   }
 
   /**
