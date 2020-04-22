@@ -133,8 +133,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
   public function buildQuickForm() {
     $this->buildQuickEntityForm();
     // Determine if we can cancel recurring contribution via API with this processor
-    $cancelSupported = $this->_paymentProcessorObj->supports('CancelRecurring');
-    if ($cancelSupported) {
+    if ($this->_paymentProcessorObj->supports('CancelRecurringNotifyOptional')) {
       $searchRange = [];
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
@@ -149,7 +148,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     else {
       $this->assign('cancelRecurNotSupportedText', $this->_paymentProcessorObj->getText('cancelRecurNotSupportedText', []));
     }
-    $this->assign('cancelSupported', $cancelSupported);
 
     if (!empty($this->_donorEmail)) {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?') . " ({$this->_donorEmail})");
@@ -195,6 +193,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
 
   /**
    * Process the form submission.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     $message = NULL;
@@ -212,16 +212,15 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       }
     }
 
-    if (CRM_Utils_Array::value('send_cancel_request', $params) == 1) {
-      try {
-        $propertyBag = new PropertyBag();
-        $propertyBag->setContributionRecurID($this->getSubscriptionDetails()->recur_id);
-        $propertyBag->setRecurProcessorID($this->getSubscriptionDetails()->subscription_id);
-        $message = $this->_paymentProcessorObj->doCancelRecurring($propertyBag)['message'];
-      }
-      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-        CRM_Core_Error::statusBounce($e->getMessage());
-      }
+    try {
+      $propertyBag = new PropertyBag();
+      $propertyBag->setIsNotifyProcessorOnCancelRecur(!empty($params['send_cancel_request']));
+      $propertyBag->setContributionRecurID($this->getSubscriptionDetails()->recur_id);
+      $propertyBag->setRecurProcessorID($this->getSubscriptionDetails()->subscription_id);
+      $message = $this->_paymentProcessorObj->doCancelRecurring($propertyBag)['message'];
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      CRM_Core_Error::statusBounce($e->getMessage());
     }
 
     if ($cancelSubscription) {

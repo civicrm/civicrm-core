@@ -12,7 +12,7 @@
 <div class="help">
   <div class="icon inform-icon"></div>&nbsp;
   {$cancelRecurDetailText}
-  {if !$cancelSupported}
+  {if $cancelRecurNotSupportedText}
     <div class="status-warning">{$cancelRecurNotSupportedText}</div>
   {/if}
 </div>
