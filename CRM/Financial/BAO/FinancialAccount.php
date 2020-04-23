@@ -113,6 +113,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       $op = 'edit';
     }
     CRM_Utils_Hook::post($op, 'FinancialAccount', $financialAccount->id, $financialAccount);
+    CRM_Core_PseudoConstant::flush();
 
     return $financialAccount;
   }
