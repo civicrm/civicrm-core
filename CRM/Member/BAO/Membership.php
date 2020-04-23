@@ -2173,12 +2173,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @throws \CRM_Core_Exception
    */
   public static function updateAllMembershipStatus($params = []) {
-    if (empty($params['only_active_membership_types'])) {
-      $params['only_active_membership_types'] = TRUE;
-    }
-    if (empty($params['exclude_test_memberships'])) {
-      $params['exclude_test_memberships'] = TRUE;
-    }
     // We want all of the statuses as id => name, even the disabled ones (cf.
     // CRM-15475), to identify which are Pending, Deceased, Cancelled, and
     // Expired.
@@ -2285,7 +2279,6 @@ WHERE {$whereClause}";
         $memParams = $memberParams;
         $memParams['status_id'] = $statusId;
         $memParams['createActivity'] = TRUE;
-        $memParams['version'] = 3;
 
         // Unset columns which should remain unchanged from their current saved
         // values. This avoids race condition in which these values may have
@@ -2302,7 +2295,7 @@ WHERE {$whereClause}";
         //since there is change in status.
 
         //process member record.
-        civicrm_api('membership', 'create', $memParams);
+        civicrm_api3('membership', 'create', $memParams);
         $updateCount++;
       }
     }
