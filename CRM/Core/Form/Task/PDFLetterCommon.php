@@ -223,6 +223,9 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param array $formValues
    *
    * @return string $html_message
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function processTemplate(&$formValues) {
     $html_message = $formValues['html_message'] ?? NULL;
@@ -326,15 +329,18 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
   /**
    * Render html from rows
-   * @param  array $rows   Array of \Civi\Token\TokenRow
-   * @param  string $msgPart The name registered with the TokenProcessor
-   * @param  string $formValues The values submitted through the form
-   * @return string
-   *   $html if formValues['is_unit_test'] is true, otherwise outputs document to browser
    *
+   * @param $rows
+   * @param string $msgPart
+   *   The name registered with the TokenProcessor
+   * @param array $formValues
+   *   The values submitted through the form
+   *
+   * @return array
+   *   If formValues['is_unit_test'] is true, otherwise outputs document to browser
    */
   public static function renderFromRows($rows, $msgPart, $formValues) {
-    $html = array();
+    $html = [];
     foreach ($rows as $row) {
       $html[] = $row->render($msgPart);
     }
@@ -346,7 +352,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
     if (!empty($html)) {
       $type = $formValues['document_type'];
 
-      if ($type == 'pdf') {
+      if ($type === 'pdf') {
         CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
       }
       else {

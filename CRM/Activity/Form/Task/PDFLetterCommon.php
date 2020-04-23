@@ -45,7 +45,8 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
    * @param  array $activityIds  array of activity ids
    * @param  string $html_message message text with tokens
    * @param  array $formValues   formValues from the form
-   * @return void
+   *
+   * @return string
    */
   public static function createDocument($activityIds, $html_message, $formValues) {
     $tp = self::createTokenProcessor();
@@ -61,13 +62,15 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
 
   /**
    * Create a token processor
+   *
+   * @return \Civi\Token\TokenProcessor
    */
   public static function createTokenProcessor() {
-    return new TokenProcessor(\Civi::dispatcher(), array(
+    return new TokenProcessor(\Civi::dispatcher(), [
       'controller' => get_class(),
       'smarty' => FALSE,
       'schema' => ['activityId'],
-    ));
+    ]);
   }
 
 }
