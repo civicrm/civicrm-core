@@ -545,28 +545,28 @@ class CRM_Core_DAO extends DB_DataObject {
     if (!empty($this->id)) {
       if ($hook) {
         $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
-        \Civi::service('dispatcher')->dispatch("civi.dao.preUpdate", $preEvent);
+        \Civi::dispatcher()->dispatch("civi.dao.preUpdate", $preEvent);
       }
 
       $result = $this->update();
 
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
-        \Civi::service('dispatcher')->dispatch("civi.dao.postUpdate", $event);
+        \Civi::dispatcher()->dispatch("civi.dao.postUpdate", $event);
       }
       $this->clearDbColumnValueCache();
     }
     else {
       if ($hook) {
         $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
-        \Civi::service('dispatcher')->dispatch("civi.dao.preInsert", $preEvent);
+        \Civi::dispatcher()->dispatch("civi.dao.preInsert", $preEvent);
       }
 
       $result = $this->insert();
 
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
-        \Civi::service('dispatcher')->dispatch("civi.dao.postInsert", $event);
+        \Civi::dispatcher()->dispatch("civi.dao.postInsert", $event);
       }
     }
     $this->free();
@@ -605,12 +605,12 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function delete($useWhere = FALSE) {
     $preEvent = new \Civi\Core\DAO\Event\PreDelete($this);
-    \Civi::service('dispatcher')->dispatch("civi.dao.preDelete", $preEvent);
+    \Civi::dispatcher()->dispatch("civi.dao.preDelete", $preEvent);
 
     $result = parent::delete($useWhere);
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
-    \Civi::service('dispatcher')->dispatch("civi.dao.postDelete", $event);
+    \Civi::dispatcher()->dispatch("civi.dao.postDelete", $event);
     $this->free();
 
     $this->clearDbColumnValueCache();

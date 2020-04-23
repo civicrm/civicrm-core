@@ -317,7 +317,7 @@ class CRM_Utils_System {
       'absolute' => $absolute,
       'isSSL' => $isSSL,
     ]);
-    Civi::service('dispatcher')->dispatch('hook_civicrm_alterExternUrl', $event);
+    Civi::dispatcher()->dispatch('hook_civicrm_alterExternUrl', $event);
     return urldecode(CRM_Utils_Url::unparseUrl($event->url));
   }
 

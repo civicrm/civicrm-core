@@ -40,7 +40,7 @@ namespace Civi\Core\Event;
  * $event->bang->objProperty = 'abcd';
  *
  * // Dispatching an event.
- * Civi::service('dispatcher')->dispatch('hook_civicrm_foo', $event);
+ * Civi::dispatcher()->dispatch('hook_civicrm_foo', $event);
  * @endCode
  *
  * Design Discussion:
