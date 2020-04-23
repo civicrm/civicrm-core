@@ -182,14 +182,16 @@ function _civicrm_api3_job_geocode_spec(&$params) {
 }
 
 /**
- * Send the scheduled reminders for all contacts (either for activities or events).
+ * Send the scheduled reminders as configured.
  *
  * @param array $params
- *   (reference ) input parameters.
- *                        now - the time to use, in YmdHis format
- *                            - makes testing a bit simpler since we can simulate past/future time
+ *  - now - the time to use, in YmdHis format
+ *  - makes testing a bit simpler since we can simulate past/future time
  *
  * @return array
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_send_reminder($params) {
   //note that $params['rowCount' can be overridden by one of the preferred syntaxes ($options['limit'] = x
@@ -199,18 +201,12 @@ function civicrm_api3_job_send_reminder($params) {
   $params['rowCount'] = 0;
   $lock = Civi::lockManager()->acquire('worker.core.ActionSchedule');
   if (!$lock->isAcquired()) {
-    return civicrm_api3_create_error('Could not acquire lock, another ActionSchedule process is running');
+    throw new API_Exception('Could not acquire lock, another ActionSchedule process is running');
   }
 
-  $result = CRM_Core_BAO_ActionSchedule::processQueue(CRM_Utils_Array::value('now', $params), $params);
+  CRM_Core_BAO_ActionSchedule::processQueue($params['now'] ?? NULL, $params);
   $lock->release();
-
-  if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success();
-  }
-  else {
-    return civicrm_api3_create_error($result['messages']);
-  }
+  return civicrm_api3_create_success(1, $params, 'ActionSchedule', 'send_reminder');
 }
 
 /**

@@ -28,6 +28,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array
    *   Array(scalar $id => Mapping $mapping).
+   *
    * @throws \CRM_Core_Exception
    */
   public static function getMappings($filters = NULL) {
@@ -322,14 +323,21 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param int $mappingID
-   * @param $now
+   * Build a list of the contacts to send to.
+   *
+   * @param string $mappingID
+   *   Value from the mapping_id field in the civicrm_action_schedule able. It might be a string like
+   *  'contribpage' for an older class like CRM_Contribute_ActionMapping_ByPage of for ones following
+   *   more recent patterns, an integer.
+   * @param string $now
    * @param array $params
    *
    * @throws API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function buildRecipientContacts($mappingID, $now, $params = []) {
+  public static function buildRecipientContacts(string $mappingID, $now, $params = []) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
+
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
     if (!empty($params)) {
@@ -348,25 +356,22 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param null $now
+   * Main processing callback for sending out scheduled reminders.
+   *
+   * @param string $now
    * @param array $params
    *
-   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function processQueue($now = NULL, $params = []) {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
     $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
     foreach ($mappings as $mappingID => $mapping) {
-      CRM_Core_BAO_ActionSchedule::buildRecipientContacts($mappingID, $now, $params);
+      CRM_Core_BAO_ActionSchedule::buildRecipientContacts((string) $mappingID, $now, $params);
       CRM_Core_BAO_ActionSchedule::sendMailings($mappingID, $now);
     }
-
-    $result = [
-      'is_error' => 0,
-      'messages' => ts('Sent all scheduled reminders successfully'),
-    ];
-    return $result;
   }
 
   /**

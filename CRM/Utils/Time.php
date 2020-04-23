@@ -32,7 +32,7 @@ class CRM_Utils_Time {
    * @param string $returnFormat
    *   Format in which date is to be retrieved.
    *
-   * @return date
+   * @return string
    */
   public static function getTime($returnFormat = 'YmdHis') {
     return date($returnFormat, self::getTimeRaw());
@@ -56,7 +56,7 @@ class CRM_Utils_Time {
    * @param string $returnFormat
    *   Format in which date is to be retrieved.
    *
-   * @return date
+   * @return string
    */
   public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
     self::$_delta = strtotime($newDateTime) - time();
