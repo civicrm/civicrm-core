@@ -59,7 +59,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['label'] = $params['name'];
     }
     if (CRM_Utils_Array::value('name', $params, NULL) === NULL) {
-      $params['name'] = $params['label'];
+      $params['name'] = CRM_Utils_String::titleToVar($params['label']);
     }
     if (CRM_Utils_Array::value('weight', $params, NULL) === NULL) {
       $params['weight'] = self::getDefaultWeight($params);
