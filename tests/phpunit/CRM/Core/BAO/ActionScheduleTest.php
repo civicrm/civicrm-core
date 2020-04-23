@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ActivityContact;
+
 /**
  * Class CRM_Core_BAO_ActionScheduleTest
  * @group ActionSchedule
@@ -896,9 +898,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *   Ex: array('subject' => '/^Hello, Alice!/').
    *   Keys: subject, body_text, body_html, from_name, from_email.
    *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   *
    * @dataProvider mailerExamples
    *
-   * @throws \CRM_Core_Exception
    */
   public function testMailer($schedule, $patterns) {
     $actionSchedule = array_merge($this->fixtures['sched_activity_1day'], $schedule);
@@ -915,11 +920,11 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
     $activity->save();
 
-    $source['contact_id'] = $contact['id'];
-    $source['activity_id'] = $activity->id;
-    $source['record_type_id'] = 2;
-    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
-    $activityContact->save();
+    ActivityContact::create()->setCheckPermissions(FALSE)->setValues([
+      'contact_id' => $contact['id'],
+      'activity_id' => $activity->id,
+      'record_type_id:name' => 'Activity Source',
+    ])->execute();
 
     CRM_Utils_Time::setTime('2012-06-14 15:00:00');
     $this->callAPISuccess('job', 'send_reminder');
@@ -1424,7 +1429,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * For contacts/members which match schedule based on end date,
    * an email should be sent.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMembershipEndDateMatch() {
     // creates membership with end_date = 20120615

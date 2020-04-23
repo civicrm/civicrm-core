@@ -36,7 +36,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @return object
    *   activity_contact object
    */
-  public static function create(&$params) {
+  public static function create($params) {
     $activityContact = new CRM_Activity_DAO_ActivityContact();
 
     $activityContact->copyValues($params);
