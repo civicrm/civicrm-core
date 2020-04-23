@@ -58,6 +58,7 @@ class BasicCreateAction extends AbstractCreateAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    $this->formatWriteValues($this->values);
     $this->validateValues();
     $result->exchangeArray([$this->writeRecord($this->values)]);
   }

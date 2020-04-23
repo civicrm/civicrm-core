@@ -60,10 +60,13 @@ class BasicSaveAction extends AbstractSaveAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $this->validateValues();
-    foreach ($this->records as $record) {
+    foreach ($this->records as &$record) {
       $record += $this->defaults;
-      $result[] = $this->writeRecord($record);
+      $this->formatWriteValues($record);
+    }
+    $this->validateValues();
+    foreach ($this->records as $item) {
+      $result[] = $this->writeRecord($item);
     }
     if ($this->reload) {
       /** @var BasicGetAction $get */

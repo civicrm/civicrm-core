@@ -23,30 +23,35 @@ namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
 use api\v4\UnitTestCase;
+use Civi\Api4\Email;
 
 /**
  * @group headless
  */
 class ContactTypeTest extends UnitTestCase {
 
-  public function testContactGetReturnsFieldsAppropriateToEachContactType() {
+  public function testGetReturnsFieldsAppropriateToEachContactType() {
     $indiv = Contact::create()
-      ->setValues(['first_name' => 'Joe', 'last_name' => 'Tester', 'contact_type' => 'Individual'])
+      ->setValues(['first_name' => 'Joe', 'last_name' => 'Tester', 'prefix_id:label' => 'Dr.', 'contact_type' => 'Individual'])
+      ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'ind@example.com']))
       ->setCheckPermissions(FALSE)
       ->execute()->first()['id'];
 
     $org = Contact::create()
       ->setValues(['organization_name' => 'Tester Org', 'contact_type' => 'Organization'])
+      ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'org@example.com']))
       ->setCheckPermissions(FALSE)
       ->execute()->first()['id'];
 
     $hh = Contact::create()
       ->setValues(['household_name' => 'Tester Family', 'contact_type' => 'Household'])
+      ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'hh@example.com']))
       ->setCheckPermissions(FALSE)
       ->execute()->first()['id'];
 
     $result = Contact::get()
       ->setCheckPermissions(FALSE)
+      ->addSelect('*', 'prefix_id:label')
       ->addWhere('id', 'IN', [$indiv, $org, $hh])
       ->execute()
       ->indexBy('id');
@@ -54,6 +59,10 @@ class ContactTypeTest extends UnitTestCase {
     $this->assertArrayHasKey('first_name', $result[$indiv]);
     $this->assertArrayNotHasKey('first_name', $result[$org]);
     $this->assertArrayNotHasKey('first_name', $result[$hh]);
+
+    $this->assertEquals('Dr.', $result[$indiv]['prefix_id:label']);
+    $this->assertArrayNotHasKey('prefix_id:label', $result[$org]);
+    $this->assertArrayNotHasKey('prefix_id:label', $result[$hh]);
 
     $this->assertArrayHasKey('organization_name', $result[$org]);
     $this->assertArrayNotHasKey('organization_name', $result[$indiv]);
@@ -66,6 +75,34 @@ class ContactTypeTest extends UnitTestCase {
     $this->assertArrayHasKey('household_name', $result[$hh]);
     $this->assertArrayNotHasKey('household_name', $result[$org]);
     $this->assertArrayNotHasKey('household_name', $result[$indiv]);
+
+    $emails = Email::get()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('contact_id', 'IN', [$indiv, $org, $hh])
+      ->addSelect('id', 'contact_id', 'contact.*', 'contact.prefix_id:label')
+      ->execute()
+      ->indexBy('contact_id');
+
+    $this->assertArrayHasKey('contact.first_name', $emails[$indiv]);
+    $this->assertArrayNotHasKey('contact.first_name', $emails[$org]);
+    $this->assertArrayNotHasKey('contact.first_name', $emails[$hh]);
+
+    $this->assertEquals('Dr.', $emails[$indiv]['contact.prefix_id:label']);
+    $this->assertArrayNotHasKey('contact.prefix_id:label', $emails[$org]);
+    $this->assertArrayNotHasKey('contact.prefix_id:label', $emails[$hh]);
+
+    $this->assertArrayHasKey('contact.organization_name', $emails[$org]);
+    $this->assertArrayNotHasKey('contact.organization_name', $emails[$indiv]);
+    $this->assertArrayNotHasKey('contact.organization_name', $emails[$hh]);
+
+    $this->assertArrayHasKey('contact.sic_code', $emails[$org]);
+    $this->assertArrayNotHasKey('contact.sic_code', $emails[$indiv]);
+    $this->assertArrayNotHasKey('contact.sic_code', $emails[$hh]);
+
+    $this->assertArrayHasKey('contact.household_name', $emails[$hh]);
+    $this->assertArrayNotHasKey('contact.household_name', $emails[$org]);
+    $this->assertArrayNotHasKey('contact.household_name', $emails[$indiv]);
+
   }
 
 }

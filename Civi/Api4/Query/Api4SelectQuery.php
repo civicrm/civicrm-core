@@ -321,7 +321,7 @@ class Api4SelectQuery extends SelectQuery {
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE') {
       $field = $this->getField($expr, TRUE);
-      FormattingUtil::formatInputValue($value, $field, $this->getEntity());
+      FormattingUtil::formatInputValue($value, $expr, $field, $this->getEntity());
       $fieldAlias = $field['sql_name'];
     }
     // For HAVING, expr must be an item in the SELECT clause
@@ -354,14 +354,18 @@ class Api4SelectQuery extends SelectQuery {
   /**
    * Fetch a field from the getFields list
    *
-   * @param string $fieldName
+   * @param string $expr
    * @param bool $strict
    *   In strict mode, this will throw an exception if the field doesn't exist
    *
    * @return string|null
    * @throws \API_Exception
    */
-  public function getField($fieldName, $strict = FALSE) {
+  public function getField($expr, $strict = FALSE) {
+    // If the expression contains a pseudoconstant filter like activity_type_id:label,
+    // strip it to look up the base field name, then add the field:filter key to apiFieldSpec
+    $col = strpos($expr, ':');
+    $fieldName = $col ? substr($expr, 0, $col) : $expr;
     // Perform join if field not yet available - this will add it to apiFieldSpec
     if (!isset($this->apiFieldSpec[$fieldName]) && strpos($fieldName, '.')) {
       $this->joinFK($fieldName);
@@ -370,6 +374,7 @@ class Api4SelectQuery extends SelectQuery {
     if ($strict && !$field) {
       throw new \API_Exception("Invalid field '$fieldName'");
     }
+    $this->apiFieldSpec[$expr] = $field;
     return $field;
   }
 

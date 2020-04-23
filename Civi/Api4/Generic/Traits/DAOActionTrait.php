@@ -175,6 +175,7 @@ trait DAOActionTrait {
       }
 
       list($customGroup, $customField) = explode('.', $name);
+      list($customField, $option) = array_pad(explode(':', $customField), 2, NULL);
 
       $customFieldId = \CRM_Core_BAO_CustomField::getFieldValue(
         \CRM_Core_DAO_CustomField::class,
@@ -197,6 +198,11 @@ trait DAOActionTrait {
 
       // todo are we sure we don't want to allow setting to NULL? need to test
       if ($customFieldId && NULL !== $value) {
+
+        if ($option) {
+          $options = FormattingUtil::getPseudoconstantList($this->getEntityName(), 'custom_' . $customFieldId, $option, $params, $this->getActionName());
+          $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
+        }
 
         if ($customFieldType == 'CheckBox') {
           // this function should be part of a class
