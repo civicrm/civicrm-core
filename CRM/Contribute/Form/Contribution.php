@@ -78,11 +78,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_params;
 
   /**
-   * Store the contribution Type ID
+   * Store the contribution Financial Type ID
    *
    * @var array
    */
-  public $_contributionType;
+  public $_financialTypeId;
 
   /**
    * The contribution values if an existing contribution
@@ -382,8 +382,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    if ($this->_contributionType) {
-      $defaults['financial_type_id'] = $this->_contributionType;
+    $this->getFinancialTypeId();
+    if (!empty($this->_financialTypeId)) {
+      $defaults['financial_type_id'] = $this->_financialTypeId;
     }
 
     if (empty($defaults['payment_instrument_id'])) {
@@ -612,7 +613,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Contribution');
-    $this->assign('customDataSubType', $this->_contributionType);
+    $this->assign('customDataSubType', $this->_financialTypeId);
     $this->assign('entityID', $this->_id);
 
     $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);

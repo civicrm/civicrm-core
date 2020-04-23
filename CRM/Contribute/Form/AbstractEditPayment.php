@@ -153,7 +153,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    *
    * @var array
    */
-  public $_contributionType;
+  public $_financialTypeId;
 
   /**
    * The contribution values if an existing contribution
@@ -289,7 +289,20 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       $this->_noteID = $daoNote->id;
       $values['note'] = $daoNote->note;
     }
-    $this->_contributionType = $values['financial_type_id'];
+    $this->getFinancialTypeId();
+  }
+
+  /**
+   * Get the financial Type ID for the contribution either from the submitted values or from the contribution values if possible
+   */
+  protected function getFinancialTypeId() {
+    // dev/core#1728 Ensure that if we are returned to the form for a formError that any custom fields based on the selected financial type are loaded.
+    if (!empty($this->_submittedValues['financial_type_id'])) {
+      $this->_financialTypeId = $this->_submittedValues['financial_type_id'];
+    }
+    if (!empty($this->_values['financial_type_id'])) {
+      $this->_financialTypeId = $this->_values['financial_type_id'];
+    }
   }
 
   /**
