@@ -23,8 +23,6 @@ use Civi\Core\Event\GenericHookEvent;
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_Resources {
   const DEFAULT_WEIGHT = 0;
