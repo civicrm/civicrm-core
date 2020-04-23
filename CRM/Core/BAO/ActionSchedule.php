@@ -25,14 +25,16 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * @param array $filters
    *   Filter by property (e.g. 'id').
+   *
    * @return array
    *   Array(scalar $id => Mapping $mapping).
+   * @throws \CRM_Core_Exception
    */
   public static function getMappings($filters = NULL) {
     static $_action_mapping;
 
     if ($_action_mapping === NULL) {
-      $event = \Civi\Core\Container::singleton()->get('dispatcher')
+      $event = \Civi::dispatcher()
         ->dispatch(\Civi\ActionSchedule\Events::MAPPINGS,
           new \Civi\ActionSchedule\Event\MappingRegisterEvent());
       $_action_mapping = $event->getMappings();
@@ -507,7 +509,7 @@ FROM civicrm_action_schedule cas
       $select->where("e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact'");
     }
 
-    \Civi\Core\Container::singleton()->get('dispatcher')
+    \Civi::dispatcher()
       ->dispatch(
         \Civi\ActionSchedule\Events::MAILING_QUERY,
         new \Civi\ActionSchedule\Event\MailingQueryEvent($actionSchedule, $mapping, $select)
@@ -644,7 +646,7 @@ FROM civicrm_action_schedule cas
    * @return \Civi\Token\TokenProcessor
    */
   protected static function createTokenProcessor($schedule, $mapping) {
-    $tp = new \Civi\Token\TokenProcessor(\Civi\Core\Container::singleton()->get('dispatcher'), [
+    $tp = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,

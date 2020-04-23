@@ -25,7 +25,7 @@ class PostEvent extends GenericHookEvent {
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function dispatchSubevent(PostEvent $event) {
-    \Civi::service('dispatcher')->dispatch("hook_civicrm_post::" . $event->entity, $event);
+    \Civi::dispatcher()->dispatch("hook_civicrm_post::" . $event->entity, $event);
   }
 
   /**
