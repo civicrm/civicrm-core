@@ -350,14 +350,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
     }
 
     if (!empty($html)) {
-      $type = $formValues['document_type'];
-
-      if ($type === 'pdf') {
-        CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
-      }
-      else {
-        CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
-      }
+      self::outputFromHtml($formValues, $html);
     }
   }
 
@@ -369,6 +362,21 @@ class CRM_Core_Form_Task_PDFLetterCommon {
     $class = get_called_class();
     if (method_exists($class, 'createTokenProcessor')) {
       return $class::createTokenProcessor()->listTokens();
+    }
+  }
+
+  /**
+   * Output the pdf or word document from the generated html.
+   *
+   * @param array $formValues
+   * @param array $html
+   */
+  protected static function outputFromHtml($formValues, array $html) {
+    if ($formValues['document_type'] === 'pdf') {
+      CRM_Utils_PDF_Utils::html2pdf($html, 'CiviLetter.pdf', FALSE, $formValues);
+    }
+    else {
+      CRM_Utils_PDF_Document::html2doc($html, 'CiviLetter.' . $formValues['document_type'], $formValues);
     }
   }
 
