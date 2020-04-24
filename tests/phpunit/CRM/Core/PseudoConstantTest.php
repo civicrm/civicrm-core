@@ -588,7 +588,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_OptionValue' => [
         [
           'fieldName' => 'option_group_id',
-          'sample' => 'gender',
+          'sample' => 'Gender',
           'max' => 200,
         ],
         [

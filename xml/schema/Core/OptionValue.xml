@@ -28,7 +28,8 @@
     <pseudoconstant>
       <table>civicrm_option_group</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
