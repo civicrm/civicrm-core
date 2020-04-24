@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Token\TokenProcessor;
-
 /**
  * This class provides the common functionality for creating PDF letter for
  * activities.
@@ -42,35 +40,30 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
    * Produce the document from the activities
    * This uses the new token processor
    *
-   * @param  array $activityIds  array of activity ids
-   * @param  string $html_message message text with tokens
-   * @param  array $formValues   formValues from the form
+   * @param array $activityIds array of activity ids
+   * @param string $html_message message text with tokens
+   * @param array $formValues formValues from the form
    *
-   * @return string
+   * @return array
+   *
+   * @throws \API_Exception
    */
   public static function createDocument($activityIds, $html_message, $formValues) {
-    $tp = self::createTokenProcessor();
-    $tp->addMessage('body_html', $html_message, 'text/html');
-
-    foreach ($activityIds as $activityId) {
-      $tp->addRow()->context('activity_id', $activityId);
+    $result = \Civi\Api4\MessageTemplate::render()
+      ->addMessage(['string' => $html_message, 'format' => 'text/html', 'key' => 'html_string'])
+      ->setEntity('Activity')
+      ->setEntityIds(['Activity' => $activityIds])
+      ->setCheckPermissions(FALSE)
+      ->execute();
+    $html = [];
+    foreach ($result as $htmDetail) {
+      $html[] = $htmDetail['html_string'];
     }
-    $tp->evaluate();
 
-    return self::renderFromRows($tp->getRows(), 'body_html', $formValues);
-  }
-
-  /**
-   * Create a token processor
-   *
-   * @return \Civi\Token\TokenProcessor
-   */
-  public static function createTokenProcessor() {
-    return new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => get_class(),
-      'smarty' => FALSE,
-      'schema' => ['activity_id'],
-    ]);
+    if (!empty($formValues['is_unit_test'])) {
+      return $html;
+    }
+    self::outputFromHtml($html, $formValues);
   }
 
 }

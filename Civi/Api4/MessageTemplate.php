@@ -27,4 +27,13 @@ namespace Civi\Api4;
  */
 class MessageTemplate extends Generic\DAOEntity {
 
+  /**
+   * @return \Civi\Api4\Action\MessageTemplate\Render
+   *
+   * @throws \API_Exception
+   */
+  public static function render() {
+    return new Action\MessageTemplate\Render(__CLASS__, __FUNCTION__);
+  }
+
 }

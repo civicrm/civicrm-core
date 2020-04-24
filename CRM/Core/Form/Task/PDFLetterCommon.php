@@ -328,33 +328,6 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Render html from rows
-   *
-   * @param $rows
-   * @param string $msgPart
-   *   The name registered with the TokenProcessor
-   * @param array $formValues
-   *   The values submitted through the form
-   *
-   * @return array
-   *   If formValues['is_unit_test'] is true, otherwise outputs document to browser
-   */
-  public static function renderFromRows($rows, $msgPart, $formValues) {
-    $html = [];
-    foreach ($rows as $row) {
-      $html[] = $row->render($msgPart);
-    }
-
-    if (!empty($formValues['is_unit_test'])) {
-      return $html;
-    }
-
-    if (!empty($html)) {
-      self::outputFromHtml($formValues, $html);
-    }
-  }
-
-  /**
    * List the available tokens
    * @return array of token name => label
    */

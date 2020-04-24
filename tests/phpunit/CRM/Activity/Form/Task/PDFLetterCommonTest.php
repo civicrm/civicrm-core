@@ -20,6 +20,7 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public function testCreateDocumentBasicTokens() {
     $activity = $this->activityCreate();
@@ -44,11 +45,19 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test custom field tokens are rendered.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function testCreateDocumentCustomFieldTokens() {
     // Set up custom group, and field
     // returns custom_group_id, custom_field_id, custom_field_option_group_id, custom_field_group_options
-    $cg = $this->entityCustomGroupWithSingleStringMultiSelectFieldCreate("MyCustomField", "ActivityTest.php");
+    $cg = $this->entityCustomGroupWithSingleStringMultiSelectFieldCreate('MyCustomField', 'ActivityTest.php');
     $cf = 'custom_' . $cg['custom_field_id'];
+    $activities = [];
     foreach (array_keys($cg['custom_field_group_options']) as $option) {
       $activity = $this->activityCreate([$cf => $option]);
       $activities[] = [
@@ -61,11 +70,11 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $activityIds = CRM_Utils_Array::collect('id', $activities);
     $output = CRM_Activity_Form_Task_PDFLetterCommon::createDocument($activityIds, $html_message, ['is_unit_test' => TRUE]);
     // Should have one row of output per activity
-    $this->assertEquals(count($activities), count($output));
+    $this->assertCount(count($activities), $output);
 
     // Check each line has the correct substitution
     foreach ($output as $key => $line) {
-      $this->assertEquals($line, "Custom: " . $cg['custom_field_group_options'][$activities[$key]['option']]);
+      $this->assertEquals($line, 'Custom: ' . $cg['custom_field_group_options'][$activities[$key]['option']]);
     }
   }
 
