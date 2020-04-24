@@ -521,25 +521,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $config->doNotAttachPDFReceipt = 1;
 
     if (!empty($params['output']) && $params['output'] == 'pdf_invoice') {
-      $activityTypeID = CRM_Core_PseudoConstant::getKey(
-        'CRM_Activity_DAO_Activity',
-        'activity_type_id',
-        'Downloaded Invoice'
-      );
+      $activityType = 'Downloaded Invoice';
     }
     else {
-      $activityTypeID = CRM_Core_PseudoConstant::getKey(
-        'CRM_Activity_DAO_Activity',
-        'activity_type_id',
-        'Emailed Invoice'
-      );
+      $activityType = 'Emailed Invoice';
     }
 
     $activityParams = [
       'subject' => $subject,
       'source_contact_id' => $userID,
       'target_contact_id' => $contactIds,
-      'activity_type_id' => $activityTypeID,
+      'activity_type_id' => $activityType,
       'activity_date_time' => date('YmdHis'),
       'attachFile_1' => [
         'uri' => $fileName,
