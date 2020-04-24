@@ -103,6 +103,14 @@ class BasicGetFieldsAction extends BasicGetAction {
    */
   protected function padResults(&$values) {
     $fields = array_column($this->fields(), 'name');
+    // Enforce field permissions
+    if ($this->checkPermissions) {
+      foreach ($values as $key => $field) {
+        if (!empty($field['permission']) && !\CRM_Core_Permission::check($field['permission'])) {
+          unset($values[$key]);
+        }
+      }
+    }
     foreach ($values as &$field) {
       $defaults = array_intersect_key([
         'title' => empty($field['name']) ? NULL : ucwords(str_replace('_', ' ', $field['name'])),
