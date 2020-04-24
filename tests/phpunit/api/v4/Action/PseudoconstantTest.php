@@ -26,7 +26,9 @@ use Civi\Api4\Activity;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
+use Civi\Api4\EntityTag;
 use Civi\Api4\OptionValue;
+use Civi\Api4\Tag;
 
 /**
  * @group headless
@@ -38,24 +40,33 @@ class PseudoconstantTest extends BaseCustomValueTest {
     $subject = uniqid('subject');
     OptionValue::create()
       ->addValue('option_group_id:name', 'activity_type')
-      ->addValue('label', 'Fake')
+      ->addValue('label', 'Fake Type')
       ->execute();
 
+    $options = Activity::getFields()
+      ->addWhere('name', '=', 'activity_type_id')
+      ->setLoadOptions(['id', 'name', 'label'])
+      ->execute()->first()['options'];
+    $options = array_column($options, NULL, 'name');
+    $this->assertEquals('Fake Type', $options['Fake_Type']['label']);
+
     Activity::create()
-      ->addValue('activity_type_id:name', 'Fake')
+      ->addValue('activity_type_id:name', 'Fake_Type')
       ->addValue('source_contact_id', $cid)
       ->addValue('subject', $subject)
       ->execute();
 
     $act = Activity::get()
-      ->addWhere('activity_type_id:name', '=', 'Fake')
+      ->addWhere('activity_type_id:label', '=', 'Fake Type')
       ->addWhere('subject', '=', $subject)
+      ->addSelect('activity_type_id:name')
       ->addSelect('activity_type_id:label')
       ->addSelect('activity_type_id')
       ->execute();
 
     $this->assertCount(1, $act);
-    $this->assertEquals('Fake', $act[0]['activity_type_id:label']);
+    $this->assertEquals('Fake Type', $act[0]['activity_type_id:label']);
+    $this->assertEquals('Fake_Type', $act[0]['activity_type_id:name']);
     $this->assertTrue(is_numeric($act[0]['activity_type_id']));
   }
 
@@ -108,30 +119,54 @@ class PseudoconstantTest extends BaseCustomValueTest {
   }
 
   public function testCustomOptions() {
+    $technicolor = [
+      ['id' => 'r', 'name' => 'red', 'label' => 'RED', 'color' => '#ff0000', 'description' => 'Red color', 'icon' => 'fa-red'],
+      ['id' => 'g', 'name' => 'green', 'label' => 'GREEN', 'color' => '#00ff00', 'description' => 'Green color', 'icon' => 'fa-green'],
+      ['id' => 'b', 'name' => 'blue', 'label' => 'BLUE', 'color' => '#0000ff', 'description' => 'Blue color', 'icon' => 'fa-blue'],
+    ];
+
     CustomGroup::create()
       ->setCheckPermissions(FALSE)
       ->addValue('name', 'myPseudoconstantTest')
       ->addValue('extends', 'Individual')
-      ->addChain('field', CustomField::create()
+      ->addChain('field1', CustomField::create()
         ->addValue('custom_group_id', '$id')
-        ->addValue('option_values', ['r' => 'red', 'g' => 'green', 'b' => 'blue'])
+        ->addValue('option_values', ['r' => 'red', 'g' => 'green', 'b' => 'blü'])
         ->addValue('label', 'Color')
         ->addValue('html_type', 'Select')
+      )->addChain('field2', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('option_values', $technicolor)
+        ->addValue('label', 'Technicolor')
+        ->addValue('html_type', 'CheckBox')
       )->execute();
+
+    $fields = Contact::getFields()
+      ->setLoadOptions(array_keys($technicolor[0]))
+      ->setIncludeCustom(TRUE)
+      ->execute()
+      ->indexBy('name');
+
+    foreach ($technicolor as $index => $option) {
+      foreach ($option as $prop => $val) {
+        $this->assertEquals($val, $fields['myPseudoconstantTest.Technicolor']['options'][$index][$prop]);
+      }
+    }
 
     $cid = Contact::create()
       ->setCheckPermissions(FALSE)
       ->addValue('first_name', 'col')
-      ->addValue('myPseudoconstantTest.Color:label', 'blue')
+      ->addValue('myPseudoconstantTest.Color:label', 'blü')
       ->execute()->first()['id'];
 
     $result = Contact::get()
       ->setCheckPermissions(FALSE)
       ->addWhere('id', '=', $cid)
-      ->addSelect('myPseudoconstantTest.Color:label', 'myPseudoconstantTest.Color')
+      ->addSelect('myPseudoconstantTest.Color:name', 'myPseudoconstantTest.Color:label', 'myPseudoconstantTest.Color')
       ->execute()->first();
 
-    $this->assertEquals('blue', $result['myPseudoconstantTest.Color:label']);
+    $this->assertEquals('blü', $result['myPseudoconstantTest.Color:label']);
+    $this->assertEquals('bl_', $result['myPseudoconstantTest.Color:name']);
     $this->assertEquals('b', $result['myPseudoconstantTest.Color']);
   }
 
@@ -172,6 +207,23 @@ class PseudoconstantTest extends BaseCustomValueTest {
     $this->assertEquals('Home', $emails[$cid3]['location_type_id:name']);
     $this->assertEquals('Female', $emails[$cid2]['contact.gender_id:label']);
     $this->assertNull($emails[$cid3]['contact.gender_id:label']);
+  }
+
+  public function testTagOptions() {
+    $tag = uniqid('tag');
+    Tag::create()->setCheckPermissions(FALSE)
+      ->addValue('name', $tag)
+      ->addValue('description', 'colorful')
+      ->addValue('color', '#aabbcc')
+      ->execute();
+    $options = EntityTag::getFields()
+      ->setLoadOptions(['id', 'name', 'color', 'description', 'label'])
+      ->addWhere('name', '=', 'tag_id')
+      ->execute()->first()['options'];
+    $options = array_column($options, NULL, 'name');
+    $this->assertEquals('colorful', $options[$tag]['description']);
+    $this->assertEquals('#aabbcc', $options[$tag]['color']);
+    $this->assertEquals($tag, $options[$tag]['label']);
   }
 
 }

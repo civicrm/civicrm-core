@@ -181,15 +181,16 @@ class FormattingUtil {
    * @param string $entity
    *   Name of api entity
    * @param string $fieldName
-   * @param string $optionValue
+   * @param string $valueType
+   *   name|label|abbr from self::$pseudoConstantContexts
    * @param array $params
    *   Other values for this object
    * @param string $action
    * @return array
    * @throws \API_Exception
    */
-  public static function getPseudoconstantList($entity, $fieldName, $optionValue, $params = [], $action = 'get') {
-    $context = self::$pseudoConstantContexts[$optionValue] ?? NULL;
+  public static function getPseudoconstantList($entity, $fieldName, $valueType, $params = [], $action = 'get') {
+    $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
     if (!$context) {
       throw new \API_Exception('Illegal expression');
     }
@@ -198,8 +199,8 @@ class FormattingUtil {
     if ($baoName) {
       $options = $baoName::buildOptions($fieldName, $context, $params);
     }
-    // Fallback for non-bao based entities
-    if (!isset($options)) {
+    // Fallback for option lists that exist in the api but not the BAO - note: $valueType gets ignored here
+    if (!isset($options) || $options === FALSE) {
       $options = civicrm_api4($entity, 'getFields', ['action' => $action, 'loadOptions' => TRUE, 'where' => [['name', '=', $fieldName]]])[0]['options'] ?? NULL;
     }
     if (is_array($options)) {

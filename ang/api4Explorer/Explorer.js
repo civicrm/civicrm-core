@@ -390,6 +390,17 @@
             if (name === 'values') {
               defaultVal = defaultValues(defaultVal);
             }
+            if (name === 'loadOptions' && $scope.action === 'getFields') {
+              param.options = [
+                false,
+                true,
+                ['id', 'name', 'label'],
+                ['id', 'name', 'label', 'abbr', 'description', 'color', 'icon']
+              ];
+              format = 'json';
+              defaultVal = false;
+              param.type = ['string'];
+            }
             $scope.$bindToRoute({
               expr: 'params["' + name + '"]',
               param: name,
