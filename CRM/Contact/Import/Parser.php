@@ -548,6 +548,11 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
               'website_type_id' => $this->_activeFields[$i]->_relatedContactWebsiteType,
             ];
           }
+          elseif (empty($this->_activeFields[$i]->_value) && isset($this->_activeFields[$i]->_relatedContactLocType)) {
+            if (empty($params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails])) {
+              $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails] = [];
+            }
+          }
           else {
             $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails] = $this->_activeFields[$i]->_value;
           }
