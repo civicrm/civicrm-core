@@ -74,7 +74,7 @@ class Request {
    * @return string
    */
   public static function normalizeEntityName($entity) {
-    return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
+    return \CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel(\CRM_Utils_String::munge($entity), TRUE);
   }
 
   /**

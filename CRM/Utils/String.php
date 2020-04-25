@@ -86,37 +86,17 @@ class CRM_Utils_String {
   }
 
   /**
-   * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g membership_payment returns MembershipPayment
+   * Convert possibly underscore separated words to camel case.
    *
-   * @param string $string
-   *
+   * @param string $str
+   * @param bool $ucFirst
+   *   Should the first letter be capitalized like `CamelCase` or lower like `camelCase`
    * @return string
    */
-  public static function convertStringToCamel($string) {
-    $map = [
-      'acl' => 'Acl',
-      'ACL' => 'Acl',
-      'im' => 'Im',
-      'IM' => 'Im',
-    ];
-    if (isset($map[$string])) {
-      return $map[$string];
-    }
-
-    $fragments = explode('_', $string);
-    foreach ($fragments as & $fragment) {
-      $fragment = ucfirst($fragment);
-      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
-      if (strpos($fragment, 'Uf') === 0 && strlen($string) > 2) {
-        $fragment = 'UF' . ucfirst(substr($fragment, 2));
-      }
-    }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
-    }
-    return implode('', $fragments);
+  public static function convertStringToCamel($str, $ucFirst = TRUE) {
+    $fragments = explode('_', $str);
+    $camel = implode('', array_map('ucfirst', $fragments));
+    return $ucFirst ? $camel : lcfirst($camel);
   }
 
   /**

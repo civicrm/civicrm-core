@@ -209,6 +209,66 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
+   * Convert possibly underscore separated words to camel case with special handling for 'UF'
+   * e.g membership_payment returns MembershipPayment
+   *
+   * @param string $name
+   * @param bool $legacyV3
+   * @return string
+   */
+  public static function convertEntityNameToCamel(string $name, $legacyV3 = FALSE): string {
+    // This map only applies to APIv3
+    $map = [
+      'acl' => 'Acl',
+      'ACL' => 'Acl',
+      'im' => 'Im',
+      'IM' => 'Im',
+    ];
+    if ($legacyV3 && isset($map[$name])) {
+      return $map[$name];
+    }
+
+    $fragments = explode('_', $name);
+    foreach ($fragments as & $fragment) {
+      $fragment = ucfirst($fragment);
+      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
+      if (strpos($fragment, 'Uf') === 0 && strlen($name) > 2) {
+        $fragment = 'UF' . ucfirst(substr($fragment, 2));
+      }
+    }
+    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
+    if ($fragments[0] === 'Uf') {
+      $fragments[0] = 'UF';
+    }
+    return implode('', $fragments);
+  }
+
+  /**
+   * Convert CamelCase to snake_case, with special handling for some entity names.
+   *
+   * Eg. Activity returns activity
+   *     UFGroup returns uf_group
+   *     OptionValue returns option_value
+   *
+   * @param string $name
+   *
+   * @return string
+   */
+  public static function convertEntityNameToLower(string $name): string {
+    if ($name === strtolower($name)) {
+      return $name;
+    }
+    if ($name === 'PCP' || $name === 'IM' || $name === 'ACL') {
+      return strtolower($name);
+    }
+    return strtolower(ltrim(str_replace('U_F',
+      'uf',
+      // That's CamelCase, beside an odd UFCamel that is expected as uf_camel
+      preg_replace('/(?=[A-Z])/', '_$0', $name)
+    ), '_'));
+  }
+
+  /**
    * Get a list of all DAO classes.
    *
    * @return array
