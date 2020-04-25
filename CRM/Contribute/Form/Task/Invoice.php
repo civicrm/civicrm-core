@@ -448,7 +448,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
         $fileName = self::putFile($html, $pdfFileName);
-        self::addActivities($subject, $contribution->contact_id, $fileName, $params);
+        self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
       elseif ($contribution->_component == 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
@@ -462,7 +462,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
         $fileName = self::putFile($html, $pdfFileName);
-        self::addActivities($subject, $contribution->contact_id, $fileName, $params);
+        self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
       $invoiceTemplate->clearTemplateVars();
     }
@@ -510,34 +510,28 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   Gives the location with name of the file.
    * @param array $params
    *   For invoices.
+   * @param int $contributionId
+   *   Contribution Id.
    *
    */
-  public static function addActivities($subject, $contactIds, $fileName, $params) {
+  public static function addActivities($subject, $contactIds, $fileName, $params, $contributionId = NULL) {
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     $config = CRM_Core_Config::singleton();
     $config->doNotAttachPDFReceipt = 1;
 
     if (!empty($params['output']) && $params['output'] == 'pdf_invoice') {
-      $activityTypeID = CRM_Core_PseudoConstant::getKey(
-        'CRM_Activity_DAO_Activity',
-        'activity_type_id',
-        'Downloaded Invoice'
-      );
+      $activityType = 'Downloaded Invoice';
     }
     else {
-      $activityTypeID = CRM_Core_PseudoConstant::getKey(
-        'CRM_Activity_DAO_Activity',
-        'activity_type_id',
-        'Emailed Invoice'
-      );
+      $activityType = 'Emailed Invoice';
     }
 
     $activityParams = [
       'subject' => $subject,
       'source_contact_id' => $userID,
       'target_contact_id' => $contactIds,
-      'activity_type_id' => $activityTypeID,
+      'activity_type_id' => $activityType,
       'activity_date_time' => date('YmdHis'),
       'attachFile_1' => [
         'uri' => $fileName,
@@ -546,7 +540,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'upload_date' => date('YmdHis'),
       ],
     ];
-    CRM_Activity_BAO_Activity::create($activityParams);
+    if ($contributionId) {
+      $activityParams['source_record_id'] = $contributionId;
+    }
+    civicrm_api3('Activity', 'create', $activityParams);
   }
 
   /**
