@@ -1,5 +1,7 @@
 {* file to handle db changes in 5.26.alpha1 during upgrade *}
 
+ALTER TABLE civicrm_option_value MODIFY COLUMN `filter` int unsigned DEFAULT NULL COMMENT 'Bitwise logic can be used to create subsets of options within an option_group for different uses.';
+
 UPDATE civicrm_contact SET is_deceased = 0 WHERE is_deceased IS NULL;
 ALTER TABLE civicrm_contact MODIFY COLUMN is_deceased TINYINT NOT NULL DEFAULT 0;
 
