@@ -120,6 +120,31 @@ class CRM_Utils_String {
   }
 
   /**
+   * Convert CamelCase to snake_case, with special handling for some entity names.
+   *
+   * Eg. Activity returns activity
+   *     UFGroup returns uf_group
+   *     OptionValue returns option_value
+   *
+   * @param string $entity
+   *
+   * @return string
+   */
+  public static function convertEntityToLowerCase(string $entity): string {
+    if ($entity === strtolower($entity)) {
+      return $entity;
+    }
+    if ($entity === 'PCP') {
+      return 'pcp';
+    }
+    return strtolower(ltrim(str_replace('U_F',
+      'uf',
+      // That's CamelCase, beside an odd UFCamel that is expected as uf_camel
+      preg_replace('/(?=[A-Z])/', '_$0', $entity)
+    ), '_'));
+  }
+
+  /**
    * Takes a variable name and munges it randomly into another variable name.
    *
    * @param string $name

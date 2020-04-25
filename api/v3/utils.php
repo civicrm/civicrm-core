@@ -2367,7 +2367,7 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create'
   if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }
-  if ($fieldName == _civicrm_api_get_entity_name_from_camel($entity) . '_id') {
+  if ($fieldName === (CRM_Utils_String::convertEntityToLowerCase($entity) . '_id')) {
     return 'id';
   }
   $result = civicrm_api($entity, 'getfields', [
