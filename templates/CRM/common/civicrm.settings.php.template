@@ -484,6 +484,25 @@ if (CIVICRM_UF === 'UnitTests') {
 }
 
 /**
+ * Whether to include the hash in config log filenames. Defaults to TRUE.
+ * Disable only if you have configured the logfiles to be outside the docroot
+ * using the civicrm.log path setting.
+ *
+ */
+// if (!defined('CIVICRM_LOG_HASH'))  {
+//   define('CIVICRM_LOG_HASH', FALSE );
+// }
+
+/**
+ * The maximum size a log file may be before it's rotated, in bytes.
+ * Set to 0 to disable rotation (only recommended if you have an
+ * external logrotate configuration).
+ */
+// if (!defined('CIVICRM_LOG_ROTATESIZE')) {
+//   define('CIVICRM_LOG_ROTATESIZE', 0 );
+// }
+
+/**
  *
  * Do not change anything below this line. Keep as is
  *
