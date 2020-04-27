@@ -134,37 +134,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * Save records in civicrm_recurring_entity table.
+   * Create or update a RecurringEntity.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   *
-   * @return object
+   * @return CRM_Core_DAO_RecurringEntity
    */
-  public static function add(&$params) {
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'RecurringEntity', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'RecurringEntity', NULL, $params);
-    }
-
-    $daoRecurringEntity = new CRM_Core_DAO_RecurringEntity();
-    $daoRecurringEntity->copyValues($params);
-    $daoRecurringEntity->find(TRUE);
-    $result = $daoRecurringEntity->save();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'RecurringEntity', $daoRecurringEntity->id, $daoRecurringEntity);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'RecurringEntity', $daoRecurringEntity->id, $daoRecurringEntity);
-    }
-    return $result;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
-   * Wrapper for the function add() to add entry in recurring entity
+   * Convenience wrapper for self::writeRecord
    *
    * @param int $parentId
    *   Parent entity id .
@@ -173,17 +153,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param string $entityTable
    *   Name of the entity table .
    *
-   *
-   * @return object
+   * @return CRM_Core_DAO_RecurringEntity
    */
   public static function quickAdd($parentId, $entityId, $entityTable) {
-    $params
-      = [
-        'parent_id' => $parentId,
-        'entity_id' => $entityId,
-        'entity_table' => $entityTable,
-      ];
-    return self::add($params);
+    $params = [
+      'parent_id' => $parentId,
+      'entity_id' => $entityId,
+      'entity_table' => $entityTable,
+    ];
+    return self::writeRecord($params);
   }
 
   /**

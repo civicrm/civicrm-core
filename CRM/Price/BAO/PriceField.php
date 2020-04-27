@@ -33,32 +33,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   private static $visibilityOptionsKeys;
 
   /**
-   * Takes an associative array and creates a price field object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * price field object. the params array could contain additional unused name/value
-   * pairs
+   * Create or update a PriceField.
    *
    * @param array $params
-   *   (reference) an assoc array of name/value pairs.
-   *
-   * @return CRM_Price_BAO_PriceField
+   * @return CRM_Price_DAO_PriceField
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'PriceField', CRM_Utils_Array::value('id', $params), $params);
-
-    $priceFieldBAO = new CRM_Price_BAO_PriceField();
-
-    $priceFieldBAO->copyValues($params);
-
-    if ($id = CRM_Utils_Array::value('id', $params)) {
-      $priceFieldBAO->id = $id;
-    }
-
-    $priceFieldBAO->save();
-    CRM_Utils_Hook::post($hook, 'PriceField', $priceFieldBAO->id, $priceFieldBAO);
-    return $priceFieldBAO;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**

@@ -20,20 +20,10 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
    * Create entity batch entry.
    *
    * @param array $params
-   * @return array
+   * @return CRM_Batch_DAO_EntityBatch
    */
-  public static function create(&$params) {
-    $op = 'edit';
-    $entityId = $params['id'] ?? NULL;
-    if (!$entityId) {
-      $op = 'create';
-    }
-    CRM_Utils_Hook::pre($op, 'EntityBatch', $entityId, $params);
-    $entityBatch = new CRM_Batch_DAO_EntityBatch();
-    $entityBatch->copyValues($params);
-    $entityBatch->save();
-    CRM_Utils_Hook::post($op, 'EntityBatch', $entityBatch->id, $entityBatch);
-    return $entityBatch;
+  public static function create($params) {
+    return self::writeRecord($params);
   }
 
   /**
