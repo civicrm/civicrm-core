@@ -3546,7 +3546,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       ];
       if (in_array($contributionStatus, $pendingStatus)) {
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-          $params['financial_type_id'],
+          $params['contribution']->financial_type_id,
           'Accounts Receivable Account is'
         );
       }
