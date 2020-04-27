@@ -133,7 +133,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
           $getTaxDetails = TRUE;
         }
         if (isset($priceField[$priceFieldBAO->id]['tax_rate'])) {
-          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceField[$priceFieldBAO->id]['price'], $priceField[$priceFieldBAO->id]['tax_rate'], TRUE);
+          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceField[$priceFieldBAO->id]['price'], $priceField[$priceFieldBAO->id]['tax_rate']);
           $priceField[$priceFieldBAO->id]['tax_amount'] = $taxAmount['tax_amount'];
         }
       }

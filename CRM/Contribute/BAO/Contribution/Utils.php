@@ -473,26 +473,14 @@ LIMIT 1
    *   Amount of field.
    * @param float $taxRate
    *   Tax rate of selected financial account for field.
-   * @param bool $ugWeDoNotKnowIfItNeedsCleaning_Help
-   *   This should ALWAYS BE FALSE and then be removed. A 'clean' money string uses a standardised format
-   *   such as '1000.99' for one thousand $/Euro/CUR and ninety nine cents/units.
-   *   However, we are in the habit of not necessarily doing that so need to grandfather in
-   *   the new expectation.
    *
    * @return array
    *   array of tax amount
    *
    */
-  public static function calculateTaxAmount($amount, $taxRate, $ugWeDoNotKnowIfItNeedsCleaning_Help = FALSE) {
-    $taxAmount = [];
-    if ($ugWeDoNotKnowIfItNeedsCleaning_Help) {
-      Civi::log()->warning('Deprecated function, make sure money is in usable format before calling this.', ['civi.tag' => 'deprecated']);
-      $amount = CRM_Utils_Rule::cleanMoney($amount);
-    }
-    // There can not be any rounding at this stage - as this is prior to quantity multiplication
-    $taxAmount['tax_amount'] = ($taxRate / 100) * $amount;
-
-    return $taxAmount;
+  public static function calculateTaxAmount($amount, $taxRate) {
+    // There can not be any rounding at this stage - as it should be done at point of display.
+    return ['tax_amount' => ($taxRate / 100) * $amount];
   }
 
   /**
