@@ -565,9 +565,27 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
         $value['line_item'] = $lineItem;
-        $value['skipCleanMoney'] = TRUE;
+
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value);
+        // This code to retrieve the contribution has been moved here from the contribution create
+        // api. It may not be required.
+        $titleFields = [
+          'contact_id',
+          'total_amount',
+          'currency',
+          'financial_type_id',
+        ];
+        $retrieveRequired = 0;
+        foreach ($titleFields as $titleField) {
+          if (!isset($contribution->$titleField)) {
+            $retrieveRequired = 1;
+            break;
+          }
+        }
+        if ($retrieveRequired == 1) {
+          $contribution->find(TRUE);
+        }
         $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
         if (!empty($this->_batchInfo['type_id']) && ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment'])) {
           $adjustTotalAmount = FALSE;
