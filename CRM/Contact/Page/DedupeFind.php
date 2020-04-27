@@ -175,7 +175,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           unset($urlQry['snippet']);
           CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), $urlQry));
         }
-        $ruleGroupName = civicrm_api3('RuleGroup', 'getvalue', ['id' => $rgid, 'return' => 'name']);
+        $ruleGroupName = civicrm_api3('RuleGroup', 'getvalue', ['id' => $rgid, 'return' => 'title']);
         CRM_Core_Session::singleton()->setStatus(ts('No possible duplicates were found using %1 rule.', [1 => $ruleGroupName]), ts('None Found'), 'info');
         $url = CRM_Utils_System::url('civicrm/contact/deduperules', 'reset=1');
         if ($context == 'search') {
