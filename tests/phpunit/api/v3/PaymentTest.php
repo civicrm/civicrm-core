@@ -68,10 +68,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'check_permissions' => TRUE,
     ];
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM'];
-    $payment = $this->callAPIFailure('payment', 'get', $params, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and access CiviContribute');
+    $this->callAPIFailure('payment', 'get', $params, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and access CiviContribute');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviContribute');
-    $payment = $this->callAPISuccess('payment', 'get', $params);
+    $this->callAPISuccess('payment', 'get', $params);
 
     $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $payment['count']);
@@ -90,6 +90,51 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
     ]);
     $this->validateAllPayments();
+  }
+
+  /**
+   * Test multiple payments for contribution and assert if option
+   * and is_payment returns the correct list of payments.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultiplePaymentsForContribution() {
+    $params = [
+      'contact_id' => $this->_individualId,
+      'total_amount' => 100,
+      'contribution_status_id' => 'Pending',
+    ];
+    $contributionID = $this->contributionCreate($params);
+    $paymentParams = [
+      'contribution_id' => $contributionID,
+      'total_amount' => 20,
+      'trxn_date' => date('Y-m-d'),
+    ];
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+    $paymentParams['total_amount'] = 30;
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+
+    $paymentParams['total_amount'] = 50;
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+
+    //check if contribution status is set to "Completed".
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contributionID,
+    ]);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    //Get Payment using options
+    $getParams = [
+      'sequential' => 1,
+      'contribution_id' => $contributionID,
+      'is_payment' => 1,
+      'options' => ['limit' => 0, 'sort' => 'total_amount DESC'],
+    ];
+    $payments = $this->callAPISuccess('Payment', 'get', $getParams);
+    $this->assertEquals(3, $payments['count']);
+    foreach ([50, 30, 20] as $key => $total_amount) {
+      $this->assertEquals($total_amount, $payments['values'][$key]['total_amount']);
+    }
   }
 
   /**
@@ -516,7 +561,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => -90,
     ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'return' => ["contribution_status_id"],
+      'return' => ['contribution_status_id'],
       'id' => $contributionID,
     ]);
     //Assert if main contribution status is updated to "Refunded".
@@ -543,7 +588,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $payment['id'],
       'check_permissions' => TRUE,
     ];
-    $payment = $this->callAPIFailure('payment', 'cancel', $cancelParams, 'API permission check failed for Payment/cancel call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
+    $this->callAPIFailure('payment', 'cancel', $cancelParams, 'API permission check failed for Payment/cancel call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
 
@@ -575,24 +620,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     ];
 
-    $payment = $this->callAPISuccess('payment', 'get', $params);
-    $this->assertEquals(1, $payment['count']);
+    $payment = $this->callAPISuccessGetSingle('payment', $params);
 
     $deleteParams = [
       'id' => $payment['id'],
       'check_permissions' => TRUE,
     ];
-    $payment = $this->callAPIFailure('payment', 'delete', $deleteParams, 'API permission check failed for Payment/delete call; insufficient permission: require access CiviCRM and access CiviContribute and delete in CiviContribute');
+    $this->callAPIFailure('payment', 'delete', $deleteParams, 'API permission check failed for Payment/delete call; insufficient permission: require access CiviCRM and access CiviContribute and delete in CiviContribute');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'delete in CiviContribute');
     $this->callAPIAndDocument('payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccessGetCount('payment', $params, 0);
 
-    $payment = $this->callAPISuccess('payment', 'get', $params);
-    $this->assertEquals(0, $payment['count']);
-
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
+    $this->callAPISuccess('Contribution', 'Delete', ['id' => $contribution['id']]);
   }
 
   /**
