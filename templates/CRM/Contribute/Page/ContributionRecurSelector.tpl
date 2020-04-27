@@ -14,6 +14,7 @@
       <th scope="col">{ts}Frequency{/ts}</th>
       <th scope="col">{ts}Start Date{/ts}</th>
       <th scope="col">{ts}Installments{/ts}</th>
+      <th scope="col">{ts}Payment Processor{/ts}</th>
       <th scope="col">{ts}Status{/ts}</th>
       <th scope="col"></th>
     </tr>
@@ -25,6 +26,7 @@
         <td>{ts}Every{/ts} {$row.frequency_interval} {$row.frequency_unit} </td>
         <td>{$row.start_date|crmDate}</td>
         <td>{$row.installments}</td>
+        <td>{$row.payment_processor}</td>
         <td>{$row.contribution_status}</td>
         <td>{$row.action|replace:'xx':$row.recurId}</td>
       </tr>
