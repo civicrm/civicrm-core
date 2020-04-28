@@ -39,24 +39,20 @@ class SettingsBagTest extends \CiviUnitTestCase {
 
     $this->assertEquals(10, $s->get('contribution_invoice_settings')['due_date']);
     $this->assertEquals(10, $s->get('invoice_due_date'));
-    $this->assertEquals(NULL, $s->getExplicit('invoice_due_date'));
 
     $s->set('invoice_due_date', 20);
     $this->assertEquals(20, $s->get('contribution_invoice_settings')['due_date']);
     $this->assertEquals(20, $s->get('invoice_due_date'));
-    $this->assertEquals(20, $s->getExplicit('invoice_due_date'));
 
     $s->set('contribution_invoice_settings', array_merge($s->get('contribution_invoice_settings'), [
       'due_date' => 30,
     ]));
     $this->assertEquals(30, $s->get('contribution_invoice_settings')['due_date']);
     $this->assertEquals(30, $s->get('invoice_due_date'));
-    $this->assertEquals(30, $s->getExplicit('invoice_due_date'));
 
-    $s->revert('invoice_due_date');
+    $s->revert('contribution_invoice_settings');
     $this->assertEquals(10, $s->get('contribution_invoice_settings')['due_date']);
     $this->assertEquals(10, $s->get('invoice_due_date'));
-    $this->assertEquals(NULL, $s->getExplicit('invoice_due_date'));
   }
 
   /**
@@ -69,7 +65,7 @@ class SettingsBagTest extends \CiviUnitTestCase {
     $this->assertEquals(10, $s->get('invoice_due_date'));
     $this->assertEquals(NULL, $s->getExplicit('invoice_due_date'));
 
-    $s->loadMandatory(['invoice_due_date' => 30]);
+    $s->loadMandatory(['contribution_invoice_settings' => ['due_date' => 30]]);
 
     $this->assertEquals(30, $s->get('contribution_invoice_settings')['due_date']);
     $this->assertEquals(30, $s->get('invoice_due_date'));

@@ -284,11 +284,12 @@ class SettingsBag {
    *   TRUE if $key is a virtualized setting. FALSE if it is a normal setting.
    */
   public function updateVirtual($key, $value) {
-    if ($key === 'contribution_invoice_settings') {
-      foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
-        $keyValue = $value[$possibleKeyName] ?? '';
-        $this->set($settingName, $keyValue);
-      }
+    $invoiceKeys = SettingsBag::getContributionInvoiceSettingKeys();
+    $internalKey = array_search($key, $invoiceKeys);
+    if ($internalKey !== FALSE) {
+      $invoiceSettings = $this->get('contribution_invoice_settings');
+      $invoiceSettings[$internalKey] = $value;
+      $this->set('contribution_invoice_settings', $invoiceSettings);
       return TRUE;
     }
     return FALSE;
@@ -300,11 +301,12 @@ class SettingsBag {
    * @return array
    */
   public function computeVirtual() {
-    $contributionSettings = [];
+    $invoice = $this->get('contribution_invoice_settings');
+    $virtuals = [];
     foreach (SettingsBag::getContributionInvoiceSettingKeys() as $keyName => $settingName) {
-      $contributionSettings[$keyName] = $this->get($settingName);
+      $virtuals[$settingName] = $invoice[$keyName] ?? '';
     }
-    return ['contribution_invoice_settings' => $contributionSettings];
+    return $virtuals;
   }
 
   /**
