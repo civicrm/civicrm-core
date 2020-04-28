@@ -168,6 +168,7 @@ class SettingsBag {
         [$this->defaults, $this->values, $this->mandatory]
       );
     }
+    $this->combined['contribution_invoice_settings'] = $this->getContributionSettings();
     return $this->combined;
   }
 
