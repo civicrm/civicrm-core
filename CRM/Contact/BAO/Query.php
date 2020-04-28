@@ -2181,8 +2181,7 @@ class CRM_Contact_BAO_Query {
         'CRM_Contact_DAO_Contact',
         $field,
         $field['title'],
-        CRM_Utils_Type::typeToString($dataType),
-        TRUE
+        CRM_Utils_Type::typeToString($dataType)
       );
       if ($name === 'gender_id') {
         self::$_openedPanes[ts('Demographics')] = TRUE;
@@ -2211,8 +2210,7 @@ class CRM_Contact_BAO_Query {
         NULL,
         $field,
         ts('World Region'),
-        'Positive',
-        TRUE
+        'Positive'
       );
     }
     elseif ($name === 'is_deceased') {
@@ -2256,36 +2254,6 @@ class CRM_Contact_BAO_Query {
       $ceWhereClause .= " AND contact_a.contact_type = 'Individual'";
       $this->_where[$grouping][] = $ceWhereClause;
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
-    }
-    elseif ($name === 'email_greeting') {
-      CRM_Core_Error::deprecatedFunctionWarning('pass in email_greeting_id or email_greeting_display');
-      $filterCondition = ['greeting_type' => 'email_greeting'];
-      $this->optionValueQuery(
-        $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::greeting($filterCondition),
-        $field,
-        ts('Email Greeting')
-      );
-    }
-    elseif ($name === 'postal_greeting') {
-      CRM_Core_Error::deprecatedFunctionWarning('pass in postal_greeting_id or postal_greeting_display');
-      $filterCondition = ['greeting_type' => 'postal_greeting'];
-      $this->optionValueQuery(
-        $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::greeting($filterCondition),
-        $field,
-        ts('Postal Greeting')
-      );
-    }
-    elseif ($name === 'addressee') {
-      CRM_Core_Error::deprecatedFunctionWarning('pass in addressee_id or addressee_display');
-      $filterCondition = ['greeting_type' => 'addressee'];
-      $this->optionValueQuery(
-        $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::greeting($filterCondition),
-        $field,
-        ts('Addressee')
-      );
     }
     elseif (substr($name, 0, 4) === 'url-') {
       $tName = 'civicrm_website';
@@ -5882,8 +5850,6 @@ AND   displayRelType.is_active = 1
    * @param string $label
    *   The label for this field element.
    * @param string $dataType
-   *   The data type for this element.
-   * @param bool $useIDsOnly
    *
    * @throws \CRM_Core_Exception
    */
@@ -5895,8 +5861,7 @@ AND   displayRelType.is_active = 1
     $daoName = NULL,
     $field,
     $label,
-    $dataType = 'String',
-    $useIDsOnly = FALSE
+    $dataType = 'String'
   ) {
 
     $pseudoFields = [
@@ -5905,27 +5870,22 @@ AND   displayRelType.is_active = 1
       'addressee',
     ];
 
-    if ($useIDsOnly) {
-      list($tableName, $fieldName) = explode('.', $field['where'], 2);
-      if ($tableName == 'civicrm_contact') {
-        $wc = "contact_a.$fieldName";
-      }
-      else {
-        // Special handling for on_hold, so that we actually use the 'where'
-        // property in order to limit the query by the on_hold status of the email,
-        // instead of using email.id which would be nonsensical.
-        if ($field['name'] === 'on_hold') {
-          $wc = $field['where'];
-        }
-        else {
-          $wc = "$tableName.id";
-        }
-      }
+    list($tableName, $fieldName) = explode('.', $field['where'], 2);
+    if ($tableName == 'civicrm_contact') {
+      $wc = "contact_a.$fieldName";
     }
     else {
-      CRM_Core_Error::deprecatedFunctionWarning('pass $ids to this method');
-      $wc = "{$field['where']}";
+      // Special handling for on_hold, so that we actually use the 'where'
+      // property in order to limit the query by the on_hold status of the email,
+      // instead of using email.id which would be nonsensical.
+      if ($field['name'] === 'on_hold') {
+        $wc = $field['where'];
+      }
+      else {
+        $wc = "$tableName.id";
+      }
     }
+
     if (in_array($name, $pseudoFields)) {
       $wc = "contact_a.{$name}_id";
       $dataType = 'Positive';
