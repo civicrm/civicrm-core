@@ -109,6 +109,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
       'from_email_address' => $loggedInEmail['id'],
       'subject' => 'Really interesting stuff',
       'bcc_id' => $bcc,
+      'cc_id' => '',
     ]));
     $mut->checkMailLog([
       'This is a test Signature',
