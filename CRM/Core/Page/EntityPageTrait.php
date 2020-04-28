@@ -124,8 +124,15 @@ trait CRM_Core_Page_EntityPageTrait {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
+  protected function getDefaultAction() {
+    return 'browse';
+  }
+
   public function preProcessQuickEntityPage() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, $this->getDefaultAction());
     $this->assign('action', $this->getAction());
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
