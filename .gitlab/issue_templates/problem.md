@@ -2,6 +2,8 @@ Overview
 ----------------------------------------
 _Please describe your problem or bug in detail._
 
+_If you have already posted on https://civicrm.stackexchange.com or https://chat.civicrm.org, please include the link to that conversation._
+
 Reproduction steps
 ----------------------------------------
 1. Click on **Contacts -> New Individual**.
