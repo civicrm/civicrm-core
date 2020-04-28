@@ -1457,7 +1457,6 @@ UPDATE  civicrm_participant
 
       list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
-          'groupName' => 'msg_tpl_workflow_event',
           'valueName' => 'participant_' . strtolower($mailType),
           'contactId' => $contactId,
           'tplParams' => [

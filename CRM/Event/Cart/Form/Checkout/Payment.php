@@ -316,7 +316,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'table' => 'civicrm_msg_template',
       'contactId' => $this->payer_contact_id,
       'from' => current(CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE)),
-      'groupName' => 'msg_tpl_workflow_event',
       'isTest' => FALSE,
       'toEmail' => $contact_details[1],
       'toName' => $contact_details[0],

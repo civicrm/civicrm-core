@@ -1309,7 +1309,6 @@ HERESQL;
 
       list($result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
-          'groupName' => 'msg_tpl_workflow_case',
           'valueName' => 'case_activity',
           'contactId' => $info['contact_id'] ?? NULL,
           'tplParams' => $tplParams,

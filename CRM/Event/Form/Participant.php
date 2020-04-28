@@ -1590,7 +1590,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         $sendTemplateParams = [
-          'groupName' => 'msg_tpl_workflow_event',
           'valueName' => 'event_offline_receipt',
           'contactId' => $contactID,
           'isTest' => !empty($this->_defaultValues['is_test']),

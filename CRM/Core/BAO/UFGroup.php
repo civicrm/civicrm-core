@@ -2706,7 +2706,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       // FIXME: take the below out of the foreach loop
       CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
-          'groupName' => 'msg_tpl_workflow_uf',
           'valueName' => 'uf_notify',
           'contactId' => $contactID,
           'tplParams' => [

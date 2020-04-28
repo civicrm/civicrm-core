@@ -15,6 +15,10 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\MessageTemplate;
+use Civi\Api4\OptionGroup;
+use Civi\Api4\OptionValue;
+
 require_once 'Mail/mime.php';
 
 /**
@@ -345,11 +349,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @return array
    *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public static function sendTemplate($params) {
     $defaults = [
-      // option group name of the template
-      'groupName' => NULL,
       // option value name of the template
       'valueName' => NULL,
       // ID of the template
@@ -386,49 +389,38 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
 
-    if ((!$params['groupName'] ||
-        !$params['valueName']
-      ) &&
-      !$params['messageTemplateID']
-    ) {
-      throw new CRM_Core_Exception(ts("Message template's option group and/or option value or ID missing."));
+    if (!$params['valueName'] && !$params['messageTemplateID']) {
+      throw new CRM_Core_Exception(ts("Message template's option value or ID missing."));
     }
+
+    $apiCall = MessageTemplate::get()
+      ->setCheckPermissions(FALSE)
+      ->addSelect('msg_subject', 'msg_text', 'msg_html', 'pdf_format_id', 'id')
+      ->addWhere('is_default', '=', 1);
 
     if ($params['messageTemplateID']) {
-      // fetch the three elements from the db based on id
-      $query = 'SELECT msg_subject subject, msg_text text, msg_html html, pdf_format_id format
-                      FROM civicrm_msg_template mt
-                      WHERE mt.id = %1 AND mt.is_default = 1';
-      $sqlParams = [1 => [$params['messageTemplateID'], 'String']];
+      $apiCall->addWhere('id', '=', (int) $params['messageTemplateID']);
     }
     else {
-      // fetch the three elements from the db based on option_group and option_value names
-      $query = 'SELECT msg_subject subject, msg_text text, msg_html html, pdf_format_id format
-                      FROM civicrm_msg_template mt
-                      JOIN civicrm_option_value ov ON workflow_id = ov.id
-                      JOIN civicrm_option_group og ON ov.option_group_id = og.id
-                      WHERE og.name = %1 AND ov.name = %2 AND mt.is_default = 1';
-      $sqlParams = [1 => [$params['groupName'], 'String'], 2 => [$params['valueName'], 'String']];
+      $apiCall->addWhere('workflow_id:name', '=', $params['valueName']);
     }
-    $dao = CRM_Core_DAO::executeQuery($query, $sqlParams);
-    $dao->fetch();
+    $messageTemplate = $apiCall->execute()->first();
 
-    if (!$dao->N) {
+    if (empty($messageTemplate['id'])) {
       if ($params['messageTemplateID']) {
         throw new CRM_Core_Exception(ts('No such message template: id=%1.', [1 => $params['messageTemplateID']]));
       }
-      throw new CRM_Core_Exception(ts('No such message template: option group %1, option value %2.', [
-        1 => $params['groupName'],
-        2 => $params['valueName'],
-      ]));
+      throw new CRM_Core_Exception(ts('No such message template: option value %2.', [2 => $params['valueName']]));
     }
 
     $mailContent = [
-      'subject' => $dao->subject,
-      'text' => $dao->text,
-      'html' => $dao->html,
-      'format' => $dao->format,
-      'groupName' => $params['groupName'],
+      'subject' => $messageTemplate['msg_subject'],
+      'text' => $messageTemplate['msg_text'],
+      'html' => $messageTemplate['msg_html'],
+      'format' => $messageTemplate['pdf_format_id'],
+      // Group name is a deprecated parameter. At some point it will not be passed out.
+      // https://github.com/civicrm/civicrm-core/pull/17180
+      'groupName' => $params['groupName'] ?? NULL,
       'valueName' => $params['valueName'],
       'messageTemplateID' => $params['messageTemplateID'],
     ];
@@ -493,7 +485,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         $returnProperties,
         FALSE, FALSE, NULL,
         CRM_Utils_Token::flattenTokens($tokens),
-        // we should consider adding groupName and valueName here
+        // we should consider adding valueName here
         'CRM_Core_BAO_MessageTemplate'
       );
       $contact = $contact[$contactID];
@@ -513,7 +505,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         [$contactID],
         NULL,
         CRM_Utils_Token::flattenTokens($tokens),
-        // we should consider adding groupName and valueName here
+        // we should consider adding valueName here
         'CRM_Core_BAO_MessageTemplate'
       );
       $contact = $contactArray[$contactID];
@@ -592,6 +584,53 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
 
     return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']];
+  }
+
+  /**
+   * Get options message template fields.
+   *
+   * This is provided to allow us to render 'workflow_id' 'as if' it were a single option group.
+   *
+   * Currently message template links workflow_id to the field option_value.id rather than
+   * value which is the case for all other option groups. There does not appear to be a good reason
+   * and this makes the underlying odd structure invisible to users who wish to access
+   * workflow_id.name and workflow_id.label.
+   *
+   * The goal is to follow up with a structural migration. Component id would need to be
+   * set for each option value.
+   *
+   * @param string $fieldName
+   * @param string $context see CRM_Core_DAO::buildOptionsContext.
+   * @param array $props whatever is known about this dao object.
+   *
+   * @return array|bool
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @see CRM_Core_DAO::buildOptions
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+    if ($fieldName === 'workflow_id') {
+      $return = [];
+      $optionGroups = OptionGroup::get()
+        ->setCheckPermissions(FALSE)
+        ->setSelect(['id'])
+        ->addWhere('name', 'LIKE', 'msg_tpl%')
+        ->execute()
+        ->indexBy('id');
+      $options = OptionValue::get()
+        ->setCheckPermissions(FALSE)
+        ->setSelect(['id', 'name', 'label'])
+        ->addWhere('option_group_id', 'IN', array_keys((array) $optionGroups))
+        ->execute();
+      foreach ($options as $option) {
+        $key = $context === 'match' ? $option['name'] : $option['id'];
+        $value = $context === 'validate' ? $option['name'] : $option['label'];
+        $return[$key] = $value;
+      }
+      return $return;
+    }
+    return parent::buildOptions($fieldName, $context, $props);
+
   }
 
 }
