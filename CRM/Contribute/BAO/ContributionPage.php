@@ -416,9 +416,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         list($ccDisplayName, $ccEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($values['related_contact']);
         $ccMailId = "{$ccDisplayName} <{$ccEmail}>";
 
-        //@todo - this is the only place in this function where  $values is altered - but I can't find any evidence it is used
-        $values['cc_receipt'] = !empty($values['cc_receipt']) ? ($values['cc_receipt'] . ',' . $ccMailId) : $ccMailId;
-
         // reset primary-email in the template
         $tplParams['email'] = $ccEmail;
 
@@ -470,6 +467,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
         }
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        //dev/core/1736 fire off a second email to the related contact, getting rid of the old CC option
+        if (array_key_exists('related_contact', $values)) {
+          $sendTemplateParams['toName'] = $ccDisplayName;
+          $sendTemplateParams['toEmail'] = $ccEmail;
+          list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        }
       }
 
       // send duplicate alert, if dupe match found during on-behalf-of processing.
