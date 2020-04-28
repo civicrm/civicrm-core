@@ -1737,7 +1737,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
         $this->assign('getTaxDetails', $getTaxDetails);
         $this->assign('dataArray', $taxRate);
-        $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+        $this->assign('taxTerm', Civi::settings()->get('tax_term'));
       }
       else {
         $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));

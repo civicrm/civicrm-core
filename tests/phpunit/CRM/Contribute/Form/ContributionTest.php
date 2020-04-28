@@ -1174,13 +1174,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 3);
-    $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1]);
-    $this->assertEquals(2, $items['count']);
-    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
-    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+    $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1])['values'];
+    $this->assertEquals(2, count($items));
+    $this->assertEquals('Contribution Amount', $items[0]['description']);
+    $this->assertEquals('Sales Tax', $items[1]['description']);
 
-    $this->assertEquals(10000, $items['values'][0]['amount']);
-    $this->assertEquals(1000, $items['values'][1]['amount']);
+    $this->assertEquals(10000, $items[0]['amount']);
+    $this->assertEquals(1000, $items[1]['amount']);
   }
 
   /**

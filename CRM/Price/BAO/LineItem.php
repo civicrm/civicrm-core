@@ -286,7 +286,7 @@ WHERE li.contribution_id = %1";
     }
     if ($invoicing) {
       // @todo - this is an inappropriate place to be doing form level assignments.
-      $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+      $taxTerm = Civi::settings()->get('tax_term');
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('taxTerm', $taxTerm);
       $smarty->assign('getTaxDetails', $getTaxDetails);

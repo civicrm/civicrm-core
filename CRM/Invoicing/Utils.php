@@ -69,8 +69,7 @@ class CRM_Invoicing_Utils {
    * is unsupported. Here we have a wrapper function to make later cleanup easier.
    */
   public static function getTaxTerm() {
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    return $invoiceSettings['tax_term'] ?? NULL;
+    return Civi::settings()->get('tax_term');
   }
 
 }
