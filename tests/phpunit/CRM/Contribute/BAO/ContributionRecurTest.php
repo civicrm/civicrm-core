@@ -218,4 +218,245 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals($fetchedTemplate['id'], $templateContrib['id']);
   }
 
+  /**
+   * Test to check if correct membership is auto renewed.
+   *
+   */
+  public function testAutoRenewalWhenOneMemberIsDeceased() {
+    $contactId1 = $this->individualCreate();
+    $contactId2 = $this->individualCreate();
+    $membershipOrganizationId = $this->organizationCreate();
+
+    // Created new contribution to bypass the deprecated error
+    // 'Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required.'
+    // in CRM_Price_BAO_LineItem::processPriceSet();
+    $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $contactId1,
+      'receive_date' => '2010-01-20',
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Completed',
+      'total_amount' => 150,
+    ]);
+    $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $contactId1,
+      'receive_date' => '2010-01-20',
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Completed',
+      'total_amount' => 150,
+    ]);
+
+    // create membership type
+    $membershipTypeId1 = $this->callAPISuccess('MembershipType', 'create', [
+      'domain_id' => 1,
+      'member_of_contact_id' => $membershipOrganizationId,
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'month',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'minimum_fee' => 100,
+      'name' => 'Parent',
+    ])['id'];
+
+    $membershipTypeId2 = $this->callAPISuccess('MembershipType', 'create', [
+      'domain_id' => 1,
+      'member_of_contact_id' => $membershipOrganizationId,
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'month',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'minimum_fee' => 50,
+      'name' => 'Child',
+    ])['id'];
+
+    $contactIds = [
+      $contactId1 => $membershipTypeId1,
+      $contactId2 => $membershipTypeId2,
+    ];
+
+    $contributionRecurId = $this->callAPISuccess('contribution_recur', 'create', $this->_params)['id'];
+
+    $priceFields = CRM_Price_BAO_PriceSet::getDefaultPriceSet('membership');
+
+    // prepare order api params.
+    $p = [
+      'contact_id' => $contactId1,
+      'receive_date' => '2010-01-20',
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Pending',
+      'contribution_recur_id' => $contributionRecurId,
+      'total_amount' => 150,
+      'api.Payment.create' => ['total_amount' => 150],
+    ];
+
+    $now = date('Ymd');
+    foreach ($priceFields as $priceField) {
+      $lineItems = [];
+      $contactId = array_search($priceField['membership_type_id'], $contactIds);
+      $lineItems[1] = [
+        'price_field_id' => $priceField['priceFieldID'],
+        'price_field_value_id' => $priceField['priceFieldValueID'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_membership',
+        'membership_type_id' => $priceField['membership_type_id'],
+      ];
+      $p['line_items'][] = [
+        'line_item' => $lineItems,
+        'params' => [
+          'contact_id' => $contactId,
+          'membership_type_id' => $priceField['membership_type_id'],
+          'source' => 'Payment',
+          'join_date' => '2020-04-28',
+          'start_date' => '2020-04-28',
+          'contribution_recur_id' => $contributionRecurId,
+          'status_id' => 'Pending',
+          'is_override' => 1,
+        ],
+      ];
+    }
+    $order = $this->callAPISuccess('order', 'create', $p);
+    $contributionId = $order['id'];
+    $membershipId1 = $this->callAPISuccessGetValue('Membership', [
+      'contact_id' => $contactId1,
+      'membership_type_id' => $membershipTypeId1,
+      'return' => 'id',
+    ]);
+
+    $membershipId2 = $this->callAPISuccessGetValue('Membership', [
+      'contact_id' => $contactId2,
+      'membership_type_id' => $membershipTypeId2,
+      'return' => 'id',
+    ]);
+
+    // First renewal (2nd payment).
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $contributionId,
+      'contribution_status_id' => 'Completed',
+    ]);
+
+    // Second Renewal (3rd payment).
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $contributionId,
+      'contribution_status_id' => 'Completed',
+    ]);
+
+    // Third renewal (4th payment).
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $contributionId,
+      'contribution_status_id' => 'Completed',
+    ]);
+
+    // check line item and membership payment count.
+    $this->validateAllCounts($membershipId1, 4);
+    $this->validateAllCounts($membershipId2, 4);
+
+    // check membership end date.
+    foreach ([$membershipId1, $membershipId2] as $mId) {
+      $endDate = $this->callAPISuccessGetValue('Membership', [
+        'id' => $mId,
+        'return' => 'end_date',
+      ]);
+      $this->assertEquals($endDate, '2020-08-27', ts('End date incorrect.'));
+    }
+
+    // At this moment Contact 2 is deceased, but we wait until payment is recorded in civi before marking the contact deceased.
+    // At payment Gateway we update the amount from 150 to 100
+    // IPN is recorded for subsequent payment (5th payment).
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $contributionId,
+      'contribution_status_id' => 'Completed',
+      'total_amount' => '100',
+    ]);
+
+    // now we mark the contact2 as deceased.
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactId2,
+      'is_deceased' => 1,
+    ]);
+
+    // We delete latest membership payment and line item.
+    $lineItemId = $this->callAPISuccessGetValue('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'entity_id' => $membershipId2,
+      'entity_table' => 'civicrm_membership',
+      'return' => 'id',
+    ]);
+
+    // No api to delete membership payment.
+    CRM_Core_DAO::executeQuery("
+      DELETE FROM civicrm_membership_payment
+      WHERE contribution_id = %1
+        AND membership_id = %2
+    ", [
+      1 => [$contribution['id'], 'Integer'],
+      2 => [$membershipId2, 'Integer'],
+    ]);
+
+    $this->callAPISuccess('LineItem', 'delete', [
+      'id' => $lineItemId,
+    ]);
+
+    // set membership recurring to null.
+    $this->callAPISuccess('Membership', 'create', [
+      'id' => $membershipId2,
+      'contribution_recur_id' => NULL,
+    ]);
+
+    // check line item and membership payment count.
+    $this->validateAllCounts($membershipId1, 5);
+    $this->validateAllCounts($membershipId2, 4);
+
+    $checkAgainst = $this->callAPISuccessGetSingle('Membership', [
+      'id' => $membershipId2,
+      'return' => ['end_date', 'status_id'],
+    ]);
+
+    // record next subsequent payment (6th payment).
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $contributionId,
+      'contribution_status_id' => 'Completed',
+      'total_amount' => '100',
+    ]);
+
+    // check membership id 1 is renewed
+    $endDate = $this->callAPISuccessGetValue('Membership', [
+      'id' => $membershipId1,
+      'return' => 'end_date',
+    ]);
+    $this->assertEquals($endDate, '2020-10-27', ts('End date incorrect.'));
+    // check line item and membership payment count.
+    $this->validateAllCounts($membershipId1, 6);
+    $this->validateAllCounts($membershipId2, 4);
+
+    // check if membership status and end date is not changed.
+    $membership2 = $this->callAPISuccessGetSingle('Membership', [
+      'id' => $membershipId2,
+      'return' => ['end_date', 'status_id'],
+    ]);
+    $this->assertTrue($membership2 === $checkAgainst);
+  }
+
+  /**
+   * Check line item and membership payment count.
+   *
+   * @param int $membershipId
+   * @param int $count
+   *
+   */
+  public function validateAllCounts($membershipId, $count) {
+    $memPayParams = [
+      'membership_id' => $membershipId,
+    ];
+    $lineItemParams = [
+      'entity_id' => $membershipId,
+      'entity_table' => 'civicrm_membership',
+    ];
+    $this->callAPISuccessGetCount('LineItem', $lineItemParams, $count);
+    $this->callAPISuccessGetCount('MembershipPayment', $memPayParams, $count);
+  }
+
 }
