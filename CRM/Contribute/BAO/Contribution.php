@@ -207,12 +207,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       self::recordFinancialAccounts($params);
     }
 
-    if (self::isUpdateToRecurringContribution($params)) {
-      CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
-        (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
-        $contributionStatus,
-        CRM_Utils_Array::value('receive_date', $params)
-      );
+    $recurID = self::isUpdateToRecurringContribution($params);
+    if ($recurID) {
+      $paymentProcessorID = (int) civicrm_api3('ContributionRecur', 'getvalue', ['id' => $recurID, 'return' => 'payment_processor_id']);
+      $paymentProcessor = \Civi\Payment\System::singleton()->getById($paymentProcessorID);
+      $paymentProcessor->doUpdateRecurOnNewContribution($recurID, $contribution->id, $contributionStatus, $params['receive_date'] ?? NULL);
     }
 
     $params['contribution_id'] = $contribution->id;
@@ -232,16 +231,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   /**
    * Is this contribution updating an existing recurring contribution.
    *
-   * We need to upd the status of the linked recurring contribution if we have a new payment against it, or the initial
+   * We need to update the status of the linked recurring contribution if we have a new payment against it, or the initial
    * pending payment is being confirmed (or failing).
    *
    * @param array $params
    *
-   * @return bool
+   * @return bool|int
    */
   public static function isUpdateToRecurringContribution($params) {
     if (!empty($params['contribution_recur_id']) && empty($params['id'])) {
-      return TRUE;
+      return (int) $params['contribution_recur_id'];
     }
     if (empty($params['prevContribution']) || empty($params['contribution_status_id'])) {
       return FALSE;
@@ -251,7 +250,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)) {
-      return TRUE;
+      return (int) $params['prevContribution']->contribution_recur_id;
     }
     return FALSE;
   }

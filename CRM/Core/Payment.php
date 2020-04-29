@@ -1807,4 +1807,61 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return FALSE;
   }
 
+  /**
+   * Update recurring contribution based on incoming payment.
+   * @todo this is a copy of the existing (partially broken) functionality
+   *   This function should update next_sched_contribution_date, cycle_day, failure_count, installments, end_date
+   *
+   * @param int $recurringContributionID
+   * @param int $newContributionID
+   * @param string $newContributionStatus
+   *   Payment status - this correlates to the machine name of the contribution status ID ie
+   *   - Completed
+   *   - Failed
+   * @param string $newContributionDate
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function doUpdateRecurOnNewContribution($recurringContributionID, $newContributionID, $newContributionStatus, $newContributionDate) {
+    $newContributionDate = $newContributionDate ? date('Y-m-d', strtotime($newContributionDate)) : date('Y-m-d');
+    if (!in_array($newContributionStatus, ['Completed', 'Failed'])) {
+      return;
+    }
+    $params = [
+      'id' => $recurringContributionID,
+      'return' => [
+        'contribution_status_id',
+        'next_sched_contribution_date',
+        'frequency_unit',
+        'frequency_interval',
+        'installments',
+        'failure_count',
+      ],
+    ];
+
+    $existing = civicrm_api3('ContributionRecur', 'getsingle', $params);
+
+    if ($newContributionStatus == 'Completed'
+      && CRM_Contribute_PseudoConstant::contributionStatus($existing['contribution_status_id'], 'name') == 'Pending') {
+      $params['contribution_status_id'] = 'In Progress';
+    }
+    if ($newContributionStatus == 'Failed') {
+      $params['failure_count'] = $existing['failure_count'];
+    }
+    $params['modified_date'] = date('Y-m-d H:i:s');
+
+    if (!empty($existing['installments']) && self::isComplete($recurringContributionID, $existing['installments'])) {
+      $params['contribution_status_id'] = 'Completed';
+    }
+    else {
+      // Only update next sched date if it's empty or 'just now' because payment processors may be managing
+      // the scheduled date themselves as core did not previously provide any help.
+      if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
+        strtotime($newContributionDate)) {
+        $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit'], strtotime($newContributionDate)));
+      }
+    }
+    civicrm_api3('ContributionRecur', 'create', $params);
+  }
+
 }
