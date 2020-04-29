@@ -88,6 +88,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
               'sum' => ts("Total Amount Contributed"),
             ],
           ],
+          'source' => [
+            'title' => ts('Contribution Source'),
+          ],
         ],
       ],
       'civicrm_financial_trxn' => [
