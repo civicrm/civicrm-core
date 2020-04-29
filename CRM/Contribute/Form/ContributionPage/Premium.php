@@ -21,6 +21,14 @@
 class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_ContributionPage {
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    parent::preProcess();
+    $this->setSelectedChild('premium');
+  }
+
+  /**
    * Set default values for the form.
    */
   public function setDefaultValues() {

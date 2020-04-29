@@ -20,6 +20,14 @@
 class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_ContributionPage {
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    parent::preProcess();
+    $this->setSelectedChild('custom');
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
