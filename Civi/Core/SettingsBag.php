@@ -287,6 +287,9 @@ class SettingsBag {
     if ($key === 'contribution_invoice_settings') {
       foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
         $keyValue = $value[$possibleKeyName] ?? '';
+        if ($possibleKeyName === 'invoicing' && is_array($keyValue)) {
+          $keyValue = $keyValue['invoicing'];
+        }
         $this->set($settingName, $keyValue);
       }
       return TRUE;
@@ -302,7 +305,15 @@ class SettingsBag {
   public function computeVirtual() {
     $contributionSettings = [];
     foreach (SettingsBag::getContributionInvoiceSettingKeys() as $keyName => $settingName) {
-      $contributionSettings[$keyName] = $this->get($settingName);
+      switch ($keyName) {
+        case 'invoicing':
+          $contributionSettings[$keyName] = $this->get($settingName) ? [$keyName => 1] : 0;
+          break;
+
+        default:
+          $contributionSettings[$keyName] = $this->get($settingName);
+          break;
+      }
     }
     return ['contribution_invoice_settings' => $contributionSettings];
   }
