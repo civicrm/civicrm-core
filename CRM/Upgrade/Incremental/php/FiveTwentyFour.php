@@ -63,6 +63,11 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
     );
   }
 
+  public function upgrade_5_24_6($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Convert CiviContribute settings', 'updateContributeSettings');
+  }
+
   /**
    * Install sequentialCreditNotes extension.
    *
