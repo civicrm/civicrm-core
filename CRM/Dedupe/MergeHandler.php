@@ -110,4 +110,31 @@ class CRM_Dedupe_MergeHandler {
     return $relTables;
   }
 
+  /**
+   * Get an array of tables that have a dynamic reference to the contact table.
+   *
+   * This would be the case when the table uses entity_table + entity_id rather than an FK.
+   *
+   * There are a number of tables that 'could' but don't have contact related data so we
+   * do a cached check for this, ensuring the query is only done once per batch run.
+   *
+   * @return array
+   */
+  public function getTablesDynamicallyRelatedToContactTable() {
+    if (!isset(\Civi::$statics[__CLASS__]['dynamic'])) {
+      \Civi::$statics[__CLASS__]['dynamic'] = [];
+      foreach (CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact') as $tableName => $field) {
+        $sql[] = "(SELECT '$tableName' as civicrm_table, '{$field[0]}' as field_name FROM $tableName WHERE entity_table = 'civicrm_contact' LIMIT 1)";
+      }
+      $sqlString = implode(' UNION ', $sql);
+      if ($sqlString) {
+        $result = CRM_Core_DAO::executeQuery($sqlString);
+        while ($result->fetch()) {
+          \Civi::$statics[__CLASS__]['dynamic'][$result->civicrm_table] = $result->field_name;
+        }
+      }
+    }
+    return \Civi::$statics[__CLASS__]['dynamic'];
+  }
+
 }

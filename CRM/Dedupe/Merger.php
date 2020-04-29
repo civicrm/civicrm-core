@@ -479,8 +479,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * Based on the provided two contact_ids and a set of tables, move the
    * belongings of the other contact to the main one.
    *
-   * @param int $mainId
-   * @param int $otherId
+   * @param CRM_Dedupe_MergeHandler $mergeHandler
    * @param array $tables
    * @param array $tableOperations
    *
@@ -488,9 +487,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function moveContactBelongings($mainId, $otherId, $tables, $tableOperations) {
+  public static function moveContactBelongings($mergeHandler, $tables, $tableOperations) {
+    $mainId = $mergeHandler->getToKeepID();
+    $otherId = $mergeHandler->getToRemoveID();
     $cidRefs = self::cidRefs();
-    $eidRefs = self::eidRefs();
+    $eidRefs = $mergeHandler->getTablesDynamicallyRelatedToContactTable();
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
     self::filterRowBasedCustomDataFromCustomTables($cidRefs);
@@ -500,6 +501,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // if there aren't any specific tables, don't affect the ones handled by relTables()
     // also don't affect tables in locTables() CRM-15658
     $relTables = self::relTables();
+    // These arrays don't make a lot of sense. For now ensure the tested handling of tags works...
+    // it is moved over further down....
+    unset($relTables['rel_table_tags']);
     $handled = self::locTables();
 
     foreach ($relTables as $params) {
@@ -545,10 +549,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
 
       if (isset($eidRefs[$table])) {
-        foreach ($eidRefs[$table] as $entityTable => $entityId) {
-          $sqls[] = "UPDATE IGNORE $table SET $entityId = $mainId WHERE $entityId = $otherId AND $entityTable = 'civicrm_contact'";
-          $sqls[] = "DELETE FROM $table WHERE $entityId = $otherId AND $entityTable = 'civicrm_contact'";
-        }
+        $sqls[] = "UPDATE IGNORE $table SET {$eidRefs[$table]}= $mainId WHERE {$eidRefs[$table]} = $otherId AND entity_table = 'civicrm_contact'";
+        $sqls[] = "DELETE FROM $table WHERE {$eidRefs[$table]} = $otherId AND entity_table = 'civicrm_contact'";
       }
     }
 
@@ -1307,7 +1309,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // overridable DAO class for it.
     $customFieldBAO = new CRM_Core_BAO_CustomField();
     $customFieldBAO->move($otherId, $mainId, $submittedCustomFields);
-    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, $moveTables, $tableOperations);
+    // add the related tables and unset the ones that don't sport any of the duplicate contact's info
+    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
+    CRM_Dedupe_Merger::moveContactBelongings($mergeHandler, $moveTables, $tableOperations);
     unset($moveTables, $tableOperations);
 
     // **** Do table related removals

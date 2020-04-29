@@ -67,6 +67,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // The membershipType create breaks transactions so this extra cleanup is needed.
     $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
     $this->cleanUpSetUpIDs();
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
     parent::tearDown();
   }
@@ -435,8 +436,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Short']);
     $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Tall']);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
-    $this->assertEquals(0, count($result['values']['skipped']));
-    $this->assertEquals(1, count($result['values']['merged']));
+    $this->assertCount(0, $result['values']['skipped']);
+    $this->assertCount(1, $result['values']['merged']);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contact2ID], 0);
     $this->callAPISuccessGetCount('FinancialItem', ['contact_id' => $contactID], 2);
@@ -451,6 +452,27 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('ActivityContact', ['contact_id' => $contactID], 14);
     // 2 for the connection to the deleted by merge activity (source & target)
     $this->callAPISuccessGetCount('ActivityContact', ['contact_id' => $contact2ID], 2);
+  }
+
+  /**
+   * Test that non-contact entity tags are untouched in merge.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionEntityTag() {
+    $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
+    $tagID = $this->tagCreate(['name' => 'Big', 'used_for' => 'civicrm_contribution'])['id'];
+    $contact1 = (int) $this->individualCreate();
+    $contact2 = (int) $this->individualCreate();
+    $contributionID = NULL;
+    while ($contributionID !== $contact2) {
+      $contributionID = (int) $this->callAPISuccess('Contribution', 'create', ['contact_id' => $contact1, 'total_amount' => 5, 'financial_type_id' => 'Donation'])['id'];
+    }
+    $entityTagParams = ['entity_id' => $contributionID, 'entity_table' => 'civicrm_contribution', 'tag_id' => $tagID];
+    $this->callAPISuccess('EntityTag', 'create', $entityTagParams);
+    $this->callAPISuccessGetSingle('EntityTag', $entityTagParams);
+    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $this->callAPISuccessGetSingle('EntityTag', $entityTagParams);
   }
 
   /**

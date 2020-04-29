@@ -2427,6 +2427,8 @@ SELECT contact_id
    *
    * Refer to CRM-17454 for information on the danger of querying the information
    * schema to derive this.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getReferencesToContactTable() {
     if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['contact_references'])) {
@@ -2441,11 +2443,28 @@ SELECT contact_id
     }
     self::appendCustomTablesExtendingContacts($contactReferences);
     self::appendCustomContactReferenceFields($contactReferences);
-
-    // FixME for time being adding below line statically as no Foreign key constraint defined for table 'civicrm_entity_tag'
-    $contactReferences['civicrm_entity_tag'][] = 'entity_id';
     \Civi::$statics[__CLASS__]['contact_references'] = $contactReferences;
     return \Civi::$statics[__CLASS__]['contact_references'];
+  }
+
+  /**
+   * Get all dynamic references to the given table.
+   *
+   * @param string $tableName
+   *
+   * @return array
+   */
+  public static function getDynamicReferencesToTable($tableName) {
+    if (!isset(\Civi::$statics[__CLASS__]['contact_references_dynamic'][$tableName])) {
+      \Civi::$statics[__CLASS__]['contact_references_dynamic'][$tableName] = [];
+      $coreReferences = CRM_Core_DAO::getReferencesToTable($tableName);
+      foreach ($coreReferences as $coreReference) {
+        if ($coreReference instanceof \CRM_Core_Reference_Dynamic) {
+          \Civi::$statics[__CLASS__]['contact_references_dynamic'][$tableName][$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
+        }
+      }
+    }
+    return \Civi::$statics[__CLASS__]['contact_references_dynamic'][$tableName];
   }
 
   /**
