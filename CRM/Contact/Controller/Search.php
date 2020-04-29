@@ -60,8 +60,7 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
     // see if we can figure out the url and redirect to the right search form
     // note that this happens really early on, so we can't use any of the form or controller
     // variables
-    $config = CRM_Core_Config::singleton();
-    $qString = $_GET[$config->userFrameworkURLVar];
+    $qString = CRM_Utils_System::currentPath();
     $args = "reset=1";
     $path = 'civicrm/contact/search/advanced';
     if (strpos($qString, 'basic') !== FALSE) {

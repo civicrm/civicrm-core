@@ -63,8 +63,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
    * @return array
    */
   public function getRequestExtAndSuite() {
-    $config = CRM_Core_Config::singleton();
-    $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
+    $arg = explode('/', CRM_Utils_System::currentPath());
 
     if ($arg[1] == 'dev'
       && CRM_Utils_Array::value(2, $arg) == 'qunit'
