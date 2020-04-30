@@ -570,8 +570,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
               1
             ) {
               // get current user
-              $session = CRM_Core_Session::singleton();
-              if ($contactID = $session->get('userID')) {
+              if ($contactID = CRM_Core_Session::getLoggedInContactID()) {
                 $clause = "{$this->_aliases['civicrm_activity_contact']}.activity_id IN
                            (SELECT activity_id FROM civicrm_activity_contact WHERE contact_id = {$contactID})";
               }
@@ -613,6 +612,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * Build ACL clause.
    *
    * @param string $tableAlias
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildACLClause($tableAlias = 'contact_a') {
     //override for ACL( Since Contact may be source
@@ -623,8 +624,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       return;
     }
 
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = CRM_Core_Session::getLoggedInContactID();
     if (!$contactID) {
       $contactID = 0;
     }
