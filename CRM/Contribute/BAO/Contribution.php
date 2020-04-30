@@ -508,27 +508,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_BAO_Note::add($noteParams);
     }
 
-    // make entry in batch entity batch table
-    if (!empty($params['batch_id'])) {
-      // in some update cases we need to get extra fields - ie an update that doesn't pass in all these params
-      $titleFields = [
-        'contact_id',
-        'total_amount',
-        'currency',
-        'financial_type_id',
-      ];
-      $retrieveRequired = 0;
-      foreach ($titleFields as $titleField) {
-        if (!isset($contribution->$titleField)) {
-          $retrieveRequired = 1;
-          break;
-        }
-      }
-      if ($retrieveRequired == 1) {
-        $contribution->find(TRUE);
-      }
-    }
-
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     $transaction->commit();
