@@ -17,7 +17,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.24.6
 
-Released April 29, 2020
+Released April 30, 2020
 
 - **[Synopsis](release-notes/5.24.6.md#synopsis)**
 - **[Bugs resolved](release-notes/5.24.6.md#bugs)**
