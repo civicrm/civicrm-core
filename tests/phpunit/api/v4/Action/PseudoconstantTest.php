@@ -51,6 +51,12 @@ class PseudoconstantTest extends BaseCustomValueTest {
     $this->assertEquals('Fake Type', $options['Fake_Type']['label']);
 
     Activity::create()
+      ->addValue('activity_type_id:name', 'Meeting')
+      ->addValue('source_contact_id', $cid)
+      ->addValue('subject', $subject)
+      ->execute();
+
+    Activity::create()
       ->addValue('activity_type_id:name', 'Fake_Type')
       ->addValue('source_contact_id', $cid)
       ->addValue('subject', $subject)
@@ -67,6 +73,28 @@ class PseudoconstantTest extends BaseCustomValueTest {
     $this->assertCount(1, $act);
     $this->assertEquals('Fake Type', $act[0]['activity_type_id:label']);
     $this->assertEquals('Fake_Type', $act[0]['activity_type_id:name']);
+    $this->assertTrue(is_numeric($act[0]['activity_type_id']));
+
+    $act = Activity::get()
+      ->addHaving('activity_type_id:name', '=', 'Fake_Type')
+      ->addHaving('subject', '=', $subject)
+      ->addSelect('activity_type_id:label')
+      ->addSelect('activity_type_id')
+      ->addSelect('subject')
+      ->execute();
+
+    $this->assertCount(1, $act);
+    $this->assertEquals('Fake Type', $act[0]['activity_type_id:label']);
+    $this->assertTrue(is_numeric($act[0]['activity_type_id']));
+
+    $act = Activity::get()
+      ->addHaving('activity_type_id:name', '=', 'Fake_Type')
+      ->addHaving('subject', '=', $subject)
+      ->addSelect('activity_type_id')
+      ->addSelect('subject')
+      ->execute();
+
+    $this->assertCount(1, $act);
     $this->assertTrue(is_numeric($act[0]['activity_type_id']));
   }
 

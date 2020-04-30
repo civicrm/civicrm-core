@@ -57,7 +57,7 @@ trait CustomValueActionTrait {
     $result = [];
     $fields = $this->entityFields();
     foreach ($items as $item) {
-      FormattingUtil::formatWriteParams($item, $this->getEntityName(), $fields);
+      FormattingUtil::formatWriteParams($item, $fields);
 
       // Convert field names to custom_xx format
       foreach ($fields as $name => $field) {

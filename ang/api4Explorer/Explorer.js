@@ -112,19 +112,28 @@
       return container;
     }
 
-    function getFieldList(action) {
+    // Returns field list formatted for select2
+    function getFieldList(action, addPseudoconstant) {
       var fields = [],
         fieldInfo = _.findWhere(getEntity().actions, {name: action}).fields;
+      if (addPseudoconstant) {
+        fieldInfo = _.cloneDeep(fieldInfo);
+        addPseudoconstants(fieldInfo, addPseudoconstant);
+      }
       formatForSelect2(fieldInfo, fields, 'name', ['description', 'required', 'default_value']);
       return fields;
     }
 
-    function addJoins(fieldList, addWildcard) {
+    // Note: this function expects fieldList to be select2-formatted already
+    function addJoins(fieldList, addWildcard, addPseudoconstant) {
       var fields = _.cloneDeep(fieldList);
       _.each(links[$scope.entity], function(link) {
         var linkFields = _.cloneDeep(entityFields(link.entity)),
           wildCard = addWildcard ? [{id: link.alias + '.*', text: link.alias + '.*', 'description': 'All core ' + link.entity + ' fields'}] : [];
         if (linkFields) {
+          if (addPseudoconstant) {
+            addPseudoconstants(linkFields, addPseudoconstant);
+          }
           fields.push({
             text: link.alias,
             description: 'Join to ' + link.entity,
@@ -133,6 +142,19 @@
         }
       });
       return fields;
+    }
+
+    // Note: this function transforms a raw list a-la getFields; not a select2-formatted list
+    function addPseudoconstants(fieldList, toAdd) {
+      var optionFields = _.filter(fieldList, 'options');
+      _.each(optionFields, function(field) {
+        var pos = _.findIndex(fieldList, {name: field.name}) + 1;
+        _.each(toAdd, function(suffix) {
+          var newField = _.cloneDeep(field);
+          newField.name += ':' + suffix;
+          fieldList.splice(pos, 0, newField);
+        });
+      });
     }
 
     $scope.help = function(title, content) {
@@ -196,12 +218,15 @@
       return info;
     };
 
+    // Returns field list for write params (values, defaults)
     $scope.fieldList = function(param) {
       return function() {
-        var fields = _.cloneDeep($scope.action === 'getFields' ? getFieldList($scope.params.action || 'get') : $scope.fields);
+        var fields = _.cloneDeep(getFieldList($scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, ['name']));
         // Disable fields that are already in use
         _.each($scope.params[param] || [], function(val) {
-          (_.findWhere(fields, {id: val[0]}) || {}).disabled = true;
+          var usedField = val[0].replace(':name', '');
+          (_.findWhere(fields, {id: usedField}) || {}).disabled = true;
+          (_.findWhere(fields, {id: usedField + ':name'}) || {}).disabled = true;
         });
         return {results: fields};
       };
@@ -339,11 +364,11 @@
         var actionInfo = _.findWhere(actions, {id: $scope.action});
         $scope.fields = getFieldList($scope.action);
         if (_.contains(['get', 'update', 'delete', 'replace'], $scope.action)) {
-          $scope.fieldsAndJoins = addJoins($scope.fields);
-          var fieldsAndFunctions = _.cloneDeep($scope.fields);
+          $scope.fieldsAndJoins = addJoins(getFieldList($scope.action, ['name']));
+          var functions = [];
           // SQL functions are supported if HAVING is
           if (actionInfo.params.having) {
-            fieldsAndFunctions.push({
+            functions.push({
               text: ts('FUNCTION'),
               description: ts('Calculate result of a SQL function'),
               children: _.transform(CRM.vars.api4.functions, function(result, fn) {
@@ -355,12 +380,12 @@
               })
             });
           }
-          $scope.fieldsAndJoinsAndFunctions = addJoins(fieldsAndFunctions, true);
-          $scope.fieldsAndJoinsAndFunctionsAndWildcards = addJoins(fieldsAndFunctions, true);
+          $scope.fieldsAndJoinsAndFunctions = addJoins($scope.fields.concat(functions), true);
+          $scope.fieldsAndJoinsAndFunctionsAndWildcards = addJoins(getFieldList($scope.action, ['name', 'label']).concat(functions), true, ['name', 'label']);
         } else {
-          $scope.fieldsAndJoins = $scope.fields;
+          $scope.fieldsAndJoins = getFieldList($scope.action, ['name']);
           $scope.fieldsAndJoinsAndFunctions = $scope.fields;
-          $scope.fieldsAndJoinsAndFunctionsAndWildcards = _.cloneDeep($scope.fields);
+          $scope.fieldsAndJoinsAndFunctionsAndWildcards = getFieldList($scope.action, ['name', 'label']);
         }
         $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
         _.each(actionInfo.params, function (param, name) {
@@ -424,7 +449,7 @@
               $scope.havingOptions.length = 0;
               _.each(values, function(item) {
                 var pieces = item.split(' AS '),
-                  alias = _.trim(pieces[pieces.length - 1]);
+                  alias = _.trim(pieces[pieces.length - 1]).replace(':label', ':name');
                 $scope.havingOptions.push({id: alias, text: alias});
               });
             });
@@ -972,17 +997,17 @@
               $el.crmDatepicker({time: (field.input_attrs && field.input_attrs.time) || false});
             }
           } else if (_.includes(['=', '!=', '<>', 'IN', 'NOT IN'], op) && (field.fk_entity || field.options || dataType === 'Boolean')) {
-            if (field.fk_entity) {
-              $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}});
-            } else if (field.options) {
+           if (field.options) {
+              var id = field.pseudoconstant || 'id';
               $el.addClass('loading').attr('placeholder', ts('- select -')).crmSelect2({multiple: multi, data: [{id: '', text: ''}]});
               loadFieldOptions(field.entity || entity).then(function(data) {
-                var options = [];
-                _.each(_.findWhere(data, {name: field.name}).options, function(val, key) {
-                  options.push({id: key, text: val});
-                });
-                $el.removeClass('loading').select2({data: options, multiple: multi});
+                var options = _.transform(data[field.name].options, function(options, opt) {
+                  options.push({id: opt[id], text: opt.label, description: opt.description, color: opt.color, icon: opt.icon});
+                }, []);
+                $el.removeClass('loading').crmSelect2({data: options, multiple: multi});
               });
+            } else if (field.fk_entity) {
+              $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}});
             } else if (dataType === 'Boolean') {
               $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
                 {id: 'true', text: ts('Yes')},
@@ -997,11 +1022,11 @@
         function loadFieldOptions(entity) {
           if (!fieldOptions[entity + action]) {
             fieldOptions[entity + action] = crmApi4(entity, 'getFields', {
-              loadOptions: true,
+              loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
               action: action,
-              where: [["options", "!=", false]],
-              select: ["name", "options"]
-            });
+              where: [['options', '!=', false]],
+              select: ['options']
+            }, 'name');
           }
           return fieldOptions[entity + action];
         }
@@ -1143,8 +1168,14 @@
   }
 
   function getField(fieldName, entity, action) {
+    var suffix = fieldName.split(':')[1];
+    fieldName = fieldName.split(':')[0];
     var fieldNames = fieldName.split('.');
-    return get(entity, fieldNames);
+    var field = get(entity, fieldNames);
+    if (field && suffix) {
+      field.pseudoconstant = suffix;
+    }
+    return field;
 
     function get(entity, fieldNames) {
       if (fieldNames.length === 1) {
