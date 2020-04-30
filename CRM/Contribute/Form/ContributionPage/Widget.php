@@ -21,6 +21,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
 
   public function preProcess() {
     parent::preProcess();
+    $this->setSelectedChild('widget');
 
     $this->_widget = new CRM_Contribute_DAO_Widget();
     $this->_widget->contribution_page_id = $this->_id;

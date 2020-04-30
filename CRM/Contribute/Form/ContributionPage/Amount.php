@@ -33,6 +33,14 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
   const NUM_OPTION = 11;
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    parent::preProcess();
+    $this->setSelectedChild('amount');
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {

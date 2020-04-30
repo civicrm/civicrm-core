@@ -21,6 +21,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    */
   public function preProcess() {
     parent::preProcess();
+    $this->setSelectedChild('settings');
   }
 
   /**
