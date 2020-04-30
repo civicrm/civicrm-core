@@ -138,9 +138,8 @@
     }
 
     function addJoins(fieldList, addWildcard) {
-      var fields = _.cloneDeep(fieldList),
-        fks = _.findWhere(links, {entity: $scope.entity}) || {};
-      _.each(fks.links, function(link) {
+      var fields = _.cloneDeep(fieldList);
+      _.each(links[$scope.entity], function(link) {
         var linkFields = _.cloneDeep(entityFields(link.entity)),
           wildCard = addWildcard ? [{id: link.alias + '.*', text: link.alias + '.*', 'description': 'All core ' + link.entity + ' fields'}] : [];
         if (linkFields) {
@@ -1066,8 +1065,7 @@
         return comboName;
       }
       var linkName = fieldNames.shift(),
-        entityLinks = _.findWhere(links, {entity: entity}).links,
-        newEntity = _.findWhere(entityLinks, {alias: linkName}).entity;
+        newEntity = _.findWhere(links[entity], {alias: linkName}).entity;
       return get(newEntity, fieldNames);
     }
   }
