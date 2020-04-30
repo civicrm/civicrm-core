@@ -17,9 +17,7 @@
 class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_selectAliasesTotal = [];
 
-  protected $_customGroupExtends = [
-    'Activity',
-  ];
+  protected $_customGroupExtends = ['Activity'];
 
   protected $_nonDisplayFields = [];
 
@@ -38,6 +36,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
   /**
    * Class constructor.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.
@@ -46,14 +46,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     // if navigated from count link of activity summary reports.
     $this->_resetDateFilter = CRM_Utils_Request::retrieve('resetDateFilter', 'Boolean');
 
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    $caseEnabled = in_array("CiviCase", $config->enableComponents);
-    if ($campaignEnabled) {
-      $this->engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
-    }
-
     $components = CRM_Core_Component::getEnabledComponents();
+    $campaignEnabled = !empty($components['CiviCampaign']);
+    $caseEnabled = !empty($components['CiviCase']);
+
     foreach ($components as $componentName => $componentInfo) {
       // CRM-19201: Add support for reporting CiviCampaign activities
       // For CiviCase, "access all cases and activities" is required here
@@ -332,7 +328,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       ];
       // If we have campaigns enabled, add those elements to both the fields, filters.
       $this->addCampaignFields('civicrm_activity');
-
+      $this->engagementLevels = $campaignEnabled ? CRM_Campaign_PseudoConstant::engagementLevel() : [];
       if (!empty($this->engagementLevels)) {
         $this->_columns['civicrm_activity']['fields']['engagement_level'] = [
           'title' => ts('Engagement Index'),
