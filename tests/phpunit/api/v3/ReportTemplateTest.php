@@ -1226,6 +1226,23 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the source contact filter works.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testActivityDetailsContactFilter() {
+    $this->createContactsWithActivities();
+    $params = [
+      'report_id' => 'activity',
+      'contact_source_op' => 'has',
+      'contact_source_value' => 'z',
+      'options' => ['metadata' => ['sql']],
+    ];
+    $rows = $this->callAPISuccess('report_template', 'getrows', $params);
+    $this->assertContains("civicrm_contact_source.sort_name LIKE '%z%'", $rows['metadata']['sql'][3]);
+  }
+
+  /**
    * Set up some activity data..... use some chars that challenge our utf handling.
    */
   public function createContactsWithActivities() {
