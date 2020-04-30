@@ -258,6 +258,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the 'return' param works for all fields.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetContributionReturnFunctionality() {
     $params = $this->_params;
