@@ -438,10 +438,55 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test similarly handled activity fields qill and where clauses.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSearchBuilderActivityType() {
+    $queryObj = new CRM_Contact_BAO_Query([['activity_type', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Activity Type = Email', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_type_id', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Activity Type ID = Email', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_status', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Activity Status = Cancelled', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_status_id', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Activity Status = Cancelled', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_engagement_level', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.engagement_level = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Engagement Index = 3', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_id', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.id = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Activity ID = 3', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_campaign_id', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.campaign_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Campaign = 3', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_priority_id', '=', '3', 1, 0]]);
+    $this->assertContains('WHERE  (  ( civicrm_activity.priority_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertEquals('Priority = Low', $queryObj->_qill[1][0]);
+
+    $queryObj = new CRM_Contact_BAO_Query([['activity_subject', '=', '3', 1, 0]]);
+    $this->assertContains("WHERE  (  ( civicrm_activity.subject = '3' )", $queryObj->getSearchSQL());
+    $this->assertEquals("Subject = '3'", $queryObj->_qill[1][0]);
+  }
+
+  /**
    * Test set up to test calling the query object per GroupContactCache BAO usage.
    *
    * CRM-17254 ensure that if only the contact_id is required other fields should
    * not be appended.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGroupContactCacheAddSearch() {
     $returnProperties = ['contact_id'];

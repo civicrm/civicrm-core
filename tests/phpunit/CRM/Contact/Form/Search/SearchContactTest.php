@@ -19,6 +19,8 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
 
   /**
    * Test contact sub type search.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactSubtype() {
     foreach (['Contact_sub_type', 'Contact2__sub__type'] as $contactSubType) {
@@ -26,7 +28,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
         'name' => $contactSubType,
         'label' => $contactSubType,
         'is_active' => 1,
-        'parent_id' => "Individual",
+        'parent_id' => 'Individual',
       ]);
       // Contact Type api munge name in create mode
       // Therefore updating the name in update mode
@@ -39,6 +41,11 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $this->searchContacts('Contact2__sub__type');
   }
 
+  /**
+   * @param string $contactSubType
+   *
+   * @throws \CRM_Core_Exception
+   */
   protected function searchContacts($contactSubType) {
     // create contact
     $params = [
@@ -78,11 +85,13 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
   /**
    * Test to search based on Group type.
    * https://lab.civicrm.org/dev/core/issues/726
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactSearchOnGroupType() {
     $groupTypes = $this->callAPISuccess('OptionValue', 'get', [
-      'return' => ["id", "name"],
-      'option_group_id' => "group_type",
+      'return' => ['id', 'name'],
+      'option_group_id' => 'group_type',
     ])['values'];
     $groupTypes = array_column($groupTypes, 'id', 'name');
 

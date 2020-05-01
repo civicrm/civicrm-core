@@ -180,19 +180,16 @@ class CRM_Activity_BAO_Query {
 
     $fields = CRM_Activity_BAO_Activity::exportableFields();
     $fieldSpec = $query->getFieldSpec($name);
+
     $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
       $query->_skipDeleteClause = TRUE;
     }
-    // @todo we want to do this in a more metadata driven way, and also in contribute.
-    // But for the rc...
-    $namesToConvert = [
-      'activity_status' => 'activity_status_id',
-    ];
-    $name = $namesToConvert[$name] ?? $name;
 
     switch ($name) {
+      case 'activity_type':
       case 'activity_type_id':
+      case 'activity_status':
       case 'activity_status_id':
       case 'activity_engagement_level':
       case 'activity_id':
@@ -201,42 +198,14 @@ class CRM_Activity_BAO_Query {
         // We no longer expect "subject" as a specific criteria (as of CRM-19447),
         // but we still use activity_subject in Activity.Get API
       case 'activity_subject':
-
-        $qillName = $name;
-        if (in_array($name, ['activity_engagement_level', 'activity_id'])) {
-          $name = $qillName = str_replace('activity_', '', $name);
-        }
-        if (in_array($name, [
-          'activity_subject',
-          'activity_priority_id',
-        ])) {
-          $name = str_replace('activity_', '', $name);
-          $qillName = str_replace('_id', '', $qillName);
-        }
-        if ($name == 'activity_campaign_id') {
-          $name = 'campaign_id';
-        }
-
-        $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
-
-        $where = $fieldSpec['where'];
-        if (!$where) {
-          $where = 'civicrm_activity.' . $name;
-        }
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($where, $op, $value, $dataType);
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
-        $query->_qill[$grouping][] = ts('%1 %2 %3', [
-          1 => $fields[$qillName]['title'],
-          2 => $op,
-          3 => $value,
-        ]);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldSpec['where'], $op, $value, CRM_Utils_Type::typeToString($fieldSpec['type']));
+        $query->_qill[$grouping][]  = $query->getQillForField($fieldSpec['is_pseudofield_for'] ?? $fieldSpec['name'], $value, $op, $fieldSpec);
         break;
 
       case 'activity_text':
         self::whereClauseSingleActivityText($values, $query);
         break;
 
-      case 'activity_type':
       case 'activity_priority':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
