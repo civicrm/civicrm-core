@@ -10,6 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Service\Schema\Joinable\Joinable;
+
 /**
  *
  * @package CRM
@@ -22,11 +24,18 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
   public function run() {
     $apiDoc = new ReflectionFunction('civicrm_api4');
     $groupOptions = civicrm_api4('Group', 'getFields', ['loadOptions' => TRUE, 'select' => ['options', 'name'], 'where' => [['name', 'IN', ['visibility', 'group_type']]]]);
+    // Don't show n-to-many joins in Explorer
+    $entityLinks = (array) civicrm_api4('Entity', 'getLinks', [], ['entity' => 'links']);
+    foreach ($entityLinks as $entity => $links) {
+      $entityLinks[$entity] = array_filter($links, function($link) {
+        return $link['joinType'] != Joinable::JOIN_TYPE_ONE_TO_MANY;
+      });
+    }
     $vars = [
       'operators' => \CRM_Core_DAO::acceptedSQLOperators(),
       'basePath' => Civi::resources()->getUrl('civicrm'),
       'schema' => (array) \Civi\Api4\Entity::get()->setChain(['fields' => ['$name', 'getFields']])->execute(),
-      'links' => (array) \Civi\Api4\Entity::getLinks()->execute(),
+      'links' => $entityLinks,
       'docs' => \Civi\Api4\Utils\ReflectionUtils::parseDocBlock($apiDoc->getDocComment()),
       'groupOptions' => array_column((array) $groupOptions, 'options', 'name'),
     ];
