@@ -779,8 +779,7 @@ AND    contact_id IN ( $contactStr )
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-
-    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $props, $context);
+    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
 
     // Sort group list by hierarchy
     // TODO: This will only work when api.entity is "group_contact". What about others?

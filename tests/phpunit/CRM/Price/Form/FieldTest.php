@@ -11,7 +11,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->visibilityOptionsKeys = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, [
+    $this->visibilityOptionsKeys = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceFieldValue', 'visibility_id', [
       'labelColumn' => 'name',
       'flip' => TRUE,
     ]);

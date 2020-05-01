@@ -2589,14 +2589,16 @@ SELECT contact_id
    * @param string $context
    * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
-   *   whatever is known about this bao object.
+   *   Raw field values; whatever is known about this bao object.
+   *
+   * Note: $props can contain unsanitized input and should not be passed directly to CRM_Core_PseudoConstant::get
    *
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
     // If a given bao does not override this function
     $baoName = get_called_class();
-    return CRM_Core_PseudoConstant::get($baoName, $fieldName, $props, $context);
+    return CRM_Core_PseudoConstant::get($baoName, $fieldName, [], $context);
   }
 
   /**
