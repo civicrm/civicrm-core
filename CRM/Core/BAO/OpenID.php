@@ -23,24 +23,13 @@
 class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
 
   /**
-   * Takes an associative array and adds OpenID.
+   * Create or update OpenID record.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   CRM_Core_BAO_OpenID object on success, null otherwise
+   * @return CRM_Core_DAO_OpenID
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'OpenID', CRM_Utils_Array::value('id', $params), $params);
-
-    $openId = new CRM_Core_DAO_OpenID();
-    $openId->copyValues($params);
-    $openId->save();
-
-    CRM_Utils_Hook::post($hook, 'OpenID', $openId->id, $openId);
-    return $openId;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
