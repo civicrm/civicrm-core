@@ -125,7 +125,7 @@ trait DAOActionTrait {
 
     foreach ($items as $item) {
       $entityId = $item['id'] ?? NULL;
-      FormattingUtil::formatWriteParams($item, $this->getEntityName(), $this->entityFields());
+      FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
       $item['check_permissions'] = $this->getCheckPermissions();
 

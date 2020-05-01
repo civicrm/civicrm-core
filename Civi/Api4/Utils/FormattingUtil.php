@@ -34,12 +34,11 @@ class FormattingUtil {
   /**
    * Massage values into the format the BAO expects for a write operation
    *
-   * @param $params
-   * @param $entity
-   * @param $fields
+   * @param array $params
+   * @param array $fields
    * @throws \API_Exception
    */
-  public static function formatWriteParams(&$params, $entity, $fields) {
+  public static function formatWriteParams(&$params, $fields) {
     foreach ($fields as $name => $field) {
       if (!empty($params[$name])) {
         $value =& $params[$name];
@@ -47,7 +46,7 @@ class FormattingUtil {
         if ($value === 'null') {
           $value = 'Null';
         }
-        self::formatInputValue($value, $name, $field, $entity);
+        self::formatInputValue($value, $name, $field);
         // Ensure we have an array for serialized fields
         if (!empty($field['serialize'] && !is_array($value))) {
           $value = (array) $value;
@@ -81,11 +80,9 @@ class FormattingUtil {
    * @param $value
    * @param string $fieldName
    * @param array $fieldSpec
-   * @param string $entity
-   *   Ex: 'Contact', 'Domain'
    * @throws \API_Exception
    */
-  public static function formatInputValue(&$value, $fieldName, $fieldSpec, $entity) {
+  public static function formatInputValue(&$value, $fieldName, $fieldSpec) {
     // Evaluate pseudoconstant suffix
     $suffix = strpos($fieldName, ':');
     if ($suffix) {
@@ -94,11 +91,11 @@ class FormattingUtil {
     }
     elseif (is_array($value)) {
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldName, $fieldSpec, $entity);
+        self::formatInputValue($val, $fieldName, $fieldSpec);
       }
       return;
     }
-    $fk = $fieldSpec['name'] == 'id' ? $entity : $fieldSpec['fk_entity'] ?? NULL;
+    $fk = $fieldSpec['name'] == 'id' ? $fieldSpec['entity'] : $fieldSpec['fk_entity'] ?? NULL;
 
     if ($fk === 'Domain' && $value === 'current_domain') {
       $value = \CRM_Core_Config::domainID();
@@ -181,15 +178,16 @@ class FormattingUtil {
    * @param string $entity
    *   Name of api entity
    * @param string $fieldName
-   * @param string $optionValue
+   * @param string $valueType
+   *   name|label|abbr from self::$pseudoConstantContexts
    * @param array $params
    *   Other values for this object
    * @param string $action
    * @return array
    * @throws \API_Exception
    */
-  public static function getPseudoconstantList($entity, $fieldName, $optionValue, $params = [], $action = 'get') {
-    $context = self::$pseudoConstantContexts[$optionValue] ?? NULL;
+  public static function getPseudoconstantList($entity, $fieldName, $valueType, $params = [], $action = 'get') {
+    $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
     if (!$context) {
       throw new \API_Exception('Illegal expression');
     }
@@ -198,8 +196,8 @@ class FormattingUtil {
     if ($baoName) {
       $options = $baoName::buildOptions($fieldName, $context, $params);
     }
-    // Fallback for non-bao based entities
-    if (!isset($options)) {
+    // Fallback for option lists that exist in the api but not the BAO - note: $valueType gets ignored here
+    if (!isset($options) || $options === FALSE) {
       $options = civicrm_api4($entity, 'getFields', ['action' => $action, 'loadOptions' => TRUE, 'where' => [['name', '=', $fieldName]]])[0]['options'] ?? NULL;
     }
     if (is_array($options)) {

@@ -35,7 +35,7 @@ class SpecFormatter {
 
     foreach ($fields as $field) {
       if ($includeFieldOptions) {
-        $field->getOptions($values);
+        $field->getOptions($values, $includeFieldOptions);
       }
       $fieldArray[$field->getName()] = $field->toArray();
     }

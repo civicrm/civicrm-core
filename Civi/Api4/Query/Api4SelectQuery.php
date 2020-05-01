@@ -49,6 +49,7 @@ class Api4SelectQuery extends SelectQuery {
 
   /**
    * @var array
+   * [alias => expr][]
    */
   protected $selectAliases = [];
 
@@ -321,20 +322,39 @@ class Api4SelectQuery extends SelectQuery {
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE') {
       $field = $this->getField($expr, TRUE);
-      FormattingUtil::formatInputValue($value, $expr, $field, $this->getEntity());
+      FormattingUtil::formatInputValue($value, $expr, $field);
       $fieldAlias = $field['sql_name'];
     }
     // For HAVING, expr must be an item in the SELECT clause
     else {
+      // Expr references a fieldName or alias
       if (isset($this->selectAliases[$expr])) {
         $fieldAlias = $expr;
+        // Attempt to format if this is a real field
+        if (isset($this->apiFieldSpec[$expr])) {
+          FormattingUtil::formatInputValue($value, $expr, $this->apiFieldSpec[$expr]);
+        }
       }
+      // Expr references a non-field expression like a function; convert to alias
       elseif (in_array($expr, $this->selectAliases)) {
         $fieldAlias = array_search($expr, $this->selectAliases);
       }
+      // If either the having or select field contains a pseudoconstant suffix, match and perform substitution
       else {
-        throw new \API_Exception("Invalid expression in $type clause: '$expr'. Must use a value from SELECT clause.");
+        list($fieldName) = explode(':', $expr);
+        foreach ($this->selectAliases as $selectAlias => $selectExpr) {
+          list($selectField) = explode(':', $selectAlias);
+          if ($selectAlias === $selectExpr && $fieldName === $selectField && isset($this->apiFieldSpec[$fieldName])) {
+            FormattingUtil::formatInputValue($value, $expr, $this->apiFieldSpec[$fieldName]);
+            $fieldAlias = $selectAlias;
+            break;
+          }
+        }
       }
+      if (!isset($fieldAlias)) {
+        throw new \API_Exception("Invalid expression in HAVING clause: '$expr'. Must use a value from SELECT clause.");
+      }
+      $fieldAlias = '`' . $fieldAlias . '`';
     }
 
     $sql_clause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
