@@ -87,6 +87,14 @@ class InstallSchemaPlugin implements \Symfony\Component\EventDispatcher\EventSub
       global $tsLocale;
       $tsLocale = $seedLanguage;
       \Civi\Setup::log()->info(sprintf('[%s] Load basic data', basename(__FILE__)));
+      // We need to load the container now otherwise smarty calls to {ts}
+      // inside the sql templates trigger a call to find the l10n path, which
+      // can't be done if there's no container to ask. But we need to boot with
+      // FALSE to prevent it trying to load from the database since it doesn't
+      // exist yet since loading the database is what we're trying to do here!
+      require_once $model->settingsPath;
+      \Civi\Core\Container::boot(FALSE);
+
       \Civi\Setup\DbUtil::sourceSQL($model->db, \Civi\Setup\SchemaGenerator::generateBasicData($model->srcPath));
     }
 

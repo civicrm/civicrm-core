@@ -96,8 +96,23 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       self::$_singleton = new CRM_Core_Config();
       \Civi\Core\Container::boot($loadFromDB);
       if ($loadFromDB && self::$_singleton->dsn) {
-        $domain = \CRM_Core_BAO_Domain::getDomain();
-        \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
+        try {
+          $domain = \CRM_Core_BAO_Domain::getDomain();
+          \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
+        }
+        catch (CRM_Core_Exception $cce) {
+          // This won't log the backtrace, but the purpose of this try/catch
+          // block is that during install there might not be a domain yet, so
+          // this isn't really an error. And when it's not during install, what
+          // does it even mean that there is no domain?
+          // Ideally it would be nice to know if we're here during an install
+          // or not.
+          // This is always going to log during `cv core:install` when using
+          // `--lang`. So I've added the text to explain this can be ignored.
+          // I've purposely not used ts() because calls to ts() are the likely
+          // reason we've ended up here during install to begin with.
+          \Civi::log()->error("If this is during an install using `cv core:install --lang` you can ignore this message.\n" . $cce->getMessage());
+        }
 
         unset($errorScope);
 
@@ -530,6 +545,14 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     // with the existing installers. NOTE: If we change the installer pageflow,
     // then we may want to modify this behavior.
     if (!CRM_Core_DAO::checkTableExists('civicrm_domain')) {
+      return;
+    }
+
+    // Similarly it might exist but the install hasn't finished yet so there's
+    // nothing in it yet.
+    $dao = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_domain LIMIT 1");
+    $dao->fetch();
+    if (empty($dao->id)) {
       return;
     }
 
