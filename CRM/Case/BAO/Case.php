@@ -510,7 +510,7 @@ HERESQL;
     }
 
     $type = CRM_Utils_Array::value('type', $params, 'upcoming');
-    $userID = CRM_Core_Session::singleton()->get('userID');
+    $userID = CRM_Core_Session::getLoggedInContactID();
 
     // validate access for all cases.
     if ($allCases && !CRM_Core_Permission::check('access all cases and activities')) {
@@ -670,7 +670,7 @@ HERESQL;
       return $caseSummary;
     }
 
-    $userID = CRM_Core_Session::singleton()->get('userID');
+    $userID = CRM_Core_Session::getLoggedInContactID();
 
     //validate access for all cases.
     if ($allCases && !CRM_Core_Permission::check('access all cases and activities')) {
@@ -1269,9 +1269,9 @@ HERESQL;
         break;
       }
     }
-    $session = CRM_Core_Session::singleton();
+
     // CRM-8926 If user is not logged in, use the activity creator as userID
-    if (!($userID = $session->get('userID'))) {
+    if (!($userID = CRM_Core_Session::getLoggedInContactID())) {
       $userID = CRM_Activity_BAO_Activity::getSourceContactID($activityId);
     }
 
@@ -1403,8 +1403,7 @@ HERESQL;
    *
    */
   public static function getNextScheduledActivity($cases, $type = 'upcoming') {
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::getLoggedInContactID();
 
     $caseID = implode(',', $cases['case_id']);
     $contactID = implode(',', $cases['contact_id']);
