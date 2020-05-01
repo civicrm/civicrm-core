@@ -27,7 +27,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    */
   public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
-      CRM_Core_Error::fatal(ts('Case Id not found.'));
+      CRM_Core_Error::statusBounce(ts('Case Id not found.'));
     }
   }
 
@@ -134,7 +134,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       !$params['case_type_id'] ||
       !$caseType
     ) {
-      CRM_Core_Error::fatal('Required parameter missing for ChangeCaseType - end post processing');
+      CRM_Core_Error::statusBounce('Required parameter missing for ChangeCaseType - end post processing');
     }
 
     $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');

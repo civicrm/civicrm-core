@@ -22,11 +22,13 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->_activityId = CRM_Utils_Request::retrieve('activityId', 'Positive');
     if (!$this->_activityId) {
-      CRM_Core_Error::fatal('required activity id is missing.');
+      throw new CRM_Core_Exception('required activity id is missing.');
     }
 
     $this->_currentCaseId = CRM_Utils_Request::retrieve('caseId', 'Positive');
@@ -46,11 +48,12 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
-   *
+   * Set default values for the form. For edit/view mode.
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
