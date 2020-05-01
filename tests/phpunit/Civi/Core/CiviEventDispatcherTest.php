@@ -20,7 +20,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
     $d->addListener('hook_civicrm_fakeRunnable', function() use (&$calls) {
       $calls['hook_civicrm_fakeRunnable'] = 1;
     });
-    $d->dispatch('hook_civicrm_fakeRunnable', new GenericHookEvent());
+    $d->dispatch('hook_civicrm_fakeRunnable', GenericHookEvent::create([]));
     $this->assertEquals(1, $calls['hook_civicrm_fakeRunnable']);
   }
 
@@ -33,7 +33,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
     $d->addListener('hook_civicrm_fakeDroppable', function() use (&$calls) {
       $calls['hook_civicrm_fakeDroppable'] = 1;
     });
-    $d->dispatch('hook_civicrm_fakeDroppable', new GenericHookEvent());
+    $d->dispatch('hook_civicrm_fakeDroppable', GenericHookEvent::create([]));
     $this->assertTrue(!isset($calls['hook_civicrm_fakeDroppable']));
   }
 
@@ -43,7 +43,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
       '/^hook_civicrm_fakeFa/' => 'fail',
     ]);
     try {
-      $d->dispatch('hook_civicrm_fakeFailure', new GenericHookEvent());
+      $d->dispatch('hook_civicrm_fakeFailure', GenericHookEvent::create([]));
       $this->fail('Expected exception');
     }
     catch (\Exception $e) {
