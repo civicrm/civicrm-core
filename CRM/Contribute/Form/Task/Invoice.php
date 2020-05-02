@@ -212,9 +212,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $cancelledStatusId = CRM_Utils_Array::key('Cancelled', $contributionStatusID);
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
 
-    // getting data from admin page
-    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-
     foreach ($invoiceElements['details'] as $contribID => $detail) {
       $input = $ids = $objects = [];
       if (in_array($detail['contact'], $invoiceElements['excludeContactIds'])) {
@@ -268,7 +265,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
       $invoiceDate = date("F j, Y");
-      $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $prefixValue['due_date'] . "" . $prefixValue['due_date_period']));
+      $dueDateSetting = Civi::settings()->get('invoice_due_date');
+      $dueDatePeriodSetting = Civi::settings()->get('invoice_due_date_period');
+      $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $dueDateSetting . "" . $dueDatePeriodSetting));
 
       $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
       $amountDue = ($input['amount'] - $amountPaid);
@@ -349,6 +348,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $countryDomain = '';
       }
 
+      $invoiceNotes = Civi::settings()->get('invoice_notes') ?? NULL;
+
       // parameters to be assign for template
       $tplParams = [
         'title' => $title,
@@ -364,7 +365,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'amountPaid' => $amountPaid,
         'invoice_date' => $invoiceDate,
         'dueDate' => $dueDate,
-        'notes' => $prefixValue['notes'] ?? NULL,
+        'notes' => $invoiceNotes,
         'display_name' => $contribution->_relatedObjects['contact']->display_name,
         'lineItem' => $lineItem,
         'dataArray' => $dataArray,

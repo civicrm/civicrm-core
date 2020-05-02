@@ -447,9 +447,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         //send email with pdf invoice
         $template = CRM_Core_Smarty::singleton();
         $taxAmt = $template->get_template_vars('dataArray');
-        $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-        $invoicing = $prefixValue['invoicing'] ?? NULL;
-        if (isset($invoicing) && isset($prefixValue['is_email_pdf'])) {
+        $isEmailPDF = Civi::settings()->get('invoice_is_email_pdf');
+        $invoicing = Civi::settings()->get('invoicing');
+        if ($invoicing && !empty($isEmailPDF)) {
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
         }
