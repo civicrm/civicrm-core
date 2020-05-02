@@ -29,12 +29,22 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
   private $autoListeners = [];
 
   /**
+   * A list of dispatch-policies (based on an exact-match to the event name).
+   *
+   * Note: $dispatchPolicyExact and $dispatchPolicyRegex should coexist; e.g.
+   * if one is NULL, then both are NULL. If one is an array, then both are arrays.
+   *
    * @var array|null
    *   Array(string $eventName => string $action)
    */
   private $dispatchPolicyExact = NULL;
 
   /**
+   * A list of dispatch-policies (based on an regex-match to the event name).
+   *
+   * Note: $dispatchPolicyExact and $dispatchPolicyRegex should coexist; e.g.
+   * if one is NULL, then both are NULL. If one is an array, then both are arrays.
+   *
    * @var array|null
    *   Array(string $eventRegex => string $action)
    */
@@ -155,6 +165,8 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
   }
 
   /**
+   * Attach any pattern-based listeners which may be interested in $eventName.
+   *
    * @param string $eventName
    *   Ex: 'civi.api.resolve' or 'hook_civicrm_dashboard'.
    */
@@ -174,7 +186,7 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
   }
 
   /**
-   * The dispatch policy allows you to filter certain events.
+   * Set the dispatch policy. This allows you to filter certain events.
    * This can be useful during upgrades or debugging.
    *
    * Enforcement will add systemic overhead, so this should normally be NULL.
@@ -219,7 +231,10 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
   //  }
 
   /**
+   * Determine whether the dispatch policy applies to a given event.
+   *
    * @param string $eventName
+   *   Ex: 'civi.api.resolve' or 'hook_civicrm_dashboard'.
    * @return string
    *   Ex: 'run', 'drop', 'fail'
    */
