@@ -134,11 +134,10 @@
      <weight>399</weight>
   </item>
   <item>
-     <path>civicrm/admin/conference_slots</path>
+     <path>civicrm/admin/options/conference_slot</path>
      <title>Conference Slot Labels</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <desc>Define conference slots and labels.</desc>
-     <path_arguments>group=conference_slot</path_arguments>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
      <weight>415</weight>
