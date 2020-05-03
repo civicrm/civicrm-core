@@ -34,6 +34,7 @@ class ActivityPreCreationSubscriber extends Generic\PreCreationSubscriber {
   protected function modify(DAOCreateAction $request) {
     $activityType = $request->getValue('activity_type');
     if ($activityType) {
+      \CRM_Core_Error::deprecatedFunctionWarning('Use activity_type_id:name instead of activity_type in APIv4');
       $result = OptionValue::get()
         ->setCheckPermissions(FALSE)
         ->addWhere('name', '=', $activityType)

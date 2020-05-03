@@ -52,7 +52,7 @@ class OptionValuePreCreationSubscriber extends Generic\PreCreationSubscriber {
     if (!$optionGroupName || $request->getValue('option_group_id')) {
       return;
     }
-
+    \CRM_Core_Error::deprecatedFunctionWarning('Use option_group_id:name instead of option_group in APIv4');
     $optionGroup = OptionGroup::get()
       ->setCheckPermissions(FALSE)
       ->addSelect('id')
