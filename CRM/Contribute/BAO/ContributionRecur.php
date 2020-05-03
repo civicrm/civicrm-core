@@ -409,8 +409,10 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *   Parameters that should be overriden. Add unit tests if using parameters other than total_amount & financial_type_id.
    *
    * @return array
+   *
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \API_Exception
    */
   public static function getTemplateContribution($id, $overrides = []) {
     // use api3 because api4 doesn't handle ContributionRecur yet...
