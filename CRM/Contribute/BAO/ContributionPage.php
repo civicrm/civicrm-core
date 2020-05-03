@@ -280,17 +280,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     ) {
       $template = CRM_Core_Smarty::singleton();
 
-      if (!array_key_exists('related_contact', $values)) {
-        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, CRM_Core_BAO_LocationType::getBilling());
-      }
-      // get primary location email if no email exist( for billing location).
-      if (!$email) {
-        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
-      }
-      if (empty($displayName)) {
-        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
-      }
-
       //for display profile need to get individual contact id,
       //hence get it from related_contact if on behalf of org true CRM-3767
       //CRM-5001 Contribution/Membership:: On Behalf of Organization,
@@ -333,11 +322,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       // Set email variables explicitly to avoid leaky smarty variables.
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
+      $sendDetails = self::getEmailAndDisplayName((int) $contactID, array_key_exists('related_contact', $values));
+
       $tplParams = [
-        'email' => $email,
+        'email' => $sendDetails['email'],
         'receiptFromEmail' => $values['receipt_from_email'] ?? NULL,
         'contactID' => $contactID,
-        'displayName' => $displayName,
+        'displayName' => $sendDetails['display_name'],
         'contributionID' => $values['contribution_id'] ?? NULL,
         'contributionOtherID' => $values['contribution_other_id'] ?? NULL,
         // CRM-5095
@@ -963,6 +954,28 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       return FALSE;
     }
     return $membershipBlocks['values'][0]['is_separate_payment'];
+  }
+
+  /**
+   * Get the display name and email to for the contact.
+   *
+   * Note that the reason for preferring billing in the case of a related contact
+   * is  historical and unclear.
+   *
+   * @param int $contactID
+   * @param bool $isPreferBilling
+   *
+   * @return array
+   */
+  protected static function getEmailAndDisplayName(int $contactID, bool $isPreferBilling): array {
+    if ($isPreferBilling) {
+      list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, CRM_Core_BAO_LocationType::getBilling());
+    }
+    // get primary location email if no email exist( for billing location).
+    if (!$email || empty($displayName)) {
+      list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+    }
+    return ['display_name' => $displayName, 'email' => $email];
   }
 
 }
