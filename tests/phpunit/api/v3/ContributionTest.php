@@ -24,9 +24,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
-  protected $_entity = 'Contribution';
-  public $debug = 0;
+  protected $entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
   protected $_pageParams = [];
@@ -100,7 +98,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'min_amount' => 10,
       'max_amount' => 1000,
     ];
-    $this->entity = $this->_entity;
   }
 
   /**
@@ -144,7 +141,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => 23456,
       'invoice_id' => 78910,
       'source' => 'SSF',
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Completed',
     ];
     $this->_contribution = $this->callAPISuccess('contribution', 'create', $p);
 
@@ -452,6 +449,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -459,15 +458,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
-    $check = $this->callAPISuccess($this->_entity, 'get', [
+    $check = $this->callAPISuccess($this->entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
     ]);
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
+    $this->assertEquals('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
   }
 
   /**
@@ -1156,7 +1155,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testCreateInvalidFinancialType() {
     $params = $this->_params;
     $params['financial_type_id'] = 99999;
-    $this->callAPIFailure($this->_entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
+    $this->callAPIFailure($this->entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
   }
 
   /**
@@ -1164,20 +1163,23 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testValidNamedFinancialType() {
     $params = $this->_params;
     $params['financial_type_id'] = 'Donation';
-    $this->callAPISuccess($this->_entity, 'create', $params);
+    $this->callAPISuccess($this->entity, 'create', $params);
   }
 
   /**
    * Tests that additional financial records are created.
    *
    * Checks when online contribution with pay later option is created
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionPayLaterOnline() {
-    CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $this->_pageParams['is_pay_later'] = 1;
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     $this->assertAPISuccess($contributionPage);
@@ -1191,18 +1193,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_pay_later' => 1,
       'invoice_id' => 67890,
       'source' => 'SSF',
-      'contribution_status_id' => 2,
+      'contribution_status_id' => 'Pending',
 
     ];
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
+    $contribution = $this->callAPIAndDocument('Contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $contribution['values'][$contribution['id']];
+    $this->assertEquals($contribution['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['total_amount'], 100.00);
+    $this->assertEquals($contribution['financial_type_id'], 1);
+    $this->assertEquals($contribution['trxn_id'], 12345);
+    $this->assertEquals($contribution['invoice_id'], 67890);
+    $this->assertEquals($contribution['source'], 'SSF');
+    $this->assertEquals($contribution['contribution_status_id'], 2);
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
 
@@ -1238,11 +1241,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test that BAO defaults work.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateBAODefaults() {
     unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
-    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', [
+    $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
       'id' => $contribution['id'],
       'api.contribution.delete' => 1,
     ]);
@@ -1253,10 +1258,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test that getsingle can be chained with delete.
+   *
+   * @throws CRM_Core_Exception
    */
   public function testDeleteChainedGetSingle() {
-    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', [
+    $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
       'id' => $contribution['id'],
       'api.contribution.delete' => 1,
     ]);
@@ -1265,6 +1272,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Function tests that line items, financial records are updated when contribution amount is changed.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionChangeTotal() {
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
@@ -1284,7 +1293,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
       'total_amount' => '125',
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $newParams);
 
     $lineItems = $this->callAPISuccess('line_item', 'getvalue', [
 
@@ -1398,7 +1407,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'trxn_id' => 'original_payment',
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'contribution_status_id' => 'Refunded',
@@ -2274,11 +2283,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'return' => 'payment_instrument_id',
       ]),
     ], 'online');
-    $this->quickCleanUpFinancialEntities();
   }
 
   /**
    * Test repeat contribution successfully creates line items (plural).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionLineItems() {
     // CRM-19309
@@ -2324,7 +2334,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // check that financial_line_items have been created for entity_id 3 and 4;
 
     $this->callAPISuccessGetCount('FinancialItem', ['description' => 'Sales Tax', 'amount' => 0], 0);
-    $this->quickCleanUpFinancialEntities();
   }
 
   /**
@@ -2382,14 +2391,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => uniqid(),
     ]);
 
-    $this->quickCleanUpFinancialEntities();
   }
 
   /**
-   * CRM-19873 Test repattransaction if contribution_recur_id is a test.
+   * CRM-19873 Test repeattransaction if contribution_recur_id is a test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionTestRecurId() {
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $this->_individualId,
       'frequency_interval' => '1',
       'amount' => '1.00',
@@ -2411,26 +2421,23 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $repeatedContribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
       'contribution_status_id' => 'Completed',
-      'trxn_id' => uniqid(),
+      'trxn_id' => 'magic_number',
     ]);
 
     $this->assertEquals($contributionRecur['values'][1]['is_test'], $repeatedContribution['values'][2]['is_test']);
-    $this->quickCleanUpFinancialEntities();
   }
 
   /**
    * CRM-19945 Tests that Contribute.repeattransaction renews a membership when contribution status=Completed
    *
+   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionMembershipRenewCompletedContribution() {
     list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
 
-    $this->callAPISuccess('contribution', 'create', [
-      'contact_id' => $originalContribution['values'][1]['contact_id'],
-      'financial_type_id' => $originalContribution['values'][1]['financial_type_id'],
-      'total_amount' => $originalContribution['values'][1]['total_amount'],
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
-      'contribution_status_id' => "Failed",
+      'contribution_status_id' => 'Failed',
     ]);
 
     $this->callAPISuccess('membership', 'create', [
@@ -2439,7 +2446,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Expired',
     ]);
 
-    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
       'contribution_status_id' => 'Completed',
       'trxn_id' => 'bobsled',
@@ -2459,8 +2466,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
     $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
     $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id']]);
-    $this->quickCleanUpFinancialEntities();
-    $this->contactDelete($originalContribution['values'][1]['contact_id']);
   }
 
   /**
@@ -2479,12 +2484,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     }
     list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
 
-    $this->callAPISuccess('contribution', 'create', [
-      'contact_id' => $originalContribution['values'][1]['contact_id'],
-      'financial_type_id' => $originalContribution['values'][1]['financial_type_id'],
-      'total_amount' => $originalContribution['values'][1]['total_amount'],
-      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
-      'contribution_status_id' => "Completed",
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
     ]);
 
     $this->callAPISuccess('membership', 'create', [
@@ -2499,9 +2501,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => 'bobsled',
     ]);
 
-    $updatedMembership = $this->callAPISuccess('membership', 'getsingle', [
-      'id' => $membership['id'],
-    ]);
+    $updatedMembership = $this->callAPISuccess('membership', 'getsingle', ['id' => $membership['id']]);
 
     $dateTime = new DateTime('yesterday');
     $this->assertEquals($dateTime->format('Y-m-d'), $updatedMembership['end_date']);
@@ -2510,8 +2510,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
     $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
     $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id']]);
-    $this->quickCleanUpFinancialEntities();
-    $this->contactDelete($originalContribution['values'][1]['contact_id']);
   }
 
   /**
@@ -4002,6 +4000,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *   Parameters to merge into the recur only.
    *
    * @return array|int
+   * @throws \CRM_Core_Exception
    */
   protected function setUpAutoRenewMembership($generalParams = [], $recurParams = []) {
     $newContact = $this->callAPISuccess('Contact', 'create', [
@@ -4018,13 +4017,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'on_hold' => '0',
     ]);
     $membershipType = $this->callAPISuccess('MembershipType', 'create', [
-      'domain_id' => "Default Domain Name",
+      'domain_id' => 'Default Domain Name',
       'member_of_contact_id' => 1,
-      'financial_type_id' => "Member Dues",
-      'duration_unit' => "month",
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'month',
       'duration_interval' => 1,
       'period_type' => 'rolling',
-      'name' => "Standard Member",
+      'name' => 'Standard Member',
       'minimum_fee' => 100,
     ]);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
@@ -4143,9 +4142,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test repeat contribution uses the Payment Processor' payment_instrument setting.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionWithNonCreditCardDefault() {
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $this->_individualId,
       'installments' => '12',
       'frequency_interval' => '1',
@@ -4160,14 +4161,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         $this->_params,
         ['contribution_recur_id' => $contributionRecur['id'], 'payment_instrument_id' => 2])
     );
-    $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
     $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
-      'trxn_id' => uniqid(),
+      'trxn_id' => 'blah',
       'original_contribution_id' => $contribution1,
     ]);
-    $this->assertEquals(array_search('Debit Card', $paymentInstruments), $contribution2['values'][$contribution2['id']]['payment_instrument_id']);
-    $this->quickCleanUpFinancialEntities();
+    $this->assertEquals('Debit Card', CRM_Contribute_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contribution2['values'][$contribution2['id']]['payment_instrument_id']));
   }
 
   /**
@@ -4204,13 +4203,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 month')), $membership['end_date']);
-
-    $this->quickCleanUpFinancialEntities();
-    $this->contactDelete($originalContribution['values'][1]['contact_id']);
   }
 
   /**
    * Test sending a mail via the API.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSendMailWithAPISetFromDetails() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -4431,14 +4429,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // @todo the following function has naming errors & has a weird signature & appears to
     // only be called from test classes. Move into test suite & maybe just use api
     // from this function.
-    return array_merge(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($trxnParams, FALSE, []));
+    return array_merge(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($trxnParams));
   }
 
   /**
    * Test getunique api call for Contribution entity
    */
   public function testContributionGetUnique() {
-    $result = $this->callAPIAndDocument($this->_entity, 'getunique', [], __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->entity, 'getunique', [], __FUNCTION__, __FILE__);
     $this->assertEquals(2, $result['count']);
     $this->assertEquals(['trxn_id'], $result['values']['UI_contrib_trxn_id']);
     $this->assertEquals(['invoice_id'], $result['values']['UI_contrib_invoice_id']);
