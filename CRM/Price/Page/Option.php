@@ -142,7 +142,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         if ($invoicing && isset($customOption[$id]['tax_rate'])) {
           $getTaxDetails = TRUE;
         }
-        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate'], TRUE);
+        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate']);
         $customOption[$id]['tax_amount'] = $taxAmount['tax_amount'];
       }
       if (!empty($values['financial_type_id'])) {
