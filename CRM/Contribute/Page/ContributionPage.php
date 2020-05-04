@@ -245,7 +245,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'name' => ts('Cumulative'),
           'title' => ts('Cumulative'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&receive_date_low=&receive_date_high=$now",
+          'qs' => "{$urlParams}",
           'uniqueName' => 'cumulative',
         ),
       );
