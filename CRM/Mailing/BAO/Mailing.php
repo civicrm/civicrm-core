@@ -120,7 +120,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $recipientsGroup = $excludeSmartGroupIDs = $includeSmartGroupIDs = $priorMailingIDs = [];
     $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
-      ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
+      ->select('GROUP_CONCAT(DISTINCT entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
       ->where('mailing_id = #mailing_id AND entity_table RLIKE "^civicrm_(group.*|mailing)$" ')
       ->groupBy(['group_type', 'entity_table'])
       ->param('!groupTableName', CRM_Contact_BAO_Group::getTableName())
