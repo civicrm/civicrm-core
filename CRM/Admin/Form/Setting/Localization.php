@@ -39,13 +39,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     'uiLanguages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
   ];
 
-  public function preProcess() {
-    if (!CRM_Core_I18n::isMultiLingual()) {
-      CRM_Core_Resources::singleton()
-        ->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/Localization.js', 1, 'html-header');
-    }
-  }
-
   /**
    * Build the form object.
    */
