@@ -318,6 +318,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_activity_create() with valid parameters.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testActivityCreate() {
 

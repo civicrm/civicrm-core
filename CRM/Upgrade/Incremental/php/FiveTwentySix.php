@@ -60,9 +60,24 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
   public function upgrade_5_26_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add option value for nl_BE', 'addNLBEOptionValue');
+    $this->addTask('Add workflow_name to civicrm_msg_template', 'addColumn', 'civicrm_msg_template', 'workflow_name',
+      "VARCHAR(255) DEFAULT NULL COMMENT 'Name of workflow'", FALSE, '5.26.0');
+    $this->addTask('Populate workflow_name in civicrm_msg_template', 'populateWorkflowName');
+
     // Additional tasks here...
     // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
     // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
+  }
+
+  /**
+   * Update workflow_name based on workflow_id values.
+   */
+  public function populateWorkflowName() {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_msg_template
+      LEFT JOIN  civicrm_option_value ov ON ov.id = workflow_id
+      SET workflow_name = ov.name'
+    );
+    return TRUE;
   }
 
   /**

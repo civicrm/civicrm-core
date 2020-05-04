@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\MessageTemplate;
+
 require_once 'Mail/mime.php';
 
 /**
@@ -345,11 +347,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @return array
    *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public static function sendTemplate($params) {
     $defaults = [
-      // option group name of the template
-      'groupName' => NULL,
       // option value name of the template
       'valueName' => NULL,
       // ID of the template
@@ -386,49 +387,38 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
 
-    if ((!$params['groupName'] ||
-        !$params['valueName']
-      ) &&
-      !$params['messageTemplateID']
-    ) {
-      throw new CRM_Core_Exception(ts("Message template's option group and/or option value or ID missing."));
+    if (!$params['valueName'] && !$params['messageTemplateID']) {
+      throw new CRM_Core_Exception(ts("Message template's option value or ID missing."));
     }
+
+    $apiCall = MessageTemplate::get()
+      ->setCheckPermissions(FALSE)
+      ->addSelect('msg_subject', 'msg_text', 'msg_html', 'pdf_format_id', 'id')
+      ->addWhere('is_default', '=', 1);
 
     if ($params['messageTemplateID']) {
-      // fetch the three elements from the db based on id
-      $query = 'SELECT msg_subject subject, msg_text text, msg_html html, pdf_format_id format
-                      FROM civicrm_msg_template mt
-                      WHERE mt.id = %1 AND mt.is_default = 1';
-      $sqlParams = [1 => [$params['messageTemplateID'], 'String']];
+      $apiCall->addWhere('id', '=', (int) $params['messageTemplateID']);
     }
     else {
-      // fetch the three elements from the db based on option_group and option_value names
-      $query = 'SELECT msg_subject subject, msg_text text, msg_html html, pdf_format_id format
-                      FROM civicrm_msg_template mt
-                      JOIN civicrm_option_value ov ON workflow_id = ov.id
-                      JOIN civicrm_option_group og ON ov.option_group_id = og.id
-                      WHERE og.name = %1 AND ov.name = %2 AND mt.is_default = 1';
-      $sqlParams = [1 => [$params['groupName'], 'String'], 2 => [$params['valueName'], 'String']];
+      $apiCall->addWhere('workflow_name', '=', $params['valueName']);
     }
-    $dao = CRM_Core_DAO::executeQuery($query, $sqlParams);
-    $dao->fetch();
+    $messageTemplate = $apiCall->execute()->first();
 
-    if (!$dao->N) {
+    if (empty($messageTemplate['id'])) {
       if ($params['messageTemplateID']) {
         throw new CRM_Core_Exception(ts('No such message template: id=%1.', [1 => $params['messageTemplateID']]));
       }
-      throw new CRM_Core_Exception(ts('No such message template: option group %1, option value %2.', [
-        1 => $params['groupName'],
-        2 => $params['valueName'],
-      ]));
+      throw new CRM_Core_Exception(ts('No message template with workflow name %2.', [2 => $params['valueName']]));
     }
 
     $mailContent = [
-      'subject' => $dao->subject,
-      'text' => $dao->text,
-      'html' => $dao->html,
-      'format' => $dao->format,
-      'groupName' => $params['groupName'],
+      'subject' => $messageTemplate['msg_subject'],
+      'text' => $messageTemplate['msg_text'],
+      'html' => $messageTemplate['msg_html'],
+      'format' => $messageTemplate['pdf_format_id'],
+      // Group name is a deprecated parameter. At some point it will not be passed out.
+      // https://github.com/civicrm/civicrm-core/pull/17180
+      'groupName' => $params['groupName'] ?? NULL,
       'valueName' => $params['valueName'],
       'messageTemplateID' => $params['messageTemplateID'],
     ];
@@ -439,9 +429,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     if ($params['isTest']) {
       $query = "SELECT msg_subject subject, msg_text text, msg_html html
                       FROM civicrm_msg_template mt
-                      JOIN civicrm_option_value ov ON workflow_id = ov.id
-                      JOIN civicrm_option_group og ON ov.option_group_id = og.id
-                      WHERE og.name = 'msg_tpl_workflow_meta' AND ov.name = 'test_preview' AND mt.is_default = 1";
+                      WHERE workflow_name = 'test_preview' AND mt.is_default = 1";
       $testDao = CRM_Core_DAO::executeQuery($query);
       $testDao->fetch();
 
@@ -493,7 +481,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         $returnProperties,
         FALSE, FALSE, NULL,
         CRM_Utils_Token::flattenTokens($tokens),
-        // we should consider adding groupName and valueName here
+        // we should consider adding valueName here
         'CRM_Core_BAO_MessageTemplate'
       );
       $contact = $contact[$contactID];
@@ -513,7 +501,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         [$contactID],
         NULL,
         CRM_Utils_Token::flattenTokens($tokens),
-        // we should consider adding groupName and valueName here
+        // we should consider adding valueName here
         'CRM_Core_BAO_MessageTemplate'
       );
       $contact = $contactArray[$contactID];
