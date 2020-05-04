@@ -852,7 +852,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       (int) $self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
     ) {
       if (!empty($fields[$self->_expressButtonName . '_x']) || !empty($fields[$self->_expressButtonName . '_y']) ||
-        CRM_Utils_Array::value($self->_expressButtonName, $fields)
+        !empty($fields[$self->_expressButtonName])
       ) {
         return $errors;
       }

@@ -150,8 +150,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       }
 
       // if relevant--membership is active and type allows inheritance--count related memberships
-      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id])
-        && CRM_Utils_Array::value('relationship_type_id', $statusANDType[$dao->id])
+      if (!empty($statusANDType[$dao->id]['is_current_member'])
+        && !empty($statusANDType[$dao->id]['relationship_type_id'])
         && empty($dao->owner_membership_id)
       ) {
         // not an related membership

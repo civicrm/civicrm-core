@@ -127,7 +127,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
 
     if (!$contributionID
-      && CRM_Utils_Array::value('membership_id', $params)
+      && !empty($params['membership_id'])
       && Civi::settings()->get('deferred_revenue_enabled')
     ) {
       $memberStartDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['membership_id'], 'start_date');

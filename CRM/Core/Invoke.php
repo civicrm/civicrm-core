@@ -55,7 +55,7 @@ class CRM_Core_Invoke {
       return NULL;
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
-    if (CRM_Utils_Array::value(1, $args) == 'ajax' || CRM_Utils_Array::value('snippet', $_REQUEST)) {
+    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
 
@@ -184,7 +184,8 @@ class CRM_Core_Invoke {
           stream_wrapper_unregister('phar');
           stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
         }
-      } else {
+      }
+      else {
         // this is not an exception we can handle
         throw $e;
       }

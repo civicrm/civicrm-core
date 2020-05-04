@@ -246,7 +246,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       }
     }
     if (!$email && !(CRM_Utils_Array::value('first_name', $fields) &&
-      CRM_Utils_Array::value('last_name', $fields))) {
+      !empty($fields['last_name']))) {
       $defaults = $params = ['id' => $eventId];
       CRM_Event_BAO_Event::retrieve($params, $defaults);
       $message = ts("Mandatory fields (first name and last name, OR email address) are missing from this form.");

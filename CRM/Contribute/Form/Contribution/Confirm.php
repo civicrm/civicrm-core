@@ -1871,7 +1871,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // the quick config seems like a red-herring - if this is about a separate membership payment then there
       // are 2 types of line items - membership ones & non-membership ones - regardless of whether quick config is set
       elseif (
-        CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock)
+        !empty($this->_membershipBlock['is_separate_payment'])
         && !empty($this->_values['fee'][$priceField->id])
         && ($this->_values['fee'][$priceField->id]['name'] == "other_amount")
         && CRM_Utils_Array::value("price_{$paramWeDoNotUnderstand}", $this->_params) < 1
@@ -2052,8 +2052,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // CRM-18854
     if (!empty($this->_params['is_pledge']) && empty($this->_values['pledge_id']) && !empty($this->_values['adjust_recur_start_date'])) {
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
-      if (CRM_Utils_Array::value('start_date', $this->_params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)
-          || !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+      if (!empty($this->_params['start_date']) || empty($pledgeBlock['is_pledge_start_date_visible'])
+          || empty($pledgeBlock['is_pledge_start_date_editable'])) {
         $pledgeStartDate = $this->_params['start_date'] ?? NULL;
         $this->_params['receive_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
         $recurParams = CRM_Pledge_BAO_Pledge::buildRecurParams($this->_params);

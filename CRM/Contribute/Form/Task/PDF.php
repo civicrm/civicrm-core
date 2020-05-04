@@ -281,7 +281,7 @@ AND    {$this->_componentClause}";
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
-          || CRM_Utils_Array::value('is_deceased', $values)
+          || !empty($values['is_deceased'])
           || !empty($values['on_hold'])
         ) {
           $suppressedEmails++;

@@ -1363,7 +1363,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
     if ((!empty($this->_params['selectMembership']) || !empty($this->_params['priceSetId']))
       && !empty($this->_paymentProcessor['is_recur']) &&
-      CRM_Utils_Array::value('auto_renew', $this->_params)
+      !empty($this->_params['auto_renew'])
       && empty($this->_params['is_recur']) && empty($this->_params['frequency_interval'])
     ) {
 

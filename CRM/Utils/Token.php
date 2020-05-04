@@ -1672,7 +1672,7 @@ class CRM_Utils_Token {
    */
   public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
     $key = 'contribution';
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       //early return
       return $str;
     }

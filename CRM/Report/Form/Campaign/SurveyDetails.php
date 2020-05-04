@@ -234,7 +234,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
       foreach ($table['fields'] as $fieldName => $field) {
         if (!empty($field['required']) ||
           !empty($this->_params['fields'][$fieldName]) ||
-          CRM_Utils_Array::value('is_required', $field)
+          !empty($field['is_required'])
         ) {
 
           $fieldsName = CRM_Utils_Array::value(1, explode('_', $tableName));

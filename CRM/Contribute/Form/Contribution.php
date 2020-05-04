@@ -369,7 +369,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['total_amount'] = CRM_Utils_Money::format($total_value, NULL, '%a');
       if (!empty($defaults['tax_amount'])) {
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (!(CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails))) {
+        if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
           $defaults['total_amount'] = CRM_Utils_Money::format($total_value - $defaults['tax_amount'], NULL, '%a');
         }
       }
@@ -483,7 +483,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // FIXME: This probably needs to be done in preprocess
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && $this->_action & CRM_Core_Action::UPDATE
-      && CRM_Utils_Array::value('financial_type_id', $this->_values)
+      && !empty($this->_values['financial_type_id'])
     ) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($this->_id, 'edit');
@@ -1253,7 +1253,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // See if we need to include this paneName in the current form.
     if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
-      CRM_Utils_Array::value("hidden_{$type}", $defaults)
+      !empty($defaults["hidden_{$type}"])
     ) {
       $this->assign('showAdditionalInfo', TRUE);
       $pane['open'] = 'true';
@@ -1462,7 +1462,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
         //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (!(CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails))) {
+        if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
           if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
             $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
           }
@@ -1499,7 +1499,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // NOTE that this IS still a legitimate use of 'quick-config' for contributions under the current DB but
     // we should look at having a price field per contribution type & then there would be little reason
     // for the back-office contribution form postProcess to know if it is a quick-config form.
-    if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && CRM_Utils_Array::value($this->_priceSetId, $lineItem)
+    if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && !empty($lineItem[$this->_priceSetId])
     ) {
       foreach ($lineItem[$this->_priceSetId] as &$values) {
         $values['financial_type_id'] = $submittedValues['financial_type_id'];
