@@ -2636,6 +2636,19 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Allow Extensions to modify IPNData before it gets processed
+   * @param array $IPNData - Array of IPN Data
+   * @return mixed
+   */
+  public static function preIPNProcess(&$IPNData) {
+    return self::singleton()->invoke(['IPNData'],
+      $IPNData, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_preIPNProcess'
+    );
+  }
+
+  /**
    * Allow extensions to modify the array of acceptable fields to be included on profiles
    * @param array $fields
    *   format is [Entity => array of DAO fields]
