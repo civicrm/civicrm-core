@@ -115,9 +115,12 @@ class TokenProcessor {
   /**
    * Add a row of data.
    *
+   * @param array|NULL $context
+   *   Optionally, initialize the context for this row.
+   *   Ex: ['contact_id' => 123].
    * @return TokenRow
    */
-  public function addRow() {
+  public function addRow($context = NULL) {
     $key = $this->next++;
     $this->rowContexts[$key] = [];
     $this->rowValues[$key] = [
@@ -125,7 +128,29 @@ class TokenProcessor {
       'text/html' => [],
     ];
 
-    return new TokenRow($this, $key);
+    $row = new TokenRow($this, $key);
+    if ($context !== NULL) {
+      $row->context($context);
+    }
+    return $row;
+  }
+
+  /**
+   * Add several rows.
+   *
+   * @param array $contexts
+   *   List of rows to add.
+   *   Ex: [['contact_id'=>123], ['contact_id'=>456]]
+   * @return TokenRow[]
+   *   List of row objects
+   */
+  public function addRows($contexts) {
+    $rows = [];
+    foreach ($contexts as $context) {
+      $row = $this->addRow($context);
+      $rows[$row->tokenRow] = $row;
+    }
+    return $rows;
   }
 
   /**
