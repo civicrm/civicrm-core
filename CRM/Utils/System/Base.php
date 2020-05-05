@@ -986,4 +986,13 @@ abstract class CRM_Utils_System_Base {
     return NULL;
   }
 
+  /**
+   * Determine if the Views module exists.
+   *
+   * @return bool
+   */
+  public function viewsExists() {
+    return FALSE;
+  }
+
 }

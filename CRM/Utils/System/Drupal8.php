@@ -803,4 +803,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return user_role_names();
   }
 
+  /**
+   * Determine if the Views module exists.
+   *
+   * @return bool
+   */
+  public function viewsExists() {
+    if (\Drupal::moduleHandler()->moduleExists('views')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
