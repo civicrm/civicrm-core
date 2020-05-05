@@ -35,7 +35,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * Test CRUD actions on a report template.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testReportTemplate() {
+    /** @noinspection SpellCheckingInspection */
     $result = $this->callAPISuccess('ReportTemplate', 'create', [
       'label' => 'Example Form',
       'description' => 'Longish description of the example form',
@@ -46,7 +52,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
-    $this->assertTrue(is_numeric($entityId));
+    $this->assertInternalType('numeric', $entityId);
     $this->assertEquals(7, $result['values'][$entityId]['component_id']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
@@ -111,7 +117,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param $reportID
    *
-   * @throws \PHPUnit\Framework\IncompleteTestError
+   * @throws \CRM_Core_Exception
    */
   public function testReportTemplateSelectWhere($reportID) {
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'hookSelectWhere']);
@@ -121,7 +127,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $found = FALSE;
     foreach ($result['metadata']['sql'] as $sql) {
-      if (strstr($sql, " =  'Organization' ")) {
+      if (strpos($sql, " =  'Organization' ") !== FALSE) {
         $found = TRUE;
       }
     }
@@ -132,9 +138,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Get templates suitable for SelectWhere test.
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   public function getReportTemplatesSupportingSelectWhere() {
-    $allTemplates = $this->getReportTemplates();
+    $allTemplates = self::getReportTemplates();
     // Exclude all that do not work as of test being written. I have not dug into why not.
     $currentlyExcluded = [
       'contribute/repeat',
@@ -156,7 +163,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ];
     foreach ($allTemplates as $index => $template) {
       $reportID = $template[0];
-      if (in_array($reportID, $currentlyExcluded) || stristr($reportID, 'has existing issues')) {
+      if (in_array($reportID, $currentlyExcluded, TRUE) || stripos($reportID, 'has existing issues') !== FALSE) {
         unset($allTemplates[$index]);
       }
     }
@@ -169,20 +176,21 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function hookSelectWhere($entity, &$clauses) {
     // Restrict access to cases by type
-    if ($entity == 'Contact') {
+    if ($entity === 'Contact') {
       $clauses['contact_type'][] = " =  'Organization' ";
     }
   }
 
   /**
    * Test getrows on contact summary report.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testReportTemplateGetRowsContactSummary() {
-    $description = "Retrieve rows from a report template (optionally providing the instance_id).";
     $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contact/summary',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals('Contact Name', $result['metadata']['labels']['civicrm_contact_sort_name']);
 
     //the second part of this test has been commented out because it relied on the db being reset to
@@ -202,8 +210,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test getrows on Mailing Opened report.
    */
   public function testReportTemplateGetRowsMailingUniqueOpened() {
-    $description = "Retrieve rows from a mailing opened report template.";
-    $this->loadXMLDataSet(dirname(__FILE__) . '/../../CRM/Mailing/BAO/queryDataset.xml');
+    $description = 'Retrieve rows from a mailing opened report template.';
+    $this->loadXMLDataSet(__DIR__ . '/../../CRM/Mailing/BAO/queryDataset.xml');
 
     // Check total rows without distinct
     global $_REQUEST;
@@ -238,21 +246,21 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param $reportID
    *
-   * @throws \PHPUnit\Framework\IncompleteTestError
+   * @throws \CRM_Core_Exception
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
     //$reportID = 'logging/contact/summary';
-    if (stristr($reportID, 'has existing issues')) {
+    if (stripos($reportID, 'has existing issues') !== FALSE) {
       $this->markTestIncomplete($reportID);
     }
-    if (substr($reportID, 0, '7') === 'logging') {
+    if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
 
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
     ]);
-    if (substr($reportID, 0, '7') === 'logging') {
+    if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 0);
     }
   }
@@ -261,6 +269,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test logging report when a custom data table has a table removed by hook.
    *
    * Here we are checking that no fatal is triggered.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLoggingReportWithHookRemovalOfCustomDataTable() {
     Civi::settings()->set('logging', 1);
@@ -297,9 +307,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param $reportID
    *
    * @throws \PHPUnit\Framework\IncompleteTestError
+   * @throws \CRM_Core_Exception
    */
   public function testReportTemplateGetRowsAllReportsACL($reportID) {
-    if (stristr($reportID, 'has existing issues')) {
+    if (stripos($reportID, 'has existing issues') !== FALSE) {
       $this->markTestIncomplete($reportID);
     }
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookNoResults']);
@@ -318,19 +329,19 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testReportTemplateGetStatisticsAllReports($reportID) {
-    if (stristr($reportID, 'has existing issues')) {
+    if (stripos($reportID, 'has existing issues') !== FALSE) {
       $this->markTestIncomplete($reportID);
     }
     if (in_array($reportID, ['contribute/softcredit', 'contribute/bookkeeping'])) {
-      $this->markTestIncomplete($reportID . " has non enotices when calling statistics fn");
+      $this->markTestIncomplete($reportID . ' has non enotices when calling statistics fn');
     }
     $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
     if ($reportID === 'contribute/summary') {
       $this->hookClass->setHook('civicrm_alterReportVar', [$this, 'alterReportVarHook']);
     }
-    $result = $this->callAPIAndDocument('report_template', 'getstatistics', [
+    $this->callAPIAndDocument('report_template', 'getstatistics', [
       'report_id' => $reportID,
-    ], __FUNCTION__, __FILE__, $description, 'Getstatistics', 'getstatistics');
+    ], __FUNCTION__, __FILE__, $description, 'Getstatistics');
   }
 
   /**
@@ -338,11 +349,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function alterReportVarHook($varType, &$var, &$object) {
     if ($varType === 'sql' && $object instanceof CRM_Report_Form_Contribute_Summary) {
+      /* @var CRM_Report_Form $var */
       $from = $var->getVar('_from');
-      $from .= " LEFT JOIN civicrm_financial_type as temp ON temp.id = contribution_civireport.financial_type_id";
+      $from .= ' LEFT JOIN civicrm_financial_type as temp ON temp.id = contribution_civireport.financial_type_id';
       $var->setVar('_from', $from);
       $where = $var->getVar('_where');
-      $where .= " AND ( temp.id IS NOT NULL )";
+      $where .= ' AND ( temp.id IS NOT NULL )';
       $var->setVar('_where', $where);
     }
   }
@@ -352,8 +364,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * Note that the function needs to
    * be static so cannot use $this->callAPISuccess
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getReportTemplates() {
+    $reportTemplates = [];
     $reportsToSkip = [
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
@@ -365,7 +380,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         $reportTemplates[] = [$report['value']];
       }
       else {
-        $reportTemplates[] = [$report['value'] . " has existing issues :  " . $reportsToSkip[$report['value']]];
+        $reportTemplates[] = [$report['value'] . ' has existing issues :  ' . $reportsToSkip[$report['value']]];
       }
     }
 
@@ -409,6 +424,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLybuntReportWithData() {
     $inInd = $this->individualCreate();
@@ -421,11 +438,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'yid_op' => 'calendar',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertEquals(1, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertEquals(1, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
   }
 
   /**
    * Test Lybunt report applies ACLs.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLybuntReportWithDataAndACLFilter() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM'];
@@ -443,13 +462,15 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ];
 
     $rows = $this->callAPISuccess('report_template', 'getrows', $params);
-    $this->assertEquals(0, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertEquals(0, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
 
     CRM_Utils_Hook::singleton()->reset();
   }
 
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLybuntReportWithFYData() {
     $inInd = $this->individualCreate();
@@ -470,7 +491,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertEquals(2, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
 
     $expected = preg_replace('/\s+/', ' ', 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
       SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
@@ -489,6 +510,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLybuntReportWithFYDataOrderByLastYearAmount() {
     $inInd = $this->individualCreate();
@@ -510,7 +533,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertEquals(2, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
   }
 
   /**
@@ -541,6 +564,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test the group filter works on the contribution summary.
    *
    * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
+   *
+   * @param string $template
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithNotINSmartGroupFilter($template) {
     $groupID = $this->setUpPopulatedSmartGroup();
@@ -555,6 +582,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test no fatal on order by per https://lab.civicrm.org/dev/core/issues/739
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCaseDetailsCaseTypeHeader() {
     $this->callAPISuccess('report_template', 'getrows', [
@@ -572,6 +601,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test the group filter works on the contribution summary.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionDetailSoftCredits() {
     $contactID = $this->individualCreate();
@@ -592,6 +623,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test the amount column is populated on soft credit details.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionDetailSoftCreditsOnly() {
     $contactID = $this->individualCreate();
@@ -611,7 +644,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql', 'labels']],
     ]);
     foreach (array_keys($rows['metadata']['labels']) as $header) {
-      $this->assertTrue(!empty($rows['values'][0][$header]));
+      $this->assertNotEmpty($rows['values'][0][$header]);
     }
   }
 
@@ -622,6 +655,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param string $template
    *   Report template unique identifier.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testReportsWithNonSmartGroupFilter($template) {
     $groupID = $this->setUpPopulatedGroup();
@@ -649,7 +684,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       $this->assertEquals($numberExpected, $rows['values'][0]['civicrm_contribution_total_amount_count'], 'wrong row count in ' . $template);
     }
     else {
-      $this->assertEquals($numberExpected, count($rows['values']), 'wrong row count in ' . $template);
+      $this->assertCount($numberExpected, $rows['values'], 'wrong row count in ' . $template);
     }
   }
 
@@ -772,7 +807,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public function testContributionSummaryWithSingleContactsInTwoGroups() {
     list($groupID1, $individualID) = $this->setUpPopulatedGroup(TRUE);
     // create second group and add the individual to it.
-    $groupID2 = $this->groupCreate(['name' => uniqid(), 'title' => uniqid()]);
+    $groupID2 = $this->groupCreate(['name' => 'test_group', 'title' => 'test_title']);
     $this->callAPISuccess('GroupContact', 'create', [
       'group_id' => $groupID2,
       'contact_id' => $individualID,
@@ -855,7 +890,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $householdID = $this->householdCreate();
     $individualID = $this->individualCreate();
     $individualIDRemoved = $this->individualCreate();
-    $groupID = $this->smartGroupCreate([], ['name' => uniqid(), 'title' => uniqid()]);
+    $groupID = $this->smartGroupCreate([], ['name' => 'smart_group', 'title' => 'smart group']);
     $this->callAPISuccess('GroupContact', 'create', [
       'group_id' => $groupID,
       'contact_id' => $individualIDRemoved,
@@ -1041,10 +1076,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contribute/deferredrevenue',
     ]);
-    $this->assertEquals(2, $rows['count'], "Report failed to get row count");
+    $this->assertEquals(2, $rows['count'], 'Report failed to get row count');
     $count = [2, 1];
     foreach ($rows['values'] as $row) {
-      $this->assertEquals(array_pop($count), count($row['rows']), "Report failed to get row count");
+      $this->assertCount(array_pop($count), $row['rows'], 'Report failed to get row count');
     }
   }
 
@@ -1056,7 +1091,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $template
    *   Report template unique identifier.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testReportsCustomDataOrderBy($template) {
     $this->entity = 'Contact';
@@ -1129,6 +1166,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test activity details report - requiring all current fields to be output.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testActivityDetails() {
     $this->createContactsWithActivities();
@@ -1199,7 +1238,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_activity_source_record_id' => NULL,
       'civicrm_activity_activity_type_id' => 'Meeting',
       'civicrm_activity_activity_subject' => 'Very secret meeting',
-      'civicrm_activity_activity_date_time' => date('Y-m-d 23:59:58', strtotime('now')),
+      'civicrm_activity_activity_date_time' => date('Y-m-d 23:59:58'),
       'civicrm_activity_status_id' => 'Scheduled',
       'civicrm_activity_duration' => '120',
       'civicrm_activity_location' => 'Pennsylvania',
@@ -1236,6 +1275,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Activity Details report has some whack-a-mole to fix when filtering on null/not null.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testActivityDetailsNullFilters() {
     $this->createContactsWithActivities();
@@ -1278,6 +1319,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Set up some activity data..... use some chars that challenge our utf handling.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function createContactsWithActivities() {
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Brzęczysław', 'email' => 'techo@spying.com']);
@@ -1286,7 +1329,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('Activity', 'create', [
       'subject' => 'Very secret meeting',
-      'activity_date_time' => date('Y-m-d 23:59:58', strtotime('now')),
+      'activity_date_time' => date('Y-m-d 23:59:58'),
       'duration' => 120,
       'location' => 'Pennsylvania',
       'details' => 'a test activity',
@@ -1300,13 +1343,15 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test the group filter works on the contribution summary.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionDetailTotalHeader() {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
     $template = 'contribute/detail';
-    $rows = $this->callAPISuccess('report_template', 'getrows', [
+    $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
       'contribution_or_soft_value' => 'contributions_only',
       'fields' => [
@@ -1325,6 +1370,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test contact subtype filter on grant report.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGrantReportSeparatedFilter() {
     $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
@@ -1417,6 +1464,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test PCP report to ensure total donors and total committed is accurate.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPcpReportTotals() {
     $donor1ContactId = $this->individualCreate();
@@ -1532,12 +1581,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       ],
     ]);
     $values = $rows['values'][0];
-    $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], "Total commited should be $100");
-    $this->assertEquals(2, $values['civicrm_contribution_soft_soft_id_count'], "Total donors should be 2");
+    $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], 'Total committed should be $100');
+    $this->assertEquals(2, $values['civicrm_contribution_soft_soft_id_count'], 'Total donors should be 2');
   }
 
   /**
    * Test a report that uses getAddressColumns();
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetAddressColumns() {
     $template = 'event/participantlisting';
