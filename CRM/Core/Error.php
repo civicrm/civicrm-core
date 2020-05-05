@@ -608,7 +608,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $prefix
    *
-   * @return Log
+   * @return Log_file
    */
   public static function createDebugLogger($prefix = '') {
     self::generateLogFileName($prefix);

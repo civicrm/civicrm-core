@@ -18,15 +18,32 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Class XDebugSubscriber
  * @package Civi\API\Subscriber
  */
-class XDebugSubscriber implements EventSubscriberInterface {
+class DebugSubscriber implements EventSubscriberInterface {
+
+  /**
+   * @var \Civi\API\LogObserver
+   */
+  private $debugLog;
 
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
     return [
-      Events::RESPOND => ['onApiRespond', Events::W_LATE],
+      Events::PREPARE => ['onApiPrepare', 999],
+      Events::RESPOND => ['onApiRespond', -999],
     ];
+  }
+
+  public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
+    $apiRequest = $event->getApiRequest();
+    if (!isset($this->debugLog)
+      && !empty($apiRequest['params']['debug'])
+      && (empty($apiRequest['params']['check_permissions']) || \CRM_Core_Permission::check('view debug output'))
+    ) {
+      $this->debugLog = new \Civi\API\LogObserver();
+      \CRM_Core_Error::createDebugLogger()->attach($this->debugLog);
+    }
   }
 
   /**
@@ -36,9 +53,7 @@ class XDebugSubscriber implements EventSubscriberInterface {
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();
-    if (
-      function_exists('xdebug_time_index')
-      && !empty($apiRequest['params']['debug'])
+    if (!empty($apiRequest['params']['debug'])
       && (empty($apiRequest['params']['check_permissions']) || \CRM_Core_Permission::check('view debug output'))
     ) {
       if (is_a($result, '\Civi\Api4\Generic\Result')) {
@@ -53,9 +68,14 @@ class XDebugSubscriber implements EventSubscriberInterface {
       else {
         return;
       }
-      $debug['peakMemory'] = xdebug_peak_memory_usage();
-      $debug['memory'] = xdebug_memory_usage();
-      $debug['timeIndex'] = xdebug_time_index();
+      if (isset($this->debugLog) && $this->debugLog->getMessages()) {
+        $debug['log'] = $this->debugLog->getMessages();
+      }
+      if (function_exists('xdebug_time_index')) {
+        $debug['peakMemory'] = xdebug_peak_memory_usage();
+        $debug['memory'] = xdebug_memory_usage();
+        $debug['timeIndex'] = xdebug_time_index();
+      }
       $event->setResponse($result);
     }
   }

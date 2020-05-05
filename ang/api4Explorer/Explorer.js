@@ -669,7 +669,7 @@
     }
 
     $scope.execute = function() {
-      $scope.status = 'warning';
+      $scope.status = 'info';
       $scope.loading = true;
       $http.post(CRM.url('civicrm/ajax/api4/' + $scope.entity + '/' + $scope.action, {
         params: angular.toJson(getParams()),
@@ -680,7 +680,7 @@
         }
       }).then(function(resp) {
           $scope.loading = false;
-          $scope.status = 'success';
+          $scope.status = resp.data && resp.data.debug && resp.data.debug.log ? 'warning' : 'success';
           $scope.debug = debugFormat(resp.data);
           $scope.result = [formatMeta(resp.data), prettyPrintOne(_.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)];
         }, function(resp) {

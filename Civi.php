@@ -75,7 +75,7 @@ class Civi {
   }
 
   /**
-   * @return \Psr\Log\LoggerInterface
+   * @return \CRM_Core_Error_Log
    */
   public static function log() {
     return Civi\Core\Container::singleton()->get('psr_log');
