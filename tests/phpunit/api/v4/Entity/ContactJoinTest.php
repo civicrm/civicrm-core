@@ -84,7 +84,7 @@ class ContactJoinTest extends UnitTestCase {
 
   public function testJoinToPCMOptionValueWillShowLabel() {
     $options = OptionValue::get()
-      ->addWhere('option_group.name', '=', 'preferred_communication_method')
+      ->addWhere('option_group_id:name', '=', 'preferred_communication_method')
       ->execute()
       ->getArrayCopy();
 
@@ -109,14 +109,11 @@ class ContactJoinTest extends UnitTestCase {
 
     $fetchedContact = Contact::get()
       ->addWhere('id', 'IN', $contactIds)
-      ->addSelect('preferred_communication_method.label')
+      ->addSelect('preferred_communication_method:label')
       ->execute()
       ->first();
 
-    $preferredMethod = $fetchedContact['preferred_communication_method'];
-    $returnedLabels = array_column($preferredMethod, 'label');
-
-    $this->assertEquals($labels, $returnedLabels);
+    $this->assertEquals($labels, $fetchedContact['preferred_communication_method:label']);
   }
 
 }

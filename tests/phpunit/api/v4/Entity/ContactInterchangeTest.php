@@ -217,7 +217,7 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
 
   public function readNameByActSubjectJoin_4($cid, $strs) {
     $get = ActivityContact::get()
-      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('record_type_id:label', '=', 'Activity Source')
       ->addWhere('activity.subject', '=', $strs['api'])
       ->addSelect('contact.first_name')
       ->execute();
@@ -226,7 +226,7 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
 
   public function readNameByActSubjectChain_4($cid, $strs) {
     $get = ActivityContact::get()
-      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('record_type_id:label', '=', 'Activity Source')
       ->addWhere('activity.subject', '=', $strs['api'])
       ->setSelect(['activity_id', 'contact_id'])
       ->setChain([
@@ -269,7 +269,7 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
 
   public function readNameByActDetailsJoin_4($cid, $strs) {
     $get = ActivityContact::get()
-      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('record_type_id:label', '=', 'Activity Source')
       ->addWhere('activity.details', '=', $strs['api'])
       ->addSelect('contact.first_name')
       ->execute();
@@ -278,7 +278,7 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
 
   public function readNameByActDetailsChain_4($cid, $strs) {
     $get = ActivityContact::get()
-      ->addWhere('activity_contacts.label', '=', 'Activity Source')
+      ->addWhere('record_type_id:label', '=', 'Activity Source')
       ->addWhere('activity.details', '=', $strs['api'])
       ->setSelect(['activity_id', 'contact_id'])
       ->setChain([

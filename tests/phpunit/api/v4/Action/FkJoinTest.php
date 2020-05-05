@@ -49,7 +49,7 @@ class FkJoinTest extends UnitTestCase {
   public function testThreeLevelJoin() {
     $results = Activity::get()
       ->setCheckPermissions(FALSE)
-      ->addWhere('activity_type.name', '=', 'Phone Call')
+      ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();
 
     $this->assertCount(1, $results);

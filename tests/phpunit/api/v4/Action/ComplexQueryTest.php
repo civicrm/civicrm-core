@@ -50,7 +50,7 @@ class ComplexQueryTest extends UnitTestCase {
   public function testGetAllHousingSupportActivities() {
     $results = Activity::get()
       ->setCheckPermissions(FALSE)
-      ->addWhere('activity_type.name', '=', 'Phone Call')
+      ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();
 
     $this->assertGreaterThan(0, count($results));

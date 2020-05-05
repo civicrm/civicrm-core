@@ -99,16 +99,16 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $result = Contact::get()
       ->setCheckPermissions(FALSE)
       ->addSelect('first_name')
-      ->addSelect("$group.$colorField.label")
-      ->addSelect("$group.$foodField.label")
+      ->addSelect("$group.$colorField:label")
+      ->addSelect("$group.$foodField:label")
       ->addSelect('FinancialStuff.Salary')
-      ->addWhere("$group.$foodField.label", 'IN', ['Corn', 'Potatoes'])
+      ->addWhere("$group.$foodField:label", 'IN', ['Corn', 'Potatoes'])
       ->addWhere('FinancialStuff.Salary', '>', '10000')
       ->execute()
       ->first();
 
-    $this->assertEquals('Red', $result["$group.$colorField.label"]);
-    $this->assertEquals('Corn', $result["$group.$foodField.label"]);
+    $this->assertEquals('Red', $result["$group.$colorField:label"]);
+    $this->assertEquals('Corn', $result["$group.$foodField:label"]);
     $this->assertEquals(50000, $result['FinancialStuff.Salary']);
   }
 
@@ -183,10 +183,10 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->setCheckPermissions(FALSE)
       ->addSelect('first_name')
       ->addSelect('last_name')
-      ->addSelect("$group.$colorField.label")
-      ->addSelect("$group.$foodField.label")
+      ->addSelect("$group.$colorField:label")
+      ->addSelect("$group.$foodField:label")
       ->addSelect('FinancialStuff.Salary')
-      ->addWhere("$group.$foodField.label", 'IN', ['Corn', 'Cheese'])
+      ->addWhere("$group.$foodField:label", 'IN', ['Corn', 'Cheese'])
       ->execute();
 
     $blueCheese = NULL;
@@ -196,8 +196,8 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       }
     }
 
-    $this->assertEquals('Blue', $blueCheese["$group.$colorField.label"]);
-    $this->assertEquals('Cheese', $blueCheese["$group.$foodField.label"]);
+    $this->assertEquals('Blue', $blueCheese["$group.$colorField:label"]);
+    $this->assertEquals('Cheese', $blueCheese["$group.$foodField:label"]);
     $this->assertEquals(500000, $blueCheese['FinancialStuff.Salary']);
   }
 
