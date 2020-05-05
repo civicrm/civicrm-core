@@ -6,6 +6,37 @@ use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Traversable;
 
+/**
+ * The TokenProcessor is a template/token-engine. It is heavily influenced by
+ * traditional expectations of CiviMail, but it's adapted to an object-oriented,
+ * extensible design.
+ *
+ * BACKGROUND
+ *
+ * The CiviMail heritage gives the following expectations:
+ *
+ * - Messages are often composed of multiple parts (e.g. HTML-part, text-part, and subject-part).
+ * - Messages are often composed in batches for multiple recipients.
+ * - Tokens are denoted as `{foo.bar}`.
+ * - Data should be loaded in an optimized fashion - fetch only the needed
+ *   columns, and fetch them with one query (per-table).
+ *
+ * The question of "optimized" data-loading is a key differentiator/complication.
+ * This requires some kind of communication/integration between the template-parser and data-loader.
+ *
+ * USAGE
+ *
+ * There are generally two perspectives on using TokenProcessor:
+ *
+ * 1. Composing messages: You need to specify the template contents (eg `addMessage(...)`)
+ *    and the recipients' key data (eg `addRow(['contact_id' => 123])`).
+ * 2. Defining tokens/entities/data-loaders: You need to listen for TokenProcessor
+ *    events; if any of your tokens/entities are used, then load the batch of data.
+ *
+ * Each use-case is presented with examples in the Developer Guide:
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/framework/token/
+ */
 class TokenProcessor {
 
   /**
@@ -182,6 +213,11 @@ class TokenProcessor {
    * Get a list of all tokens used in registered messages.
    *
    * @return array
+   *   The list of activated tokens, indexed by object/entity.
+   *   Array(string $entityName => string[] $fieldNames)
+   *
+   *   Ex: If a message says 'Hello {contact.first_name} {contact.last_name}!',
+   *   then $result['contact'] would be ['first_name', 'last_name'].
    */
   public function getMessageTokens() {
     $tokens = [];
@@ -195,12 +231,28 @@ class TokenProcessor {
     return $tokens;
   }
 
+  /**
+   * Get a specific row (i.e. target or recipient).
+   *
+   * Ex: echo $p->getRow(2)->context['contact_id'];
+   * Ex: $p->getRow(3)->token('profile', 'viewUrl', 'http://example.com/profile?cid=3');
+   *
+   * @param int $key
+   *   The row ID
+   * @return \Civi\Token\TokenRow
+   *   The row is presented with a fluent, OOP facade.
+   * @see TokenRow
+   */
   public function getRow($key) {
     return new TokenRow($this, $key);
   }
 
   /**
+   * Get the list of rows (i.e. targets/recipients to generate).
+   *
+   * @see TokenRow
    * @return \Traversable<TokenRow>
+   *   Each row is presented with a fluent, OOP facade.
    */
   public function getRows() {
     return new TokenRowIterator($this, new \ArrayIterator($this->rowContexts));
@@ -212,7 +264,7 @@ class TokenProcessor {
    *
    * @param string $field
    *   Ex: 'contactId'.
-   * @param $subfield
+   * @param string|NULL $subfield
    * @return array
    *   Ex: [12, 34, 56].
    */
@@ -248,7 +300,7 @@ class TokenProcessor {
    * Get the list of available tokens.
    *
    * @return array
-   *   Ex: $tokens['event'] = array('location', 'start_date', 'end_date').
+   *   Ex: $tokens['event'] = ['location', 'start_date', 'end_date'].
    */
   public function getTokens() {
     if ($this->tokens === NULL) {
@@ -263,7 +315,7 @@ class TokenProcessor {
    * Get the list of available tokens, formatted for display
    *
    * @return array
-   *   Ex: $tokens[ '{token.name}' ] = "Token label"
+   *   Ex: $tokens['{token.name}'] = "Token label"
    */
   public function listTokens() {
     if ($this->listTokens === NULL) {
