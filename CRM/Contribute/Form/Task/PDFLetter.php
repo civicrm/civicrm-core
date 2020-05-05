@@ -155,6 +155,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
     $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
+    $tokens = array_merge(CRM_Core_SelectValues::domainTokens(), $tokens);
     return $tokens;
   }
 

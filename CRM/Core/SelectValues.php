@@ -494,14 +494,24 @@ class CRM_Core_SelectValues {
       '{action.forward}' => ts('Forward this email (link)'),
       '{action.reply}' => ts('Reply to this email (link)'),
       '{action.subscribeUrl}' => ts('Subscribe via web page'),
-      '{domain.name}' => ts('Domain name'),
-      '{domain.address}' => ts('Domain (organization) address'),
-      '{domain.phone}' => ts('Domain (organization) phone'),
-      '{domain.email}' => ts('Domain (organization) email'),
       '{mailing.key}' => ts('Mailing key'),
       '{mailing.name}' => ts('Mailing name'),
       '{mailing.group}' => ts('Mailing group'),
       '{mailing.viewUrl}' => ts('Mailing permalink'),
+    ] + self::domainTokens();
+  }
+
+  /**
+   * Domain tokens
+   *
+   * @return array
+   */
+  public static function domainTokens() {
+    return [
+      '{domain.name}' => ts('Domain name'),
+      '{domain.address}' => ts('Domain (organization) address'),
+      '{domain.phone}' => ts('Domain (organization) phone'),
+      '{domain.email}' => ts('Domain (organization) email'),
     ];
   }
 
