@@ -687,4 +687,16 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return array_combine(user_roles(), user_roles());
   }
 
+  /**
+   * Determine if the Views module exists.
+   *
+   * @return bool
+   */
+  public function viewsExists() {
+    if (function_exists('module_exists') && module_exists('views')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
