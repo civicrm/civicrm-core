@@ -48,4 +48,4 @@ UPDATE civicrm_state_province s
      AND s.name = 'Regiao Autonoma da Madeira'
 SET s.name = 'Região Autónoma da Madeira';
 
-ALTER TABLE `civicrm_contribution_recur` CHANGE `amount` `amount` DECIMAL( 20,2 ) COMMENT 'Amount to be collected by payment processor each recurrence';
+ALTER TABLE `civicrm_contribution_recur` CHANGE `amount` `amount` DECIMAL( 20,2 ) COMMENT 'Amount to be collected (including any sales tax) by payment processor each recurrence';
