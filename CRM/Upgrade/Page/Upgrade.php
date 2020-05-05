@@ -86,7 +86,6 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
     // All cached content needs to be cleared because the civi codebase was just replaced
     CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
-    CRM_Core_Menu::store();
 
     // cleanup only the templates_c directory
     $config->cleanup(1, FALSE);

@@ -330,6 +330,10 @@ class Container {
    */
   public function createEventDispatcher($container) {
     $dispatcher = new CiviEventDispatcher($container);
+    if (\CRM_Core_Config::isUpgradeMode()) {
+      $dispatcher->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
+    }
+
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, ['\Civi\Core\DatabaseInitializer', 'initialize']);
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, ['\Civi\Core\LocalizationInitializer', 'initialize']);
