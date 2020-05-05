@@ -260,18 +260,18 @@ class CRM_Case_Form_Activity_OpenCase {
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
 
     if (!$isMultiClient && !$form->_currentlyViewedContactId) {
-      throw new CRM_Core_Exception('Required parameter missing for OpenCase - end post processing');
+      CRM_Core_Error::statusBounce('Required parameter missing for OpenCase - end post processing');
     }
 
     if (!$form->_currentUserId || !$params['case_id'] || !$params['case_type']) {
-      throw new CRM_Core_Exception('Required parameter missing for OpenCase - end post processing');
+      CRM_Core_Error::statusBounce('Required parameter missing for OpenCase - end post processing');
     }
 
     // 1. create case-contact
     if ($isMultiClient && $form->_context == 'standalone') {
       foreach ($params['client_id'] as $cliId) {
         if (empty($cliId)) {
-          throw new CRM_Core_Exception('client_id cannot be empty for OpenCase - end post processing');
+          CRM_Core_Error::statusBounce('client_id cannot be empty for OpenCase - end post processing');
         }
         $contactParams = [
           'case_id' => $params['case_id'],
