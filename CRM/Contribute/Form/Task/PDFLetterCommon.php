@@ -220,7 +220,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    */
   private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator) {
     $categories = self::getTokenCategories();
-    $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    $tokenHtml = CRM_Utils_Token::replaceDomainTokens($html_message, $domain, TRUE, $messageToken);
+    $tokenHtml = CRM_Utils_Token::replaceContactTokens($tokenHtml, $contact, TRUE, $messageToken);
     if ($grouped) {
       $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
     }
