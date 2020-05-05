@@ -509,6 +509,10 @@
   name        : Francesc Bassas i Bullich
   jira        : francescbassas
 
+- github      : freeform-sg
+  organization: Freeform Solutions
+  name        : S.Gray
+
 - github      : freephile
   name        : Greg Rundlett
   organization: eQuality Technology
@@ -1326,7 +1330,7 @@
 - github      : simonjohnparker
   name        : Simon John Parker
 
-- gitub       : sushant
+- gitub       : sushantpaste
   organization: OSSeed Technologies LLP
   name        : Sushant Paste
 
