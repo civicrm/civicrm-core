@@ -18,6 +18,11 @@
 class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
 
   /**
+   * @var array
+   */
+  public $map;
+
+  /**
    * CRM_Core_Error_Log constructor.
    */
   public function __construct() {

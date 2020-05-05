@@ -169,7 +169,7 @@
       </div>
   </div>
   <div class="api4-explorer-row">
-      <div class="panel panel-warning explorer-code-panel">
+      <div class="panel panel-info explorer-code-panel">
         <ul class="panel-heading nav nav-tabs">
           <li role="presentation" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
             <a href ng-click="selectLang(lang)">
@@ -193,15 +193,16 @@
               <span ng-switch="status">
                 <i class="fa fa-fw fa-circle-o" ng-switch-when="default"></i>
                 <i class="fa fa-fw fa-check-circle" ng-switch-when="success"></i>
+                <i class="fa fa-fw fa-check-circle" ng-switch-when="warning"></i>
                 <i class="fa fa-fw fa-minus-circle" ng-switch-when="danger"></i>
-                <i class="fa fa-fw fa-spinner fa-pulse" ng-switch-when="warning"></i>
+                <i class="fa fa-fw fa-spinner fa-pulse" ng-switch-when="info"></i>
               </span>
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
           <li role="presentation" ng-if="::perm.accessDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
             <a href ng-click="selectedTab.result = 'debug'">
-              <i class="fa fa-fw fa-{{ debug ? 'bug' : 'circle-o' }}"></i>
+              <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}"></i>
               <span>{{:: ts('Debug') }}</span>
             </a>
           </li>

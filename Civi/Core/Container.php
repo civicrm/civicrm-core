@@ -410,7 +410,7 @@ class Container {
       \CRM_Utils_API_ReloadOption::singleton(),
       \CRM_Utils_API_MatchOption::singleton(),
     ]));
-    $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\DebugSubscriber());
     $kernel = new \Civi\API\Kernel($dispatcher);
 
     $reflectionProvider = new \Civi\API\Provider\ReflectionProvider($kernel);

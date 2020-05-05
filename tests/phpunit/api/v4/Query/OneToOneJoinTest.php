@@ -50,14 +50,14 @@ class OneToOneJoinTest extends UnitTestCase {
 
     $contacts = Contact::get()
       ->addWhere('id', 'IN', [$armenianContact['id'], $basqueContact['id']])
-      ->addSelect('preferred_language.label')
+      ->addSelect('preferred_language:label')
       ->addSelect('last_name')
       ->execute()
       ->indexBy('last_name')
       ->getArrayCopy();
 
-    $this->assertEquals($contacts['One']['preferred_language.label'], 'Armenian');
-    $this->assertEquals($contacts['Two']['preferred_language.label'], 'Basque');
+    $this->assertEquals($contacts['One']['preferred_language:label'], 'Armenian');
+    $this->assertEquals($contacts['Two']['preferred_language:label'], 'Basque');
   }
 
 }
