@@ -183,6 +183,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                 'soft_credits_only' => ts('Soft Credits Only'),
                 'both' => ts('Both'),
               ],
+              'default' => 'contributions_only',
             ],
             'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
             'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
@@ -534,7 +535,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
       $this->noDisplayContributionOrSoftColumn = TRUE;
     }
 
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params, 'contributions_only') == 'contributions_only') {
+    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
       $this->isContributionBaseMode = TRUE;
     }
     if ($this->isContributionBaseMode &&
