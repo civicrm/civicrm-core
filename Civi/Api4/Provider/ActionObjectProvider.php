@@ -31,7 +31,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     // to override standard implementations -- which is
     // handy for testing/mocking.
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         ['onApiResolve', Events::W_EARLY],
       ],
     ];

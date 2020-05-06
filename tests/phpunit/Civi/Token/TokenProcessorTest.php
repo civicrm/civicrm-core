@@ -22,8 +22,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->useTransaction(TRUE);
     parent::setUp();
     $this->dispatcher = new EventDispatcher();
-    $this->dispatcher->addListener(Events::TOKEN_REGISTER, [$this, 'onListTokens']);
-    $this->dispatcher->addListener(Events::TOKEN_EVALUATE, [$this, 'onEvalTokens']);
+    $this->dispatcher->addListener('civi.token.list', [$this, 'onListTokens']);
+    $this->dispatcher->addListener('civi.token.eval', [$this, 'onEvalTokens']);
     $this->counts = [
       'onListTokens' => 0,
       'onEvalTokens' => 0,

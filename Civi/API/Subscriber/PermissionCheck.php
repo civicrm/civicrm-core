@@ -26,7 +26,7 @@ class PermissionCheck implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::AUTHORIZE => [
+      'civi.api.authorize' => [
         ['onApiAuthorize', Events::W_LATE],
       ],
     ];

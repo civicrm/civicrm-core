@@ -37,6 +37,8 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * (Note: When adding more JOINs, it seems typical to use !casMailingJoinType, although
  * some hard-code a LEFT JOIN. Don't have an explanation for why.)
+ *
+ * Event name: 'civi.actionSchedule.prepareMailingQuery'
  */
 class MailingQueryEvent extends Event {
 

@@ -30,8 +30,8 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::AUTHORIZE => ['onApiAuthorize', Events::W_EARLY],
-      Events::RESPOND => ['onApiRespond', Events::W_MIDDLE],
+      'civi.api.authorize' => ['onApiAuthorize', Events::W_EARLY],
+      'civi.api.respond' => ['onApiRespond', Events::W_MIDDLE],
     ];
   }
 

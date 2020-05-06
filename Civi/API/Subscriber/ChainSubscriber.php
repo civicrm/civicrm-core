@@ -40,7 +40,7 @@ class ChainSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::RESPOND => ['onApiRespond', Events::W_EARLY],
+      'civi.api.respond' => ['onApiRespond', Events::W_EARLY],
     ];
   }
 

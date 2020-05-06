@@ -14,6 +14,12 @@ namespace Civi\API\Event;
 /**
  * Class AuthorizeEvent
  * @package Civi\API\Event
+ *
+ * Determine whether the API request is allowed for the current user.
+ * For successful execution, at least one listener must invoke
+ * $event->authorize().
+ *
+ * Event name: 'civi.api.authorize'
  */
 class AuthorizeEvent extends Event {
   /**
