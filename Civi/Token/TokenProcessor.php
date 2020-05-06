@@ -306,7 +306,7 @@ class TokenProcessor {
     if ($this->tokens === NULL) {
       $this->tokens = [];
       $event = new TokenRegisterEvent($this, ['entity' => 'undefined']);
-      $this->dispatcher->dispatch(Events::TOKEN_REGISTER, $event);
+      $this->dispatcher->dispatch('civi.token.list', $event);
     }
     return $this->tokens;
   }
@@ -332,7 +332,7 @@ class TokenProcessor {
    */
   public function evaluate() {
     $event = new TokenValueEvent($this);
-    $this->dispatcher->dispatch(Events::TOKEN_EVALUATE, $event);
+    $this->dispatcher->dispatch('civi.token.eval', $event);
     return $this;
   }
 
@@ -371,7 +371,7 @@ class TokenProcessor {
     $event->context = $row->context;
     $event->row = $row;
     $event->string = strtr($message['string'], $filteredTokens);
-    $this->dispatcher->dispatch(Events::TOKEN_RENDER, $event);
+    $this->dispatcher->dispatch('civi.token.render', $event);
     return $event->string;
   }
 

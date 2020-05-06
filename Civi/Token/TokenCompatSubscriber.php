@@ -25,8 +25,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::TOKEN_EVALUATE => 'onEvaluate',
-      Events::TOKEN_RENDER => 'onRender',
+      'civi.token.eval' => 'onEvaluate',
+      'civi.token.render' => 'onRender',
     ];
   }
 

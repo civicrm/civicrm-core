@@ -18,6 +18,8 @@ namespace Civi\Token\Event;
  *   'label' => ts('Default Profile URL (View Mode)'),
  * ));
  * @endcode
+ *
+ * Event name: 'civi.token.list'
  */
 class TokenRegisterEvent extends TokenEvent {
 

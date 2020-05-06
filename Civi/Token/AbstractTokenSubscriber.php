@@ -41,8 +41,8 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
 
   public static function getSubscribedEvents() {
     return [
-      Events::TOKEN_REGISTER => 'registerTokens',
-      Events::TOKEN_EVALUATE => 'evaluateTokens',
+      'civi.token.list' => 'registerTokens',
+      'civi.token.eval' => 'evaluateTokens',
       \Civi\ActionSchedule\Events::MAILING_QUERY => 'alterActionScheduleQuery',
     ];
   }

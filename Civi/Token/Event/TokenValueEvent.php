@@ -32,6 +32,7 @@ namespace Civi\Token\Event;
  * }
  * @encode
  *
+ * Event name: 'civi.token.eval'
  */
 class TokenValueEvent extends TokenEvent {
 
