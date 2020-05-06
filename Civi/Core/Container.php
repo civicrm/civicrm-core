@@ -1,7 +1,6 @@
 <?php
 namespace Civi\Core;
 
-use Civi\Core\Event\SystemInstallEvent;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -334,9 +333,9 @@ class Container {
       $dispatcher->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
     }
 
-    $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, ['\Civi\Core\InstallationCanary', 'check']);
-    $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, ['\Civi\Core\DatabaseInitializer', 'initialize']);
-    $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, ['\Civi\Core\LocalizationInitializer', 'initialize']);
+    $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
+    $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
+    $dispatcher->addListener('civi.core.install', ['\Civi\Core\LocalizationInitializer', 'initialize']);
     $dispatcher->addListener('hook_civicrm_post', ['\CRM_Core_Transaction', 'addPostCommit'], -1000);
     $dispatcher->addListener('hook_civicrm_pre', ['\Civi\Core\Event\PreEvent', 'dispatchSubevent'], 100);
     $dispatcher->addListener('civi.dao.preDelete', ['\CRM_Core_BAO_EntityTag', 'preDeleteOtherEntity']);
