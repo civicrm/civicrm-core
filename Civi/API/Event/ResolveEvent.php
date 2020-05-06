@@ -14,6 +14,12 @@ namespace Civi\API\Event;
 /**
  * Class ResolveEvent
  * @package Civi\API\Event
+ *
+ * Determine which API provider executes the given request. For successful
+ * execution, at least one listener must invoke
+ * $event->setProvider($provider).
+ *
+ * Event name: 'civi.api.resolve'
  */
 class ResolveEvent extends Event {
 

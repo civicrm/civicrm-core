@@ -39,10 +39,10 @@ class KernelTest extends \CiviUnitTestCase {
     ]);
 
     $expectedEventSequence = [
-      ['name' => Events::RESOLVE, 'class' => 'Civi\API\Event\ResolveEvent'],
-      ['name' => Events::AUTHORIZE, 'class' => 'Civi\API\Event\AuthorizeEvent'],
-      ['name' => Events::PREPARE, 'class' => 'Civi\API\Event\PrepareEvent'],
-      ['name' => Events::RESPOND, 'class' => 'Civi\API\Event\RespondEvent'],
+      ['name' => 'civi.api.resolve', 'class' => 'Civi\API\Event\ResolveEvent'],
+      ['name' => 'civi.api.authorize', 'class' => 'Civi\API\Event\AuthorizeEvent'],
+      ['name' => 'civi.api.prepare', 'class' => 'Civi\API\Event\PrepareEvent'],
+      ['name' => 'civi.api.respond', 'class' => 'Civi\API\Event\RespondEvent'],
     ];
     $this->assertEquals($expectedEventSequence, $this->actualEventSequence);
     $this->assertEquals('frob', $result['values'][98]);
@@ -50,10 +50,10 @@ class KernelTest extends \CiviUnitTestCase {
 
   public function testResolveException() {
     $test = $this;
-    $this->dispatcher->addListener(Events::RESOLVE, function () {
+    $this->dispatcher->addListener('civi.api.resolve', function () {
       throw new \API_Exception('Oh My God', 'omg', ['the' => 'badzes']);
     }, Events::W_EARLY);
-    $this->dispatcher->addListener(Events::EXCEPTION, function (\Civi\API\Event\ExceptionEvent $event) use ($test) {
+    $this->dispatcher->addListener('civi.api.exception', function (\Civi\API\Event\ExceptionEvent $event) use ($test) {
       $test->assertEquals('Oh My God', $event->getException()->getMessage());
     });
 
@@ -63,8 +63,8 @@ class KernelTest extends \CiviUnitTestCase {
     ]);
 
     $expectedEventSequence = [
-      ['name' => Events::RESOLVE, 'class' => 'Civi\API\Event\ResolveEvent'],
-      ['name' => Events::EXCEPTION, 'class' => 'Civi\API\Event\ExceptionEvent'],
+      ['name' => 'civi.api.resolve', 'class' => 'Civi\API\Event\ResolveEvent'],
+      ['name' => 'civi.api.exception', 'class' => 'Civi\API\Event\ExceptionEvent'],
     ];
     $this->assertEquals($expectedEventSequence, $this->actualEventSequence);
     $this->assertEquals('Oh My God', $result['error_message']);

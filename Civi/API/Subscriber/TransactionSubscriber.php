@@ -34,9 +34,9 @@ class TransactionSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::PREPARE => ['onApiPrepare', Events::W_EARLY],
-      Events::RESPOND => ['onApiRespond', Events::W_MIDDLE],
-      Events::EXCEPTION => ['onApiException', Events::W_EARLY],
+      'civi.api.prepare' => ['onApiPrepare', Events::W_EARLY],
+      'civi.api.respond' => ['onApiRespond', Events::W_MIDDLE],
+      'civi.api.exception' => ['onApiException', Events::W_EARLY],
     ];
   }
 

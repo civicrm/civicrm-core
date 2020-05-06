@@ -11,7 +11,6 @@
 
 namespace Civi\API\Subscriber;
 
-use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -30,8 +29,8 @@ class DebugSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::PREPARE => ['onApiPrepare', 999],
-      Events::RESPOND => ['onApiRespond', -999],
+      'civi.api.prepare' => ['onApiPrepare', 999],
+      'civi.api.respond' => ['onApiRespond', -999],
     ];
   }
 
