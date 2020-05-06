@@ -81,7 +81,7 @@ class FkJoinTest extends UnitTestCase {
       ->setCheckPermissions(FALSE)
       ->addSelect('phones.phone')
       ->addWhere('id', '=', $testContact['id'])
-      ->addWhere('phones.location_type.name', '=', 'Home')
+      ->addWhere('phones.location_type_id:name', '=', 'Home')
       ->execute()
       ->first();
 

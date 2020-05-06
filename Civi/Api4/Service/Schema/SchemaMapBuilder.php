@@ -27,7 +27,6 @@ use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Civi\Api4\Service\Schema\Joinable\OptionValueJoinable;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class SchemaMapBuilder {
@@ -99,41 +98,6 @@ class SchemaMapBuilder {
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
       $table->addTableLink($field, $joinable);
     }
-    elseif (!empty($data['pseudoconstant'])) {
-      $this->addPseudoConstantJoin($table, $field, $data);
-    }
-  }
-
-  /**
-   * @param Table $table
-   * @param string $field
-   * @param array $data
-   */
-  private function addPseudoConstantJoin(Table $table, $field, array $data) {
-    $pseudoConstant = $data['pseudoconstant'] ?? NULL;
-    $tableName = $pseudoConstant['table'] ?? NULL;
-    $optionGroupName = $pseudoConstant['optionGroupName'] ?? NULL;
-    $keyColumn = $pseudoConstant['keyColumn'] ?? 'id';
-
-    if ($tableName) {
-      $alias = str_replace('civicrm_', '', $tableName);
-      $joinable = new Joinable($tableName, $keyColumn, $alias);
-      $condition = $pseudoConstant['condition'] ?? NULL;
-      if ($condition) {
-        $joinable->addCondition($condition);
-      }
-      $table->addTableLink($field, $joinable);
-    }
-    elseif ($optionGroupName) {
-      $keyColumn = $pseudoConstant['keyColumn'] ?? 'value';
-      $joinable = new OptionValueJoinable($optionGroupName, NULL, $keyColumn);
-
-      if (!empty($data['serialize'])) {
-        $joinable->setJoinType($joinable::JOIN_TYPE_ONE_TO_MANY);
-      }
-
-      $table->addTableLink($field, $joinable);
-    }
   }
 
   /**
@@ -144,11 +108,6 @@ class SchemaMapBuilder {
   private function addBackReferences(SchemaMap $map) {
     foreach ($map->getTables() as $table) {
       foreach ($table->getTableLinks() as $link) {
-        // there are too many possible joins from option value so skip
-        if ($link instanceof OptionValueJoinable) {
-          continue;
-        }
-
         $target = $map->getTableByName($link->getTargetTable());
         $tableName = $link->getBaseTable();
         $plural = str_replace('civicrm_', '', $this->getPlural($tableName));
@@ -211,11 +170,6 @@ class SchemaMapBuilder {
       $customTable = $map->getTableByName($tableName);
       if (!$customTable) {
         $customTable = new Table($tableName);
-      }
-
-      if (!empty($fieldData->option_group_id)) {
-        $optionValueJoinable = new OptionValueJoinable($fieldData->option_group_id, $fieldData->label);
-        $customTable->addTableLink($fieldData->column_name, $optionValueJoinable);
       }
 
       $map->addTable($customTable);

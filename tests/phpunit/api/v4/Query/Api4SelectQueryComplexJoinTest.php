@@ -51,7 +51,7 @@ class Api4SelectQueryComplexJoinTest extends UnitTestCase {
     $query->select[] = 'display_name';
     $query->select[] = 'phones.*_id';
     $query->select[] = 'emails.email';
-    $query->select[] = 'emails.location_type.name';
+    $query->select[] = 'emails.location_type_id:name';
     $query->select[] = 'created_activities.contact_id';
     $query->select[] = 'created_activities.activity.subject';
     $query->select[] = 'created_activities.activity.activity_type_id:name';
@@ -74,7 +74,7 @@ class Api4SelectQueryComplexJoinTest extends UnitTestCase {
     $this->assertContains($firstActivity['subject'], $activitySubjects);
     $this->assertArrayHasKey('activity_type_id:name', $firstActivity);
 
-    $this->assertArrayHasKey('name', $firstResult['emails'][0]['location_type']);
+    $this->assertArrayHasKey('location_type_id:name', $firstResult['emails'][0]);
     $this->assertArrayHasKey('location_type_id', $firstResult['phones'][0]);
     $this->assertArrayHasKey('id', $firstResult['phones'][0]);
     $this->assertArrayNotHasKey('phone', $firstResult['phones'][0]);
@@ -98,13 +98,13 @@ class Api4SelectQueryComplexJoinTest extends UnitTestCase {
     $query->select[] = 'id';
     $query->select[] = 'first_name';
     // before emails selection
-    $query->select[] = 'emails.location_type.name';
+    $query->select[] = 'emails.location_type_id:name';
     $query->select[] = 'emails.email';
     $query->where[] = ['emails.email', 'IS NOT NULL'];
     $results = $query->run();
     $firstResult = array_shift($results);
 
-    $this->assertNotEmpty($firstResult['emails'][0]['location_type']['name']);
+    $this->assertNotEmpty($firstResult['emails'][0]['location_type_id:name']);
   }
 
 }

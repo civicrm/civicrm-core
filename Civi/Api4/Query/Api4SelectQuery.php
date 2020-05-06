@@ -16,7 +16,6 @@ use Civi\Api4\Event\Events;
 use Civi\Api4\Event\PostSelectQueryEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
-use Civi\Api4\Service\Schema\Joinable\OptionValueJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\SelectUtil;
@@ -429,9 +428,6 @@ class Api4SelectQuery extends SelectQuery {
     foreach ($joinPath as $joinable) {
       if ($joinable->getJoinType() === Joinable::JOIN_TYPE_ONE_TO_MANY) {
         $isMany = TRUE;
-      }
-      if ($joinable instanceof OptionValueJoinable) {
-        \Civi::log()->warning('Use API pseudoconstant suffix like :name or :label instead of join.', ['civi.tag' => 'deprecated']);
       }
     }
 
