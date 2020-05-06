@@ -25,7 +25,7 @@
     {/foreach}
     <div class="action-link">
         {if $listingURL}
-            <a href="{$listingURL}">&raquo; {ts}Back to Listings{/ts}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="{$listingURL}"><i class="crm-i fa-chevron-right"></i> {ts}Back to Listings{/ts}</a>&nbsp;&nbsp;&nbsp;&nbsp;
         {/if}
         {if $mapURL}
             <a href="{$mapURL}">&raquo; {ts}Map Primary Address{/ts}</a>

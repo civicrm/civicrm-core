@@ -21,7 +21,7 @@
 
 </table>
 <div id="comment_show">
-    <a href="#" class="button" onclick="cj('#comment_show').hide(); cj('#comment').show(); document.getElementById('forward_comment').focus(); return false;"><span>&raquo; {ts}Add Comment{/ts}</span></a>
+    <a href="#" class="button" onclick="cj('#comment_show').hide(); cj('#comment').show(); document.getElementById('forward_comment').focus(); return false;"><span><i class="crm-i fa-plus"></i> {ts}Add Comment{/ts}</span></a>
 </div><div class="spacer"></div>
 <div id="comment" style="display:none">
             <table class="form-layout">
@@ -35,4 +35,3 @@
 <br />
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
