@@ -93,7 +93,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts}Map event location{/ts}">&raquo;&nbsp;{ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker"></i>&nbsp;{ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
@@ -124,7 +124,7 @@
     </tbody>
     </table>
     {if $eventSummary.total_events GT 10}
-     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}">&raquo; {ts}Browse more events{/ts}...</a></div>
+     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}"><i class="crm-i fa-chevron-right"></i> {ts}Browse more events{/ts}...</a></div>
     {/if}
 {else}
     <br />

@@ -75,7 +75,7 @@
 
                     {if $action eq 1 or $action eq 2}
                       <br />
-                      <a href="#" class="crm-with-contact">&raquo; {ts}With other contact(s){/ts}</a>
+                      <a href="#" class="crm-with-contact"><i class="crm-i fa-user-plus"></i> {ts}With other contact(s){/ts}</a>
                     {/if}
                   </td>
                 </tr>
@@ -87,7 +87,7 @@
                       {$form.target_contact_id.html}
                       <br/>
                       <a href="#" class="crm-with-contact">
-                        &raquo; {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
+                        <i class="crm-i fa-user"></i> {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
                       </a>
                     </td>
                   </tr>

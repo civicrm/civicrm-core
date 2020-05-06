@@ -25,7 +25,7 @@
     {foreach from = $links key = k item = v}
           <tr>
             <td>
-                <a href="{crmURL p=$v.url q=$v.qs|replace:'%%pcpId%%':$replace.id|replace:'%%pageComponent%%':$replace.pageComponent|replace:'%%pcpBlock%%':$replace.block}" title="{$v.title|escape:'html'}" {if $v.extra}{$v.extra}{/if}><strong>&raquo; {$v.name}</strong></a>
+                <a href="{crmURL p=$v.url q=$v.qs|replace:'%%pcpId%%':$replace.id|replace:'%%pageComponent%%':$replace.pageComponent|replace:'%%pcpBlock%%':$replace.block}" title="{$v.title|escape:'html'}" {if $v.extra}{$v.extra}{/if}><strong><i class="crm-i fa-chevron-right"></i> {$v.name}</strong></a>
        </td>
          <td>&nbsp;<cite>{$hints.$k}</cite></td>
       </tr>

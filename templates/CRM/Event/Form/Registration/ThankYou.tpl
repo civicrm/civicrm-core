@@ -195,7 +195,7 @@
     {/if}
 
     <div class="action-link section event_info_link-section">
-        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}">&raquo; {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
+        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
     </div>
 
     {if $event.is_public }
