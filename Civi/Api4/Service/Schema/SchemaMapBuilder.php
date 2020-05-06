@@ -70,8 +70,8 @@ class SchemaMapBuilder {
     /** @var \CRM_Core_DAO $daoName */
     foreach (AllCoreTables::get() as $daoName => $data) {
       $table = new Table($data['table']);
-      foreach ($daoName::fields() as $field => $fieldData) {
-        $this->addJoins($table, $field, $fieldData);
+      foreach ($daoName::fields() as $fieldData) {
+        $this->addJoins($table, $fieldData['name'], $fieldData);
       }
       $map->addTable($table);
       if (in_array($data['name'], $this->apiEntities)) {
