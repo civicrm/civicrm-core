@@ -9,6 +9,8 @@ use Symfony\Component\EventDispatcher\Event;
  * @package Civi\ActionSchedule\Event
  *
  * Register any available mappings.
+ *
+ * Event name: 'civi.actionSchedule.getMappings'
  */
 class MappingRegisterEvent extends Event {
 
