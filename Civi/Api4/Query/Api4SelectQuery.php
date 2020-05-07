@@ -12,8 +12,6 @@
 namespace Civi\Api4\Query;
 
 use Civi\API\SelectQuery;
-use Civi\Api4\Event\Events;
-use Civi\Api4\Event\PostSelectQueryEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Utils\FormattingUtil;
@@ -133,24 +131,21 @@ class Api4SelectQuery extends SelectQuery {
       $this->debugOutput['sql'][] = $sql;
     }
     $query = \CRM_Core_DAO::executeQuery($sql);
-    $i = 0;
     while ($query->fetch()) {
-      $id = $query->id ?? $i++;
       if (in_array('row_count', $this->select)) {
         $results[]['row_count'] = (int) $query->c;
         break;
       }
-      $results[$id] = [];
+      $result = [];
       foreach ($this->selectAliases as $alias => $expr) {
         $returnName = $alias;
         $alias = str_replace('.', '_', $alias);
-        $results[$id][$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
+        $result[$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
       }
+      $results[] = $result;
     }
-    $event = new PostSelectQueryEvent($results, $this);
-    \Civi::dispatcher()->dispatch(Events::POST_SELECT_QUERY, $event);
-
-    return $event->getResults();
+    FormattingUtil::formatOutputValues($results, $this->getApiFieldSpec(), $this->getEntity());
+    return $results;
   }
 
   protected function buildSelectClause() {
@@ -173,7 +168,7 @@ class Api4SelectQuery extends SelectQuery {
       });
       foreach ($wildFields as $item) {
         $pos = array_search($item, array_values($this->select));
-        $this->joinFK($item);
+        $this->autoJoinFK($item);
         $matches = SelectUtil::getMatchingFields($item, array_keys($this->apiFieldSpec));
         array_splice($this->select, $pos, 1, $matches);
       }
@@ -190,9 +185,6 @@ class Api4SelectQuery extends SelectQuery {
           if (is_array($this->debugOutput)) {
             $this->debugOutput['undefined_fields'][] = $fieldName;
           }
-          $valid = FALSE;
-        }
-        elseif ($field['is_many']) {
           $valid = FALSE;
         }
       }
@@ -388,7 +380,7 @@ class Api4SelectQuery extends SelectQuery {
     $fieldName = $col ? substr($expr, 0, $col) : $expr;
     // Perform join if field not yet available - this will add it to apiFieldSpec
     if (!isset($this->apiFieldSpec[$fieldName]) && strpos($fieldName, '.')) {
-      $this->joinFK($fieldName);
+      $this->autoJoinFK($fieldName);
     }
     $field = $this->apiFieldSpec[$fieldName] ?? NULL;
     if ($strict && !$field) {
@@ -399,13 +391,13 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Joins a path and adds all fields in the joined eneity to apiFieldSpec
+   * Joins a path and adds all fields in the joined entity to apiFieldSpec
    *
    * @param $key
    * @throws \API_Exception
    * @throws \Exception
    */
-  protected function joinFK($key) {
+  protected function autoJoinFK($key) {
     if (isset($this->apiFieldSpec[$key])) {
       return;
     }
@@ -418,20 +410,12 @@ class Api4SelectQuery extends SelectQuery {
     array_pop($pathArray);
     $pathString = implode('.', $pathArray);
 
-    if (!$joiner->canJoin($this, $pathString)) {
+    if (!$joiner->canAutoJoin($this->getFrom(), $pathString)) {
       return;
     }
 
     $joinPath = $joiner->join($this, $pathString);
 
-    $isMany = FALSE;
-    foreach ($joinPath as $joinable) {
-      if ($joinable->getJoinType() === Joinable::JOIN_TYPE_ONE_TO_MANY) {
-        $isMany = TRUE;
-      }
-    }
-
-    /** @var \Civi\Api4\Service\Schema\Joinable\Joinable $lastLink */
     $lastLink = array_pop($joinPath);
 
     // Custom field names are already prefixed
@@ -447,7 +431,6 @@ class Api4SelectQuery extends SelectQuery {
       $fieldArray['sql_name'] = '`' . $lastLink->getAlias() . '`.`' . $fieldArray['column_name'] . '`';
       $fieldArray['is_custom'] = $isCustom;
       $fieldArray['is_join'] = TRUE;
-      $fieldArray['is_many'] = $isMany;
       $this->addSpecField($prefix . $fieldArray['name'], $fieldArray);
     }
   }
@@ -612,51 +595,6 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Checks if a field either belongs to the main entity or is joinable 1-to-1.
-   *
-   * Used to determine if a field can be added to the SELECT of the main query,
-   * or if it must be fetched post-query.
-   *
-   * @param string $fieldPath
-   * @return bool
-   */
-  public function isOneToOneField(string $fieldPath) {
-    return strpos($fieldPath, '.') === FALSE || !array_filter($this->getPathJoinTypes($fieldPath));
-  }
-
-  /**
-   * Separates a string like 'emails.location_type.label' into an array, where
-   * each value in the array tells whether it is 1-1 or 1-n join type
-   *
-   * @param string $pathString
-   *   Dot separated path to the field
-   *
-   * @return array
-   *   Index is table alias and value is boolean whether is 1-to-many join
-   */
-  public function getPathJoinTypes($pathString) {
-    $pathParts = explode('.', $pathString);
-    // remove field
-    array_pop($pathParts);
-    $path = [];
-    $query = $this;
-    $isMultipleChecker = function($alias) use ($query) {
-      foreach ($query->getJoinedTables() as $table) {
-        if ($table->getAlias() === $alias) {
-          return $table->getJoinType() === Joinable::JOIN_TYPE_ONE_TO_MANY;
-        }
-      }
-      return FALSE;
-    };
-
-    foreach ($pathParts as $part) {
-      $path[$part] = $isMultipleChecker($part);
-    }
-
-    return $path;
-  }
-
-  /**
    * @param $path
    * @param $field
    */
@@ -667,7 +605,7 @@ class Api4SelectQuery extends SelectQuery {
       return;
     }
     $defaults = [];
-    $defaults['is_custom'] = $defaults['is_join'] = $defaults['is_many'] = FALSE;
+    $defaults['is_custom'] = $defaults['is_join'] = FALSE;
     $field += $defaults;
     $this->apiFieldSpec[$path] = $field;
   }

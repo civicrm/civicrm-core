@@ -36,9 +36,4 @@ class Events {
    */
   const SCHEMA_MAP_BUILD = 'api.schema_map.build';
 
-  /**
-   * Alter query results of APIv4 select query
-   */
-  const POST_SELECT_QUERY = 'api.select_query.post';
-
 }

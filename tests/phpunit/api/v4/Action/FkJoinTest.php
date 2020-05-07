@@ -55,40 +55,4 @@ class FkJoinTest extends UnitTestCase {
     $this->assertCount(1, $results);
   }
 
-  public function testActivityContactJoin() {
-    $results = Activity::get()
-      ->setCheckPermissions(FALSE)
-      ->addSelect('assignees.id')
-      ->addSelect('assignees.first_name')
-      ->addSelect('assignees.display_name')
-      ->addWhere('assignees.first_name', '=', 'Phoney')
-      ->execute();
-
-    $firstResult = $results->first();
-
-    $this->assertCount(1, $results);
-    $this->assertTrue(is_array($firstResult['assignees']));
-
-    $firstAssignee = array_shift($firstResult['assignees']);
-    $this->assertEquals($firstAssignee['first_name'], 'Phoney');
-  }
-
-  public function testContactPhonesJoin() {
-    $testContact = $this->getReference('test_contact_1');
-    $testPhone = $this->getReference('test_phone_1');
-
-    $results = Contact::get()
-      ->setCheckPermissions(FALSE)
-      ->addSelect('phones.phone')
-      ->addWhere('id', '=', $testContact['id'])
-      ->addWhere('phones.location_type_id:name', '=', 'Home')
-      ->execute()
-      ->first();
-
-    $this->assertArrayHasKey('phones', $results);
-    $this->assertCount(1, $results['phones']);
-    $firstPhone = array_shift($results['phones']);
-    $this->assertEquals($testPhone['phone'], $firstPhone['phone']);
-  }
-
 }
