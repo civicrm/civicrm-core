@@ -8,7 +8,6 @@
     <page_callback>CRM_Tag_Page_Tag</page_callback>
     <access_arguments>administer CiviCRM;manage tags</access_arguments>
     <adminGroup>Customize Data and Screens</adminGroup>
-    <icon>admin/small/11.png</icon>
     <weight>25</weight>
   </item>
   <item>

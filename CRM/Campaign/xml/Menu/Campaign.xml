@@ -34,7 +34,6 @@
     <title>Survey Types</title>
     <page_callback>CRM_Campaign_Page_SurveyType</page_callback>
     <access_arguments>administer CiviCampaign</access_arguments>
-    <icon>admin/small/05.png</icon>
     <adminGroup>CiviCampaign</adminGroup>
     <component>CiviCampaign</component>
     <weight>1</weight>
@@ -45,7 +44,6 @@
      <desc>categorize your campaigns using campaign types.</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviCampaign</adminGroup>
-     <icon>admin/small/05.png</icon>
      <weight>2</weight>
      <component>CiviCampaign</component>
   </item>
@@ -55,7 +53,6 @@
      <desc>Define statuses for campaign here.</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviCampaign</adminGroup>
-     <icon>admin/small/05.png</icon>
      <weight>3</weight>
      <component>CiviCampaign</component>
   </item>
@@ -65,7 +62,6 @@
      <desc>Engagement levels.</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviCampaign</adminGroup>
-     <icon>admin/small/05.png</icon>
      <weight>4</weight>
      <component>CiviCampaign</component>
   </item>
