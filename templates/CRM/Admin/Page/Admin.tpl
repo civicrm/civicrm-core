@@ -25,6 +25,19 @@
 
 {strip}
 <div class="crm-content-block">
+{foreach from=$adminPanel key=groupName item=group}
+<div id="admin-section-{$groupName}">
+  <h3>{$group.title}</h3>
+  <div class="admin-section-items">
+    {foreach from=$group.fields item=panelItem  key=panelName}
+    <dl>
+      <dt><a href="{$panelItem.url}"{if $panelItem.extra} {$panelItem.extra}{/if} id="id_{$panelItem.id}">{$panelItem.title}</a></dt>
+      <dd>{$panelItem.desc}</dd>
+    </dl>
+    {/foreach}
+  </div>
+</div>
+{/foreach}
 {foreach from=$adminPanel key=groupName item=group name=adminLoop}
  <div id="id_{$groupName}_show" class="section-hidden{if $smarty.foreach.adminLoop.last eq false} section-hidden-border{/if}">
     <table class="form-layout">
