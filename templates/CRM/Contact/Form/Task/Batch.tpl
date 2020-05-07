@@ -19,7 +19,7 @@
       {if $field.skipDisplay}
         {continue}
       {/if}
-      <td><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{$field.title}</td>
+      <td>{copyIcon name=$field.name title=$field.title}{$field.title}</td>
     {/foreach}
     </tr>
     </thead>
@@ -78,4 +78,3 @@
 
 {*include batch copy js js file*}
 {include file="CRM/common/batchCopy.tpl"}
-
