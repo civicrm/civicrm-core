@@ -45,9 +45,7 @@
           <div crm-mailing-block-review crm-mailing="mailing" crm-mailing-attachments="attachments"></div>
         </div>
         <center>
-          <a class="button crmMailing-submit-button crmMailing-btn-primary" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">
-            <div>{{:: ts('Submit Mailing') }}</div>
-          </a>
+          <a class="button crmMailing-submit-button crmMailing-btn-primary" crm-icon="fa-paper-plane" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">{{:: ts('Submit Mailing') }}</a>
         </center>
       </div>
 

@@ -158,9 +158,7 @@
           }"
           crm-abtest="abtest"></div>
         <center>
-          <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingAB.$invalid}">
-            <div>{{:: ts('Submit Mailing') }}</div>
-          </a>
+          <a class="button crmMailing-submit-button" crm-icon="fa-paper-plane" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingAB.$invalid}">{{:: ts('Submit Mailing') }}</a>
         </center>
       </div>
       <span crm-ui-wizard-buttons style="float:right;">
