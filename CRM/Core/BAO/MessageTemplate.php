@@ -79,7 +79,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       if (!CRM_Core_Permission::check('edit message templates')) {
         if (!empty($params['id'])) {
           $details = civicrm_api3('MessageTemplate', 'getSingle', ['id' => $params['id']]);
-          if (!empty($details['workflow_id'])) {
+          if (!empty($details['workflow_id']) || !empty($details['workflow_name'])) {
             if (!CRM_Core_Permission::check('edit system workflow message templates')) {
               throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
             }
@@ -89,7 +89,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           }
         }
         else {
-          if (!empty($params['workflow_id'])) {
+          if (!empty($params['workflow_id']) || !empty($params['workflow_name'])) {
             if (!CRM_Core_Permission::check('edit system workflow message templates')) {
               throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
             }
@@ -106,6 +106,31 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     if (!empty($params['file_id']) && is_array($params['file_id']) && count($params['file_id'])) {
       $fileParams = $params['file_id'];
       unset($params['file_id']);
+    }
+
+    // The workflow_id and workflow_name should be sync'd. But what mix of inputs do we have to work with?
+    switch ((empty($params['workflow_id']) ? '' : 'id') . (empty($params['workflow_name']) ? '' : 'name')) {
+      case 'id':
+        $params['workflow_name'] = array_search($params['workflow_id'], self::getWorkflowNameIdMap());
+        break;
+
+      case 'name':
+        $params['workflow_id'] = self::getWorkflowNameIdMap()[$params['workflow_name']] ?? NULL;
+        break;
+
+      case 'idname':
+        $map = self::getWorkflowNameIdMap();
+        if ($map[$params['workflow_name']] != $params['workflow_id']) {
+          throw new CRM_Core_Exception("The workflow_id and workflow_name are mismatched. Note: You only need to submit one or the other.");
+        }
+        break;
+
+      case '':
+        // OK, don't care.
+        break;
+
+      default:
+        throw new \RuntimeException("Bad code");
     }
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
@@ -580,6 +605,19 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
 
     return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']];
+  }
+
+  /**
+   * Create a map between workflow_name and workflow_id.
+   *
+   * @return array
+   *   Array(string $workflowName => int $workflowId)
+   */
+  protected static function getWorkflowNameIdMap() {
+    // There's probably some more clever way to do this, but this seems simple.
+    return CRM_Core_DAO::executeQuery('SELECT cov.name as name, cov.id as id FROM civicrm_option_group cog INNER JOIN civicrm_option_value cov on cov.option_group_id=cog.id WHERE cog.name LIKE %1', [
+      1 => ['msg_tpl_workflow_%', 'String'],
+    ])->fetchMap('name', 'id');
   }
 
 }
