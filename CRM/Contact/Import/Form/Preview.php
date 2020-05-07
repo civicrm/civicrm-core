@@ -513,8 +513,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
         'description' => $newTagDesc,
         'is_active' => TRUE,
       );
-      $id = array();
-      $addedTag = CRM_Core_BAO_Tag::add($tagParams, $id);
+      $addedTag = CRM_Core_BAO_Tag::add($tagParams);
       $tag[$addedTag->id] = 1;
     }
     //add Tag to Import

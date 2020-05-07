@@ -355,8 +355,7 @@ class CRM_Contact_Import_ImportJob {
         'is_selectable' => TRUE,
         'used_for' => 'civicrm_contact',
       );
-      $id = array();
-      $addedTag = CRM_Core_BAO_Tag::add($tagParams, $id);
+      $addedTag = CRM_Core_BAO_Tag::add($tagParams);
       $this->_tag[$addedTag->id] = 1;
     }
     //add Tag to Import
