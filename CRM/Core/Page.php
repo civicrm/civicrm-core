@@ -418,4 +418,35 @@ class CRM_Core_Page {
     $this->assign('fields', $dateFields);
   }
 
+  /**
+   * Handy helper to produce the standard markup for an icon with alternative
+   * text for a title and screen readers.
+   *
+   * See also the smarty block function `icon`
+   *
+   * @param string $icon
+   *   The class name of the icon to display.
+   * @param string $text
+   *   The translated text to display.
+   * @param bool $condition
+   *   Whether to display anything at all. This helps simplify code when a
+   *   checkmark should appear if something is true.
+   *
+   * @return string
+   *   The whole bit to drop in.
+   */
+  public static function crmIcon($icon, $text = NULL, $condition = TRUE) {
+    if (!$condition) {
+      return '';
+    }
+    if ($text === NULL || $text === '') {
+      $title = $sr = '';
+    }
+    else {
+      $title = " title=\"$text\"";
+      $sr = "<span class=\"sr-only\">$text</span>";
+    }
+    return "<i class=\"crm-i $icon\"$title></i>$sr";
+  }
+
 }
