@@ -378,7 +378,6 @@ class CRM_Core_Menu {
     }
 
     foreach ($values as $group => $dontCare) {
-      $values[$group]['perColumn'] = round(count($values[$group]['fields']) / 2);
       ksort($values[$group]);
     }
 
