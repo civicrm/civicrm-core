@@ -69,7 +69,6 @@
      <title>CiviCase Settings</title>
      <page_callback>CRM_Admin_Form_Setting_Case</page_callback>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/36.png</icon>
      <weight>380</weight>
   </item>
   <item>
@@ -80,7 +79,6 @@
      <page_callback>CRM_Core_Page_Redirect</page_callback>
      <page_arguments>url=civicrm/a/#/caseType</page_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/case_type.png</icon>
      <weight>390</weight>
   </item>
   <item>
@@ -90,7 +88,6 @@
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/redaction_type.png</icon>
      <weight>400</weight>
   </item>
   <item>
@@ -100,7 +97,6 @@
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/case_type.png</icon>
      <weight>400</weight>
   </item>
   <item>
@@ -110,7 +106,6 @@
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/case_type.png</icon>
      <weight>400</weight>
   </item>
   <item>
