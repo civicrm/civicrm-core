@@ -63,7 +63,6 @@ class Joiner {
       $conditions = $link->getConditionsForJoin($baseTable);
 
       $query->join($side, $target, $alias, $conditions);
-      $query->addJoinedTable($link);
 
       $baseTable = $link->getAlias();
     }

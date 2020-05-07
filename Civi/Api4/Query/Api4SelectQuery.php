@@ -13,7 +13,6 @@ namespace Civi\Api4\Query;
 
 use Civi\API\SelectQuery;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
-use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\SelectUtil;
@@ -38,12 +37,6 @@ class Api4SelectQuery extends SelectQuery {
    * @var int
    */
   protected $apiVersion = 4;
-
-  /**
-   * @var \Civi\Api4\Service\Schema\Joinable\Joinable[]
-   *   The joinable tables that have been joined so far
-   */
-  protected $joinedTables = [];
 
   /**
    * @var array
@@ -436,17 +429,6 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * @param \Civi\Api4\Service\Schema\Joinable\Joinable $joinable
-   *
-   * @return $this
-   */
-  public function addJoinedTable(Joinable $joinable) {
-    $this->joinedTables[] = $joinable;
-
-    return $this;
-  }
-
-  /**
    * @return FALSE|string
    */
   public function getFrom() {
@@ -503,13 +485,6 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * @return bool
-   */
-  public function isFillUniqueFields() {
-    return $this->isFillUniqueFields;
-  }
-
-  /**
    * @return \CRM_Utils_SQL_Select
    */
   public function getQuery() {
@@ -556,24 +531,6 @@ class Api4SelectQuery extends SelectQuery {
    */
   public function getApiVersion() {
     return $this->apiVersion;
-  }
-
-  /**
-   * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
-   */
-  public function getJoinedTables() {
-    return $this->joinedTables;
-  }
-
-  /**
-   * @return \Civi\Api4\Service\Schema\Joinable\Joinable
-   */
-  public function getJoinedTable($alias) {
-    foreach ($this->joinedTables as $join) {
-      if ($join->getAlias() == $alias) {
-        return $join;
-      }
-    }
   }
 
   /**
