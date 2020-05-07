@@ -2470,9 +2470,8 @@ div.crm-master-accordion-header a.helpicon {
 
 /* privacy icons */
 #crm-container div span.privacy-flag {
-  background-repeat: no-repeat;
-  background-image: url("../i/stop-icon.png");
   float: right;
+  font-size: 80%;
 }
 
 /* specific, targeted fixes */
