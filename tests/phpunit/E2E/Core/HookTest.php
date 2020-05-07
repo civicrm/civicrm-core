@@ -19,18 +19,23 @@ class HookTest extends \CiviEndToEndTestCase {
    */
   public function testSymfonyListener_names() {
     $calls = 0;
-    \Civi::dispatcher()
-      ->addListener('hook_civicrm_e2eHookExample', function ($e) use (&$calls) {
-        $calls++;
-        $e->a['foo'] = 'a.name';
-        $e->b->bar = 'b.name';
-      });
-    $a = [];
-    $b = new \stdClass();
-    $this->hookStub(['a', 'b'], $a, $b);
-    $this->assertEquals(1, $calls);
-    $this->assertEquals('a.name', $a['foo']);
-    $this->assertEquals('b.name', $b->bar);
+    $hookExample = function ($e) use (&$calls) {
+      $calls++;
+      $e->a['foo'] = 'a.name';
+      $e->b->bar = 'b.name';
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_e2eHookExample', $hookExample);
+    try {
+      $a = [];
+      $b = new \stdClass();
+      $this->hookStub(['a', 'b'], $a, $b);
+      $this->assertEquals(1, $calls);
+      $this->assertEquals('a.name', $a['foo']);
+      $this->assertEquals('b.name', $b->bar);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_e2eHookExample', $hookExample);
+    }
   }
 
   /**
@@ -43,18 +48,23 @@ class HookTest extends \CiviEndToEndTestCase {
    */
   public function testSymfonyListener_int() {
     $calls = 0;
-    \Civi::dispatcher()
-      ->addListener('hook_civicrm_e2eHookExample', function ($e) use (&$calls) {
-        $calls++;
-        $e->arg1['foo'] = 'a.num';
-        $e->arg2->bar = 'b.num';
-      });
-    $a = [];
-    $b = new \stdClass();
-    $this->hookStub(2, $a, $b);
-    $this->assertEquals(1, $calls);
-    $this->assertEquals('a.num', $a['foo']);
-    $this->assertEquals('b.num', $b->bar);
+    $hookExample = function ($e) use (&$calls) {
+      $calls++;
+      $e->arg1['foo'] = 'a.num';
+      $e->arg2->bar = 'b.num';
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_e2eHookExample', $hookExample);
+    try {
+      $a = [];
+      $b = new \stdClass();
+      $this->hookStub(2, $a, $b);
+      $this->assertEquals(1, $calls);
+      $this->assertEquals('a.num', $a['foo']);
+      $this->assertEquals('b.num', $b->bar);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_e2eHookExample', $hookExample);
+    }
   }
 
   /**
