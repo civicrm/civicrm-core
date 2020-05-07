@@ -5,7 +5,7 @@
  * Perform an initial, partial bootstrap.
  *
  * GOAL: This should provide sufficient services for `InstallSchema` to generate
- * For example, `ts()` needs to be online..
+ * For example, `ts()` needs to be online.
  *
  * MECHANICS: This basically loads `civicrm.settings.php` and calls
  * `CRM_Core_Config::singleton(FALSE,TRUE)`.

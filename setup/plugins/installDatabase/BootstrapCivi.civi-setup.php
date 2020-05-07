@@ -6,7 +6,7 @@
  *
  * GOAL: All the standard services (database, DAOs, translations, settings, etc) should be loaded.
  *
- * MECHANICS: This is basically calls `CRM_Core_Config::singleton(TRUE,TRUE)`.
+ * MECHANICS: This basically calls `CRM_Core_Config::singleton(TRUE,TRUE)`.
  *
  * NOTE: This is technically a *reboot*. `Preboot` started things off, but it
  * booted with `CRM_Core_Config::singleton($loadFromDB==FALSE)`. Now, the DB is
