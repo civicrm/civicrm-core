@@ -151,7 +151,7 @@ if (isset($_REQUEST['seedLanguage']) and isset($langs[$_REQUEST['seedLanguage']]
   $tsLocale = $_REQUEST['seedLanguage'];
 }
 
-$config = CRM_Core_Config::singleton(FALSE);
+CRM_Core_Config::singleton(FALSE);
 $GLOBALS['civicrm_default_error_scope'] = NULL;
 
 // The translation files are in the parent directory (l10n)
