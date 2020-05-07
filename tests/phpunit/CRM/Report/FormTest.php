@@ -67,7 +67,7 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
    */
   public function testGetFromTo($expectedFrom, $expectedTo, $relative, $from, $to) {
     $obj = new CRM_Report_Form();
-    if (date('H-i') === '00:00') {
+    if (date('Hi') === '0000') {
       $this->markTestIncomplete('The date might have changed since the dataprovider was called. Skip to avoid flakiness');
     }
     list($calculatedFrom, $calculatedTo) = $obj->getFromTo($relative, $from, $to);
