@@ -55,24 +55,24 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       $this->assertLike($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
     // Ensure that search builder return individual contact as per criteria
-    if ($dataSet['context'] == 'builder') {
+    if ($dataSet['context'] === 'builder') {
       $contactID = $this->individualCreate(['first_name' => 'James', 'last_name' => 'Bond']);
-      if ('Search builder behaviour for Activity' == $dataSet['description']) {
+      if ('Search builder behaviour for Activity' === $dataSet['description']) {
         $this->callAPISuccess('Activity', 'create', [
           'activity_type_id' => 'Meeting',
-          'subject' => "Test",
+          'subject' => 'Test',
           'source_contact_id' => $contactID,
         ]);
         $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
-        $this->assertEquals(1, count($rows));
+        $this->assertCount(1, $rows);
         $this->assertEquals($contactID, $rows[0]['source_contact_id']);
       }
       else {
         $this->callAPISuccess('Address', 'create', [
           'contact_id' => $contactID,
-          'location_type_id' => "Home",
+          'location_type_id' => 'Home',
           'is_primary' => 1,
-          'country_id' => "IN",
+          'country_id' => 'IN',
         ]);
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
         $this->assertEquals(1, count($rows));
