@@ -866,7 +866,7 @@ MODIFY      {$columnName} varchar( $length )
       }
       $query .= " CHARACTER SET = $newCharSet COLLATE = $tableCollation";
       if ($param['Engine'] === 'InnoDB') {
-        $query .= ' ROW_FORMAT = Dynamic';
+        $query .= ' ROW_FORMAT = Dynamic KEY_BLOCK_SIZE = 0';
       }
       // Disable i18n rewrite.
       CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
