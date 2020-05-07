@@ -31,7 +31,7 @@
               !empty($add.geo_code_2) AND
               is_numeric($add.geo_code_2)
           }
-          <br /><a href="{crmURL p='civicrm/contact/map' q="reset=1&cid=`$contactId`&lid=`$add.location_type_id`"}" title="{ts 1=`$add.location_type`}Map %1 Address{/ts}"><span class="geotag">{ts}Map{/ts}</span></a>
+          <br /><a href="{crmURL p='civicrm/contact/map' q="reset=1&cid=`$contactId`&lid=`$add.location_type_id`"}" title="{ts 1=`$add.location_type`}Map %1 Address{/ts}"><i class="crm-i fa-map-marker"></i> {ts}Map{/ts}</a>
           {/if}
         </div>
         <div class="crm-content">
