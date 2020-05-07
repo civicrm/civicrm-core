@@ -5,6 +5,20 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
+
+/* Use this class to hide text that should only be there for screen readers */
+.sr-only {
+   border: 0;
+   clip: rect(1px, 1px, 1px, 1px);
+   clip-path: inset(50%);
+   height: 1px;
+   width: 1px;
+   margin: -1px;
+   overflow: hidden;
+   padding: 0;
+   position: absolute;
+}
+
 .crm-container input {
   box-sizing: content-box;
 }
