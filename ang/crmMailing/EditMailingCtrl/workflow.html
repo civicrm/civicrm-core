@@ -47,14 +47,10 @@
           <div crm-mailing-block-approve crm-mailing="mailing"></div>
         </div>
         <center ng-if="!checkPerm('approve mailings') && !checkPerm('access CiviMail')">
-          <a class="button crmMailing-submit-button crmMailing-btn-primary" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">
-            <div>{{:: ts('Submit Mailing') }}</div>
-          </a>
+          <a class="button crmMailing-submit-button crmMailing-btn-primary" crm-icon="fa-check" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">{{:: ts('Submit Mailing') }}</a>
         </center>
         <center ng-if="checkPerm('approve mailings') || checkPerm('access CiviMail')">
-          <a class="button crmMailing-submit-button crmMailing-btn-primary" ng-click="approve('Approved')" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">
-            <div>{{:: ts('Submit and Approve Mailing') }}</div>
-          </a>
+          <a class="button crmMailing-submit-button crmMailing-btn-primary" crm-icon="fa-paper-plane" ng-click="approve('Approved')" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">{{:: ts('Submit and Approve Mailing') }}</a>
         </center>
       </div>
 
