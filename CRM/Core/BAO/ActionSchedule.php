@@ -547,7 +547,7 @@ FROM civicrm_action_schedule cas
     $sms_body_text = $tokenRow->render('sms_body_text');
 
     $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID') ? $session->get('userID') : $tokenRow->context['contactId'];
+    $userID = $session->get('userID') ? $session->get('userID') : $tokenRow->context['contact_id'];
     $smsParams = [
       'To' => $toPhoneNumber,
       'provider_id' => $schedule->sms_provider_id,
@@ -566,7 +566,7 @@ FROM civicrm_action_schedule cas
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
     try {
-      CRM_Activity_BAO_Activity::sendSMSMessage($tokenRow->context['contactId'],
+      CRM_Activity_BAO_Activity::sendSMSMessage($tokenRow->context['contact_id'],
         $sms_body_text,
         $smsParams,
         $activity->id,

@@ -49,11 +49,11 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
 
     foreach ($e->getRows() as $row) {
-      if (empty($row->context['contactId'])) {
+      if (empty($row->context['contact_id'])) {
         continue;
       }
       /** @var int $contactId */
-      $contactId = $row->context['contactId'];
+      $contactId = $row->context['contact_id'];
       if (empty($row->context['contact'])) {
         $params = [
           ['contact_id', '=', $contactId, 0, 0],
@@ -63,7 +63,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = reset($contact);
         if (!$contact || is_a($contact, 'CRM_Core_Error')) {
           // FIXME: Need to differentiate errors which kill the batch vs the individual row.
-          \Civi::log()->debug("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
+          \Civi::log()->debug("Failed to generate token data. Invalid contact ID: " . $row->context['contact_id']);
           continue;
         }
 
