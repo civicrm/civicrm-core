@@ -575,6 +575,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ];
 
     // The testSqlOperators fails sporadically on MySQL 5.5, which is deprecated anyway.
+    // Re:^^^ => the failure was probably correct behavior, and test is now fixed, but yeah 5.5 is deprecated, and don't care enough to verify.
     // Test data providers should be able to run in pre-boot environment, so we connect directly to SQL server.
     require_once 'DB.php';
     $db = DB::connect(CIVICRM_DSN);
@@ -1104,7 +1105,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       }
       $totalEntities = 3;
     }
-    $entities = $this->callAPISuccess($entityName, 'get', ['options' => ['limit' => 0]]);
+    $entities = $this->callAPISuccess($entityName, 'get', ['options' => ['limit' => 0, 'sort' => 'id']]);
     $entities = array_keys($entities['values']);
     $this->assertGreaterThan(2, $totalEntities);
     $this->callAPISuccess($entityName, 'getsingle', ['id' => ['IN' => [$entities[0]]]]);
