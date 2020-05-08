@@ -126,7 +126,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             }
             // show tax rate with amount
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-            $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+            $taxTerm = Civi::settings()->get('tax_term');
             $displayOpt = $invoiceSettings['tax_display_settings'] ?? NULL;
             $invoicing = $invoiceSettings['invoicing'] ?? NULL;
             foreach ($fieldValues['options'] as $optionId => $optionVal) {

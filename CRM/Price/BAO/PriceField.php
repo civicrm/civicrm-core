@@ -306,7 +306,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $valueFieldName = 'amount';
     $seperator = '|';
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+    $taxTerm = Civi::settings()->get('tax_term');
     $displayOpt = $invoiceSettings['tax_display_settings'] ?? NULL;
     $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     switch ($field->html_type) {
