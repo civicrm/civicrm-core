@@ -113,21 +113,14 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * Add grant.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains the id.
-   *
    *
    * @return object
    */
-  public static function add(&$params, &$ids) {
-
-    if (!empty($ids['grant_id'])) {
-      CRM_Utils_Hook::pre('edit', 'Grant', $ids['grant_id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Grant', NULL, $params);
-    }
+  public static function add($params, $ids = []) {
+    $id = $ids['grant_id'] ?? $params['id'] ?? NULL;
+    $hook = $id ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($hook, 'Grant', $id, $params);
 
     // first clean up all the money fields
     $moneyFields = [
@@ -154,7 +147,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       }
     }
     $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = $ids['grant_id'] ?? NULL;
+    $grant->id = $id;
 
     $grant->copyValues($params);
 
@@ -200,27 +193,20 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       );
     }
 
-    if (!empty($ids['grant'])) {
-      CRM_Utils_Hook::post('edit', 'Grant', $grant->id, $grant);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Grant', $grant->id, $grant);
-    }
+    CRM_Utils_Hook::post($hook, 'Grant', $grant->id, $grant);
 
     return $result;
   }
 
   /**
-   * Create the event.
+   * Adds a grant.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains the id.
    *
    * @return object
    */
-  public static function create(&$params, &$ids) {
+  public static function create($params, $ids = []) {
     $transaction = new CRM_Core_Transaction();
 
     $grant = self::add($params, $ids);
