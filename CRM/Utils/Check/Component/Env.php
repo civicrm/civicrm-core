@@ -938,12 +938,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkMysqlVersion() {
     $messages = [];
     $version = CRM_Utils_SQL::getDatabaseVersion();
-    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), '5.7', '<')) {
+    $minInstallVersion = CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER;
+    $minRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER;
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minInstallVersion, '<')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('This system uses MySQL/MariaDB version %1. To ensure the continued operation of CiviCRM, upgrade your server now. At least MySQL version %2 or MariaDB version %3 is recommended', [
           1 => $version,
-          2 => '5.7',
+          2 => $minRecommendedVersion,
           3 => '10.1',
         ]),
         ts('MySQL Out of date'),
@@ -951,6 +953,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'fa-server'
       );
     }
+    return $messages;
   }
 
 }

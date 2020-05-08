@@ -480,11 +480,11 @@ class InstallRequirements {
         )
       )
       ) {
-        @$this->requireMySQLVersion("5.1",
+        @$this->requireMySQLVersion(CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           array(
             ts("MySQL %1 Configuration", array(1 => $dbName)),
-            ts("MySQL version at least %1", array(1 => '5.1')),
-            ts("MySQL version %1 or higher is required, you are running MySQL %2.", array(1 => '5.1', 2 => mysqli_get_server_info($this->conn))),
+            ts("MySQL version at least %1", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER)),
+            ts("MySQL version %1 or higher is required, you are running MySQL %2.", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER, 2 => mysqli_get_server_info($this->conn))),
             ts("MySQL %1", array(1 => mysqli_get_server_info($this->conn))),
           )
         );
