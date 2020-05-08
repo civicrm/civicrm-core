@@ -312,7 +312,8 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
         $surveysData[$sid]['isActive'] = $isActive;
 
-        $surveysData[$sid]['is_default'] = self::crmIcon('fa-check', ts('Default'), $surveysData[$sid]['is_default']);
+        // For some reason, 'is_default' is coming as a string.
+        $surveysData[$sid]['is_default'] = boolval($surveysData[$sid]['is_default']);
 
         if ($surveysData[$sid]['result_id']) {
           $resultSet = '<a href= "javascript:displayResultSet( ' . $sid . ',' . "'" . $surveysData[$sid]['title'] . "'" . ', ' . $surveysData[$sid]['result_id'] . ' )" title="' . ts('view result set') . '">' . ts('Result Set') . '</a>';
@@ -411,7 +412,9 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
           $isActive = ts('Yes');
         }
         $petitionsData[$pid]['isActive'] = $isActive;
-        $petitionsData[$pid]['is_default'] = self::crmIcon('fa-check', ts('Default'), $petitionsData[$pid]['is_default']);
+
+        // For some reason, 'is_default' is coming as a string.
+        $petitionsData[$pid]['is_default'] = boolval($petitionsData[$pid]['is_default']);
 
         $petitionsData[$pid]['action'] = CRM_Core_Action::formLink(self::petitionActionLinks(),
           $action,
