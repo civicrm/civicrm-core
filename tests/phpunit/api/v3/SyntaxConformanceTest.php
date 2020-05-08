@@ -515,6 +515,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'SystemLog',
       //skip this because it doesn't make sense to update logs,
       'Logging',
+      // Skip message template because workflow_id/workflow_name are sync'd.
+      'MessageTemplate',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -525,7 +527,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $e,
       ];
     }
-    return ['pledge'];
+    // WTF
+    return ['pledge', 'MessageTemplate'];
     return $entities;
   }
 

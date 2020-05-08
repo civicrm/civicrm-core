@@ -257,7 +257,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
       // populate action links
       $this->action($messageTemplate, $action, $values[$messageTemplate->id], $links, CRM_Core_Permission::EDIT);
 
-      if (!$messageTemplate->workflow_id) {
+      if (!$messageTemplate->workflow_name) {
         $userTemplates[$messageTemplate->id] = $values[$messageTemplate->id];
       }
       elseif (!$messageTemplate->is_reserved) {

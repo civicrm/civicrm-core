@@ -69,10 +69,17 @@
   </field>
   <field>
     <name>workflow_id</name>
-    <title>Message Template Workflow</title>
+    <title>Deprecated field for Message Template Workflow.</title>
     <type>int unsigned</type>
     <comment>a pseudo-FK to civicrm_option_value</comment>
     <add>3.1</add>
+  </field>
+  <field>
+    <name>workflow_name</name>
+    <title>Message Template Workflow Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>5.26</add>
   </field>
   <field>
     <name>is_default</name>
