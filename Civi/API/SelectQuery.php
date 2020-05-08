@@ -365,7 +365,7 @@ abstract class SelectQuery {
    * @param array $stack
    * @return array
    */
-  protected function getAclClause($tableAlias, $baoName, $stack = []) {
+  public function getAclClause($tableAlias, $baoName, $stack = []) {
     if (!$this->checkPermissions) {
       return [];
     }

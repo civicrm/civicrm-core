@@ -967,4 +967,38 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testContactGetViaJoin($version) {
+    $this->_apiversion = $version;
+    $this->createLoggedInUser();
+    $main = $this->individualCreate(['first_name' => 'Main']);
+    $other = $this->individualCreate(['first_name' => 'Other'], 1);
+    $tag1 = $this->tagCreate(['name' => uniqid('created'), 'created_id' => $main])['id'];
+    $tag2 = $this->tagCreate(['name' => uniqid('other'), 'created_id' => $other])['id'];
+    $this->setPermissions(['access CiviCRM']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
+    $createdFirstName = $version == 4 ? 'created.first_name' : 'created_id.first_name';
+    $result = $this->callAPISuccess('Tag', 'get', [
+      'check_permissions' => 1,
+      'return' => ['id', $createdFirstName],
+      'id' => ['IN' => [$tag1, $tag2]],
+    ]);
+    $this->assertEquals('Main', $result['values'][$tag1][$createdFirstName]);
+    $this->assertEquals('Other', $result['values'][$tag2][$createdFirstName]);
+    $this->allowedContactId = $main;
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
+    $this->cleanupCachedPermissions();
+    $result = $this->callAPISuccess('Tag', 'get', [
+      'check_permissions' => 1,
+      'return' => ['id', $createdFirstName],
+      'id' => ['IN' => [$tag1, $tag2]],
+    ]);
+    $this->assertEquals('Main', $result['values'][$tag1][$createdFirstName]);
+    $this->assertEquals($tag2, $result['values'][$tag2]['id']);
+    $this->assertFalse(isset($result['values'][$tag2][$createdFirstName]));
+  }
+
 }

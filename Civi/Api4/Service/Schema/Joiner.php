@@ -60,7 +60,11 @@ class Joiner {
     foreach ($fullPath as $link) {
       $target = $link->getTargetTable();
       $alias = $link->getAlias();
-      $conditions = $link->getConditionsForJoin($baseTable);
+      $bao = \CRM_Core_DAO_AllCoreTables::getBAOClassName(\CRM_Core_DAO_AllCoreTables::getClassForTable($target));
+      $conditions = array_merge(
+        $link->getConditionsForJoin($baseTable),
+        $query->getAclClause($alias, $bao, explode('.', $joinPath))
+      );
 
       $query->join($side, $target, $alias, $conditions);
 
