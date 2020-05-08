@@ -396,6 +396,34 @@ if (!CRM.vars) CRM.vars = {};
   }
 
   /**
+   * Helper to generate an icon with alt text.
+   *
+   * See also smarty `{icon}` and CRM_Core_Page::crmIcon() functions
+   *
+   * @param string icon
+   *   The Font Awesome icon class to use.
+   * @param string text
+   *   Alt text to display.
+   * @param mixed condition
+   *   This will only display if this is truthy.
+   *
+   * @return string
+   *   The formatted icon markup.
+   */
+  CRM.utils.formatConditionalIcon = function (icon, text, condition) {
+    if (!condition) {
+      return '';
+    }
+    var title = '';
+    var sr = '';
+    if (text) {
+      title = ' title="' + text + '"';
+      sr = '<span class="sr-only">' + text + '</span>';
+    }
+    return '<i class="crm-i ' + icon + '"' + title + '></i>' + sr;
+  };
+
+  /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
    */
