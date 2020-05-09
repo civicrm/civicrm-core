@@ -51,7 +51,7 @@
           <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
             <td>
               {if $index GT 1}
-                <a onclick="hideRow({$index}); return false;" name="orderBy_{$index}" href="#" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>
+                <a onclick="hideRow({$index}); return false;" name="orderBy_{$index}" href="#" class="form-link">{icon icon="fa-trash"}{ts}hide field or section{/ts}{/icon}</a>
               {/if}
             </td>
             <td> {$form.order_bys.$index.column.html}</td>
@@ -65,7 +65,7 @@
         {/section}
       </table>
       <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}show field or section{/ts}"/>{ts}another column{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon"></i> {ts}another column{/ts}</a>
       </div>
 
       <script type="text/javascript">
