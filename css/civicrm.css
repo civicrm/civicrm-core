@@ -2232,23 +2232,68 @@ div.crm-master-accordion-header a.helpicon {
 
 /* accordion styles */
 
-.crm-container .crm-accordion-header {
-  background-image: url("../i/TreeMinusWhite.gif");
-  background-repeat: no-repeat;
-  background-position: 2px center;
+.crm-container .crm-accordion-header,
+.crm-container .crm-collapsible .collapsible-title,
+.crm-container span.collapsed,
+.crm-container a.collapsed,
+.crm-container .crm-expand-row {
   cursor: pointer;
-  color: #F5F6F1;
-  font-weight: normal;
-  padding: 4px 8px 4px 20px;
-  background-color: #5D677B;
 }
 
-.crm-container .crm-accordion-header:hover {
-  background-color: #32414f;
+.crm-container .crm-accordion-wrapper {
+  margin-bottom: 4px;
+}
+
+/* Specific types of headers */
+
+#crm-container .widget-content .crm-accordion-header {
+  background-color: #EFEFE5;
+  color: #080808;
+}
+
+.crm-container a.crm-expand-row:before,
+.crm-container a.crm-expand-row:link::before,
+.crm-container a.crm-expand-row:visited::before {
+  color: #3E3E3E;
+}
+
+.crm-container .crm-accordion-header {
+  color: #F5F6F1;
+  font-weight: normal;
+  padding: 4px 8px;
+  background-color: #5D677B;
+  border-radius: 4px 4px 0 0;
 }
 
 .crm-container .collapsed .crm-accordion-header {
-  background-image: url("../i/TreePlusWhite.gif");
+  border-radius: 4px;
+}
+
+.crm-container .crm-accordion-header.active {
+  font-weight: bold;
+  background-color: #3E3E3E;
+}
+
+.crm-container .crm-accordion-header:hover {
+  background-color: #2F2F2E;
+}
+
+#crm-container .widget-content .crm-accordion-header:hover {
+  background-color: #e8e8de;
+}
+
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
+  background-color: transparent;
+  color: #3E3E3E;
+}
+
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
+  font-size: 16px;
+}
+
+.crm-container .crm-master-accordion-header.crm-accordion-header:hover,
+.crm-container .crm-collapsible .collapsible-title:hover {
+  color: #121A2D;
 }
 
 .crm-container .collapsed .crm-accordion-body,
@@ -2256,48 +2301,40 @@ div.crm-master-accordion-header a.helpicon {
   display: none;
 }
 
-.crm-container .crm-expand-row {
-  min-width: 16px;
-  min-height: 16px;
+/* Collapse icon */
+
+/* General icon settings for all collapsible things */
+.crm-container .crm-accordion-header:before,
+.crm-container .crm-collapsible .collapsible-title:before,
+.crm-container span.collapsed:before,
+.crm-container a.collapsed:before,
+.crm-container .crm-expand-row:before {
+  font-family: "FontAwesome";
   display: inline-block;
-}
-
-.crm-container .crm-accordion-inner .crm-accordion-header,
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header,
-.crm-container .crm-collapsible .collapsible-title {
-  background-image: url("../i/TreeMinus.gif");
-  background-color: transparent;
-  color: #3E3E3E;
-}
-
-.crm-container .crm-accordion-inner.collapsed .crm-accordion-header,
-.crm-container .crm-accordion-wrapper.collapsed .crm-master-accordion-header,
-.crm-container .crm-collapsible.collapsed .collapsible-title {
-  background-image: url("../i/TreePlus.gif");
-}
-
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
-  background-color: transparent;
-  font-size: 16px;
-  color: #3e3e3e;
-  margin-bottom: 0;
-}
-
-.crm-container .crm-accordion-inner .crm-accordion-header {
+  width: 1em;
+  content: "\f0da";
   font-size: 13px;
 }
 
-.crm-container .crm-accordion-wrapper {
-  margin-bottom: 4px;
+/* Collapsed icon */
+.crm-container .collapsed .crm-accordion-header:before,
+.crm-container .crm-collapsible.collapsed .collapsible-title:before,
+.crm-container span.collapsed:before,
+.crm-container a.collapsed:before,
+.crm-container .crm-expand-row:before {
+  content: "\f0da";
 }
 
-.crm-container .crm-accordion-header {
-  border-radius: 4px 4px 0 0;
+/* Expanded icon */
+.crm-container .crm-accordion-header:before,
+.crm-container .crm-collapsible .collapsible-title:before,
+.crm-container span.expanded:before,
+.crm-container a.expanded:before,
+.crm-container .crm-expand-row.expanded:before {
+  content: "\f0d7";
 }
 
-.crm-container .collapsed .crm-accordion-header {
-  border-radius: 4px;
-}
+/* Accordion bodies */
 
 .crm-container .crm-accordion-body {
   border-radius: 0 0 4px 4px;
@@ -2306,12 +2343,8 @@ div.crm-master-accordion-header a.helpicon {
   padding: 4px 0;
 }
 
-.crm-container .crm-collapsible .collapsible-title {
-  padding-left: 19px;
-  text-decoration: none;
-  background-repeat: no-repeat;
-  background-position: 0 center;
-  cursor: pointer;
+#crm-container .widget-content .crm-accordion-body {
+  border-color: #e8e8de;
 }
 
 .crm-container .crm-master-accordion-header+.crm-accordion-body {
@@ -2319,19 +2352,10 @@ div.crm-master-accordion-header a.helpicon {
   padding: 0;
 }
 
-.crm-container .crm-accordion-header.active {
-  font-weight: bold;
-  background-color: #41477E;
-}
-
-.crm-container .crm-accordion-header.active:hover {
-  background-color: #2E3471;
-}
-
-.crm-container .crm-master-accordion-header.crm-accordion-header:hover,
-.crm-container .crm-collapsible .collapsible-title:hover {
-  background-color: transparent;
-  color: #0200A0;
+#crm-container .widget-content .crm-accordion-body,
+.crm-container .crm-accordion-body.padded {
+  padding-left: .5em;
+  padding-right: .5em;
 }
 
 .crm-container .crm-child-row > td {
@@ -3495,21 +3519,6 @@ span.crm-select-item-color {
 #crm-container td span.show-children,
 #crm-container td span.crm-no-children {
   padding-left: 20px;
-}
-
-.crm-container span.collapsed,
-.crm-container a.collapsed,
-.crm-container .crm-expand-row {
-  background: url("../i/TreePlus.gif") no-repeat 0 0;
-  padding-left: 19px;
-  cursor: pointer;
-}
-
-.crm-container span.expanded,
-.crm-container a.expanded {
-  background: url("../i/TreeMinus.gif") no-repeat 0 0;
-  padding-left: 19px;
-  cursor: pointer;
 }
 
 /* Notifications */

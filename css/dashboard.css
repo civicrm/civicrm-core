@@ -71,25 +71,6 @@
   min-height: 10em;
 }
 
-#crm-container .widget-content .crm-accordion-header {
-  background-color: #EFEFE5;
-  background-image: url("../i/TreeMinus.gif");
-  color: #080808;
-}
-
-#crm-container .widget-content .crm-accordion-wrapper.collapsed .crm-accordion-header {
-  background-image: url("../i/TreePlus.gif");
-}
-
-#crm-container .widget-content .crm-accordion-header:hover {
-  background-color: #e8e8de;
-}
-
-#crm-container .widget-content .crm-accordion-body {
-  border-color: #e8e8de;
-  padding: 4px .5em;
-}
-
 #crm-container .widget-controls {
   background-color: #5D677B;
   /* Standards-browsers do this anyway because all inner block elements are floated.  IE doesn't because it's crap. */
