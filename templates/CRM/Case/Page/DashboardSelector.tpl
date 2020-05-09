@@ -7,7 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{capture assign=expandIconURL}<img src="{$config->resourceBase}i/TreePlus.gif" alt="{ts}open section{/ts}"/>{/capture}
 {strip}
 <table class="case-selector-{$list} crm-ajax-table" data-page-length='10'>
 <thead>
