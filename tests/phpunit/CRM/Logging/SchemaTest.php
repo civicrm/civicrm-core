@@ -279,10 +279,6 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
       CHANGE COLUMN test_integer test_integer int(6) NULL,
       CHANGE COLUMN test_decimal test_decimal decimal(22,2) NULL"
     );
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
-    $schema->fixSchemaDifferences();
-    // need to do it twice so the columnSpecs static is refreshed
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should increase
@@ -293,9 +289,6 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
       CHANGE COLUMN test_integer test_integer int(4) NULL,
       CHANGE COLUMN test_decimal test_decimal decimal(20,2) NULL"
     );
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
-    $schema->fixSchemaDifferences();
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should not decrease
@@ -312,9 +305,6 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_enum_change CHANGE COLUMN test_enum test_enum enum('A','B','C','D') NULL");
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
-    $schema->fixSchemaDifferences();
-    // need to do it twice so the columnSpecs static is refreshed
     \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
