@@ -122,7 +122,7 @@ AND    TABLE_TYPE = 'BASE TABLE'
 AND    TABLE_NAME LIKE 'civicrm_%'
 ");
     while ($dao->fetch()) {
-      $this->tables[] = $dao->TABLE_NAME;
+      $this->tables[] = strtolower($dao->TABLE_NAME);
     }
 
     // do not log temp import, cache, menu and log tables
@@ -146,7 +146,7 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     $this->tables = array_diff($this->tables, ['civicrm_mailing_recipients']);
     $this->logTableSpec = array_fill_keys($this->tables, []);
     foreach ($this->exceptions as $tableName => $fields) {
-      $this->logTableSpec[$tableName]['exceptions'] = $fields;
+      $this->logTableSpec[strtolower($tableName)]['exceptions'] = $fields;
     }
     CRM_Utils_Hook::alterLogTables($this->logTableSpec);
     $this->tables = array_keys($this->logTableSpec);
@@ -310,7 +310,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     $updatedTablesCount = 0;
     foreach ($this->logs as $mainTable => $logTable) {
       $alterSql = [];
-      $tableSpec = $this->logTableSpec[$mainTable];
+      $tableSpec = $this->logTableSpec[strtolower($mainTable)];
       $currentEngine = strtoupper($this->getEngineForLogTable($logTable));
       if (!isset($tableSpec['engine']) && $currentEngine == 'ARCHIVE' && $params['forceEngineMigration']) {
         // table uses ARCHIVE engine (the previous default) and no one set an
@@ -780,8 +780,8 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
             log_action  ENUM('Initialization', 'Insert', 'Update', 'Delete')
 COLS;
 
-    if (!empty($this->logTableSpec[$table]['indexes'])) {
-      foreach ($this->logTableSpec[$table]['indexes'] as $indexName => $indexSpec) {
+    if (!empty($this->logTableSpec[strtolower($table)]['indexes'])) {
+      foreach ($this->logTableSpec[strtolower($table)]['indexes'] as $indexName => $indexSpec) {
         if (is_array($indexSpec)) {
           $indexSpec = implode(" , ", $indexSpec);
         }
@@ -804,8 +804,8 @@ COLS;
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], self::ENGINE));
-    $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
+    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[strtolower($table)], self::ENGINE));
+    $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[strtolower($table)]);
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 
     // log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
@@ -933,7 +933,7 @@ COLS;
 
     // logging is enabled, so now lets create the trigger info tables
     foreach ($tableNames as $table) {
-      if (!isset($this->logTableSpec[$table])) {
+      if (!isset($this->logTableSpec[strtolower($table)])) {
         // Per testIgnoreCustomTableByHook this would be unset if a hook had
         // intervened to prevent logging / triggers on this table.
         // This could go to the extent of blocking the updates to 'modified_date'
@@ -945,7 +945,7 @@ COLS;
       // only do the change if any data has changed
       $cond = [];
       foreach ($columns as $column) {
-        $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : [];
+        $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[strtolower($table)]) ? $this->logTableSpec[strtolower($table)]['exceptions'] : [];
         // ignore modified_date changes
         $tableExceptions[] = 'modified_date';
         // exceptions may be provided with or without backticks
