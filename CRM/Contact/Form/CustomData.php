@@ -53,13 +53,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   //protected $_groupTree;
 
   /**
-   * Which blocks should we show and hide.
-   *
-   * @var CRM_Core_ShowHideBlocks
-   */
-  protected $_showHide;
-
-  /**
    * Array group titles.
    *
    * @var array
