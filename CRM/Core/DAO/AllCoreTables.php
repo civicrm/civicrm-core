@@ -186,14 +186,26 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * Get the DAO for the class.
+   * Get the DAO for a BAO class.
    *
-   * @param string $className
+   * @param string $baoName
    *
-   * @return string
+   * @return string|CRM_Core_DAO
    */
-  public static function getCanonicalClassName($className) {
-    return str_replace('_BAO_', '_DAO_', $className);
+  public static function getCanonicalClassName($baoName) {
+    return str_replace('_BAO_', '_DAO_', $baoName);
+  }
+
+  /**
+   * Get the BAO for a DAO class.
+   *
+   * @param string $daoName
+   *
+   * @return string|CRM_Core_DAO
+   */
+  public static function getBAOClassName($daoName) {
+    $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    return class_exists($baoName) ? $baoName : $daoName;
   }
 
   /**
