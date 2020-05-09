@@ -1549,18 +1549,12 @@ input.crm-form-entityref {
   cursor: pointer;
   position: relative;
   white-space: nowrap;
-  padding-right: 15px !important;
   display: inline;
 }
 .crm-container .btn-slide:after {
-  content: "";
-  display: block;
-  height: 15px;
-  position: absolute;
-  right: 2px;
-  top: 3px;
-  width: 15px;
-  background: url("../i/TreePlus.gif") no-repeat right 1px;
+  font-family: "FontAwesome";
+  content: "\f0da";
+  padding-left: .5ex;
 }
 
 .crm-container .btn-slide-active .panel {
