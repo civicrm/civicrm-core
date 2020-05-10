@@ -226,12 +226,6 @@ div#crm-contact-thumbnail {
   text-align: right;
 }
 
-#crm-container .geotag {
-  padding: 2px 0 2px 20px !important;
-  background: url('../i/geotag_16.png') left center no-repeat;
-  font-size: .9em;
-}
-
 /* contact actions */
 
 #crm-contact-actions-wrapper {
