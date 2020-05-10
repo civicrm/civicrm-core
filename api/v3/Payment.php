@@ -273,6 +273,22 @@ function _civicrm_api3_payment_create_spec(&$params) {
         'type' => 'Text',
       ],
     ],
+    'order_reference' => [
+      'name' => 'order_reference',
+      'type' => CRM_Utils_Type::T_STRING,
+      'title' => 'Order Reference',
+      'description' => 'Payment Processor external order reference',
+      'maxlength' => 255,
+      'size' => 25,
+      'where' => 'civicrm_financial_trxn.order_reference',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Text',
+      ],
+    ],
     'check_number' => [
       'name' => 'check_number',
       'type' => CRM_Utils_Type::T_STRING,
