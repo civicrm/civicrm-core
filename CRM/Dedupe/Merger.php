@@ -543,8 +543,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
           $sqls = array_merge($sqls, $preOperationSqls);
-          $sqls[] = "UPDATE IGNORE $table SET $field = $mainId WHERE $field = $otherId";
-          $sqls[] = "DELETE FROM $table WHERE $field = $otherId";
+          $sqls[] = "UPDATE $table SET $field = $mainId WHERE $field = $otherId";
         }
       }
 
