@@ -1817,12 +1817,10 @@ class CRM_Utils_System {
    * @return bool
    */
   public static function isDevelopment() {
-    static $cache = NULL;
-    if ($cache === NULL) {
-      global $civicrm_root;
-      $cache = file_exists("{$civicrm_root}/.svn") || file_exists("{$civicrm_root}/.git");
+    if (Civi::settings()->get('environment') === 'Development') {
+      return TRUE;
     }
-    return $cache;
+    return FALSE;
   }
 
   /**
