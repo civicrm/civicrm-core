@@ -1678,7 +1678,7 @@ WHERE      activity.id IN ($activityIds)";
   }
 
   /**
-   * Add activity for Membership/Event/Contribution.
+   * Add or update activity for Membership/Event/Contribution.
    *
    * @param object $activity
    *   particular component object.
@@ -1688,7 +1688,9 @@ WHERE      activity.id IN ($activityIds)";
    * @param array $params
    *   Activity params to override.
    *
-   * @return bool|NULL
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function addActivity(
     $activity,
@@ -1697,14 +1699,10 @@ WHERE      activity.id IN ($activityIds)";
     $params = []
   ) {
     $date = date('YmdHis');
-    if ($activity->__table == 'civicrm_membership') {
-      $component = 'Membership';
-    }
-    elseif ($activity->__table == 'civicrm_participant') {
+    if ($activity->__table == 'civicrm_participant') {
       if ($activityType != 'Email') {
         $activityType = 'Event Registration';
       }
-      $component = 'Event';
     }
     elseif ($activity->__table == 'civicrm_contribution') {
       // create activity record only for Completed Contributions
@@ -1712,11 +1710,11 @@ WHERE      activity.id IN ($activityIds)";
       if ($activity->contribution_status_id != $contributionCompletedStatusId) {
         //For onbehalf payments, create a scheduled activity.
         if (empty($params['on_behalf'])) {
-          return NULL;
+          return;
         }
         $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
       }
-      $activityType = $component = 'Contribution';
+      $activityType = 'Contribution';
 
       // retrieve existing activity based on source_record_id and activity_type
       if (empty($params['id'])) {
@@ -1741,9 +1739,13 @@ WHERE      activity.id IN ($activityIds)";
       'is_test' => $activity->is_test,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'skipRecentView' => TRUE,
-      'campaign_id' => $activity->campaign_id,
     ];
     $activityParams = array_merge($activityParams, $params);
+
+    // campaign_id gets passed in via the $activity object and is set to string "null" (at least for contribution)
+    if (empty($activityParams['campaign_id']) && !CRM_Utils_System::isNull($activity->campaign_id)) {
+      $activityParams['campaign_id'] = $activity->campaign_id;
+    }
 
     if (empty($activityParams['subject'])) {
       $activityParams['subject'] = self::getActivitySubject($activity);
@@ -1767,11 +1769,19 @@ WHERE      activity.id IN ($activityIds)";
     if ($targetContactID) {
       $activityParams['target_contact_id'][] = $targetContactID;
     }
-    // @todo - use api - remove lots of wrangling above. Remove deprecated fatal & let form layer
-    // deal with any exceptions.
-    if (is_a(self::create($activityParams), 'CRM_Core_Error')) {
-      throw new CRM_Core_Exception("Failed creating Activity for $component of id {$activity->id}");
+
+    // Despite being called "addActivity" this function actually both adds and updates activities
+    // So we have to select the right Api4 action depending on if we have an activity ID.
+    if (!empty($activityParams['id'])) {
+      $activityApi4 = \Civi\Api4\Activity::update();
     }
+    else {
+      $activityApi4 = \Civi\Api4\Activity::create();
+    }
+    $activityApi4
+      ->setValues($activityParams)
+      ->setCheckPermissions(FALSE)
+      ->execute();
   }
 
   /**
