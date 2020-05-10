@@ -21,10 +21,23 @@
     <div class="clear">&nbsp;</div>
     <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
       {help id="id-event-intro"}
-      <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
-      <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
-      <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-download"></i></a>
-      <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a></h3>
+      <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link">
+        <span class="fa-stack"><i class="crm-i fa-calendar-o fa-stack-2x"></i><i style="top: 15%;" class="crm-i fa-th-list fa-stack-1x"></i></span>
+        <span class="sr-only">{ts}HTML listing of current and future public events.{/ts}</span>
+      </a>
+      <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link">
+        <span class="fa-stack"><i class="crm-i fa-calendar-o fa-stack-2x"></i><i style="top: 15%;" class="crm-i fa-rss fa-stack-1x"></i></span>
+        <span class="sr-only">{ts}Get RSS 2.0 feed for current and future public events.{/ts}</span>
+      </a>
+      <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link">
+        <span class="fa-stack"><i class="crm-i fa-calendar-o fa-stack-2x"></i><i style="top: 15%;" class="crm-i fa-download fa-stack-1x"></i></span>
+        <span class="sr-only">{ts}Download iCalendar entry for this event.{/ts}</span>
+      </a>
+      <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link">
+        <span class="fa-stack"><i class="crm-i fa-calendar-o fa-stack-2x"></i><i style="top: 15%;" class="crm-i fa-link fa-stack-1x"></i></span>
+        <span class="sr-only">{ts}iCalendar feed for this event.{/ts}</span>
+      </a>
+    </h3>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
