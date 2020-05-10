@@ -412,8 +412,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       }
     }
 
-    $tag = new CRM_Core_DAO_Tag();
-
     // if parent id is set then inherit used for and is hidden properties
     if (!empty($params['parent_id'])) {
       // get parent details
@@ -423,34 +421,28 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $params['used_for'] = implode(',', $params['used_for']);
     }
 
+    // Hack to make white null, because html5 color widget can't be empty
     if (isset($params['color']) && strtolower($params['color']) === '#ffffff') {
       $params['color'] = '';
     }
 
-    $tag->copyValues($params);
-    $tag->id = $id;
-    $hook = !$id ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Tag', $tag->id, $params);
-
     // save creator id and time
-    if (!$tag->id) {
-      $session = CRM_Core_Session::singleton();
-      $tag->created_id = $session->get('userID');
-      $tag->created_date = date('YmdHis');
+    if (!$id) {
+      $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::getLoggedInContactID();
+      $params['created_date'] = $params['created_date'] ?? date('YmdHis');
     }
 
-    $tag->save();
-    CRM_Utils_Hook::post($hook, 'Tag', $tag->id, $tag);
+    $tag = self::writeRecord($params);
 
     // if we modify parent tag, then we need to update all children
-    $tag->find(TRUE);
-    if (!$tag->parent_id && $tag->used_for) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET used_for=%1 WHERE parent_id = %2",
-        [
+    if ($id) {
+      $tag->find(TRUE);
+      if (!$tag->parent_id && $tag->used_for) {
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET used_for=%1 WHERE parent_id = %2", [
           1 => [$tag->used_for, 'String'],
           2 => [$tag->id, 'Integer'],
-        ]
-      );
+        ]);
+      }
     }
 
     CRM_Core_PseudoConstant::flush();
@@ -462,11 +454,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * Check if there is data to create the object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return bool
    */
-  public static function dataExists(&$params) {
+  public static function dataExists($params) {
     // Disallow empty values except for the number zero.
     // TODO: create a utility for this since it's needed in many places
     if (!empty($params['name']) || (string) $params['name'] === '0') {
