@@ -26,7 +26,7 @@
         <a href="#" onclick="html_code.profile.select(); return false;" class="button"><span>Select HTML Code</span></a>
     </div>
     <div class="action-link">
-        &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}">&raquo;  {ts}Back to Profile Listings{/ts}</a>
+        &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}"><i class="crm-i fa-chevron-left"></i>  {ts}Back to Profile Listings{/ts}</a>
     </div>
     </form>
 

@@ -36,7 +36,7 @@
             <tr>
          <td width="50%" style="padding: 0px;">
                 {foreach from=$group.fields item=panelItem  key=panelName name=groupLoop}
-                    &raquo;&nbsp;<a href="{$panelItem.url}"{if $panelItem.extra} {$panelItem.extra}{/if} id="idc_{$panelItem.id}">{$panelItem.title}</a><br />
+                    <i class="crm-i fa-chevron-right"></i>&nbsp;<a href="{$panelItem.url}"{if $panelItem.extra} {$panelItem.extra}{/if} id="idc_{$panelItem.id}">{$panelItem.title}</a><br />
                     {if $smarty.foreach.groupLoop.iteration EQ $group.perColumn}
                          </td><td width="50%" style="padding: 0px;">
                     {/if}

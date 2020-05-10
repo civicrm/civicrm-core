@@ -824,9 +824,9 @@
             return steps[selectedIndex] && steps[selectedIndex].isStepValid();
           };
           this.iconFor = function(index) {
-            if (index < this.$index()) return '√';
-            if (index === this.$index()) return '»';
-            return ' ';
+            if (index < this.$index()) return 'crm-i fa-check';
+            if (index === this.$index()) return 'crm-i fa-angle-double-right';
+            return '';
           };
           this.isSelectable = function(step) {
             if (step.selected) return false;
