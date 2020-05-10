@@ -960,7 +960,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'), TRUE);
 
     $form->addYesNo('contribution_test', ts('Contribution is a Test?'), TRUE);
-
+    $form->add('number', 'contribution_id', ts('Contribution ID'), ['class' => 'four', 'min' => 1]);
     // Add field for transaction ID search
     $form->addElement('text', 'contribution_trxn_id', ts("Transaction ID"));
     $form->addElement('text', 'contribution_check_number', ts('Check Number'));
