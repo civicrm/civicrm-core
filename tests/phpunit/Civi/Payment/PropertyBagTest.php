@@ -81,6 +81,15 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
+   * Test that emails set by the legacy method of 'email-5' can be retrieved with getEmail.
+   */
+  public function testSetBillingEmailLegacy() {
+    $localPropertyBag = new PropertyBag();
+    $localPropertyBag->mergeLegacyInputParams(['email-' . \CRM_Core_BAO_LocationType::getBilling() => 'a@b.com']);
+    $this->assertEquals('a@b.com', $localPropertyBag->getEmail());
+  }
+
+  /**
    */
   public function testMergeInputs() {
     $propertyBag = new PropertyBag();
@@ -88,7 +97,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'contactID' => 123,
       'contributionRecurID' => 456,
     ]);
-    $this->assertEquals("We have merged input params into the property bag for now but please rewrite code to not use this.", $propertyBag->lastWarning);
+    $this->assertEquals('We have merged input params into the property bag for now but please rewrite code to not use this.', $propertyBag->lastWarning);
     $this->assertEquals(123, $propertyBag->getContactID());
     $this->assertEquals(456, $propertyBag->getContributionRecurID());
   }
