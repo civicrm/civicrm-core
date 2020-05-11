@@ -925,7 +925,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * or FALSE otherwise.
    */
   private function convertIsOverrideValue() {
-    $this->_params['is_override'] = CRM_Member_StatusOverrideTypes::isOverridden($this->_params['is_override']);
+    $this->_params['is_override'] = CRM_Member_StatusOverrideTypes::isOverridden($this->_params['is_override'] ?? CRM_Member_StatusOverrideTypes::NO);
   }
 
   /**
