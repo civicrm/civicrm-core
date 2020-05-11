@@ -6,7 +6,10 @@
  */
 class CRM_Logging_SchemaTest extends CiviUnitTestCase {
 
+  protected $databaseVersion;
+
   public function setUp() {
+    $this->databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
     parent::setUp();
   }
 
@@ -18,6 +21,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   public function tearDown() {
     $schema = new CRM_Logging_Schema();
     $schema->disableLogging();
+    $this->databaseVersion = NULL;
     parent::tearDown();
     $this->quickCleanup(['civicrm_contact'], TRUE);
     $schema->dropAllLogTables();
@@ -241,7 +245,9 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
 
     $this->assertEquals('int', $ci['test_integer']['DATA_TYPE']);
-    $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+    if (version_compare($this->databaseVersion, '8.0.19', '<') || stripos($this->databaseVersion, 'mariadb') !== FALSE) {
+      $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+    }
     $this->assertEquals('YES', $ci['test_integer']['IS_NULLABLE']);
 
     $this->assertEquals('decimal', $ci['test_decimal']['DATA_TYPE']);
@@ -274,16 +280,19 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
+    print_r(CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_test_length_change")->fetchAll());
     CRM_Core_DAO::executeQuery(
       "ALTER TABLE civicrm_test_length_change
       CHANGE COLUMN test_integer test_integer int(6) NULL,
       CHANGE COLUMN test_decimal test_decimal decimal(22,2) NULL"
     );
     $schema->fixSchemaDifferences();
-    print_r(\Civi::$statics['CRM_Logging_Schema']);
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
+    print_r($ci);
     // length should increase
-    $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    if (version_compare($this->databaseVersion, '8.0.19', '<') || stripos($this->databaseVersion, 'mariadb') !== FALSE) {
+      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    }
     $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
     CRM_Core_DAO::executeQuery(
       "ALTER TABLE civicrm_test_length_change
@@ -293,7 +302,9 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should not decrease
-    $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    if (version_compare($this->databaseVersion, '8.0.19', '<') || stripos($this->databaseVersion, 'mariadb') !== FALSE) {
+      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    }
     $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
   }
 
