@@ -280,6 +280,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
       CHANGE COLUMN test_decimal test_decimal decimal(22,2) NULL"
     );
     $schema->fixSchemaDifferences();
+    print_r(\Civi::$statics['CRM_Logging_Schema']);
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should increase
     $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
