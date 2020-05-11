@@ -217,7 +217,10 @@
       {/crmRegion}
     </div>
     {if $event.is_public }
-        <br />{include file="CRM/Event/Page/iCalLinks.tpl"}
+        <br />
+        <div class="action-link section iCal_links-section">
+          {include file="CRM/Event/Page/iCalLinks.tpl"}
+        </div>
     {/if}
 
     {if $event.is_share }

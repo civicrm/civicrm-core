@@ -175,6 +175,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       $this->assign('friendURL', $url);
     }
 
+    $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_eventId));
+
     $this->freeze();
 
     //lets give meaningful status message, CRM-4320.
