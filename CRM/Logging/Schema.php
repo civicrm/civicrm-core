@@ -111,6 +111,9 @@ class CRM_Logging_Schema {
    * Populate $this->tables and $this->logs with current db state.
    */
   public function __construct() {
+    if (!empty($this->tables)) {
+      print_r('Tables value is not empty');
+    }
     $dao = new CRM_Contact_DAO_Contact();
     $civiDBName = $dao->_database;
 

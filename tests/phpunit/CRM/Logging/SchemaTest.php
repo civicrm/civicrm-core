@@ -280,7 +280,6 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
-    print_r(CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_test_length_change")->fetchAll());
     CRM_Core_DAO::executeQuery(
       "ALTER TABLE civicrm_test_length_change
       CHANGE COLUMN test_integer test_integer int(6) NULL,
@@ -288,7 +287,6 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     );
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
-    print_r($ci);
     // length should increase
     if (version_compare($this->databaseVersion, '8.0.19', '<') || stripos($this->databaseVersion, 'mariadb') !== FALSE) {
       $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
