@@ -1243,7 +1243,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if ($customField->data_type == 'Money' && isset($value)) {
       $value = number_format($value, 2);
     }
-    if (self::isSerialized($customField)) {
+    if (self::isSerialized($customField) && $value) {
       $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldId, FALSE);
       $defaults[$elementName] = [];
       $checkedValue = CRM_Utils_Array::explodePadded($value);
