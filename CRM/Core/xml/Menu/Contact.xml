@@ -343,7 +343,6 @@
    <page_callback>CRM_Contact_Page_DedupeRules</page_callback>
    <access_arguments>administer dedupe rules;merge duplicate contacts</access_arguments>
    <adminGroup>Manage</adminGroup>
-   <icon>admin/small/duplicate_matching.png</icon>
    <weight>105</weight>
 </item>
 <item>

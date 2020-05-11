@@ -72,7 +72,6 @@
      <desc>Create and edit event configuration including times, locations, online registration forms, and fees. Links for iCal and RSS syndication.</desc>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
-     <icon>admin/small/event_manage.png</icon>
      <weight>370</weight>
   </item>
   <item>
@@ -82,7 +81,6 @@
      <desc>Administrators can create Event Templates - which are basically master event records pre-filled with default values</desc>
      <access_arguments>access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
-     <icon>admin/small/template.png</icon>
      <weight>375</weight>
   </item>
   <item>
@@ -92,7 +90,6 @@
      <desc>Use Event Types to categorize your events. Event feeds can be filtered by Event Type and participant searches can use Event Type as a criteria.</desc>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
-     <icon>admin/small/event_type.png</icon>
      <weight>385</weight>
   </item>
   <item>
@@ -102,7 +99,6 @@
      <desc>Define statuses for event participants here (e.g. Registered, Attended, Cancelled...). You can then assign statuses and search for participants by status.</desc>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
-     <icon>admin/small/parti_status.png</icon>
      <weight>390</weight>
   </item>
   <item>
@@ -112,7 +108,6 @@
      <desc>Define participant roles for events here (e.g. Attendee, Host, Speaker...). You can then assign roles and search for participants by role.</desc>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
-     <icon>admin/small/parti_role.png</icon>
      <weight>395</weight>
   </item>
   <item>
@@ -121,7 +116,6 @@
      <desc>Template to control participant listing display.</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviEvent</adminGroup>
-     <icon>admin/small/01.png</icon>
      <weight>398</weight>
   </item>
   <item>
