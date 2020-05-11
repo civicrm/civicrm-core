@@ -417,6 +417,7 @@ if (!CRM.vars) CRM.vars = {};
     var title = '';
     var sr = '';
     if (text) {
+      text = _.escape(text);
       title = ' title="' + text + '"';
       sr = '<span class="sr-only">' + text + '</span>';
     }
