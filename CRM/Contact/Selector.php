@@ -61,6 +61,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     'status',
     'do_not_email',
     'do_not_phone',
+    'do_not_sms',
     'do_not_mail',
   ];
 

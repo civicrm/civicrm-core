@@ -19,7 +19,7 @@
     <div class="crm-summary-row">
       <div class="crm-label">
         {ts}Email{/ts}
-        {if $privacy.do_not_email}<span class="icon privacy-flag do-not-email" title="{ts}Privacy flag: Do Not Email{/ts}"></span>{/if}
+        {if $privacy.do_not_email}{privacyFlag field=do_not_email}{/if}
       </div>
       <div class="crm-content"></div>
     </div>
@@ -29,7 +29,7 @@
     <div class="crm-summary-row {if $item.is_primary eq 1}primary{/if}">
       <div class="crm-label">
         {$item.location_type} {ts}Email{/ts}
-        {if $privacy.do_not_email}<span class="icon privacy-flag do-not-email" title="{ts}Privacy flag: Do Not Email{/ts}"></span>{elseif $item.on_hold}<span class="icon privacy-flag email-hold" title="{ts}Email on hold - generally due to bouncing.{/ts}"></span>{/if}
+        {if $privacy.do_not_email}{privacyFlag field=do_not_email}{elseif $item.on_hold}{privacyFlag field=on_hold}{/if}
       </div>
       <div class="crm-content crm-contact_email">
         {if !$item.on_hold and !$privacy.do_not_email}

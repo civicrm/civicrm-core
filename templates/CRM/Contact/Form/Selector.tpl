@@ -81,7 +81,7 @@
             <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=`$context`"}">{if $row.is_deleted}<del>{/if}{$row.sort_name}{if $row.is_deleted}</del>{/if}</a></td>
             {if $action eq 512 or $action eq 256}
               {if !empty($columnHeaders.street_address)}
-          <td><span title="{$row.street_address|escape}">{$row.street_address|mb_truncate:22:"...":true}{if $row.do_not_mail} <span class="icon privacy-flag do-not-mail"></span>{/if}</span></td>
+          <td><span title="{$row.street_address|escape}">{$row.street_address|mb_truncate:22:"...":true}{if $row.do_not_mail} {privacyFlag field=do_not_mail}{/if}</span></td>
         {/if}
         {if !empty($columnHeaders.city)}
                 <td>{$row.city}</td>
@@ -100,9 +100,9 @@
                     <span title="{$row.email|escape}">
                         {$row.email|mb_truncate:17:"...":true}
                         {if $row.on_hold}
-                          (On Hold)<span class="status-hold" title="{ts}This email is on hold (probably due to bouncing).{/ts}"></span>
+                          {privacyFlag field=on_hold}
                         {elseif $row.do_not_email}
-                          <span class="icon privacy-flag do-not-email" title="{ts}Do Not Email{/ts}"></span>
+                          {privacyFlag field=do_not_email}
                         {/if}
                     </span>
                 {/if}
@@ -111,7 +111,10 @@
                 {if $row.phone}
                   {$row.phone}
                   {if $row.do_not_phone}
-                    <span class="icon privacy-flag do-not-phone" title="{ts}Do Not Phone{/ts}" ></span>
+                    {privacyFlag field=do_not_phone}
+                  {/if}
+                  {if $row.do_not_sms}
+                    {privacyFlag field=do_not_sms}
                   {/if}
                 {/if}
               </td>
