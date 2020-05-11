@@ -282,6 +282,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
     // need to do it twice so the columnSpecs static is refreshed
+    print_r(\Civi::$statics['CRM_Logging_Schema']);
     \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
