@@ -134,8 +134,8 @@ function _civicrm_api3_mailing_create_spec(&$params) {
 
   $params['forward_replies']['api.default'] = FALSE;
   $params['auto_responder']['api.default'] = FALSE;
-  $params['open_tracking']['api.default'] = TRUE;
-  $params['url_tracking']['api.default'] = TRUE;
+  $params['open_tracking']['api.default'] = Civi::settings()->get('open_tracking_default');
+  $params['url_tracking']['api.default'] = Civi::settings()->get('url_tracking_default');
 
   $params['header_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
   $params['footer_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
