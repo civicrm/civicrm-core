@@ -467,25 +467,24 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       // CRM-11182 - Optional confirmation screen
       // Change button label depending on whether the next action is confirm or register
+      $buttonParams = [
+        'type' => 'upload',
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ];
       if (
         !$this->_values['event']['is_multiple_registrations']
         && !$this->_values['event']['is_monetary']
         && !$this->_values['event']['is_confirm_enabled']
       ) {
-        $buttonLabel = ts('Register');
+        $buttonParams['name'] = ts('Register');
       }
       else {
-        $buttonLabel = ts('Review your registration');
+        $buttonParams['name'] = ts('Review your registration');
+        $buttonParams['icon'] = 'fa-chevron-right';
       }
 
-      $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => $buttonLabel,
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-      ]);
+      $this->addButtons([$buttonParams]);
     }
 
     $this->addFormRule(['CRM_Event_Form_Registration_Register', 'formRule'], $this);
