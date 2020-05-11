@@ -3038,6 +3038,7 @@ tbody.scrollContent tr.alternateRow {
 }
 .crm-container .select2-container-multi .select2-choices .select2-search-field input {
   padding: 4px;
+  min-height: unset;  /* Overide style imposed by WordPress 5.3 - see https://lab.civicrm.org/dev/wordpress/issues/46 */
 }
 .crm-container .select2-search-choice-close {
   top: 2px;
