@@ -68,7 +68,7 @@
                 <td class="crm-price-option-count">{$row.count}</td>
                 <td class="crm-price-option-max">{$row.max_value}</td>
               {/if}
-              <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
+              <td class="crm-price-option-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight}</td>
               {if $getTaxDetails}

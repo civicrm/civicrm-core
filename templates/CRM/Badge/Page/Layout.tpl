@@ -38,10 +38,7 @@
               <td id="row_{$row.id}_status" class="crm-badge-layout-is_active">
                 {if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}
               </td>
-              <td class="crm-badge-layout-is_default">
-                {if $row.is_default eq 1}
-                <img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>
-                {/if}&nbsp;
+              <td class="crm-badge-layout-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;
               </td>
               <td>{$row.action|replace:'xx':$row.id}</td>
             </tr>

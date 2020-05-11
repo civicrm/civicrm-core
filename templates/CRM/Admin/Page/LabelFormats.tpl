@@ -53,8 +53,7 @@
               <td class="crm-labelFormat-name">{$row.groupName}</td>
               <td class="crm-labelFormat-order nowrap">{$row.weight}</td>
               <td class="crm-labelFormat-description">{$row.grouping}</td>
-              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}
-              <img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
+              <td class="crm-labelFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
               <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
               <td>{$row.action|replace:'xx':$row.id}</td>

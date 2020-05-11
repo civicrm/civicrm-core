@@ -312,11 +312,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
         $surveysData[$sid]['isActive'] = $isActive;
 
-        $isDefault = NULL;
-        if ($surveysData[$sid]['is_default']) {
-          $isDefault = '<img src="' . $config->resourceBase . 'i/check.gif" alt="' . ts('Default') . '" />';
-        }
-        $surveysData[$sid]['is_default'] = $isDefault;
+        $surveysData[$sid]['is_default'] = self::crmIcon('fa-check', ts('Default'), $surveysData[$sid]['is_default']);
 
         if ($surveysData[$sid]['result_id']) {
           $resultSet = '<a href= "javascript:displayResultSet( ' . $sid . ',' . "'" . $surveysData[$sid]['title'] . "'" . ', ' . $surveysData[$sid]['result_id'] . ' )" title="' . ts('view result set') . '">' . ts('Result Set') . '</a>';
@@ -415,11 +411,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
           $isActive = ts('Yes');
         }
         $petitionsData[$pid]['isActive'] = $isActive;
-        $isDefault = NULL;
-        if ($petitionsData[$pid]['is_default']) {
-          $isDefault = '<img src="' . $config->resourceBase . 'i/check.gif" alt="' . ts('Default') . '" />';
-        }
-        $petitionsData[$pid]['is_default'] = $isDefault;
+        $petitionsData[$pid]['is_default'] = self::crmIcon('fa-check', ts('Default'), $petitionsData[$pid]['is_default']);
 
         $petitionsData[$pid]['action'] = CRM_Core_Action::formLink(self::petitionActionLinks(),
           $action,
