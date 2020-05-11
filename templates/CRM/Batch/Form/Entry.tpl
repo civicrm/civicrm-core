@@ -55,10 +55,7 @@
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
           {if $field.name|substr:0:11 ne 'soft_credit' and $field.name ne 'trxn_id'}
-          <img src="{$config->resourceBase}i/copy.png"
-               alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}"
-               fname="{$field.name}" class="action-icon"
-               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>
+          {copyIcon name=$field.name title=$field.title}
           {/if}{$field.title}
         </div>
       {/foreach}

@@ -116,12 +116,12 @@
             {if $field.skipDisplay}
               {continue}
             {/if}
-            <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{$field.title}</th>
+            <th>{copyIcon name=$field.name title=$field.title}{$field.title}</th>
           {/foreach}
         {/if}
 
-        <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=note}Click to copy %1 from row one to all rows.{/ts}" fname="note" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Note{/ts}</th>
-        <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=result}Click to copy %1 from row one to all rows.{/ts}" fname="result" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Result{/ts}</th>
+        <th>{capture assign="tsNote"}{ts}Note{/ts}{/capture}{copyIcon name=note title=$tsNote}{$tsNote}</th>
+        <th>{capture assign="tsResult"}{ts}Result{/ts}{/capture}{copyIcon name=result title=$tsResult}{$tsResult}</th>
         <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
       </tr>
       </thead>
