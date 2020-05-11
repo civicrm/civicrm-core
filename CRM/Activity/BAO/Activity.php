@@ -1118,9 +1118,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $from = "$fromDisplayName <$fromEmail>";
     }
 
-    //create the meta level record first ( email activity )
-    $activityID = self::createEmailActivity($userID, $subject, $html, $text, $additionalDetails, $campaignId, $attachments, $caseId);
-
     $returnProperties = [];
     if (isset($messageToken['contact'])) {
       foreach ($messageToken['contact'] as $key => $value) {
@@ -1226,6 +1223,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       $sent = FALSE;
+      // Create the email activity.
+      $activityID = self::createEmailActivity($userID, $tokenSubject, $tokenHtml, $tokenText, $additionalDetails, $campaignId, $attachments, $caseId);
+
       if (self::sendMessage(
         $from,
         $userID,
