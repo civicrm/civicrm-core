@@ -149,13 +149,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_honorID = NULL;
 
   /**
-   * Store the financial Type ID
-   *
-   * @var array
-   */
-  public $_contributionType;
-
-  /**
    * The contribution values if an existing contribution
    * @var array
    */
@@ -289,7 +282,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       $this->_noteID = $daoNote->id;
       $values['note'] = $daoNote->note;
     }
-    $this->_contributionType = $values['financial_type_id'];
   }
 
   /**
