@@ -34,10 +34,8 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
     }
 
     if (empty($params['id'])) {
-
       if (empty($params['created_id'])) {
-        $session = CRM_Core_Session::singleton();
-        $params['created_id'] = $session->get('userID');
+        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
 
       if (empty($params['created_date'])) {
@@ -47,26 +45,11 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       if (empty($params['name'])) {
         $params['name'] = CRM_Utils_String::titleToVar($params['title'], 64);
       }
-
-      CRM_Utils_Hook::pre('create', 'Campaign', NULL, $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('edit', 'Campaign', $params['id'], $params);
     }
 
-    $campaign = new CRM_Campaign_DAO_Campaign();
-    $campaign->copyValues($params);
-    $campaign->save();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Campaign', $campaign->id, $campaign);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Campaign', $campaign->id, $campaign);
-    }
+    $campaign = self::writeRecord($params);
 
     /* Create the campaign group record */
-
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
 
     if (isset($params['groups']) && !empty($params['groups']['include']) && is_array($params['groups']['include'])) {
@@ -81,9 +64,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
     }
 
     //store custom data
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
+    if (!empty($params['custom']) && is_array($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_campaign', $campaign->id);
     }
 

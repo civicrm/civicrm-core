@@ -74,9 +74,10 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
     $pledgeFrequencyUnit = [
       'week' => 1,
-      'month' => 1,
+      'month' => 0,
       'year' => 1,
     ];
+    $pledgeFrequencySerialized = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys(array_filter($pledgeFrequencyUnit)));
 
     $params = [
       'entity_id' => $this->_contributionPageId,
@@ -89,6 +90,8 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
     // check for add pledge block
     $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::add($params);
+    // This param is expected to get serialized
+    $params['pledge_frequency_unit'] = $pledgeFrequencySerialized;
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $pledgeBlock->$param);
     }
@@ -106,6 +109,8 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
     // also check for edit pledge block
     $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::add($params);
+    // This param is expected to get serialized
+    $params['pledge_frequency_unit'] = $pledgeFrequencySerialized;
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $pledgeBlock->$param);
     }
@@ -121,6 +126,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
       'month' => 1,
       'year' => 1,
     ];
+    $pledgeFrequencySerialized = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys(array_filter($pledgeFrequencyUnit)));
 
     $params = [
       'entity_id' => $this->_contributionPageId,
@@ -144,6 +150,8 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     // use getPledgeBlock() method
     $getPledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_contributionPageId);
 
+    // This param is expected to get serialized
+    $params['pledge_frequency_unit'] = $pledgeFrequencySerialized;
     // check on both retrieve and getPledgeBlock values
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $retrievePledgeBlock->$param);

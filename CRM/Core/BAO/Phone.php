@@ -57,15 +57,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Phone', $params['id'] ?? NULL, $params);
-
-    $phone = new CRM_Core_DAO_Phone();
-    $phone->copyValues($params);
-    $phone->save();
-
-    CRM_Utils_Hook::post($hook, 'Phone', $phone->id, $phone);
-    return $phone;
+    return self::writeRecord($params);
   }
 
   /**
