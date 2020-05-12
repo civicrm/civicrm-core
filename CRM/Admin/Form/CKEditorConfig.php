@@ -16,13 +16,9 @@
  */
 
 /**
- * Page for configuring CKEditor options.
- *
- * Note that while this is implemented as a CRM_Core_Page, it is actually a form.
- * Because the form needs to be submitted and refreshed via javascript, it seemed like
- * Quickform and CRM_Core_Form/Controller might get in the way.
+ * Form for configuring CKEditor options.
  */
-class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
+class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
 
   const CONFIG_FILEPATH = '[civicrm.files]/persist/crm-ckeditor-';
 
@@ -52,9 +48,8 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    *
    * @return string
    */
-  public function run() {
+  public function preProcess() {
     $this->preset = CRM_Utils_Array::value('preset', $_REQUEST, 'default');
-
     // If the form was submitted, take appropriate action.
     if (!empty($_POST['revert'])) {
       self::deleteConfigFile($this->preset);
@@ -97,7 +92,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       ],
     ]);
 
-    return parent::run();
+    return parent::preProcess();
   }
 
   /**

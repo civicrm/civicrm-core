@@ -109,7 +109,7 @@
     var selectorOpen = false,
       changedWhileOpen = false;
 
-    $('#toolbarModifierForm')
+    $('#CKEditorConfig')
       .on('submit', function(e) {
         $('.toolbar button:last', '#toolbarModifierWrapper')[0].click();
         $('.configContainer textarea', '#toolbarModifierWrapper').attr('name', 'config');
@@ -117,7 +117,7 @@
       .on('change', '.config-param', function(e) {
         changedWhileOpen = true;
         if (!selectorOpen) {
-          $('#toolbarModifierForm').submit().block();
+          $('#CKEditorConfig').submit().block();
         }
       })
       .on('change', 'input.crm-config-option-name', changeOptionName)
