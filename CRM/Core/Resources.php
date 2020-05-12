@@ -760,11 +760,11 @@ class CRM_Core_Resources {
     // add wysiwyg editor
     $editor = Civi::settings()->get('editor_id');
     if ($editor == "CKEditor") {
-      CRM_Admin_Page_CKEditorConfig::setConfigDefault();
+      CRM_Admin_Form_CKEditorConfig::setConfigDefault();
       $items[] = [
         'config' => [
           'wysisygScriptLocation' => Civi::paths()->getUrl("[civicrm.root]/js/wysiwyg/crm.ckeditor.js"),
-          'CKEditorCustomConfig' => CRM_Admin_Page_CKEditorConfig::getConfigUrl(),
+          'CKEditorCustomConfig' => CRM_Admin_Form_CKEditorConfig::getConfigUrl(),
         ],
       ];
     }
