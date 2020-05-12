@@ -515,6 +515,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         $out = "\$$variable_name = $out";
       }
       else {
+        // Block to avoid memory leak in drupal 8
+        if (array_key_exists('exception', $variable)) {
+          $exception = (array) $variable['exception'];
+          foreach ($exception as $k => & $v) {
+            if (gettype($v) == 'array') {
+              $v = self::formatBacktrace($v);
+            }
+          }
+          $variable['exception'] = $exception;
+        }
         // use var_dump
         ob_start();
         var_dump($variable);
