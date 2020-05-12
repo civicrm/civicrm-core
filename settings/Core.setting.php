@@ -239,6 +239,27 @@ return [
     'description' => NULL,
     'help_text' => NULL,
   ],
+  'defaultExternUrl' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'defaultExternUrl',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+    ],
+    'default' => 'router',
+    'add' => '5.27',
+    'title' => ts('Extern URL Style'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => NULL,
+    'options' => [
+      'standalone' => ts('Prefer standalone scripts'),
+      'router' => ts('Prefer normal router'),
+    ],
+  ],
   'activity_assignee_notification' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
