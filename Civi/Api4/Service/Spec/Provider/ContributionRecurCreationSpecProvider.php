@@ -10,30 +10,30 @@
  +--------------------------------------------------------------------+
  */
 
+
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
 /**
- * Class ContributionCreationSpecProvider
+ * Class ContributionRecurCreationSpecProvider
  *
  * @package Civi\Api4\Service\Spec\Provider
  */
-class ContributionCreationSpecProvider implements Generic\SpecProviderInterface {
+class ContributionRecurCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('financial_type_id')->setRequired(TRUE);
-    $spec->getFieldByName('receive_date')->setDefaultValue('now');
+    $spec->getFieldByName('create_date')->setDefaultValue('now');
   }
 
   /**
    * @inheritDoc
    */
   public function applies($entity, $action) {
-    return $entity === 'Contribution' && $action === 'create';
+    return $entity === 'ContributionRecur' && $action === 'create';
   }
 
 }
