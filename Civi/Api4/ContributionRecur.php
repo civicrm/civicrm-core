@@ -13,10 +13,10 @@
 namespace Civi\Api4;
 
 /**
- * Contribution entity.
+ * ContributionRecur entity.
  *
  * @package Civi\Api4
  */
-class Contribution extends Generic\DAOEntity {
+class ContributionRecur extends Generic\DAOEntity {
 
 }

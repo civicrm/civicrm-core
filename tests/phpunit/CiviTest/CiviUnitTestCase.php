@@ -3562,4 +3562,35 @@ VALUES
     }
   }
 
+  /**
+   * Generic create test.
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function basicCreateTest(int $version) {
+    $this->_apiversion = $version;
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
+    $this->getAndCheck($this->params, $result['id'], $this->_entity);
+  }
+
+  /**
+   * Generic delete test.
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function basicDeleteTest($version) {
+    $this->_apiversion = $version;
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $deleteParams = ['id' => $result['id']];
+    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
+    $this->assertEquals(0, $checkDeleted['count']);
+  }
+
 }
