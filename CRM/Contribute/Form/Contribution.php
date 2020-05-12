@@ -78,13 +78,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_params;
 
   /**
-   * Store the contribution Type ID
-   *
-   * @var array
-   */
-  public $_contributionType;
-
-  /**
    * The contribution values if an existing contribution
    * @var array
    */
@@ -277,7 +270,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
-      $this->applyCustomData('Contribution', CRM_Utils_Array::value('financial_type_id', $_POST), $this->_id);
+      $this->applyCustomData('Contribution', $this->getFinancialTypeID(), $this->_id);
     }
 
     $this->_lineItems = [];
@@ -380,10 +373,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (isset($defaults[$amt])) {
         $defaults[$amt] = CRM_Utils_Money::format($defaults[$amt], NULL, '%a');
       }
-    }
-
-    if ($this->_contributionType) {
-      $defaults['financial_type_id'] = $this->_contributionType;
     }
 
     if (empty($defaults['payment_instrument_id'])) {
@@ -612,7 +601,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Contribution');
-    $this->assign('customDataSubType', $this->_contributionType);
+    $this->assign('customDataSubType', $this->getFinancialTypeID());
     $this->assign('entityID', $this->_id);
 
     $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
@@ -1806,6 +1795,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     return 0;
+  }
+
+  /**
+   * Get the financial Type ID for the contribution either from the submitted values or from the contribution values if possible.
+   *
+   * This is important for dev/core#1728 - ie ensure that if we are returned to the form for a form
+   * error that any custom fields based on the selected financial type are loaded.
+   *
+   * @return int
+   */
+  protected function getFinancialTypeID() {
+    if (!empty($this->_submitValues['financial_type_id'])) {
+      return $this->_submitValues['financial_type_id'];
+    }
+    if (!empty($this->_values['financial_type_id'])) {
+      return $this->_values['financial_type_id'];
+    }
   }
 
 }
