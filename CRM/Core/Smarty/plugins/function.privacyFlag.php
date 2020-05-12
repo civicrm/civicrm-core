@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @author Andrew Hunt, AGH Strategies
- * $Id$
  *
  */
 
@@ -23,12 +22,16 @@
  * @param $params
  *   - field: the applicable privacy field
  *     (one of CRM_Core_SelectValues::privacy() or `on_hold`)
+ *   - condition: if present and falsey, return empty
  *
  * @param $smarty
  *
  * @return string
  */
 function smarty_function_privacyFlag($params, &$smarty) {
+  if (array_key_exists('condition', $params) && !$params['condition']) {
+    return '';
+  }
   $icons = [
     'do_not_phone' => 'fa-phone',
     'do_not_email' => 'fa-paper-plane',
