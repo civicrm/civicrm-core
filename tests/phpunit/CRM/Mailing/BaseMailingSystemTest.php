@@ -200,7 +200,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertRegExp(
         ";" .
         // body_html
-        "<p>You can go to <a href=['\"].*civicrm/mailing/url\.php\?u=\d+&amp\\;qid=\d+['\"] rel='nofollow'>Google</a>" .
+        "<p>You can go to <a href=['\"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+&amp\\;qid=\d+['\"] rel='nofollow'>Google</a>" .
         " or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" .
         // Default footer
         "Sample Footer for HTML formatted content" .
@@ -219,7 +219,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "\n" .
         "Links:\n" .
         "------\n" .
-        "\\[1\\] http.*civicrm/mailing/url\.php\?u=\d+&qid=\d+\n" .
+        "\\[1\\] http.*(extern/url.php|civicrm/mailing/url)(\?|&)u=\d+&qid=\d+\n" .
         "\\[2\\] http.*civicrm/mailing/optout.*\n" .
         "\n" .
         // Default footer
@@ -243,32 +243,32 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $cases = [];
 
     // Tracking disabled
-    $cases[] = [
+    $cases[0] = [
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href="http://example\.net/">Foo</a></p>;',
       ';\\[1\\] http://example\.net/;',
       ['url_tracking' => 0],
     ];
-    $cases[] = [
+    $cases[1] = [
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       // FIXME: Legacy tracker adds extra quote after URL
       ';<p><a href="http://example\.net/\?id=\d+""?>Foo</a></p>;',
       ';\\[1\\] http://example\.net/\?id=\d+;',
       ['url_tracking' => 0],
     ];
-    $cases[] = [
+    $cases[2] = [
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
       ';\\[1\\] http.*civicrm/mailing/optout.*;',
       ['url_tracking' => 0],
     ];
-    $cases[] = [
+    $cases[3] = [
       '<p>Look at <img src="http://example.net/foo.png">.</p>',
       ';<p>Look at <img src="http://example\.net/foo\.png">\.</p>;',
       ';Look at \.;',
       ['url_tracking' => 0],
     ];
-    $cases[] = [
+    $cases[4] = [
       // Plain-text URL's are tracked in plain-text emails...
       // but not in HTML emails.
       "<p>Please go to: http://example.net/</p>",
@@ -278,13 +278,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     ];
 
     // Tracking enabled
-    $cases[] = [
+    $cases[5] = [
       '<p><a href="http://example.net/">Foo</a></p>',
-      ';<p><a href=[\'"].*civicrm/mailing/url\.php\?u=\d+.*[\'"]>Foo</a></p>;',
-      ';\\[1\\] .*civicrm/mailing/url\.php\?u=\d+.*;',
+      ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*[\'"]>Foo</a></p>;',
+      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*;',
       ['url_tracking' => 1],
     ];
-    $cases[] = [
+    $cases[6] = [
       // FIXME: CiviMail URL tracking doesn't track tokenized links.
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       // FIXME: Legacy tracker adds extra quote after URL
@@ -292,26 +292,26 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       ';\\[1\\] http://example\.net/\?id=\d+;',
       ['url_tracking' => 1],
     ];
-    $cases[] = [
+    $cases[7] = [
       // It would be redundant/slow to track the action URLs?
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
       ';\\[1\\] http.*civicrm/mailing/optout.*;',
       ['url_tracking' => 1],
     ];
-    $cases[] = [
+    $cases[8] = [
       // It would be excessive/slow to track every embedded image.
       '<p>Look at <img src="http://example.net/foo.png">.</p>',
       ';<p>Look at <img src="http://example\.net/foo\.png">\.</p>;',
       ';Look at \.;',
       ['url_tracking' => 1],
     ];
-    $cases[] = [
+    $cases[8] = [
       // Plain-text URL's are tracked in plain-text emails...
       // but not in HTML emails.
       "<p>Please go to: http://example.net/</p>",
       ";<p>Please go to: http://example\.net/</p>;",
-      ';Please go to: .*civicrm/mailing.php\?u=\d+&qid=\d+;',
+      ';Please go to: .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+&qid=\d+;',
       ['url_tracking' => 1],
     ];
 
