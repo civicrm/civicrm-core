@@ -105,32 +105,11 @@ ORDER BY title";
       $this->addFormRule(['CRM_Mailing_Form_Subscribe', 'formRule']);
     }
 
-    $addCaptcha = TRUE;
-
-    // if recaptcha is not configured, then dont add it
-    // CRM-11316 Only enable ReCAPTCHA for anonymous visitors
-    $config = CRM_Core_Config::singleton();
+    // CRM-11316 Enable ReCAPTCHA for anonymous visitors
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
-    if (empty($config->recaptchaPublicKey) ||
-      empty($config->recaptchaPrivateKey) ||
-      $contactID
-    ) {
-      $addCaptcha = FALSE;
-    }
-    else {
-      // If this is POST request and came from a block,
-      // lets add recaptcha only if already present.
-      // Gross hack for now.
-      if (!empty($_POST) &&
-        !array_key_exists('recaptcha_challenge_field', $_POST)
-      ) {
-        $addCaptcha = FALSE;
-      }
-    }
-
-    if ($addCaptcha) {
+    if (!$contactID) {
       CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
 
