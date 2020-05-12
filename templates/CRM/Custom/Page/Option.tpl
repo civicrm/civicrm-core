@@ -87,7 +87,7 @@
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
                 $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-label" />');
                 $('td:eq(0)', nRow).prepend('<span class="crm-i fa-arrows crm-grip" />');
-                $('td:eq(3)', nRow).addClass('crmf-default_value').html(CRM.utils.formatConditionalIcon('fa-check', ts('Default'), nRow.cells[3].innerText));
+                $('td:eq(3)', nRow).addClass('crmf-default_value').html(CRM.utils.formatIcon('fa-check', ts('Default'), nRow.cells[3].innerText));
                 return nRow;
               },
               "fnDrawCallback": function() {

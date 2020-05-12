@@ -410,8 +410,8 @@ if (!CRM.vars) CRM.vars = {};
    * @return string
    *   The formatted icon markup.
    */
-  CRM.utils.formatConditionalIcon = function (icon, text, condition) {
-    if (!condition) {
+  CRM.utils.formatIcon = function (icon, text, condition) {
+    if (typeof condition !== 'undefined' && !condition) {
       return '';
     }
     var title = '';
