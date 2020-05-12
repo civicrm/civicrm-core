@@ -443,6 +443,7 @@ class CRM_Core_Page {
       $title = $sr = '';
     }
     else {
+      $text = htmlspecialchars($text);
       $title = " title=\"$text\"";
       $sr = "<span class=\"sr-only\">$text</span>";
     }
