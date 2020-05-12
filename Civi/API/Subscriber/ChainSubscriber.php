@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * The ChainSubscriber looks for API parameters which specify a nested or
  * chained API call. For example:
  *
- * @code
+ * ```
  * $result = civicrm_api('Contact', 'create', array(
  *   'version' => 3,
  *   'first_name' => 'Amy',
@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *     'location_type_id' => 123,
  *   ),
  * ));
- * @endcode
+ * ```
  *
  * The ChainSubscriber looks for any parameters of the form "api.Email.create";
  * if found, it issues the nested API call (and passes some extra context --

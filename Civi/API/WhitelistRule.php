@@ -14,14 +14,14 @@ namespace Civi\API;
  * A WhitelistRule is used to determine if an API call is authorized.
  * For example:
  *
- * @code
+ * ```
  * new WhitelistRule(array(
  *   'entity' => 'Contact',
  *   'actions' => array('get','getsingle'),
  *   'required' => array('contact_type' => 'Organization'),
  *   'fields' => array('id', 'display_name', 'sort_name', 'created_date'),
  * ));
- * @endcode
+ * ```
  *
  * This rule would allow API requests that attempt to get contacts of type "Organization",
  * but only a handful of fields ('id', 'display_name', 'sort_name', 'created_date')

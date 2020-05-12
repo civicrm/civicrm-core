@@ -15,7 +15,7 @@
  * different queue-providers may store the queue content in different
  * ways (in memory, in SQL, or in an external service).
  *
- * @code
+ * ```
  * $queue = CRM_Queue_Service::singleton()->create(array(
  *   'type' => 'interactive',
  *   'name' => 'upgrade-tasks',
@@ -31,7 +31,7 @@
  *     $queue->releaseItem($item);
  *   }
  * }
- * @endcode
+ * ```
  */
 class CRM_Queue_Service {
 

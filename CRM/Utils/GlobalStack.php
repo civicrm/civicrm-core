@@ -17,7 +17,7 @@
 /**
  * Temporarily change a global variable.
  *
- * @code
+ * ```
  * $globals = CRM_Utils_GlobalStack::singleton();
  * $globals->push(array(
  *   '_GET' => array(
@@ -26,7 +26,7 @@
  * ));
  * ...do stuff...
  * $globals->pop();
- * @endcode
+ * ```
  *
  * Note: for purposes of this class, we'll refer to the array passed into
  * push() as a frame.

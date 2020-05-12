@@ -8,12 +8,12 @@ namespace Civi\Angular;
  * The AngularLoader stops short of bootstrapping AngularJS. You may
  * need to `<div ng-app="..."></div>` or `angular.bootstrap(...)`.
  *
- * @code
+ * ```
  * $loader = new AngularLoader();
  * $loader->setPageName('civicrm/case/a');
  * $loader->setModules(array('crmApp'));
  * $loader->load();
- * @endCode
+ * ```
  *
  * @link https://docs.angularjs.org/guide/bootstrap
  */

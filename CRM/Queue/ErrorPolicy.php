@@ -13,12 +13,12 @@
  * To ensure that PHP errors or unhandled exceptions are reported in JSON
  * format, wrap this around your code. For example:
  *
- * @code
+ * ```
  * $errorContainer = new CRM_Queue_ErrorPolicy();
  * $errorContainer->call(function() {
  *    ...include some files, do some work, etc...
  * });
- * @endcode
+ * ```
  *
  * Note: Most of the code in this class is pretty generic vis-a-vis error
  * handling -- except for 'reportError', whose message format is only

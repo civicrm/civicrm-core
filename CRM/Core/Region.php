@@ -68,7 +68,7 @@ class CRM_Core_Region {
   /**
    * Add a snippet of content to a region.
    *
-   * @code
+   * ```
    * CRM_Core_Region::instance('page-header')->add(array(
    *   'markup' => '<div style="color:red">Hello!</div>',
    * ));
@@ -81,7 +81,7 @@ class CRM_Core_Region {
    * CRM_Core_Region::instance('page-header')->add(array(
    *   'callback' => 'myextension_callback_function',
    * ));
-   * @endcode
+   * ```
    *
    * Note: This function does not perform any extra encoding of markup, script code, or etc. If
    * you're passing in user-data, you must clean it yourself.

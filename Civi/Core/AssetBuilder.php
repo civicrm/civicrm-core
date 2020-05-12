@@ -20,7 +20,7 @@ use Civi\Core\Exception\UnknownAssetException;
  * named "api-fields.json" which lists all the fields of
  * all the API entities.
  *
- * @code
+ * ```
  * // Build a URL to `api-fields.json`.
  * $url = \Civi::service('asset_builder')->getUrl('api-fields.json');
  *
@@ -37,7 +37,7 @@ use Civi\Core\Exception\UnknownAssetException;
  *   $mimeType = 'application/json';
  *   $content = json_encode($fields);
  * }
- * @endCode
+ * ```
  *
  * Assets can be parameterized. Each combination of ($asset,$params)
  * will be cached separately. For example, we might want a copy of
@@ -45,7 +45,7 @@ use Civi\Core\Exception\UnknownAssetException;
  * Simply pass the chosen entities into `getUrl()`, then update
  * the definition to use `$params['entities']`, as in:
  *
- * @code
+ * ```
  * // Build a URL to `api-fields.json`.
  * $url = \Civi::service('asset_builder')->getUrl('api-fields.json', array(
  *   'entities' => array('Contact', 'Phone', 'Email', 'Address'),
@@ -63,7 +63,7 @@ use Civi\Core\Exception\UnknownAssetException;
  *   $mimeType = 'application/json';
  *   $content = json_encode($fields);
  * }
- * @endCode
+ * ```
  *
  * Note: These assets are designed to hold non-sensitive data, such as
  * aggregated JS or common metadata. There probably are ways to

@@ -11,25 +11,25 @@ namespace Civi\Token;
  * (1) When setting up a job, you may specify general/baseline info.
  * This is called the "context" data. Here, we create two rows:
  *
- * @code
+ * ```
  * $proc->addRow()->context('contact_id', 123);
  * $proc->addRow()->context('contact_id', 456);
- * @endCode
+ * ```
  *
  * (2) When defining a token (eg `{profile.viewUrl}`), you might read the
  * context-data (`contact_id`) and set the token-data (`profile => viewUrl`):
  *
- * @code
+ * ```
  * foreach ($proc->getRows() as $row) {
  *   $row->tokens('profile', [
  *     'viewUrl' => 'http://example.com/profile?cid=' . urlencode($row->context['contact_id'];
  *   ]);
  * }
- * @endCode
+ * ```
  *
  * The context and tokens can be accessed using either methods or attributes.
  *
- * @code
+ * ```
  * # Setting context data
  * $row->context('contact_id', 123);
  * $row->context(['contact_id' => 123]);
@@ -43,7 +43,7 @@ namespace Civi\Token;
  *
  * # Reading token data
  * echo $row->tokens['profile']['viewUrl'];
- * @endCode
+ * ```
  *
  * Note: The methods encourage a "fluent" style. They were written for PHP 5.3
  * (eg before short-array syntax was supported) and are fairly flexible about

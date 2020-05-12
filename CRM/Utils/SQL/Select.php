@@ -13,7 +13,7 @@
  * Dear God Why Do I Have To Write This (Dumb SQL Builder)
  *
  * Usage:
- * @code
+ * ```
  * $select = CRM_Utils_SQL_Select::from('civicrm_activity act')
  *     ->join('absence', 'inner join civicrm_activity absence on absence.id = act.source_record_id')
  *     ->where('activity_type_id = #type', array('type' => 234))
@@ -25,7 +25,7 @@
  *        'value' => $form['foo']
  *      ))
  * echo $select->toSQL();
- * @endcode
+ * ```
  *
  * Design principles:
  *  - Portable
@@ -49,7 +49,7 @@
  * xor output. The notations for input and output interpolation are a bit different,
  * and they may not be mixed.
  *
- * @code
+ * ```
  * // Interpolate on input. Set params when using them.
  * $select->where('activity_type_id = #type', array(
  *   'type' => 234,
@@ -59,7 +59,7 @@
  * $select
  *     ->where('activity_type_id = #type')
  *     ->param('type', 234),
- * @endcode
+ * ```
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing

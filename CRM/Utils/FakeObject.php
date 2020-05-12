@@ -19,12 +19,12 @@
  * This is a quick-and-dirty way to define a vaguely-class-ish structure. It's non-performant, abnormal,
  * and not a complete OOP system. Only use for testing/mocking.
  *
- * @code
+ * ```
  * $object = new CRM_Utils_FakeObject(array(
  *   'doIt' => function() {  print "It!\n"; }
  * ));
  * $object->doIt();
- * @endcode
+ * ```
  */
 class CRM_Utils_FakeObject {
 

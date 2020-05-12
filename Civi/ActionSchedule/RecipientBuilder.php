@@ -37,7 +37,7 @@ namespace Civi\ActionSchedule;
  * to fire the reminders X days after the registration date. The
  * MappingInterface::createQuery() could return a query like:
  *
- * @code
+ * ```
  * CRM_Utils_SQL_Select::from('civicrm_participant e')
  *   ->join('event', 'INNER JOIN civicrm_event event ON e.event_id = event.id')
  *   ->where('e.is_pay_later = 1')
@@ -46,7 +46,7 @@ namespace Civi\ActionSchedule;
  *   ->param('casDateField', 'e.register_date')
  *   ->param($defaultParams)
  *   ...etc...
- * @endcode
+ * ```
  *
  * In the RELATION_FIRST phase, RecipientBuilder adds a LEFT-JOIN+WHERE to find
  * participants who have *not* yet received any reminder, and filters those

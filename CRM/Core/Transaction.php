@@ -28,7 +28,7 @@
  *
  * Examples:
  *
- * @code
+ * ```
  * // Some business logic using the helper functions
  * function my_business_logic() {
  *   CRM_Core_Transaction::create()->run(function($tx) {
@@ -60,7 +60,7 @@
  *   }
  * }
  *
- * @endcode
+ * ```
  *
  * Note: As of 4.6, the transaction manager supports both reference-counting and nested
  * transactions (SAVEPOINTs). In the past, it only supported reference-counting. The two cases
