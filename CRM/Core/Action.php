@@ -247,7 +247,7 @@ class CRM_Core_Action {
           $urlPath,
           $classes,
           !empty($link['title']) ? "title='{$link['title']}' " : '',
-          $link['name']
+          empty($link['icon']) ? $link['name'] : CRM_Core_Page::crmIcon($link['icon'], $link['name'], TRUE, ['title' => ''])
         );
       }
     }

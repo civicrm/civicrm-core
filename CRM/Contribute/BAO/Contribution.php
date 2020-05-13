@@ -1290,7 +1290,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       if (empty($resultDAO->payment_processor_id) && CRM_Core_Permission::check('edit contributions')) {
         $links = [
           CRM_Core_Action::UPDATE => [
-            'name' => "<i class='crm-i fa-pencil'></i>",
+            'name' => ts('Edit Payment'),
+            'icon' => 'fa-pencil',
             'url' => 'civicrm/payment/edit',
             'class' => 'medium-popup',
             'qs' => "reset=1&id=%%id%%&contribution_id=%%contribution_id%%",
