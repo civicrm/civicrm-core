@@ -45,12 +45,12 @@ function smarty_function_privacyFlag($params, &$smarty) {
   if ($field == 'on_hold') {
     $text = ts('Email on hold - generally due to bouncing.');
     return <<<HEREDOC
-<span class="privacy-flag email-hold" title="$text"><i class="crm-i fa-exclamation-triangle fa-lg font-red"></i></span><span class="sr-only">$text</span>
+<span class="privacy-flag email-hold" title="$text"><i class="crm-i fa-exclamation-triangle fa-lg font-red" aria-hidden="true"></i></span><span class="sr-only">$text</span>
 HEREDOC;
   }
   $class = str_replace('_', '-', $field);
   $text = ts('Privacy flag: %1', [1 => $titles[$field]]);
   return <<<HEREDOC
-<span class="fa-stack privacy-flag $class" title="$text"><i class="crm-i {$icons[$field]} fa-stack-1x"></i><i class="crm-i fa-ban fa-stack-2x font-red"></i></span><span class="sr-only">$text</span>
+<span class="fa-stack privacy-flag $class" title="$text" aria-hidden="true"><i class="crm-i {$icons[$field]} fa-stack-1x"></i><i class="crm-i fa-ban fa-stack-2x font-red"></i></span><span class="sr-only">$text</span>
 HEREDOC;
 }
