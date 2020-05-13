@@ -17,6 +17,10 @@
 
 /**
  * Redirects a user to the full url from a mailing url.
+ *
+ * General Usage: civicrm/mailing/url?qid={event_queue_id}&u={url_id}
+ *
+ * Additional arguments may be handled by extractPassthroughParameters().
  */
 class CRM_Mailing_Page_Url extends CRM_Core_Page {
 
@@ -29,12 +33,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
     $queue_id = CRM_Utils_Request::retrieveValue('qid', 'Integer');
     $url_id = CRM_Utils_Request::retrieveValue('u', 'Integer', NULL, TRUE);
     $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($queue_id, $url_id);
-
-    // CRM-7103
-    // Looking for additional query variables and append them when redirecting.
-    $query_param = $_GET;
-    unset($query_param['qid'], $query_param['u']);
-    $query_string = http_build_query($query_param);
+    $query_string = $this->extractPassthroughParameters();
 
     if (strlen($query_string) > 0) {
       // Parse the url to preserve the fragment.
@@ -60,6 +59,33 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
       }
     }
     CRM_Utils_System::redirect($url);
+  }
+
+  /**
+   * Determine if this request has any valid pass-through parameters.
+   *
+   * Under CRM-7103 (v3.3), all unrecognized query-parameters (besides qid/u) are passed
+   * through as part of the redirect. This mechanism is relevant to certain
+   * customizations (eg using `hook_alterMailParams` to append extra URL args)
+   * but does not matter for normal URLs.
+   *
+   * The functionality seems vaguely problematic (IMHO) - especially now that
+   * 'extern/url.php' is moving into the CMS/Civi router ('civicrm/mailing/url').
+   * But it's the current protocol.
+   *
+   * A better design might be to support `hook_alterRedirect` in the CiviMail
+   * click-through tracking. Then you don't have to take any untrusted inputs
+   * and you can fix URL mistakes in realtime.
+   *
+   * @return string
+   * @link https://issues.civicrm.org/jira/browse/CRM-7103
+   */
+  protected function extractPassthroughParameters():string {
+    $query_param = $_GET;
+    unset($query_param['qid'], $query_param['u']);
+    unset($query_param[CRM_Core_Config::singleton()->userFrameworkURLVar]);
+    $query_string = http_build_query($query_param);
+    return $query_string;
   }
 
 }
