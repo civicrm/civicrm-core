@@ -207,4 +207,9 @@
     <page_callback>CRM_Mailing_Page_Url</page_callback>
     <access_arguments>*always allow*</access_arguments>
   </item>
+  <item>
+    <path>civicrm/mailing/open</path>
+    <page_callback>CRM_Mailing_Page_Open</page_callback>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
 </menu>
