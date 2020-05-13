@@ -58,7 +58,11 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
         $url .= '#' . $pieces['fragment'];
       }
     }
-    CRM_Utils_System::redirect($url);
+    CRM_Utils_System::redirect($url, [
+      'for' => 'civicrm/mailing/url',
+      'queue_id' => $queue_id,
+      'url_id' => $url_id,
+    ]);
   }
 
   /**
