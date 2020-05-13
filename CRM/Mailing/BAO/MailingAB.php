@@ -34,15 +34,13 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *   Form values.
    *
    * @param array $params
-   * @param array $ids
    *
-   * @return object
-   *   $mailingab      The new mailingab object
+   * @return CRM_Mailing_DAO_MailingAB
    */
-  public static function create(&$params, $ids = []) {
+  public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
-    $mailingab = self::add($params, $ids);
+    $mailingab = self::writeRecord($params);
 
     if (is_a($mailingab, 'CRM_Core_Error')) {
       $transaction->rollback();
@@ -50,47 +48,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     }
     $transaction->commit();
     return $mailingab;
-  }
-
-  /**
-   * function to add the mailings.
-   *
-   * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
-   *
-   *
-   * @return object
-   */
-  public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('mailingab_id', $ids, CRM_Utils_Array::value('id', $params));
-
-    if ($id) {
-      CRM_Utils_Hook::pre('edit', 'MailingAB', $id, $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'MailingAB', NULL, $params);
-    }
-
-    $mailingab = new CRM_Mailing_DAO_MailingAB();
-    $mailingab->id = $id;
-    if (!$id) {
-      $mailingab->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
-    }
-
-    $mailingab->copyValues($params);
-
-    $result = $mailingab->save();
-
-    if ($id) {
-      CRM_Utils_Hook::post('edit', 'MailingAB', $mailingab->id, $mailingab);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'MailingAB', $mailingab->id, $mailingab);
-    }
-
-    return $result;
   }
 
   /**
