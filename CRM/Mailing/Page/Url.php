@@ -85,9 +85,18 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
    * @link https://issues.civicrm.org/jira/browse/CRM-7103
    */
   protected function extractPassthroughParameters():string {
+    $config = CRM_Core_Config::singleton();
+
     $query_param = $_GET;
-    unset($query_param['qid'], $query_param['u']);
-    unset($query_param[CRM_Core_Config::singleton()->userFrameworkURLVar]);
+    unset($query_param['qid']);
+    unset($query_param['u']);
+    unset($query_param[$config->userFrameworkURLVar]);
+    if ($config->userFramework === 'WordPress') {
+      // Ugh
+      unset($query_param['page']);
+      unset($query_param['noheader']);
+    }
+
     $query_string = http_build_query($query_param);
     return $query_string;
   }
