@@ -306,7 +306,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       ';Look at \.;',
       ['url_tracking' => 1],
     ];
-    $cases[8] = [
+    $cases[9] = [
       // Plain-text URL's are tracked in plain-text emails...
       // but not in HTML emails.
       "<p>Please go to: http://example.net/</p>",
