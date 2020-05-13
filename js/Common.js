@@ -387,7 +387,7 @@ if (!CRM.vars) CRM.vars = {};
       description = row.description || $(row.element).data('description'),
       ret = '';
     if (icon) {
-      ret += '<i class="crm-i ' + icon + '"></i> ';
+      ret += '<i class="crm-i ' + icon + '" aria-hidden="true"></i> ';
     }
     if (color) {
       ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
@@ -421,7 +421,7 @@ if (!CRM.vars) CRM.vars = {};
       title = ' title="' + text + '"';
       sr = '<span class="sr-only">' + text + '</span>';
     }
-    return '<i class="crm-i ' + icon + '"' + title + '></i>' + sr;
+    return '<i class="crm-i ' + icon + '"' + title + ' aria-hidden="true"></i>' + sr;
   };
 
   /**
@@ -463,7 +463,7 @@ if (!CRM.vars) CRM.vars = {};
             placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
           if (m.length && placeholder === m) {
             iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
-            out = '<i class="crm-i ' + iconClass + '"></i> ' + out;
+            out = '<i class="crm-i ' + iconClass + '" aria-hidden="true"></i> ' + out;
           }
           return out;
         };
@@ -733,7 +733,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
-        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '"></i> ' +
+        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
