@@ -431,23 +431,45 @@ class CRM_Core_Page {
    * @param bool $condition
    *   Whether to display anything at all. This helps simplify code when a
    *   checkmark should appear if something is true.
+   * @param array $attribs
+   *   Attributes to set or override on the icon element.  Any standard
+   *   attribute can be unset by setting the value to an empty string.
    *
    * @return string
    *   The whole bit to drop in.
    */
-  public static function crmIcon($icon, $text = NULL, $condition = TRUE) {
+  public static function crmIcon($icon, $text = NULL, $condition = TRUE, $attribs = []) {
     if (!$condition) {
       return '';
     }
+
+    // Add icon classes to any that might exist in $attribs
+    $classes = array_key_exists('class', $attribs) ? explode(' ', $attribs['class']) : [];
+    $classes[] = 'crm-i';
+    $classes[] = $icon;
+    $attribs['class'] = implode(' ', array_unique($classes));
+
+    $standardAttribs = ['aria-hidden' => 'true'];
     if ($text === NULL || $text === '') {
       $title = $sr = '';
     }
     else {
-      $text = htmlspecialchars($text);
-      $title = " title=\"$text\"";
+      $standardAttribs['title'] = $text;
       $sr = "<span class=\"sr-only\">$text</span>";
     }
-    return "<i class=\"crm-i $icon\"$title></i>$sr";
+
+    // Assemble attribs
+    $attribString = '';
+    // Strip out title if $attribs specifies a blank title
+    $attribs = array_merge($standardAttribs, $attribs);
+    foreach ($attribs as $attrib => $val) {
+      if (strlen($val)) {
+        $val = htmlspecialchars($val);
+        $attribString .= " $attrib=\"$val\"";
+      }
+    }
+
+    return "<i$attribString></i>$sr";
   }
 
 }
