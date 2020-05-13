@@ -50,7 +50,7 @@
 {/if}
 
 {if $action neq 1028}
-    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
+    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
 {/if}
 
 <script type="text/javascript">

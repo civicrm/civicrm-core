@@ -16,7 +16,7 @@
     {if NOT ($action eq 1 or $action eq 2) }
       <table class="form-layout-compressed">
       <tr>
-      <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Contribution Page{/ts}</span></a></td>
+      <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a></td>
             <td style="vertical-align: top"><a class="button" href="{crmURL p="civicrm/admin/pcp" q="reset=1"}"><span>{ts}Manage Personal Campaign Pages{/ts}</span></a> {help id="id-pcp-intro" file="CRM/PCP/Page/PCP.hlp"}</td>
       </tr>
       </table>

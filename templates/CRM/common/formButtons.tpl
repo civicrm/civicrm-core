@@ -17,7 +17,7 @@
     {else}{assign var="accessKey" value=""}
     {/if}
     {if $linkButton.icon}
-      {capture assign=icon}<i class="crm-i {$linkButton.icon}"></i> {/capture}
+      {capture assign=icon}<i class="crm-i {$linkButton.icon}" aria-hidden="true"></i> {/capture}
     {else}{assign var="icon" value=""}
     {/if}
     {if $linkButton.ref}
@@ -42,7 +42,7 @@
     {capture assign=iconPrefix}{$icon|truncate:3:"":true}{/capture}
     {if $icon && $iconPrefix eq 'fa-'}
       {assign var='buttonClass' value=' crm-i-button'}
-      {capture assign=iconDisp}<i class="crm-i {$icon}"></i>{/capture}
+      {capture assign=iconDisp}<i class="crm-i {$icon}" aria-hidden="true"></i>{/capture}
     {elseif $icon}
       {assign var='buttonClass' value=' crm-icon-button'}
       {capture assign=iconDisp}<span class="crm-button-icon ui-icon-{$icon}"> </span>{/capture}

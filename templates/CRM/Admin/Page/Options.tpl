@@ -115,7 +115,7 @@
         {foreach from=$rows item=row}
           <tr id="option_value-{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
             {if !empty($hasIcons)}
-              <td class="crm-admin-options-icon"><i class="crm-i {$row.icon}"></i></td>
+              <td class="crm-admin-options-icon"><i class="crm-i {$row.icon}" aria-hidden="true"></i></td>
             {/if}
             {if $showComponent}
               <td class="crm-admin-options-component_name">{$row.component_name}</td>

@@ -29,7 +29,7 @@
     <div>
       <a href="#" class="nav-reset crm-hover-button">
         {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
-        <i class="crm-i fa-undo"></i> {ts}Cleanup reports menu{/ts}
+        <i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
       </a>
     </div>
     <div class="spacer"></div>

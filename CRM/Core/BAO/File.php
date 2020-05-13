@@ -726,17 +726,19 @@ AND       CEF.entity_id    = %2";
           $fileType == 'image/x-png' ||
           $fileType == 'image/png'
         ) {
-          $file_url[$fileID] = "
-              <a href='$url' class='crm-image-popup' title='$title'>
-                <i class='crm-i fa-file-image-o'></i>
-              </a>";
+          $file_url[$fileID] = <<<HEREDOC
+              <a href="$url" class="crm-image-popup" title="$title">
+                <i class="crm-i fa-file-image-o" aria-hidden="true"></i>
+              </a>
+HEREDOC;
         }
         // for non image files
         else {
-          $file_url[$fileID] = "
-              <a href='$url' title='$title'>
-                <i class='crm-i fa-paperclip'></i>
-              </a>";
+          $file_url[$fileID] = <<<HEREDOC
+              <a href="$url" title="$title">
+                <i class="crm-i fa-paperclip" aria-hidden="true"></i>
+              </a>
+HEREDOC;
         }
       }
     }
