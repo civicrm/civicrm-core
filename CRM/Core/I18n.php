@@ -38,18 +38,26 @@ class CRM_Core_I18n {
   public static $SQL_ESCAPER = NULL;
 
   /**
-   * Encode a string for use in SQL.
+   * Escape a string if a mode is specified, otherwise return string unmodified.
    *
    * @param string $text
+   * @param string $mode
    * @return string
    */
-  protected static function escapeSql($text) {
-    if (self::$SQL_ESCAPER == NULL) {
-      return CRM_Core_DAO::escapeString($text);
+  protected static function escape($text, $mode) {
+    switch ($mode) {
+      case 'sql':
+        if (self::$SQL_ESCAPER == NULL) {
+          return CRM_Core_DAO::escapeString($text);
+        }
+        else {
+          return call_user_func(self::$SQL_ESCAPER, $text);
+        }
+
+      case 'js':
+        return substr(json_encode($text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 1, -1);
     }
-    else {
-      return call_user_func(self::$SQL_ESCAPER, $text);
-    }
+    return $text;
   }
 
   /**
@@ -312,23 +320,15 @@ class CRM_Core_I18n {
    *   the translated string
    */
   public function crm_translate($text, $params = []) {
-    if (isset($params['escape'])) {
-      $escape = $params['escape'];
-      unset($params['escape']);
-    }
+    $escape = $params['escape'] ?? NULL;
+    unset($params['escape']);
 
     // sometimes we need to {ts}-tag a string, but don’t want to
     // translate it in the template (like civicrm_navigation.tpl),
     // because we handle the translation in a different way (CRM-6998)
     // in such cases we return early, only doing SQL/JS escaping
     if (isset($params['skip']) and $params['skip']) {
-      if (isset($escape) and ($escape == 'sql')) {
-        $text = self::escapeSql($text);
-      }
-      if (isset($escape) and ($escape == 'js')) {
-        $text = addcslashes($text, "'");
-      }
-      return $text;
+      return self::escape($text, $escape);
     }
 
     $plural = $count = NULL;
@@ -385,17 +385,7 @@ class CRM_Core_I18n {
       $text = $this->strarg($text, $params);
     }
 
-    // escape SQL if we were asked for it
-    if (isset($escape) and ($escape == 'sql')) {
-      $text = self::escapeSql($text);
-    }
-
-    // escape for JavaScript (if requested)
-    if (isset($escape) and ($escape == 'js')) {
-      $text = addcslashes($text, "'");
-    }
-
-    return $text;
+    return self::escape($text, $escape);
   }
 
   /**
