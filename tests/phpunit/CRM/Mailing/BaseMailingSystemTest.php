@@ -151,7 +151,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         // Default footer
         "Sample Footer for HTML formatted content" .
         ".*\n" .
-        "<img src=\".*extern/open.php.*\"" .
+        "<img src=\".*(extern/open.php|civicrm/mailing/open).*\"" .
         ";",
         $htmlPart->text
       );
@@ -206,7 +206,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "Sample Footer for HTML formatted content" .
         ".*\n" .
         // Open-tracking code
-        "<img src=\".*extern/open.php.*\"" .
+        "<img src=\".*(extern/open.php|civicrm/mailing/open).*\"" .
         ";",
         $htmlPart->text
       );
