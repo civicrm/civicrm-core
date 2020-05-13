@@ -214,7 +214,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       civicrm_api3('FinancialTrxn', 'create', $submittedValues);
     }
 
-    self::updateRelatedContribution($submittedValues, $this->_contributionID);
+    CRM_Financial_BAO_Payment::updateRelatedContribution($submittedValues, $this->_contributionID);
   }
 
   /**
@@ -228,35 +228,6 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     $this->_values = civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $params['id']]);
 
     $this->submit($params);
-  }
-
-  /**
-   * Function to update contribution's check_number and trxn_id by
-   *  concatenating values from financial trxn's check_number and trxn_id respectively
-   *
-   * @param array $params
-   * @param int $contributionID
-   */
-  public static function updateRelatedContribution($params, $contributionID) {
-    $contributionDAO = new CRM_Contribute_DAO_Contribution();
-    $contributionDAO->id = $contributionID;
-    $contributionDAO->find(TRUE);
-
-    foreach (['trxn_id', 'check_number'] as $fieldName) {
-      if (!empty($params[$fieldName])) {
-        if (!empty($contributionDAO->$fieldName)) {
-          $values = explode(',', $contributionDAO->$fieldName);
-          // if submitted check_number or trxn_id value is
-          //   already present then ignore else add to $values array
-          if (!in_array($params[$fieldName], $values)) {
-            $values[] = $params[$fieldName];
-          }
-          $contributionDAO->$fieldName = implode(',', $values);
-        }
-      }
-    }
-
-    $contributionDAO->save();
   }
 
   /**
