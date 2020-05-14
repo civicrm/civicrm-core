@@ -34,6 +34,10 @@
         {/if}
       </td>
     </tr>
+    <tr class="crm-custom-field-form-block-serialize">
+      <td class="label">{$form.serialize.label}</td>
+      <td class="html-adjust">{$form.serialize.html}</td>
+    </tr>
     {if $form.in_selector}
       <tr class='crm-custom-field-form-block-in_selector'>
         <td class='label'>{$form.in_selector.label}</td>
@@ -262,6 +266,8 @@
       $("#textLength", $form).toggle(dataType === 'String');
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
+
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Country' || htmlType === 'StateProvince');
     }
 
     $('[name^="data_type"]', $form).change(customOptionHtmlType);

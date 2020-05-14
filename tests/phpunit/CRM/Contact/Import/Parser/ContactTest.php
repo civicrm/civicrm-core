@@ -548,7 +548,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'extends' => 'Contact',
       'title' => 'ABC',
     ]);
-    $customField = $this->customFieldOptionValueCreate($customGroup, 'fieldABC', ['html_type' => 'Multi-Select']);
+    $customField = $this->customFieldOptionValueCreate($customGroup, 'fieldABC', ['html_type' => 'Select', 'serialize' => 1]);
     $params = [
       'custom_' . $customField['id'] => 'Label1|Label2',
     ];

@@ -1917,90 +1917,72 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         return [$cFields, $submitted];
       }
       $htmlType = $cFields[$fid]['attributes']['html_type'];
-      switch ($htmlType) {
-        case 'File':
-          // Handled in CustomField->move(). Tested in testMergeCustomFields.
-          unset($submitted["custom_$fid"]);
-          break;
+      $isSerialized = CRM_Core_BAO_CustomField::isSerialized($cFields[$fid]['attributes']);
 
-        case 'Select Country':
-          // @todo Test in testMergeCustomFields disabled as this does not work, Handle in CustomField->move().
-        case 'Select State/Province':
-          $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
-          break;
-
-        case 'Select Date':
-          if ($cFields[$fid]['attributes']['is_view']) {
-            $submitted[$key] = date('YmdHis', strtotime($submitted[$key]));
-          }
-          break;
-
-        case 'CheckBox':
-        case 'Multi-Select':
-        case 'Multi-Select Country':
-        case 'Multi-Select State/Province':
-          // Merge values from both contacts for multivalue fields, CRM-4385
-          // get the existing custom values from db.
-          $customParams = ['entityID' => $mainId, $key => TRUE];
-          $customfieldValues = CRM_Core_BAO_CustomValueTable::getValues($customParams);
-          if (!empty($customfieldValues[$key])) {
-            $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
-            if (is_array($existingValue) && !empty($existingValue)) {
-              $mergeValue = $submittedCustomFields = [];
-              if ($value == 'null') {
-                // CRM-19074 if someone has deliberately chosen to overwrite with 'null', respect it.
-                $submitted[$key] = $value;
-              }
-              else {
-                if ($value) {
-                  $submittedCustomFields = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-                }
-
-                // CRM-19653: overwrite or add the existing custom field value with dupicate contact's
-                // custom field value stored at $submittedCustomValue.
-                foreach ($submittedCustomFields as $k => $v) {
-                  if ($v != '' && !in_array($v, $mergeValue)) {
-                    $mergeValue[] = $v;
-                  }
-                }
-
-                //keep state and country as array format.
-                //for checkbox and m-select format w/ VALUE_SEPARATOR
-                if (in_array($htmlType, [
-                  'CheckBox',
-                  'Multi-Select',
-                ])) {
-                  $submitted[$key] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                      $mergeValue
-                    ) . CRM_Core_DAO::VALUE_SEPARATOR;
-                }
-                else {
-                  $submitted[$key] = $mergeValue;
-                }
-              }
+      if ($htmlType === 'File') {
+        // Handled in CustomField->move(). Tested in testMergeCustomFields.
+        unset($submitted["custom_$fid"]);
+      }
+      elseif (!$isSerialized && ($htmlType === 'Select Country' || $htmlType === 'Select State/Province')) {
+        // @todo Test in testMergeCustomFields disabled as this does not work, Handle in CustomField->move().
+        $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
+      }
+      elseif ($htmlType === 'Select Date') {
+        if ($cFields[$fid]['attributes']['is_view']) {
+          $submitted[$key] = date('YmdHis', strtotime($submitted[$key]));
+        }
+      }
+      elseif ($isSerialized) {
+        // Merge values from both contacts for multivalue fields, CRM-4385
+        // get the existing custom values from db.
+        $customParams = ['entityID' => $mainId, $key => TRUE];
+        $customfieldValues = CRM_Core_BAO_CustomValueTable::getValues($customParams);
+        if (!empty($customfieldValues[$key])) {
+          $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
+          if (is_array($existingValue) && !empty($existingValue)) {
+            $mergeValue = $submittedCustomFields = [];
+            if ($value == 'null') {
+              // CRM-19074 if someone has deliberately chosen to overwrite with 'null', respect it.
+              $submitted[$key] = $value;
             }
-          }
-          elseif (in_array($htmlType, [
-            'Multi-Select Country',
-            'Multi-Select State/Province',
-          ])) {
-            //we require submitted values should be in array format
-            if ($value) {
-              $mergeValueArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-              //hack to remove null values from array.
-              $mergeValue = [];
-              foreach ($mergeValueArray as $k => $v) {
-                if ($v != '') {
+            else {
+              if ($value) {
+                $submittedCustomFields = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+              }
+
+              // CRM-19653: overwrite or add the existing custom field value with dupicate contact's
+              // custom field value stored at $submittedCustomValue.
+              foreach ($submittedCustomFields as $k => $v) {
+                if ($v != '' && !in_array($v, $mergeValue)) {
                   $mergeValue[] = $v;
                 }
               }
-              $submitted[$key] = $mergeValue;
+
+              //keep state and country as array format.
+              //for checkbox and m-select format w/ VALUE_SEPARATOR
+              if (in_array($htmlType, ['CheckBox', 'Select'])) {
+                $submitted[$key] = CRM_Utils_Array::implodePadded($mergeValue);
+              }
+              else {
+                $submitted[$key] = $mergeValue;
+              }
             }
           }
-          break;
-
-        default:
-          break;
+        }
+        elseif (in_array($htmlType, ['Select Country', 'Select State/Province'])) {
+          //we require submitted values should be in array format
+          if ($value) {
+            $mergeValueArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+            //hack to remove null values from array.
+            $mergeValue = [];
+            foreach ($mergeValueArray as $k => $v) {
+              if ($v != '') {
+                $mergeValue[] = $v;
+              }
+            }
+            $submitted[$key] = $mergeValue;
+          }
+        }
       }
     }
     return [$cFields, $submitted];

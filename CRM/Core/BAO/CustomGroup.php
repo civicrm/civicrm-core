@@ -399,6 +399,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'time_format',
         'option_group_id',
         'in_selector',
+        'serialize',
       ],
       'custom_group' => [
         'id',

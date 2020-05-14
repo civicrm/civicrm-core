@@ -30,6 +30,12 @@
  */
 function civicrm_api3_custom_field_create($params) {
 
+  // Legacy handling for old way of naming serialized fields
+  if (!empty($params['html_type']) && ($params['html_type'] == 'CheckBox' || strpos($params['html_type'], 'Multi-') === 0)) {
+    $params['serialize'] = 1;
+    $params['html_type'] = str_replace('Multi-', '', $params['html_type']);
+  }
+
   // Array created for passing options in params.
   if (isset($params['option_values']) && is_array($params['option_values'])) {
     $weight = 0;
@@ -116,7 +122,26 @@ function civicrm_api3_custom_field_delete($params) {
  * @return array
  */
 function civicrm_api3_custom_field_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if (($params['legacy_html_type'] ?? TRUE) && !empty($params['return'])) {
+    if (is_array($params['return'])) {
+      $params['return'][] = 'serialize';
+    }
+    elseif (is_string($params['return'])) {
+      $params['return'] .= ',serialize';
+    }
+  }
+
+  $results = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+
+  if (($params['legacy_html_type'] ?? TRUE) && !empty($results['values']) && is_array($results['values'])) {
+    foreach ($results['values'] as $id => $result) {
+      if (!empty($result['serialize']) && !empty($result['html_type'])) {
+        $results['values'][$id]['html_type'] = str_replace('Select', 'Multi-Select', $result['html_type']);
+      }
+    }
+  }
+
+  return $results;
 }
 
 /**

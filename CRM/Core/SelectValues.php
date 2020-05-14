@@ -181,12 +181,9 @@ class CRM_Core_SelectValues {
       'Select Date' => ts('Select Date'),
       'File' => ts('File'),
       'Select State/Province' => ts('Select State/Province'),
-      'Multi-Select State/Province' => ts('Multi-Select State/Province'),
       'Select Country' => ts('Select Country'),
-      'Multi-Select Country' => ts('Multi-Select Country'),
       'RichTextEditor' => ts('Rich Text Editor'),
       'Autocomplete-Select' => ts('Autocomplete-Select'),
-      'Multi-Select' => ts('Multi-Select'),
       'Link' => ts('Link'),
       'ContactReference' => ts('Autocomplete-Select'),
     ];
@@ -1177,6 +1174,16 @@ class CRM_Core_SelectValues {
     }
 
     return $ret;
+  }
+
+  public static function fieldSerialization() {
+    return [
+      CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND => 'separator_bookend',
+      CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED => 'separator_trimmed',
+      CRM_Core_DAO::SERIALIZE_JSON => 'json',
+      CRM_Core_DAO::SERIALIZE_PHP => 'php',
+      CRM_Core_DAO::SERIALIZE_COMMA => 'comma',
+    ];
   }
 
 }

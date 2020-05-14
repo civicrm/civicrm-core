@@ -243,6 +243,20 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
+   * @inheritDoc
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+    $options = parent::buildOptions($fieldName, $context, $props);
+    // This provides legacy support for APIv3, allowing no-longer-existent html types
+    if ($fieldName == 'html_type' && isset($props['version']) && $props['version'] == 3) {
+      $options['Multi-Select'] = 'Multi-Select';
+      $options['Multi-Select Country'] = 'Multi-Select Country';
+      $options['Multi-Select State/Province'] = 'Multi-Select State/Province';
+    }
+    return $options;
+  }
+
+  /**
    * Store and return an array of all active custom fields.
    *
    * @param string $customDataType
@@ -396,6 +410,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.date_format,
                             $cfTable.time_format,
                             $cgTable.is_multiple,
+                            $cfTable.serialize,
                             $cgTable.table_name,
                             og.name as option_group_name
                      FROM $cfTable
@@ -478,6 +493,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['is_required'] = $dao->is_required;
           $fields[$dao->id]['table_name'] = $dao->table_name;
           $fields[$dao->id]['column_name'] = $dao->column_name;
+          $fields[$dao->id]['serialize'] = $dao->serialize;
           $fields[$dao->id]['where'] = $dao->table_name . '.' . $dao->column_name;
           // Probably we should use a different fn to get the extends tables but this is a refactor so not changing that now.
           $fields[$dao->id]['extends_table'] = array_key_exists($dao->extends, CRM_Core_BAO_CustomQuery::$extendsMap) ? CRM_Core_BAO_CustomQuery::$extendsMap[$dao->extends] : '';
@@ -659,11 +675,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     // FIXME: Why are select state/country separate widget types?
     $isSelect = (in_array($widget, [
       'Select',
-      'Multi-Select',
       'Select State/Province',
-      'Multi-Select State/Province',
       'Select Country',
-      'Multi-Select Country',
       'CheckBox',
       'Radio',
     ]));
@@ -680,7 +693,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $selectAttributes = ['class' => 'crm-select2'];
 
       // Search field is always multi-select
-      if ($search || strpos($field->html_type, 'Multi') !== FALSE) {
+      if ($search || (self::isSerialized($field) && $widget === 'Select')) {
         $selectAttributes['class'] .= ' huge';
         $selectAttributes['multiple'] = 'multiple';
         $selectAttributes['placeholder'] = $placeholder;
@@ -1053,9 +1066,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Select Country':
       case 'Select State/Province':
       case 'CheckBox':
-      case 'Multi-Select':
-      case 'Multi-Select State/Province':
-      case 'Multi-Select Country':
         if ($field['data_type'] == 'ContactReference' && $value) {
           if (is_numeric($value)) {
             $display = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'display_name');
@@ -1233,7 +1243,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if ($customField->data_type == 'Money' && isset($value)) {
       $value = number_format($value, 2);
     }
-    if (self::isSerialized($customField)) {
+    if (self::isSerialized($customField) && $value) {
       $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldId, FALSE);
       $defaults[$elementName] = [];
       $checkedValue = CRM_Utils_Array::explodePadded($value);
@@ -1881,7 +1891,12 @@ WHERE  id IN ( %1, %2 )
       $params['date_format'] = Civi::settings()->get('dateInputFormat');
     }
 
-    if ($htmlType === 'CheckBox' || $htmlType === 'Multi-Select') {
+    // Checkboxes are always serialized in current schema
+    if ($htmlType == 'CheckBox') {
+      $params['serialize'] = CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
+    }
+
+    if (!empty($params['serialize'])) {
       if (isset($params['default_checkbox_option'])) {
         $defaultArray = [];
         foreach (array_keys($params['default_checkbox_option']) as $k => $v) {
@@ -1935,7 +1950,7 @@ WHERE  id IN ( %1, %2 )
       // retrieve it from one of the other custom fields which use this option group
       if (empty($params['default_value'])) {
         //don't insert only value separator as default value, CRM-4579
-        $defaultValue = self::getOptionGroupDefault($params['option_group_id'], $htmlType);
+        $defaultValue = self::getOptionGroupDefault($params['option_group_id'], !empty($params['serialize']));
 
         if (!CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultValue))) {
           $params['default_value'] = $defaultValue;
@@ -2194,49 +2209,33 @@ WHERE  option_group_id = {$optionGroupId}";
    * Get option group default.
    *
    * @param int $optionGroupId
-   * @param string $htmlType
+   * @param bool $serialize
    *
    * @return null|string
    */
-  public static function getOptionGroupDefault($optionGroupId, $htmlType) {
+  public static function getOptionGroupDefault($optionGroupId, $serialize) {
     $query = "
-SELECT   default_value, html_type
+SELECT   default_value, serialize
 FROM     civicrm_custom_field
 WHERE    option_group_id = {$optionGroupId}
-AND      default_value IS NOT NULL
-ORDER BY html_type";
+AND      default_value IS NOT NULL";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-    $defaultValue = NULL;
-    $defaultHTMLType = NULL;
     while ($dao->fetch()) {
-      if ($dao->html_type == $htmlType) {
+      if ($dao->serialize == $serialize) {
         return $dao->default_value;
       }
-      if ($defaultValue == NULL) {
-        $defaultValue = $dao->default_value;
-        $defaultHTMLType = $dao->html_type;
-      }
+      $defaultValue = $dao->default_value;
     }
 
-    // some conversions are needed if either the old or new has a html type which has potential
-    // multiple default values.
-    if (($htmlType == 'CheckBox' || $htmlType == 'Multi-Select') &&
-      ($defaultHTMLType != 'CheckBox' && $defaultHTMLType != 'Multi-Select')
-    ) {
-      $defaultValue = CRM_Core_DAO::VALUE_SEPARATOR . $defaultValue . CRM_Core_DAO::VALUE_SEPARATOR;
+    // Convert serialization
+    if (isset($defaultValue) && $serialize) {
+      return CRM_Utils_Array::implodePadded([$defaultValue]);
     }
-    elseif (($defaultHTMLType == 'CheckBox' || $defaultHTMLType == 'Multi-Select') &&
-      ($htmlType != 'CheckBox' && $htmlType != 'Multi-Select')
-    ) {
-      $defaultValue = substr($defaultValue, 1, -1);
-      $values = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        substr($defaultValue, 1, -1)
-      );
-      $defaultValue = $values[0];
+    elseif (isset($defaultValue)) {
+      return CRM_Utils_Array::explodePadded($defaultValue)[0];
     }
-
-    return $defaultValue;
+    return NULL;
   }
 
   /**
@@ -2523,15 +2522,20 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
   /**
    * Does this field store a serialized string?
    *
-   * @param array|object $field
+   * @param CRM_Core_DAO_CustomField|array $field
    *
    * @return bool
    */
   public static function isSerialized($field) {
     // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
     $html_type = is_object($field) ? $field->html_type : $field['html_type'];
-    // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
-    return ($html_type === 'CheckBox' || strpos($html_type, 'Multi') !== FALSE);
+    // APIv3 has a "legacy" mode where it returns old-style html_type of "Multi-Select"
+    // If anyone is using this function in conjunction with legacy api output, we'll accomodate:
+    if ($html_type === 'CheckBox' || strpos($html_type, 'Multi') !== FALSE) {
+      return TRUE;
+    }
+    // Otherwise this is the new standard as of 5.26
+    return is_object($field) ? !empty($field->serialize) : !empty($field['serialize']);
   }
 
   /**
