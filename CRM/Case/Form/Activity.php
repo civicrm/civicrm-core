@@ -639,6 +639,28 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
           ];
           CRM_Case_BAO_Case::processCaseActivity($caseParams);
           $followupStatus = ts("A followup activity has been scheduled.") . '<br /><br />';
+
+          //dev/core#1721
+          if (Civi::settings()->get('activity_assignee_notification') &&
+            !in_array($followupActivity->activity_type_id,
+              Civi::settings()->get('do_not_notify_assignees_for'))
+          ) {
+            $followupActivityIDs = [$followupActivity->id];
+            $followupAssigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($followupActivityIDs, TRUE, FALSE);
+
+            if (!empty($followupAssigneeContacts)) {
+              $mailToFollowupContacts = [];
+              foreach ($followupAssigneeContacts as $facValues) {
+                $mailToFollowupContacts[$facValues['email']] = $facValues;
+              }
+
+              $facParams['case_id'] = $vval['case_id'];
+              $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts, $facParams);
+              if ($sentFollowup) {
+                $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
+              }
+            }
+          }
         }
       }
       $title = ts("%1 Saved", [1 => $this->_activityTypeName]);
