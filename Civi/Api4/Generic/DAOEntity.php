@@ -10,15 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Generic;
 
 /**
@@ -28,6 +19,8 @@ abstract class DAOEntity extends AbstractEntity {
 
   /**
    * @return DAOGetAction
+   *
+   * @throws \API_Exception
    */
   public static function get() {
     return new DAOGetAction(static::class, __FUNCTION__);
@@ -49,6 +42,8 @@ abstract class DAOEntity extends AbstractEntity {
 
   /**
    * @return DAOCreateAction
+   *
+   * @throws \API_Exception
    */
   public static function create() {
     return new DAOCreateAction(static::class, __FUNCTION__);
