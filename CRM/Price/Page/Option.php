@@ -160,7 +160,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
       }
-      $customOption[$id]['is_default'] = CRM_Core_Page::crmIcon('fa-check', ts('Default'), !empty($customOption[$id]['is_default']));
       $customOption[$id]['order'] = $customOption[$id]['weight'];
       $customOption[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         [

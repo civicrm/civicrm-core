@@ -138,12 +138,11 @@ class CRM_Core_BAO_CustomOption {
       }
 
       if (in_array($field->html_type, ['CheckBox', 'Multi-Select'])) {
-        $isDefault = (isset($defVal) && in_array($dao->value, $defVal));
+        $options[$dao->id]['is_default'] = (isset($defVal) && in_array($dao->value, $defVal));
       }
       else {
-        $isDefault = ($field->default_value == $dao->value);
+        $options[$dao->id]['is_default'] = ($field->default_value == $dao->value);
       }
-      $options[$dao->id]['is_default'] = CRM_Core_Page::crmIcon('fa-check', ts('Default'), $isDefault);
       $options[$dao->id]['description'] = $dao->description;
       $options[$dao->id]['class'] = $dao->id . ',' . $class;
       $options[$dao->id]['is_active'] = empty($dao->is_active) ? ts('No') : ts('Yes');

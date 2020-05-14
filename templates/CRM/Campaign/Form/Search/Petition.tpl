@@ -198,6 +198,7 @@ function loadPetitionList( )
 
          //add id for yes/no column.
          CRM.$(nRow).children().eq(8).attr( 'id', rowId + '_status' );
+         CRM.$(nRow).children().eq(6).html(CRM.utils.formatIcon('fa-check', ts('Default'), nRow.cells[6].innerText));
 
          return nRow;
     },

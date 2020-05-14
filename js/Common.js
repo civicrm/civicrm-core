@@ -387,13 +387,42 @@ if (!CRM.vars) CRM.vars = {};
       description = row.description || $(row.element).data('description'),
       ret = '';
     if (icon) {
-      ret += '<i class="crm-i ' + icon + '"></i> ';
+      ret += '<i class="crm-i ' + icon + '" aria-hidden="true"></i> ';
     }
     if (color) {
       ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
     }
     return ret + _.escape(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + _.escape(description) + '</p></div>' : '');
   }
+
+  /**
+   * Helper to generate an icon with alt text.
+   *
+   * See also smarty `{icon}` and CRM_Core_Page::crmIcon() functions
+   *
+   * @param string icon
+   *   The Font Awesome icon class to use.
+   * @param string text
+   *   Alt text to display.
+   * @param mixed condition
+   *   This will only display if this is truthy.
+   *
+   * @return string
+   *   The formatted icon markup.
+   */
+  CRM.utils.formatIcon = function (icon, text, condition) {
+    if (typeof condition !== 'undefined' && !condition) {
+      return '';
+    }
+    var title = '';
+    var sr = '';
+    if (text) {
+      text = _.escape(text);
+      title = ' title="' + text + '"';
+      sr = '<span class="sr-only">' + text + '</span>';
+    }
+    return '<i class="crm-i ' + icon + '"' + title + ' aria-hidden="true"></i>' + sr;
+  };
 
   /**
    * Wrapper for select2 initialization function; supplies defaults
@@ -434,7 +463,7 @@ if (!CRM.vars) CRM.vars = {};
             placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
           if (m.length && placeholder === m) {
             iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
-            out = '<i class="crm-i ' + iconClass + '"></i> ' + out;
+            out = '<i class="crm-i ' + iconClass + '" aria-hidden="true"></i> ' + out;
           }
           return out;
         };
@@ -704,7 +733,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
-        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '"></i> ' +
+        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
