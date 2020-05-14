@@ -281,13 +281,15 @@ abstract class CRM_Core_Payment {
     }
 
     $log = new CRM_Utils_SystemLogger();
-    // $_REQUEST doesn't handle JSON, to support providers that POST JSON we need the raw POST data.
+    // $_POST doesn't handle JSON, to support providers that POST JSON we need the raw POST data.
     $rawRequestData = file_get_contents("php://input");
     if (CRM_Utils_JSON::isValidJSON($rawRequestData)) {
       $log->alert($message, json_decode($rawRequestData, TRUE));
     }
     else {
-      $log->alert($message, $_REQUEST);
+      // Note: the array_merge here is to preserve the existing behaviour, but
+      // it might make more sense for it to just be _POST.
+      $log->alert($message, array_merge($_GET, $_POST));
     }
   }
 
@@ -1580,7 +1582,7 @@ abstract class CRM_Core_Payment {
     }
 
     // Call IPN postIPNProcess hook to allow for custom processing of IPN data.
-    $IPNParams = array_merge($_GET, $_REQUEST);
+    $IPNParams = array_merge($_GET, $_POST);
     CRM_Utils_Hook::postIPNProcess($IPNParams);
     if (!$extension_instance_found) {
       $message = "No extension instances of the '%1' payment processor were found.<br />" .

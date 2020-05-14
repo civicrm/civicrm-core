@@ -485,10 +485,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->postProcessHook();
 
     // Respond with JSON if in AJAX context (also support legacy value '6')
-    if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], [
-      CRM_Core_Smarty::PRINT_JSON,
-      6,
-    ])) {
+    $snippet = $_POST['snippet'] ?? $_GET['snippet'] ?? NULL;
+    if ($allowAjax && in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {

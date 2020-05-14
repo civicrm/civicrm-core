@@ -1253,7 +1253,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $form = new CRM_Event_Form_Registration_Confirm();
     // This way the mocked up controller ignores the session stuff.
     $_SERVER['REQUEST_METHOD'] = 'GET';
-    $_REQUEST['id'] = $form->_eventId = $params['id'];
+    // Unsure which var to set here, previously _REQUEST.
+    $_GET['id'] = $_POST['id'] = $form->_eventId = $params['id'];
     $form->controller = new CRM_Event_Controller_Registration();
     $form->_params = $params['params'];
     // This happens in buildQuickForm so emulate here.

@@ -20,7 +20,7 @@ require_once 'CRM/Core/Config.php';
 
 CRM_Core_Config::singleton();
 $log = new CRM_Utils_SystemLogger();
-$log->alert('payment_notification processor_name=Payment_Express', $_REQUEST);
+$log->alert('payment_notification processor_name=Payment_Express', array_merge($_GET, $_POST));
 /*
  * Get the password from the Payment Processor's table based on the DPS user id
  * being passed back from the server

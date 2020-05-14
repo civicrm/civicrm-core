@@ -567,8 +567,9 @@ AND    u.status = 1
     $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       // Load the user we need to check Backdrop permissions.
-      $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      $request = array_merge($_GET, $_POST);
+      $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $request));
+      $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $request));
 
       if ($name) {
         $uid = user_authenticate($name, $pass);

@@ -432,8 +432,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     }
     else {
       // get the optional ids
-      //@ how can this not be broken retrieving from GET as we are dealing with a POST request?
-      // copy & paste? Note the retrieve function now uses data from _REQUEST so this will be included
+      //@todo how can this not be broken retrieving from GET as we are dealing with a POST request?
+      // copy & paste? Note the retrieve function now basically uses array_merge(_GET, _POST) so this will be included
+      // ^ @todo clarify the comment above!
       $ids['membership'] = self::retrieve('membershipID', 'Integer', 'GET', FALSE);
       $ids['contributionRecur'] = self::getValue('r', FALSE);
       $ids['contributionPage'] = self::getValue('p', FALSE);

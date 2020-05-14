@@ -1744,7 +1744,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
         && empty($form->_values['fee'])
-        && CRM_Utils_Array::value('snippet', $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
+        && ($_POST['snippet'] ?? $_GET['snippet'] ?? NULL) == CRM_Core_Smarty::PRINT_NOFORM
       ) {
         CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
         return FALSE;

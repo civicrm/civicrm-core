@@ -245,17 +245,18 @@ class CRM_Financial_Page_AJAX {
       9 => 'name',
     ];
 
-    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $return = isset($_REQUEST['return']) ? CRM_Utils_Type::escape($_REQUEST['return'], 'Boolean') : FALSE;
-    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
+    $request = array_merge($_GET, $_POST);
+    $sEcho = CRM_Utils_Type::escape($request['sEcho'], 'Integer');
+    $return = isset($request['return']) ? CRM_Utils_Type::escape($request['return'], 'Boolean') : FALSE;
+    $offset = isset($request['iDisplayStart']) ? CRM_Utils_Type::escape($request['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($request['iDisplayLength']) ? CRM_Utils_Type::escape($request['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($request['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($request['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($request['sSortDir_0']) ? CRM_Utils_Type::escape($request['sSortDir_0'], 'String') : 'asc';
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
-    $entityID = isset($_REQUEST['entityID']) ? CRM_Utils_Type::escape($_REQUEST['entityID'], 'String') : NULL;
-    $notPresent = isset($_REQUEST['notPresent']) ? CRM_Utils_Type::escape($_REQUEST['notPresent'], 'String') : NULL;
-    $statusID = isset($_REQUEST['statusID']) ? CRM_Utils_Type::escape($_REQUEST['statusID'], 'String') : NULL;
-    $search = isset($_REQUEST['search']);
+    $entityID = isset($request['entityID']) ? CRM_Utils_Type::escape($request['entityID'], 'String') : NULL;
+    $notPresent = isset($request['notPresent']) ? CRM_Utils_Type::escape($request['notPresent'], 'String') : NULL;
+    $statusID = isset($request['statusID']) ? CRM_Utils_Type::escape($request['statusID'], 'String') : NULL;
+    $search = isset($request['search']);
 
     $params = $_POST;
     if ($sort && $sortOrder) {
@@ -458,9 +459,10 @@ class CRM_Financial_Page_AJAX {
   }
 
   public static function bulkAssignRemove() {
-    $checkIDs = $_REQUEST['ID'];
-    $entityID = CRM_Utils_Type::escape($_REQUEST['entityID'], 'String');
-    $action = CRM_Utils_Type::escape($_REQUEST['action'], 'String');
+    $request = array_merge($_GET, $_POST);
+    $checkIDs = $request['ID'];
+    $entityID = CRM_Utils_Type::escape($request['entityID'], 'String');
+    $action = CRM_Utils_Type::escape($request['action'], 'String');
     foreach ($checkIDs as $key => $value) {
       if ((substr($value, 0, 7) == "mark_x_" && $action == 'Assign') || (substr($value, 0, 7) == "mark_y_" && $action == 'Remove')) {
         $contributions = explode("_", $value);
@@ -496,7 +498,7 @@ class CRM_Financial_Page_AJAX {
   }
 
   public static function getBatchSummary() {
-    $batchID = CRM_Utils_Type::escape($_REQUEST['batchID'], 'String');
+    $batchID = CRM_Utils_Type::escape(CRM_Utils_Request::retrieveValue('batchID', 'String'), 'String');
     $params = ['id' => $batchID];
 
     $batchSummary = self::makeBatchSummary($batchID, $params);

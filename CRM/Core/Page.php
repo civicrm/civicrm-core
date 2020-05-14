@@ -119,16 +119,17 @@ class CRM_Core_Page {
     }
 
     // FIXME - why are we messing with 'snippet'? Why not just pass it directly into $this->_print?
-    if (!empty($_REQUEST['snippet'])) {
-      if ($_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_PDF) {
+    $snippet = $_POST['snippet'] ?? $_GET['snippet'] ?? NULL;
+    if (!empty($snippet)) {
+      if ($snippet == CRM_Core_Smarty::PRINT_PDF) {
         $this->_print = CRM_Core_Smarty::PRINT_PDF;
       }
       // FIXME - why does this number not match the constant?
-      elseif ($_REQUEST['snippet'] == 5) {
+      elseif ($snippet == 5) {
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
       // Support 'json' as well as legacy value '6'
-      elseif (in_array($_REQUEST['snippet'], [CRM_Core_Smarty::PRINT_JSON, 6])) {
+      elseif (in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
       }
       else {
@@ -137,7 +138,7 @@ class CRM_Core_Page {
     }
 
     // if the request has a reset value, initialize the controller session
-    if (!empty($_REQUEST['reset'])) {
+    if (!empty($_POST['reset'] ?? $_GET['reset'] ?? NULL)) {
       $this->reset();
     }
   }

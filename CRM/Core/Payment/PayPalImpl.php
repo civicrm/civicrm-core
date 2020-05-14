@@ -704,7 +704,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \CiviCRM_API3_Exception
    */
   public static function handlePaymentNotification() {
-    $params = array_merge($_GET, $_REQUEST);
+    $params = array_merge($_GET, $_POST);
     $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
     $lastParam = array_pop($q);
     if (is_numeric($lastParam)) {

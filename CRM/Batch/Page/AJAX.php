@@ -59,13 +59,16 @@ class CRM_Batch_Page_AJAX {
         6 => 'created_id.sort_name',
       ];
     }
-    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
-    $params = $_REQUEST;
+    // POST takes precedence over GET:
+    $params = array_merge($_GET, $_POST);
+
+    $sEcho = CRM_Utils_Type::escape($params['sEcho'], 'Integer');
+    $offset = isset($params['iDisplayStart']) ? CRM_Utils_Type::escape($params['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($params['iDisplayLength']) ? CRM_Utils_Type::escape($params['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($params['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($params['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($params['sSortDir_0']) ? CRM_Utils_Type::escape($params['sSortDir_0'], 'String') : 'asc';
+
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }

@@ -418,7 +418,7 @@ class CRM_Admin_Page_AJAX {
       $result = array_values(array_unique($result));
     }
 
-    if (!empty($_REQUEST['is_unit_test'])) {
+    if (!empty($_POST['is_unit_test'] ?? $_GET['is_unit_test'] ?? NULL)) {
       return $result;
     }
 

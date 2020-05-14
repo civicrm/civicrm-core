@@ -55,7 +55,7 @@ class CRM_Core_Invoke {
       return NULL;
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
-    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_REQUEST['snippet'])) {
+    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_POST['snippet'] ?? $_GET['snippet'] ?? NULL)) {
       ini_set('display_errors', 0);
     }
 

@@ -259,7 +259,7 @@ class CRM_Contact_Page_AJAX {
         CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID, $sourceContactID);
       }
     }
-    if (!empty($_REQUEST['is_unit_test'])) {
+    if (!empty($_POST['is_unit_test'] ?? $_GET['is_unit_test'] ?? NULL)) {
       return $ret;
     }
 
@@ -270,7 +270,7 @@ class CRM_Contact_Page_AJAX {
    * Fetch the custom field help.
    */
   public static function customField() {
-    $fieldId = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
+    $fieldId = CRM_Utils_Type::escape(CRM_Utils_Request::retrieveValue('id', 'Integer'), 'Integer');
     $params = ['id' => $fieldId];
     $returnProperties = ['help_pre', 'help_post'];
     $values = [];
@@ -291,8 +291,8 @@ class CRM_Contact_Page_AJAX {
    */
   public static function deleteCustomValue() {
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
-    $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
-    $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
+    $customValueID = CRM_Utils_Type::escape($_POST['valueID'] ?? $_GET['valueID'] ?? 0, 'Positive');
+    $customGroupID = CRM_Utils_Type::escape($_POST['groupID'] ?? $_GET['groupID'] ?? 0, 'Positive');
     $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive');
     CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID);
     if ($contactId) {
@@ -311,16 +311,16 @@ class CRM_Contact_Page_AJAX {
     $sig = CRM_Utils_Request::retrieve('sig', 'String');
     $for = CRM_Utils_Request::retrieve('for', 'String');
     if (
-      CRM_Utils_Time::getTimeRaw() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
+      CRM_Utils_Time::getTimeRaw() > ($_POST['ts'] ?? $_GET['ts'] ?? 0) + self::CHECK_USERNAME_TTL
       || $for != 'civicrm/ajax/cmsuser'
-      || !$signer->validate($sig, $_REQUEST)
+      || !$signer->validate($sig, array_merge($_GET, $_POST))
     ) {
       $user = ['name' => 'error'];
       CRM_Utils_JSON::output($user);
     }
 
     $config = CRM_Core_Config::singleton();
-    $username = trim(CRM_Utils_Array::value('cms_name', $_REQUEST));
+    $username = trim(CRM_Utils_Array::value('cms_name', array_merge($_GET, $_POST)));
 
     $params = ['name' => $username];
 
@@ -504,13 +504,13 @@ LIMIT {$offset}, {$rowCount}
    * Function used for CiviCRM dashboard operations.
    */
   public static function dashboard() {
-    switch ($_REQUEST['op']) {
+    switch (CRM_Utils_Request::retrieve('op', 'String')) {
       case 'save_columns':
-        CRM_Core_BAO_Dashboard::saveDashletChanges($_REQUEST['columns'] ?? NULL);
+        CRM_Core_BAO_Dashboard::saveDashletChanges($_POST['columns'] ?? $_GET['columns'] ?? NULL);
         break;
 
       case 'delete_dashlet':
-        $dashletID = CRM_Utils_Type::escape($_REQUEST['dashlet_id'], 'Positive');
+        $dashletID = CRM_Utils_Type::escape($_POST['dashlet_id'] ?? $_GET['dashlet_id'] ?? NULL, 'Positive');
         CRM_Core_DAO_Dashboard::deleteRecord(['id' => $dashletID]);
     }
 
@@ -521,7 +521,7 @@ LIMIT {$offset}, {$rowCount}
    * Retrieve signature based on email id.
    */
   public static function getSignature() {
-    $emailID = CRM_Utils_Type::escape($_REQUEST['emailID'], 'Positive');
+    $emailID = CRM_Utils_Type::escape($_POST['emailID'] ?? $_GET['emailID'] ?? NULL, 'Positive');
     $query = "SELECT signature_text, signature_html FROM civicrm_email WHERE id = {$emailID}";
     $dao = CRM_Core_DAO::executeQuery($query);
 
@@ -540,9 +540,10 @@ LIMIT {$offset}, {$rowCount}
    * Process dupes.
    */
   public static function processDupes() {
-    $oper = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-    $cid = CRM_Utils_Type::escape($_REQUEST['cid'], 'Positive');
-    $oid = CRM_Utils_Type::escape($_REQUEST['oid'], 'Positive');
+    $request = array_merge($_GET, $_POST);
+    $oper = CRM_Utils_Type::escape($request['op'], 'String');
+    $cid = CRM_Utils_Type::escape($request['cid'], 'Positive');
+    $oid = CRM_Utils_Type::escape($request['oid'], 'Positive');
 
     if (!$oper || !$cid || !$oid) {
       return;
@@ -557,8 +558,9 @@ LIMIT {$offset}, {$rowCount}
    * Retrieve list of duplicate pairs from cache table.
    */
   public static function getDedupes() {
-    $offset    = isset($_REQUEST['start']) ? CRM_Utils_Type::escape($_REQUEST['start'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['length']) ? CRM_Utils_Type::escape($_REQUEST['length'], 'Integer') : 25;
+    $request = array_merge($_GET, $_POST);
+    $offset    = isset($request['start']) ? CRM_Utils_Type::escape($request['start'], 'Integer') : 0;
+    $rowCount  = isset($request['length']) ? CRM_Utils_Type::escape($request['length'], 'Integer') : 25;
 
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive');
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
@@ -644,14 +646,15 @@ LIMIT {$offset}, {$rowCount}
       $join .= " LEFT JOIN civicrm_address ca2 ON (ca2.contact_id = pn.entity_id2 AND ca2.is_primary = 1 )";
     }
     $iTotal = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, $join, $whereClause, '=', $queryParams);
-    if (!empty($_REQUEST['order'])) {
-      foreach ($_REQUEST['order'] as $orderInfo) {
+    $request = array_merge($_GET, $_POST);
+    if (!empty($request['order'])) {
+      foreach ($request['order'] as $orderInfo) {
         if (!empty($orderInfo['column'])) {
           $orderColumnNumber = $orderInfo['column'];
           $dir = CRM_Utils_Type::escape($orderInfo['dir'], 'MysqlOrderByDirection', FALSE);
         }
       }
-      $columnDetails = $_REQUEST['columns'][$orderColumnNumber] ?? NULL;
+      $columnDetails = $request['columns'][$orderColumnNumber] ?? NULL;
     }
     if (!empty($columnDetails)) {
       switch ($columnDetails['data']) {
@@ -756,7 +759,7 @@ LIMIT {$offset}, {$rowCount}
       'recordsTotal'    => $iTotal,
       'recordsFiltered' => $iFilteredTotal,
     ];
-    if (!empty($_REQUEST['is_unit_test'])) {
+    if (!empty($request['is_unit_test'])) {
       return $dupePairs;
     }
     CRM_Utils_JSON::output($dupePairs);
@@ -769,7 +772,7 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function getSearchOptionsFromRequest() {
     $searchParams = [];
-    $searchData = $_REQUEST['search'] ?? NULL;
+    $searchData = $_POST['search'] ?? $_GET['search'] ?? NULL;
     $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
     $selectorElements = [
       'is_selected',
@@ -788,7 +791,7 @@ LIMIT {$offset}, {$rowCount}
       'weight',
       'actions',
     ];
-    $columns = $_REQUEST['columns'];
+    $columns = $_POST['columns'] ?? $_GET['columns'] ?? NULL;
 
     foreach ($columns as $column) {
       if (!empty($column['search']['value']) && in_array($column['data'], $selectorElements)) {
@@ -804,7 +807,7 @@ LIMIT {$offset}, {$rowCount}
   /**
    * Is the query an OR query.
    *
-   * If a generic search value is passed in - ie. $_REQUEST['search']['value'] = 'abc'
+   * If a generic search value is passed in - ie. $_POST['search']['value'] = 'abc' (or GET)
    * then all fields are searched for this.
    *
    * It is unclear if there is any code that still passes this in or whether is is just legacy. It
@@ -814,7 +817,7 @@ LIMIT {$offset}, {$rowCount}
    * @return bool
    */
   public static function isOrQuery() {
-    $searchData = $_REQUEST['search'] ?? NULL;
+    $searchData = $_POST['search'] ?? $_GET['search'] ?? NULL;
     return !empty($searchData['value']);
   }
 
@@ -864,7 +867,7 @@ LIMIT {$offset}, {$rowCount}
    * Retrieve a PDF Page Format for the PDF Letter form.
    */
   public function pdfFormat() {
-    $formatId = CRM_Utils_Type::escape($_REQUEST['formatId'], 'Integer');
+    $formatId = CRM_Utils_Type::escape($_POST['formatId'] ?? $_GET['formatId'] ?? NULL, 'Integer');
 
     $pdfFormat = CRM_Core_BAO_PdfFormat::getById($formatId);
 
@@ -875,7 +878,7 @@ LIMIT {$offset}, {$rowCount}
    * Retrieve Paper Size dimensions.
    */
   public static function paperSize() {
-    $paperSizeName = CRM_Utils_Type::escape($_REQUEST['paperSizeName'], 'String');
+    $paperSizeName = CRM_Utils_Type::escape($_POST['paperSizeName'] ?? $_GET['paperSize'] ?? NULL, 'String');
 
     $paperSize = CRM_Core_BAO_PaperSize::getByName($paperSizeName);
 
@@ -893,7 +896,7 @@ LIMIT {$offset}, {$rowCount}
 
       // We cannot use CRM_Utils_Request::retrieve() because it might be an array.
       // It later gets validated in escapeAll below.
-      $prevNextId = $_REQUEST['pnid'];
+      $prevNextId = $_POST['pnid'] ?? $_GET['pnid'] ?? NULL;
     }
 
     $onlySelected = FALSE;
@@ -909,12 +912,13 @@ LIMIT {$offset}, {$rowCount}
    * Used to store selected contacts across multiple pages in advanced search.
    */
   public static function selectUnselectContacts() {
-    $name = $_REQUEST['name'] ?? NULL;
-    $cacheKey = $_REQUEST['qfKey'] ?? NULL;
-    $state = CRM_Utils_Array::value('state', $_REQUEST, 'checked');
-    $variableType = CRM_Utils_Array::value('variableType', $_REQUEST, 'single');
+    $request = array_merge($_GET, $_POST);
+    $name = $request['name'] ?? NULL;
+    $cacheKey = $request['qfKey'] ?? NULL;
+    $state = CRM_Utils_Array::value('state', $request, 'checked');
+    $variableType = CRM_Utils_Array::value('variableType', $request, 'single');
 
-    $actionToPerform = CRM_Utils_Array::value('action', $_REQUEST, 'select');
+    $actionToPerform = CRM_Utils_Array::value('action', $request, 'select');
 
     if ($variableType == 'multiple') {
       // action post value only works with multiple type variable
@@ -976,8 +980,8 @@ LIMIT {$offset}, {$rowCount}
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */
   public static function toggleDedupeSelect() {
-    $pnid = $_REQUEST['pnid'];
-    $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
+    $pnid = $_POST['pnid'] ?? $_GET['pnid'] ?? NULL;
+    $isSelected = CRM_Utils_Type::escape($_POST['is_selected'] ?? $_GET['is_selected'] ?? NULL, 'Boolean');
     $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', $null, FALSE);
 
     $params = [

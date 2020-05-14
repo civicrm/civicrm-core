@@ -96,15 +96,17 @@ function civicrm_api3_contribution_page_submit($params) {
  *
  * @return array
  *   API result array
+ *
  */
 function civicrm_api3_contribution_page_validate($params) {
   // If we are calling this as a result of a POST action (e.g validating a form submission before first getting payment
   // authorization from a payment processor like Paypal checkout) the lack of a qfKey will not result in a valid
   // one being generated so we generate one first.
-  $originalRequest = $_REQUEST;
-  $qfKey = $_REQUEST['qfKey'] ?? NULL;
+  $originalPost = $_POST;
+  $qfKey = CRM_Utils_Request::retrieveValue('qfKey', 'String');
   if (!$qfKey) {
-    $_REQUEST['qfKey'] = CRM_Core_Key::get('CRM_Core_Controller', TRUE);
+    // Generate a key for the duration of this process.
+    $_POST['qfKey'] = CRM_Core_Key::get('CRM_Core_Controller', TRUE);
   }
   $form = new CRM_Contribute_Form_Contribution_Main();
   $form->controller = new CRM_Core_Controller();
@@ -114,7 +116,8 @@ function civicrm_api3_contribution_page_validate($params) {
   if ($errors === TRUE) {
     $errors = [];
   }
-  $_REQUEST = $originalRequest;
+  // Restore _POST var
+  $_POST = $originalPost;
   return civicrm_api3_create_success($errors, $params, 'ContributionPage', 'validate');
 }
 

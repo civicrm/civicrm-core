@@ -49,13 +49,14 @@ require_once '../civicrm.config.php';
 
 CRM_Core_Config::singleton();
 $log = new CRM_Utils_SystemLogger();
+$request = array_merge($_GET, $_POST);
 if (empty($_GET)) {
-  $log->alert('payment_notification processor_name=PayPal', $_REQUEST);
-  $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
+  $log->alert('payment_notification processor_name=PayPal', $request);
+  $paypalIPN = new CRM_Core_Payment_PayPalProIPN($request);
 }
 else {
-  $log->alert('payment_notification PayPal_Standard', $_REQUEST);
-  $paypalIPN = new CRM_Core_Payment_PayPalIPN($_REQUEST);
+  $log->alert('payment_notification PayPal_Standard', $request);
+  $paypalIPN = new CRM_Core_Payment_PayPalIPN($request);
   // @todo upgrade standard per Pro
 }
 try {
@@ -76,7 +77,8 @@ try {
 catch (CRM_Core_Exception $e) {
   CRM_Core_Error::debug_log_message($e->getMessage());
   CRM_Core_Error::debug_var('error data', $e->getErrorData(), TRUE, TRUE);
-  CRM_Core_Error::debug_var('REQUEST', $_REQUEST, TRUE, TRUE);
+  CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
+  CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
   //@todo give better info to logged in user - ie dev
   echo "The transaction has failed. Please review the log for more detail";
 }

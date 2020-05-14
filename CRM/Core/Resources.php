@@ -855,7 +855,7 @@ class CRM_Core_Resources {
    *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
-    if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), [
+    if (in_array(CRM_Utils_Request::retrieveValue('snippet', 'String'), [
       CRM_Core_Smarty::PRINT_SNIPPET,
       CRM_Core_Smarty::PRINT_NOFORM,
       CRM_Core_Smarty::PRINT_JSON,

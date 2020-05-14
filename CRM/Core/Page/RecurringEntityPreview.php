@@ -22,7 +22,8 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
   public function run() {
     $parentEntityId = $startDate = $endDate = NULL;
     $dates = $original = [];
-    $formValues = $_REQUEST;
+    // Q: should this only use _POST?
+    $formValues = array_merge($_GET, $_POST);
     if (!empty($formValues['entity_table'])) {
       $startDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'][0];
       $endDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['intervalDateColumns'][0];

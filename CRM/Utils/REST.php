@@ -561,7 +561,7 @@ class CRM_Utils_REST {
    */
   public static function processMultiple() {
     $output = [];
-    foreach (json_decode($_REQUEST['json'], TRUE) as $key => $call) {
+    foreach (json_decode(CRM_Utils_Request::retrieveValue('json', 'String'), TRUE) as $key => $call) {
       $args = [
         'civicrm',
         $call[0],

@@ -27,10 +27,11 @@ class CRM_Core_Page_AJAX {
    *
    */
   public static function run() {
-    $className = CRM_Utils_Type::escape($_REQUEST['class_name'], 'String');
+    $request = array_merge($_GET, $_POST);
+    $className = CRM_Utils_Type::escape($request['class_name'], 'String');
     $type = '';
-    if (!empty($_REQUEST['type'])) {
-      $type = CRM_Utils_Type::escape($_REQUEST['type'], 'String');
+    if (!empty($request['type'])) {
+      $type = CRM_Utils_Type::escape($request['type'], 'String');
     }
 
     if (!$className) {
@@ -38,8 +39,8 @@ class CRM_Core_Page_AJAX {
     }
 
     $fnName = NULL;
-    if (isset($_REQUEST['fn_name'])) {
-      $fnName = CRM_Utils_Type::escape($_REQUEST['fn_name'], 'String');
+    if (isset($request['fn_name'])) {
+      $fnName = CRM_Utils_Type::escape($request['fn_name'], 'String');
     }
 
     if (!self::checkAuthz($type, $className, $fnName)) {
@@ -77,9 +78,10 @@ class CRM_Core_Page_AJAX {
    *
    */
   public static function setIsQuickConfig() {
-    $id = $context = NULL;
-    if (!empty($_REQUEST['id'])) {
-      $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
+    $context = NULL;
+    $id = CRM_Utils_Request::retrieveValue('id', 'Positive');
+    if (!empty($id)) {
+      $id = CRM_Utils_Type::escape($id, 'Integer');
     }
 
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');

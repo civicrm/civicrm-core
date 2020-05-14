@@ -57,13 +57,14 @@ class CRM_Core_IDS {
     $init = self::create(self::createRouteConfig($route));
 
     // Add request url and user agent.
-    $_REQUEST['IDS_request_uri'] = $_SERVER['REQUEST_URI'];
+    $request = array_merge($_GET, $_POST);
+    $request['IDS_request_uri'] = $_SERVER['REQUEST_URI'];
     if (isset($_SERVER['HTTP_USER_AGENT'])) {
-      $_REQUEST['IDS_user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+      $request['IDS_user_agent'] = $_SERVER['HTTP_USER_AGENT'];
     }
 
     require_once 'IDS/Monitor.php';
-    $ids = new \IDS_Monitor($_REQUEST, $init);
+    $ids = new \IDS_Monitor($request, $init);
 
     $result = $ids->run();
     if (!$result->isEmpty()) {

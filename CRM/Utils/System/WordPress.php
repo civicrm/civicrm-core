@@ -526,8 +526,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
     $uid = $params['uid'] ?? NULL;
     if (!$uid) {
-      $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      $request = array_merge($_GET, $_POST);
+      $name = $name ? $name : trim(CRM_Utils_Array::value('name', $request));
+      $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $request));
       if ($name) {
         $uid = wp_authenticate($name, $pass);
         if (!$uid) {

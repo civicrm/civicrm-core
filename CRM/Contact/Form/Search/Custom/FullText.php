@@ -105,8 +105,8 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
       // 1. this custom search has slightly different structure ,
       // 2. we are in constructor right now,
       // we 'll use a small hack -
-      $rowCount = CRM_Utils_Array::value('crmRowCount', $_REQUEST, CRM_Utils_Pager::ROWCOUNT);
-      $pageId = CRM_Utils_Array::value('crmPID', $_REQUEST, 1);
+      $rowCount = CRM_Utils_Request::retrieveValue('crmRowCount', 'Positive', CRM_Utils_Pager::ROWCOUNT);
+      $pageId = CRM_Utils_Request::retrieveValue('crmPID', 'Positive', 1);
       $offset = ($pageId - 1) * $rowCount;
       $this->_limitClause = NULL;
       $this->_limitRowClause = [$rowCount, NULL];

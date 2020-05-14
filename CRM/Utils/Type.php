@@ -208,6 +208,9 @@ class CRM_Utils_Type {
   /**
    * Verify that a variable is of a given type, and apply a bit of processing.
    *
+   * @todo: clarify escape for *what purpose*? Shell argument? SQL? e.g. this
+   * function is NOT suitable for escaping a boolean for MySQL.
+   *
    * @param mixed $data
    *   The value to be verified/escaped.
    * @param string $type

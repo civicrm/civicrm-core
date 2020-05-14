@@ -17,9 +17,10 @@
 class CRM_SMS_Page_Callback {
 
   public function run() {
-    $provider = CRM_SMS_Provider::singleton($_REQUEST);
+    $request = array_merge($_GET, $_POST);
+    $provider = CRM_SMS_Provider::singleton($request);
 
-    if (array_key_exists('status', $_REQUEST)) {
+    if (array_key_exists('status', $request)) {
       $provider->callback();
     }
     else {

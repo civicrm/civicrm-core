@@ -49,20 +49,32 @@ class CRM_Utils_Request {
   }
 
   /**
-   * Retrieve a value from the request (GET/POST/REQUEST)
+   * Retrieve a value from POST, GET or session storage.
    *
    * @param string $name
    *   Name of the variable to be retrieved.
+   *   Note that 'action' is treated as a special case - see code below.
    * @param string $type
-   *   Type of the variable (see CRM_Utils_Type for details).
+   *   Type of the variable (see CRM_Utils_Type for details). This is used to
+   *   validate the retrieved value using CRM_Utils_Rule, but it does
+   *   not (always) cast it. e.g. Retrieving a 'Boolean' when the input data is
+   *   'No' will result in the string 'No', which PHP will treat as TRUE if
+   *   compared as a boolean. So don't do this:
+   *       if (CRM_Utils_Request::retrieve(..., 'Boolean')) {  }
+   *
    * @param object $store
    *   Session scope where variable is stored.
    * @param bool $abort
    *   TRUE, if the variable is required.
    * @param mixed $default
-   *   Default value of the variable if not present.
+   *   Default value of the variable if not present. Not used if $abort == TRUE
+   *   This is not validated against $type.
    * @param string $method
    *   Where to look for the variable - 'GET', 'POST' or 'REQUEST'.
+   *   If 'REQUEST' then POST is consulted first, and if not found
+   *   GET is used. This used to use $_REQUEST but the contents
+   *   of that is dependent on the hosting environment and so is
+   *   ambiguous (it can also contain _COOKIE, which we don't want).
    * @param bool $isThrowException
    *   Should a an exception be thrown rather than a fatal.
    *
@@ -84,7 +96,7 @@ class CRM_Utils_Request {
         break;
 
       default:
-        $value = self::getValue($name, $_REQUEST);
+        $value = self::getValue($name, $_POST) ?? self::getValue($name, $_GET);
         break;
     }
 
@@ -125,28 +137,29 @@ class CRM_Utils_Request {
    * @param string $name
    *   Name of the variable to be retrieved.
    *
-   * @param array $method - '$_GET', '$_POST' or '$_REQUEST'.
+   * @param array $source
+   *   Typically '$_GET', '$_POST' or some other array.
    *
    * @return mixed
-   *   The value of the variable
+   *   The value of the variable or NULL.
    */
-  protected static function getValue($name, $method) {
-    if (isset($method[$name])) {
-      return $method[$name];
+  protected static function getValue($name, $source) {
+    if (isset($source[$name])) {
+      return $source[$name];
     }
     // CRM-18384 - decode incorrect keys generated when &amp; is present in url
-    foreach ($method as $key => $value) {
+    foreach ($source as $key => $value) {
       if (strpos($key, 'amp;') !== FALSE) {
-        $method[str_replace('amp;', '', $key)] = $method[$key];
-        if (isset($method[$name])) {
-          return $method[$name];
+        $source[str_replace('amp;', '', $key)] = $source[$key];
+        if (isset($source[$name])) {
+          return $source[$name];
         }
         else {
           continue;
         }
       }
     }
-    return NULL;
+    return;
   }
 
   /**
@@ -178,6 +191,31 @@ class CRM_Utils_Request {
   /**
    * Retrieve a variable from the http request.
    *
+   * You can use this instead of retrieve() when you do not need to store the
+   * result in a session store.
+   *
+   * Examples:
+   *
+   * e.g. Get the 'cid' param from POST, falling back to GET data, and returning
+   *      NULL without error or exception if it's not found:
+   *      $value = CRM_Utils_Type::retrieveValue('cid', 'Positive');
+   *
+   * e.g. Get the 'cid' param from POST, falling back to GET data, and returning
+   *      0 without error or exception if it's not found:
+   *      $value = CRM_Utils_Type::retrieveValue('cid', 'Positive', 0);
+   *
+   * e.g. Get the 'cid' param from POST, falling back to GET data, and throw
+   *      an exception if it's not found. Note that if $isRequired is set then
+   *      the default value is never used.
+   *      $value = CRM_Utils_Type::retrieveValue('cid', 'Positive',
+   *         'this is never used', $isRequired=TRUE);
+   *
+   * e.g. Get the 'name' param from GET only, falling back to 'anonymous' if not provided.
+   *      $value = CRM_Utils_Type::retrieveValue(
+   *          'name', 'String', 'anonymous', FALSE, 'GET'
+   *        );
+   *
+   *
    * @param string $name
    *   Name of the variable to be retrieved.
    * @param string $type
@@ -188,9 +226,13 @@ class CRM_Utils_Request {
    *   - 'CommaSeparatedIntegers'
    *   - 'Boolean'
    *   - 'String'
+   *   Note that 'String' will always pass if the value comes from GET or POST and
+   *   that has not been re-set by some other PHP code, since HTTP requests are strings.
+   *   The only exception is when a parameter is an array.
    *
    * @param mixed $defaultValue
-   *   Default value of the variable if not present.
+   *   Default value of the variable if not present, unless $isRequired is set.
+   *   This is not validated against $type.
    * @param bool $isRequired
    *   Is the variable required for this function to proceed without an exception.
    * @param string $method

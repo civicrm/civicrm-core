@@ -208,7 +208,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
     parent::__construct($name, $modal);
 
-    $snippet = $_REQUEST['snippet'] ?? NULL;
+    $snippet = $_POST['snippet'] ?? $_GET['snippet'] ?? NULL;
     if ($snippet) {
       if ($snippet == 3) {
         $this->_print = CRM_Core_Smarty::PRINT_PDF;
@@ -255,8 +255,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       'String',
       $this,
       FALSE,
-      NULL,
-      $_REQUEST
+      NULL
     );
   }
 
@@ -284,7 +283,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       return NULL;
     }
 
-    $key = $_REQUEST['qfKey'] ?? NULL;
+    $key = CRM_Utils_Request::retrieveValue('qfKey', 'String');
     if (!$key && $_SERVER['REQUEST_METHOD'] === 'GET') {
       $key = CRM_Core_Key::get($name, $addSequence);
     }

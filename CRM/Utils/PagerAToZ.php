@@ -137,7 +137,7 @@ class CRM_Utils_PagerAToZ {
     if (empty($qfKey)) {
       // CRM-20943 Can only pass variables by reference and also cannot use $this so using $empty setting to NULL which is default.
       $emptyVariable = NULL;
-      $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $emptyVariable, FALSE, NULL, $_REQUEST);
+      $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $emptyVariable, FALSE, NULL);
     }
 
     $aToZBar = [];

@@ -51,7 +51,10 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
     );
 
-    $action = CRM_Utils_Array::value('action', $_REQUEST, 'intro');
+    // Note: this does not use CRM_Utils_Request::retrieveValue because
+    // that function includes a hack that changes the 'action' value and
+    // we need the raw value here.
+    $action = $_POST['action'] ?? $_GET['action'] ?? 'intro';
     switch ($action) {
       case 'intro':
         $this->runIntro();

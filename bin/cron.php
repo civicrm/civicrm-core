@@ -28,7 +28,7 @@ if ($job === NULL) {
 else {
   $ignored = array("name", "pass", "key", "job");
   $params = array();
-  foreach ($_REQUEST as $name => $value) {
+  foreach (array_merge($_GET, $_POST) as $name => $value) {
     if (!in_array($name, $ignored)) {
       $params[$name] = CRM_Utils_Request::retrieve($name, 'String', CRM_Core_DAO::$_nullArray, FALSE, NULL, 'REQUEST');
     }
