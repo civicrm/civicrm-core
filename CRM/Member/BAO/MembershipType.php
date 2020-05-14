@@ -740,7 +740,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       if (!empty($results)) {
         $results['label'] = $results['name'] = $params['name'];
         $results['amount'] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
-        $optionsIds['id'] = $results['id'];
       }
       else {
         $results = [
@@ -756,12 +755,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       if ($previousID) {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
         if (!empty($optionsIds['option_id'])) {
-          $optionsIds['id'] = current(CRM_Utils_Array::value('option_id', $optionsIds));
+          $results['id'] = current($optionsIds['option_id']);
         }
       }
       $results['financial_type_id'] = $params['financial_type_id'] ?? NULL;
       $results['description'] = $params['description'] ?? NULL;
-      CRM_Price_BAO_PriceFieldValue::add($results, $optionsIds);
+      CRM_Price_BAO_PriceFieldValue::add($results);
     }
   }
 
