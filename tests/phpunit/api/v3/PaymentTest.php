@@ -874,14 +874,28 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $checkNumber1 = 'C111';
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
-      'payment_instrument_id' => 'Cash',
+      'payment_instrument_id' => 'Check',
+      'check_number' => $checkNumber1,
     ]);
     $payments = $this->callAPISuccess('Payment', 'get', ['contribution_id' => $contribution['id']])['values'];
     $this->assertCount(1, $payments);
     $this->validateAllPayments();
+
+    $checkNumber2 = 'C222';
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 20,
+      'payment_instrument_id' => 'Check',
+      'check_number' => $checkNumber2,
+    ]);
+    $expectedConcatanatedCheckNumbers = implode(',', [$checkNumber1, $checkNumber2]);
+    //Assert check number is concatenated on the main contribution.
+    $contributionValues = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $contribution['id']]);
+    $this->assertEquals($expectedConcatanatedCheckNumbers, $contributionValues['check_number']);
   }
 
   /**
