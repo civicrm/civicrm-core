@@ -19,7 +19,7 @@ class CRM_Utils_Url {
    *
    * @param string $url
    *
-   * @return \GuzzleHttp\Psr7\UriInterface
+   * @return \Psr\Http\Message\UriInterface
    */
   public static function parseUrl($url) {
     return new Uri($url);
@@ -28,7 +28,7 @@ class CRM_Utils_Url {
   /**
    * Unparse url back to a string.
    *
-   * @param \GuzzleHttp\Psr7\UriInterface $parsed
+   * @param \Psr\Http\Message\UriInterface $parsed
    *
    * @return string
    */
