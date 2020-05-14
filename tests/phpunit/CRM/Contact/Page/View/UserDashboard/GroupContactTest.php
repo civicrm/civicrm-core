@@ -83,7 +83,7 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
 
     // Get logged in user contact ID.
     $user_id = $this->createLoggedInUser();
-    $_REQUEST['id'] = $user_id;
+    $_POST['id'] = $user_id;
 
     // Add current user to the test groups.
     $publicSmartGroup = $this->callAPISuccess('Contact', 'create', [
@@ -169,7 +169,7 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
 
     // Run the contact dashboard and assert that only the public groups appear
     // in select list of available groups.
-    $_REQUEST['id'] = $user_id;
+    $_POST['id'] = $user_id;
     $page = new CRM_Contact_Page_View_UserDashBoard_GroupContact();
     $page->run();
 
@@ -193,7 +193,7 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
 
     // Run the contact dashboard and assert that none of the groups appear
     // in select list of available groups.
-    $_REQUEST['id'] = $user_id;
+    $_POST['id'] = $user_id;
     $page = new CRM_Contact_Page_View_UserDashBoard_GroupContact();
     $page->run();
 

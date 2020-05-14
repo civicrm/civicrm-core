@@ -65,8 +65,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function setPermissionAndRequest($permission) {
     $this->setPermissions((array) $permission);
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    global $_POST;
+    $_POST = $this->_params;
   }
 
   /**
@@ -76,8 +76,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   public function setHookAndRequest($permission, $hook) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = (array) $permission;
     $this->hookClass->setHook('civicrm_aclGroup', [$this, $hook]);
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    global $_POST;
+    $_POST = $this->_params;
   }
 
   /**
@@ -664,8 +664,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    *
    */
   public function setupEditAllGroupsACL() {
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    global $_POST;
+    $_POST = $this->_params;
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $optionGroupID = $this->callAPISuccessGetValue('option_group', ['return' => 'id', 'name' => 'acl_role']);

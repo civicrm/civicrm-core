@@ -364,7 +364,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     //flush component settings
     CRM_Core_Component::getEnabledComponents(TRUE);
 
-    $_REQUEST = $_GET = $_POST = [];
+    $_GET = $_POST = [];
     error_reporting(E_ALL);
 
     $this->renameLabels();
@@ -2322,8 +2322,7 @@ VALUES
    * @param bool $isProfile
    */
   public function setupACL($isProfile = FALSE) {
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    $_POST = $this->_params;
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $optionGroupID = $this->callAPISuccessGetValue('option_group', ['return' => 'id', 'name' => 'acl_role']);

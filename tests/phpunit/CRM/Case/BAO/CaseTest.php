@@ -439,18 +439,18 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     // HTTP vars needed because that's how the form determines stuff
     $oldMETHOD = empty($_SERVER['REQUEST_METHOD']) ? NULL : $_SERVER['REQUEST_METHOD'];
     $oldGET = empty($_GET) ? [] : $_GET;
-    $oldREQUEST = empty($_REQUEST) ? [] : $_REQUEST;
+    $oldPOST = empty($_POST) ? [] : $_POST;
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $_GET['caseid'] = $case_id;
-    $_REQUEST['caseid'] = $case_id;
+    $_POST['caseid'] = $case_id;
     $_GET['cid'] = $client_id;
-    $_REQUEST['cid'] = $client_id;
+    $_POST['cid'] = $client_id;
     $_GET['action'] = 'add';
-    $_REQUEST['action'] = 'add';
+    $_POST['action'] = 'add';
     $_GET['reset'] = 1;
-    $_REQUEST['reset'] = 1;
+    $_POST['reset'] = 1;
     $_GET['atype'] = $atype;
-    $_REQUEST['atype'] = $atype;
+    $_POST['atype'] = $atype;
 
     $form = new CRM_Case_Form_Activity();
     $form->controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Activity', 'Case Activity');
@@ -513,7 +513,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       $_SERVER['REQUEST_METHOD'] = $oldMETHOD;
     }
     $_GET = $oldGET;
-    $_REQUEST = $oldREQUEST;
+    $_POST = $oldPOST;
   }
 
   /**

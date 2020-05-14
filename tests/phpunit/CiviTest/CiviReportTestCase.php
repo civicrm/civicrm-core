@@ -67,7 +67,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
     $reportObj =& $controller->_pages[$reportName];
 
     $tmpGlobals = array();
-    $tmpGlobals['_REQUEST']['force'] = 1;
+    $tmpGlobals['_POST']['force'] = 1;
     $tmpGlobals['_GET'][$config->userFrameworkURLVar] = 'civicrm/placeholder';
     $tmpGlobals['_SERVER']['QUERY_STRING'] = '';
     if (!empty($inputParams['fields'])) {

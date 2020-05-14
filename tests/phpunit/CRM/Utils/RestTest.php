@@ -30,7 +30,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
         ],
       ],
     ];
-    $_REQUEST['json'] = json_encode($input);
+    $_POST['json'] = json_encode($input);
     $output = CRM_Utils_REST::processMultiple();
     $this->assertGreaterThan(0, $output['cow']['id']);
     $this->assertGreaterThan($output['cow']['id'], $output['sheep']['id']);

@@ -6,22 +6,22 @@
 class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
 
   /**
-   * Original $_REQUEST
+   * Original $_POST
    *
    * We are messing with globals so fix afterwards.
    *
    * @var array
    */
-  protected $originalRequest = [];
+  protected $originalPost = [];
 
   public function setUp() {
     $this->useTransaction(TRUE);
     parent::setUp();
-    $this->originalRequest = $_REQUEST;
+    $this->originalPost = $_POST;
   }
 
   public function tearDown() {
-    $_REQUEST = $this->originalRequest;
+    $_POST = $this->originalPost;
     parent::tearDown();
   }
 
@@ -29,9 +29,9 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
    * Minimal test on the testGetDupes function to make sure it completes without error.
    */
   public function testGetDedupes() {
-    $_REQUEST['gid'] = 1;
-    $_REQUEST['rgid'] = 1;
-    $_REQUEST['columns'] = [
+    $_POST['gid'] = 1;
+    $_POST['rgid'] = 1;
+    $_POST['columns'] = [
       [
         'search' => [
           'value' => [
@@ -41,7 +41,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
         'data' => 'src',
       ],
     ];
-    $_REQUEST['is_unit_test'] = TRUE;
+    $_POST['is_unit_test'] = TRUE;
     $result = CRM_Contact_Page_AJAX::getDedupes();
     $this->assertEquals(['data' => [], 'recordsTotal' => 0, 'recordsFiltered' => 0], $result);
   }
@@ -63,11 +63,11 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   public function testGetDedupesPostCode() {
-    $_REQUEST['gid'] = 1;
-    $_REQUEST['rgid'] = 1;
-    $_REQUEST['snippet'] = 4;
-    $_REQUEST['draw'] = 3;
-    $_REQUEST['columns'] = [
+    $_POST['gid'] = 1;
+    $_POST['rgid'] = 1;
+    $_POST['snippet'] = 4;
+    $_POST['draw'] = 3;
+    $_POST['columns'] = [
       0 => [
         'data' => 'is_selected_input',
         'name' => '',
@@ -222,19 +222,19 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       ],
     ];
 
-    $_REQUEST['start'] = 0;
-    $_REQUEST['length'] = 10;
-    $_REQUEST['search'] = [
+    $_POST['start'] = 0;
+    $_POST['length'] = 10;
+    $_POST['search'] = [
       'value' => '',
       'regex' => FALSE,
     ];
 
-    $_REQUEST['_'] = 1466478641007;
-    $_REQUEST['Drupal_toolbar_collapsed'] = 0;
-    $_REQUEST['has_js'] = 1;
-    $_REQUEST['SESSa06550b3043ecca303761d968e3c846a'] = 'qxSxw0F_UmBITMM0JaVwTRcHV1bQqBSHNmBMY9AA8Wk';
+    $_POST['_'] = 1466478641007;
+    $_POST['Drupal_toolbar_collapsed'] = 0;
+    $_POST['has_js'] = 1;
+    $_POST['SESSa06550b3043ecca303761d968e3c846a'] = 'qxSxw0F_UmBITMM0JaVwTRcHV1bQqBSHNmBMY9AA8Wk';
 
-    $_REQUEST['is_unit_test'] = TRUE;
+    $_POST['is_unit_test'] = TRUE;
 
     $result = CRM_Contact_Page_AJAX::getDedupes();
     $this->assertEquals(['data' => [], 'recordsTotal' => 0, 'recordsFiltered' => 0], $result);
@@ -294,7 +294,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
 
     // CASE I : check the usage count of parent tag which need to be 1
     //  as the one contact added
-    $_REQUEST['is_unit_test'] = TRUE;
+    $_POST['is_unit_test'] = TRUE;
     $parentTagTreeResult = CRM_Admin_Page_AJAX::getTagTree();
     foreach ($parentTagTreeResult as $result) {
       if ($result['id'] == $parentTag['id']) {

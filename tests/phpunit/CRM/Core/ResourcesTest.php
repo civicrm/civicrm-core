@@ -31,7 +31,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   protected $cacheBusterString = 'xBkdk3';
 
-  protected $originalRequest;
+  protected $originalPost;
   protected $originalGet;
 
   public function setUp() {
@@ -47,7 +47,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     require_once 'CRM/Core/Smarty/resources/String.php';
     civicrm_smarty_register_string_resource();
 
-    $this->originalRequest = $_REQUEST;
+    $this->originalPost = $_POST;
     $this->originalGet = $_GET;
   }
 
@@ -55,7 +55,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * Restore globals so this test doesn't interfere with others.
    */
   public function tearDown() {
-    $_REQUEST = $this->originalRequest;
+    $_POST = $this->originalPost;
     $_GET = $this->originalGet;
   }
 
@@ -330,7 +330,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * @dataProvider ajaxModeData
    */
   public function testIsAjaxMode($query, $result) {
-    $_REQUEST = $_GET = $query;
+    $_POST = $_GET = $query;
     $this->assertEquals($result, CRM_Core_Resources::isAjaxMode());
   }
 

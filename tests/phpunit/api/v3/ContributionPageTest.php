@@ -2009,7 +2009,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * to be done before processing but the validity of input needs to be checked first.
    *
    * For example Paypal Checkout will replace the confirm button with it's own but we are able to validate
-   * before paypal launches it's modal. In this case the $_REQUEST is post but we need validation to succeed.
+   * before paypal launches it's modal. In this case the request is sent using POST but we need validation to succeed.
    *
    * @throws \CRM_Core_Exception
    */
@@ -2059,7 +2059,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ]);
     $message .= json_encode($log_params);
     $log = new CRM_Utils_SystemLogger();
-    $log->debug($message, $_REQUEST);
+    $log->debug($message, $_POST);
   }
 
   /**

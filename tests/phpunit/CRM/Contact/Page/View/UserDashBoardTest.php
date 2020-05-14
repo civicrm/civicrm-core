@@ -160,11 +160,11 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * Run the user dashboard.
    */
   protected function runUserDashboard() {
-    $_REQUEST = ['reset' => 1, 'id' => $this->contactID];
+    $_POST = ['reset' => 1, 'id' => $this->contactID];
     $dashboard = new CRM_Contact_Page_View_UserDashBoard();
     $dashboard->_contactId = $this->contactID;
     $dashboard->run();
-    $_REQUEST = [];
+    $_POST = [];
   }
 
 }

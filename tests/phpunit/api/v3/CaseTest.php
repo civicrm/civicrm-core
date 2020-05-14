@@ -338,7 +338,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $relType = $this->relationshipTypeCreate(['name_a_b' => 'Test AB', 'name_b_a' => 'Test BA', 'contact_type_b' => 'Individual']);
     $relContact = $this->individualCreate(['first_name' => 'First', 'last_name' => 'Last']);
 
-    $_REQUEST = [
+    $_POST = [
       'rel_type' => "{$relType}_b_a",
       'rel_contact' => $relContact,
       'case_id' => $case['id'],
@@ -857,7 +857,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     $relType = $this->relationshipTypeCreate(['name_a_b' => 'Test AB', 'name_b_a' => 'Test BA', 'contact_type_b' => 'Individual']);
     $relContact = $this->individualCreate(['first_name' => 'First', 'last_name' => 'Last']);
-    $_REQUEST = [
+    $_POST = [
       'rel_type' => "{$relType}_b_a",
       'rel_contact' => $relContact,
       'case_id' => $case['id'],

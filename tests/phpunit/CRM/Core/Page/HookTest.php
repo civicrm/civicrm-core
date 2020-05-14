@@ -69,7 +69,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
   public function testFormsCallBuildFormOnce() {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_buildForm', [$this, 'onBuildForm']);
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_preProcess', [$this, 'onPreProcess']);
-    $_REQUEST = ['action' => 'add'];
+    $_POST = ['action' => 'add'];
     foreach ($this->basicPages as $pageName) {
       // Reset the counters
       $this->hookCount = [
@@ -108,7 +108,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
    */
   public function testPagesCallPageRunOnce() {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pageRun', [$this, 'onPageRun']);
-    $_REQUEST = ['action' => 'browse'];
+    $_POST = ['action' => 'browse'];
     foreach ($this->basicPages as $pageName) {
       // Reset the counters
       $this->hookCount = ['pageRun' => []];

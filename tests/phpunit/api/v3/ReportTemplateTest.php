@@ -214,8 +214,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->loadXMLDataSet(__DIR__ . '/../../CRM/Mailing/BAO/queryDataset.xml');
 
     // Check total rows without distinct
-    global $_REQUEST;
-    $_REQUEST['distinct'] = 0;
+    $_POST['distinct'] = 0;
     $result = $this->callAPIAndDocument('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
@@ -223,7 +222,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(14, $result['count']);
 
     // Check total rows with distinct
-    $_REQUEST['distinct'] = 1;
+    $_POST['distinct'] = 1;
     $result = $this->callAPIAndDocument('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
@@ -231,7 +230,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(5, $result['count']);
 
     // Check total rows with distinct by passing NULL value to distinct parameter
-    $_REQUEST['distinct'] = NULL;
+    $_POST['distinct'] = NULL;
     $result = $this->callAPIAndDocument('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],

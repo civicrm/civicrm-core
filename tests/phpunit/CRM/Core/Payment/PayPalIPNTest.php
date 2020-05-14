@@ -79,8 +79,8 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertEquals(NULL, $contribution['values'][0]['trxn_id']);
     $this->assertEquals($pendingStatusID, $contribution['values'][0]['contribution_status_id']);
 
-    global $_REQUEST;
-    $_REQUEST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $this->getPaypalTransaction();
+    global $_POST;
+    $_POST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $this->getPaypalTransaction();
 
     $mut = new CiviMailUtils($this, TRUE);
     $paymentProcesors = $this->callAPISuccessGetSingle('PaymentProcessor', ['id' => $this->_paymentProcessorID]);
@@ -97,7 +97,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
-    $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($_POST['txn_id'], $contribution['values'][0]['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
   }
 
@@ -306,15 +306,15 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertEquals(NULL, $contribution['values'][0]['trxn_id']);
     $this->assertEquals($pendingStatusID, $contribution['values'][0]['contribution_status_id']);
     $this->hookClass->setHook('civicrm_postIPNProcess', [$this, 'hookCiviCRMAlterIPNData']);
-    global $_REQUEST;
-    $_REQUEST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $this->getPaypalTransaction();
+    global $_POST;
+    $_POST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $this->getPaypalTransaction();
 
     $mut = new CiviMailUtils($this, TRUE);
     $payment = CRM_Core_Payment::handlePaymentMethod('PaymentNotification', ['processor_id' => $this->_paymentProcessorID]);
 
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
-    $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($_POST['txn_id'], $contribution['values'][0]['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
     $this->assertEquals('test12345', $contribution['values'][0]['custom_' . $this->_customFieldID]);
   }
@@ -342,14 +342,14 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $payPalIPNParams = $this->getPaypalTransaction();
     $payPalIPNParams['contactID'] = $contactTobeDeleted;
     $this->callAPISuccess('Contact', 'delete', ['id' => $contactTobeDeleted, 'skip_undelete' => 1]);
-    global $_REQUEST;
-    $_REQUEST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $payPalIPNParams;
+    global $_POST;
+    $_POST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $payPalIPNParams;
     // Now process the IPN noting that the contact id that was supplied with the IPN has been deleted but there is still a valid one on the contribution id
     $payment = CRM_Core_Payment::handlePaymentMethod('PaymentNotification', ['processor_id' => $this->_paymentProcessorID]);
 
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
-    $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($_POST['txn_id'], $contribution['values'][0]['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
   }
 

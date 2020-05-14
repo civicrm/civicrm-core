@@ -1349,7 +1349,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = new CRM_Contribute_Form_ContributionBase();
     $form->controller = new CRM_Core_Controller();
     $form->set('id', $page1['id']);
-    $_REQUEST['id'] = $page1['id'];
+    $_POST['id'] = $page1['id'];
 
     $form->preProcess();
     $this->assertEquals($form->_paymentProcessor['name'], 'pay_later');
@@ -1361,7 +1361,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     //Assert an exception is thrown on loading the contribution page.
     $form = new CRM_Contribute_Form_ContributionBase();
     $form->controller = new CRM_Core_Controller();
-    $_REQUEST['id'] = $page2['id'];
+    $_POST['id'] = $page2['id'];
     $form->set('id', $page2['id']);
     try {
       $form->preProcess();

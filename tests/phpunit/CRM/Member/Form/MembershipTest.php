@@ -1156,8 +1156,8 @@ Expires: ',
    * @throws \CRM_Core_Exception
    */
   protected function getForm() {
-    if (isset($_REQUEST['cid'])) {
-      unset($_REQUEST['cid']);
+    if (isset($_POST['cid'])) {
+      unset($_POST['cid']);
     }
     $form = new CRM_Member_Form_Membership();
     $_SERVER['REQUEST_METHOD'] = 'GET';
