@@ -251,7 +251,7 @@ return [
     ],
     'default' => 'router',
     'add' => '5.27',
-    'title' => ts('Extern URL Style'),
+    'title' => ts('Extern URL Style (Transition Support)'),
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
