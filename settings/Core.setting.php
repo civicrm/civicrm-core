@@ -251,9 +251,10 @@ return [
     ],
     'default' => 'router',
     'add' => '5.27',
-    'title' => ts('Extern URL Style (Transition Support)'),
+    'title' => ts('Extern URL Style'),
     'is_domain' => 1,
     'is_contact' => 0,
+    'description' => ts('This setting provides transitional support. It should be set to "Prefer normal router." If your deployment requires "Prefer standalone script", then please ensure that the issue is tracked in <code>lab.civicrm.org</code>.'),
     'help_text' => NULL,
     'options' => [
       'standalone' => ts('Prefer standalone scripts'),

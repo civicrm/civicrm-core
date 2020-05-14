@@ -82,7 +82,8 @@
             {$form.defaultExternUrl.label} {help id='id-defaultExternUrl'}
         </td>
         <td>
-            {$form.defaultExternUrl.html}
+            {$form.defaultExternUrl.html}<br/>
+            <p class="description font-red">{ts}{$settings_fields.defaultExternUrl.description}{/ts}</p>
         </td>
     </tr>
 </table>
