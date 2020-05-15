@@ -605,7 +605,6 @@ class CRM_Contact_Form_Search_Criteria {
 
     foreach ($groupDetails as $key => $group) {
       $_groupTitle[$key] = $group['name'];
-      CRM_Core_ShowHideBlocks::links($form, $group['name'], '', '');
 
       foreach ($group['fields'] as $field) {
         $fieldId = $field['id'];
