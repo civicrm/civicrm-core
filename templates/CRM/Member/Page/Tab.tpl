@@ -80,9 +80,9 @@
                 <td class="crm-membership-source">{$activeMember.source}</td>
                 <td class="crm-membership-auto_renew">
                   {if $activeMember.auto_renew eq 1}
-                      <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+                      {icon icon="fa-check"}{ts}Auto-renew active{/ts}{/icon}
                   {elseif $activeMember.auto_renew eq 2}
-                      <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+                      {icon icon="fa-exclamation-triangle"}{ts}Auto-renew error{/ts}{/icon}
                   {/if}
                 </td>
                 <td class="crm-membership-related_count">{$activeMember.related_count}</td>
@@ -130,9 +130,9 @@
                 <td class="crm-membership-source">{$inActiveMember.source}</td>
                 <td class="crm-membership-auto_renew">
                   {if $inActiveMember.auto_renew eq 1}
-                    <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+                    {icon icon="fa-check"}{ts}Auto-renew active{/ts}{/icon}
                   {elseif $inActiveMember.auto_renew eq 2}
-                    <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+                    {icon icon="fa-exclamation-triangle"}{ts}Auto-renew error{/ts}{/icon}
                   {/if}
                 </td>
     <td>{$inActiveMember.action|replace:'xx':$inActiveMember.id}
