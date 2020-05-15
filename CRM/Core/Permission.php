@@ -1644,6 +1644,10 @@ class CRM_Core_Permission {
     ) {
       return TRUE;
     }
+    // Allow downloading invoices for a related contact with view permission
+    if (CRM_Contact_BAO_Contact_Permission::allow($_GET['cid'], CRM_Core_Permission::VIEW)) {
+      return TRUE;
+    }
     return FALSE;
   }
 
