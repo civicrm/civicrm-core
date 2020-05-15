@@ -93,7 +93,7 @@
     CRM.$(function($) {
       var mailSetting = $("input[name='outBound_option']:checked").val( );
 
-      var archiveWarning = "{/literal}{ts escape='js'}WARNING: You are switching from a testing mode (Redirect to Database) to a live mode. Check Mailings > Archived Mailings, and delete any test mailings that are not in Completed status prior to running the mailing cron job for the first time. This will ensure that test mailings are not actually sent out.{/ts}{literal}"
+      var archiveWarning = "{/literal}{ts escape='js'}WARNING: You are switching from a testing mode (Redirect to Database) to a live mode. Check Mailings > Archived Mailings, and delete any test mailings that are not in Completed status prior to running the mailing cron job for the first time. This will ensure that test mailings are not actually sent out.{/ts}{literal}";
 
         showHideMailOptions( $("input[name='outBound_option']:checked").val( ) ) ;
 

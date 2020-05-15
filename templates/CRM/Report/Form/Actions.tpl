@@ -42,7 +42,7 @@
                       (function($) {
                         $('#groups').val('').change(function() {
                           CRM.confirm({
-                            message: ts({/literal}'{ts escape='js' 1='<em>%1</em>'}Add all contacts to %1 group?{/ts}'{literal}, {1: $('option:selected', '#groups').text()})
+                            message: ts({/literal}'{ts escape='js' 1='<em>%1</em>'}Add all contacts to %1 group?{/ts}'{literal}, {1: CRM._.escape($('option:selected', '#groups').text())})
                           })
                             .on({
                               'crmConfirm:yes': function() {
