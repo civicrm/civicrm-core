@@ -52,6 +52,7 @@
     $scope.loading = false;
     $scope.controls = {};
     $scope.langs = ['php', 'js', 'ang', 'cli'];
+    $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
     $scope.code = {
       php: [
         {name: 'oop', label: ts('OOP Style'), code: ''},
@@ -136,7 +137,7 @@
           }
           fields.push({
             text: link.alias,
-            description: 'Join to ' + link.entity,
+            description: 'Implicit join to ' + link.entity,
             children: wildCard.concat(formatForSelect2(linkFields, [], 'name', ['description'], link.alias + '.'))
           });
         }
@@ -253,7 +254,7 @@
       if (_.isEmpty($scope.availableParams)) {
         return;
       }
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having'];
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having', 'join'];
       if ($scope.availableParams.limit && $scope.availableParams.offset) {
         specialParams.push('limit', 'offset');
       }
@@ -454,12 +455,15 @@
               });
             });
           }
-          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select') {
+          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select' || name === 'join') {
             $scope.$watch('controls.' + name, function(value) {
               var field = value;
               $timeout(function() {
                 if (field) {
-                  if (typeof objectParams[name] === 'undefined') {
+                  if (name === 'join') {
+                    $scope.params[name].push([field + ' AS ' + _.snakeCase(field), false, '[]']);
+                  }
+                  else if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
                   } else {
                     var defaultOp = _.cloneDeep(objectParams[name]);

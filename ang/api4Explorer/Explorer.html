@@ -63,6 +63,21 @@
               <input class="collapsible-optgroups form-control huge" ng-model="controls.select" crm-ui-select="{data: fieldsAndJoinsAndFunctionsAndWildcards}" placeholder="Add select" />
             </div>
           </fieldset>
+          <fieldset class="api4-input form-inline" ng-mouseenter="help('join', availableParams.join)" ng-mouseleave="help()" ng-if="::availableParams.join">
+            <legend>join<span class="crm-marker" ng-if="::availableParams.join.required"> *</span></legend>
+            <div ng-model="params.join" ui-sortable="{axis: 'y'}">
+              <div class="api4-input form-inline" ng-repeat="item in params.join track by $index">
+                <i class="crm-i fa-arrows"></i>
+                <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" />
+                <select class="form-control" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+                <input class="form-control twenty" type="text" ng-model="params.join[$index][2]" />
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times"></i></a>
+              </div>
+            </div>
+            <div class="api4-input form-inline">
+              <input class="collapsible-optgroups form-control huge" ng-model="controls.join" crm-ui-select="{data: entities}" placeholder="Add join" />
+            </div>
+          </fieldset>
           <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()" ng-if="::availableParams.fields">
             <label for="api4-param-fields">fields<span class="crm-marker" ng-if="::availableParams.fields.required"> *</span></label>
             <input class="form-control" ng-list crm-ui-select="::{data: fields, multiple: true}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
