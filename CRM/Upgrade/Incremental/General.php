@@ -45,6 +45,20 @@ class CRM_Upgrade_Incremental_General {
   const MIN_INSTALL_PHP_VER = '7.1.0';
 
   /**
+   * The minimum recommended MySQL/MariaDB version.
+   *
+   * A site running an earlier version will be told to upgrade.
+   */
+  const MIN_RECOMMENDED_MYSQL_VER = '5.7';
+
+  /**
+   * The minimum MySQL/MariaDB version required to install Civi.
+   *
+   * @see install/index.php
+   */
+  const MIN_INSTALL_MYSQL_VER = '5.5';
+
+  /**
    * Compute any messages which should be displayed before upgrade.
    *
    * @param string $preUpgradeMessage
