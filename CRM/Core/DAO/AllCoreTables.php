@@ -254,7 +254,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'Contact'.
    */
   public static function getBriefName($className) {
-    return CRM_Utils_Array::value($className, array_flip(self::daoToClass()));
+    $className = self::getCanonicalClassName($className);
+    return array_search($className, self::daoToClass(), TRUE) ?: NULL;
   }
 
   /**

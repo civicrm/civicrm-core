@@ -194,7 +194,7 @@ class CRM_Core_PseudoConstant {
       'fresh' => FALSE,
       'context' => $context,
     ];
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getCanonicalClassName($daoName));
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 
     // Custom fields are not in the schema
     if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
