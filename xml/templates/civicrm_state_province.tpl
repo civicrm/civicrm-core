@@ -119,6 +119,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1231, 1101, "DL", "Delhi"),
 (1232, 1101, "LD", "Lakshadweep"),
 (1233, 1101, "PY", "Pondicherry"),
+-- Note we believe all lower-case is correct for Poland. See https://github.com/civicrm/civicrm-core/pull/17107
 (1300, 1172, "MZ", "mazowieckie"),
 (1301, 1172, "PM", "pomorskie"),
 (1302, 1172, "DS", "dolnośląskie"),
