@@ -184,6 +184,19 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
 
+    // Use the custom fatalErrorHandler if defined
+    if ($config->fatalErrorHandler && function_exists($config->fatalErrorHandler)) {
+      $name = $config->fatalErrorHandler;
+      $vars = [
+        'pearError' => $pearError,
+      ];
+      $ret = $name($vars);
+      if ($ret) {
+        // the call has been successfully handled so we just exit
+        self::abend(CRM_Core_Error::FATAL_ERROR);
+      }
+    }
+
     $template->assign_by_ref('error', $error);
     $errorDetails = CRM_Core_Error::debug('', $error, FALSE);
     $template->assign_by_ref('errorDetails', $errorDetails);
@@ -204,7 +217,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       exit;
     }
     $runOnce = TRUE;
-    self::abend(1);
+    self::abend(CRM_Core_Error::FATAL_ERROR);
   }
 
   /**
@@ -558,6 +571,18 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       echo $str;
     }
     $file_log->close();
+
+    // Use the custom fatalErrorHandler if defined
+    if (in_array($priority, [PEAR_LOG_EMERG, PEAR_LOG_ALERT, PEAR_LOG_CRIT, PEAR_LOG_ERR])) {
+      if ($config->fatalErrorHandler && function_exists($config->fatalErrorHandler)) {
+        $name = $config->fatalErrorHandler;
+        $vars = [
+          'debugLogMessage' => $message,
+          'priority' => $priority,
+        ];
+        $name($vars);
+      }
+    }
 
     if (!isset(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
       // Set it to FALSE first & then try to set it. This is to prevent a loop as calling
