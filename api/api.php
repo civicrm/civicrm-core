@@ -302,12 +302,11 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
 /**
  * Having a DAO object find the entity name.
  *
- * @param object $bao
+ * @param CRM_Core_DAO $bao
  *   DAO being passed in.
  *
  * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {
-  $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+  return CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
 }
