@@ -36,42 +36,51 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
     return TRUE;
   }
 
-  public function fromToData() {
+  /**
+   * Used by testGetFromTo
+   */
+  private function fromToData() {
     $cases = [];
     // Absolute dates
-    $cases[] = ['20170901000000', '20170913235959', 0, '09/01/2017', '09/13/2017'];
+    $cases['absolute'] = [
+      'expectedFrom' => '20170901000000',
+      'expectedTo' => '20170913235959',
+      'relative' => 0,
+      'from' => '09/01/2017',
+      'to' => '09/13/2017',
+    ];
     // "Today" relative date filter
     $date = new DateTime();
-    $expectedFrom = $date->format('Ymd') . '000000';
-    $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = [$expectedFrom, $expectedTo, 'this.day', '', ''];
+    $cases['today'] = [
+      'expectedFrom' => $date->format('Ymd') . '000000',
+      'expectedTo' => $date->format('Ymd') . '235959',
+      'relative' => 'this.day',
+      'from' => '',
+      'to' => '',
+    ];
     // "yesterday" relative date filter
     $date = new DateTime();
     $date->sub(new DateInterval('P1D'));
-    $expectedFrom = $date->format('Ymd') . '000000';
-    $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = [$expectedFrom, $expectedTo, 'previous.day', '', ''];
+    $cases['yesterday'] = [
+      'expectedFrom' => $date->format('Ymd') . '000000',
+      'expectedTo' => $date->format('Ymd') . '235959',
+      'relative' => 'previous.day',
+      'from' => '',
+      'to' => '',
+    ];
     return $cases;
   }
 
   /**
    * Test that getFromTo returns the correct dates.
-   *
-   * @dataProvider fromToData
-   *
-   * @param string $expectedFrom
-   * @param string $expectedTo
-   * @param string $relative
-   * @param string $from
-   * @param string $to
    */
-  public function testGetFromTo($expectedFrom, $expectedTo, $relative, $from, $to) {
-    $obj = new CRM_Report_Form();
-    if (date('Hi') === '0000') {
-      $this->markTestIncomplete('The date might have changed since the dataprovider was called. Skip to avoid flakiness');
+  public function testGetFromTo() {
+    $cases = $this->fromToData();
+    foreach ($cases as $caseDescription => $case) {
+      $obj = new CRM_Report_Form();
+      list($calculatedFrom, $calculatedTo) = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
+      $this->assertEquals([$case['expectedFrom'], $case['expectedTo']], [$calculatedFrom, $calculatedTo], "fail on data set '{$caseDescription}'. Local php time is " . date('Y-m-d H:i:s') . ' and mysql time is ' . CRM_Core_DAO::singleValueQuery('SELECT NOW()'));
     }
-    list($calculatedFrom, $calculatedTo) = $obj->getFromTo($relative, $from, $to);
-    $this->assertEquals([$expectedFrom, $expectedTo], [$calculatedFrom, $calculatedTo], "fail on data set [ $relative , $from , $to ]. Local php time is " . date('Y-m-d H:i:s') . ' and mysql time is ' . CRM_Core_DAO::singleValueQuery('SELECT NOW()'));
   }
 
 }
