@@ -353,7 +353,7 @@ class CRM_Activity_Page_AJAX {
     if (!empty($params['assigneeContactIds'])) {
       $assigneeContacts = array_unique(explode(',', $params['assigneeContactIds']));
     }
-    foreach ($assigneeContacts as $key => $value) {
+    foreach ($assigneeContacts as $value) {
       $assigneeParams = [
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
