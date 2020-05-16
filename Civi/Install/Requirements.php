@@ -291,7 +291,7 @@ class Requirements {
    * @return array
    */
   public function checkMysqlVersion(array $db_config) {
-    $min = CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER;
+    $min = \CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER;
     $results = [
       'title' => 'CiviCRM MySQL Version',
       'severity' => $this::REQUIREMENT_OK,
