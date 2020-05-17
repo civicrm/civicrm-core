@@ -832,6 +832,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
               $this->formatLocationBlock($value, $formatted);
             }
             else {
+              // @todo - this is still reachable - e.g. import with related contact info like firstname,lastname,spouse-first-name,spouse-last-name,spouse-home-phone
               CRM_Core_Error::deprecatedFunctionWarning('this is not expected to be reachable now');
               $this->formatContactParameters($value, $formatted);
             }
