@@ -46,12 +46,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
   /**
    * Upgrade function.
    *
@@ -66,6 +60,37 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     $this->addTask('Make the name field required on civicrm_membership_type', 'nameMembershipTypeRequired');
     $this->addTask('Rebuild Multilingal Schema', 'rebuildMultilingalSchema', '5.27.alpha1');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Install event cart extension', 'installEventCart');
+  }
+
+  /**
+   * Install eventCart extension.
+   *
+   * This feature is restructured as a core extension - which is primarily a code cleanup step.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function installEventCart(CRM_Queue_TaskContext $ctx) {
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic.
+    // (2) On new installs, the extension is activated purely via default SQL INSERT.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'eventcart',
+      'name' => 'Event cart',
+      'label' => 'Event cart',
+      'file' => 'eventcart',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+    return TRUE;
   }
 
   public function priceFieldValueLabelRequired($ctx) {

@@ -85,6 +85,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       unset($tabs['repeat']['class']);
     }
 
+    // @todo Move to eventcart extension
     // check if we're in shopping cart mode for events
     if (!(bool) Civi::settings()->get('enable_cart')) {
       unset($tabs['conference']);

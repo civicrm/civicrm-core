@@ -20,7 +20,6 @@
 <xi:include href="Campaign/files.xml"          parse="xml" />
 <xi:include href="Activity/files.xml"          parse="xml" />
 <xi:include href="Event/files.xml"             parse="xml" />
-<xi:include href="Event/Cart/files.xml"        parse="xml" />
 <xi:include href="Dedupe/files.xml"            parse="xml" />
 <xi:include href="Case/files.xml"              parse="xml" />
 <xi:include href="Grant/files.xml"             parse="xml" />
