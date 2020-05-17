@@ -473,5 +473,14 @@ function _eventcart_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _eventcart_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes['CRM_Event_Cart_DAO_Cart'] = [
+    'name' => 'Cart',
+    'class' => 'CRM_Event_Cart_DAO_Cart',
+    'table' => 'civicrm_event_cart',
+  ];
+  $entityTypes['CRM_Event_Cart_DAO_EventInCart'] = [
+    'name' => 'EventInCart',
+    'class' => 'CRM_Event_Cart_DAO_EventInCart',
+    'table' => 'civicrm_events_in_carts',
+  ];
 }
