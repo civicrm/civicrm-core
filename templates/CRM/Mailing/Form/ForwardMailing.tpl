@@ -25,7 +25,7 @@
 </div><div class="spacer"></div>
 <div id="comment" style="display:none">
             <table class="form-layout">
-            <tr class="crm-mailing-forward-form-block-forward_comment"><td><a href="#" onclick="cj('#comment').hide(); cj('#comment_show').show(); return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}close section{/ts}"/></a>
+            <tr class="crm-mailing-forward-form-block-forward_comment"><td><a href="#" onclick="cj('#comment').hide(); cj('#comment_show').show(); return false;">{icon icon="fa-caret-down action-icon"}{ts}close section{/ts}{/icon}</a>
                 <label>{$form.forward_comment.label}</label></td>
                 <td>{$form.forward_comment.html}<br /><br />
               &nbsp;{$form.html_comment.html}<br /></td>
