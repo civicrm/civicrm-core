@@ -25,6 +25,7 @@
  * @param $params
  *   - condition: if present and falsey, return empty
  *   - icon: the icon class to display instead of fa-check
+ *   - anything else is passed along as attributes for the icon
  *
  * @param $text
  *   The translated text to include in the icon's title and screen-reader text.
@@ -36,5 +37,9 @@
 function smarty_block_icon($params, $text, &$smarty) {
   $condition = array_key_exists('condition', $params) ? $params['condition'] : 1;
   $icon = $params['icon'] ?? 'fa-check';
-  return CRM_Core_Page::crmIcon($icon, $text, $condition);
+  $dontPass = [
+    'condition' => 1,
+    'icon' => 1,
+  ];
+  return CRM_Core_Page::crmIcon($icon, $text, $condition, array_diff_key($params, $dontPass));
 }
