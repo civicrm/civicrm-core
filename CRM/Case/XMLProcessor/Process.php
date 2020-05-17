@@ -23,18 +23,16 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @param string $caseType
    * @param array $params
    *
-   * @return bool
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function run($caseType, &$params) {
     $xml = $this->retrieve($caseType);
 
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
-      CRM_Core_Error::fatal(ts("Configuration file could not be retrieved for case type = '%1' %2.",
+      throw new CRM_Core_Exception(ts("Configuration file could not be retrieved for case type = '%1' %2.",
         [1 => $caseType, 2 => $docLink]
       ));
-      return FALSE;
     }
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
@@ -56,10 +54,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $xml = $this->retrieve($caseType);
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
-      CRM_Core_Error::fatal(ts("Unable to load configuration file for the referenced case type: '%1' %2.",
+      throw new CRM_Core_Exception(ts("Unable to load configuration file for the referenced case type: '%1' %2.",
         [1 => $caseType, 2 => $docLink]
       ));
-      return FALSE;
     }
 
     switch ($fieldSet) {
@@ -93,8 +90,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
               $params
             )
             ) {
-              CRM_Core_Error::fatal();
-              return FALSE;
+              throw new CRM_Core_Exception('Unable to create case relationships');
             }
           }
         }
@@ -198,10 +194,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     list($relationshipType, $relationshipTypeName) = $this->locateNameOrLabel($relationshipTypeXML);
     if ($relationshipType === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
-      CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
+      throw new CRM_Core_Exception(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
         [1 => $relationshipTypeName, 2 => $docLink]
       ));
-      return FALSE;
     }
 
     $client = $params['clientID'];
@@ -228,8 +223,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       }
 
       if (!$this->createRelationship($relationshipParams)) {
-        CRM_Core_Error::fatal();
-        return FALSE;
+        throw new CRM_Core_Exception('Unable to create case relationship');
       }
     }
     return TRUE;
@@ -415,10 +409,9 @@ AND        a.is_deleted = 0
 
     if (!$activityTypeInfo) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
-      CRM_Core_Error::fatal(ts('Activity type %1, found in case configuration file, is not present in the database %2',
+      throw new CRM_Core_Exception(ts('Activity type %1, found in case configuration file, is not present in the database %2',
         [1 => $activityTypeName, 2 => $docLink]
       ));
-      return FALSE;
     }
 
     $activityTypeID = $activityTypeInfo['id'];
@@ -549,8 +542,7 @@ AND        a.is_deleted = 0
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
     if (!$activity) {
-      CRM_Core_Error::fatal();
-      return FALSE;
+      throw new CRM_Core_Exception('Unable to create Activity');
     }
 
     // create case activity record
@@ -740,8 +732,7 @@ AND        a.is_deleted = 0
     $xml = $this->retrieve($caseType);
 
     if ($xml === FALSE) {
-      CRM_Core_Error::fatal();
-      return FALSE;
+      throw new CRM_Core_Exception('Unable to read supplied XML File');
     }
 
     $activityInstances = $this->activityTypes($xml->ActivityTypes, TRUE);

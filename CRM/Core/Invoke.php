@@ -102,7 +102,7 @@ class CRM_Core_Invoke {
         return CRM_Utils_System::redirect();
       }
       else {
-        CRM_Core_Error::fatal('You do not have permission to execute this url');
+        CRM_Core_Error::statusBounce('You do not have permission to execute this url');
       }
     }
   }
@@ -224,7 +224,7 @@ class CRM_Core_Invoke {
 
       if (!array_key_exists('page_callback', $item)) {
         CRM_Core_Error::debug('Bad item', $item);
-        CRM_Core_Error::fatal(ts('Bad menu record in database'));
+        CRM_Core_Error::statusBounce(ts('Bad menu record in database'));
       }
 
       // check that we are permissioned to access this page
@@ -307,7 +307,7 @@ class CRM_Core_Invoke {
           $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
         }
         else {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Execute supplied menu action');
         }
         $result = $object->run($newArgs, $pageArgs);
       }
