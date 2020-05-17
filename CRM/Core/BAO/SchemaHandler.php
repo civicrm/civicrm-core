@@ -502,7 +502,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    * @param string $columnName
    * @param $length
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function alterFieldLength($customFieldID, $tableName, $columnName, $length) {
     // first update the custom field tables
@@ -543,7 +543,7 @@ MODIFY      {$columnName} varchar( $length )
       CRM_Core_DAO::executeQuery($sql);
     }
     else {
-      CRM_Core_Error::fatal(ts('Could Not Find Custom Field Details for %1, %2, %3',
+      throw new CRM_Core_Exception(ts('Could Not Find Custom Field Details for %1, %2, %3',
         [
           1 => $tableName,
           2 => $columnName,

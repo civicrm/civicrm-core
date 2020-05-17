@@ -153,7 +153,7 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'File':
               if (!$field['file_id']) {
-                CRM_Core_Error::fatal();
+                throw new CRM_Core_Exception('Missing parameter file_id');
               }
 
               // need to add/update civicrm_entity_file
@@ -318,7 +318,7 @@ class CRM_Core_BAO_CustomValueTable {
         return 'datetime';
 
       default:
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Invalid Field Type');
     }
   }
 
@@ -415,12 +415,13 @@ class CRM_Core_BAO_CustomValueTable {
    *   Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
+   * @throws CRM_Core_Exception
    */
   public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE, $DTparams = NULL) {
     if (!$entityID) {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
-      CRM_Core_Error::fatal('Please file an issue with the backtrace');
+      throw new CRM_Core_Exception('Please file an issue with the backtrace');
       return NULL;
     }
 

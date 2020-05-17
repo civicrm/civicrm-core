@@ -608,6 +608,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return CRM_Core_BAO_CustomField
    *   The field object.
+   * @throws CRM_Core_Exception
    */
   public static function getFieldObject($fieldID) {
     $field = new CRM_Core_BAO_CustomField();
@@ -619,7 +620,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if (empty($fieldValues)) {
       $field->id = $fieldID;
       if (!$field->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Cannot find Custom Field');
       }
 
       $fieldValues = [];
@@ -1777,11 +1778,13 @@ WHERE  id IN ( %1, %2 )
    *   FK to civicrm_custom_field.
    * @param int $newGroupID
    *   FK to civicrm_custom_group.
+   *
+   * @throws CRM_Core_Exception
    */
   public static function moveField($fieldID, $newGroupID) {
     $validation = self::_moveFieldValidate($fieldID, $newGroupID);
     if (TRUE !== $validation) {
-      CRM_Core_Error::fatal(implode(' ', $validation));
+      throw new CRM_Core_Exception(implode(' ', $validation));
     }
     $field = new CRM_Core_DAO_CustomField();
     $field->id = $fieldID;
@@ -2070,7 +2073,7 @@ WHERE  id IN ( %1, %2 )
    *
    * @return array
    *   fatal is fieldID does not exists, else array of tableName, columnName
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getTableColumnGroup($fieldID, $force = FALSE) {
     $cacheKey = "CRM_Core_DAO_CustomField_CustomGroup_TableColumn_{$fieldID}";
@@ -2087,7 +2090,7 @@ AND    cf.id = %1";
       $dao = CRM_Core_DAO::executeQuery($query, $params);
 
       if (!$dao->fetch()) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception("Cannot find table and column information for Custom Field " . $fieldID);
       }
       $fieldValues = [$dao->table_name, $dao->column_name, $dao->id];
       $cache->set($cacheKey, $fieldValues);

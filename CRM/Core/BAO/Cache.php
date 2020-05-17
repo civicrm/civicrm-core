@@ -149,6 +149,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param int $componentID
    *   The optional component ID (so componenets can share the same name space).
    * @deprecated
+   * @throws CRM_Core_Exception
    */
   public static function setItem(&$data, $group, $path, $componentID = NULL) {
     CRM_Core_Error::deprecatedFunctionWarning(
@@ -167,7 +168,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     // CRM-11234
     $lock = Civi::lockManager()->acquire("cache.{$group}_{$path}._{$componentID}");
     if (!$lock->isAcquired()) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Cannot acquire database lock');
     }
 
     $table = self::getTableName();

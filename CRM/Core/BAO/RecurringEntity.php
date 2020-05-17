@@ -224,6 +224,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * Generate new DAOs and along with entries in civicrm_recurring_entity table.
    *
    * @return array
+   * @throws CRM_Core_Exception
    */
   public function generateEntities() {
     self::setStatus(self::RUNNING);
@@ -241,7 +242,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
       }
       if (empty($findCriteria)) {
-        CRM_Core_Error::fatal("Find criteria missing to generate form. Make sure entity_id and table is set.");
+        throw new CRM_Core_Exception("Find criteria missing to generate form. Make sure entity_id and table is set.");
       }
 
       $count = 0;
@@ -547,11 +548,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    *
    * @return object
+   * @throws new CRM_Core_Exception
    */
   public static function copyCreateEntity($entityTable, $fromCriteria, $newParams, $createRecurringEntity = TRUE) {
     $daoName = self::$_tableDAOMapper[$entityTable];
     if (!$daoName) {
-      CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
+      throw new CRM_Core_Exception("DAO Mapper missing for $entityTable.");
     }
     $newObject = CRM_Core_DAO::copyGeneric($daoName, $fromCriteria, $newParams);
 
@@ -631,7 +633,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $updateDAO = CRM_Core_DAO::cascadeUpdate($daoName, $obj->id, $entityID, $skipData);
       }
       else {
-        CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
+        throw new CRM_Core_Exception("DAO Mapper missing for $entityTable.");
       }
     }
     // done with processing. lets unset static var.
@@ -811,7 +813,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         foreach (self::$_linkedEntitiesInfo as $linkedTable => $linfo) {
           $daoName = self::$_tableDAOMapper[$linkedTable];
           if (!$daoName) {
-            CRM_Core_Error::fatal("DAO Mapper missing for $linkedTable.");
+            throw new CRM_Core_Exception("DAO Mapper missing for $linkedTable.");
           }
 
           $linkedDao = new $daoName();

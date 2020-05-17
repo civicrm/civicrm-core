@@ -421,7 +421,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
-      CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
+      CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
     }
 
     if ($inputType == 'color') {
@@ -436,7 +436,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $error = $this->addRule($name, ts('%1 is a required field.', [1 => $label]), 'required');
       }
       if (HTML_QuickForm::isError($error)) {
-        CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
+        CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
       }
     }
 

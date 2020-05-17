@@ -40,6 +40,7 @@ class CRM_Core_BAO_Block {
    *
    * @return array
    *   Array of $block objects.
+   * @throws CRM_Core_Exception
    */
   public static function &getValues($blockName, $params) {
     if (empty($params)) {
@@ -52,7 +53,7 @@ class CRM_Core_BAO_Block {
     if (!isset($params['entity_table'])) {
       $block->contact_id = $params['contact_id'];
       if (!$block->contact_id) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Invalid Contact ID parameter passed');
       }
       $blocks = self::retrieveBlock($block, $blockName);
     }

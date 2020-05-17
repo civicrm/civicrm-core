@@ -88,10 +88,11 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    *   ID of the job to be deleted.
    *
    * @return bool|null
+   * @throws CRM_Core_Exception
    */
   public static function del($jobID) {
     if (!$jobID) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+      throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
     }
 
     $dao = new CRM_Core_DAO_Job();
