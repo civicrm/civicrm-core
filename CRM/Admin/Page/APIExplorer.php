@@ -177,7 +177,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     // Fetch block for a specific action
     else {
       $action = strtolower($action);
-      $fnName = 'civicrm_api3_' . _civicrm_api_get_entity_name_from_camel($entity) . '_' . $action;
+      $fnName = 'civicrm_api3_' . CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($entity) . '_' . $action;
       // Support the alternate "1 file per action" structure
       $actionFile = "api/v3/$entity/" . ucfirst($action) . '.php';
       $actionFileContents = file_get_contents("api/v3/$entity/" . ucfirst($action) . '.php', FILE_USE_INCLUDE_PATH);

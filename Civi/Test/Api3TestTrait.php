@@ -302,7 +302,7 @@ trait Api3TestTrait {
    * @throws \Exception
    */
   public function runApi4Legacy($v3Entity, $v3Action, $v3Params = []) {
-    $v4Entity = self::convertEntityNameToApi4($v3Entity);
+    $v4Entity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($v3Entity);
     $v4Action = $v3Action = strtolower($v3Action);
     $v4Params = ['checkPermissions' => isset($v3Params['check_permissions']) ? (bool) $v3Params['check_permissions'] : FALSE];
     $sequential = !empty($v3Params['sequential']);
@@ -641,9 +641,9 @@ trait Api3TestTrait {
 
     // Handle single api call
     list(, $chainEntity, $chainAction) = explode('.', $key);
-    $lcChainEntity = \_civicrm_api_get_entity_name_from_camel($chainEntity);
-    $chainEntity = self::convertEntityNameToApi4($chainEntity);
-    $lcMainEntity = \_civicrm_api_get_entity_name_from_camel($mainEntity);
+    $lcChainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($chainEntity);
+    $chainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($chainEntity);
+    $lcMainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntity);
     $params = is_array($params) ? $params : [];
 
     // Api3 expects this to be inherited
@@ -675,21 +675,6 @@ trait Api3TestTrait {
       $params[$lcMainEntity . '_id'] = $result['id'];
     }
     return $this->runApi4Legacy($chainEntity, $chainAction, $params);
-  }
-
-  /**
-   * Fix the naming differences between api3 & api4 entities.
-   *
-   * @param string $legacyName
-   * @return string
-   */
-  public static function convertEntityNameToApi4($legacyName) {
-    $api4Name = \CRM_Utils_String::convertStringToCamel($legacyName);
-    $map = [
-      'Im' => 'IM',
-      'Acl' => 'ACL',
-    ];
-    return $map[$api4Name] ?? $api4Name;
   }
 
 }

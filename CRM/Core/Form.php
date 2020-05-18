@@ -2015,7 +2015,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, []);
-    $props['entity'] = CRM_Utils_String::convertStringToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
+    $props['entity'] = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
     $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
 
     if (array_key_exists('create', $props) && empty($props['create'])) {

@@ -281,22 +281,15 @@ function _civicrm_api_replace_variable($value, $parentResult, $separator) {
  *
  * @return string
  *   Entity name in underscore separated format.
+ *
+ * @deprecated
  */
 function _civicrm_api_get_entity_name_from_camel($entity) {
-  if (!$entity || $entity === strtolower($entity)) {
-    return $entity;
+  if (!$entity) {
+    // @todo - this should not be called when empty.
+    return '';
   }
-  elseif ($entity == 'PCP') {
-    return 'pcp';
-  }
-  else {
-    $entity = ltrim(strtolower(str_replace('U_F',
-          'uf',
-          // That's CamelCase, beside an odd UFCamel that is expected as uf_camel
-          preg_replace('/(?=[A-Z])/', '_$0', $entity)
-        )), '_');
-  }
-  return $entity;
+  return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($entity);
 }
 
 /**
