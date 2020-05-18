@@ -109,6 +109,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @param $transactionReference
    *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
     $ids = $input = $params = [];
@@ -160,8 +162,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    $transaction = new CRM_Core_Transaction();
-
     // check if contribution is already completed, if so we ignore this ipn
 
     if ($contribution->contribution_status_id == 1) {
@@ -181,7 +181,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
         $contribution->trxn_id = $ids['membership'];
       }
     }
-    $this->completeTransaction($input, $ids, $objects, $transaction);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
     return TRUE;
   }
 
