@@ -205,7 +205,8 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
 
   /**
    * Format a docblock to be a bit more readable
-   * Not a proper doc parser... patches welcome :)
+   *
+   * FIXME: APIv4 uses markdown in code docs. Switch to that.
    *
    * @param string $text
    * @return string
@@ -224,8 +225,8 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
 
     // Extract code blocks - save for later to skip html conversion
     $code = [];
-    preg_match_all('#@code(.*?)@endcode#is', $text, $code);
-    $text = preg_replace('#@code.*?@endcode#is', '<pre></pre>', $text);
+    preg_match_all('#(@code|```)(.*?)(@endcode|```)#is', $text, $code);
+    $text = preg_replace('#(@code|```)(.*?)(@endcode|```)#is', '<pre></pre>', $text);
 
     // Convert @annotations to titles
     $text = preg_replace_callback(
@@ -242,8 +243,8 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     $text = nl2br($text);
 
     // Add unformatted code blocks back in
-    if ($code && !empty($code[1])) {
-      foreach ($code[1] as $block) {
+    if ($code && !empty($code[2])) {
+      foreach ($code[2] as $block) {
         $text = preg_replace('#<pre></pre>#', "<pre>$block</pre>", $text, 1);
       }
     }

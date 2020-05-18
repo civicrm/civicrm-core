@@ -222,11 +222,11 @@ class ResolverApi {
   /**
    * Recursively interpolate values.
    *
-   * @code
+   * ```
    * $params = array('foo' => '@1');
    * $this->interpolate($params, array('@1'=> $object))
    * assert $data['foo'] == $object;
-   * @endcode
+   * ```
    *
    * @param array $array
    *   Array which may or many not contain a mix of tokens.

@@ -654,13 +654,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * For example, 'civicrm/contact/view?reset=1&cid=66' will be returned as:
    *
-   * @code
+   * ```
    * array(
    *   'path' => 'civicrm/contact/view',
    *   'route' => 'civicrm.civicrm_contact_view',
    *   'query' => array('reset' => '1', 'cid' => '66'),
    * );
-   * @endcode
+   * ```
    *
    * @param string $url
    *   The url to parse.

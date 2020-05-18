@@ -21,7 +21,7 @@
  *   - "match-mandatory" will generate an error
  *   - "match" will allow action to proceed -- thus inserting a new record
  *
- * @code
+ * ```
  * $result = civicrm_api('contact', 'create', array(
  *   'options' => array(
  *     'match' => array('last_name', 'first_name')
@@ -30,7 +30,7 @@
  *   'last_name' => 'Lebowski',
  *   'nick_name' => 'The Dude',
  * ));
- * @endcode
+ * ```
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing

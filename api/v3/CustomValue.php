@@ -22,7 +22,7 @@
  *   Expected keys are in format custom_fieldID:recordID or custom_groupName:fieldName:recordID.
  *
  * @example:
- * @code
+ * ```
  *   // entity ID. You do not need to specify entity type, we figure it out based on the fields you're using
  *   'entity_id' => 123,
  *   // (omitting :id) inserts or updates a field in a single-valued group
@@ -39,7 +39,7 @@
  *   'custom_some_group:my_field' => 'myinfo',
  *   // updates record ID 8 in my_other_field in multi-valued some_big_group
  *   'custom_some_big_group:my_other_field:8' => 'myinfo',
- * @endcode
+ * ```
  *
  * @throws Exception
  * @return array

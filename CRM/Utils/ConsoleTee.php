@@ -12,12 +12,12 @@
 /**
  * Capture the output from the console, copy it to a file, and pass it on.
  *
- * @code
+ * ```
  * $tee = CRM_Utils_ConsoleTee::create()->start();
  * echo "hello world";
  * $tee->stop();
  * assertEquals("hello world", file_get_contents($tee->getFileName()));
- * @endCode
+ * ```
  *
  * Loosely speaking, it serves a similar purpose to Unix `tee`.
  *

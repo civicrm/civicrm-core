@@ -20,7 +20,7 @@
  *
  * FIXME: Add TTL support?
  *
- * @code
+ * ```
  * $signer = new CRM_Utils_Signer('myprivatekey', array('param1','param2'));
  * $params = array(
  *   'param1' => 'hello',
@@ -29,7 +29,7 @@
  * $token = $signer->sign($params);
  * ...
  * assertTrue($signer->validate($token, $params));
- * @endcode
+ * ```
  */
 class CRM_Utils_Signer {
   /**

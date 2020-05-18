@@ -2858,11 +2858,11 @@ SELECT contact_id
    * Generates acl clauses suitable for adding to WHERE or ON when doing an api.get for this entity
    *
    * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
-   * @code
+   * ```
    *   array(
    *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
    *   )
-   * @endcode
+   * ```
    *
    * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
    *

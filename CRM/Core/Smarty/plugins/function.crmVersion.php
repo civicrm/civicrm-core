@@ -20,11 +20,11 @@
 /**
  * Display the CiviCRM version
  *
- * @code
+ * ```
  * The version is {crmVersion}.
  *
  * {crmVersion redact=auto assign=ver}The version is {$ver}.
- * @endcode
+ * ```
  *
  * @param $params
  * @param $smarty

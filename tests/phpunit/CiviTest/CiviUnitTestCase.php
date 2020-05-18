@@ -495,14 +495,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Create a batch of external API calls which can
    * be executed concurrently.
    *
-   * @code
+   * ```
    * $calls = $this->createExternalAPI()
    *    ->addCall('Contact', 'get', ...)
    *    ->addCall('Contact', 'get', ...)
    *    ...
    *    ->run()
    *    ->getResults();
-   * @endcode
+   * ```
    *
    * @return \Civi\API\ExternalBatch
    * @throws PHPUnit_Framework_SkippedTestError

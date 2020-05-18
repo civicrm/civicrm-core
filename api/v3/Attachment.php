@@ -15,7 +15,7 @@
  * file content.
  * For core fields use "entity_table", for custom fields use "field_name"
  *
- * @code
+ * ```
  * // Create an attachment for a core field
  * $result = civicrm_api3('Attachment', 'create', array(
  *   'entity_table' => 'civicrm_activity',
@@ -26,9 +26,9 @@
  * ));
  * $attachment = $result['values'][$result['id']];
  * echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
- * @endcode
+ * ```
  *
- * @code
+ * ```
  * // Create an attachment for a custom file field
  * $result = civicrm_api3('Attachment', 'create', array(
  *   'field_name' => 'custom_6',
@@ -39,9 +39,9 @@
  * ));
  * $attachment = $result['values'][$result['id']];
  * echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
- * @endcode
+ * ```
  *
- * @code
+ * ```
  * // Move an existing file and save as an attachment
  * $result = civicrm_api3('Attachment', 'create', array(
  *   'entity_table' => 'civicrm_activity',
@@ -54,7 +54,7 @@
  * ));
  * $attachment = $result['values'][$result['id']];
  * echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
- * @endcode
+ * ```
  *
  * Notes:
  *  - File content is not returned by default. One must specify 'return => content'.
