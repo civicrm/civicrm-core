@@ -36,84 +36,46 @@ class Paths {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
       })
       ->register('civicrm.packages', function () {
-        return [
-          'path' => \Civi::paths()->getPath('[civicrm.root]/packages/'),
-          'url' => \Civi::paths()->getUrl('[civicrm.root]/packages/', 'absolute'),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCiviPackagesStorage();
       })
       ->register('civicrm.vendor', function () {
-        return [
-          'path' => \Civi::paths()->getPath('[civicrm.root]/vendor/'),
-          'url' => \Civi::paths()->getUrl('[civicrm.root]/vendor/', 'absolute'),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCiviVendorStorage();
       })
       ->register('civicrm.bower', function () {
-        return [
-          'path' => \Civi::paths()->getPath('[civicrm.root]/bower_components/'),
-          'url' => \Civi::paths()->getUrl('[civicrm.root]/bower_components/', 'absolute'),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCiviBowerStorage();
       })
       ->register('civicrm.files', function () {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })
       ->register('civicrm.private', function () {
-        return [
-          // For backward compatibility with existing deployments, this
-          // effectively returns `dirname(CIVICRM_TEMPLATE_COMPILEDIR)`.
-          // That's confusing. Future installers should probably set `civicrm.private`
-          // explicitly instead of setting `CIVICRM_TEMPLATE_COMPILEDIR`.
-          'path' => \CRM_Utils_File::baseFilePath(),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCiviPrivateStorage();
       })
       ->register('civicrm.log', function () {
-        return [
-          'path' => \Civi::paths()->getPath('[civicrm.private]/ConfigAndLog'),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCiviConfigAndLogStorage();
       })
       ->register('civicrm.compile', function () {
-        return [
-          // These two formulations are equivalent in typical deployments; however,
-          // for existing systems which previously customized CIVICRM_TEMPLATE_COMPILEDIR,
-          // using the constant should be more backward-compatibility.
-          'path' => defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CIVICRM_TEMPLATE_COMPILEDIR : \Civi::paths()->getPath('[civicrm.private]/templates_c'),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCiviCompileDirectory();
       })
       ->register('civicrm.l10n', function () {
-        $dir = defined('CIVICRM_L10N_BASEDIR') ? CIVICRM_L10N_BASEDIR : \Civi::paths()->getPath('[civicrm.private]/l10n');
-        return [
-          'path' => is_dir($dir) ? $dir : \Civi::paths()->getPath('[civicrm.root]/l10n'),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCiviL10nDirectory();
       })
       ->register('wp.frontend.base', function () {
-        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
+        return \CRM_Core_Config::singleton()->userSystem->getWPFrontendBase();
       })
       ->register('wp.frontend', function () use ($paths) {
-        $config = \CRM_Core_Config::singleton();
-        $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
-        return [
-          'url' => $paths->getVariable('wp.frontend.base', 'url') . $suffix,
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getWPFrontend($paths);
       })
       ->register('wp.backend.base', function () {
-        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/'];
+        return \CRM_Core_Config::singleton()->userSystem->getWPBackendBase();
       })
       ->register('wp.backend', function () use ($paths) {
-        return [
-          'url' => $paths->getVariable('wp.backend.base', 'url') . 'admin.php',
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getWPBackend($paths);
       })
       ->register('cms', function () {
-        return [
-          'path' => \CRM_Core_Config::singleton()->userSystem->cmsRootPath(),
-          'url' => \CRM_Utils_System::baseCMSURL(),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCMSPathAndURL();
       })
       ->register('cms.root', function () {
-        return [
-          'path' => \CRM_Core_Config::singleton()->userSystem->cmsRootPath(),
-          // Misleading: this *removes* the language part of the URL, producing a pristine base URL.
-          'url' => \CRM_Utils_System::languageNegotiationURL(\CRM_Utils_System::baseCMSURL(), FALSE, TRUE),
-        ];
+        return \CRM_Core_Config::singleton()->userSystem->getCMSRootPathAndURL();
       });
   }
 
@@ -142,9 +104,18 @@ class Paths {
    */
   public function getVariable($name, $attr) {
     if (!isset($this->variables[$name])) {
-      $this->variables[$name] = call_user_func($this->variableFactory[$name]);
+      // Try looking in $GLOBALS first.
       if (isset($GLOBALS['civicrm_paths'][$name])) {
-        $this->variables[$name] = array_merge($this->variables[$name], $GLOBALS['civicrm_paths'][$name]);
+        if (isset($this->variables[$name])) {
+          $this->variables[$name] = array_merge($this->variables[$name], $GLOBALS['civicrm_paths'][$name]);
+        }
+        else {
+          $this->variables[$name] = $GLOBALS['civicrm_paths'][$name];
+        }
+      }
+      // If nothing is found in $GLOBALS, call closure.
+      if (!isset($this->variables[$name])) {
+        $this->variables[$name] = call_user_func($this->variableFactory[$name]);
       }
       if (isset($this->variables[$name]['url'])) {
         // Typical behavior is to return an absolute URL. If an admin has put an override that's site-relative, then convert.

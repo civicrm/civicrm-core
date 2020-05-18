@@ -697,6 +697,181 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Determine the location of the CiviCRM packages directory.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm/packages/"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm/packages/"
+   */
+  public function getCiviPackagesStorage() {
+    return [
+      'path' => Civi::paths()->getPath('[civicrm.root]/packages/'),
+      'url' => Civi::paths()->getUrl('[civicrm.root]/packages/', 'absolute'),
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM vendor directory.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm/vendor/"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm/vendor/"
+   */
+  public function getCiviVendorStorage() {
+    return [
+      'path' => Civi::paths()->getPath('[civicrm.root]/vendor/'),
+      'url' => Civi::paths()->getUrl('[civicrm.root]/vendor/', 'absolute'),
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM bower components directory.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm/bower_components/"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm/bower_components/"
+   */
+  public function getCiviBowerStorage() {
+    return [
+      'path' => Civi::paths()->getPath('[civicrm.root]/bower_components/'),
+      'url' => Civi::paths()->getUrl('[civicrm.root]/bower_components/', 'absolute'),
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM private directory.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www/sites/default/civicrm/"
+   */
+  public function getCiviPrivateStorage() {
+    return [
+      // For backward compatibility with existing deployments, this
+      // effectively returns `dirname(CIVICRM_TEMPLATE_COMPILEDIR)`.
+      // That's confusing. Future installers should probably set `civicrm.private`
+      // explicitly instead of setting `CIVICRM_TEMPLATE_COMPILEDIR`.
+      'path' => CRM_Utils_File::baseFilePath(),
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM Config and Log directory.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www/sites/default/civicrm/ConfigAndLog"
+   */
+  public function getCiviConfigAndLogStorage() {
+    return [
+      'path' => Civi::paths()->getPath('[civicrm.private]/ConfigAndLog'),
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM template compile directory.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www/sites/default/civicrm/templates_c"
+   */
+  public function getCiviCompileDirectory() {
+    return [
+      // These two formulations are equivalent in typical deployments; however,
+      // for existing systems which previously customized CIVICRM_TEMPLATE_COMPILEDIR,
+      // using the constant should be more backward-compatibility.
+      'path' => defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CIVICRM_TEMPLATE_COMPILEDIR : Civi::paths()->getPath('[civicrm.private]/templates_c'),
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM localisation directory.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www/sites/default/civicrm/l10n"
+   */
+  public function getCiviL10nDirectory() {
+    $dir = defined('CIVICRM_L10N_BASEDIR') ? CIVICRM_L10N_BASEDIR : Civi::paths()->getPath('[civicrm.private]/l10n');
+    return [
+      'path' => is_dir($dir) ? $dir : Civi::paths()->getPath('[civicrm.root]/l10n'),
+    ];
+  }
+
+  /**
+   * Determine the WordPress "front-end base" URL.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/"
+   */
+  public function getWPFrontendBase() {
+    return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
+  }
+
+  /**
+   * Determine the WordPress "front-end" URL.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/civicrm"
+   */
+  public function getWPFrontend($paths) {
+    $config = CRM_Core_Config::singleton();
+    $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
+    return [
+      'url' => $paths->getVariable('wp.frontend.base', 'url') . $suffix,
+    ];
+  }
+
+  /**
+   * Determine the WordPress "back-end base" URL.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/wp-admin/"
+   */
+  public function getWPBackendBase() {
+    return [
+      'url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/',
+    ];
+  }
+
+  /**
+   * Determine the WordPress "back-end" URL.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/wp-admin/admin.php"
+   */
+  public function getWPBackend($paths) {
+    return [
+      'url' => $paths->getVariable('wp.backend.base', 'url') . 'admin.php',
+    ];
+  }
+
+  /**
+   * Determine the CMS Path and URL.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/wp-admin/admin.php"
+   */
+  public function getCMSPathAndURL() {
+    $config = CRM_Core_Config::singleton();
+    return [
+      'path' => $config->userSystem->cmsRootPath(),
+      'url' => CRM_Utils_System::baseCMSURL(),
+    ];
+  }
+
+  /**
+   * Determine the CMS Root Path and URL.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/wp-admin/admin.php"
+   */
+  public function getCMSRootPathAndURL() {
+    $config = CRM_Core_Config::singleton();
+    return [
+      'path' => $config->userSystem->cmsRootPath(),
+      // Misleading: this *removes* the language part of the URL, producing a pristine base URL.
+      'url' => CRM_Utils_System::languageNegotiationURL(CRM_Utils_System::baseCMSURL(), FALSE, TRUE),
+    ];
+  }
+
+  /**
    * Perform any post login activities required by the CMS.
    *
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,

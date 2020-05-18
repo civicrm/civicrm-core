@@ -61,15 +61,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Moved from CRM_Utils_System_Base
    */
   public function getDefaultFileStorage() {
-    $config = CRM_Core_Config::singleton();
-    $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
-    $cmsPath = $this->cmsRootPath();
-    $filesPath = CRM_Utils_File::baseFilePath();
-    $filesRelPath = CRM_Utils_File::relativize($filesPath, $cmsPath);
-    $filesURL = rtrim($cmsUrl, '/') . '/' . ltrim($filesRelPath, ' /');
+    $upload_dir = wp_get_upload_dir();
     return [
-      'url' => CRM_Utils_File::addTrailingSlash($filesURL, '/'),
-      'path' => CRM_Utils_File::addTrailingSlash($filesPath),
+      'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR,
+      'url' => $upload_dir['baseurl'] . '/civicrm/',
     ];
   }
 
@@ -77,32 +72,135 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Determine the location of the CiviCRM source tree.
    *
    * @return array
-   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
-   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/wp-content/plugins/civicrm/civicrm/"
+   *   - url: string. ex: "https://example.com/wp-content/plugins/civicrm/civicrm/"
    */
   public function getCiviSourceStorage() {
-    global $civicrm_root;
-
-    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
-    // More generally, we shouldn't be using $config here.
-    if (!defined('CIVICRM_UF_BASEURL')) {
-      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
-    }
-
-    $cmsPath = $this->cmsRootPath();
-
-    // $config  = CRM_Core_Config::singleton();
-    // overkill? // $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
-    $cmsUrl = CIVICRM_UF_BASEURL;
-    if (CRM_Utils_System::isSSL()) {
-      $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
-    }
-    $civiRelPath = CRM_Utils_File::relativize(realpath($civicrm_root), realpath($cmsPath));
-    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
     return [
-      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
-      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+      'path' => CIVICRM_PLUGIN_DIR . 'civicrm' . DIRECTORY_SEPARATOR,
+      'url' => CIVICRM_PLUGIN_URL . 'civicrm/',
     ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM packages directory.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www/wp-content/plugins/civicrm/civicrm/packages/"
+   *   - url: string. ex: "https://example.com/wp-content/plugins/civicrm/civicrm/packages/"
+   */
+  public function getCiviPackagesStorage() {
+    $source = self::getCiviSourceStorage();
+    return [
+      'path' => $source['path'] . 'packages/',
+      'url' => $source['url'] . 'packages/',
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM vendor directory.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www/wp-content/plugins/civicrm/civicrm/vendor/"
+   *   - url: string. ex: "https://example.com/wp-content/plugins/civicrm/civicrm/vendor/"
+   */
+  public function getCiviVendorStorage() {
+    $source = self::getCiviSourceStorage();
+    return [
+      'path' => $source['path'] . 'vendor/',
+      'url' => $source['url'] . 'vendor/',
+    ];
+  }
+
+  /**
+   * Determine the location of the CiviCRM bower components directory.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www/wp-content/plugins/civicrm/civicrm/bower_components/"
+   *   - url: string. ex: "https://example.com/wp-content/plugins/civicrm/civicrm/bower_components/"
+   */
+  public function getCiviBowerStorage() {
+    $source = self::getCiviSourceStorage();
+    return [
+      'path' => $source['path'] . 'bower_components/',
+      'url' => $source['url'] . 'bower_components/',
+    ];
+  }
+
+  /**
+   * Determine the WordPress "front-end base" URL.
+   *
+   * @return array
+   *   - url: string. ex: "https://example.com/"
+   */
+  public function getWPFrontendBase() {
+    return [
+      'url' => home_url('/'),
+    ];
+  }
+
+  /**
+   * Determine the WordPress "front-end" URL, also known as the "Base Page".
+   *
+   * @return array
+   *   - url: string. ex: "https://example.com/civicrm"
+   */
+  public function getWPFrontend($paths) {
+    return [
+      'url' => self::getBaseUrl(FALSE, TRUE, FALSE),
+    ];
+  }
+
+  /**
+   * Determine the WordPress "back-end base" URL.
+   *
+   * @return array
+   *   - url: string. ex: "https://example.com/wp-admin/"
+   */
+  public function getWPBackendBase() {
+    return [
+      'url' => admin_url(),
+    ];
+  }
+
+  /**
+   * Determine the WordPress "back-end" URL.
+   *
+   * @return array
+   *   - url: string. ex: "https://example.com/wp-admin/admin.php"
+   */
+  public function getWPBackend($paths) {
+    return [
+      'url' => admin_url('admin.php'),
+    ];
+  }
+
+  /**
+   * Determine the CMS Path and URL.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www"
+   *   - url: string. ex: "https://example.com"
+   */
+  public function getCMSPathAndURL() {
+    $config = CRM_Core_Config::singleton();
+    return [
+      'path' => untrailingslashit(ABSPATH),
+      'url' => home_url(),
+    ];
+  }
+
+  /**
+   * Determine the CMS Root Path and URL.
+   *
+   * The Path and URL is identical to that determined in `getCMSPathAndURL()`.
+   *
+   * @return array
+   *   - path: string. ex: "/var/www"
+   *   - url: string. ex: "http://example.com"
+   */
+  public function getCMSRootPathAndURL() {
+    return self::getCMSPathAndURL();
   }
 
   /**
@@ -302,13 +400,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @return mixed|null|string
    */
-  private function getBaseUrl($absolute, $frontend, $forceBackend) {
+  public function getBaseUrl($absolute, $frontend, $forceBackend) {
     $config = CRM_Core_Config::singleton();
     if ((is_admin() && !$frontend) || $forceBackend) {
-      return Civi::paths()->getUrl('[wp.backend]/.', $absolute ? 'absolute' : 'relative');
+      return admin_url('admin.php');
     }
     else {
-      return Civi::paths()->getUrl('[wp.frontend]/.', $absolute ? 'absolute' : 'relative');
+      $basepage = get_page_by_path($config->wpBasePage);
+      return get_permalink($basepage->ID);
     }
   }
 
