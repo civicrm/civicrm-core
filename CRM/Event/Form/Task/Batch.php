@@ -367,7 +367,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $input['component'] = $name;
 
     $baseIPN = new CRM_Core_Payment_BaseIPN();
-    $transaction = new CRM_Core_Transaction();
 
     // reset template values.
     $template = CRM_Core_Smarty::singleton();
@@ -385,11 +384,13 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     ]);
     $input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] = $params['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] ?? NULL;
     if ($statusId == $contributionStatuses['Cancelled']) {
+      $transaction = new CRM_Core_Transaction();
       $baseIPN->cancelled($objects, $transaction, $input);
       $transaction->commit();
       return $statusId;
     }
     elseif ($statusId == $contributionStatuses['Failed']) {
+      $transaction = new CRM_Core_Transaction();
       $baseIPN->failed($objects, $transaction, $input);
       $transaction->commit();
       return $statusId;
@@ -397,7 +398,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     // status is not pending
     if ($contribution->contribution_status_id != $contributionStatuses['Pending']) {
-      $transaction->commit();
       return;
     }
 
@@ -426,7 +426,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     //complete the contribution.
     // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
     // as this method is not preferred / supported.
-    $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
 
     // reset template values before processing next transactions
     $template->clearTemplateVars();
