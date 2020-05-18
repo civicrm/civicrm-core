@@ -144,11 +144,10 @@ if (!defined('CIVICRM_L10N_BASEDIR') && file_exists($crmPath . DIRECTORY_SEPARAT
 }
 
 // CRM-16801 This validates that seedLanguage is valid by looking in $langs.
-// NB: the variable is initial a $_REQUEST for the initial page reload,
-// then becomes a $_POST when the installation form is submitted.
-// ^ I think that comment means that the parameter is first found in _GET then later in _POST
-$request = array_merge($_GET, $_POST);
-if (isset($request['seedLanguage']) && isset($langs[$request['seedLanguage']])) {
+// 'seedLanguage' is originally passed in on the query string so found in _GET,
+// but on the subsequent request(s) it will be in _POST.
+$inputSource = ($_SERVER['REQUEST_METHOD'] === 'POST') ? $_POST : $_GET;
+if (isset($inputSource['seedLanguage']) && isset($langs[$inputSource['seedLanguage']])) {
   $seedLanguage = $request['seedLanguage'];
   $tsLocale = $request['seedLanguage'];
 }
