@@ -215,8 +215,6 @@ AND    co.id IN ( $contribIDs )";
     $statusID = $params['contribution_status_id'] ?? NULL;
     $baseIPN = new CRM_Core_Payment_BaseIPN();
 
-    $transaction = new CRM_Core_Transaction();
-
     // get the missing pieces for each contribution
     $contribIDs = implode(',', $form->_contributionIds);
     $details = self::getDetails($contribIDs);
@@ -246,11 +244,13 @@ AND    co.id IN ( $contribIDs )";
       );
 
       if ($statusID == array_search('Cancelled', $contributionStatuses)) {
+        $transaction = new CRM_Core_Transaction();
         $baseIPN->cancelled($objects, $transaction);
         $transaction->commit();
         continue;
       }
       elseif ($statusID == array_search('Failed', $contributionStatuses)) {
+        $transaction = new CRM_Core_Transaction();
         $baseIPN->failed($objects, $transaction);
         $transaction->commit();
         continue;
@@ -261,7 +261,6 @@ AND    co.id IN ( $contribIDs )";
           $contributionStatuses
         )
       ) {
-        $transaction->commit();
         continue;
       }
 
@@ -282,8 +281,8 @@ AND    co.id IN ( $contribIDs )";
       $input['trxn_date'] = $params["trxn_date_{$row['contribution_id']}"] . ' ' . date('H:i:s');
       $input['is_email_receipt'] = !empty($params['is_email_receipt']);
 
-      // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
-      $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
+      // @todo calling CRM_Contribute_BAO_Contribution::completeOrder like this is a pattern in it's last gasps. Call contribute.completetransaction api.
+      CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
 
       // reset template values before processing next transactions
       $template->clearTemplateVars();
