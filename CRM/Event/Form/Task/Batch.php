@@ -75,19 +75,18 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   /**
    * Build the form object.
    *
-   *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
     if (!$ufGroupId) {
-      CRM_Core_Error::fatal('ufGroupId is missing');
+      CRM_Core_Error::statusBounce('ufGroupId is missing');
     }
 
     $this->_title = ts('Update multiple participants') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
     $this->addDefaultButtons(ts('Save'));
-    $this->_fields = [];
+
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
     if (array_key_exists('participant_status', $this->_fields)) {
       $this->assign('statusProfile', 1);
@@ -194,7 +193,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           }
         }
         else {
-          if ($field['name'] == 'participant_role') {
+          if ($field['name'] === 'participant_role') {
             $field['is_multiple'] = TRUE;
           }
           // handle non custom fields
@@ -208,7 +207,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     // don't set the status message when form is submitted.
     $buttonName = $this->controller->getButtonName('submit');
 
-    if ($suppressFields && $buttonName != '_qf_Batch_next') {
+    if ($suppressFields && $buttonName !== '_qf_Batch_next') {
       CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple participants."), ts('Unsupported Field Type'), 'info');
     }
 
@@ -218,12 +217,11 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   /**
    * Set default values for the form.
    *
-   *
-   * @return void
+   * @return array
    */
   public function setDefaultValues() {
     if (empty($this->_fields)) {
-      return;
+      return [];
     }
 
     $defaults = [];
@@ -265,6 +263,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * @param int $statusId
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function updatePendingOnlineContribution($participantId, $statusId) {
     if (!$participantId || !$statusId) {
@@ -315,13 +315,17 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   /**
    * Update contribution status.
    *
+   * @param array $params
+   *
+   * @return NULL|int
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   *
    * @deprecated
    * This is only called from one place in the code &
    * it is unclear whether it is a function on the way in or on the way out
    *
-   * @param array $params
-   *
-   * @return NULL|int
    */
   public static function updateContributionStatus($params) {
     // get minimum required values.
@@ -346,7 +350,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       );
     }
 
-    if ($componentName == 'Event') {
+    if ($componentName === 'Event') {
       $name = 'event';
       $ids['participant'] = $componentId;
 
@@ -358,7 +362,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       }
     }
 
-    if ($componentName == 'Membership') {
+    if ($componentName === 'Membership') {
       $name = 'contribute';
       $ids['membership'] = $componentId;
     }
@@ -374,7 +378,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $template->clearTemplateVars();
 
     if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('validation error');
     }
 
     $contribution = &$objects['contribution'];
@@ -448,7 +452,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
 
   /**
-   * @param $params
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function submit($params) {
     $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();
