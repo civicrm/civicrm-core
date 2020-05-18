@@ -186,7 +186,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @param array $params
    *
    * @return bool
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function createRelationships($relationshipTypeXML, &$params) {
 
@@ -723,16 +723,16 @@ AND        a.is_deleted = 0
 
   /**
    * @param $caseType
-   * @param null $activityTypeName
+   * @param string|null $activityTypeName
    *
    * @return array|bool|mixed
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function getMaxInstance($caseType, $activityTypeName = NULL) {
     $xml = $this->retrieve($caseType);
 
     if ($xml === FALSE) {
-      throw new CRM_Core_Exception('Unable to read supplied XML File');
+      throw new CRM_Core_Exception('Unable to locate xml definition for case type ' . $caseType);
     }
 
     $activityInstances = $this->activityTypes($xml->ActivityTypes, TRUE);

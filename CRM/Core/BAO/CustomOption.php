@@ -277,7 +277,7 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
           break;
 
         default:
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Invalid HTML Type');
       }
       $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     }

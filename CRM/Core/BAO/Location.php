@@ -260,13 +260,14 @@ WHERE e.id = %1";
    *   Contact id.
    * @param int $locationTypeId
    *   Id of the location to delete.
+   * @throws CRM_Core_Exception
    */
   public static function deleteLocationBlocks($contactId, $locationTypeId) {
     // ensure that contactId has a value
     if (empty($contactId) ||
       !CRM_Utils_Rule::positiveInteger($contactId)
     ) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Incorrect contact id parameter passed to deleteLocationBlocks');
     }
 
     if (empty($locationTypeId) ||

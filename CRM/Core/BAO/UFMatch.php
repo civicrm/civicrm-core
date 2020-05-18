@@ -57,12 +57,14 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    *
    * @param $ctype
    * @param bool $isLogin
+   *
+   * @throws CRM_Core_Exception
    */
   public static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
     $userSystem = CRM_Core_Config::singleton()->userSystem;
     $session = CRM_Core_Session::singleton();
     if (!is_object($session)) {
-      CRM_Core_Error::fatal('wow, session is not an object?');
+      throw new CRM_Core_Exception('wow, session is not an object?');
       return;
     }
 

@@ -72,12 +72,13 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @return int
    *   Group ID (null if Group ID doesn't exist)
+   * @throws CRM_Core_Exception
    */
   private static function _getGid() {
     if (!self::$_gid) {
       self::$_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'paper_size', 'id', 'name');
       if (!self::$_gid) {
-        CRM_Core_Error::fatal(ts('Paper Size Option Group not found in database.'));
+        throw new CRM_Core_Exception(ts('Paper Size Option Group not found in database.'));
       }
     }
     return self::$_gid;
@@ -268,6 +269,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param array $values associative array of name/value pairs
    * @param int $id
    *   Id of the database record (null = new record).
+   * @throws CRM_Core_Exception
    */
   public function savePaperSize(&$values, $id) {
     // get the Option Group ID for Paper Sizes (create one if it doesn't exist)
@@ -311,7 +313,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
     // make sure serialized array will fit in the 'value' column
     $attribute = CRM_Core_DAO::getAttribute('CRM_Core_BAO_PaperSize', 'value');
     if (strlen($this->value) > $attribute['maxlength']) {
-      CRM_Core_Error::fatal(ts('Paper Size does not fit in database.'));
+      throw new CRM_Core_Exception(ts('Paper Size does not fit in database.'));
     }
     $this->save();
 
@@ -325,7 +327,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @param int $id
    *   ID of the Paper Size to be deleted.
-   *
+   * @throws CRM_Core_Exception
    */
   public static function del($id) {
     if ($id) {
@@ -340,7 +342,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
         }
       }
     }
-    CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+    throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
   }
 
 }

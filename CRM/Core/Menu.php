@@ -105,13 +105,15 @@ class CRM_Core_Menu {
    *   An XML document defining a list of menu items.
    * @param array $menu
    *   An alterable list of menu items.
+   *
+   * @throws CRM_Core_Exception
    */
   public static function readXML($xml, &$menu) {
     $config = CRM_Core_Config::singleton();
     foreach ($xml->item as $item) {
       if (!(string ) $item->path) {
         CRM_Core_Error::debug('i', $item);
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Unable to read XML file');
       }
       $path = (string ) $item->path;
       $menu[$path] = array();
@@ -204,7 +206,7 @@ class CRM_Core_Menu {
    * @param array $menu
    * @param string $path
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function fillMenuValues(&$menu, $path) {
     $fieldsToPropagate = array(
@@ -240,15 +242,15 @@ class CRM_Core_Menu {
       return;
     }
 
-    $messages = array();
+    $messages = [];
     foreach ($fieldsToPropagate as $field) {
       if (!$fieldsPresent[$field]) {
         $messages[] = ts("Could not find %1 in path tree",
-          array(1 => $field)
+          [1 => $field]
         );
       }
     }
-    CRM_Core_Error::fatal("'$path': " . implode(', ', $messages));
+    throw new CRM_Core_Exception("'$path': " . implode(', ', $messages));
   }
 
   /**

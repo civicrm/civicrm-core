@@ -28,6 +28,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
    * @param array $params
    *
    * @return array
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
     $statusPreference = new CRM_Core_BAO_StatusPreference();
@@ -42,11 +43,11 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
       $params['ignore_severity'] = CRM_Utils_Check::severityMap($params['ignore_severity']);
     }
     if ($params['ignore_severity'] > 7) {
-      CRM_Core_Error::fatal(ts('You can not pass a severity level higher than 7.'));
+      throw new CRM_Core_Exception(ts('You can not pass a severity level higher than 7.'));
     }
     // If severity is now blank, you have an invalid severity string.
     if (is_null($params['ignore_severity'])) {
-      CRM_Core_Error::fatal(ts('Invalid string passed as severity level.'));
+      throw new CRM_Core_Exception(ts('Invalid string passed as severity level.'));
     }
 
     // Check if this StatusPreference already exists.

@@ -1181,7 +1181,7 @@ SELECT is_primary,
     $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Household Member of', 'id', 'name_a_b');
 
     if (!$relTypeId) {
-      CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type 'Household Member of'"));
+      throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Household Member of'"));
     }
 
     $relParam = [
