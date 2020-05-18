@@ -85,7 +85,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
+  public function validateData($input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
     // Check if the contribution exists
     // make sure contribution exists and is valid
@@ -158,7 +158,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool|array
    */
-  public function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
+  public function loadObjects($input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
       // default options are that we log an error & echo it out
       // note that we should refactor this error handling into error code @ some point
