@@ -30,6 +30,10 @@ class Paths {
    * Class constructor.
    */
   public function __construct() {
+    // Below is a *default* set of functions to calculate paths/URLs.
+    // Some variables may be overridden as follow:
+    // - The global `$civicrm_paths` may be preset before Civi boots. (Ex: via `civicrm.settings.php`, `settings.php`, or `vendor/autoload.php`)
+    // - Variables may be re-registered. (Ex: via `CRM_Utils_System_WordPress`)
     $this
       ->register('civicrm.root', function () {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();

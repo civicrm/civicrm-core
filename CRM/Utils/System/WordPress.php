@@ -44,25 +44,76 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Specify the default computation for various paths/URLs.
    */
   protected function registerPathVars():void {
-    Civi::paths()
-      ->register('wp.frontend.base', function () {
-        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
-      })
-      ->register('wp.frontend', function () {
-        $config = \CRM_Core_Config::singleton();
-        $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
+    $isNormalBoot = function_exists('get_option');
+    if ($isNormalBoot) {
+      // Normal mode - CMS boots first, then calls Civi. "Normal" web pages and newer extern routes.
+      // To simplify the code-paths, some items are re-registered with WP-specific functions.
+      $cmsRoot = function() {
         return [
-          'url' => Civi::paths()->getVariable('wp.frontend.base', 'url') . $suffix,
+          'path' => untrailingslashit(ABSPATH),
+          'url' => home_url(),
         ];
-      })
-      ->register('wp.backend.base', function () {
-        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/'];
-      })
-      ->register('wp.backend', function () {
+      };
+      Civi::paths()->register('cms', $cmsRoot);
+      Civi::paths()->register('cms.root', $cmsRoot);
+      Civi::paths()->register('civicrm.files', function () {
+        $upload_dir = wp_get_upload_dir();
         return [
-          'url' => Civi::paths()->getVariable('wp.backend.base', 'url') . 'admin.php',
+          'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'url' => $upload_dir['baseurl'] . '/civicrm/',
         ];
       });
+      Civi::paths()->register('civicrm.root', function () {
+        return [
+          'path' => CIVICRM_PLUGIN_DIR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'url' => CIVICRM_PLUGIN_URL . 'civicrm/',
+        ];
+      });
+      Civi::paths()->register('wp.frontend.base', function () {
+        return [
+          'url' => home_url('/'),
+        ];
+      });
+      Civi::paths()->register('wp.frontend', function () {
+        $config = CRM_Core_Config::singleton();
+        $basepage = get_page_by_path($config->wpBasePage);
+        return [
+          'url' => get_permalink($basepage->ID),
+        ];
+      });
+      Civi::paths()->register('wp.backend.base', function () {
+        return [
+          'url' => admin_url(),
+        ];
+      });
+      Civi::paths()->register('wp.backend', function() {
+        return [
+          'url' => admin_url('admin.php'),
+        ];
+      });
+    }
+    else {
+      // Legacy support - only relevant for older extern routes.
+      Civi::paths()
+        ->register('wp.frontend.base', function () {
+          return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
+        })
+        ->register('wp.frontend', function () {
+          $config = \CRM_Core_Config::singleton();
+          $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
+          return [
+            'url' => Civi::paths()->getVariable('wp.frontend.base', 'url') . $suffix,
+          ];
+        })
+        ->register('wp.backend.base', function () {
+          return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/'];
+        })
+        ->register('wp.backend', function () {
+          return [
+            'url' => Civi::paths()->getVariable('wp.backend.base', 'url') . 'admin.php',
+          ];
+        });
+    }
   }
 
   /**
