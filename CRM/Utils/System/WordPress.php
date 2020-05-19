@@ -35,6 +35,36 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $this->is_wordpress = TRUE;
   }
 
+  public function initialize() {
+    parent::initialize();
+    $this->registerPathVars();
+  }
+
+  /**
+   * Specify the default computation for various paths/URLs.
+   */
+  protected function registerPathVars():void {
+    Civi::paths()
+      ->register('wp.frontend.base', function () {
+        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
+      })
+      ->register('wp.frontend', function () {
+        $config = \CRM_Core_Config::singleton();
+        $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
+        return [
+          'url' => Civi::paths()->getVariable('wp.frontend.base', 'url') . $suffix,
+        ];
+      })
+      ->register('wp.backend.base', function () {
+        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/'];
+      })
+      ->register('wp.backend', function () {
+        return [
+          'url' => Civi::paths()->getVariable('wp.backend.base', 'url') . 'admin.php',
+        ];
+      });
+  }
+
   /**
    * @inheritDoc
    */
