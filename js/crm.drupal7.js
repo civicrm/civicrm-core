@@ -1,23 +1,13 @@
 (function($, crmMenubar) {
-  var numberOfMenusReady = 0;
-  var numberOfMenusToWaitFor = 2;
+  var menuReadyEvents = {
+    adminMenu: $.Deferred(),
+    crmMenu: $.Deferred()
+  };
 
-  $(document).ready(runWhenMenusAreReady);
-  $(document).on('crmLoad', '#civicrm-menu', runWhenMenusAreReady);
-
-  /**
-   * Runs the hide menu toggle button when both the Admin Menu and the
-   * CiviCRM menu are ready.
-   */
-  function runWhenMenusAreReady() {
-    numberOfMenusReady++;
-
-    if (numberOfMenusReady < numberOfMenusToWaitFor) {
-      return;
-    }
-
-    hideMenuToggleButtonForNonAdminUsers();
-  }
+  $.when(menuReadyEvents.adminMenu, menuReadyEvents.crmMenu)
+    .done(hideMenuToggleButtonForNonAdminUsers);
+  $(document).ready(menuReadyEvents.adminMenu.resolve);
+  $(document).on('crmLoad', '#civicrm-menu', menuReadyEvents.crmMenu.resolve);
 
   /**
    * Hides the Menu Toggle Button when the Admin Menu is not available for the user.
