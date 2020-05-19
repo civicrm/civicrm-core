@@ -73,6 +73,23 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * Appends a Drupal 7 Javascript file when the CRM Menubar Javascript file has
+   * been included.
+   */
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $event) {
+    $crmDrupal7JsFilePath = 'js/crm.drupal7.js';
+    $smartMenuFilePath = 'js/crm.menubar.js';
+    $smartMenuFileIndex = array_search($smartMenuFilePath, $event->list);
+    $hasNotIncludedTheCrmMenu = $smartMenuFileIndex === FALSE;
+
+    if ($hasNotIncludedTheCrmMenu) {
+      return;
+    }
+
+    array_splice($event->list, $smartMenuFileIndex + 1, 0, [$crmDrupal7JsFilePath]);
+  }
+
+  /**
    * @inheritDoc
    */
   public function updateCMSName($ufID, $ufName) {
