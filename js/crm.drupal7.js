@@ -1,4 +1,4 @@
-(function($, crmMenubar) {
+(function($) {
   var menuReadyEvents = {
     adminMenu: $.Deferred(),
     crmMenu: $.Deferred()
@@ -16,10 +16,8 @@
    */
   function hideMenuToggleButtonForNonAdminUsers() {
     var $adminToolbar = $('#toolbar');
-    var $body = $('body');
     var $menuToggleButton = $('#crm-menubar-toggle-position');
     var hasAdminToolbar = $adminToolbar.length > 0;
-    var isCrmMenubarBelowAdminbar = $body.hasClass('crm-menubar-below-cms-menu');
 
     if (hasAdminToolbar) {
       return;
@@ -27,8 +25,8 @@
 
     $menuToggleButton.hide();
 
-    if (isCrmMenubarBelowAdminbar) {
-      crmMenubar.togglePosition();
+    if (CRM.menubar.position === 'below-cms-menu') {
+      CRM.menubar.togglePosition();
     }
   }
-})(CRM.$, CRM.menubar);
+})(CRM.$);
