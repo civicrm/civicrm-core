@@ -10,21 +10,13 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * @method string getLanguage()
- * @method setLanguage(string $language)
+ * @method $this setLanguage(string $language)
  */
 trait DAOActionTrait {
 
@@ -103,9 +95,11 @@ trait DAOActionTrait {
    *
    * @param array $items
    *   The records to write to the DB.
+   *
    * @return array
    *   The records after being written to the DB (e.g. including newly assigned "id").
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function writeObjects($items) {
     $baoName = $this->getBaoName();
@@ -130,7 +124,7 @@ trait DAOActionTrait {
       $item['check_permissions'] = $this->getCheckPermissions();
 
       // For some reason the contact bao requires this
-      if ($entityId && $this->getEntityName() == 'Contact') {
+      if ($entityId && $this->getEntityName() === 'Contact') {
         $item['contact_id'] = $entityId;
       }
 
@@ -138,7 +132,7 @@ trait DAOActionTrait {
         $this->checkContactPermissions($baoName, $item);
       }
 
-      if ($this->getEntityName() == 'Address') {
+      if ($this->getEntityName() === 'Address') {
         $createResult = $baoName::add($item, $this->fixAddress);
       }
       elseif (method_exists($baoName, $method)) {
@@ -162,7 +156,11 @@ trait DAOActionTrait {
   /**
    * @param array $params
    * @param int $entityId
+   *
    * @return mixed
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function formatCustomParams(&$params, $entityId) {
     $customParams = [];
@@ -204,7 +202,7 @@ trait DAOActionTrait {
           $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
         }
 
-        if ($customFieldType == 'CheckBox') {
+        if ($customFieldType === 'CheckBox') {
           // this function should be part of a class
           formatCheckBoxField($value, 'custom_' . $customFieldId, $this->getEntityName());
         }
@@ -232,13 +230,14 @@ trait DAOActionTrait {
   /**
    * Check edit/delete permissions for contacts and related entities.
    *
-   * @param $baoName
-   * @param $item
+   * @param string $baoName
+   * @param array $item
+   *
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function checkContactPermissions($baoName, $item) {
-    if ($baoName == 'CRM_Contact_BAO_Contact' && !empty($item['id'])) {
-      $permission = $this->getActionName() == 'delete' ? \CRM_Core_Permission::DELETE : \CRM_Core_Permission::EDIT;
+    if ($baoName === 'CRM_Contact_BAO_Contact' && !empty($item['id'])) {
+      $permission = $this->getActionName() === 'delete' ? \CRM_Core_Permission::DELETE : \CRM_Core_Permission::EDIT;
       if (!\CRM_Contact_BAO_Contact_Permission::allow($item['id'], $permission)) {
         throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
       }
