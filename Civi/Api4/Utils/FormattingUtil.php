@@ -88,6 +88,7 @@ class FormattingUtil {
     if ($suffix) {
       $options = self::getPseudoconstantList($fieldSpec['entity'], $fieldSpec['name'], substr($fieldName, $suffix + 1));
       $value = self::replacePseudoconstant($options, $value, TRUE);
+      return;
     }
     elseif (is_array($value)) {
       foreach ($value as &$val) {

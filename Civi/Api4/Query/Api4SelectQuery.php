@@ -12,11 +12,7 @@
 namespace Civi\Api4\Query;
 
 use Civi\API\SelectQuery;
-use Civi\Api4\Event\Events;
-use Civi\Api4\Event\PostSelectQueryEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
-use Civi\Api4\Service\Schema\Joinable\Joinable;
-use Civi\Api4\Service\Schema\Joinable\OptionValueJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\SelectUtil;
@@ -41,12 +37,6 @@ class Api4SelectQuery extends SelectQuery {
    * @var int
    */
   protected $apiVersion = 4;
-
-  /**
-   * @var \Civi\Api4\Service\Schema\Joinable\Joinable[]
-   *   The joinable tables that have been joined so far
-   */
-  protected $joinedTables = [];
 
   /**
    * @var array
@@ -102,6 +92,9 @@ class Api4SelectQuery extends SelectQuery {
 
     // Add ACLs first to avoid redundant subclauses
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
+
+    // Add explicit joins. Other joins implied by dot notation may be added later
+    $this->addExplicitJoins($apiGet->getJoin());
   }
 
   /**
@@ -134,24 +127,21 @@ class Api4SelectQuery extends SelectQuery {
       $this->debugOutput['sql'][] = $sql;
     }
     $query = \CRM_Core_DAO::executeQuery($sql);
-    $i = 0;
     while ($query->fetch()) {
-      $id = $query->id ?? $i++;
       if (in_array('row_count', $this->select)) {
         $results[]['row_count'] = (int) $query->c;
         break;
       }
-      $results[$id] = [];
+      $result = [];
       foreach ($this->selectAliases as $alias => $expr) {
         $returnName = $alias;
         $alias = str_replace('.', '_', $alias);
-        $results[$id][$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
+        $result[$returnName] = property_exists($query, $alias) ? $query->$alias : NULL;
       }
+      $results[] = $result;
     }
-    $event = new PostSelectQueryEvent($results, $this);
-    \Civi::dispatcher()->dispatch(Events::POST_SELECT_QUERY, $event);
-
-    return $event->getResults();
+    FormattingUtil::formatOutputValues($results, $this->getApiFieldSpec(), $this->getEntity());
+    return $results;
   }
 
   protected function buildSelectClause() {
@@ -174,7 +164,7 @@ class Api4SelectQuery extends SelectQuery {
       });
       foreach ($wildFields as $item) {
         $pos = array_search($item, array_values($this->select));
-        $this->joinFK($item);
+        $this->autoJoinFK($item);
         $matches = SelectUtil::getMatchingFields($item, array_keys($this->apiFieldSpec));
         array_splice($this->select, $pos, 1, $matches);
       }
@@ -191,9 +181,6 @@ class Api4SelectQuery extends SelectQuery {
           if (is_array($this->debugOutput)) {
             $this->debugOutput['undefined_fields'][] = $fieldName;
           }
-          $valid = FALSE;
-        }
-        elseif ($field['is_many']) {
           $valid = FALSE;
         }
       }
@@ -236,11 +223,7 @@ class Api4SelectQuery extends SelectQuery {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
         throw new \API_Exception("Invalid sort direction. Cannot order by $item $dir");
       }
-      $expr = SqlExpression::convert($item);
-      foreach ($expr->getFields() as $fieldName) {
-        $this->getField($fieldName, TRUE);
-      }
-      $this->query->orderBy($expr->render($this->apiFieldSpec) . " $dir");
+      $this->query->orderBy($this->renderExpression($item) . " $dir");
     }
   }
 
@@ -259,11 +242,7 @@ class Api4SelectQuery extends SelectQuery {
    */
   protected function buildGroupBy() {
     foreach ($this->groupBy as $item) {
-      $expr = SqlExpression::convert($item);
-      foreach ($expr->getFields() as $fieldName) {
-        $this->getField($fieldName, TRUE);
-      }
-      $this->query->groupBy($expr->render($this->apiFieldSpec));
+      $this->query->groupBy($this->renderExpression($item));
     }
   }
 
@@ -272,7 +251,7 @@ class Api4SelectQuery extends SelectQuery {
    *
    * @param array $clause
    * @param string $type
-   *   WHERE|HAVING
+   *   WHERE|HAVING|ON
    * @return string SQL where clause
    *
    * @throws \API_Exception
@@ -311,7 +290,7 @@ class Api4SelectQuery extends SelectQuery {
    * Validate and transform a leaf clause array to SQL.
    * @param array $clause [$fieldName, $operator, $criteria]
    * @param string $type
-   *   WHERE|HAVING
+   *   WHERE|HAVING|ON
    * @return string SQL
    * @throws \API_Exception
    * @throws \Exception
@@ -319,6 +298,9 @@ class Api4SelectQuery extends SelectQuery {
   protected function composeClause(array $clause, string $type) {
     // Pad array for unary operators
     list($expr, $operator, $value) = array_pad($clause, 3, NULL);
+    if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      throw new \API_Exception('Illegal operator');
+    }
 
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE') {
@@ -327,7 +309,7 @@ class Api4SelectQuery extends SelectQuery {
       $fieldAlias = $field['sql_name'];
     }
     // For HAVING, expr must be an item in the SELECT clause
-    else {
+    elseif ($type === 'HAVING') {
       // Expr references a fieldName or alias
       if (isset($this->selectAliases[$expr])) {
         $fieldAlias = $expr;
@@ -357,12 +339,50 @@ class Api4SelectQuery extends SelectQuery {
       }
       $fieldAlias = '`' . $fieldAlias . '`';
     }
+    elseif ($type === 'ON') {
+      $expr = $this->getExpression($expr);
+      $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
+      $fieldAlias = $expr->render($this->apiFieldSpec);
+      if (is_string($value)) {
+        $valExpr = $this->getExpression($value);
+        if ($fieldName && $valExpr->getType() === 'SqlString') {
+          FormattingUtil::formatInputValue($valExpr->expr, $fieldName, $this->apiFieldSpec[$fieldName]);
+        }
+        return sprintf('%s %s %s', $fieldAlias, $operator, $valExpr->render($this->apiFieldSpec));
+      }
+      elseif ($fieldName) {
+        FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName]);
+      }
+    }
 
     $sql_clause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
     if ($sql_clause === NULL) {
       throw new \API_Exception("Invalid value in $type clause for '$expr'");
     }
     return $sql_clause;
+  }
+
+  /**
+   * @param string $expr
+   * @return SqlExpression
+   * @throws \API_Exception
+   */
+  protected function getExpression(string $expr) {
+    $sqlExpr = SqlExpression::convert($expr);
+    foreach ($sqlExpr->getFields() as $fieldName) {
+      $this->getField($fieldName, TRUE);
+    }
+    return $sqlExpr;
+  }
+
+  /**
+   * @param string $expr
+   * @return string
+   * @throws \API_Exception
+   */
+  protected function renderExpression(string $expr) {
+    $sqlExpr = $this->getExpression($expr);
+    return $sqlExpr->render($this->apiFieldSpec);
   }
 
   /**
@@ -389,7 +409,7 @@ class Api4SelectQuery extends SelectQuery {
     $fieldName = $col ? substr($expr, 0, $col) : $expr;
     // Perform join if field not yet available - this will add it to apiFieldSpec
     if (!isset($this->apiFieldSpec[$fieldName]) && strpos($fieldName, '.')) {
-      $this->joinFK($fieldName);
+      $this->autoJoinFK($fieldName);
     }
     $field = $this->apiFieldSpec[$fieldName] ?? NULL;
     if ($strict && !$field) {
@@ -400,13 +420,76 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Joins a path and adds all fields in the joined eneity to apiFieldSpec
+   * Join onto other entities as specified by the api call.
+   *
+   * @param $joins
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  private function addExplicitJoins($joins) {
+    foreach ($joins as $join) {
+      // First item in the array is the entity name
+      $entity = array_shift($join);
+      // Which might contain an alias. Split on the keyword "AS"
+      list($entity, $alias) = array_pad(explode(' AS ', $entity), 2, NULL);
+      // Ensure alias is a safe string, and supply default if not given
+      $alias = $alias ? \CRM_Utils_String::munge($alias) : strtolower($entity);
+      // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
+      // The rest are join conditions.
+      $side = array_shift($join) ? 'INNER' : 'LEFT';
+      $joinEntityGet = \Civi\API\Request::create($entity, 'get', ['version' => 4, 'checkPermissions' => $this->checkPermissions]);
+      foreach ($joinEntityGet->entityFields() as $field) {
+        $field['sql_name'] = '`' . $alias . '`.`' . $field['column_name'] . '`';
+        $field['is_join'] = TRUE;
+        $this->addSpecField($alias . '.' . $field['name'], $field);
+      }
+      $conditions = [];
+      foreach (array_merge($join, $this->getJoinConditions($entity, $alias)) as $clause) {
+        $conditions[] = $this->treeWalkClauses($clause, 'ON');
+      }
+      $tableName = AllCoreTables::getTableForEntityName($entity);
+      $this->join($side, $tableName, $alias, $conditions);
+    }
+  }
+
+  /**
+   * Supply conditions for an explicit join.
+   *
+   * @param $entity
+   * @param $alias
+   * @return array
+   */
+  private function getJoinConditions($entity, $alias) {
+    $conditions = [];
+    // getAclClause() expects a stack of 1-to-1 join fields to help it dedupe, but this is more flexible,
+    // so unless this is a direct 1-to-1 join with the main entity, we'll just hack it
+    // with a padded empty stack to bypass its deduping.
+    $stack = [NULL, NULL];
+    foreach ($this->apiFieldSpec as $name => $field) {
+      if ($field['entity'] !== $entity && $field['fk_entity'] === $entity) {
+        $conditions[] = [$name, '=', "$alias.id"];
+        $stack = [$name];
+      }
+      elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 &&  $field['fk_entity'] === $this->entity) {
+        $conditions[] = [$name, '=', 'id'];
+      }
+    }
+    // Hmm, if we came up with > 1 condition, then it's ambiguous how it should be joined so we won't return anything but the generic ACLs
+    if (count($conditions) > 1) {
+      return $this->getAclClause($alias, AllCoreTables::getFullName($entity), [NULL, NULL]);
+    }
+    $acls = $this->getAclClause($alias, AllCoreTables::getFullName($entity), $stack);
+    return array_merge($acls, $conditions);
+  }
+
+  /**
+   * Joins a path and adds all fields in the joined entity to apiFieldSpec
    *
    * @param $key
    * @throws \API_Exception
    * @throws \Exception
    */
-  protected function joinFK($key) {
+  protected function autoJoinFK($key) {
     if (isset($this->apiFieldSpec[$key])) {
       return;
     }
@@ -419,23 +502,12 @@ class Api4SelectQuery extends SelectQuery {
     array_pop($pathArray);
     $pathString = implode('.', $pathArray);
 
-    if (!$joiner->canJoin($this, $pathString)) {
+    if (!$joiner->canAutoJoin($this->getFrom(), $pathString)) {
       return;
     }
 
     $joinPath = $joiner->join($this, $pathString);
 
-    $isMany = FALSE;
-    foreach ($joinPath as $joinable) {
-      if ($joinable->getJoinType() === Joinable::JOIN_TYPE_ONE_TO_MANY) {
-        $isMany = TRUE;
-      }
-      if ($joinable instanceof OptionValueJoinable) {
-        \Civi::log()->warning('Use API pseudoconstant suffix like :name or :label instead of join.', ['civi.tag' => 'deprecated']);
-      }
-    }
-
-    /** @var \Civi\Api4\Service\Schema\Joinable\Joinable $lastLink */
     $lastLink = array_pop($joinPath);
 
     // Custom field names are already prefixed
@@ -451,20 +523,8 @@ class Api4SelectQuery extends SelectQuery {
       $fieldArray['sql_name'] = '`' . $lastLink->getAlias() . '`.`' . $fieldArray['column_name'] . '`';
       $fieldArray['is_custom'] = $isCustom;
       $fieldArray['is_join'] = TRUE;
-      $fieldArray['is_many'] = $isMany;
       $this->addSpecField($prefix . $fieldArray['name'], $fieldArray);
     }
-  }
-
-  /**
-   * @param \Civi\Api4\Service\Schema\Joinable\Joinable $joinable
-   *
-   * @return $this
-   */
-  public function addJoinedTable(Joinable $joinable) {
-    $this->joinedTables[] = $joinable;
-
-    return $this;
   }
 
   /**
@@ -524,13 +584,6 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * @return bool
-   */
-  public function isFillUniqueFields() {
-    return $this->isFillUniqueFields;
-  }
-
-  /**
    * @return \CRM_Utils_SQL_Select
    */
   public function getQuery() {
@@ -580,24 +633,6 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
-   */
-  public function getJoinedTables() {
-    return $this->joinedTables;
-  }
-
-  /**
-   * @return \Civi\Api4\Service\Schema\Joinable\Joinable
-   */
-  public function getJoinedTable($alias) {
-    foreach ($this->joinedTables as $join) {
-      if ($join->getAlias() == $alias) {
-        return $join;
-      }
-    }
-  }
-
-  /**
    * Get table name on basis of entity
    *
    * @param string $baoName
@@ -616,51 +651,6 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Checks if a field either belongs to the main entity or is joinable 1-to-1.
-   *
-   * Used to determine if a field can be added to the SELECT of the main query,
-   * or if it must be fetched post-query.
-   *
-   * @param string $fieldPath
-   * @return bool
-   */
-  public function isOneToOneField(string $fieldPath) {
-    return strpos($fieldPath, '.') === FALSE || !array_filter($this->getPathJoinTypes($fieldPath));
-  }
-
-  /**
-   * Separates a string like 'emails.location_type.label' into an array, where
-   * each value in the array tells whether it is 1-1 or 1-n join type
-   *
-   * @param string $pathString
-   *   Dot separated path to the field
-   *
-   * @return array
-   *   Index is table alias and value is boolean whether is 1-to-many join
-   */
-  public function getPathJoinTypes($pathString) {
-    $pathParts = explode('.', $pathString);
-    // remove field
-    array_pop($pathParts);
-    $path = [];
-    $query = $this;
-    $isMultipleChecker = function($alias) use ($query) {
-      foreach ($query->getJoinedTables() as $table) {
-        if ($table->getAlias() === $alias) {
-          return $table->getJoinType() === Joinable::JOIN_TYPE_ONE_TO_MANY;
-        }
-      }
-      return FALSE;
-    };
-
-    foreach ($pathParts as $part) {
-      $path[$part] = $isMultipleChecker($part);
-    }
-
-    return $path;
-  }
-
-  /**
    * @param $path
    * @param $field
    */
@@ -671,7 +661,7 @@ class Api4SelectQuery extends SelectQuery {
       return;
     }
     $defaults = [];
-    $defaults['is_custom'] = $defaults['is_join'] = $defaults['is_many'] = FALSE;
+    $defaults['is_custom'] = $defaults['is_join'] = FALSE;
     $field += $defaults;
     $this->apiFieldSpec[$path] = $field;
   }

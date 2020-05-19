@@ -35,7 +35,7 @@ abstract class SqlExpression {
    * The raw expression, minus the alias.
    * @var string
    */
-  protected $expr = '';
+  public $expr = '';
 
   /**
    * SqlFunction constructor.
@@ -146,6 +146,16 @@ abstract class SqlExpression {
    */
   public function getAlias(): string {
     return $this->alias ?? $this->fields[0] ?? \CRM_Utils_String::munge($this->expr);
+  }
+
+  /**
+   * Returns the name of this sql expression class.
+   *
+   * @return string
+   */
+  public function getType(): string {
+    $className = get_class($this);
+    return substr($className, strrpos($className, '\\') + 1);
   }
 
 }

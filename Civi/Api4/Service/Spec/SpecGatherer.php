@@ -14,7 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  *
  */
 
@@ -31,13 +30,6 @@ class SpecGatherer {
    * @var \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface[]
    */
   protected $specProviders = [];
-
-  /**
-   * A cache of DAOs based on entity
-   *
-   * @var \CRM_Core_DAO[]
-   */
-  protected $DAONames;
 
   /**
    * Returns a RequestSpec with all the fields available. Uses spec providers

@@ -21,7 +21,6 @@
 
 namespace api\v4\Query;
 
-use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use api\v4\UnitTestCase;
 
@@ -38,40 +37,11 @@ class SelectQueryMultiJoinTest extends UnitTestCase {
     return parent::setUpHeadless();
   }
 
-  public function testOneToManySelect() {
-    $results = Contact::get()
-      ->addSelect('emails.email')
-      ->execute()
-      ->indexBy('id')
-      ->getArrayCopy();
-
-    $firstContactId = $this->getReference('test_contact_1')['id'];
-    $secondContactId = $this->getReference('test_contact_2')['id'];
-
-    $firstContact = $results[$firstContactId];
-    $secondContact = $results[$secondContactId];
-    $firstContactEmails = array_column($firstContact['emails'], 'email');
-    $secondContactEmails = array_column($secondContact['emails'], 'email');
-
-    $expectedFirstEmails = [
-      'test_contact_one_home@fakedomain.com',
-      'test_contact_one_work@fakedomain.com',
-    ];
-    $expectedSecondEmails = [
-      'test_contact_two_home@fakedomain.com',
-      'test_contact_two_work@fakedomain.com',
-    ];
-
-    $this->assertEquals($expectedFirstEmails, $firstContactEmails);
-    $this->assertEquals($expectedSecondEmails, $secondContactEmails);
-  }
-
   public function testManyToOneSelect() {
     $results = Email::get()
       ->addSelect('contact.display_name')
       ->execute()
-      ->indexBy('id')
-      ->getArrayCopy();
+      ->indexBy('id');
 
     $firstEmail = $this->getReference('test_email_1');
     $secondEmail = $this->getReference('test_email_2');

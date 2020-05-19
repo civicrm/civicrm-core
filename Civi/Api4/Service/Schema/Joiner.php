@@ -63,7 +63,6 @@ class Joiner {
       $conditions = $link->getConditionsForJoin($baseTable);
 
       $query->join($side, $target, $alias, $conditions);
-      $query->addJoinedTable($link);
 
       $baseTable = $link->getAlias();
     }
@@ -72,20 +71,33 @@ class Joiner {
   }
 
   /**
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * Determines if path string points to a simple n-1 join that can be automatically added
+   *
+   * @param string $baseTable
    * @param $joinPath
    *
    * @return bool
    */
-  public function canJoin(Api4SelectQuery $query, $joinPath) {
-    return !empty($this->getPath($query->getFrom(), $joinPath));
+  public function canAutoJoin($baseTable, $joinPath) {
+    try {
+      $path = $this->getPath($baseTable, $joinPath);
+      foreach ($path as $joinable) {
+        if ($joinable->getJoinType() === $joinable::JOIN_TYPE_ONE_TO_MANY) {
+          return FALSE;
+        }
+      }
+      return TRUE;
+    }
+    catch (\Exception $e) {
+      return FALSE;
+    }
   }
 
   /**
    * @param string $baseTable
    * @param string $joinPath
    *
-   * @return array
+   * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
    * @throws \Exception
    */
   protected function getPath($baseTable, $joinPath) {

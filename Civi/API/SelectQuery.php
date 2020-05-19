@@ -361,7 +361,7 @@ abstract class SelectQuery {
    * Get acl clause for an entity
    *
    * @param string $tableAlias
-   * @param string $baoName
+   * @param \CRM_Core_DAO|string $baoName
    * @param array $stack
    * @return array
    */

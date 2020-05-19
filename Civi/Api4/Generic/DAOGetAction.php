@@ -46,6 +46,13 @@ class DAOGetAction extends AbstractGetAction {
   protected $select = [];
 
   /**
+   * Joins to other entities.
+   *
+   * @var array
+   */
+  protected $join = [];
+
+  /**
    * Field(s) by which to group the results.
    *
    * @var array
@@ -118,6 +125,34 @@ class DAOGetAction extends AbstractGetAction {
     }
     $this->having[] = [$expr, $op, $value];
     return $this;
+  }
+
+  /**
+   * @param string $entity
+   * @param bool $required
+   * @param array ...$conditions
+   * @return DAOGetAction
+   */
+  public function addJoin(string $entity, bool $required = FALSE, ...$conditions): DAOGetAction {
+    array_unshift($conditions, $entity, $required);
+    $this->join[] = $conditions;
+    return $this;
+  }
+
+  /**
+   * @param array $join
+   * @return DAOGetAction
+   */
+  public function setJoin(array $join): DAOGetAction {
+    $this->join = $join;
+    return $this;
+  }
+
+  /**
+   * @return array
+   */
+  public function getJoin(): array {
+    return $this->join;
   }
 
 }

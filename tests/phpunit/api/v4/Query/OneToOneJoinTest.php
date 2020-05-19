@@ -14,7 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  *
  */
 
@@ -53,8 +52,7 @@ class OneToOneJoinTest extends UnitTestCase {
       ->addSelect('preferred_language:label')
       ->addSelect('last_name')
       ->execute()
-      ->indexBy('last_name')
-      ->getArrayCopy();
+      ->indexBy('last_name');
 
     $this->assertEquals($contacts['One']['preferred_language:label'], 'Armenian');
     $this->assertEquals($contacts['Two']['preferred_language:label'], 'Basque');

@@ -48,35 +48,6 @@ class Api4SelectQueryTest extends UnitTestCase {
     return parent::setUpHeadless();
   }
 
-  public function testWithSingleWhereJoin() {
-    $phoneNum = $this->getReference('test_phone_1')['phone'];
-
-    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
-    $query = new Api4SelectQuery($api);
-    $query->where[] = ['phones.phone', '=', $phoneNum];
-    $results = $query->run();
-
-    $this->assertCount(1, $results);
-  }
-
-  public function testOneToManyJoin() {
-    $phoneNum = $this->getReference('test_phone_1')['phone'];
-
-    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
-    $query = new Api4SelectQuery($api);
-    $query->select[] = 'id';
-    $query->select[] = 'first_name';
-    $query->select[] = 'phones.phone';
-    $query->where[] = ['phones.phone', '=', $phoneNum];
-    $results = $query->run();
-
-    $this->assertCount(1, $results);
-    $firstResult = array_shift($results);
-    $this->assertArrayHasKey('phones', $firstResult);
-    $firstPhone = array_shift($firstResult['phones']);
-    $this->assertEquals($phoneNum, $firstPhone['phone']);
-  }
-
   public function testManyToOneJoin() {
     $phoneNum = $this->getReference('test_phone_1')['phone'];
     $contact = $this->getReference('test_contact_1');
@@ -93,20 +64,6 @@ class Api4SelectQueryTest extends UnitTestCase {
     $this->assertCount(1, $results);
     $firstResult = array_shift($results);
     $this->assertEquals($contact['display_name'], $firstResult['contact.display_name']);
-  }
-
-  public function testOneToManyMultipleJoin() {
-    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
-    $query = new Api4SelectQuery($api);
-    $query->select[] = 'id';
-    $query->select[] = 'first_name';
-    $query->select[] = 'phones.phone';
-    $query->where[] = ['first_name', '=', 'Phoney'];
-    $results = $query->run();
-    $result = array_pop($results);
-
-    $this->assertEquals('Phoney', $result['first_name']);
-    $this->assertCount(2, $result['phones']);
   }
 
   public function testInvaidSort() {
