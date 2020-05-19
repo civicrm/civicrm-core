@@ -78,16 +78,11 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * for the menu bar ready event.
    */
   public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $event) {
-    $crmDrupal7JsFilePath = 'js/crm.drupal7.js';
-    $menuBarFilePath = 'js/crm.menubar.js';
-    $menuBarFileIndex = array_search($menuBarFilePath, $event->list);
-    $hasNotIncludedTheCrmMenu = $menuBarFileIndex === FALSE;
+    $menuBarFileIndex = array_search('js/crm.menubar.js', $event->list);
 
-    if ($hasNotIncludedTheCrmMenu) {
-      return;
+    if ($menuBarFileIndex !== FALSE) {
+      array_splice($event->list, $menuBarFileIndex, 0, ['js/crm.drupal7.js']);
     }
-
-    array_splice($event->list, $menuBarFileIndex, 0, [$crmDrupal7JsFilePath]);
   }
 
   /**
