@@ -640,7 +640,8 @@ UNION ALL
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
-    $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
+    // We pass in TRUE as 2nd param so that even disabled contribution page titles are returned and replaced in the report
+    $contributionPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
     $batches = CRM_Batch_BAO_Batch::getBatches();
     foreach ($rows as $rowNum => $row) {
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
