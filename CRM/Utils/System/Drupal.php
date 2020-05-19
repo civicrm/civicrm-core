@@ -74,19 +74,20 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
    * Appends a Drupal 7 Javascript file when the CRM Menubar Javascript file has
-   * been included.
+   * been included. The file is added before the menu bar so we can properly listen
+   * for the menu bar ready event.
    */
   public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $event) {
     $crmDrupal7JsFilePath = 'js/crm.drupal7.js';
-    $smartMenuFilePath = 'js/crm.menubar.js';
-    $smartMenuFileIndex = array_search($smartMenuFilePath, $event->list);
-    $hasNotIncludedTheCrmMenu = $smartMenuFileIndex === FALSE;
+    $menuBarFilePath = 'js/crm.menubar.js';
+    $menuBarFileIndex = array_search($menuBarFilePath, $event->list);
+    $hasNotIncludedTheCrmMenu = $menuBarFileIndex === FALSE;
 
     if ($hasNotIncludedTheCrmMenu) {
       return;
     }
 
-    array_splice($event->list, $smartMenuFileIndex + 1, 0, [$crmDrupal7JsFilePath]);
+    array_splice($event->list, $menuBarFileIndex, 0, [$crmDrupal7JsFilePath]);
   }
 
   /**
