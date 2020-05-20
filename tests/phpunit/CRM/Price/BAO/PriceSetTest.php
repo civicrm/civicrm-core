@@ -33,6 +33,8 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
    *
    * (these are denoted as 'quickConfig' in the code - but quickConfig is only supposed to refer to the
    * configuration interface - there should be no different post process.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetAmountLevelTextAmount() {
     $priceSetID = $this->eventPriceSetCreate(9);
@@ -49,6 +51,8 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
 
   /**
    * CRM-20237 Test that Copied price set does not generate long name and unneded information
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCopyPriceSet() {
     $priceSetID = $this->eventPriceSetCreate(9);
@@ -79,6 +83,8 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
   /**
    * Test CRM_Price_BAO_PriceSet::getMembershipCount() that return correct number of
    *   membership type occurances against it's corresponding member orgaisation
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetMembershipCount() {
     // create two organisations

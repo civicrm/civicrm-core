@@ -27,6 +27,7 @@
     <pseudoconstant>
       <table>civicrm_price_set</table>
       <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <add>1.8</add>

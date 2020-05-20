@@ -71,6 +71,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     $priceSetBAO->save();
 
     CRM_Utils_Hook::post($hook, 'PriceSet', $priceSetBAO->id, $priceSetBAO);
+    unset(\Civi::$statics['CRM_Core_PseudoConstant']);
     return $priceSetBAO;
   }
 
@@ -1171,6 +1172,7 @@ WHERE  id = %1";
     $copy->save();
 
     CRM_Utils_Hook::copy('Set', $copy);
+    unset(\Civi::$statics['CRM_Core_PseudoConstant']);
     return $copy;
   }
 
