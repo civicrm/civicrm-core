@@ -13,10 +13,10 @@
 namespace Civi\Api4;
 
 /**
- * LocationType entity.
+ * PriceField entity.
  *
  * @package Civi\Api4
  */
-class LocationType extends Generic\DAOEntity {
+class PriceField extends Generic\DAOEntity {
 
 }
