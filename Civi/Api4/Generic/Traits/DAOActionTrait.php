@@ -175,19 +175,13 @@ trait DAOActionTrait {
       list($customGroup, $customField) = explode('.', $name);
       list($customField, $option) = array_pad(explode(':', $customField), 2, NULL);
 
-      $customFieldId = \CRM_Core_BAO_CustomField::getFieldValue(
+      $customFieldId = \CRM_Core_DAO::getFieldValue(
         \CRM_Core_DAO_CustomField::class,
         $customField,
         'id',
         'name'
       );
-      $customFieldType = \CRM_Core_BAO_CustomField::getFieldValue(
-        \CRM_Core_DAO_CustomField::class,
-        $customField,
-        'html_type',
-        'name'
-      );
-      $customFieldExtends = \CRM_Core_BAO_CustomGroup::getFieldValue(
+      $customFieldExtends = \CRM_Core_DAO::getFieldValue(
         \CRM_Core_DAO_CustomGroup::class,
         $customGroup,
         'extends',
@@ -200,11 +194,6 @@ trait DAOActionTrait {
         if ($option) {
           $options = FormattingUtil::getPseudoconstantList($this->getEntityName(), 'custom_' . $customFieldId, $option, $params, $this->getActionName());
           $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
-        }
-
-        if ($customFieldType === 'CheckBox') {
-          // this function should be part of a class
-          formatCheckBoxField($value, 'custom_' . $customFieldId, $this->getEntityName());
         }
 
         \CRM_Core_BAO_CustomField::formatCustomField(
