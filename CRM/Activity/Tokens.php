@@ -48,12 +48,10 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   }
 
   /**
-   * Get the name of the field which holds the ID of the given entity.
-   *
    * @return string
    */
-  private function getEntityIDFieldName(): string {
-    return 'activity_id';
+  private function getEntityContextSchema(): string {
+    return 'activityId';
   }
 
   /**
@@ -90,7 +88,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     // Find all the entity IDs
     $entityIds
       = $e->getTokenProcessor()->getContextValues('actionSearchResult', 'entityID')
-      + $e->getTokenProcessor()->getContextValues($this->getEntityIDFieldName());
+      + $e->getTokenProcessor()->getContextValues($this->getEntityContextSchema());
 
     if (!$entityIds) {
       return NULL;
@@ -124,8 +122,6 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
   /**
    * @inheritDoc
-   *
-   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     // maps token name to api field
@@ -134,7 +130,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     ];
 
     // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
-    $activityId = $row->context['actionSearchResult']->entityID ?? $row->context[$this->getEntityIDFieldName()];
+    $activityId = $row->context['actionSearchResult']->entityID ?? $row->context[$this->getEntityContextSchema()];
 
     $activity = (object) $prefetch['activity'][$activityId];
 
