@@ -19,7 +19,7 @@ trait CRM_Core_TokenTrait {
    * @inheritDoc
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return in_array($this->getEntityIDFieldName(), $processor->context['schema'], TRUE) ||
+    return in_array($this->getEntityContextSchema(), $processor->context['schema']) ||
       (!empty($processor->context['actionMapping'])
         && $processor->context['actionMapping']->getEntity() === $this->getEntityTableName());
   }
@@ -51,7 +51,6 @@ trait CRM_Core_TokenTrait {
 
   /**
    * Find the fields that we need to get to construct the tokens requested.
-   *
    * @param  array $tokens list of tokens
    * @return array         list of fields needed to generate those tokens
    */
