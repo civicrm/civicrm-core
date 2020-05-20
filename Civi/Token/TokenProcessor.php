@@ -58,7 +58,7 @@ class TokenProcessor {
    *   - schema: array, a list of fields that will be provided for each row.
    *     This is automatically populated with any general context
    *     keys, but you may need to add extra keys for token-row data.
-   *     ex: ['contactId', 'activity_id']. (Note we are standardising on the latter).
+   *     ex: ['contactId', 'activityId'].
    */
   public $context;
 

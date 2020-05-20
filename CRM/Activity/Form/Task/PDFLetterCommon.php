@@ -53,7 +53,7 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
     $tp->addMessage('body_html', $html_message, 'text/html');
 
     foreach ($activityIds as $activityId) {
-      $tp->addRow()->context('activity_id', $activityId);
+      $tp->addRow()->context('activityId', $activityId);
     }
     $tp->evaluate();
 
@@ -69,7 +69,7 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
     return new TokenProcessor(\Civi::dispatcher(), [
       'controller' => get_class(),
       'smarty' => FALSE,
-      'schema' => ['activity_id'],
+      'schema' => ['activityId'],
     ]);
   }
 
