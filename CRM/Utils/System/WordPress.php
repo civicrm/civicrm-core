@@ -253,7 +253,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
       // pre-existing logic
       if (isset($path)) {
-        $queryParts[] = 'page=CiviCRM';
+        // Admin URLs still need "page=CiviCRM", front-end URLs do not.
+        if ((is_admin() && !$frontend) || $forceBackend) {
+          $queryParts[] = 'page=CiviCRM';
+        }
+        else {
+          $queryParts[] = 'civiwp=CiviCRM';
+        }
         $queryParts[] = 'q=' . rawurlencode($path);
       }
       if ($wpPageParam) {
