@@ -706,15 +706,18 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         // Register the delivery event.
         $deliveredParams[] = $field['id'];
         $targetParams[] = $field['contact_id'];
-
+        // #1768 Write to the database every time we send a mail.
+        // If we don't do this, and the job fails for some reason, the mailer
+        // will re-send the mails it has already sent when the job restarts.
+        $this->writeToDB(
+          $deliveredParams,
+          $targetParams,
+          $mailing,
+          $job_date
+        );
         $count++;
         if ($count % CRM_Mailing_Config::BULK_MAIL_INSERT_COUNT == 0) {
-          $this->writeToDB(
-            $deliveredParams,
-            $targetParams,
-            $mailing,
-            $job_date
-          );
+
           $count = 0;
 
           // hack to stop mailing job at run time, CRM-4246.
