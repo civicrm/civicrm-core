@@ -14,6 +14,9 @@
   </urls>
   <releaseDate>2020-05-17</releaseDate>
   <version>1.0</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.27</ver>
