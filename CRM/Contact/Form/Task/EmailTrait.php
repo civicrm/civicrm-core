@@ -350,6 +350,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \API_Exception
    */
   public function postProcess() {
     $this->bounceIfSimpleMailLimitExceeded(count($this->_contactIds));
@@ -418,7 +419,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     // format contact details array to handle multiple emails from same contact
     $formattedContactDetails = [];
-    $tempEmails = [];
     foreach ($this->_contactIds as $key => $contactId) {
       // if we dont have details on this contactID, we should ignore
       // potentially this is due to the contact not wanting to receive email
@@ -428,14 +428,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $email = $this->_toContactEmails[$key];
       // prevent duplicate emails if same email address is selected CRM-4067
       // we should allow same emails for different contacts
-      $emailKey = "{$contactId}::{$email}";
-      if (!in_array($emailKey, $tempEmails)) {
-        $tempEmails[] = $emailKey;
-        $details = $this->_contactDetails[$contactId];
-        $details['email'] = $email;
-        unset($details['email_id']);
-        $formattedContactDetails[] = $details;
-      }
+      $details = $this->_contactDetails[$contactId];
+      $details['email'] = $email;
+      unset($details['email_id']);
+      $formattedContactDetails["{$contactId}::{$email}"] = $details;
     }
 
     $contributionIds = [];
