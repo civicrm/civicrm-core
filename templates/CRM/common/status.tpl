@@ -13,7 +13,7 @@
   {assign var="status" value=$session->getStatus(true)}
   {foreach name=statLoop item=statItem from=$status}
     {if $urlIsPublic}
-      {assign var="infoType" value="no-popup"}
+      {assign var="infoType" value="no-popup `$statItem.type`"}
     {else}
       {assign var="infoType" value=$statItem.type}
     {/if}
