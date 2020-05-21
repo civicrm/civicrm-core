@@ -471,19 +471,6 @@ INSERT INTO `civicrm_event` (`id`, `title`, `summary`, `description`, `event_typ
 /*!40000 ALTER TABLE `civicrm_event` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Dumping data for table `civicrm_event_carts`
---
-
-LOCK TABLES `civicrm_event_carts` WRITE;
-/*!40000 ALTER TABLE `civicrm_event_carts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `civicrm_event_carts` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Dumping data for table `civicrm_events_in_carts`
---
-
 LOCK TABLES `civicrm_events_in_carts` WRITE;
 /*!40000 ALTER TABLE `civicrm_events_in_carts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `civicrm_events_in_carts` ENABLE KEYS */;
@@ -495,7 +482,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `civicrm_extension` WRITE;
 /*!40000 ALTER TABLE `civicrm_extension` DISABLE KEYS */;
-INSERT INTO `civicrm_extension` (`id`, `type`, `full_name`, `name`, `label`, `file`, `schema_version`, `is_active`) VALUES (1,'module','sequentialcreditnotes','Sequential credit notes','Sequential credit notes','sequentialcreditnotes',NULL,1);
+INSERT INTO `civicrm_extension` (`id`, `type`, `full_name`, `name`, `label`, `file`, `schema_version`, `is_active`) VALUES (1,'module','sequentialcreditnotes','Sequential credit notes','Sequential credit notes','sequentialcreditnotes',NULL,1),(2,'module','eventcart','Event cart','Event cart','eventcart',NULL,1);
 /*!40000 ALTER TABLE `civicrm_extension` ENABLE KEYS */;
 UNLOCK TABLES;
 
