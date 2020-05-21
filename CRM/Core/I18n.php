@@ -623,13 +623,14 @@ class CRM_Core_I18n {
     // Change the language of the CMS as well, for URLs.
     CRM_Utils_System::setUFLocale($locale);
 
-    // change the gettext ressources
     if ($this->_nativegettext) {
+      // Native gettext has its own global flag indicating the active locale.
       $this->setNativeGettextLocale($locale);
     }
     else {
-      // phpgettext
-      $this->setPhpGettextLocale($locale);
+      // With phpgettext, each locale is retained as a separate instance of CRM_Core_I18n.
+      // It is sufficient to update `$tsLocale` and switch to the designated instance.
+      // Changing the locale for a live instance will actually cause problems when alternating locales.
     }
 
     // For sql queries, if running in DB multi-lingual mode.
