@@ -21,7 +21,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
   public static function translateTables() {
     $tables = [];
     $tables[] = ['civicrm_option_group', 'civicrm_option_group_en_US'];
-    $tables[] = ['civicrm_events_in_carts', 'civicrm_events_in_carts'];
+    $tables[] = ['civicrm_extension', 'civicrm_extension'];
     $tables[] = ['civicrm_event', 'civicrm_event_en_US'];
     return $tables;
   }
