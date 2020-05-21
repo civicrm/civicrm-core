@@ -76,7 +76,9 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
       $urlCache[$mailing_id . $url] = $redirect;
     }
 
-    $returnUrl = CRM_Utils_System::externUrl('extern/url', "u=$id&qid=$queue_id");
+    // This looks silly - calling the hook twice. This smells like an accident. Restoring old cache-based lookup.
+    // $returnUrl = CRM_Utils_System::externUrl('extern/url', "u=$id&qid=$queue_id");
+    $returnUrl = "{$urlCache[$mailing_id . $url]}&qid={$queue_id}";
 
     if ($hrefExists) {
       $returnUrl = "href='{$returnUrl}' rel='nofollow'";

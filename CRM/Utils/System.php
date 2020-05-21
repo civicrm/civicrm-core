@@ -319,6 +319,41 @@ class CRM_Utils_System {
   }
 
   /**
+   * Perform any current conversions/migrations on the extern URL.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   * @see CRM_Utils_Hook::alterExternUrl
+   */
+  public static function migrateExternUrl(\Civi\Core\Event\GenericHookEvent $e) {
+
+    /**
+     * $mkRouteUri is a small adapter to return generated URL as a "UriInterface".
+     * @param string $path
+     * @param string $query
+     * @return \Psr\Http\Message\UriInterface
+     */
+    $mkRouteUri = function ($path, $query) use ($e) {
+      $urlTxt = CRM_Utils_System::url($path, $query, $e->absolute, $e->fragment, FALSE);
+      if ($e->isSSL || ($e->isSSL === NULL && \CRM_Utils_System::isSSL())) {
+        $urlTxt = str_replace('http://', 'https://', $urlTxt);
+      }
+      return CRM_Utils_Url::parseUrl($urlTxt);
+    };
+
+    switch (Civi::settings()->get('defaultExternUrl') . ':' . $e->path) {
+      case 'router:extern/open':
+        $e->url = $mkRouteUri('civicrm/mailing/open', preg_replace('/(^|&)q=/', '\1qid=', $e->query));
+        break;
+
+      case 'router:extern/url':
+        $e->url = $mkRouteUri('civicrm/mailing/url', $e->query);
+        break;
+
+      // Otherwise, keep the default.
+    }
+  }
+
+  /**
    * @deprecated
    * @see \CRM_Utils_System::currentPath
    *
