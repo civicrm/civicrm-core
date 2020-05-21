@@ -145,7 +145,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
   public $discount_amount;
 
   /**
-   * FK to civicrm_event_carts
+   * Pseudo FK to civicrm_event_carts
    *
    * @var int
    */
@@ -195,7 +195,6 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'registered_by_id', 'civicrm_participant', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'discount_id', 'civicrm_discount', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'campaign_id', 'civicrm_campaign', 'id');
-      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'cart_id', 'civicrm_event_carts', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'transferred_to_contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -512,14 +511,12 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'name' => 'cart_id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Event Cart ID'),
-          'description' => ts('FK to civicrm_event_carts'),
+          'description' => ts('Pseudo FK to civicrm_event_carts'),
           'where' => 'civicrm_participant.cart_id',
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
           'localizable' => 0,
-          'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
-          'add' => '4.1',
         ],
         'must_wait' => [
           'name' => 'must_wait',
