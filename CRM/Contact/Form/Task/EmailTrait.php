@@ -174,29 +174,19 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $setDefaults = FALSE;
     }
 
-    $elements = ['to'];
     $this->_allContactIds = $this->_toContactIds = $this->_contactIds;
-    foreach ($elements as $element) {
-      if ($$element->getValue()) {
 
-        foreach ($this->getEmails($$element) as $value) {
-          $contactId = $value['contact_id'];
-          $email = $value['email'];
-          if ($contactId) {
-            switch ($element) {
-              case 'to':
-                $this->_contactIds[] = $this->_toContactIds[] = $contactId;
-                $this->_toContactEmails[] = $email;
-                break;
-
-            }
-
-            $this->_allContactIds[] = $contactId;
-          }
+    if ($to->getValue()) {
+      foreach ($this->getEmails($to) as $value) {
+        $contactId = $value['contact_id'];
+        $email = $value['email'];
+        if ($contactId) {
+          $this->_contactIds[] = $this->_toContactIds[] = $contactId;
+          $this->_toContactEmails[] = $email;
+          $this->_allContactIds[] = $contactId;
         }
-
-        $setDefaults = TRUE;
       }
+      $setDefaults = TRUE;
     }
 
     //get the group of contacts as per selected by user in case of Find Activities
