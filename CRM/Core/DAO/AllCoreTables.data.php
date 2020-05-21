@@ -197,11 +197,6 @@ return [
     'class' => 'CRM_Event_DAO_ParticipantStatusType',
     'table' => 'civicrm_participant_status_type',
   ],
-  'CRM_Event_Cart_DAO_Cart' => [
-    'name' => 'Cart',
-    'class' => 'CRM_Event_Cart_DAO_Cart',
-    'table' => 'civicrm_event_carts',
-  ],
   'CRM_Dedupe_DAO_RuleGroup' => [
     'name' => 'RuleGroup',
     'class' => 'CRM_Dedupe_DAO_RuleGroup',
@@ -741,11 +736,6 @@ return [
     'name' => 'ParticipantPayment',
     'class' => 'CRM_Event_DAO_ParticipantPayment',
     'table' => 'civicrm_participant_payment',
-  ],
-  'CRM_Event_Cart_DAO_EventInCart' => [
-    'name' => 'EventInCart',
-    'class' => 'CRM_Event_Cart_DAO_EventInCart',
-    'table' => 'civicrm_events_in_carts',
   ],
   'CRM_Pledge_DAO_PledgePayment' => [
     'name' => 'PledgePayment',

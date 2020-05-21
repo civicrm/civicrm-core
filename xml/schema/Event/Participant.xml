@@ -271,15 +271,9 @@
     <name>cart_id</name>
     <type>int unsigned</type>
     <title>Event Cart ID</title>
-    <comment>FK to civicrm_event_carts</comment>
+    <comment>Pseudo FK to civicrm_event_carts</comment>
     <add>4.1</add>
   </field>
-  <foreignKey>
-    <name>cart_id</name>
-    <table>civicrm_event_carts</table>
-    <key>id</key>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
   <field>
     <name>must_wait</name>
     <type>int</type>
