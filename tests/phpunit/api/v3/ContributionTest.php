@@ -2859,7 +2859,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
-    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'receipt_date' => 'now']);
+    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'receipt_date' => 'now', 'is_pay_later' => TRUE]);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->callAPISuccess('contribution', 'completetransaction', ['id' => $contribution['id'], 'trxn_date' => date('Y-m-d')]);
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id'], 'sequential' => 1]);

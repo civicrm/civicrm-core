@@ -4438,6 +4438,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionParams = array_merge([
       'contribution_status_id' => $completedContributionStatusID,
+      'is_pay_later' => FALSE,
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
