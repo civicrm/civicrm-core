@@ -145,23 +145,43 @@ class BasicActionsTest extends UnitTestCase {
   public function testGetFields() {
     $getFields = MockBasicEntity::getFields()->execute()->indexBy('name');
 
-    $this->assertCount(6, $getFields);
+    $this->assertCount(7, $getFields);
     $this->assertEquals('Id', $getFields['id']['title']);
     // Ensure default data type is "String" when not specified
     $this->assertEquals('String', $getFields['color']['data_type']);
 
     // Getfields should default to loadOptions = false and reduce them to bool
     $this->assertTrue($getFields['group']['options']);
+    $this->assertTrue($getFields['fruit']['options']);
     $this->assertFalse($getFields['id']['options']);
 
-    // Now load options
+    // Load simple options
     $getFields = MockBasicEntity::getFields()
-      ->addWhere('name', '=', 'group')
+      ->addWhere('name', 'IN', ['group', 'fruit'])
       ->setLoadOptions(TRUE)
       ->execute()->indexBy('name');
 
-    $this->assertCount(1, $getFields);
+    $this->assertCount(2, $getFields);
     $this->assertArrayHasKey('one', $getFields['group']['options']);
+    // Complex options should be reduced to simple array
+    $this->assertArrayHasKey(1, $getFields['fruit']['options']);
+    $this->assertEquals('Banana', $getFields['fruit']['options'][3]);
+
+    // Load complex options
+    $getFields = MockBasicEntity::getFields()
+      ->addWhere('name', 'IN', ['group', 'fruit'])
+      ->setLoadOptions(['id', 'name', 'label', 'color'])
+      ->execute()->indexBy('name');
+
+    // Simple options should be expanded to non-assoc array
+    $this->assertCount(2, $getFields);
+    $this->assertEquals('one', $getFields['group']['options'][0]['id']);
+    $this->assertEquals('First', $getFields['group']['options'][0]['name']);
+    $this->assertEquals('First', $getFields['group']['options'][0]['label']);
+    $this->assertFalse(isset($getFields['group']['options'][0]['color']));
+    // Complex options should give all requested properties
+    $this->assertEquals('Banana', $getFields['fruit']['options'][2]['label']);
+    $this->assertEquals('yellow', $getFields['fruit']['options'][2]['color']);
   }
 
   public function testItemsToGet() {
@@ -233,6 +253,37 @@ class BasicActionsTest extends UnitTestCase {
       ->execute()
       ->first();
     $this->assertEquals(['shape', 'size', 'weight'], array_keys($result));
+  }
+
+  public function testPseudoconstantMatch() {
+    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
+
+    $records = [
+      ['group:label' => 'First', 'shape' => 'round', 'fruit:name' => 'banana'],
+      ['group:name' => 'Second', 'shape' => 'square', 'fruit:label' => 'Pear'],
+    ];
+    MockBasicEntity::save()->setRecords($records)->execute();
+
+    $results = MockBasicEntity::get()
+      ->addSelect('*', 'group:label', 'group:name', 'fruit:name', 'fruit:color', 'fruit:label')
+      ->execute();
+
+    $this->assertEquals('round', $results[0]['shape']);
+    $this->assertEquals('one', $results[0]['group']);
+    $this->assertEquals('First', $results[0]['group:label']);
+    $this->assertEquals('First', $results[0]['group:name']);
+    $this->assertEquals(3, $results[0]['fruit']);
+    $this->assertEquals('Banana', $results[0]['fruit:label']);
+    $this->assertEquals('banana', $results[0]['fruit:name']);
+    $this->assertEquals('yellow', $results[0]['fruit:color']);
+
+    // Cannot match to a non-unique option property like :color on create
+    try {
+      MockBasicEntity::create()->addValue('fruit:color', 'yellow')->execute();
+    }
+    catch (\API_Exception $createError) {
+    }
+    $this->assertContains('Illegal expression', $createError->getMessage());
   }
 
 }

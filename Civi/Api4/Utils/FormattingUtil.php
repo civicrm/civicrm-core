@@ -31,6 +31,8 @@ class FormattingUtil {
     'label' => 'get',
   ];
 
+  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon'];
+
   /**
    * Massage values into the format the BAO expects for a write operation
    *
@@ -46,7 +48,7 @@ class FormattingUtil {
         if ($value === 'null') {
           $value = 'Null';
         }
-        self::formatInputValue($value, $name, $field);
+        self::formatInputValue($value, $name, $field, 'create');
         // Ensure we have an array for serialized fields
         if (!empty($field['serialize'] && !is_array($value))) {
           $value = (array) $value;
@@ -80,19 +82,21 @@ class FormattingUtil {
    * @param $value
    * @param string $fieldName
    * @param array $fieldSpec
+   * @param string $action
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, $fieldName, $fieldSpec) {
+  public static function formatInputValue(&$value, $fieldName, $fieldSpec, $action = 'get') {
     // Evaluate pseudoconstant suffix
     $suffix = strpos($fieldName, ':');
     if ($suffix) {
-      $options = self::getPseudoconstantList($fieldSpec['entity'], $fieldSpec['name'], substr($fieldName, $suffix + 1));
+      $options = self::getPseudoconstantList($fieldSpec['entity'], $fieldSpec['name'], substr($fieldName, $suffix + 1), $action);
       $value = self::replacePseudoconstant($options, $value, TRUE);
       return;
     }
     elseif (is_array($value)) {
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldName, $fieldSpec);
+        self::formatInputValue($val, $fieldName, $fieldSpec, $action);
       }
       return;
     }
@@ -189,17 +193,20 @@ class FormattingUtil {
    */
   public static function getPseudoconstantList($entity, $fieldName, $valueType, $params = [], $action = 'get') {
     $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
-    if (!$context) {
+    // For create actions, only unique identifiers can be used.
+    // For get actions any valid suffix is ok.
+    if (($action === 'create' && !$context) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
       throw new \API_Exception('Illegal expression');
     }
-    $baoName = CoreUtil::getBAOFromApiName($entity);
+    $baoName = $context ? CoreUtil::getBAOFromApiName($entity) : NULL;
     // Use BAO::buildOptions if possible
     if ($baoName) {
       $options = $baoName::buildOptions($fieldName, $context, $params);
     }
-    // Fallback for option lists that exist in the api but not the BAO - note: $valueType gets ignored here
+    // Fallback for option lists that exist in the api but not the BAO
     if (!isset($options) || $options === FALSE) {
-      $options = civicrm_api4($entity, 'getFields', ['action' => $action, 'loadOptions' => TRUE, 'where' => [['name', '=', $fieldName]]])[0]['options'] ?? NULL;
+      $options = civicrm_api4($entity, 'getFields', ['action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $fieldName]]])[0]['options'] ?? NULL;
+      $options = $options ? array_column($options, $valueType, 'id') : $options;
     }
     if (is_array($options)) {
       return $options;
@@ -278,7 +285,7 @@ class FormattingUtil {
           \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'];
           // Include suffixed variants like prefix_id:label
           if (!empty($field['pseudoconstant'])) {
-            foreach (array_keys(self::$pseudoConstantContexts) as $suffix) {
+            foreach (self::$pseudoConstantSuffixes as $suffix) {
               \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'] . ':' . $suffix;
             }
           }
