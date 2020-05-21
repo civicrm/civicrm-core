@@ -471,11 +471,6 @@ INSERT INTO `civicrm_event` (`id`, `title`, `summary`, `description`, `event_typ
 /*!40000 ALTER TABLE `civicrm_event` ENABLE KEYS */;
 UNLOCK TABLES;
 
-LOCK TABLES `civicrm_events_in_carts` WRITE;
-/*!40000 ALTER TABLE `civicrm_events_in_carts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `civicrm_events_in_carts` ENABLE KEYS */;
-UNLOCK TABLES;
-
 --
 -- Dumping data for table `civicrm_extension`
 --

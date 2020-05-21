@@ -106,7 +106,7 @@ function dm_install_coreext() {
 ## Get a list of default/core extension directories (space-delimited)
 ## reldirs=$(dm_core_exts)
 function dm_core_exts() {
-  echo ext/sequentialcreditnotes
+  echo ext/sequentialcreditnotes ext/eventcart
 }
 
 ## Copy all packages
