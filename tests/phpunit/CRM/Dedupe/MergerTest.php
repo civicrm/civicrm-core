@@ -1205,9 +1205,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_event' => [
         0 => 'created_id',
       ],
-      'civicrm_event_carts' => [
-        0 => 'user_id',
-      ],
       'civicrm_financial_account' => [
         0 => 'contact_id',
       ],
