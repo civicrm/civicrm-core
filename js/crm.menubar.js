@@ -238,7 +238,7 @@
             e.preventDefault();
             CRM.menubar.togglePosition();
           })
-          .append('<li id="crm-menubar-toggle-position"><a href="#toggle-position" title="' + ts('Adjust menu position') + '"><i class="crm-i fa-arrow-up"></i></a>');
+          .append('<li id="crm-menubar-toggle-position"><a href="#toggle-position" title="' + ts('Adjust menu position') + '"><i class="crm-i fa-arrow-up" aria-hidden="true"></i></a>');
         CRM.menubar.position = CRM.cache.get('menubarPosition', CRM.menubar.position);
       }
       $('body').addClass('crm-menubar-visible crm-menubar-' + CRM.menubar.position);

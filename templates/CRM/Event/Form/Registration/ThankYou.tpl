@@ -26,14 +26,14 @@
     {* Show link to Tell a Friend (CRM-2153) *}
     {if $friendText}
         <div id="tell-a-friend" class="crm-section tell_friend_link-section">
-            <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right"></i> {$friendText}</span></a>
+            <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$friendText}</span></a>
        </div><br /><br />
     {/if}
 
     {* Add button for donor to create their own Personal Campaign page *}
     {if $pcpLink}
       <div class="crm-section create_pcp_link-section">
-            <a href="{$pcpLink}" title="{$pcpLinkText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right"></i> {$pcpLinkText}</span></a>
+            <a href="{$pcpLink}" title="{$pcpLinkText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$pcpLinkText}</span></a>
         </div><br /><br />
     {/if}
 
@@ -195,7 +195,7 @@
     {/if}
 
     <div class="action-link section event_info_link-section">
-        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
+        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
     </div>
 
     {if $event.is_public }

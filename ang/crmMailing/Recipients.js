@@ -99,7 +99,7 @@
           if (option.entity_type != 'civicrm_mailing' && isMandatory(option.entity_id)) {
             spanClass = 'crmMailing-mandatory';
           }
-          return '<i class="crm-i '+icon+'"></i> <span class="' + spanClass + '">' + item.text + '</span>';
+          return '<i class="crm-i '+icon+'" aria-hidden="true"></i> <span class="' + spanClass + '">' + item.text + '</span>';
         }
 
         function validate() {

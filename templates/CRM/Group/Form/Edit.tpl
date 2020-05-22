@@ -82,15 +82,15 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if $action neq 1}
     <div class="action-link">
-      <a {$crmURL}><i class="crm-i fa-users"></i> {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
       {if $group.saved_search_id}
         <br />
         {if $group.mapping_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil"></i> {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
         {elseif $group.search_custom_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil"></i> {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
         {else}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil"></i> {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
         {/if}
 
       {/if}

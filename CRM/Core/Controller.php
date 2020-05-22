@@ -556,8 +556,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function addWizardStyle(&$wizard) {
     $wizard['style'] = [
       'barClass' => '',
-      'stepPrefixCurrent' => '<i class="crm-i fa-chevron-right"></i>&nbsp;',
-      'stepPrefixPast' => '<i class="crm-i fa-check"></i>&nbsp;',
+      'stepPrefixCurrent' => '<i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;',
+      'stepPrefixPast' => '<i class="crm-i fa-check" aria-hidden="true"></i>&nbsp;',
       'stepPrefixFuture' => ' ',
       'subStepPrefixCurrent' => '&nbsp;&nbsp;',
       'subStepPrefixPast' => '&nbsp;&nbsp;',

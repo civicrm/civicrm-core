@@ -29,7 +29,7 @@
         type = hasDatepicker ? 'text' : 'number';
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times"></i></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times" aria-hidden="true"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {

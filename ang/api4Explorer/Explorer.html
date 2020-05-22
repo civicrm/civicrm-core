@@ -8,7 +8,7 @@
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
   <div class="messages warning no-popup collapse">
     <p>
-      <i class="crm-i fa-exclamation-triangle"></i>
+      <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
       <strong>{{:: ts('Bootstrap theme not found.') }}</strong>
     </p>
     <p>{{:: ts('This screen may not work correctly without a bootstrap-based theme such as Shoreditch installed.') }}</p>
@@ -48,15 +48,15 @@
             <label class="radio-inline">
               <input type="radio" ng-model="params[name]" ng-value="false" />false
             </label>
-            <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="params[name] !== null"><i class="crm-i fa-times"></i></a>
+            <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="params[name] !== null"><i class="crm-i fa-times" aria-hidden="true"></i></a>
           </div>
           <fieldset class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select && !isSelectRowCount()">
             <legend>select<span class="crm-marker" ng-if="::availableParams.select.required"> *</span></legend>
             <div ng-model="params.select" ui-sortable="{axis: 'y'}">
               <div class="api4-input form-inline" ng-repeat="item in params.select track by $index">
-                <i class="crm-i fa-arrows"></i>
+                <i class="crm-i fa-arrows" aria-hidden="true"></i>
                 <input class="form-control huge" type="text" ng-model="params.select[$index]" />
-                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('select', $index)"><i class="crm-i fa-times"></i></a>
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('select', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
               </div>
             </div>
             <div class="api4-input form-inline">
@@ -90,7 +90,7 @@
             <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
             <input class="form-control" ng-if="::!param.options" type="{{:: param.type[0] === 'int' && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
             <select class="form-control" ng-if="::param.options" ng-options="o for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
-            <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times"></i></a>
+            <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times" aria-hidden="true"></i></a>
           </div>
           <div class="api4-input" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['array', 'mixed'])">
             <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
@@ -113,9 +113,9 @@
             <legend>groupBy<span class="crm-marker" ng-if="::availableParams.groupBy.required"> *</span></legend>
             <div ng-model="params.groupBy" ui-sortable="{axis: 'y'}">
               <div class="api4-input form-inline" ng-repeat="item in params.groupBy track by $index">
-                <i class="crm-i fa-arrows"></i>
+                <i class="crm-i fa-arrows" aria-hidden="true"></i>
                 <input class="form-control huge" type="text" ng-model="params.groupBy[$index]" />
-                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('groupBy', $index)"><i class="crm-i fa-times"></i></a>
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('groupBy', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
               </div>
             </div>
             <div class="api4-input form-inline">
@@ -128,13 +128,13 @@
             <legend>orderBy<span class="crm-marker" ng-if="::availableParams.orderBy.required"> *</span></legend>
             <div ng-model="params.orderBy" ui-sortable="{axis: 'y'}">
               <div class="api4-input form-inline" ng-repeat="clause in params.orderBy">
-                <i class="crm-i fa-arrows"></i>
+                <i class="crm-i fa-arrows" aria-hidden="true"></i>
                 <input class="form-control huge" type="text" ng-model="clause[0]" />
                 <select class="form-control" ng-model="clause[1]">
                   <option value="ASC">ASC</option>
                   <option value="DESC">DESC</option>
                 </select>
-                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('orderBy', $index)"><i class="crm-i fa-times"></i></a>
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('orderBy', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
               </div>
             </div>
             <div class="api4-input form-inline">
@@ -151,7 +151,7 @@
                 <label for="api4-param-offset">offset<span class="crm-marker" ng-if="::availableParams.offset.required"> *</span></label>
                 <input class="form-control" type="number" min="0" id="api4-param-offset" ng-model="params.offset"/>
               </span>
-              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times"></i></a>
+              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times" aria-hidden="true"></i></a>
             </div>
           </fieldset>
           <fieldset ng-if="::availableParams.chain" ng-mouseenter="help('chain', availableParams.chain)" ng-mouseleave="help()">

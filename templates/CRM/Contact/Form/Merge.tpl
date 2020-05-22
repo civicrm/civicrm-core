@@ -31,24 +31,24 @@
   </div>
 
   <div class="action-link">
-    {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><i class="crm-i fa-chevron-left"></i> {ts}Previous{/ts}</a>{/if}
-    {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <i class="crm-i fa-chevron-right"></i></a>{/if}
+    {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Previous{/ts}</a>{/if}
+    {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <i class="crm-i fa-chevron-right" aria-hidden="true"></i></a>{/if}
     <a href="{$flip}" class="action-item crm-hover-button">
-      <i class="crm-i fa-random"></i>
+      <i class="crm-i fa-random" aria-hidden="true"></i>
       {ts}Flip between original and duplicate contacts.{/ts}
     </a>
   </div>
 
   <div class="action-link">
     <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid|escape}, {$other_cid|escape}, 'dupe-nondupe', 'merge-contact', '{$browseUrl}' );return false;">
-      <i class="crm-i fa-times-circle"></i>
+      <i class="crm-i fa-times-circle" aria-hidden="true"></i>
       {ts}Mark this pair as not a duplicate.{/ts}
     </a>
   </div>
 
   <div class="action-link">
     <a href="javascript:void(0);" class="action-item crm-hover-button toggle_equal_rows">
-      <i class="crm-i fa-eye-slash"></i>
+      <i class="crm-i fa-eye-slash" aria-hidden="true"></i>
       {ts}Show/hide rows with the same data on each contact record.{/ts}
     </a>
   </div>

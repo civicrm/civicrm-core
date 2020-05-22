@@ -27,7 +27,7 @@
     </div>
 {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-            <a href="{$newGrantURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Grant{/ts}</span></a><br/><br/>
+            <a href="{$newGrantURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Grant{/ts}</span></a><br/><br/>
             </div>
         {/if}
     {if $rows}

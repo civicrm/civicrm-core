@@ -153,8 +153,8 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
             $fieldName = ' <span style="color:red"> - Deleted - </span> ';
           }
         }
-        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "?reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria') . '"> <i class="crm-i fa-pencil"></i> </a>';
-        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "?reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings') . '"> <i class="crm-i fa-gear"></i> </a>';
+        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "?reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria') . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "?reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings') . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
         $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
       }
 

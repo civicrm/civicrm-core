@@ -18,7 +18,7 @@
 {/if}
 
   <div class="action-link">
-    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
   </div>
 
 {if $rows}
@@ -59,6 +59,6 @@
 {/if}
 
   <div class="action-link">
-    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
   </div>
 </div>

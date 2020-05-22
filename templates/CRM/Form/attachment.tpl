@@ -15,7 +15,7 @@
           {foreach from=$currentAttachmentInfo key=attKey item=attVal}
                 <div id="attachStatusMesg" class="status hiddenElement"></div>
                 <div id="attachFileRecord_{$attVal.fileID}">
-                  <strong><a href="{$attVal.url}"><i class="crm-i {$attVal.icon}"></i> {$attVal.cleanName}</a></strong>
+                  <strong><a href="{$attVal.url}"><i class="crm-i {$attVal.icon}" aria-hidden="true"></i> {$attVal.cleanName}</a></strong>
                   {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
                   {if !empty($attVal.tag)}
                     <br />
@@ -47,7 +47,7 @@
         {/if}
         <tr>
           <td class="label">{$form.attachFile_1.label}</td>
-          <td>{$form.attachFile_1.html}&nbsp;{$form.attachDesc_1.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
+          <td>{$form.attachFile_1.html}&nbsp;{$form.attachDesc_1.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
             <div class="description">{ts}Browse to the <strong>file</strong> you want to upload.{/ts}{if $maxAttachments GT 1} {ts 1=$maxAttachments}You can have a maximum of %1 attachment(s).{/ts}{/if} {ts 1=$config->maxFileSize}Each file must be less than %1M in size. You can also add a short description.{/ts}</div>
           </td>
         </tr>
@@ -68,7 +68,7 @@
             <tr class="attachment-fieldset solid-border-top"><td colspan="2"></td></tr>
             <tr>
                 <td class="label">{$form.attachFile_1.label}</td>
-                <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a></td>
+                <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a></td>
             </tr>
             <tr>
               <td class="label">{$form.$tagElement.label}</td>

@@ -364,7 +364,7 @@
 
       // Adds controls to a widget.  id is for internal use and image file name in images/dashboard/ (a .gif).
       widget.addControl = function(id, control) {
-          var markup = '<a class="crm-i ' + control.icon + '" alt="' + control.description + '" title="' + control.description + '"></a>';
+          var markup = '<a class="crm-i ' + control.icon + '" alt="' + control.description + '" title="' + control.description + '" aria-hidden="true"></a>';
           control.element = $(markup).prependTo($('.widget-controls', widget.element)).click(control.callback);
       };
 
