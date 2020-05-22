@@ -199,7 +199,9 @@
     </div>
 
     {if $event.is_public }
+      <div class="action-link section iCal_links-section">
         {include file="CRM/Event/Page/iCalLinks.tpl"}
+      </div>
     {/if}
     {if $event.is_share}
     {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}

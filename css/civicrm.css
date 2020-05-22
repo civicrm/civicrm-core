@@ -1695,6 +1695,10 @@ input.crm-form-entityref {
 .crm-container a.crm-event-feed-link {
   margin: 0 1ex;
   color: #52534D;
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 2px 0;
+  vertical-align: bottom;
 }
 
 .crm-container a.crm-event-feed-link:hover {
