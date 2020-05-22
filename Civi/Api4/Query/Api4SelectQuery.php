@@ -16,7 +16,6 @@ use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\SelectUtil;
-use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 /**
  * A query `node` may be in one of three formats:
@@ -81,14 +80,14 @@ class Api4SelectQuery extends SelectQuery {
     if ($apiGet->getDebug()) {
       $this->debugOutput =& $apiGet->_debugOutput;
     }
-    $baoName = CoreUtil::getBAOFromApiName($this->entity);
-    $this->entityFieldNames = array_column($baoName::fields(), 'name');
-    foreach ($apiGet->entityFields() as $path => $field) {
+    foreach ($apiGet->entityFields() as $field) {
+      $this->entityFieldNames[] = $field['name'];
       $field['sql_name'] = '`' . self::MAIN_TABLE_ALIAS . '`.`' . $field['column_name'] . '`';
-      $this->addSpecField($path, $field);
+      $this->addSpecField($field['name'], $field);
     }
 
-    $this->constructQueryObject($baoName);
+    $baoName = CoreUtil::getBAOFromApiName($this->entity);
+    $this->constructQueryObject();
 
     // Add ACLs first to avoid redundant subclauses
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
@@ -443,11 +442,11 @@ class Api4SelectQuery extends SelectQuery {
         $field['is_join'] = TRUE;
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
-      $conditions = [];
-      foreach (array_merge($join, $this->getJoinConditions($entity, $alias)) as $clause) {
+      $conditions = $this->getJoinConditions($entity, $alias);
+      foreach (array_filter($join) as $clause) {
         $conditions[] = $this->treeWalkClauses($clause, 'ON');
       }
-      $tableName = AllCoreTables::getTableForEntityName($entity);
+      $tableName = CoreUtil::getTableName($entity);
       $this->join($side, $tableName, $alias, $conditions);
     }
   }
@@ -467,18 +466,20 @@ class Api4SelectQuery extends SelectQuery {
     $stack = [NULL, NULL];
     foreach ($this->apiFieldSpec as $name => $field) {
       if ($field['entity'] !== $entity && $field['fk_entity'] === $entity) {
-        $conditions[] = [$name, '=', "$alias.id"];
-        $stack = [$name];
+        $conditions[] = $this->treeWalkClauses([$name, '=', "$alias.id"], 'ON');
       }
       elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 &&  $field['fk_entity'] === $this->entity) {
-        $conditions[] = [$name, '=', 'id'];
+        $conditions[] = $this->treeWalkClauses([$name, '=', 'id'], 'ON');
+        $stack = ['id'];
       }
     }
     // Hmm, if we came up with > 1 condition, then it's ambiguous how it should be joined so we won't return anything but the generic ACLs
     if (count($conditions) > 1) {
-      return $this->getAclClause($alias, AllCoreTables::getFullName($entity), [NULL, NULL]);
+      $stack = [NULL, NULL];
+      $conditions = [];
     }
-    $acls = $this->getAclClause($alias, AllCoreTables::getFullName($entity), $stack);
+    $baoName = CoreUtil::getBAOFromApiName($entity);
+    $acls = array_values($this->getAclClause($alias, $baoName, $stack));
     return array_merge($acls, $conditions);
   }
 
@@ -531,7 +532,7 @@ class Api4SelectQuery extends SelectQuery {
    * @return FALSE|string
    */
   public function getFrom() {
-    return AllCoreTables::getTableForClass(AllCoreTables::getFullName($this->entity));
+    return CoreUtil::getTableName($this->entity);
   }
 
   /**
@@ -635,19 +636,11 @@ class Api4SelectQuery extends SelectQuery {
   /**
    * Get table name on basis of entity
    *
-   * @param string $baoName
-   *
    * @return void
    */
-  public function constructQueryObject($baoName) {
-    if (strstr($this->entity, 'Custom_')) {
-      $this->query = \CRM_Utils_SQL_Select::from(CoreUtil::getCustomTableByName(str_replace('Custom_', '', $this->entity)) . ' ' . self::MAIN_TABLE_ALIAS);
-      $this->entityFieldNames = array_keys($this->apiFieldSpec);
-    }
-    else {
-      $bao = new $baoName();
-      $this->query = \CRM_Utils_SQL_Select::from($bao->tableName() . ' ' . self::MAIN_TABLE_ALIAS);
-    }
+  public function constructQueryObject() {
+    $tableName = CoreUtil::getTableName($this->entity);
+    $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
   }
 
   /**

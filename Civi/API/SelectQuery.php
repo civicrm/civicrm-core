@@ -63,7 +63,7 @@ abstract class SelectQuery {
   /**
    * @var array
    */
-  protected $entityFieldNames;
+  protected $entityFieldNames = [];
   /**
    * @var array
    */
