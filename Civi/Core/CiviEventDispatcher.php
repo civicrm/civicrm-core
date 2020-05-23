@@ -2,7 +2,7 @@
 
 namespace Civi\Core;
 
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @see \CRM_Utils_Hook
  */
-class CiviEventDispatcher extends ContainerAwareEventDispatcher {
+class CiviEventDispatcher extends EventDispatcher {
 
   const DEFAULT_HOOK_PRIORITY = -100;
 
@@ -172,6 +172,7 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
    */
   protected function bindPatterns($eventName) {
     if ($eventName !== NULL && !isset($this->autoListeners[$eventName])) {
+      $this->lazyLoad($eventName);
       $this->autoListeners[$eventName] = 1;
       if ($this->isHookEvent($eventName)) {
         // WISHLIST: For native extensions (and possibly D6/D7/D8/BD), enumerate
@@ -181,6 +182,11 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
           '\Civi\Core\CiviEventDispatcher',
           'delegateToUF',
         ], self::DEFAULT_HOOK_PRIORITY);
+      }
+    }
+    elseif (NULL === $eventName) {
+      foreach ($this->listenerIds as $serviceEventName => $args) {
+        $this->lazyLoad($serviceEventName);
       }
     }
   }
@@ -248,6 +254,71 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
       }
     }
     return 'fail';
+  }
+
+  public function addListenerService($eventName, $callback, $priority = 0) {
+    if (!\is_array($callback) || 2 !== \count($callback)) {
+      throw new \InvalidArgumentException('Expected an array("service", "method") argument');
+    }
+    $this->listenerIds[$eventName][] = array(
+      $callback[0],
+      $callback[1],
+      $priority,
+    );
+  }
+
+  public function addSubscriberService($serviceId, $class) {
+    foreach ($class::getSubscribedEvents() as $eventName => $params) {
+      if (\is_string($params)) {
+        $this->listenerIds[$eventName][] = array(
+          $serviceId,
+          $params,
+          0,
+        );
+      }
+      elseif (\is_string($params[0])) {
+        $this->listenerIds[$eventName][] = array(
+          $serviceId,
+          $params[0],
+          isset($params[1]) ? $params[1] : 0,
+        );
+      }
+      else {
+        foreach ($params as $listener) {
+          $this->listenerIds[$eventName][] = array(
+            $serviceId,
+            $listener[0],
+            isset($listener[1]) ? $listener[1] : 0,
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Lazily loads listeners for this event from the dependency injection
+   * container.
+   *
+   * @param string $eventName The name of the event to dispatch. The name of
+   *                          the event is the name of the method that is
+   *                          invoked on listeners.
+   */
+  protected function lazyLoad($eventName) {
+    if (isset($this->listenerIds[$eventName])) {
+      foreach ($this->listenerIds[$eventName] as list($serviceId, $method, $priority)) {
+        $listener = \Civi\Core\Container::singleton()->get($serviceId);
+        $key = $serviceId . '.' . $method;
+        if (!isset($this->listeners[$eventName][$key])) {
+          $this->addListener($eventName, array($listener, $method), $priority);
+        }
+        elseif ($this->listeners[$eventName][$key] !== $listener) {
+          parent::removeListener($eventName, array($this->listeners[$eventName][$key], $method));
+          $this->addListener($eventName, array($listener, $method), $priority);
+        }
+
+        $this->listeners[$eventName][$key] = $listener;
+      }
+    }
   }
 
 }
