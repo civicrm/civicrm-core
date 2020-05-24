@@ -1459,6 +1459,7 @@ FROM   civicrm_domain
       $dao = new CRM_Core_DAO();
     }
     else {
+      CRM_Core_Error::deprecatedFunctionWarning('silly param');
       $dao = new $daoName();
     }
 
@@ -1573,6 +1574,9 @@ FROM   civicrm_domain
    */
   public static function composeQuery($query, $params = [], $abort = TRUE) {
     $tr = [];
+    if (!$abort) {
+      CRM_Core_Error::deprecatedFunctionWarning('abort should never be false');
+    }
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
         if (CRM_Utils_Type::validate($item[0], $item[1]) !== NULL) {
