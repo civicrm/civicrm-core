@@ -191,6 +191,14 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     ], $defaults);
     $this->normalizeDefaultValues($defaults);
 
+    //991/Subtypes not respected when editing smart group criteria
+    if (!empty($defaults['contact_type']) && !empty($this->_formValues['contact_sub_type'])) {
+      foreach ($this->_formValues['contact_sub_type'] as $subtype) {
+        $basicType = CRM_Contact_BAO_ContactType::getBasicType($subtype);
+        $defaults['contact_type'][$subtype] = $basicType . '__' . $subtype;
+      }
+    }
+
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_ADD;
     }
