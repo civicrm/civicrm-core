@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @author Andrew Hunt, AGH Strategies
- * $Id$
- *
  */
 
 /**

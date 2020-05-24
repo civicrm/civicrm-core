@@ -10,11 +10,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Grant_BAO_Query
  */
 class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
