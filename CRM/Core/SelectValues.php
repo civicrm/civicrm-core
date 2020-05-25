@@ -68,11 +68,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function contactType() {
-    static $contactType = NULL;
-    if (!$contactType) {
-      $contactType = CRM_Contact_BAO_ContactType::basicTypePairs();
-    }
-    return $contactType;
+    return CRM_Contact_BAO_ContactType::basicTypePairs();
   }
 
   /**

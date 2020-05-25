@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContactType;
+
 /**
  *
  * @package CRM
@@ -53,48 +55,24 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   /**
    * Retrieve basic contact type information.
    *
-   * @param bool $all
+   * @param bool $includeInactive
    *
    * @return array
    *   Array of basic contact types information.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function basicTypeInfo($all = FALSE) {
-    static $_cache = NULL;
-
-    if ($_cache === NULL) {
-      $_cache = [];
-    }
-
-    $argString = $all ? 'CRM_CT_BTI_1' : 'CRM_CT_BTI_0';
-    if (!array_key_exists($argString, $_cache)) {
-      $cache = CRM_Utils_Cache::singleton();
-      $_cache[$argString] = $cache->get($argString);
-      if (!$_cache[$argString]) {
-        $sql = "
-SELECT *
-FROM   civicrm_contact_type
-WHERE  parent_id IS NULL
-";
-        if ($all === FALSE) {
-          $sql .= " AND is_active = 1";
-        }
-
-        $params = [];
-        $dao = CRM_Core_DAO::executeQuery($sql,
-          $params,
-          FALSE,
-          'CRM_Contact_DAO_ContactType'
-        );
-        while ($dao->fetch()) {
-          $value = [];
-          CRM_Core_DAO::storeValues($dao, $value);
-          $_cache[$argString][$dao->name] = $value;
-        }
-
-        $cache->set($argString, $_cache[$argString]);
+  public static function basicTypeInfo($includeInactive = FALSE) {
+    $cacheKey = 'CRM_CT_BTI_' . (int) $includeInactive;
+    if (!Civi::cache('contactTypes')->has($cacheKey)) {
+      $contactType = ContactType::get()->setCheckPermissions(FALSE)->setSelect(['*'])->addWhere('parent_id', 'IS NULL');
+      if ($includeInactive === FALSE) {
+        $contactType->addWhere('is_active', '=', 1);
       }
+      Civi::cache('contactTypes')->set($cacheKey, (array) $contactType->execute()->indexBy('name'));
     }
-    return $_cache[$argString];
+    return Civi::cache('contactTypes')->get($cacheKey);
   }
 
   /**
@@ -578,10 +556,10 @@ WHERE contact_sub_type = '$name'";
 
     // remove navigation entry if any
     if ($name) {
-      $sql = "
+      $sql = '
 DELETE
 FROM civicrm_navigation
-WHERE name = %1";
+WHERE name = %1';
       $params = [1 => ["New $name", 'String']];
       CRM_Core_DAO::executeQuery($sql, $params);
       CRM_Core_BAO_Navigation::resetNavigation();
