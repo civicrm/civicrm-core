@@ -989,11 +989,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * @param int $userID
+   * @param int $sourceContactID
+   *   The contact ID of the email "from".
    * @param string $subject
    * @param string $html
    * @param string $text
    * @param string $additionalDetails
+   *   The additional information of CC and BCC appended to the activity details.
    * @param int $campaignID
    * @param array $attachments
    * @param int $caseID
@@ -1002,12 +1004,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   The created activity ID
    * @throws \CRM_Core_Exception
    */
-  public static function createEmailActivity($userID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments, $caseID) {
+  public static function createEmailActivity($sourceContactID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments, $caseID) {
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
 
     // CRM-6265: save both text and HTML parts in details (if present)
     if ($html and $text) {
-      $details = "-ALTERNATIVE ITEM 0-\n$html$additionalDetails\n-ALTERNATIVE ITEM 1-\n$text$additionalDetails\n-ALTERNATIVE END-\n";
+      $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
     }
     else {
       $details = $html ? $html : $text;
@@ -1015,12 +1017,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $activityParams = [
-      'source_contact_id' => $userID,
+      'source_contact_id' => $sourceContactID,
       'activity_type_id' => $activityTypeID,
       'activity_date_time' => date('YmdHis'),
       'subject' => $subject,
       'details' => $details,
-      // FIXME: check for name Completed and get ID from that lookup
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
       'campaign_id' => $campaignID,
     ];
@@ -1038,6 +1039,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $activity = civicrm_api3('Activity', 'create', $activityParams);
+
     return $activity['id'];
   }
 
