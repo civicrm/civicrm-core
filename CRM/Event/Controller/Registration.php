@@ -10,11 +10,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Event_Controller_Registration
  */
 class CRM_Event_Controller_Registration extends CRM_Core_Controller {
 

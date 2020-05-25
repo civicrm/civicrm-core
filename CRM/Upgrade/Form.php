@@ -10,11 +10,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Upgrade_Form
  */
 class CRM_Upgrade_Form extends CRM_Core_Form {
   const QUEUE_NAME = 'CRM_Upgrade';

@@ -10,11 +10,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Grant_BAO_Grant
  */
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 

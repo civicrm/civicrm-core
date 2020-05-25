@@ -10,14 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * Class for grant form task actions.
  * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
  */

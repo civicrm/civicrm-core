@@ -10,12 +10,7 @@
  */
 
 /**
- *
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Extension_ClassLoader
  */
 class CRM_Extension_ClassLoader {
 

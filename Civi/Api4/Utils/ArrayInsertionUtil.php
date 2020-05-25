@@ -10,17 +10,13 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Utils;
 
+/**
+ * Class ArrayInsertionUtil
+ *
+ * @package Civi\Api4\Utils
+ */
 class ArrayInsertionUtil {
 
   /**
