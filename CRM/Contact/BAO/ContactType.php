@@ -70,21 +70,16 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
       $cache = CRM_Utils_Cache::singleton();
       $_cache[$argString] = $cache->get($argString);
       if (!$_cache[$argString]) {
-        $sql = "
+        $sql = '
 SELECT *
 FROM   civicrm_contact_type
 WHERE  parent_id IS NULL
-";
+';
         if ($all === FALSE) {
-          $sql .= " AND is_active = 1";
+          $sql .= ' AND is_active = 1';
         }
 
-        $params = [];
-        $dao = CRM_Core_DAO::executeQuery($sql,
-          $params,
-          FALSE,
-          'CRM_Contact_DAO_ContactType'
-        );
+        $dao = CRM_Core_DAO::executeQuery($sql);
         while ($dao->fetch()) {
           $value = [];
           CRM_Core_DAO::storeValues($dao, $value);
@@ -156,11 +151,10 @@ INNER JOIN civicrm_contact_type parent ON subtype.parent_id = parent.id
 WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
 ";
       if ($all === FALSE) {
-        $sql .= " AND subtype.is_active = 1 AND parent.is_active = 1 ORDER BY parent.id";
+        $sql .= ' AND subtype.is_active = 1 AND parent.is_active = 1 ORDER BY parent.id';
       }
-      $dao = CRM_Core_DAO::executeQuery($sql, [],
-        FALSE, 'CRM_Contact_DAO_ContactType'
-      );
+      $dao = CRM_Core_DAO::executeQuery($sql);
+
       $values = [];
       while ($dao->fetch()) {
         $value = [];
@@ -189,7 +183,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *   a given basic contact type
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
-    if ($columnName == 'name') {
+    if ($columnName === 'name') {
       return array_keys(self::subTypeInfo($contactType, $all, $ignoreCache));
     }
     else {
@@ -259,21 +253,17 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
       if (!$_cache[$argString]) {
         $_cache[$argString] = [];
 
-        $sql = "
+        $sql = '
 SELECT type.*, parent.name as parent, parent.label as parent_label
 FROM      civicrm_contact_type type
 LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id
 WHERE  type.name IS NOT NULL
-";
+';
         if ($all === FALSE) {
-          $sql .= " AND type.is_active = 1";
+          $sql .= ' AND type.is_active = 1';
         }
 
-        $dao = CRM_Core_DAO::executeQuery($sql,
-          [],
-          FALSE,
-          'CRM_Contact_DAO_ContactType'
-        );
+        $dao = CRM_Core_DAO::executeQuery($sql);
         while ($dao->fetch()) {
           $value = [];
           CRM_Core_DAO::storeValues($dao, $value);
@@ -295,8 +285,8 @@ WHERE  type.name IS NOT NULL
    * Retrieve basic type pairs with name as 'built-in name' and 'label' as value.
    *
    * @param bool $all
-   * @param null $typeName
-   * @param null $delimiter
+   * @param string|array $typeName
+   * @param string $delimiter
    *
    * @return array
    *   Array of basictypes with name as 'built-in name' and 'label' as value
@@ -360,13 +350,13 @@ WHERE  type.name IS NOT NULL
       if (!$_cache[$argString]) {
         $_cache[$argString] = [];
 
-        $sql = "
+        $sql = '
 SELECT    c.name as child_name , c.label as child_label , c.id as child_id,
           p.name as parent_name, p.label as parent_label, p.id as parent_id
 FROM      civicrm_contact_type c
 LEFT JOIN civicrm_contact_type p ON ( c.parent_id = p.id )
 WHERE     ( c.name IS NOT NULL )
-";
+';
 
         if ($all === FALSE) {
           $sql .= "
