@@ -1711,6 +1711,32 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Function tets that financial records are correctly added when financial type is changed
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateUpdateContributionWithFeeAmountChangeFinancialType() {
+    $contribParams = [
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2012-01-01',
+      'total_amount' => 100.00,
+      'fee_amount' => 0.57,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+
+    ];
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
+    $newParams = array_merge($contribParams, [
+      'id' => $contribution['id'],
+      'financial_type_id' => 3,
+    ]);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $this->_checkFinancialTrxn($contribution, 'changeFinancial', NULL, ['fee_amount' => '-0.57', 'net_amount' => '-99.43']);
+    $this->_checkFinancialItem($contribution['id'], 'changeFinancial');
+  }
+
+  /**
    * Test that update does not change status id CRM-15105.
    */
   public function testCreateUpdateWithoutChangingPendingStatus() {
@@ -3900,7 +3926,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
           'status_id' => 1,
         ];
       }
-      else {
+      elseif ($context !== 'changeFinancial') {
         $compareParams = [
           'total_amount' => 100,
           'status_id' => 1,
@@ -3915,6 +3941,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       }
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
       $compareParams['total_amount'] = 100;
+      // Reverse the extra params now that we will be checking the new positive transaction.
+      if ($context === 'changeFinancial' && !empty($extraParams)) {
+        foreach ($extraParams as $param => $value) {
+          $extraParams[$param] = 0 - $value;
+        }
+      }
     }
 
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $params, array_merge($compareParams, $extraParams));
