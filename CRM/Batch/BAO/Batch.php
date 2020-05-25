@@ -42,20 +42,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *   $batch batch object
    */
   public static function create(&$params) {
-    $op = 'edit';
-    $batchId = $params['id'] ?? NULL;
-    if (!$batchId) {
-      $op = 'create';
+    if (empty($params['id']) && empty($params['name'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
-    CRM_Utils_Hook::pre($op, 'Batch', $batchId, $params);
-    $batch = new CRM_Batch_DAO_Batch();
-    $batch->copyValues($params);
-    $batch->save();
-
-    CRM_Utils_Hook::post($op, 'Batch', $batch->id, $batch);
-
-    return $batch;
+    return self::writeRecord($params);
   }
 
   /**

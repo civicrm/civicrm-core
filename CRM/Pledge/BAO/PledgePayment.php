@@ -154,31 +154,11 @@ WHERE     pledge_id = %1
    *   pledge payment id
    */
   public static function add($params) {
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'PledgePayment', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'PledgePayment', NULL, $params);
-    }
-
-    $payment = new CRM_Pledge_DAO_PledgePayment();
-    $payment->copyValues($params);
-
     // set currency for CRM-1496
-    if (!isset($payment->currency)) {
-      $payment->currency = CRM_Core_Config::singleton()->defaultCurrency;
+    if (empty($params['id']) && !isset($params['currency'])) {
+      $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
     }
-
-    $result = $payment->save();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'PledgePayment', $payment->id, $payment);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'PledgePayment', $payment->id, $payment);
-    }
-
-    return $result;
+    return self::writeRecord($params);
   }
 
   /**
