@@ -518,6 +518,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ];
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
+    foreach ($financialItems['values'] as $financialItem) {
+      $this->assertEquals(date('Y-m-d H:i:s', strtotime($contribution['values'][$contribution['id']]['receive_date'])), date('Y-m-d H:i:s', strtotime($financialItem['transaction_date'])));
+    }
     $lineItems = $this->callAPISuccess('line_item', 'get', [
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
