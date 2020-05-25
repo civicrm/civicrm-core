@@ -161,29 +161,12 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     //cache contact fields retaining localized titles
     //though we changed localization, so reseting cache.
-    Civi::cache('fields')->flush();
+    Civi::cache('fields')->clear();
 
     //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
-    Civi::cache('navigation')->flush();
+    Civi::cache('navigation')->clear();
     // reset ACL and System caches
     CRM_Core_BAO_Cache::resetCaches();
-
-    // we do this only to initialize monetary decimal point and thousand separator
-    $config = CRM_Core_Config::singleton();
-
-    // save enabled currencies and default currency in option group 'currencies_enabled'
-    // CRM-1496
-    if (empty($values['currencyLimit'])) {
-      $values['currencyLimit'] = [$values['defaultCurrency']];
-    }
-    elseif (!in_array($values['defaultCurrency'], $values['currencyLimit'])) {
-      $values['currencyLimit'][] = $values['defaultCurrency'];
-    }
-
-    self::updateEnabledCurrencies($values['currencyLimit'], $values['defaultCurrency']);
-
-    // unset currencyLimit so we dont store there
-    unset($values['currencyLimit']);
 
     // make the site multi-lang if requested
     if (!empty($values['makeMultilingual'])) {
@@ -213,6 +196,21 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // if we manipulated the language list, return to the localization admin screen
     $return = (bool) (CRM_Utils_Array::value('makeMultilingual', $values) or CRM_Utils_Array::value('addLanguage', $values));
+
+    // Update enabled currencies
+    // we do this only to initialize monetary decimal point and thousand separator
+    $config = CRM_Core_Config::singleton();
+    // save enabled currencies and default currency in option group 'currencies_enabled'
+    // CRM-1496
+    if (empty($values['currencyLimit'])) {
+      $values['currencyLimit'] = [$values['defaultCurrency']];
+    }
+    elseif (!in_array($values['defaultCurrency'], $values['currencyLimit'])) {
+      $values['currencyLimit'][] = $values['defaultCurrency'];
+    }
+    self::updateEnabledCurrencies($values['currencyLimit'], $values['defaultCurrency']);
+    // unset currencyLimit so we dont store there
+    unset($values['currencyLimit']);
 
     $filteredValues = $values;
     unset($filteredValues['makeMultilingual']);
