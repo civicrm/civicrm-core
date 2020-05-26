@@ -178,13 +178,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
     if ($to->getValue()) {
       $this->_toContactIds = $this->_contactIds = [];
       foreach ($this->getEmails($to) as $value) {
-        $contactId = $value['contact_id'];
-        $email = $value['email'];
-        if ($contactId) {
-          $this->_contactIds[] = $this->_toContactIds[] = $contactId;
-          $this->_toContactEmails[] = $email;
-          $this->_allContactIds[] = $contactId;
-        }
+        $this->_contactIds[] = $this->_toContactIds[] = $this->_allContactIds[] = $value['contact_id'];
+        $this->_toContactEmails[] = $value['email'];
       }
     }
 
