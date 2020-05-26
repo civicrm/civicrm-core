@@ -537,20 +537,30 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       if (!empty($this->_params['send_receipt'])) {
         $paymentParams['email'] = $this->_contributorEmail;
       }
-      $paymentParams['is_email_receipt'] = !empty($this->_params['send_receipt']);
 
       $paymentParams['contactID'] = $this->_contributorContactID;
 
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
-      $payment = $this->_paymentProcessor['object'];
-
       if (!empty($this->_params['auto_renew'])) {
-        $contributionRecurParams = $this->processRecurringContribution($paymentParams);
+
+        $contributionRecurParams = $this->processRecurringContribution([
+          'contact_id' => $this->_contributorContactID,
+          'amount' => $this->_params['total_amount'],
+          'contribution_status_id' => 'Pending',
+          'payment_processor_id' => $this->_params['payment_processor_id'],
+          'campaign_id' => $this->_params['campaign_id'],
+          'financial_type_id' => $this->_params['financial_type_id'],
+          'is_email_receipt' => !empty($this->_params['send_receipt']),
+          'payment_instrument_id' => $this->_params['payment_instrument_id'],
+          'invoice_id' => $this->_params['invoice_id'],
+        ], $membershipID = $paymentParams['membership_type_id'][1]);
+
         $contributionRecurID = $contributionRecurParams['contributionRecurID'];
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
       }
 
+      $payment = $this->_paymentProcessor['object'];
       $result = $payment->doPayment($paymentParams);
       $this->_params = array_merge($this->_params, $result);
 
