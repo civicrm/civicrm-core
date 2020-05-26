@@ -61,10 +61,11 @@ class Joiner {
       $target = $link->getTargetTable();
       $alias = $link->getAlias();
       $bao = \CRM_Core_DAO_AllCoreTables::getBAOClassName(\CRM_Core_DAO_AllCoreTables::getClassForTable($target));
-      $conditions = array_merge(
-        $link->getConditionsForJoin($baseTable),
-        $query->getAclClause($alias, $bao, explode('.', $joinPath))
-      );
+      $conditions = $link->getConditionsForJoin($baseTable);
+      // Custom fields do not have a bao, and currently do not have field-specific ACLs
+      if ($bao) {
+        $conditions = array_merge($conditions, $query->getAclClause($alias, $bao, explode('.', $joinPath)));
+      }
 
       $query->join($side, $target, $alias, $conditions);
 
