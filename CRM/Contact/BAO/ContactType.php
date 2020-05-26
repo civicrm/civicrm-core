@@ -82,6 +82,9 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *
    * @return array
    *   Array of basic contact types
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypes($all = FALSE) {
     return array_keys(self::basicTypeInfo($all));
@@ -92,6 +95,8 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param string $key
    *
    * @return array
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypePairs($all = FALSE, $key = 'name') {
     $subtypes = self::basicTypeInfo($all);
@@ -167,7 +172,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *   a given basic contact type
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
-    if ($columnName == 'name') {
+    if ($columnName === 'name') {
       return array_keys(self::subTypeInfo($contactType, $all, $ignoreCache));
     }
     else {
@@ -214,17 +219,12 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * Retrieve info array about all types i.e basic + subtypes.
    *
    * @param bool $all
-   * @param bool $reset
    *
    * @return array
    *   Array of basic types + all subtypes.
    */
-  public static function contactTypeInfo($all = FALSE, $reset = FALSE) {
+  public static function contactTypeInfo($all = FALSE) {
     static $_cache = NULL;
-
-    if ($reset === TRUE) {
-      $_cache = NULL;
-    }
 
     if ($_cache === NULL) {
       $_cache = [];
@@ -237,14 +237,14 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
       if (!$_cache[$argString]) {
         $_cache[$argString] = [];
 
-        $sql = "
+        $sql = '
 SELECT type.*, parent.name as parent, parent.label as parent_label
 FROM      civicrm_contact_type type
 LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id
 WHERE  type.name IS NOT NULL
-";
+';
         if ($all === FALSE) {
-          $sql .= " AND type.is_active = 1";
+          $sql .= ' AND type.is_active = 1';
         }
 
         $dao = CRM_Core_DAO::executeQuery($sql,
@@ -338,19 +338,19 @@ WHERE  type.name IS NOT NULL
       if (!$_cache[$argString]) {
         $_cache[$argString] = [];
 
-        $sql = "
+        $sql = '
 SELECT    c.name as child_name , c.label as child_label , c.id as child_id,
           p.name as parent_name, p.label as parent_label, p.id as parent_id
 FROM      civicrm_contact_type c
 LEFT JOIN civicrm_contact_type p ON ( c.parent_id = p.id )
 WHERE     ( c.name IS NOT NULL )
-";
+';
 
         if ($all === FALSE) {
-          $sql .= "
+          $sql .= '
 AND   c.is_active = 1
 AND   ( p.is_active = 1 OR p.id IS NULL )
-";
+';
         }
         $sql .= " ORDER BY c.id";
 
@@ -575,6 +575,7 @@ WHERE name = %1';
    *   An assoc array of name/value pairs.
    *
    * @return object|void
+   * @throws \CRM_Core_Exception
    */
   public static function add(&$params) {
 
@@ -678,6 +679,7 @@ WHERE name = %1';
    *   Subtype.
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public static function isAllowEdit($contactId, $subType = NULL) {
 
@@ -771,11 +773,12 @@ LIMIT 1";
   }
 
   /**
-   * @todo what does this function do?
    * @param $contactType
    * @param array $subtypeSet
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @todo what does this function do?
    */
   public static function getSubtypeCustomPair($contactType, $subtypeSet = []) {
     if (empty($subtypeSet)) {
@@ -788,9 +791,9 @@ LIMIT 1";
       $subtype = CRM_Core_DAO::VALUE_SEPARATOR . $subtype . CRM_Core_DAO::VALUE_SEPARATOR;
       $subTypeClause[] = "extends_entity_column_value LIKE '%{$subtype}%' ";
     }
-    $query = "SELECT table_name
+    $query = 'SELECT table_name
 FROM civicrm_custom_group
-WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
+WHERE extends = %1 AND ' . implode(" OR ", $subTypeClause);
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$contactType, 'String']]);
     while ($dao->fetch()) {
       $customSet[] = $dao->table_name;
