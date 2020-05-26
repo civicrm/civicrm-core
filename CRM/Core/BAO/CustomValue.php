@@ -206,4 +206,16 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     );
   }
 
+  /**
+   * ACL clause for an APIv4 custom pseudo-entity (aka multi-record custom group extending Contact).
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    $clauses = [
+      'entity_id' => CRM_Utils_SQL::mergeSubquery('Contact'),
+    ];
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
 }

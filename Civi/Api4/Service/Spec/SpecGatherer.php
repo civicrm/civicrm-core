@@ -138,6 +138,7 @@ class SpecGatherer {
    */
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
     $customFields = CustomField::get()
+      ->setCheckPermissions(FALSE)
       ->addWhere('custom_group.name', '=', $customGroup)
       ->setSelect(['custom_group.name', 'custom_group.table_name', '*'])
       ->execute();

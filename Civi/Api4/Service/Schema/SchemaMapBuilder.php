@@ -110,10 +110,13 @@ class SchemaMapBuilder {
       foreach ($table->getTableLinks() as $link) {
         $target = $map->getTableByName($link->getTargetTable());
         $tableName = $link->getBaseTable();
-        $plural = str_replace('civicrm_', '', $this->getPlural($tableName));
-        $joinable = new Joinable($tableName, $link->getBaseColumn(), $plural);
-        $joinable->setJoinType($joinable::JOIN_TYPE_ONE_TO_MANY);
-        $target->addTableLink($link->getTargetColumn(), $joinable);
+        // Exclude custom field tables
+        if (strpos($link->getTargetTable(), 'civicrm_value_') !== 0) {
+          $plural = str_replace('civicrm_', '', $this->getPlural($tableName));
+          $joinable = new Joinable($tableName, $link->getBaseColumn(), $plural);
+          $joinable->setJoinType($joinable::JOIN_TYPE_ONE_TO_MANY);
+          $target->addTableLink($link->getTargetColumn(), $joinable);
+        }
       }
     }
   }
@@ -178,6 +181,12 @@ class SchemaMapBuilder {
       $links[$alias]['tableName'] = $tableName;
       $links[$alias]['isMultiple'] = !empty($fieldData->is_multiple);
       $links[$alias]['columns'][$fieldData->name] = $fieldData->column_name;
+
+      // Add backreference
+      if (!empty($fieldData->is_multiple)) {
+        $joinable = new Joinable($baseTable->getName(), 'id', AllCoreTables::convertEntityNameToLower($entity));
+        $customTable->addTableLink('entity_id', $joinable);
+      }
     }
 
     foreach ($links as $alias => $link) {
