@@ -177,15 +177,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     if ($to->getValue()) {
       $this->_toContactIds = $this->_contactIds = [];
-    }
-    $setDefaults = TRUE;
-    if (property_exists($this, '_context') && $this->_context === 'standalone') {
-      $setDefaults = FALSE;
-    }
-
-    $this->_allContactIds = $this->_toContactIds = $this->_contactIds;
-
-    if ($to->getValue()) {
       foreach ($this->getEmails($to) as $value) {
         $contactId = $value['contact_id'];
         $email = $value['email'];
@@ -195,7 +186,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
           $this->_allContactIds[] = $contactId;
         }
       }
-      $setDefaults = TRUE;
     }
 
     //get the group of contacts as per selected by user in case of Find Activities
@@ -205,7 +195,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     // check if we need to setdefaults and check for valid contact emails / communication preferences
-    if (is_array($this->_allContactIds) && $setDefaults) {
+    if (!empty($this->_allContactIds)) {
       // get the details for all selected contacts ( to, cc and bcc contacts )
       $allContactDetails = civicrm_api3('Contact', 'get', [
         'id' => ['IN' => $this->_allContactIds],
