@@ -10,14 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * Business objects for managing price fields.
  *
  */
