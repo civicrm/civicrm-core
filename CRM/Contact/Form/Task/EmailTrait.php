@@ -80,6 +80,15 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $contactEmails = [];
 
   /**
+   * Contacts form whom emails could not be sent.
+   *
+   * An array of contact ids and the relevant message details.
+   *
+   * @var array
+   */
+  protected $suppressedEmails = [];
+
+  /**
    * Getter for isSearchContext.
    *
    * @return bool
@@ -208,31 +217,24 @@ trait CRM_Contact_Form_Task_EmailTrait {
       ];
 
       // get the details for all selected contacts ( to, cc and bcc contacts )
-      list($this->_contactDetails) = CRM_Utils_Token::getTokenDetails($this->_allContactIds,
+      list($this->_allContactDetails) = CRM_Utils_Token::getTokenDetails($this->_allContactIds,
         $returnProperties,
         FALSE,
         FALSE
       );
 
-      // make a copy of all contact details
-      $this->_allContactDetails = $this->_contactDetails;
-
       // perform all validations on unique contact Ids
       foreach (array_unique($this->_allContactIds) as $key => $contactId) {
-        $value = $this->_contactDetails[$contactId];
+        $value = $this->_allContactDetails[$contactId];
         if ($value['do_not_email'] || empty($value['email']) || !empty($value['is_deceased']) || $value['on_hold']) {
-          $suppressedEmails++;
-
-          // unset contact details for contacts that we won't be sending email. This is prevent extra computation
-          // during token evaluation etc.
-          unset($this->_contactDetails[$contactId]);
+          $this->setSuppressedEmail($contactId, $value);
         }
         else {
           $email = $value['email'];
 
           // build array's which are used to setdefaults
           if (in_array($contactId, $this->_toContactIds)) {
-            $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId];
+            $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId] = $this->_allContactDetails[$contactId];
             // If a particular address has been specified as the default, use that instead of contact's primary email
             if (!empty($this->_toEmail) && $this->_toEmail['contact_id'] == $contactId) {
               $email = $this->_toEmail['email'];
@@ -252,7 +254,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $this->assign('toContact', json_encode($toArray));
 
-    $this->assign('suppressedEmails', $suppressedEmails);
+    $this->assign('suppressedEmails', count($this->suppressedEmails));
 
     $this->assign('totalSelectedContacts', count($this->_contactIds));
 
@@ -494,23 +496,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
       ]) . $followupStatus, ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $count_success]), 'success');
     }
 
-    // Display the name and number of contacts for those email is not sent.
-    // php 5.4 throws out a notice since the values of these below arrays are arrays.
-    // the behavior is not documented in the php manual, but it does the right thing
-    // suppressing the notices to get things in good shape going forward
-    $emailsNotSent = @array_diff_assoc($this->_allContactDetails, $this->_contactDetails);
-
-    if ($emailsNotSent) {
-      $not_sent = [];
-      foreach ($emailsNotSent as $contactId => $values) {
-        $displayName = $values['display_name'];
-        $email = $values['email'];
-        $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contactId");
-        $not_sent[] = "<a href='$contactViewUrl' title='$email'>$displayName</a>" . ($values['on_hold'] ? '(' . ts('on hold') . ')' : '');
-      }
-      $status = '(' . ts('because no email address on file or communication preferences specify DO NOT EMAIL or Contact is deceased or Primary email address is On Hold') . ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
+    if (!empty($this->suppressedEmails)) {
+      $status = '(' . ts('because no email address on file or communication preferences specify DO NOT EMAIL or Contact is deceased or Primary email address is On Hold') . ')<ul><li>' . implode('</li><li>', $this->suppressedEmails) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', [
-        'count' => count($emailsNotSent),
+        'count' => count($this->suppressedEmails),
         'plural' => '%count Messages Not Sent',
       ]), 'info');
     }
@@ -631,6 +620,17 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $urlString .= "<a href='{$contactURL}'>" . $this->contactEmails[$email]['contact.display_name'] . '</a>';
     }
     return $urlString;
+  }
+
+  /**
+   * Set the emails that are not to be sent out.
+   *
+   * @param int $contactID
+   * @param array $values
+   */
+  protected function setSuppressedEmail($contactID, $values) {
+    $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $contactID);
+    $this->suppressedEmails[$contactID] = "<a href='$contactViewUrl' title='{$values['email']}'>{$values['display_name']}</a>" . ($values['on_hold'] ? '(' . ts('on hold') . ')' : '');
   }
 
 }
