@@ -37,6 +37,7 @@
     <title>Name</title>
     <length>255</length>
     <comment>Price field option name</comment>
+    <required>true</required>
     <html>
       <type>Text</type>
     </html>
@@ -49,6 +50,7 @@
     <length>255</length>
     <localizable>true</localizable>
     <comment>Price field option label</comment>
+    <required>true</required>
     <html>
       <type>Text</type>
     </html>

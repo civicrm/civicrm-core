@@ -61,7 +61,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       return NULL;
     }
     if (!$id && empty($params['name'])) {
-      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
+      $params['name'] = strtolower(CRM_Utils_String::munge(($params['label'] ?? '_'), '_', 242));
     }
 
     if ($id && !empty($params['weight'])) {
@@ -76,13 +76,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $fieldValues = ['price_field_id' => CRM_Utils_Array::value('price_field_id', $params, 0)];
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
-    else {
-      if (!$id) {
-        CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-        if (empty($params['name'])) {
-          $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
-        }
-      }
+    elseif (!$id) {
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
     }
 
     $financialType = $params['financial_type_id'] ?? NULL;
