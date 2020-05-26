@@ -236,7 +236,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
         }
       }
 
-      if (empty($toArray)) {
+      if (empty($this->_toContactDetails)) {
         CRM_Core_Error::statusBounce(ts('Selected contact(s) do not have a valid email address, or communication preferences specify DO NOT EMAIL, or they are deceased or Primary email address is On Hold.'));
       }
     }
