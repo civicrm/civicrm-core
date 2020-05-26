@@ -227,9 +227,11 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param mixed $prop Valid property name
    * @param string $label e.g. 'default'
+   *
+   * @return mixed
    */
   protected function get($prop, $label) {
-    if (isset($this->props['default'][$prop])) {
+    if (array_key_exists($prop, $this->props['default'])) {
       return $this->props[$label][$prop];
     }
     throw new \BadMethodCallException("Property '$prop' has not been set.");
@@ -599,11 +601,13 @@ class PropertyBag implements \ArrayAccess {
   /**
    * @param int $contributionRecurID
    * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
    */
   public function setContributionRecurID($contributionRecurID, $label = 'default') {
     // We don't use this because it counts zero as positive: CRM_Utils_Type::validate($contactID, 'Positive');
     if (!($contributionRecurID > 0)) {
-      throw new InvalidArgumentException("ContributionRecurID must be a positive integer");
+      throw new InvalidArgumentException('ContributionRecurID must be a positive integer');
     }
 
     return $this->set('contributionRecurID', $label, (int) $contributionRecurID);
@@ -916,7 +920,9 @@ class PropertyBag implements \ArrayAccess {
    * Nb. this is stored in civicrm_contribution_recur.processor_id and is NOT
    * in any way related to the payment processor ID.
    *
-   * @return string
+   * @param string $label
+   *
+   * @return string|null
    */
   public function getRecurProcessorID($label = 'default') {
     return $this->get('recurProcessorID', $label);
@@ -926,12 +932,20 @@ class PropertyBag implements \ArrayAccess {
    * Set the unique payment processor service provided ID for a particular
    * subscription.
    *
-   * @param string $input
+   * See https://github.com/civicrm/civicrm-core/pull/17292 for discussion
+   * of how this function accepting NULL fits with standard / planned behaviour.
+   *
+   * @param string|null $input
    * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
    */
   public function setRecurProcessorID($input, $label = 'default') {
-    if (empty($input) || strlen($input) > 255) {
-      throw new \InvalidArgumentException("processorID field has max length of 255");
+    if ($input === '') {
+      $input = NULL;
+    }
+    if (strlen($input) > 255 || in_array($input, [FALSE, 0], TRUE)) {
+      throw new \InvalidArgumentException('processorID field has max length of 255');
     }
     return $this->set('recurProcessorID', $label, $input);
   }
