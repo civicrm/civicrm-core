@@ -397,7 +397,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // If we have had a contact email used here the value returned from the line above will be the
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>
     $from = CRM_Utils_Mail::formatFromAddress($from);
-    $subject = $formValues['subject'];
 
     $ccArray = $formValues['cc_id'] ? explode(',', $formValues['cc_id']) : [];
     $cc = $this->getEmailString($ccArray);
@@ -406,12 +405,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $bccArray = $formValues['bcc_id'] ? explode(',', $formValues['bcc_id']) : [];
     $bcc = $this->getEmailString($bccArray);
     $additionalDetails .= empty($bccArray) ? '' : "\nbcc : " . $this->getEmailUrlString($bccArray);
-
-    // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
-    if (isset($this->_caseId) && is_numeric($this->_caseId)) {
-      $hash = substr(sha1(CIVICRM_SITE_KEY . $this->_caseId), 0, 7);
-      $subject = "[case #$hash] $subject";
-    }
 
     // format contact details array to handle multiple emails from same contact
     $formattedContactDetails = [];
@@ -438,7 +431,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // send the mail
     list($sent, $activityId) = CRM_Activity_BAO_Activity::sendEmail(
       $formattedContactDetails,
-      $subject,
+      $this->getSubject($formValues['subject']),
       $formValues['text_message'],
       $formValues['html_message'],
       NULL,
@@ -641,6 +634,24 @@ trait CRM_Contact_Form_Task_EmailTrait {
       NULL, NULL
     );
     return $attachments;
+  }
+
+  /**
+   * Get the subject for the message.
+   *
+   * The case handling should possibly be on the case form.....
+   *
+   * @param string $subject
+   *
+   * @return string
+   */
+  protected function getSubject(string $subject):string {
+    // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
+    if (isset($this->_caseId) && is_numeric($this->_caseId)) {
+      $hash = substr(sha1(CIVICRM_SITE_KEY . $this->_caseId), 0, 7);
+      $subject = "[case #$hash] $subject";
+    }
+    return $subject;
   }
 
 }
