@@ -1158,9 +1158,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
 
     // create a logged in USER since the code references it for sendEmail user.
-    $this->createLoggedInUser();
-    $session = CRM_Core_Session::singleton();
-    $loggedInUser = $session->get('userID');
+    $loggedInUser = $this->createLoggedInUser();
 
     $contact = $this->civicrm_api('contact', 'getsingle', ['id' => $contactId, 'version' => $this->_apiversion]);
     $contactDetailsIntersectKeys = [
