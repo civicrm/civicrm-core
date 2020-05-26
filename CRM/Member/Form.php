@@ -356,27 +356,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   /**
    * Create a recurring contribution record.
    *
-   * Recurring contribution parameters are set explicitly rather than merging paymentParams because it's hard
-   * to know the downstream impacts if we keep passing around the same array.
+   * @param array $contributionRecurParams
    *
-   * @param $paymentParams
+   * @param int $membershipID
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  protected function processRecurringContribution($paymentParams) {
-    $membershipID = $paymentParams['membership_type_id'][1];
-    $contributionRecurParams = [
-      'contact_id' => $paymentParams['contactID'],
-      'amount' => $paymentParams['total_amount'],
-      'contribution_status_id' => 'Pending',
-      'payment_processor_id' => $paymentParams['payment_processor_id'],
-      'campaign_id' => $paymentParams['campaign_id'],
-      'financial_type_id' => $paymentParams['financial_type_id'],
-      'is_email_receipt' => $paymentParams['is_email_receipt'],
-      'payment_instrument_id' => $paymentParams['payment_instrument_id'],
-      'invoice_id' => $paymentParams['invoice_id'],
-    ];
+  protected function processRecurringContribution($contributionRecurParams, $membershipID) {
 
     $mapping = [
       'frequency_interval' => 'duration_interval',
