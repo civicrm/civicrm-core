@@ -227,17 +227,15 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $component->id = $mailing->reply_id;
     $component->find(TRUE);
 
-    $message = new Mail_Mime("\n");
-
     $domain = CRM_Core_BAO_Domain::getDomain();
     list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $headers = [
-      'Subject' => $component->subject,
-      'To' => $to,
-      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
-      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+    $params = [
+      'subject' => $component->subject,
+      'toEmail' => $to,
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     ];
 
     // TODO: do we need reply tokens?
@@ -257,24 +255,19 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     if ($eq->format == 'HTML' || $eq->format == 'Both') {
       $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
       $html = CRM_Utils_Token::replaceMailingTokens($html, $mailing, NULL, $tokens['html']);
-      $message->setHTMLBody($html);
     }
     if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
       $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceMailingTokens($text, $mailing, NULL, $tokens['text']);
-      $message->setTxtBody($text);
     }
+    $params['html'] = $html;
+    $params['text'] = $text;
 
-    $b = CRM_Utils_Mail::setMimeParams($message);
-    $h = $message->headers($headers);
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'a', $eq->job_id, queue_id, $eq->hash);
-
-    $mailer = \Civi::service('pear_mail');
-    if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($to, $h, $b);
-      unset($errorScope);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', $eq->job_id, queue_id, $eq->hash);
+    if (CRM_Core_BAO_MailSettings::includeMessageId()) {
+      $params['messageId'] = $params['Message-ID'];
     }
+    CRM_Utils_Mail::send($params);
   }
 
   /**
