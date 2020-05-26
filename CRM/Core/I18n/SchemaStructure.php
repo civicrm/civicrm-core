@@ -585,6 +585,7 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_price_field_value' => [
           'label' => [
             'type' => "Text",
+            'required' => "true",
           ],
           'description' => [
             'type' => "TextArea",
