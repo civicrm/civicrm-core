@@ -464,6 +464,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
     ]);
+    $group = $this->callAPISuccess('CustomGroup', 'getsingle', ['id' => $ids['custom_group_id']]);
+    $field = $this->callAPISuccess('CustomField', 'getsingle', ['id' => $ids['custom_field_id']]);
+    $contribution = \Civi\Api4\Contribution::get()
+      ->setSelect([
+        'id',
+        'total_amount',
+        $group['name'] . '.' . $field['name'],
+      ])
+      ->addWhere('id', '=', $result['id'])
+      ->execute()
+      ->first();
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
     $this->assertEquals('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
