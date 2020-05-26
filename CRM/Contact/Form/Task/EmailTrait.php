@@ -148,8 +148,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $this->assign('suppressForm', FALSE);
     $this->assign('emailTask', TRUE);
 
-    $toArray = [];
-    $suppressedEmails = 0;
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $this->get('cid');
     if ($cid) {
@@ -160,10 +158,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
     $this->bounceIfSimpleMailLimitExceeded(count($this->_contactIds));
 
-    $emailAttributes = [
+    $to = $this->addEntityRef('to_id', ts('To'), [
+      'entity' => 'Email',
       'class' => 'huge',
-    ];
-    $to = $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
+      'multiple' => TRUE,
+    ]);
 
     $this->addEntityRef('cc_id', ts('CC'), [
       'entity' => 'Email',
@@ -214,10 +213,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
         }
         elseif (in_array($contactId, $this->_toContactIds)) {
           $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId] = $value;
-          $toArray[] = [
-            'text' => '"' . $value['sort_name'] . '" <' . $value['email'] . '>',
-            'id' => "$contactId::{$value['email']}",
-          ];
         }
       }
 
@@ -225,8 +220,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
         CRM_Core_Error::statusBounce(ts('Selected contact(s) do not have a valid email address, or communication preferences specify DO NOT EMAIL, or they are deceased or Primary email address is On Hold.'));
       }
     }
-
-    $this->assign('toContact', json_encode($toArray));
 
     $this->assign('suppressedEmails', count($this->suppressedEmails));
 
@@ -492,16 +485,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * @param HTML_QuickForm_Element $element
    *
-   * @return array
+   * @return \Civi\Api4\Generic\Result
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function getEmails($element): array {
+  protected function getEmails($element) {
     $allEmails = explode(',', $element->getValue());
-    $return = [];
-    foreach ($allEmails as $value) {
-      $values = explode('::', $value);
-      $return[] = ['contact_id' => $values[0], 'email' => $values[1]];
-    }
-    return $return;
+    return Email::get()->setSelect(['contact_id', 'email'])->addWhere('id', 'IN', $allEmails)->execute();
   }
 
   /**

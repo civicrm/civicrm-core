@@ -21,9 +21,9 @@
     <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin logged_in_email_setting=$logged_in_email_setting}</td>
   </tr>
     <tr class="crm-contactEmail-form-block-recipient">
-       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
+       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to_id.label}{/if}</td>
        <td>
-         {$form.to.html}
+         {$form.to_id.html}
        </td>
     </tr>
     <tr class="crm-contactEmail-form-block-cc_id" {if !$form.cc_id.value}style="display:none;"{/if}>
@@ -101,33 +101,6 @@ CRM.$(function($) {
     $('.crm-contactEmail-form-block-'+type, $form).hide().find('input.crm-ajax-select').select2('data', []);
   });
 
-  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
-
-  function emailSelect(el, prepopulate) {
-    $(el, $form).data('api-entity', 'contact').css({width: '40em', 'max-width': '90%'}).crmSelect2({
-      minimumInputLength: 1,
-      multiple: true,
-      ajax: {
-        url: sourceDataUrl,
-        data: function(term) {
-          return {
-            name: term
-          };
-        },
-        results: function(response) {
-          return {
-            results: response
-          };
-        }
-      }
-    }).select2('data', prepopulate);
-  }
-
-  {/literal}
-  var toContact = {if $toContact}{$toContact}{else}''{/if},
-    ccContact = {if $ccContact}{$ccContact}{else}''{/if};
-  {literal}
-  emailSelect('#to', toContact);
 });
 
 
