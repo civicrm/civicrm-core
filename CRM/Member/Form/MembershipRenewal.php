@@ -538,9 +538,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $paymentParams['email'] = $this->_contributorEmail;
       }
 
-      $paymentParams['contactID'] = $this->_contributorContactID;
-
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
+
+      $paymentPropertyBag = new \Civi\Payment\PropertyBag();
+      // @todo - ideally we would instantiate this early on and not use the merge function.
+      // but we need to sort out
+      // a few ambiguities like email being set above AND in CRM_Core_Payment_Form::mapParams
+      // & determine the outcome of that.
+      $paymentPropertyBag->mergeLegacyInputParams($paymentParams);
+      $paymentPropertyBag->setContactID($this->_contributorContactID);
 
       if (!empty($this->_params['auto_renew'])) {
 
@@ -556,12 +562,14 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'invoice_id' => $this->_params['invoice_id'],
         ], $membershipID = $paymentParams['membership_type_id'][1]);
 
-        $contributionRecurID = $contributionRecurParams['contributionRecurID'];
-        $paymentParams = array_merge($paymentParams, $contributionRecurParams);
+        $contributionRecurID = (int) $contributionRecurParams['contributionRecurID'];
+        $paymentPropertyBag->setContributionRecurID($contributionRecurID);
+        $paymentPropertyBag->setRecurFrequencyUnit($contributionRecurParams['frequency_unit']);
+        $paymentPropertyBag->setRecurFrequencyInterval((int) $contributionRecurParams['frequency_interval']);
       }
 
       $payment = $this->_paymentProcessor['object'];
-      $result = $payment->doPayment($paymentParams);
+      $result = $payment->doPayment($paymentPropertyBag);
       $this->_params = array_merge($this->_params, $result);
 
       $this->_params['contribution_status_id'] = $result['payment_status_id'];
