@@ -9,17 +9,11 @@ use Civi\Test\TransactionalInterface;
  */
 class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
+  /**
+   * @return \Civi\Test\CiviEnvBuilder
+   */
   public function setUpHeadless() {
     return \Civi\Test::headless()->apply();
-  }
-
-  protected function setUp() {
-    parent::setUp();
-    // $this->useTransaction(TRUE);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
   }
 
   /**
@@ -87,6 +81,18 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $localPropertyBag = new PropertyBag();
     $localPropertyBag->mergeLegacyInputParams(['email-' . \CRM_Core_BAO_LocationType::getBilling() => 'a@b.com']);
     $this->assertEquals('a@b.com', $localPropertyBag->getEmail());
+  }
+
+  /**
+   * Test that null is valid for recurring contribution ID.
+   *
+   * See https://github.com/civicrm/civicrm-core/pull/17292
+   */
+  public function testRecurProcessorIDNull() {
+    $bag = new PropertyBag();
+    $bag->setRecurProcessorID(NULL);
+    $value = $bag->getRecurProcessorID();
+    $this->assertNull($value);
   }
 
   /**
@@ -244,7 +250,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ['paymentToken', [], $valid_strings, []],
       ['recurFrequencyInterval', ['frequency_interval'], $valid_ints, $invalid_ints],
       ['recurFrequencyUnit', [], [['month', 'month'], ['day', 'day'], ['year', 'year']], ['', NULL, 0]],
-      ['recurProcessorID', [], [['foo', 'foo']], [str_repeat('x', 256), NULL, '', 0]],
+      ['recurProcessorID', [], [['foo', 'foo']], [str_repeat('x', 256)]],
       ['transactionID', ['transaction_id'], $valid_strings, []],
       ['trxnResultCode', [], $valid_strings, []],
     ];
