@@ -89,6 +89,10 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
       $form->_contactIds[$contactID] = $contactID;
       $form->_toContactEmails[$this->callAPISuccessGetValue('Email', ['return' => 'id', 'email' => $email])] = $email;
     }
+    $deceasedContactID = $this->individualCreate(['is_deceased' => 1, 'email' => 'dead@example.com']);
+    $form->_contactIds[$deceasedContactID] = $deceasedContactID;
+    $form->_toContactEmails[$this->callAPISuccessGetValue('Email', ['return' => 'id', 'email' => 'dead@example.com'])] = 'dead@example.com';
+
     $loggedInEmail = $this->callAPISuccess('Email', 'create', [
       'email' => 'mickey@mouse.com',
       'location_type_id' => 1,
@@ -119,6 +123,20 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     $bccUrl1 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $bcc1], TRUE);
     $bccUrl2 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $bcc2], TRUE);
     $this->assertContains("bcc : <a href='" . $bccUrl1 . "'>Mr. Anthony Anderson II</a><a href='" . $bccUrl2 . "'>Mr. Anthony Anderson II</a>", $activity['details']);
+    $this->assertEquals([
+      [
+        'text' => '27 messages were sent successfully. ',
+        'title' => 'Messages Sent',
+        'type' => 'success',
+        'options' => NULL,
+      ],
+      [
+        'text' => '(because no email address on file or communication preferences specify DO NOT EMAIL or Contact is deceased or Primary email address is On Hold)<ul><li><a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $deceasedContactID . '" title="dead@example.com">Mr. Anthony Anderson II</a></li></ul>',
+        'title' => 'One Message Not Sent',
+        'type' => 'info',
+        'options' => NULL,
+      ],
+    ], CRM_Core_Session::singleton()->getStatus());
   }
 
 }
