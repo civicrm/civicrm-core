@@ -764,9 +764,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   /**
    * Build chart.
    *
-   * @param array $rows
+   * @param array $original_rows
    */
-  public function buildChart(&$rows) {
+  public function buildChart(&$original_rows) {
     $graphRows = [];
 
     if (!empty($this->_params['charts'])) {
@@ -774,6 +774,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
         $contrib = !empty($this->_params['fields']['total_amount']);
         $softContrib = !empty($this->_params['fields']['soft_amount']);
+
+        // Make a copy so that we don't affect what gets passed later to hooks etc.
+        $rows = $original_rows;
+        if ($this->_rollup) {
+          // Remove the total row otherwise it overwrites the real last month's data since it has the
+          // same date.
+          array_pop($rows);
+        }
 
         foreach ($rows as $key => $row) {
           if ($row['civicrm_contribution_receive_date_subtotal']) {
